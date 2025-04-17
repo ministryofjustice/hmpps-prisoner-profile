@@ -1,9 +1,10 @@
 import { stubFor } from './wiremock'
 import { communityManagerMock } from '../../server/data/localMockData/communityManagerMock'
 import { mockProbationDocumentsResponse } from '../../server/data/localMockData/deliusApi/probationDocuments'
+import CommunityManager from '../../server/data/interfaces/deliusApi/CommunityManager'
 
 export default {
-  stubGetCommunityManager: () => {
+  stubGetCommunityManager: (resp: CommunityManager = communityManagerMock) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -14,7 +15,26 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: communityManagerMock,
+        jsonBody: resp,
+      },
+    })
+  },
+
+  stubGetCommunityManagerNotFound: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/delius/probation-cases/G6123VU/community-manager`,
+      },
+      response: {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          errorMessage: 'Not found',
+          httpStatusCode: 404,
+        },
       },
     })
   },

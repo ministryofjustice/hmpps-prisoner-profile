@@ -1,5 +1,5 @@
-import { CaseNote } from '../../interfaces/caseNotesApi/caseNote'
-import { PagedList } from '../../interfaces/prisonApi/pagedList'
+import PagedList from '../interfaces/prisonApi/PagedList'
+import CaseNote from '../interfaces/caseNotesApi/CaseNote'
 
 export const pagedCaseNotesMock: PagedList<CaseNote> = {
   content: [
@@ -57,7 +57,7 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
       creationDateTime: '2023-03-23T15:33:34.095823303',
       occurrenceDateTime: '2023-03-23T15:33:33',
       authorName: 'Bull, Dom',
-      authorUserId: '485572',
+      authorUserId: 'USER1',
       text: 'Moved by Dom - sorry John! ;-)',
       locationId: 'MDI',
       eventId: 47022448,
@@ -75,7 +75,7 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
       creationDateTime: '2023-02-21T12:25:01.924585542',
       occurrenceDateTime: '2023-02-21T12:24:00',
       authorName: 'Heath, Harry',
-      authorUserId: '485802',
+      authorUserId: '999999',
       text: 'John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today.',
       locationId: 'MDI',
       eventId: 47020236,

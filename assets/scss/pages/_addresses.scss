@@ -1,0 +1,18 @@
+.address-metadata {
+  border-top: 1px solid $govuk-border-colour;
+  padding-top: 15px;
+  font-size: 16px;
+  font-weight: 300;
+  color: $govuk-secondary-text-colour;
+}
+
+.address-section-divider {
+  padding-bottom: 30px;
+  border-bottom: 3px solid $govuk-border-colour;
+}
+
+.address-cards {
+  .govuk-summary-list__key {
+    width: 30%;
+  }
+}

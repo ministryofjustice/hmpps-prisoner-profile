@@ -1,4 +1,4 @@
-import { CaseNoteUsage } from '../../interfaces/prisonApi/caseNoteUsage'
+import { CaseNoteUsage } from '../interfaces/prisonApi/CaseNote'
 
 export const caseNoteUsageMock: CaseNoteUsage[] = [
   {

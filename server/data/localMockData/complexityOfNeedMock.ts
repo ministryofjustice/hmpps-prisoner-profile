@@ -1,4 +1,4 @@
-import { ComplexityLevel, ComplexityOfNeed } from '../../interfaces/complexityApi/complexityOfNeed'
+import ComplexityOfNeed, { ComplexityLevel } from '../interfaces/complexityApi/ComplexityOfNeed'
 
 export const complexityOfNeedHighMock: ComplexityOfNeed = {
   offenderNo: 'G6123VU',

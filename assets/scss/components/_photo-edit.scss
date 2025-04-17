@@ -1,0 +1,51 @@
+.hmpps-photo-upload {
+  &__upload {
+    display: block;
+  }
+
+  &__preview {
+    border: 1px solid $govuk-border-colour;
+    display: none;
+    gap: 20px;
+    padding: 14px 15px;
+    width: 100%;
+  }
+
+  &__photo {
+    width: 120px;
+    min-width: 120px;
+  }
+
+  &__file-name {
+    // Prevents overflowing the container due to flexbox
+    min-width: 0;
+  }
+
+  &__change {
+    margin-left: auto;
+  }
+}
+
+.hmpps-photo-container {
+  @include govuk-responsive-padding(2);
+  border: 1px solid $govuk-border-colour;
+  display: flex;
+  width: 100%;
+
+  &__photo {
+    img {
+      max-width: 250px;
+    }
+  }
+
+  &__photo-preview {
+    img {
+      width: 427px;
+      height: 570px;
+    }
+  }
+}
+
+.hmpps-withheld-photo {
+  width: 170px;
+}

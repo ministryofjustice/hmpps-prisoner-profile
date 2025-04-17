@@ -4,27 +4,32 @@
 {% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Add more details to a case note' %}
 {% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ miniBanner(miniBannerData) }}
+        </div>
+    </div>
 
     {% if errors.length > 0 %}
         {{ govukErrorSummary({
             titleText: "There is a problem",
             errorList: errors,
-            attributes: { 'data-qa-errors': true }
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
         })}}
     {% endif %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 id="updateCaseNoteHeader">Add more details to {{ prisonerDisplayName | apostrophe }} case note</h1>
+        <h1 id="updateCaseNoteHeader" class="govuk-!-margin-top-0">Add more details to {{ prisonerDisplayName | apostrophe }} case note</h1>
     </div>
 </div>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
-        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
-
         {% if maxLength < 1 %}
             {{ govukWarningText({
                 text: "You cannot add more details to this case note because it has reached the character limit. You’ll need to add a new case note to add more details.",

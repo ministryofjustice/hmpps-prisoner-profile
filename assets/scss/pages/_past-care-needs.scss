@@ -1,0 +1,12 @@
+.past-care-needs-list {
+  .govuk-summary-list__row:first-of-type {
+    border-top: 1px solid $govuk-border-colour;
+  }
+
+  .govuk-summary-list__key {
+    width: 30%;
+  }
+  .govuk-summary-list__row > .govuk-summary-list__value {
+    padding-right: 24%;
+  }
+}

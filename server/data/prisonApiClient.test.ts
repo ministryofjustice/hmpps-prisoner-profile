@@ -15,8 +15,6 @@ import { CaseNotesByTypeA } from './localMockData/caseNotes'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
 import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import { CourtCasesMock } from './localMockData/courtCaseMock'
 import { OffenceHistoryMock } from './localMockData/offenceHistoryMock'
@@ -25,35 +23,31 @@ import { mockAddresses } from './localMockData/addresses'
 import { mockOffenderContacts } from './localMockData/offenderContacts'
 import { mockReferenceDomains } from './localMockData/referenceDomains'
 import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments'
-import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+import { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
-import { AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
-import { alertTypesMock } from './localMockData/alertTypesMock'
 import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
 import { MovementType } from './enums/movementType'
 import movementsMock from './localMockData/movementsData'
-import { locationsMock } from './localMockData/locationsMock'
 import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
 import { GetDetailsMock } from './localMockData/getDetailsMock'
-import { GetAttributesForLocation } from './localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
-import { alertDetailsMock } from './localMockData/alertDetailsMock'
 import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
-
-jest.mock('./tokenStore')
+import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
+import { visitPrisonsMock } from './localMockData/visitPrisons'
+import { imageDetailListMock, imageDetailMock } from './localMockData/imageMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -76,9 +70,6 @@ describe('prisonApiClient', () => {
   }
   const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
     fakePrisonApi.post(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
-  }
-  const mockSuccessfulPrisonApiPut = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
-    fakePrisonApi.put(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
   describe('getCaseLoads', () => {
@@ -163,7 +154,7 @@ describe('prisonApiClient', () => {
 
   describe('getCaseNoteSummaryByTypes', () => {
     it('Should return data from the API', async () => {
-      const params = { type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' }
+      const params = { type: 'KA', subType: 'KS', numMonths: 38, bookingId: 1102484 }
       fakePrisonApi
         .get(`/api/case-notes/summary?${mapToQueryString(params)}`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
@@ -200,20 +191,6 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/secondary-languages`, secondaryLanguagesMock)
       const output = await prisonApiClient.getSecondaryLanguages(bookingId)
       expect(output).toEqual(secondaryLanguagesMock)
-    })
-  })
-
-  describe('getAlerts', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
-      mockSuccessfulPrisonApiCall(
-        `/api/bookings/${bookingId}/alerts/v2?size=20&alertStatus=ACTIVE`,
-        pagedActiveAlertsMock,
-      )
-
-      const output = await prisonApiClient.getAlerts(bookingId, queryParams)
-      expect(output).toEqual(pagedActiveAlertsMock)
     })
   })
 
@@ -287,9 +264,12 @@ describe('prisonApiClient', () => {
     it.each([ReferenceCodeDomain.Health, ReferenceCodeDomain.HealthTreatments])(
       'Should return data from the API',
       async (domain: ReferenceCodeDomain) => {
-        mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/${domain}`, mockReferenceDomains.health)
+        mockSuccessfulPrisonApiCall(
+          `/api/reference-domains/domains/${domain}`,
+          mockReferenceDomains(ReferenceCodeDomain.Health),
+        )
         const output = await prisonApiClient.getReferenceCodesByDomain(domain)
-        expect(output).toEqual(mockReferenceDomains.health)
+        expect(output).toEqual(mockReferenceDomains(ReferenceCodeDomain.Health))
       },
     )
   })
@@ -358,36 +338,9 @@ describe('prisonApiClient', () => {
   describe('getInmatesAtLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 123456
-      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, [
-        mockInmateAtLocation,
-      ])
-      const output = await prisonApiClient.getInmatesAtLocation(locationId, {})
+      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates`, [mockInmateAtLocation])
+      const output = await prisonApiClient.getInmatesAtLocation(locationId)
       expect(output).toEqual([mockInmateAtLocation])
-    })
-  })
-
-  describe('getAlertTypes', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/ALERT?withSubCodes=true`, alertTypesMock)
-      const output = await prisonApiClient.getAlertTypes()
-      expect(output).toEqual(alertTypesMock)
-    })
-  })
-
-  describe('createAlert', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const alert = pagedActiveAlertsMock.content[0]
-      const alertForm: AlertForm = {
-        alertType: alert.alertType,
-        alertCode: alert.alertCode,
-        comment: alert.comment,
-        alertDate: alert.dateCreated,
-      }
-      mockSuccessfulPrisonApiPost(`/api/bookings/${bookingId}/alert`, alertForm, alert)
-
-      const output = await prisonApiClient.createAlert(bookingId, alertForm)
-      expect(output).toEqual(alert)
     })
   })
 
@@ -442,15 +395,6 @@ describe('prisonApiClient', () => {
       const response = await prisonApiClient.getMovements([prisonerNumber], [MovementType.Transfer, MovementType.Court])
       expect(apiRequest.isDone()).toBe(true)
       expect(response).toEqual(movements)
-    })
-  })
-
-  describe('getLocationsForAppointments', () => {
-    it('Should return data from the API', async () => {
-      const agencyId = 'MDI'
-      mockSuccessfulPrisonApiCall(`/api/agencies/${agencyId}/locations?eventType=APP`, locationsMock)
-      const output = await prisonApiClient.getLocationsForAppointments(agencyId)
-      expect(output).toEqual(locationsMock)
     })
   })
 
@@ -549,15 +493,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getLocation', () => {
-    it('Should return data from the API', async () => {
-      const locationId = 27000
-      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}`, locationsMock[0])
-      const output = await prisonApiClient.getLocation(locationId)
-      expect(output).toEqual(locationsMock[0])
-    })
-  })
-
   describe('getActivitiesAtLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 27000
@@ -603,16 +538,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAttributesForLocation', () => {
-    it('Should return data from the API', async () => {
-      const locationId = 'AB1234C'
-
-      mockSuccessfulPrisonApiCall(`/api/cell/${locationId}/attributes`, GetAttributesForLocation)
-      const output = await prisonApiClient.getAttributesForLocation(locationId)
-      expect(output).toEqual(GetAttributesForLocation)
-    })
-  })
-
   describe('getHistoryForLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 'AB1234C'
@@ -644,16 +569,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAlertDetails', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const alertId = 1
-      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/alerts/${alertId}`, alertDetailsMock)
-      const output = await prisonApiClient.getAlertDetails(bookingId, alertId)
-      expect(output).toEqual(alertDetailsMock)
-    })
-  })
-
   describe('getBeliefHistory', () => {
     it('Should return data from the API for a specific booking', async () => {
       const prisonerNumber = 'AB1234C'
@@ -675,18 +590,39 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('updateAlert', () => {
-    it('Should call API with data and return data from the API', async () => {
+  describe('getVisitsWithVisitors', () => {
+    it('Should return data from the API', async () => {
       const bookingId = 123456
-      const alert = pagedActiveAlertsMock.content[0]
-      const { alertId } = alert
-      const alertChanges: AlertChanges = {
-        comment: 'Comment',
-      }
-      mockSuccessfulPrisonApiPut(`/api/bookings/${bookingId}/alert/${alertId}`, alertChanges, alert)
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits-with-visitors?page=1`, pagedVisitsMock)
+      const output = await prisonApiClient.getVisitsForBookingWithVisitors(bookingId, { page: 1 })
+      expect(output).toEqual(pagedVisitsMock)
+    })
+  })
 
-      const output = await prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
-      expect(output).toEqual(alert)
+  describe('getVisitsPrisons', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits/prisons`, visitPrisonsMock)
+      const output = await prisonApiClient.getVisitsPrisons(bookingId)
+      expect(output).toEqual(visitPrisonsMock)
+    })
+  })
+
+  describe('getImagesForPrisoner', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'abc123'
+      mockSuccessfulPrisonApiCall(`/api/images/offenders/${prisonerNumber}`, imageDetailListMock)
+      const output = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
+      expect(output).toEqual(imageDetailListMock)
+    })
+  })
+
+  describe('getImageDetail', () => {
+    it('Should return data from the API', async () => {
+      const imageId = 1234
+      mockSuccessfulPrisonApiCall(`/api/images/${imageId}`, imageDetailMock)
+      const output = await prisonApiClient.getImageDetail(imageId)
+      expect(output).toEqual(imageDetailMock)
     })
   })
 })

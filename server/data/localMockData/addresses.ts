@@ -1,4 +1,4 @@
-import { Address } from '../../interfaces/prisonApi/address'
+import Address from '../interfaces/prisonApi/Address'
 
 export const mockAddresses: Address[] = [
   {
@@ -14,6 +14,7 @@ export const mockAddresses: Address[] = [
     comment:
       'comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.  comment field goes here.',
     primary: true,
+    mail: false,
     noFixedAddress: false,
     startDate: '2020-05-01',
     phones: [
@@ -78,6 +79,7 @@ export const mockAddresses: Address[] = [
     comment:
       'address comment goes here address comment goes here address comment goes here address comment goes here address comment goes here address comment goes here address comment goes here address comment goes here address comment goes here  xxxxx',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2020-05-01',
     phones: [
@@ -122,6 +124,7 @@ export const mockAddresses: Address[] = [
     county: 'South Yorkshire',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2013-06-01',
     phones: [],
@@ -145,6 +148,7 @@ export const mockAddresses: Address[] = [
     country: 'United Kingdom',
     comment: 'JCCpWhJCCpWh',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     endDate: '2020-05-01',
     phones: [],
@@ -177,6 +181,7 @@ export const mockAddresses: Address[] = [
     county: 'South Yorkshire',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2012-01-01',
     phones: [],
@@ -210,6 +215,7 @@ export const mockAddresses: Address[] = [
     county: 'South Yorkshire',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2011-09-01',
     phones: [],
@@ -244,6 +250,7 @@ export const mockAddresses: Address[] = [
     county: 'South Yorkshire',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2011-09-01',
     phones: [],
@@ -264,6 +271,7 @@ export const mockAddresses: Address[] = [
     county: 'South Yorkshire',
     comment: 'dxaFwYdxaFwY',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     phones: [],
     addressUsages: [
@@ -283,6 +291,7 @@ export const mockAddresses: Address[] = [
     county: 'Nottinghamshire',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: false,
     startDate: '2012-09-01',
     phones: [],
@@ -293,6 +302,7 @@ export const mockAddresses: Address[] = [
     town: 'Doncaster',
     country: 'England',
     primary: false,
+    mail: false,
     noFixedAddress: true,
     startDate: '2015-02-01',
     endDate: '2020-05-01',
@@ -311,5 +321,112 @@ export const mockAddresses: Address[] = [
         activeFlag: false,
       },
     ],
+  },
+]
+
+export const addressesPrimaryAndMailMock: Address[] = [
+  {
+    primary: true,
+    mail: true,
+    noFixedAddress: false,
+    street: '1 Station Road',
+    town: 'Some Town',
+    county: 'Countyshire',
+    postalCode: 'CS1 1CS',
+    country: 'England',
+    startDate: '2024-01-01',
+    comment: 'Example comment',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [
+      {
+        number: '0912 3456789',
+        type: 'HOME',
+      },
+      {
+        number: '0912 3456788',
+        type: 'VISIT',
+      },
+    ],
+  },
+]
+
+export const addressesMailMock: Address[] = [
+  {
+    primary: false,
+    mail: true,
+    noFixedAddress: false,
+    street: '1 Station Road',
+    town: 'Some Town',
+    county: 'Countyshire',
+    postalCode: 'CS1 1CS',
+    country: 'England',
+    startDate: '2024-01-01',
+    comment: 'Example comment',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [
+      {
+        number: '0912 3456789',
+        type: 'HOME',
+      },
+      {
+        number: '0912 3456788',
+        type: 'VISIT',
+      },
+    ],
+  },
+]
+
+export const addressesNoStartDateMock: Address[] = [
+  {
+    primary: false,
+    mail: false,
+    noFixedAddress: false,
+    street: '99 sajdhskdfh',
+    town: 'Thjjsdfhshd',
+    county: 'Countyshire',
+    postalCode: 'CS9 1CS',
+    country: 'England',
+    startDate: '2023-11-20',
+    comment: 'Example comment',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [],
+  },
+  {
+    primary: false,
+    mail: false,
+    noFixedAddress: false,
+    street: '88 ioasndkjhsgd',
+    town: 'Imnksjdfjshdf',
+    county: 'Countyshire',
+    postalCode: 'CS8 1CS',
+    country: 'England',
+    startDate: undefined,
+    comment: 'No start date',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [],
   },
 ]

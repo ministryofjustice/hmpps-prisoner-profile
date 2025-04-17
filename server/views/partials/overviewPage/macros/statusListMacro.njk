@@ -1,7 +1,7 @@
 {% macro statusList(statuses) %}
   <ul class="hmpps-status-list">
     {% for status in statuses %}
-      <li>
+      <li class="hmpps-status hmpps-status{% if status.error %}--error{% else %}--success{% endif %}">
         <p>{{ status.label }}</p>
         {% if status.date %}
             <p>

@@ -8,23 +8,24 @@
 {% set pageTitle = 'Create an alert' %}
 {% block body %}
 
-    {% if errors.length > 0 %}
-        {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errors,
-            attributes: { 'data-qa-errors': true }
-        })}}
-    {% endif %}
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <h1 id="addCaseNote">Add an alert</h1>
-    </div>
-</div>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner(miniBannerData) }}
+    </div>
+</div>
+
+{% if errors.length > 0 %}
+    {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errors,
+        attributes: { 'data-qa-errors': true },
+        classes: 'govuk-!-margin-bottom-6'
+    })}}
+{% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 id="addCaseNote" class="govuk-!-margin-top-0">Add an alert</h1>
     </div>
 </div>
 
@@ -32,7 +33,6 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post" novalidate="novalidate" autocomplete="off">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
             <input type="hidden" name="existingAlerts" value="{{ formValues.existingAlerts }}" />
             {{ govukSelect({
                 id: "alertType",
@@ -57,12 +57,12 @@
             }) }}
 
             {{ govukCharacterCount({
-                name: "comment",
-                id: "comment",
-                maxlength: 1000,
+                name: "description",
+                id: "description",
+                maxlength: 4000,
                 rows: 10,
-                value: formValues.comment,
-                errorMessage: errors | findError('comment'),
+                value: formValues.description,
+                errorMessage: errors | findError('description'),
                 label: {
                     text: "Why are you creating this alert?",
                     classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
@@ -70,29 +70,29 @@
             }) }}
 
             {{ hmppsDatepicker({
-                id: "alertDate",
-                name: "alertDate",
+                id: "activeFrom",
+                name: "activeFrom",
                 label: {
                     text: "Alert start date",
                     classes: "govuk-!-font-weight-bold"
                 },
-                errorMessage: errors | findError('alertDate'),
+                errorMessage: errors | findError('activeFrom'),
                 classes: 'hmpps-datepicker--fixed-width',
-                value: formValues.alertDate,
+                value: formValues.activeFrom,
                 minDate: todayMinus8,
                 maxDate: today
             }) }}
 
             {{ hmppsDatepicker({
-                id: "expiryDate",
-                name: "expiryDate",
+                id: "activeTo",
+                name: "activeTo",
                 label: {
                     text: "Alert end date (optional)",
                     classes: "govuk-!-font-weight-bold"
                 },
-                errorMessage: errors | findError('expiryDate'),
+                errorMessage: errors | findError('activeTo'),
                 classes: 'hmpps-datepicker--fixed-width',
-                value: formValues.expiryDate,
+                value: formValues.activeTo,
                 minDate: todayMinus8
             }) }}
 

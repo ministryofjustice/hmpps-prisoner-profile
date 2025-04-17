@@ -43,14 +43,8 @@
 
 {% macro incorrectDetails(probationDetails) %}
   <p class="govuk-body">
-    We have retrieved this information from the probation system where the prisoner’s name is recorded as
-    <strong data-qa="probation-details-name">{{ probationDetails.name }}</strong>. If something does not look right you
-    should ask a Community offender manager to check the details in Delius, the case reference number (CRN) is
-    <strong data-qa="probation-details-crn">{{ probationDetails.crn }}</strong>.
-  </p>
-  <p class="govuk-body">
-    The Delius record should have the prison number assigned to the Delius NOMS number and the Throughcare (custody)
-    details may need to be updated using the Search DSS feature.
+    This information is from the probation system. Contact a probation practitioner if you think it’s incorrect.
+    The CRN (case reference number) is <strong data-qa="probation-details-crn">{{ probationDetails.crn }}</strong>.
   </p>
 {% endmacro %}
 
@@ -111,31 +105,19 @@
 
 {% block content %}
   <h1 class="govuk-heading-l">Documents held by probation</h1>
-  {% if probationDetails %}
-    {{
-      govukDetails({
-      summaryText: "These details don't look correct",
-      html: incorrectDetails(probationDetails)
-      })
-    }}
-  {% else %}
-    {{
-      govukDetails({
-      summaryText: "What can I do to find the probation documents",
-      text: "If something does not look right you should ask a Community offender manager to check the details in Delius. It is possible that the offender record does exist in Delius, but the Delius NOMS number has not been set correctly to the prison number. Ask a someone to update the Delius record and try again."
-      })
-    }}
-  {% endif %}
+  {% if probationDocuments.status === 'fulfilled' %}
+    {% set probationDetails = probationDocuments.value.probationDetails %}
+    {% set documents = probationDocuments.value.documents %}
 
-  {% if probationDocumentsNotFound %}
-    {{
-      govukErrorSummary({
-      titleText: "There is a problem",
-      errorList: [{text: "We are unable to display documents for this prisoner because we cannot find the offender record in the probation system"}],
-      attributes: { 'data-qa-errors': true }
-      })
-    }}
-  {% else %}
+    <article class="govuk-!-width-two-thirds">
+      {{
+        govukDetails({
+        summaryText: "What to do if these details look incorrect",
+        html: incorrectDetails(probationDetails)
+        })
+      }}
+    </article>
+
     {% if documents.offenderDocuments.length > 0 %}
       {{ documentTable(documents.offenderDocuments, "General documents for " + probationDetails.name, prisonerNumber) }}
     {% endif %}
@@ -145,20 +127,49 @@
       {%
         set convictionItems = (convictionItems.push(
         {
-        heading: { text: summaryTitle(conviction) },
-        summary: { html: summary(conviction) },
-        content: { html: convictionDocuments(conviction, prisonerNumber) }
+          heading: { text: summaryTitle(conviction) },
+          summary: { html: summary(conviction) },
+          content: { html: convictionDocuments(conviction, prisonerNumber) }
         }
-        ), convictionItems)
+      ), convictionItems)
       %}
     {% endfor %}
 
     <h3 class="govuk-heading-m govuk-!-margin-top-9 govuk-!-margin-bottom-0">Documents related to each sentence</h3>
     {{
-      govukAccordion({
+    govukAccordion({
       id: "accordion-default",
       items: convictionItems
+    })
+    }}
+
+  {% else %}
+
+    {% if probationDocuments.reason.status === 404 %}
+      {% set msg = 'We are unable to display documents for this prisoner because we cannot find the record in the probation system.' %}
+
+      <article class="govuk-!-width-two-thirds">
+        {{
+        govukDetails({
+          summaryText: "How to find probation documents",
+          text: "If you think something is missing, ask a probation practitioner to update the record in the probation system."
+        })
+        }}
+      </article>
+
+    {% else %}
+      {% set msg = 'We cannot show these details right now. Try again later.' %}
+    {% endif %}
+
+    {{
+      govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{text: msg}],
+      attributes: { 'data-qa-errors': true },
+      classes: 'govuk-!-width-two-thirds'
       })
     }}
+
   {% endif %}
+
 {% endblock %}

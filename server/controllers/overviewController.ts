@@ -1,48 +1,120 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
-import OverviewPageService from '../services/overviewPageService'
-import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { User } from '../data/hmppsAuthClient'
-import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
-import { Role } from '../data/enums/role'
-import { Nominal } from '../interfaces/pathfinderApi/nominal'
-import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
-import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
+import { formatName, isInUsersCaseLoad } from '../utils/utils'
+import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
+import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import buildOverviewActions from './utils/buildOverviewActions'
+import buildOverviewActions from './utils/overviewController/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
+import OffencesService from '../services/offencesService'
+import OverviewPageData from './interfaces/OverviewPageData'
+import mapCourtCaseSummary from './utils/overviewController/mapCourtCaseSummary'
+import MoneyService from '../services/moneyService'
+import AdjudicationsService from '../services/adjudicationsService'
+import { VisitsService } from '../services/visitsService'
+import PrisonerScheduleService from '../services/prisonerScheduleService'
+import IncentivesService from '../services/incentivesService'
+import PersonalPageService from '../services/personalPageService'
+import { Result } from '../utils/result/result'
+import OffenderService from '../services/offenderService'
+import ProfessionalContactsService from '../services/professionalContactsService'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import getOverviewStatuses from './utils/overviewController/getOverviewStatuses'
+import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfoLinks'
+import getPersonalDetails from './utils/overviewController/getPersonalDetails'
+import getCsraSummary from './utils/overviewController/getCsraSummary'
+import getCategorySummary from './utils/overviewController/getCategorySummary'
+import CsipService from '../services/csipService'
+import { isServiceEnabled } from '../utils/isServiceEnabled'
+import ContactsService from '../services/contactsService'
+import { externalContactsEnabled } from '../utils/featureToggles'
 
 /**
  * Parse request for overview page and orchestrate response
  */
 export default class OverviewController {
   constructor(
-    private readonly overviewPageService: OverviewPageService,
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
     private readonly auditService: AuditService,
+    private readonly offencesService: OffencesService,
+    private readonly moneyService: MoneyService,
+    private readonly adjudicationsService: AdjudicationsService,
+    private readonly visitsService: VisitsService,
+    private readonly prisonerScheduleService: PrisonerScheduleService,
+    private readonly incentivesService: IncentivesService,
+    private readonly personalPageService: PersonalPageService,
+    private readonly offenderService: OffenderService,
+    private readonly professionalContactsService: ProfessionalContactsService,
+    private readonly csipService: CsipService,
+    private readonly contactsService: ContactsService,
   ) {}
 
-  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
-    const { clientToken } = res.locals
+  public async displayOverview(req: Request, res: Response) {
+    const { apiErrorCallback } = res.locals
+    const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
+    const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
+    const { courCasesSummaryEnabled } = config.featureToggles
+
+    const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, res.locals.user)
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
+
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
+    const showCourtCaseSummary = courCasesSummaryEnabled && permissions.courtCases?.view
 
-    const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      this.overviewPageService.get(
-        clientToken,
-        prisonerData,
-        res.locals.user.staffId,
-        inmateDetail,
-        res.locals.user.caseLoads,
-        res.locals.user.userRoles,
+    const [
+      pathfinderNominal,
+      socNominal,
+      nextCourtAppearance,
+      activeCourtCasesCount,
+      latestReleaseDate,
+      moneySummary,
+      adjudicationSummary,
+      visitsSummary,
+      schedule,
+      incentiveSummary,
+      learnerNeurodivergence,
+      scheduledTransfers,
+      prisonerDetail,
+      staffContacts,
+      offencesOverview,
+      nonAssociationSummary,
+      currentCsipDetail,
+      externalContactsSummary,
+    ] = await Promise.all([
+      pathfinderApiClient.getNominal(prisonerNumber),
+      manageSocCasesApiClient.getNominal(prisonerNumber),
+      this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
+      this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
+      showCourtCaseSummary
+        ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
+      permissions.money?.view ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
+      permissions.adjudications?.view
+        ? Result.wrap(this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId), apiErrorCallback)
+        : null,
+      permissions.visits?.view ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
+      this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
+      permissions.incentives?.view ? this.incentivesService.getIncentiveOverview(clientToken, bookingId) : null,
+      Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
+      this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
+      this.offenderService.getPrisoner(clientToken, prisonerNumber),
+      this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
+      this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
+      Result.wrap(
+        this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
+        apiErrorCallback,
       ),
-      pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
-      manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+      isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
+        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
+      externalContactsEnabled(prisonId)
+        ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
     ])
 
     const overviewActions = buildOverviewActions(
@@ -50,92 +122,66 @@ export default class OverviewController {
       pathfinderNominal,
       socNominal,
       res.locals.user,
-      overviewPageData.staffRoles ?? [],
       config,
-      res.locals.feComponentsMeta,
+      res.locals.feComponents?.sharedData,
+      permissions,
     )
 
-    const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
+    this.auditOverviewPageView(req, res, prisonerData)
 
-    // Set role based permissions
-    const canView = canViewCaseNotes(res.locals.user, prisonerData)
-    const canAdd = canAddCaseNotes(res.locals.user, prisonerData)
+    const viewData: OverviewPageData = {
+      pageTitle: 'Overview',
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'overview'),
+      moneySummary,
+      adjudicationSummary,
+      visitsSummary,
+      currentCsipDetail,
+      categorySummary: getCategorySummary(prisonerData, inmateDetail, permissions.category?.edit),
+      csraSummary: getCsraSummary(prisonerData),
+      schedule,
+      incentiveSummary,
+      overviewActions,
+      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, permissions),
+      courtCaseSummary: mapCourtCaseSummary(
+        nextCourtAppearance,
+        activeCourtCasesCount,
+        latestReleaseDate,
+        permissions.courtCases?.edit,
+        prisonerData.prisonerNumber,
+      ),
+      statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
+      prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
+      prisonerInCaseLoad,
+      bookingId: prisonerData.bookingId,
+      personalDetails: getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
+      staffContacts,
+      isYouthPrisoner,
+      prisonName,
+      offencesOverview: {
+        ...offencesOverview,
+        imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,
+        confirmedReleaseDate: prisonerData.confirmedReleaseDate,
+        conditionalReleaseDate: prisonerData.conditionalReleaseDate,
+      },
+      nonAssociationSummary,
+      externalContactsSummary,
+      options: {
+        showCourtCaseSummary,
+      },
+    }
 
+    res.render('pages/overviewPage', viewData)
+  }
+
+  private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.Overview,
       })
       .catch(error => logger.error(error))
-
-    res.render('pages/overviewPage', {
-      pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
-      ...overviewPageData,
-      overviewActions,
-      overviewInfoLinks,
-      canView,
-      canAdd,
-    })
-  }
-
-  private buildOverviewInfoLinks(
-    prisonerData: Prisoner,
-    pathfinderNominal: Nominal,
-    socNominal: Nominal,
-    user: User,
-  ): { text: string; url: string; dataQA: string }[] {
-    const links: { text: string; url: string; dataQA: string }[] = []
-
-    if (
-      userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
-      (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads) ||
-        ['OUT', 'TRN'].includes(prisonerData.prisonId))
-    ) {
-      links.push({
-        text: 'Probation documents',
-        url: `/prisoner/${prisonerData.prisonerNumber}/probation-documents`,
-        dataQA: 'probation-documents-info-link',
-      })
-    }
-
-    if (
-      userHasRoles(
-        [
-          Role.PathfinderApproval,
-          Role.PathfinderStdPrison,
-          Role.PathfinderStdProbation,
-          Role.PathfinderHQ,
-          Role.PathfinderUser,
-          Role.PathfinderLocalReader,
-          Role.PathfinderNationalReader,
-          Role.PathfinderPolice,
-          Role.PathfinderPsychologist,
-        ],
-        user.userRoles,
-      ) &&
-      pathfinderNominal
-    ) {
-      links.push({
-        text: 'Pathfinder profile',
-        url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
-        dataQA: 'pathfinder-profile-info-link',
-      })
-    }
-
-    if (userHasRoles([Role.SocCommunity, Role.SocCustody], user.userRoles) && socNominal) {
-      links.push({
-        text: 'SOC profile',
-        url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,
-        dataQA: 'soc-profile-info-link',
-      })
-    }
-
-    return links
   }
 }

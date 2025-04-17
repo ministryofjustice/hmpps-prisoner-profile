@@ -39,33 +39,36 @@
     crossorigin
   />
 
-  {% if feComponents.jsIncludes %}
-    {% for js in feComponents.jsIncludes %}
-      <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
-    {% endfor %}
-  {% endif %}
+  {% for js in feComponents.jsIncludes %}
+    <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+  {% endfor %}
 
-  {% if feComponents.cssIncludes %}
-    {% for css in feComponents.cssIncludes %}
-      <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
-    {% endfor %}
-  {% endif %}
+  {% for css in feComponents.cssIncludes %}
+    <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+  {% endfor %}
 
 {% endblock %}
 
 {% block pageTitle %}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
 {% block header %}
-  {% if feComponents.header %}
-    {{ feComponents.header | safe }}
-  {% else %}
-    {% include "./header.njk" %}
-  {% endif %}
+  {{ feComponents.header | safe }}
 {% endblock %}
 
 {% block beforeContent %}
+  {% if pageHasApiErrors %}
+    <div class="hmpps-api-error-banner">
+      <p>Sorry, there is a problem with the service</p>
+      <p>Some information on this page may be unavailable. Try again later.</p>
+    </div>
+  {% endif %}
+
+  {% if bannerText %}
+    {% include "./banner.njk" %}
+  {% endif %}
+
   {% if flashMessage %}
-    <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}">
+    <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}{{ ' hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
       <p role="alert">{{ flashMessage.text }}</p>
     </div>
   {% endif %}
@@ -113,6 +116,7 @@
   <script src="/assets/datepicker.js"></script>
   <script src="/assets/backToTop.js"></script>
   <script src="/assets/printPage.js"></script>
+  <script src="/assets/openCloseAll.js"></script>
 
   {# Javascript block for individual pages #}
   {% block pageScripts %}
@@ -121,9 +125,5 @@
 {% endblock %}
 
 {% block footer %}
-  {% if feComponents.footer %}
     {{ feComponents.footer | safe }}
-  {% else %}
-    {% include "./footer.njk" %}
-  {% endif %}
 {% endblock %}

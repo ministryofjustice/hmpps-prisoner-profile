@@ -1,17 +1,19 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
+import { SortOption } from '../interfaces/SortParams'
 import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
-import { CaseNote, CaseNoteAmendment, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import HmppsError from '../interfaces/HmppsError'
+
+import CaseNotesPageData, { CaseNotePageData } from './interfaces/caseNotesService/CaseNotesPageData'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
-import { UserDetails } from './userService'
 import validateDateRange from '../utils/validateDateRange'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class CaseNotesService {
   constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}
@@ -22,7 +24,7 @@ export default class CaseNotesService {
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
+  private mapToApiParams(queryParams: CaseNotesListQueryParams) {
     const apiParams = { ...queryParams }
 
     if (apiParams.startDate)
@@ -35,22 +37,21 @@ export default class CaseNotesService {
     return apiParams
   }
 
-  /**
-   * Handle request for case notes
-   *
-   * @param token
-   * @param prisonerData
-   * @param queryParams
-   * @param canDeleteSensitiveCaseNotes
-   * @param currentUserDetails
-   */
-  public async get(
-    token: string,
-    prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
-    canDeleteSensitiveCaseNotes: boolean,
-    currentUserDetails: UserDetails,
-  ): Promise<CaseNotesPageData> {
+  public async get({
+    token,
+    prisonerData,
+    queryParams = {},
+    canViewSensitiveCaseNotes = false,
+    canDeleteSensitiveCaseNotes = false,
+    currentUserDetails,
+  }: {
+    token: string
+    prisonerData: Prisoner
+    queryParams?: CaseNotesListQueryParams
+    canViewSensitiveCaseNotes?: boolean
+    canDeleteSensitiveCaseNotes?: boolean
+    currentUserDetails: HmppsUser
+  }): Promise<CaseNotesPageData> {
     const sortOptions: SortOption[] = [
       { value: 'creationDateTime,DESC', description: 'Created (most recent)' },
       { value: 'creationDateTime,ASC', description: 'Created (oldest)' },
@@ -62,13 +63,21 @@ export default class CaseNotesService {
     const errors: HmppsError[] = validateDateRange(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList<CaseNotePageData>
-    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
+    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: false,
+      includeInactive: true,
+      includeRestricted: true,
+    })
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
       const { content, ...rest } = await caseNotesApiClient.getCaseNotes(
         prisonerData.prisonerNumber,
-        this.mapToApiParams(queryParams),
+        prisonerData.prisonId,
+        {
+          ...this.mapToApiParams(queryParams),
+          includeSensitive: String(canViewSensitiveCaseNotes),
+        },
       )
 
       const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {
@@ -112,6 +121,7 @@ export default class CaseNotesService {
         'case note',
         sortOptions,
         'Sort by',
+        true,
       ),
       caseNoteTypes,
       fullName: prisonerFullName,
@@ -119,21 +129,36 @@ export default class CaseNotesService {
     }
   }
 
-  public async getCaseNoteTypesForUser(token: string) {
+  public async getCaseNoteTypesForUser({
+    token,
+    canEditSensitiveCaseNotes,
+  }: {
+    token: string
+    canEditSensitiveCaseNotes?: boolean
+  }) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
-    return caseNotesApiClient.getCaseNoteTypesForUser()
+    return caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: true,
+      includeInactive: false,
+      includeRestricted: canEditSensitiveCaseNotes,
+    })
   }
 
-  public async getCaseNote(token: string, prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {
-    return this.caseNotesApiClientBuilder(token).getCaseNote(prisonerNumber, caseNoteId)
+  public async getCaseNote(
+    token: string,
+    prisonerNumber: string,
+    caseloadId: string,
+    caseNoteId: string,
+  ): Promise<CaseNote> {
+    return this.caseNotesApiClientBuilder(token).getCaseNote(prisonerNumber, caseloadId, caseNoteId)
   }
 
-  public async addCaseNote(token: string, prisonerNumber: string, caseNote: CaseNoteForm) {
+  public async addCaseNote(token: string, prisonerNumber: string, caseloadId: string, caseNote: CaseNoteForm) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const dateTime = parseDate(caseNote.date).setHours(+caseNote.hours, +caseNote.minutes, 0)
     const occurrenceDateTime = formatDateTimeISO(new Date(dateTime))
 
-    return caseNotesApiClient.addCaseNote(prisonerNumber, {
+    return caseNotesApiClient.addCaseNote(prisonerNumber, caseloadId, {
       type: caseNote.type,
       subType: caseNote.subType,
       text: caseNote.text,
@@ -141,14 +166,15 @@ export default class CaseNotesService {
     })
   }
 
-  public async updateCaseNote(
+  public async addCaseNoteAmendment(
     token: string,
     prisonerNumber: string,
+    caseloadId: string,
     caseNoteId: string,
-    updatedCaseNoteForm: UpdateCaseNoteForm,
+    text: string,
   ) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
 
-    return caseNotesApiClient.updateCaseNote(prisonerNumber, caseNoteId, updatedCaseNoteForm)
+    return caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, caseloadId, caseNoteId, text)
   }
 }

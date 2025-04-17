@@ -2,23 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const appointmentDateInput = document.getElementById('date')
   const appointmentLocationSelect = document.getElementById('location')
   const appointmentTypeSelect = document.getElementById('appointmentType')
+  const probationTeamSelect = document.querySelector('.js-probation-team')
+  const probationMeetingRadios = document.querySelector('.js-meeting-type')
+  const probationOfficerDetails = document.querySelector('.js-probation-officer')
   const recurringRadios = document.querySelector('.js-recurring-radios')
+  const commentsHint = document.getElementById('comments-hint')
   const appointmentRepeatsSelect = document.getElementById('repeats')
   const appointmentRepeatsTimesInput = document.getElementById('times')
   const lastAppointmentDate = document.getElementById('last-appointment-date')
   const locationEventsContainer = document.getElementById('location-events')
   const offenderEventsContainer = document.getElementById('offender-events')
+  const appointmentId = document.getElementById('appointment-id')?.value || ''
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
     const locationId = appointmentLocationSelect.value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`))
+      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
       locationEventsContainer.innerHTML = await response.text()
-      locationEventsContainer.style.display = 'block'
+      locationEventsContainer.removeAttribute("style");
     } else {
       locationEventsContainer.style.display = 'none'
     }
@@ -29,10 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const prisonerNumber = document.getElementById('prisonerNumber').textContent
 
     const response =
-      prisonerNumber && date && (await fetch(`/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}`))
+      prisonerNumber && date && (await fetch(`/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
-      offenderEventsContainer.style.display = 'block'
+      offenderEventsContainer.removeAttribute("style");
       offenderEventsContainer.innerHTML = await response.text()
     } else {
       offenderEventsContainer.style.display = 'none'
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       times && date && (await fetch(`/api/get-recurring-end-date?date=${date}&repeats=${repeats}&times=${times}`))
 
     if (response?.ok) {
-      lastAppointmentDate.style.display = 'block'
+      lastAppointmentDate.removeAttribute("style");
       lastAppointmentDate.innerText = await response.text()
     } else {
       lastAppointmentDate.style.display = 'none'
@@ -58,20 +63,52 @@ document.addEventListener('DOMContentLoaded', () => {
   function showHideRecurring() {
     const appointmentType = appointmentTypeSelect.value
 
-    if (appointmentType === 'VLB') {
+    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
       recurringRadios.style.display = 'none'
     } else {
-      recurringRadios.style.display = 'block'
+      recurringRadios.removeAttribute("style");
+    }
+  }
+
+  function showHideProbationFields() {
+    const appointmentType = appointmentTypeSelect.value
+
+    // TODO remove this when the feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
+    if (!probationTeamSelect || !probationMeetingRadios || !probationOfficerDetails) {
+      return
+    }
+
+    if (appointmentType === 'VLPM') {
+      probationTeamSelect.removeAttribute("style");
+      probationMeetingRadios.removeAttribute("style");
+      probationOfficerDetails.removeAttribute("style");
+    } else {
+      probationTeamSelect.style.display = 'none'
+      probationMeetingRadios.style.display = 'none'
+      probationOfficerDetails.style.display = 'none'
+    }
+  }
+
+  function showHideCommentsHint() {
+    const appointmentType = appointmentTypeSelect.value
+
+    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
+      commentsHint.removeAttribute("style");
+    } else {
+      commentsHint.style.display = 'none'
     }
   }
 
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
+    showHideProbationFields()
+    showHideCommentsHint()
   })
 
   appointmentLocationSelect.addEventListener('change', () => {
     getEventsForLocation()
   })
+
   appointmentDateInput.addEventListener('change', () => {
     getEventsForLocation()
   })
@@ -83,14 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
   appointmentRepeatsSelect.addEventListener('change', () => {
     getAppointmentEndDate()
   })
+
   appointmentDateInput.addEventListener('change', () => {
     getAppointmentEndDate()
   })
+
   appointmentRepeatsTimesInput.addEventListener('keyup', () => {
     getAppointmentEndDate()
   })
 
   // Initialise on form load
   getEventsForOffender()
+  getEventsForLocation()
   getAppointmentEndDate()
+  showHideRecurring()
+  showHideProbationFields()
+  showHideCommentsHint()
 })

@@ -1,0 +1,69 @@
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% set options = {
+    title: 'Filter',
+    id: 'visitsFilter',
+    currentUrlPath: currentUrlPath,
+    queryParams: listMetadata.filtering.queryParams
+} %}
+{%- call hmppsSideFilter(options) -%}
+    <div class="govuk-form-group">
+        {{ govukSelect({
+            id: "type",
+            name: "visitType",
+            label: {
+                text: "Type"
+            },
+            items: visitTypes | addDefaultSelectedValue('Choose type', false) | setSelected(listMetadata.filtering.visitType)
+        }) }}
+
+        {{ govukSelect({
+            id: "status",
+            name: "visitStatus",
+            label: {
+                text: "Status"
+            },
+            items: statuses | addDefaultSelectedValue('Choose status', false) | setSelected(visitStatusSelected)
+        }) }}
+
+        {{ govukSelect({
+            id: "establishment",
+            name: "prisonId",
+            label: {
+                text: "Establishment"
+            },
+            items: prisons | addDefaultSelectedValue('Choose establishment', false) | setSelected(listMetadata.filtering.prisonId)
+        }) }}
+
+        {{ hmppsDatepicker({
+            id: "fromDate",
+            name: "fromDate",
+            label: {
+                text: "Date from (earliest)",
+                classes: "govuk-label--m"
+            },
+            hint: {
+                text: "For example, 31/3/2022"
+            },
+            errorMessage: errors | findError('fromDate'),
+            value: listMetadata.filtering.fromDate
+        }) }}
+
+        {{ hmppsDatepicker({
+            id: "toDate",
+            name: "toDate",
+            label: {
+                text: "Date to (latest)",
+                classes: "govuk-label--m"
+            },
+            hint: {
+                text: "For example, 31/3/2023"
+            },
+            errorMessage: errors | findError('toDate'),
+            value: listMetadata.filtering.toDate
+        }) }}
+    </div>
+{%- endcall -%}

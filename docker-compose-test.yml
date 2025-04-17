@@ -11,7 +11,7 @@ services:
   wiremock:
     image: wiremock/wiremock
     networks:
-    - hmpps_int
+      - hmpps_int
     container_name: wiremock
     restart: always
     ports:

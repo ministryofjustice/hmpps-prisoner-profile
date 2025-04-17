@@ -1,16 +1,31 @@
 import { RequestHandler } from 'express'
-import { Prisoner } from '../interfaces/prisoner'
+import { isToday, isWithinInterval, parseISO, startOfToday, subDays } from 'date-fns'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { Services } from '../services'
 import NotFoundError from '../utils/notFoundError'
-import { Assessment } from '../interfaces/prisonApi/assessment'
+import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
+import { toAlertSummaryData } from '../services/mappers/alertMapper'
+import { Result } from '../utils/result/result'
+import { isActiveCaseLoad } from '../utils/utils'
 
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
     try {
-      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
-      const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
+      let prisonerNumber = ''
+      if (req.params?.prisonerNumber) {
+        prisonerNumber = req.params.prisonerNumber
+      } else if (req.query?.prisonerNumber) {
+        prisonerNumber = req.query.prisonerNumber as string
+      }
+
+      if (prisonerNumber === '') {
+        return next(new NotFoundError())
+      }
+
+      const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(prisonerNumber)
 
       if (prisonerData.prisonerNumber === undefined) {
         return next(new NotFoundError())
@@ -24,11 +39,18 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Get Assessment details and Inmate details, and add to prisonerData
       // Needed for CSRA and Category data
       // Need to update prisoner search endpoint to return the data needed, then this can be removed
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-      const [assessments, inmateDetail] = await Promise.all([
+      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
+      const alertsApiClient = services.dataAccess.alertsApiClientBuilder(req.middleware.clientToken)
+      const [assessments, inmateDetail, alerts, arrivalDate] = await Promise.all([
         prisonApiClient.getAssessments(prisonerData.bookingId),
         prisonApiClient.getInmateDetail(prisonerData.bookingId),
+        Result.wrap(alertsApiClient.getAlerts(prisonerNumber, { showAll: true })),
+        isActiveCaseLoad(prisonerData.prisonId, res.locals.user)
+          ? prisonApiClient.getLatestArrivalDate(prisonerData.prisonerNumber)
+          : null,
       ])
+
+      const alertSummaryData = toAlertSummaryData(alerts)
 
       if (assessments && Array.isArray(assessments)) {
         prisonerData.assessments = assessments.sort(
@@ -40,10 +62,20 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       )?.classification
       // End
 
+      if (arrivalDate) {
+        const arrival = parseISO(arrivalDate)
+        prisonerData.newArrival24 = isToday(arrival)
+        prisonerData.newArrival72 = isWithinInterval(arrival, {
+          start: subDays(startOfToday(), 2),
+          end: subDays(startOfToday(), 1),
+        })
+      }
+
       req.middleware = {
         ...req.middleware,
         prisonerData,
         inmateDetail,
+        alertSummaryData,
       }
     } catch (error) {
       logger.error(error, `Failed to retrieve get prisoner data: ${error.endpoint}`)

@@ -2,20 +2,28 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {%- call summaryCard({title: "Non-associations"}) -%}
 
-    <dl class="govuk-summary-list non-association-summary">
-        <div class="govuk-summary-list__row">
-            <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-2">
-                <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-2" data-qa="overview-na-prison-name">In {{ nonAssociationSummary.prisonName }}</dt>
-                <dd class="govuk-!-font-size-36 govuk-!-margin-left-0 govuk-!-margin-bottom-2" data-qa="overview-na-prison-count" >{{ nonAssociationSummary.prisonCount }}</dd>
+    {% if nonAssociationSummary.status === 'fulfilled' %}
+        {% set summary = nonAssociationSummary.value %}
+        <dl class="govuk-summary-list non-association-summary">
+            <div class="govuk-summary-list__row">
+                <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-2">
+                    <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-2" data-qa="overview-na-prison-name">In {{ summary.prisonName }}</dt>
+                    <dd class="govuk-!-font-size-36 govuk-!-margin-left-0 govuk-!-margin-bottom-2" data-qa="overview-na-prison-count" >{{ summary.prisonCount }}</dd>
+                </div>
             </div>
-        </div>
-        <div class="govuk-summary-list__row--no-border">
-            <div class="govuk-!-padding-top-3">
-                <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-2">In other establishments</dt>
-                <dd class="govuk-!-font-size-36 govuk-!-margin-left-0 govuk-!-margin-bottom-4" data-qa="overview-na-other-prisons-count">{{ nonAssociationSummary.otherPrisonsCount }}</dd>
-                <dd class="govuk-!-margin-left-0" data-qa="overview-non-associations-link"><a href="{{ nonAssociationSummary.nonAssociationsUrl }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Non-associations</a></dd>
+            <div class="govuk-summary-list__row--no-border">
+                <div class="govuk-!-padding-top-3">
+                    <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-2">In other establishments</dt>
+                    <dd class="govuk-!-font-size-36 govuk-!-margin-left-0 govuk-!-margin-bottom-4" data-qa="overview-na-other-prisons-count">{{ summary.otherPrisonsCount }}</dd>
+                    <dd class="govuk-!-margin-left-0" data-qa="overview-non-associations-link"><a href="{{ config.serviceUrls.nonAssociations }}/prisoner/{{ prisonerNumber }}/non-associations" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Non-associations</a></dd>
+                </div>
             </div>
+        </dl>
+    {% else %}
+        <div class="hmpps-summary-card__unavailable-body" data-qa="non-association-summary-unavailable">
+            <div class="hmpps-summary-card__unavailable-message">{{ standardApiErrorText() }}</div>
+            <div><a href="{{ config.serviceUrls.nonAssociations }}/prisoner/{{ prisonerNumber }}/non-associations" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Non-associations</a></div>
         </div>
-    </dl>
+    {% endif %}
 
 {%- endcall -%}

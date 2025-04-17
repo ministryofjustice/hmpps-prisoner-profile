@@ -1,8 +1,12 @@
 import {
+  addDefaultSelectedValue,
   addressToLines,
+  addressToSummaryItems,
   apostrophe,
   arrayToQueryString,
   calculateAge,
+  camelToSnakeCase,
+  contactAddressToHtml,
   convertNameCommaToHuman,
   convertToTitleCase,
   extractLocation,
@@ -10,26 +14,37 @@ import {
   formatCategoryALabel,
   formatCategoryCodeDescription,
   formatCommunityManager,
+  formatHeight,
   formatLocation,
   formatMoney,
   formatName,
   formatNamePart,
+  formatPhoneNumber,
+  formatPomName,
   formatScheduleItem,
+  formatWeight,
   getNamesFromString,
   groupBy,
+  includesActiveCaseLoad,
   initialiseName,
+  isActiveCaseLoad,
+  isInUsersCaseLoad,
   isTemporaryLocation,
+  latestImageId,
+  lengthOfService,
   mapToQueryString,
   neurodiversityEnabled,
   objectToSelectOptions,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
-  prisonerBelongsToUsersCaseLoad,
   prisonerIsOut,
   prisonerIsTRN,
   properCaseName,
   refDataToSelectOptions,
+  SelectOption,
+  snakeToCamelCase,
   sortArrayOfObjectsByDate,
+  sortByLatestAndUuid,
   SortType,
   summaryListOneHalfWidth,
   SummaryListRow,
@@ -37,9 +52,8 @@ import {
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { Address } from '../interfaces/address'
-import { HmppsError } from '../interfaces/hmppsError'
-import { CaseLoad } from '../interfaces/caseLoad'
+import HmppsError from '../interfaces/HmppsError'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 import config from '../config'
 import {
@@ -47,8 +61,13 @@ import {
   xrayCareNeedsDESCMock,
   xrayCareNeedsMock,
 } from '../data/localMockData/personalCareNeedsMock'
-import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
+import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
+import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import Address from '../data/interfaces/prisonApi/Address'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
+import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
+import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -304,7 +323,7 @@ describe('utils', () => {
 
   describe('Address to lines', () => {
     it('Maps a full address', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         flat: '7',
         premise: 'premises address',
         street: 'street field',
@@ -324,7 +343,7 @@ describe('utils', () => {
     })
 
     it('Maps a partial address', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         premise: 'premises address',
         street: 'street field',
         locality: 'locality field',
@@ -341,7 +360,7 @@ describe('utils', () => {
     })
 
     it('does not return a country on its own', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         country: 'England',
       }
 
@@ -350,7 +369,7 @@ describe('utils', () => {
     })
 
     it('does return single lines that are not country', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         premise: 'premises address',
       }
 
@@ -385,14 +404,55 @@ describe('utils', () => {
     })
   })
 
-  describe('prisonerBelongsToUsersCaseLoad', () => {
+  describe('isActiveCaseLoad', () => {
+    it('Should return true when the prisonId matches the active case load', () => {
+      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
+      expect(isActiveCaseLoad('ABC', user)).toEqual(true)
+    })
+
+    it('Should return false when the prisonId does not match the active case load', () => {
+      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
+      expect(isActiveCaseLoad('DEF', user)).toEqual(false)
+    })
+
+    it('Should return false for non prison users', () => {
+      const probationUser = { authSource: 'delius' } as ProbationUser
+      const externalUser = { authSource: 'external' } as ExternalUser
+
+      expect(isActiveCaseLoad('123', probationUser)).toEqual(false)
+      expect(isActiveCaseLoad('123', externalUser)).toEqual(false)
+    })
+  })
+
+  describe('includesActiveCaseLoad', () => {
+    it('Should return true when one of the prisonIds matches the active case load', () => {
+      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
+      expect(includesActiveCaseLoad(['ABC', 'DEF'], user)).toEqual(true)
+    })
+
+    it('Should return false when non of the prisonIds match the active case load', () => {
+      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
+      expect(includesActiveCaseLoad(['DEF', 'GHI'], user)).toEqual(false)
+    })
+
+    it('Should return false for non prison users', () => {
+      const probationUser = { authSource: 'delius' } as ProbationUser
+      const externalUser = { authSource: 'external' } as ExternalUser
+
+      expect(includesActiveCaseLoad(['ABC'], probationUser)).toEqual(false)
+      expect(includesActiveCaseLoad(['ABC'], externalUser)).toEqual(false)
+    })
+  })
+
+  describe('isInUsersCaseLoad', () => {
     it('Should return true when the user has a caseload matching the prisoner', () => {
       const caseLoads: CaseLoad[] = [
         { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
         { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
       ]
+      const user = { authSource: 'nomis', caseLoads } as PrisonUser
 
-      expect(prisonerBelongsToUsersCaseLoad('DEF', caseLoads)).toEqual(true)
+      expect(isInUsersCaseLoad('DEF', user)).toEqual(true)
     })
 
     it('Should return false when the user has a caseload that doesnt match the prisoner', () => {
@@ -400,8 +460,17 @@ describe('utils', () => {
         { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
         { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
       ]
+      const user = { authSource: 'nomis', caseLoads } as PrisonUser
 
-      expect(prisonerBelongsToUsersCaseLoad('123', caseLoads)).toEqual(false)
+      expect(isInUsersCaseLoad('123', user)).toEqual(false)
+    })
+
+    it('Should return false for non prison users', () => {
+      const probationUser = { authSource: 'delius' } as ProbationUser
+      const externalUser = { authSource: 'external' } as ExternalUser
+
+      expect(isInUsersCaseLoad('123', probationUser)).toEqual(false)
+      expect(isInUsersCaseLoad('123', externalUser)).toEqual(false)
     })
   })
 
@@ -659,7 +728,7 @@ describe('utils', () => {
 
   describe('objectToSelectOptions', () => {
     it('should map objects to select options', () => {
-      const data: object[] = [
+      const data: { id: string; desc: string; random: string }[] = [
         {
           id: 'id1',
           desc: 'desc1',
@@ -671,11 +740,11 @@ describe('utils', () => {
           random: 'random2',
         },
       ]
-      const selectOptions = objectToSelectOptions(data, 'id', 'desc')
+      const selectOptions = objectToSelectOptions(data, 'id', 'desc', 'id2')
 
       expect(selectOptions).toEqual([
         { value: 'id1', text: 'desc1' },
-        { value: 'id2', text: 'desc2' },
+        { value: 'id2', text: 'desc2', selected: true },
       ])
     })
   })
@@ -689,7 +758,6 @@ describe('utils', () => {
         'Probation Team (COM not yet allocated)',
       ],
       ['404', null, 'Not assigned'],
-      ['Error', undefined, 'We cannot show these details right now'],
     ])('%s: formatCommunityManager(%s, %s, %s)', (_: string, communityManager: CommunityManager, expected: string) => {
       expect(formatCommunityManager(communityManager)).toEqual(expected)
     })
@@ -715,7 +783,7 @@ describe('utils', () => {
 
     it('groupBy list that does not contain the grouping key should return an empty list', () => {
       // unexpected behaviour....
-      expect(groupBy([group1Item1], 'notthere')).toEqual({ undefined: [group1Item1] })
+      expect(groupBy([group1Item1], 'notthere' as keyof typeof group1Item1)).toEqual({ undefined: [group1Item1] })
     })
 
     it('groupBy single item', () => {
@@ -727,6 +795,329 @@ describe('utils', () => {
         [group1Key]: [group1Item1, group1Item2],
         [group2Key]: [group2Item1],
       })
+    })
+  })
+
+  describe('address to summary items', () => {
+    it.each([
+      [
+        'Full normal address',
+        {
+          primary: true,
+          mail: true,
+          noFixedAddress: false,
+          startDate: '2024-01-01',
+          street: 'Street',
+          town: 'Town',
+          postalCode: 'AB1 1AB',
+          phones: [{ type: 'HOME', number: '1234567890' }],
+          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: true }],
+          comment: 'Comment',
+        } as Address,
+        [
+          {
+            key: { text: 'Address' },
+            value: { html: 'Street<br/>Town<br/>AB1 1AB' },
+            classes: 'govuk-summary-list__row--no-border',
+          },
+          {
+            key: { text: 'Type of address' },
+            value: { html: 'Reception' },
+          },
+          {
+            key: { text: 'Phone' },
+            value: { html: '1234567890' },
+          },
+          {
+            key: { text: 'Comment' },
+            value: { text: 'Comment' },
+          },
+        ],
+      ],
+      [
+        'No fixed address with no phone or comment',
+        {
+          primary: true,
+          mail: true,
+          noFixedAddress: true,
+          startDate: '2024-01-01',
+          street: 'Street',
+          town: 'Town',
+          postalCode: 'AB1 1AB',
+          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: false }],
+        } as Address,
+        [
+          {
+            key: { text: 'Address' },
+            value: { html: 'No fixed address' },
+            classes: 'govuk-summary-list__row--no-border',
+          },
+          {
+            key: { text: 'Type of address' },
+            value: { html: 'Not entered' },
+          },
+        ],
+      ],
+      ['No address', null, []],
+    ])('%s: addressToSummaryItems(%s, %s, %s)', (_: string, address: Address, expected: GovSummaryItem[]) => {
+      expect(addressToSummaryItems(address)).toEqual(expected)
+    })
+  })
+
+  describe('add default selected value', () => {
+    const testItems: SelectOption[] = [{ value: 'val', text: 'text' }]
+
+    it.each([
+      ['null', null, 'default', undefined, null],
+      [
+        'Hide default',
+        testItems,
+        'default',
+        undefined,
+        [{ text: 'default', value: '', selected: true, attributes: { hidden: 'hidden' } }, ...testItems],
+      ],
+      ['Keep default', testItems, 'default', false, [{ text: 'default', value: '', selected: true }, ...testItems]],
+    ])(
+      '%s: addDefaultSelectedValue(%s, %s, %s, %s)',
+      (_: string, items: SelectOption[], text: string, setHidden: boolean, expected: SelectOption[] | null) => {
+        expect(addDefaultSelectedValue(items, text, setHidden)).toEqual(expected)
+      },
+    )
+  })
+
+  describe('formatPomName', () => {
+    it.each([
+      ['Valid name', 'SMITH, JOHN', 'John Smith'],
+      ['Invalid name', 'BILLY JONES', 'BILLY JONES'],
+      ['No POM supplied', null, null],
+    ])('%s: formatPomName(%s)', (_: string, pomName: string, expected: string) => {
+      expect(formatPomName(pomName)).toEqual(expected)
+    })
+  })
+
+  describe('snakeToCamelCase', () => {
+    it.each([
+      ['FACIAL_HAIR', 'facialHair'],
+      ['BUILD', 'build'],
+      ['MULTI_WORD_PARAM_NAME', 'multiWordParamName'],
+      ['', ''],
+      [undefined, undefined],
+    ])('%s: snakeToCamelCase(%s)', (str: string, expected: string) => {
+      expect(snakeToCamelCase(str)).toEqual(expected)
+    })
+  })
+
+  describe('camelToSnakeCase', () => {
+    it.each([
+      ['facialHair', 'FACIAL_HAIR'],
+      ['build', 'BUILD'],
+      ['multiWordParamName', 'MULTI_WORD_PARAM_NAME'],
+      ['', ''],
+      [undefined, undefined],
+    ])('%s: camelToSnakeCase(%s)', (str: string, expected: string) => {
+      expect(camelToSnakeCase(str)).toEqual(expected)
+    })
+  })
+
+  describe('formatHeight', () => {
+    it.each([
+      [0, '0m'],
+      [10, '0.1m'],
+      [15, '0.15m'],
+      [200, '2m'],
+      [210, '2.1m'],
+      [211, '2.11m'],
+      [null, 'Not entered'],
+    ])('%s: formatHeight(%s)', (height: number, expected: string) => {
+      expect(formatHeight(height)).toEqual(expected)
+    })
+  })
+
+  describe('formatWeight', () => {
+    it.each([
+      [0, '0kg'],
+      [50, '50kg'],
+      [123, '123kg'],
+      [null, 'Not entered'],
+    ])('%s: formatWeight(%s)', (weight: number, expected: string) => {
+      expect(formatWeight(weight)).toEqual(expected)
+    })
+  })
+
+  describe('sortByLatestAndUuid', () => {
+    test.each([
+      ['empty list', [], []],
+      ['list with one item', [{ id: 1, latest: true }], [{ id: 1, latest: true }]],
+      [
+        'list sorted by latest and then by id',
+        [
+          { id: 1, latest: false },
+          { id: 2, latest: true },
+          { id: 3, latest: false },
+        ],
+        [
+          { id: 2, latest: true },
+          { id: 3, latest: false },
+          { id: 1, latest: false },
+        ],
+      ],
+    ])('should sort %s', (_, input, expected) => {
+      expect(sortByLatestAndUuid(input)).toEqual(expected)
+    })
+
+    test('should not mutate the original array', () => {
+      const input = [
+        { id: 2, latest: true },
+        { id: 1, latest: false },
+      ]
+      const copy = [...input]
+      sortByLatestAndUuid(input)
+      expect(input).toEqual(copy)
+    })
+  })
+
+  describe('latestImageId', () => {
+    test.each([
+      ['empty list', [], undefined],
+      ['list with one item', [{ id: 1, latest: true }], 1],
+      [
+        'list with multiple items',
+        [
+          { id: 1, latest: false },
+          { id: 2, latest: true },
+          { id: 3, latest: false },
+        ],
+        2,
+      ],
+    ])('should sort %s', (_, input, expected) => {
+      expect(latestImageId(input)).toEqual(expected)
+    })
+  })
+
+  describe('lengthOfService', () => {
+    it('should return correct length of service in years and months', () => {
+      expect(lengthOfService('2020-01-01', '2023-01-01')).toEqual('3 years')
+      expect(lengthOfService('2020-01-01', '2021-01-01')).toEqual('1 year')
+      expect(lengthOfService('2020-01-01', '2023-04-01')).toEqual('3 years, 3 months')
+      expect(lengthOfService('2020-01-01', '2021-04-01')).toEqual('1 year, 3 months')
+      expect(lengthOfService('2020-01-01', '2023-02-01')).toEqual('3 years, 1 month')
+      expect(lengthOfService('2020-01-01', '2021-02-01')).toEqual('1 year, 1 month')
+      expect(lengthOfService('2020-01-01', '2020-04-01')).toEqual('3 months')
+      expect(lengthOfService('2020-01-01', '2020-02-01')).toEqual('1 month')
+      expect(lengthOfService('2020-01-01', '2020-01-01')).toEqual('0 years')
+    })
+  })
+
+  describe('formatPhoneNumber', () => {
+    it.each([
+      ['Valid UK number no spaces', '01234567890', '01234 567890'],
+      ['Valid UK number 5+6', '01234 567890', '01234 567890'],
+      ['Valid UK number padded', '  0123 456 7890  ', '01234 567890'],
+      ['Number with +XX country code', '+441234567890', '+441234567890'],
+      ['Number with 00 country code', '00441234567890', '00441234567890'],
+      ['Number with varying country code length', '+123456789012', '+123456789012'],
+      ['Number with brackets and > 11 digits', '(01234) 5678901', '(01234) 5678901'],
+      ['Number with brackets', '(01234) 567890', '01234 567890'],
+      ['Number with dashes', '01234-567-890', '01234 567890'],
+      ['Number with dashes and > 11 digits', '01234-567-8901', '01234-567-8901'],
+      ['Number with spaces', '01234 567 890', '01234 567890'],
+      ['Number with spaces and > 11 digits', '01234 567 8901', '01234 567 8901'],
+      ['Empty string', '', null],
+      ['Whitespace only', '   ', null],
+      ['Null input', null, null],
+      ['Short number', '12345', '12345'],
+      ['Non-numeric characters', 'abc123', 'abc123'],
+    ])('%s: formatPhoneNumber(%s)', (_: string, input: string, expected: string) => {
+      expect(formatPhoneNumber(input)).toEqual(expected)
+    })
+  })
+
+  describe('contactAddressToHtml', () => {
+    it.each([
+      [
+        'Full address with flat',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Full address without flat',
+        {
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Building Name Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without property',
+        {
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without street',
+        {
+          property: 'Building Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Building Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without city',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>AB1 2CD',
+      ],
+      [
+        'Address without postcode',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>City',
+      ],
+      [
+        'Address with only flat',
+        {
+          flat: '7',
+        } as PersonalRelationshipsContact,
+        'Flat 7',
+      ],
+      [
+        'Address with only property and street',
+        {
+          property: 'Building Name',
+          street: 'Street Name',
+        } as PersonalRelationshipsContact,
+        'Building Name Street Name',
+      ],
+      ['Empty address', {} as PersonalRelationshipsContact, 'Not entered'],
+      [
+        'Non address properties',
+        { dateOfBirth: '2000-01-01', comments: 'Comment' } as PersonalRelationshipsContact,
+        'Not entered',
+      ],
+      ['Undefined address', undefined, 'Not entered'],
+      ['Null address', null, 'Not entered'],
+    ])('%s', (_: string, address: PersonalRelationshipsContact, expected: string) => {
+      expect(contactAddressToHtml(address)).toEqual(expected)
     })
   })
 })

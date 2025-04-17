@@ -3,29 +3,73 @@ import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
 import {
+  addDefaultSelectedValue,
   addressToLines,
+  addressToSummaryItems,
+  apiErrorMessage,
   apostrophe,
+  contactAddressToHtml,
   findError,
   formatMoney,
   formatName,
+  formatPhoneNumber,
   formatScheduleItem,
   initialiseName,
+  isInUsersCaseLoad,
+  latestImageId,
+  lengthOfService,
   neurodiversityEnabled,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
-  prisonerBelongsToUsersCaseLoad,
   prisonerIsOut,
   prisonerIsTRN,
+  sortByLatestAndUuid,
   summaryListOneHalfWidth,
   toNonAssociationRows,
   userHasRoles,
 } from './utils'
+import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
-import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
+import {
+  formatAddressDate,
+  formatDate,
+  formatDateTime,
+  formatDateToPattern,
+  formatDateWithAge,
+  timeFormat,
+} from './dateHelpers'
 import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
 import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
+import visitsWithVisitorsToListMapper from '../mappers/visitsWithVisitorsToListMapper'
+import moneySummaryToMiniSummary from '../views/dataUtils/moneySummaryToMiniSummary'
+import adjudicationsSummaryToMiniSummary from '../views/dataUtils/adjudicationsSummaryToMiniSummary'
+import visitsSummaryToMiniSummary from '../views/dataUtils/visitsSummaryToMiniSummary'
+import csraSummaryToMiniSummary from '../views/dataUtils/csraSummaryToMiniSummary'
+import categorySummaryToMiniSummary from '../views/dataUtils/categorySummaryToMiniSummary'
+import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryToMiniSummary'
+import summaryListRowWithOptionalChangeLink, {
+  listToSummaryListRows,
+} from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
+import groupDistinguishingMarks, {
+  getBodyPartDescription,
+  getBodyPartToken,
+  getMarkLocationDescription,
+} from '../views/dataUtils/groupDistinguishingMarksForView'
+import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
+import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
+import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
+import {
+  bvlsMasteredVlpmFeatureToggleEnabled,
+  externalContactsEnabled,
+  militaryHistoryEnabled,
+  newOverviewPageLayoutEnabled,
+} from './featureToggles'
+import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
+import categorySummaryToMiniSummaryOldLayout from '../views/dataUtils/categorySummaryToMiniSummaryOldLayout'
+import incentiveSummaryToMiniSummaryOldLayout from '../views/dataUtils/incentiveSummaryToMiniSummaryOldLayout'
+import visitsSummaryToMiniSummaryOldLayout from '../views/dataUtils/visitsSummaryToMiniSummaryOldLayout'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -33,7 +77,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'Digital Prison Services'
+  app.locals.applicationName = 'DPS'
   app.locals.config = config
 
   // Cachebusting version string
@@ -55,6 +99,8 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       'node_modules/govuk-frontend/dist/components/',
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
+      'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/',
+      'node_modules/@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/',
     ],
     {
       autoescape: true,
@@ -67,14 +113,18 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     analytics: { tagManagerContainerId },
   } = config
   njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
-
-  njkEnv.addGlobal('prisonerBelongsToUsersCaseLoad', prisonerBelongsToUsersCaseLoad)
+  njkEnv.addGlobal('isInUsersCaseLoad', isInUsersCaseLoad)
   njkEnv.addGlobal('userHasRoles', userHasRoles)
-
   njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
-
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
+  njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
+  njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
+  njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
+  njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
+  njkEnv.addGlobal('useNewOverviewPageLayout', newOverviewPageLayoutEnabled)
+  njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
+  njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
@@ -83,23 +133,14 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
+  njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)
+  njkEnv.addFilter('find', (l: never[], iteratee: string, eq: unknown) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)
-  njkEnv.addFilter('addDefaultSelectedValue', (items, text) => {
-    if (!items) return null
-
-    return [
-      {
-        text,
-        value: '',
-        selected: true,
-        attributes: {
-          hidden: 'hidden',
-        },
-      },
-      ...items,
-    ]
-  })
+  njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
+  njkEnv.addFilter('containsSelected', (items: { selected: boolean }[]) => items && items.some(item => item.selected))
 
   njkEnv.addFilter(
     'setSelected',
@@ -108,6 +149,16 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       items.map(entry => ({
         ...entry,
         selected: entry && String(entry.value) === String(selected),
+      })),
+  )
+
+  njkEnv.addFilter(
+    'setChecked',
+    (items: { value: string; text: string }[], checked: string[]) =>
+      items &&
+      items.map(entry => ({
+        ...entry,
+        checked: entry && checked.includes(String(entry.value)),
       })),
   )
 
@@ -141,6 +192,32 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatName', formatName)
   njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
-
-  njkEnv.addFilter('formatMultilineText', njkEnv.getFilter('nl2br')) // Use the inbuilt `nl2br` filter, but reference it as `formatMultilineText` in the nunjucks templates because it's a better name
+  njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
+  njkEnv.addFilter('formatAddressDate', formatAddressDate)
+  njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
+  njkEnv.addFilter('toMoneySummaryDisplay', moneySummaryToMiniSummary)
+  njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
+  njkEnv.addFilter('toNonAssociationSummaryDisplay', nonAssociationSummaryToMiniSummary)
+  njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
+  njkEnv.addFilter('toVisitsSummaryDisplayOldLayout', visitsSummaryToMiniSummaryOldLayout)
+  njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
+  njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
+  njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
+  njkEnv.addFilter('toCategorySummaryDisplayOldLayout', categorySummaryToMiniSummaryOldLayout)
+  njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
+  njkEnv.addFilter('toIncentiveSummaryDisplayOldLayout', incentiveSummaryToMiniSummaryOldLayout)
+  njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
+  njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
+  njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
+  njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
+  njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
+  njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
+  njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
+  njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
+  njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
+  njkEnv.addFilter('latestImageId', latestImageId)
+  njkEnv.addFilter('lengthOfService', lengthOfService)
+  njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
+  njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
+  njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
 }

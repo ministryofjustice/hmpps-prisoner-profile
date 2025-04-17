@@ -1,11 +1,54 @@
 import { extractLocation, groupBy, isTemporaryLocation } from '../utils/utils'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from './interfaces/locationDetails'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import OffenderBooking from '../data/interfaces/prisonApi/OffenderBooking'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from './interfaces/locationDetailsService/LocationDetails'
+import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
+import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
+import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
+import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
 
 export default class LocationDetailsService {
-  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly nomisSyncPrisonMappingClientBuilder: RestClientBuilder<NomisSyncPrisonerMappingApiClient>,
+    private readonly locationsInsidePrisonApiClientBuilder: RestClientBuilder<LocationsInsidePrisonApiClient>,
+  ) {}
+
+  getLocationMappingUsingNomisLocationId = (clientToken: string, locationId: number): Promise<NomisSyncLocation> => {
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingNomisLocationId(locationId)
+  }
+
+  getLocationMappingUsingDpsLocationId = (clientToken: string, locationId: string): Promise<NomisSyncLocation> => {
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingDpsLocationId(locationId)
+  }
+
+  getLocationMappingUsingDpsLocationKey = async (
+    clientToken: string,
+    locationKey: string,
+  ): Promise<NomisSyncLocation> => {
+    const location = await this.getLocationByKey(clientToken, locationKey)
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingDpsLocationId(location.id)
+  }
+
+  getLocation = async (clientToken: string, locationId: string): Promise<LocationsApiLocation> => {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocation(locationId)
+  }
+
+  getLocationByKey = async (clientToken: string, locationKey: string): Promise<LocationsApiLocation> => {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationByKey(locationKey)
+  }
+
+  getLocationByNomisLocationId = async (clientToken: string, locationId: number): Promise<LocationsApiLocation> => {
+    const map = await this.getLocationMappingUsingNomisLocationId(clientToken, locationId)
+    return this.getLocation(clientToken, map.dpsLocationId)
+  }
+
+  getLocationsForAppointments = async (clientToken: string, prisonId: string): Promise<LocationsApiLocation[]> => {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationsForAppointments(prisonId)
+  }
 
   getInmatesAtLocation = (clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> => {
     return this.prisonApiClientBuilder(clientToken).getInmatesAtLocation(livingUnitId, {})

@@ -3,75 +3,74 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
     {% if info.bodyPart %}
-        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">
-            {{ info.bodyPart }}
-        </p>
+        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">{{ info.bodyPart }}</p>
     {% endif %}
 
     {% if info.side or info.orientation or info.comment or info.imageId %}
         <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
             <summary class="govuk-details__summary govuk-!-display-none-print">
-              <span class="govuk-details__summary-text">View details</span>
+                <span class="govuk-details__summary-text">View details</span>
             </summary>
             <div class="govuk-details__text">
-              {% if info.side %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
-                  <span class="govuk-!-font-weight-bold">Side</span><br />
-                  {{ info.side }}
-                </p>
-              {% endif %}
-              {% if info.orientation %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
-                  <span class="govuk-!-font-weight-bold">Orientation</span><br />
-                  {{ info.orientation }}
-                </p>
-              {% endif %}
-              {% if info.comment %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
-                  <span class="govuk-!-font-weight-bold">Comment</span><br />
-                  {{ info.comment }}
-                </p>
-              {% endif %}
-              {% if info.imageId %}
-                <p class="govuk-body">
-                  <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
-                </p>
-              {% endif %}
+                {% if info.side %}
+                    <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
+                        <span class="govuk-!-font-weight-bold">Side</span><br />
+                        {{ info.side }}
+                    </p>
+                {% endif %}
+                {% if info.orientation %}
+                    <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
+                        <span class="govuk-!-font-weight-bold">Orientation</span><br />
+                        {{ info.orientation }}
+                    </p>
+                {% endif %}
+                {% if info.comment %}
+                    <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
+                        <span class="govuk-!-font-weight-bold">Comment</span><br />
+                        {{ info.comment }}
+                    </p>
+                {% endif %}
+                {% if info.imageId %}
+                    <p class="govuk-body">
+                        <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
+                    </p>
+                {% endif %}
             </div>
         </details>
     {% endif %}
 {% endmacro %}
+
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
-{% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length %}
-  <div class="govuk-grid-row" data-qa="appearance">
-    <div class="govuk-grid-column-full" data-qa="physical-characteristics">
-      <h3 class="govuk-heading-m">Physical characteristics</h3>
-      {{
-        govukSummaryList({
-        classes: listClasses,
-        rows: [
-        {key: { text: "Height"}, value: { text: physicalCharacteristics.height } },
-        {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
-        {key: { text: "Hair colour"}, value: { text: physicalCharacteristics.hairColour } },
-        {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
-        {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
-        {key: { text: "Facial hair"}, value: { text: physicalCharacteristics.facialHair } },
-        {key: { text: "Shape of face"}, value: { text: physicalCharacteristics.shapeOfFace } },
-        {key: { text: "Build"}, value: { text: physicalCharacteristics.build } },
-        {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },
-        {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
-        {key: { text: "Warned not to change appearance"}, value: { text: physicalCharacteristics.warnedNotToChangeAppearance } }
-        ]
-        })
-      }}
-      {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
-        <h3 class="govuk-heading-m">Distinguishing marks</h3>
-        <dl class="govuk-summary-list hmpps-distinguishing-marks" data-qa="distinguishing-marks">
-          {% for m in physicalCharacteristics.distinguishingMarks %}
-            {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
-          {% endfor %}
-        </dl>
-      {% endif %}
+    {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length or distinguishingMarks %}
+    <div class="govuk-grid-row" data-qa="appearance">
+        <div class="govuk-grid-column-full" data-qa="physical-characteristics">
+            <h3 class="govuk-heading-m">Physical characteristics</h3>
+            {{ govukSummaryList({
+                classes: listClasses,
+                rows: toSummaryListRows([
+                    { key: "Height", value: physicalCharacteristics.height, options: { dataQa: "height", changeHref: "personal/height", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } },
+                    { key: "Weight", value: physicalCharacteristics.weight, options: { dataQa: "weight", changeHref: "personal/weight", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'weight' } },
+                    { key: "Hair type or colour", value: physicalCharacteristics.hairColour, options: { dataQa: "hair-type-or-colour", changeHref: "personal/hair", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } },
+                    { key: "Left eye colour", value: physicalCharacteristics.leftEyeColour, options: { dataQa: "left-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
+                    { key: "Right eye colour", value: physicalCharacteristics.rightEyeColour, options: { dataQa: "right-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
+                    { key: "Facial hair", value: physicalCharacteristics.facialHair, options: { dataQa: "facial-hair", changeHref: "personal/facial-hair", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: "facial hair type" } },
+                    { key: "Shape of face", value: physicalCharacteristics.shapeOfFace, options: { dataQa: "face-shape", changeHref: "personal/face-shape", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: "face shape" } },
+                    { key: "Build", value: physicalCharacteristics.build, options: { dataQa: "build", changeHref: "personal/build", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' } },
+                    { key: "Shoe size", value: physicalCharacteristics.shoeSize, options: { dataQa: "shoe-size", changeHref: "personal/shoe-size", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'shoeSize' } },
+                    { key: "Warned about tattooing", value: physicalCharacteristics.warnedAboutTattooing, options: { dataQa: "warned-about-tattooing" } },
+                    { key: "Warned not to change appearance", value: physicalCharacteristics.warnedNotToChangeAppearance, options: { dataQa: "warned-not-to-change-appearance" } }
+                ])
+            }) }}
+            {% if distinguishingMarks %}
+                {% include "./distinguishingMarks.njk" %}
+            {% elseif physicalCharacteristics.distinguishingMarks.length > 0 %}
+                <h3 class="govuk-heading-m">Distinguishing marks</h3>
+                <dl class="govuk-summary-list hmpps-distinguishing-marks" data-qa="distinguishing-marks">
+                    {% for m in physicalCharacteristics.distinguishingMarks %}
+                        {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
+                    {% endfor %}
+                </dl>
+            {% endif %}
+        </div>
     </div>
-  </div>
 {%- endcall -%}

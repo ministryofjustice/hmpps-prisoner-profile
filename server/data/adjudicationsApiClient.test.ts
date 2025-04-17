@@ -3,8 +3,6 @@ import config from '../config'
 import { adjudicationSummaryWithActiveMock } from './localMockData/miniSummaryMock'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('adjudicationsApiClient', () => {

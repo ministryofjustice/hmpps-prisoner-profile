@@ -1,22 +1,24 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Role } from '../data/enums/role'
-import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
-import { formatLocation, formatName, userHasRoles } from '../utils/utils'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { canAddCaseNotes } from '../utils/roleHelpers'
+import { formatLocation, formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
-import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
+import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
+import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { isServiceEnabled } from '../utils/isServiceEnabled'
+import { Result } from '../utils/result/result'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -31,28 +33,16 @@ export default class CaseNotesController {
   public displayCaseNotes(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
-      const queryParams: PagedListQueryParams = {}
-      const { clientToken } = res.locals
-      const userToken = res.locals.user.token
+      const queryParams: CaseNotesListQueryParams = {}
+      const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
 
+      queryParams.sort = (req.query.sort as string) || 'creationDateTime,DESC'
       if (req.query.page) queryParams.page = +req.query.page
-      if (req.query.sort) queryParams.sort = req.query.sort as string
       if (req.query.type) queryParams.type = req.query.type as string
       if (req.query.subType) queryParams.subType = req.query.subType as string
       if (req.query.startDate) queryParams.startDate = req.query.startDate as string
       if (req.query.endDate) queryParams.endDate = req.query.endDate as string
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
-
-      // Get prisoner data for banner and for use in alerts generation
-      const { prisonerData } = req.middleware
-
-      // Set role based permissions
-      const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
-
-      // If user cannot view this prisoner's case notes, redirect to 404 page
-      if (!canViewCaseNotes(res.locals.user, prisonerData)) {
-        return next()
-      }
 
       const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
@@ -62,33 +52,38 @@ export default class CaseNotesController {
       // Get case notes based on given query params
       // Get inmate detail for header
       const prisonApiClient = this.prisonApiClientBuilder(clientToken)
-      const [caseNotesUsage, caseNotesPageData, inmateDetail] = await Promise.all([
+      const [caseNotesUsage, caseNotesPageData] = await Promise.all([
         prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber),
-        this.caseNotesService.get(
-          userToken,
-          prisonerData,
-          queryParams,
-          canDeleteSensitiveCaseNotes,
-          req.session.userDetails,
+        Result.wrap(
+          this.caseNotesService.get({
+            token: clientToken,
+            prisonerData,
+            queryParams,
+            canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
+            canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
+            currentUserDetails: res.locals.user,
+          }),
         ),
-        prisonApiClient.getInmateDetail(prisonerData.bookingId),
       ])
+
+      if (!caseNotesPageData.isFulfilled()) {
+        return res.render('pages/caseNotes/caseNotesPage', {
+          pageTitle: 'Case notes',
+          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+          caseNotesApiUnavailable: true,
+        })
+      }
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(
-        caseNotesPageData.caseNoteTypes,
+        caseNotesPageData.getOrThrow().caseNoteTypes,
         queryParams.type,
       )
       const showingAll = queryParams.showAll
 
-      // Get staffId to use in conditional logic for amend link
-      const { staffId } = res.locals.user
-
       this.auditService
         .sendSearch({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
@@ -100,30 +95,24 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'case-notes'),
-        ...caseNotesPageData,
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+        ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,
         typeSubTypeMap,
         showingAll,
         hasCaseNotes,
         addCaseNoteLinkUrl,
-        staffId,
+        canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponents?.sharedData),
       })
     }
   }
 
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
-      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient, cellLocation } =
-        req.middleware.prisonerData
+      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-
-      // If user cannot view this prisoner's case notes, redirect to 404 page
-      if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
-        return next()
-      }
+      const { permissions } = req.middleware
 
       const now = new Date()
       const caseNoteFlash = req.flash('caseNote')
@@ -140,7 +129,10 @@ export default class CaseNotesController {
           }
       const errors = req.flash('errors')
 
-      const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser(userToken)
+      const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
+        token: req.middleware.clientToken,
+        canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+      })
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(caseNoteTypes, formValues.type, true)
 
       // Generate back link based on where the user came from - default to profile overview if no referer
@@ -152,9 +144,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -182,7 +172,8 @@ export default class CaseNotesController {
   }
 
   public post(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { permissions } = req.middleware
       const { prisonerNumber } = req.params
       const { type, subType, text, date, hours, minutes, refererUrl } = req.body
       const caseNote = {
@@ -193,10 +184,25 @@ export default class CaseNotesController {
         hours,
         minutes,
       }
+
       const errors = req.errors || []
       if (!errors.length) {
+        const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
+          token: req.middleware.clientToken,
+          canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+        })
+        if (!allowedCaseNoteTypes.some(allowedType => allowedType.code === type)) {
+          logger.info(`User not permitted to create case note of type: ${type}`)
+          return next()
+        }
+
         try {
-          await this.caseNotesService.addCaseNote(res.locals.user.token, prisonerNumber, caseNote)
+          await this.caseNotesService.addCaseNote(
+            req.middleware.clientToken,
+            prisonerNumber,
+            req.middleware.prisonerData.prisonId,
+            caseNote,
+          )
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -220,8 +226,7 @@ export default class CaseNotesController {
       req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.CaseNote,
@@ -234,17 +239,19 @@ export default class CaseNotesController {
 
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
       const { caseNoteId } = req.params
-      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } = req.middleware.prisonerData
+      const { clientToken, permissions } = req.middleware
+      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-      // If user cannot view this prisoner's case notes, redirect to 404 page
-      if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
+      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
+
+      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
+        logger.info(`User not permitted to edit sensitive case note: ${caseNoteId}`)
         return next()
       }
 
-      const currentCaseNote = await this.caseNotesService.getCaseNote(userToken, prisonerNumber, caseNoteId)
       const currentLength = this.calculateCaseNoteTotalLength(currentCaseNote)
       const isOMICOpen = currentCaseNote.subType === 'OPEN_COMM'
       const isExternal = Number.isNaN(+currentCaseNote.caseNoteId) // External case notes have non-numeric IDs
@@ -261,9 +268,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -281,25 +286,39 @@ export default class CaseNotesController {
         maxLength,
         isOMICOpen,
         isExternal,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
         errors,
       })
     }
   }
 
   public postUpdate(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, caseNoteId } = req.params
-      const { text, isExternal, currentLength, username } = req.body
+      const { text } = req.body
+      const { clientToken, permissions } = req.middleware
+      const { prisonId } = req.middleware.prisonerData
+      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
+
+      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
+        logger.info(`User not permitted to edit sensitive case notes`)
+        return next()
+      }
 
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.caseNotesService.updateCaseNote(res.locals.user.token, prisonerNumber, caseNoteId, {
+          await this.caseNotesService.addCaseNoteAmendment(
+            req.middleware.clientToken,
+            prisonerNumber,
+            prisonId,
+            caseNoteId,
             text,
-            isExternal,
-            currentLength: +currentLength,
-            username,
-          })
+          )
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -316,8 +335,7 @@ export default class CaseNotesController {
       req.flash('flashMessage', { text: 'Case note updated', type: FlashMessageType.success })
       this.auditService
         .sendPutSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PutAction.CaseNote,
@@ -333,12 +351,10 @@ export default class CaseNotesController {
    *
    * @param caseNoteTypes
    * @param type - preselected type to determine list of subTypes
-   * @param onlyActive - if true, filter out types/subtypes where activeFlag !== 'Y'
+   * @param onlyActive - if true, filter out types/subtypes where active is true
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const types = caseNoteTypes
-      ?.filter(t => !onlyActive || t.activeFlag === 'Y')
-      .map(t => ({ value: t.code, text: t.description }))
+    const types = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
 
     const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = caseNoteTypes.reduce(
       (ts, t) => ({
@@ -353,7 +369,7 @@ export default class CaseNotesController {
       const selectedType = caseNoteTypes.find(t => t.code === type)
       if (selectedType) {
         subTypes = selectedType.subCodes
-          ?.filter(t => !onlyActive || t.activeFlag === 'Y')
+          ?.filter(t => !onlyActive || t.active)
           .map(subType => ({
             value: subType.code,
             text: subType.description,

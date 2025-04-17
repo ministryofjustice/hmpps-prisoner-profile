@@ -1,0 +1,118 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: miniBannerData.prisonerName,
+        href: "/prisoner/" + miniBannerData.prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + miniBannerData.prisonerNumber + "/personal"
+    }
+] %}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+    {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
+        {{ govukBackLink({
+            text: "Back",
+            href: "/prisoner/" + miniBannerData.prisonerNumber + "/personal/change-name",
+            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
+        }) }}
+
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            }) }}
+        {% endif %}
+
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ formTitle }}</h1>
+
+        <div class="hmpps-name-change govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                <form method="post" novalidate="novalidate" autocomplete="off">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+                    {{ govukInput({
+                        id: 'firstName',
+                        name: 'firstName',
+                        label: {
+                            text: 'First name',
+                            classes: 'govuk-label--s'
+                        },
+                        value: formValues.firstName,
+                        errorMessage: errors | findError('firstName')
+                    }) }}
+
+                    {{ govukInput({
+                        id: 'middleName1',
+                        name: 'middleName1',
+                        label: {
+                            text: 'Middle name',
+                            classes: 'govuk-label--s'
+                        },
+                        value: formValues.middleName1,
+                        errorMessage: errors | findError('middleName1')
+                    }) }}
+
+                    {{ govukInput({
+                        id: 'middleName2',
+                        name: 'middleName2',
+                        label: {
+                            text: 'Second middle name',
+                            classes: 'govuk-label--s'
+                        },
+                        value: formValues.middleName2,
+                        errorMessage: errors | findError('middleName2')
+                    }) }}
+
+                    {{ govukInput({
+                        id: 'lastName',
+                        name: 'lastName',
+                        label: {
+                            text: 'Last name',
+                            classes: 'govuk-label--s'
+                        },
+                        value: formValues.lastName,
+                        errorMessage: errors | findError('lastName')
+                    }) }}
+
+                    {{ govukWarningText({
+                        text: warningText,
+                        iconFallbackText: "Warning",
+                        classes: "govuk-body-s"
+                    }) }}
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Save",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            attributes: { "data-qa": "edit-submit-button" }
+                        }) }}
+                        <a href="/prisoner/{{ miniBannerData.prisonerNumber }}/personal#personal-details"
+                           class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}

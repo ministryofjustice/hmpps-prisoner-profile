@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import { add, format, isAfter, isBefore, startOfToday } from 'date-fns'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Prisoner } from '../interfaces/prisoner'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { formatName, groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { ScheduledEvent, SelectedWeekDates } from '../interfaces/scheduledEvent'
+import ScheduledEvent, { SelectedWeekDates } from '../data/interfaces/prisonApi/ScheduledEvent'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
 
@@ -25,7 +25,7 @@ export default class PrisonerScheduleController {
     const { firstName, middleNames, lastName } = prisonerData
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
@@ -113,7 +113,7 @@ export default class PrisonerScheduleController {
     }
 
     const days = selectedWeekDates?.map(day => ({
-      date: formatDate(day?.date, 'full').replace(',', ''),
+      date: formatDate(day?.date, 'full'),
       periods: groupedByDate
         ? eventsAction(groupedByDate[day?.date])
         : {
@@ -124,9 +124,7 @@ export default class PrisonerScheduleController {
     }))
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,

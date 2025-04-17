@@ -1,4 +1,4 @@
-import { CsraAssessmentSummary } from '../../interfaces/prisonApi/csraAssessmentSummary'
+import { CsraAssessmentSummary } from '../interfaces/prisonApi/CsraAssessment'
 
 const csraAssessmentMock: CsraAssessmentSummary = {
   assessmentAgencyId: 'HLI',

@@ -1,16 +1,48 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro identityNumbersWithComment(identityNumbers) %}
+  {% for identityNumber in identityNumbers %}
+    <p class="govuk-body">{{ identityNumber.value }}</p>
+      {% if identityNumber.comment %}
+      <p class="govuk-body-s">
+        <strong>Comment</strong>
+        <br />
+        {{ identityNumber.comment }}
+      </p>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro identityNumber(name, identityNumbers, id) %}
+  {% if identityNumbers.length > 0 %}
+    {{ summaryListRow(name, identityNumbersWithComment(identityNumbers), id, {html: true}) }}
+  {% endif %}
+{% endmacro %}
+
 {%- call summaryCard({title: "Identity numbers", id: "identity-numbers"}) -%}
   <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">
       <dl class="govuk-summary-list">
         {{ summaryListRow("Prison number", identityNumbers.prisonNumber, "prison-number") }}
-        {{ summaryListRow("PNC number", identityNumbers.pncNumber, "pnc-number") }}
-        {{ summaryListRow("CRO number", identityNumbers.croNumber, "cro-number") }}
-        {{ summaryListRow("Home Office reference number", identityNumbers.homeOfficeReferenceNumber, "home-office-reference-number", { hideIfEmpty: true }) }}
-        {{ summaryListRow("National Insurance number", identityNumbers.nationalInsuranceNumber, "national-insurance-number", { hideIfEmpty: true }) }}
-        {{ summaryListRow("Driving licence number", identityNumbers.drivingLicenceNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("PNC number", identityNumbers.pncNumber, "pnc-number") }}
+        {{ identityNumber("CRO number", identityNumbers.croNumber, "cro-number") }}
+        {{ identityNumber("Home Office reference number", identityNumbers.homeOfficeReferenceNumber, "home-office-reference-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("National Insurance number", identityNumbers.nationalInsuranceNumber, "national-insurance-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Driving licence number", identityNumbers.drivingLicenceNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Case Information Database (CID)", identityNumbers.caseInformationDatabase, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Prison Legacy System number", identityNumbers.prisonLegacySystemNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Local Inmate Data System (LIDS) number", identityNumbers.localInmateDataSystemNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Probation Legacy System number", identityNumbers.passportNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Passport number", identityNumbers.passportNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Parkrun number", identityNumbers.parkrunNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Port reference number", identityNumbers.portReferenceNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Scottish PNC number", identityNumbers.scottishPncNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Staff identity card number", identityNumbers.staffIdentityCardNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Did not enter prison tagged bail rel", identityNumbers.didNotEnterPrisonTaggedBailRel, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("Unique learner number", identityNumbers.uniqueLearnerNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+        {{ identityNumber("YJAF number", identityNumbers.yjafNumber, "driving-licence-number", { hideIfEmpty: true }) }}
       </dl>
     </div>
   </div>

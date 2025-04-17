@@ -1,7 +1,6 @@
-import { PrisonApiClient } from '../../server/data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../../server/data/interfaces/prisonApi/prisonApiClient'
 
 export const prisonApiClientMock = (): PrisonApiClient => ({
-  createAlert: jest.fn(),
   getAccountBalances: jest.fn(),
   getActivities: jest.fn(),
   getActivitiesAtLocation: jest.fn(),
@@ -9,8 +8,6 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getAddresses: jest.fn(),
   getAddressesForPerson: jest.fn(),
   getAgencyDetails: jest.fn(),
-  getAlertTypes: jest.fn(),
-  getAlerts: jest.fn(),
   getAppointmentTypes: jest.fn(),
   getAppointments: jest.fn(),
   getAssessments: jest.fn(),
@@ -31,8 +28,6 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getImage: jest.fn(),
   getInmateDetail: jest.fn(),
   getInmatesAtLocation: jest.fn(),
-  getLocation: jest.fn(),
-  getLocationsForAppointments: jest.fn(),
   getMainOffence: jest.fn(),
   getMovements: jest.fn(),
   getOffenceHistory: jest.fn(),
@@ -64,11 +59,15 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getVisitSummary: jest.fn(),
   getVisits: jest.fn(),
   getDetails: jest.fn(),
-  getAttributesForLocation: jest.fn(),
   getHistoryForLocation: jest.fn(),
   getCellMoveReasonTypes: jest.fn(),
-  getAlertDetails: jest.fn(),
   getBeliefHistory: jest.fn(),
   getReceptionsWithCapacity: jest.fn(),
-  updateAlert: jest.fn(),
+  getVisitsForBookingWithVisitors: jest.fn(),
+  getVisitsPrisons: jest.fn(),
+  getNextCourtEvent: jest.fn(),
+  getActiveCourtCasesCount: jest.fn(),
+  getLatestArrivalDate: jest.fn(),
+  getImagesForPrisoner: jest.fn(),
+  getImageDetail: jest.fn(),
 })

@@ -1,4 +1,4 @@
-import { Prisoner } from '../../interfaces/prisoner'
+import Prisoner from '../interfaces/prisonerSearchApi/Prisoner'
 
 export const PrisonerMockDataA: Prisoner = {
   prisonerNumber: 'G6123VU',
@@ -144,7 +144,7 @@ export const PrisonerMockDataA: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }
 
 export const PrisonerMockDataB: Prisoner = {
@@ -208,11 +208,11 @@ export const PrisonerMockDataB: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }
 
 export const PrisonerOnRemandMockData: Prisoner = {
-  prisonerNumber: 'ONREMAND',
+  prisonerNumber: 'X9999XX',
   pncNumber: '08/359381C',
   pncNumberCanonicalShort: '08/359381C',
   pncNumberCanonicalLong: '2008/359381C',
@@ -355,5 +355,5 @@ export const PrisonerOnRemandMockData: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }

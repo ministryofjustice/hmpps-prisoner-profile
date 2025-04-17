@@ -1,8 +1,16 @@
 .hmpps-profile--personal-content {
+  .hmpps-alias-details {
+    margin-bottom: govuk-spacing(0);
+    padding-bottom: govuk-spacing(3);
 
-  @media (min-width: 40.0625em) {
-    .hmpps-alias-details th:first-of-type {
-      width: 41.5%;
+    @media (min-width: 40.0625em) {
+      th:first-of-type {
+        width: 41.5%;
+      }
+
+      th:nth-of-type(2) {
+        width: 20%;
+      }
     }
   }
 
@@ -14,7 +22,7 @@
 
 
   .govuk-summary-list__row--no-border .govuk-summary-list__row {
-    border-bottom: none!important;
+    border-bottom: none !important;
   }
 
   .govuk-body-s-dd {
@@ -45,5 +53,158 @@
       border-bottom: 1px solid $govuk-border-colour;
     }
   }
+
+  .govuk-summary-list.govuk-summary-list--bottom-border {
+    .govuk-summary-list__row:last-of-type {
+      border-bottom: 1px solid $govuk-border-colour;
+    }
+  }
+
+  .govuk-summary-list .govuk-summary-list__value.govuk-summary-list--sub-list--bottom-border {
+    padding-top: 15px;
+    padding-right: 20px;
+    padding-bottom: 15px;
+  }
+
+  .govuk-summary-list--sub-list {
+    margin-top: 0;
+    margin-bottom: 0;
+
+    &.govuk-summary-list--bottom-border .govuk-summary-list__row:last-of-type {
+      border-bottom: 1px solid $govuk-border-colour !important;
+    }
+
+    .govuk-summary-list__key {
+      font-weight: normal;
+      min-width: 10rem;
+    }
+  }
+
+  .govuk-summary-list--sub-list--bottom-border {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  .govuk-summary-list__actions :not(.hmpps-alias-row) {
+    width: 10%;
+
+    @media (max-width: 800px) {
+      width: 20%;
+    }
+  }
 }
 
+@keyframes greenToTransparent {
+  0% {
+    background-color: govuk-tint(govuk-colour("green"), 80%);
+  }
+  80% {
+    background-color: govuk-tint(govuk-colour("green"), 80%);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.row-updated {
+  background-color: transparent;
+  animation: greenToTransparent 3s;
+}
+
+.new-arrival .not-entered-tag:not(:has(> span)),
+.new-arrival .not-entered-tag > span:nth-of-type(2),
+.new-arrival .personal-distinguishing-marks__row__empty dd:first-of-type {
+  display: inline-block;
+  max-width: 180px;
+  margin-top: -2px;
+  margin-bottom: -3px;
+  padding: 2px 8px 3px;
+  text-decoration: none;
+  overflow-wrap: break-word;
+  color: govuk-shade(govuk-colour("green"), 20%);
+  background-color: govuk-tint(govuk-colour("green"), 80%);
+
+  > p {
+    margin-bottom: auto;
+    color: inherit;
+  }
+}
+
+.not-entered-tag.not-entered-tag--heading {
+  display: inline-block;
+  max-width: 180px;
+  padding: 5px 8px 4px;
+  margin: 5px 0 15px;
+  text-decoration: none;
+  overflow-wrap: break-word;
+  color: govuk-shade(govuk-colour("green"), 20%);
+  background-color: govuk-tint(govuk-colour("green"), 80%);
+
+  > p {
+    margin-bottom: auto;
+    color: inherit;
+  }
+}
+
+.last-updated-summary {
+  font-size: 10pt;
+}
+
+.govuk-summary-list dd .other-languages-header--list {
+  margin-bottom: 8px;
+}
+
+.contact-status-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .contact-type-pills {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .contact-change-link {
+    margin: 10px 0 15px;
+  }
+}
+
+.contact-type-pill {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 10px 0 15px;
+  padding: 11px 13px 11px 35px;
+  gap: 5px;
+  height: 38px;
+  border: 2px solid $govuk-border-colour;
+  border-radius: 100px;
+
+}
+
+.contact-type-pill--next-of-kin {
+  background-image: url('/assets/images/next-of-kin.svg');
+  background-repeat: no-repeat;
+  background-position: 9px center;
+}
+
+.contact-type-pill--emergency-contact {
+  background-image: url('/assets/images/emergency-contact.svg');
+  background-repeat: no-repeat;
+  background-position: 9px center;
+}
+
+.contact-additional-details {
+  .govuk-summary-list__key {
+    width: 16%;
+  }
+  div.govuk-summary-list__row {
+  border-bottom: none !important;
+  }
+  dl.govuk-summary-list {
+    margin-bottom: 0;
+  }
+}

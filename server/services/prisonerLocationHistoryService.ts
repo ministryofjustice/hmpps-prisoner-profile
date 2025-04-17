@@ -1,157 +1,139 @@
-import { format } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Prisoner } from '../interfaces/prisoner'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
-import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
-import { CaseLoad } from '../interfaces/caseLoad'
-import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
-import { extractLocation, formatName, hasLength, putLastNameFirst, sortByDateTime } from '../utils/utils'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
+import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
+import { formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import AttributesForLocation from '../data/interfaces/locationsInsidePrisonApi/AttributesForLocation'
+import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import CellMoveReasonType from '../data/interfaces/prisonApi/CellMoveReasonTypes'
+import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
+import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
 
-export type PrisonerLocationHistoryService = (
-  token: string,
-  prisonerData: Prisoner,
-  agencyId: string,
-  locationId: string,
-  fromDate: string,
-  toDate: string,
-  userCaseLoads: CaseLoad[],
-) => Promise<LocationHistoryPageData>
+type PrisonerLocationHistoryResponse = {
+  agencyDetails: AgencyDetails
+  cellMoveReasonTypes: CellMoveReasonType[]
+  currentPrisonerDetails: HistoryForLocationItem
+  locationAttributes: AttributesForLocation
+  locationHistoryWithPrisoner: (HistoryForLocationItem & InmateDetail)[]
+  movementMadeByName: string
+  whatHappenedDetails: string
+}
+export default class PrisonerLocationHistoryService {
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
+    private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>,
+    private readonly locationsInsidePrisonApiClientBuilder: RestClientBuilder<LocationsInsidePrisonApiClient>,
+    private readonly nomisSyncPrisonerMappingApiClientBuilder: RestClientBuilder<NomisSyncPrisonerMappingApiClient>,
+  ) {}
 
-export default ({
-  prisonApiClientBuilder,
-  whereaboutsApiClientBuilder,
-  caseNotesApiClientBuilder,
-}: {
-  prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>
-  whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>
-  caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>
-}): PrisonerLocationHistoryService => {
-  const fetchStaffName = async (username: string, prisonApi: PrisonApiClient) => {
-    const staffDetails = await prisonApi.getStaffDetails(username)
-    return staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : username
-  }
-
-  const fetchWhatHappened = async (
-    bookingId: number,
-    offenderNo: string,
-    bedAssignmentHistorySequence: number,
-    caseNotesApi: CaseNotesApiClient,
-    whereaboutsApi: WhereaboutsApiClient,
-  ) => {
-    const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence, true)
-    if (cellMoveReason) {
-      const caseNote = await caseNotesApi.getCaseNote(
-        offenderNo,
-        cellMoveReason.cellMoveReason?.caseNoteId.toString(),
-        true,
-      )
-
-      if (caseNote) {
-        return caseNote.text
-      }
+  public async getPrisonerLocationHistory(
+    token: string,
+    prisonerData: Prisoner,
+    agencyId: string,
+    locationId: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<PrisonerLocationHistoryResponse> {
+    const fetchStaffName = async (username: string, prisonApi: PrisonApiClient) => {
+      const staffDetails = await prisonApi.getStaffDetails(username)
+      return staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : username
     }
 
-    return null
-  }
+    const fetchWhatHappened = async (
+      bookingId: number,
+      offenderNo: string,
+      caseloadId: string,
+      bedAssignmentHistorySequence: number,
+      caseNotesApi: CaseNotesApiClient,
+      whereaboutsApi: WhereaboutsApiClient,
+    ) => {
+      const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence, true)
+      if (cellMoveReason) {
+        const caseNote = await caseNotesApi.getCaseNote(
+          offenderNo,
+          caseloadId,
+          cellMoveReason.cellMoveReason?.caseNoteId.toString(),
+          true,
+        )
 
-  const mapReasonToCellMoveReasonDescription = (cellMoveReasonTypes: CellMoveReasonType[], assignmentReason: string) =>
-    cellMoveReasonTypes.find((type: CellMoveReasonType) => type.code === assignmentReason)?.description
+        if (caseNote) {
+          return caseNote.text
+        }
+      }
 
-  const getMovedOutText = (
-    currentPrisonerDetails: HistoryForLocationItem,
-    prisonerName: string,
-    sharingOffenderEndTime: string,
-  ) => {
-    if (!currentPrisonerDetails.assignmentEndDateTime && !sharingOffenderEndTime) return 'Currently sharing'
-    if (currentPrisonerDetails.assignmentEndDateTime && !sharingOffenderEndTime) return `${prisonerName} moved out`
-    if (sharingOffenderEndTime) return format(new Date(sharingOffenderEndTime), 'dd/MM/yyyy - HH:mm')
-    return null
-  }
+      return null
+    }
 
-  const getLocationHistoryWithPrisoner = async (
-    locationHistory: HistoryForLocationItem[],
-    prisonApiClient: PrisonApiClient,
-  ) => {
-    return Promise.all(
-      locationHistory.map(async (record: HistoryForLocationItem) => ({
-        ...record,
-        ...(await prisonApiClient.getInmateDetail(record.bookingId)),
-      })),
-    )
-  }
+    const getLocationHistoryWithPrisoner = async (
+      locationHistory: HistoryForLocationItem[],
+      prisonApiClient: PrisonApiClient,
+    ) => {
+      return Promise.all(
+        locationHistory.map(async (record: HistoryForLocationItem) => ({
+          ...record,
+          ...(await prisonApiClient.getInmateDetail(record.bookingId)),
+        })),
+      )
+    }
 
-  return async (token, prisonerData, agencyId, locationId, fromDate, toDate, userCaseLoads) => {
-    const prisonApiClient = prisonApiClientBuilder(token)
-    const whereaboutsApiClient = whereaboutsApiClientBuilder(token)
-    const caseNotesApiClient = caseNotesApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
+    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+    const locationsInsidePrisonApiClient = this.locationsInsidePrisonApiClientBuilder(token)
+    const nomisSyncPrisonerMappingApiClient = this.nomisSyncPrisonerMappingApiClientBuilder(token)
 
-    const { prisonerNumber, firstName, lastName, bookingId } = prisonerData
-    const prisonerName = formatName(firstName, '', lastName)
+    const { bookingId } = prisonerData
 
     const offenderNo = prisonerData.prisonerNumber
-    const userCaseLoadIds = userCaseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)
 
-    const [locationAttributes, locationHistory, agencyDetails, cellMoveReasonTypes] = await Promise.all([
-      prisonApiClient.getAttributesForLocation(locationId.toString()),
-      prisonApiClient.getHistoryForLocation(locationId as string, fromDate as string, toDate as string),
+    const { dpsLocationId } = await nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId(
+      parseInt(locationId, 10),
+    )
+
+    const [location, locationAtrbts, locationHistory, agencyDetails, cellMoveReasonTypes] = await Promise.all([
+      locationsInsidePrisonApiClient.getLocation(dpsLocationId),
+      locationsInsidePrisonApiClient.getLocationAttributes(dpsLocationId),
+      prisonApiClient.getHistoryForLocation(locationId, fromDate as string, toDate as string),
       prisonApiClient.getAgencyDetails(agencyId.toString()),
       prisonApiClient.getCellMoveReasonTypes(),
     ])
+
+    const locationAttributes = {
+      attributes: locationAtrbts.map(attribute => ({ code: attribute.code, description: attribute.description })),
+      description: location.key,
+    }
 
     const currentPrisonerDetails =
       locationHistory.find((record: HistoryForLocationItem) => record.bookingId.toString() === bookingId.toString()) ||
       ({} as HistoryForLocationItem)
 
-    const { movementMadeBy, assignmentReason, bedAssignmentHistorySequence } = currentPrisonerDetails
+    const { movementMadeBy, bedAssignmentHistorySequence } = currentPrisonerDetails
 
-    const movementMadeByName = await fetchStaffName(movementMadeBy, prisonApiClient)
-    const whatHappenedDetails = await fetchWhatHappened(
-      bookingId,
-      offenderNo,
-      bedAssignmentHistorySequence,
-      caseNotesApiClient,
-      whereaboutsApiClient,
-    )
-
-    const isDpsCellMove = Boolean(whatHappenedDetails)
-    const assignmentReasonName =
-      isDpsCellMove && mapReasonToCellMoveReasonDescription(cellMoveReasonTypes, assignmentReason)
-    const locationHistoryWithPrisoner = await getLocationHistoryWithPrisoner(locationHistory, prisonApiClient)
+    const [movementMadeByName, whatHappenedDetails, locationHistoryWithPrisoner] = await Promise.all([
+      fetchStaffName(movementMadeBy, prisonApiClient),
+      fetchWhatHappened(
+        bookingId,
+        offenderNo,
+        prisonerData.prisonId,
+        bedAssignmentHistorySequence,
+        caseNotesApiClient,
+        whereaboutsApiClient,
+      ),
+      getLocationHistoryWithPrisoner(locationHistory, prisonApiClient),
+    ])
 
     return {
-      prisonerName,
-      prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-      prisonerNumber,
-      locationName: extractLocation(locationAttributes.description, agencyId.toString()),
-
-      locationDetails: {
-        description: agencyDetails.description,
-        movedIn:
-          currentPrisonerDetails.assignmentDateTime &&
-          format(new Date(currentPrisonerDetails.assignmentDateTime), 'dd/MM/yyyy - HH:mm'),
-        movedOut: currentPrisonerDetails.assignmentEndDateTime
-          ? format(new Date(currentPrisonerDetails.assignmentEndDateTime), 'dd/MM/yyyy - HH:mm')
-          : 'Current cell',
-        movedBy: movementMadeByName,
-        reasonForMove: assignmentReasonName || 'Not entered',
-        whatHappened: whatHappenedDetails || 'Not entered',
-        attributes: locationAttributes.attributes,
-      },
-
-      locationSharingHistory: locationHistoryWithPrisoner
-        .filter(prisoner => prisoner.bookingId.toString() !== bookingId.toString())
-        .sort((left, right) => sortByDateTime(right.assignmentDateTime, left.assignmentDateTime))
-        .map(prisoner => ({
-          shouldLink: hasLength(userCaseLoadIds) && userCaseLoadIds.includes(prisoner.agencyId),
-          name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
-          number: prisoner.offenderNo,
-          movedIn: prisoner.assignmentDateTime && format(new Date(prisoner.assignmentDateTime), 'dd/MM/yyyy - HH:mm'),
-          movedOut: getMovedOutText(currentPrisonerDetails, prisonerName, prisoner.assignmentEndDateTime),
-        })),
+      agencyDetails,
+      cellMoveReasonTypes,
+      currentPrisonerDetails,
+      locationAttributes,
+      locationHistoryWithPrisoner,
+      movementMadeByName,
+      whatHappenedDetails,
     }
   }
 }

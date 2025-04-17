@@ -21,33 +21,37 @@ export default class OverviewPage extends Page {
 
   // Mini Summary
 
-  miniSummaryGroupA = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
+  moneyVisitsNonAssociationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
 
-  miniSummaryGroupA_MacroHeader = (): PageElement =>
+  moneyVisitsNonAssociationsGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]')
 
   moneyCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
 
-  adjudicationsCard = (): PageElement =>
+  visitsCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
 
-  visitsCard = (): PageElement =>
+  nonAssociationsCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
 
-  miniSummaryGroupB = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
+  categoryCsraCsipGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
 
-  miniSummaryGroupB_MacroHeader = (): PageElement =>
+  categoryCsraCsipGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
 
   categoryCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--categories')
 
-  incentivesCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
+  adjudicationsSummary = (): PageElement => cy.get('[data-qa=adjudications-summary] > .hmpps-summary-card')
+
+  incentivesCard = (): PageElement => cy.get('.mini-card--incentives')
 
   csraCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csra')
+
+  csipCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csip')
 
   // Non Associations
 
@@ -68,7 +72,6 @@ export default class OverviewPage extends Page {
   personalDetails = () => {
     const card = (): PageElement => cy.getDataQa('personal-details')
     return {
-      perferredName: (): PageElement => card().findDataQa('preferred-name'),
       dateOfBirth: (): PageElement => card().findDataQa('date-of-birth'),
       age: (): PageElement => card().findDataQa('age'),
       nationality: (): PageElement => card().findDataQa('nationality'),
@@ -80,7 +83,23 @@ export default class OverviewPage extends Page {
     }
   }
 
+  externalContacts = () => {
+    const card = (): PageElement => cy.get('#external-contacts')
+    return {
+      card,
+      officialHeading: (): PageElement => card().findDataQa('external-contacts-official'),
+      official: (): PageElement => card().findDataQa('external-contacts-official-count'),
+      socialHeading: (): PageElement => card().findDataQa('external-contacts-social'),
+      social: (): PageElement => card().findDataQa('external-contacts-social-count'),
+      link: (): PageElement => card().findDataQa('external-contacts-link'),
+    }
+  }
+
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
+
+  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(2) dd')
+
+  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(3) dd')
 
   schedule = () => ({
     morning: () => ({
@@ -182,11 +201,47 @@ export default class OverviewPage extends Page {
 
   alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
 
-  // Alerts summary
-  nonAssociationSummary = () => ({
-    prisonName: (): PageElement => cy.get('[data-qa=overview-na-prison-name]'),
-    prisonCount: (): PageElement => cy.get('[data-qa=overview-na-prison-count]'),
-    otherPrisonsCount: (): PageElement => cy.get('[data-qa=overview-na-other-prisons-count]'),
-    nonAssociationsLink: (): PageElement => cy.get('[data-qa=overview-non-associations-link] a'),
+  courtCasesAndReleaseDates = () => ({
+    card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),
+    courtCasesCount: (): PageElement => cy.get('[data-qa="overview-court-cases-count"]'),
+    nextCourtAppearance: () => ({
+      caseReference: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value',
+        ),
+
+      location: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value',
+        ),
+
+      hearingType: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value',
+        ),
+
+      date: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value',
+        ),
+
+      placeHolderText: (): PageElement => cy.get('[data-qa="overview-next-court-appearance"] > :nth-child(2)'),
+    }),
+    latestCalculation: () => ({
+      dateOfCalculation: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value',
+        ),
+      establishment: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value',
+        ),
+      reason: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value',
+        ),
+
+      placeHolderText: (): PageElement => cy.get('[data-qa="overview-latest-calculation"] > :nth-child(2)'),
+    }),
   })
 }

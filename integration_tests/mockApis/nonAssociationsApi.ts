@@ -17,4 +17,23 @@ export default {
       },
     })
   },
+
+  stubNonAssociationsError: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/nonassociations/prisoner/${prisonerNumber}/non-associations.*`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          errorMessage: 'Service unavailable',
+          httpStatusCode: 500,
+        },
+      },
+    })
+  },
 }

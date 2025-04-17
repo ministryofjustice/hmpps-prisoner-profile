@@ -1,11 +1,11 @@
-import { formatMoney, formatPrivilegedVisitsSummary } from '../../utils/utils'
-import { MiniSummary, MiniSummaryData } from '../../interfaces/miniSummary'
-import { AccountBalances } from '../../interfaces/accountBalances'
-import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
-import { VisitSummary } from '../../interfaces/visitSummary'
-import { VisitBalances } from '../../interfaces/visitBalances'
-import { Assessment } from '../../interfaces/prisonApi/assessment'
+import { formatMoney } from '../../utils/utils'
+import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import AccountBalances from '../interfaces/prisonApi/AccountBalances'
+import VisitSummary from '../interfaces/prisonApi/VisitSummary'
+import VisitBalances from '../interfaces/prisonApi/VisitBalances'
+import Assessment from '../interfaces/prisonApi/Assessment'
 import { formatDate } from '../../utils/dateHelpers'
+import AdjudicationSummary from '../interfaces/adjudicationsApi/AdjudicationsSummary'
 
 export const accountBalancesMock: AccountBalances = {
   spends: 240.51,
@@ -98,7 +98,7 @@ export const visitsSummaryDataMock: MiniSummaryData = {
   topClass: 'big',
   bottomLabel: 'Remaining visits',
   bottomContentLine1: 6,
-  bottomContentLine3: formatPrivilegedVisitsSummary(2),
+  bottomContentLine3: 'Including 2 privileged visits',
   bottomClass: 'small',
   linkLabel: 'Visits details',
 } as MiniSummaryData
@@ -141,33 +141,3 @@ export const csraSummaryDataMock: MiniSummaryData = {
   bottomClass: 'small',
   linkLabel: 'CSRA history',
 } as MiniSummaryData
-
-export const miniSummaryGroupAMock: MiniSummary[] = [
-  {
-    data: moneySummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-  {
-    data: adjudicationsSummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-  {
-    data: visitsSummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-]
-
-export const miniSummaryGroupBMock: MiniSummary[] = [
-  {
-    data: categorySummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-  {
-    data: incentiveSummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-  {
-    data: csraSummaryDataMock,
-    classes: 'govuk-grid-row card-body',
-  },
-]

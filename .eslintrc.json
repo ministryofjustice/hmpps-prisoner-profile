@@ -67,7 +67,9 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
+        "no-shadow": "off",
         "dot-notation": "off",
+        "@typescript-eslint/no-shadow": ["error"],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-use-before-define": 0,
         "class-methods-use-this": 0,
@@ -134,6 +136,7 @@
         "printWidth": 120,
         "semi": false
       }
-    ]
+    ],
+    "no-empty-function": ["error", { "allow": ["constructors", "arrowFunctions"] }]
   }
 }

@@ -1,54 +1,49 @@
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% macro miniSummaryMacro(miniSummary) %}
-  {%- call summaryCard({title: miniSummary.data.heading}) -%}
-    <div class="{{ miniSummary.classes }} {{ 'hmpps-summary-card__no-header' if not miniSummary.data.heading }}">
+  {%- call summaryCard({title: miniSummary.heading}) -%}
+    <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not miniSummary.heading }}">
       <div class="govuk-grid-column-full">
-        {% if miniSummary.data.topLabel %}
+        {% if miniSummary.topLabel %}
           <p class="govuk-body card-label">
-            {{ miniSummary.data.topLabel }}
+            {{ miniSummary.topLabel }}
           </p>
         {% endif %}
-        {% if miniSummary.data.topContent !== undefined %}
-          <p
-            class="govuk-body hmpps-mini-card__{{ miniSummary.data.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.data.topClass === 'small' }}"
-          >
-            {{ miniSummary.data.topContent if miniSummary.data.topContent !== undefined else '&nbsp;' | safe }}
+        {% if miniSummary.topContent !== undefined %}
+          <p class="govuk-body hmpps-mini-card__{{ miniSummary.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.topClass === 'small' }}">
+            {{ miniSummary.topContent if miniSummary.topContent !== undefined else '&nbsp;' | safe }}
           </p>
+          {% if useNewOverviewPageLayout() %}<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">{% endif %}
         {% endif %}
         <p class="govuk-body card-label">
-          {{ miniSummary.data.bottomLabel }}
+          {{ miniSummary.bottomLabel }}
         </p>
-        <p
-          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }}"
-        >
-            {% if miniSummary.data.bottomContentLine1Href %}
-                <a href="{{ miniSummary.data.bottomContentLine1Href }}" class="govuk-link govuk-link--no-visited-state">
-                    {{ miniSummary.data.bottomContentLine1 }}
+        <p class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}">
+            {% if miniSummary.bottomContentLine1Href %}
+                <a href="{{ miniSummary.bottomContentLine1Href }}" class="govuk-link govuk-link--no-visited-state">
+                    {{ miniSummary.bottomContentLine1 }}
                 </a>
             {% else %}
-                {{ miniSummary.data.bottomContentLine1 }}
+                {{ miniSummary.bottomContentLine1 }}
             {% endif %}
         </p>
-        {% if miniSummary.data.bottomContentLine2 !== undefined %}
-        <p
-          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }}"
-        >
-            {{ miniSummary.data.bottomContentLine2 }}
+        {% if miniSummary.bottomContentLine2 !== undefined %}
+        <p class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}">
+            {{ miniSummary.bottomContentLine2 }}
         </p>
         {% endif %}
-        {% if miniSummary.data.bottomContentLine3 !== undefined %}
+        {% if miniSummary.bottomContentLine3 !== undefined %}
           <p class="govuk-body hmpps-mini-card__sub-text">
-            {{ miniSummary.data.bottomContentLine3 }}
+            {{ miniSummary.bottomContentLine3 }}
           </p>
         {%- endif -%}
-          {% if miniSummary.data.bottomContentError !== undefined %}
+          {% if miniSummary.bottomContentError !== undefined %}
               <p class="govuk-body hmpps-mini-card__error">
-                  {{ miniSummary.data.bottomContentError }}
+                  {{ miniSummary.bottomContentError }}
               </p>
           {%- endif -%}
         <p class="govuk-body hmpps-mini-card__link">
-          <a href="{{ miniSummary.data.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
-            {{ miniSummary.data.linkLabel }}
+          <a href="{{ miniSummary.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+            {{ miniSummary.linkLabel }}
           </a>
         </p>
       </div>

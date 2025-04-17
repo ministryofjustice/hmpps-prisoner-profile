@@ -1,4 +1,4 @@
-import { SentenceAdjustments, SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
+import SentenceSummary, { SentenceAdjustments } from '../interfaces/prisonApi/SentenceSummary'
 
 export const SentenceSummaryWithSentenceMock: SentenceSummary = {
   prisonerNumber: 'G6123VU',

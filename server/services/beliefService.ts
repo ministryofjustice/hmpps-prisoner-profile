@@ -1,6 +1,6 @@
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Belief } from '../interfaces/prisonApi/belief'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Belief from '../data/interfaces/prisonApi/Belief'
 
 export default class BeliefService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}

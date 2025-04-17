@@ -1,12 +1,10 @@
 import nock from 'nock'
 import config from '../config'
-import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import { pagedCaseNotesMock } from './localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
-import { CaseNote, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-
-jest.mock('./tokenStore')
+import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
+import CaseNote from './interfaces/caseNotesApi/CaseNote'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -39,25 +37,30 @@ describe('caseNotesApiClient', () => {
       const prisonerNumber = 'AB1234Y'
       mockSuccessfulCaseNotesApiCall(`/case-notes/${prisonerNumber}?size=20`, pagedCaseNotesMock)
 
-      const output = await caseNotesApiClient.getCaseNotes(prisonerNumber, null)
+      const output = await caseNotesApiClient.getCaseNotes(prisonerNumber, 'MDI', null)
+      expect(output).toEqual(pagedCaseNotesMock)
+    })
+
+    it.each(['true', 'false'])('Should map include sensitive query param (%s)', async includeSensitive => {
+      const prisonerNumber = 'AB1234Y'
+      mockSuccessfulCaseNotesApiCall(
+        `/case-notes/${prisonerNumber}?size=20&includeSensitive=${includeSensitive}`,
+        pagedCaseNotesMock,
+      )
+
+      const output = await caseNotesApiClient.getCaseNotes(prisonerNumber, 'MDI', {
+        includeSensitive,
+      })
+
       expect(output).toEqual(pagedCaseNotesMock)
     })
   })
 
   describe('getCaseNoteTypes', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulCaseNotesApiCall(`/case-notes/types`, caseNoteTypesMock)
+      mockSuccessfulCaseNotesApiCall(`/case-notes/types?selectableBy=ALL&includeInactive=true`, caseNoteTypesMock)
 
-      const output = await caseNotesApiClient.getCaseNoteTypes()
-      expect(output).toEqual(caseNoteTypesMock)
-    })
-  })
-
-  describe('getCaseNoteTypesForUser', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulCaseNotesApiCall(`/case-notes/types-for-user`, caseNoteTypesMock)
-
-      const output = await caseNotesApiClient.getCaseNoteTypesForUser()
+      const output = await caseNotesApiClient.getCaseNoteTypes({ includeInactive: true })
       expect(output).toEqual(caseNoteTypesMock)
     })
   })
@@ -67,7 +70,7 @@ describe('caseNotesApiClient', () => {
       const prisonerNumber = 'AB1234Y'
       mockSuccessfulCaseNotesPostApiCall(`/case-notes/${prisonerNumber}`, pagedCaseNotesMock.content[0])
 
-      const output = await caseNotesApiClient.addCaseNote(prisonerNumber, {} as CaseNote)
+      const output = await caseNotesApiClient.addCaseNote(prisonerNumber, 'MDI', {} as CaseNote)
       expect(output).toEqual(pagedCaseNotesMock.content[0])
     })
   })
@@ -77,7 +80,7 @@ describe('caseNotesApiClient', () => {
       const prisonerNumber = 'AB1234Y'
       mockSuccessfulCaseNotesPutApiCall(`/case-notes/${prisonerNumber}/abc123`, pagedCaseNotesMock.content[0])
 
-      const output = await caseNotesApiClient.updateCaseNote(prisonerNumber, 'abc123', {} as UpdateCaseNoteForm)
+      const output = await caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, 'MDI', 'abc123', 'text')
       expect(output).toEqual(pagedCaseNotesMock.content[0])
     })
   })

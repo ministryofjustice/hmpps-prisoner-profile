@@ -1,32 +1,63 @@
-import { addDays, startOfYear } from 'date-fns'
 import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { Alias } from '../interfaces/prisoner'
-import { formatName } from '../utils/utils'
+import { Alias } from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { convertToTitleCase, formatName } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
-import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
-import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
-import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
-import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
 import { addressSummaryMock } from '../data/localMockData/addressSummary'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { curiousApiClientMock } from '../../tests/mocks/curiousApiClientMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
-import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
+import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
+import MetricsService from './metrics/metricsService'
+import { prisonUserMock } from '../data/localMockData/user'
+import Address from '../data/interfaces/prisonApi/Address'
+import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import {
+  PersonIntegrationApiClient,
+  PseudonymResponseDto,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import ReferenceDataService from './referenceData/referenceDataService'
+import {
+  EnglandCountryReferenceDataCodeMock,
+  MilitaryRecordsMock,
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
+import {
+  HealthAndMedicationApiClient,
+  ValueWithMetadata,
+} from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  dietAndAllergyMock,
+  healthAndMedicationMock,
+} from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
+import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
+import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
+import PrisonService from './prisonService'
+import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { PersonalRelationshipsContactsDtoMock } from '../data/localMockData/personalRelationshipsApiMock'
+
+jest.mock('./metrics/metricsService')
+jest.mock('./referenceData/referenceDataService')
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
+  let personIntegrationApiClient: PersonIntegrationApiClient
+  let healthAndMedicationApiClient: HealthAndMedicationApiClient
+  let referenceDataService: ReferenceDataService
+  let prisonService: PrisonService
+  let metricsService: MetricsService
+  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -37,40 +68,43 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) => {
-      switch (domain) {
-        case ReferenceCodeDomain.Health:
-          return mockReferenceDomains.health
-        case ReferenceCodeDomain.HealthTreatments:
-          return mockReferenceDomains.healthTreatment
-        default:
-          return []
-      }
-    })
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
 
     curiousApiClient = curiousApiClientMock()
-
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
+    personIntegrationApiClient = personIntegrationApiClientMock()
+
+    healthAndMedicationApiClient = {
+      getReferenceDataCodes: jest.fn(),
+      getHealthAndMedication: jest.fn(async () => healthAndMedicationMock),
+      updateDietAndAllergyData: jest.fn(async () => dietAndAllergyMock),
+      updateSmokerStatus: jest.fn(async () => {}),
+    }
+
+    referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
+    referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
+
+    prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
+    prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
+
+    metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
+
+    personalRelationshipsApiClient = {
+      getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
+    }
   })
-
-  const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
-      offenderNo: 'AB1234',
-      personalCareNeeds: careNeeds,
-    }))
-  }
-
-  const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
-  }
 
   const constructService = () =>
     new PersonalPageService(
       () => prisonApiClient,
       () => curiousApiClient,
+      () => personIntegrationApiClient,
+      () => healthAndMedicationApiClient,
+      referenceDataService,
+      prisonService,
+      metricsService,
+      () => Promise.resolve({ curiousApiToken: 'token' }),
+      () => personalRelationshipsApiClient,
     )
 
   describe('Getting information from the Prison API', () => {
@@ -107,30 +141,128 @@ describe('PersonalPageService', () => {
     })
 
     describe('Aliases', () => {
-      const getResponseWithAliases = async (aliases: Alias[]) => {
-        const prisonerData = { ...PrisonerMockDataA }
-        prisonerData.aliases = aliases
-        const service = constructService()
-        return service.get('token', prisonerData)
-      }
+      describe('Aliases from Prisoner Search', () => {
+        const getResponseWithAliases = async (aliases: Alias[]) => {
+          const prisonerData = { ...PrisonerMockDataA }
+          prisonerData.aliases = aliases
+          const service = constructService()
+          return service.get('token', prisonerData)
+        }
 
-      it('Handles no aliases', async () => {
-        const response = await getResponseWithAliases([])
-        expect(response.personalDetails.aliases).toEqual([])
+        it('Handles no aliases', async () => {
+          const response = await getResponseWithAliases([])
+          expect(response.personalDetails.aliases).toEqual([])
+        })
+
+        it('Maps multiple aliases', async () => {
+          const response = await getResponseWithAliases([
+            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: 'Male' },
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleNames: 'Middle',
+              lastName: 'Last',
+              gender: 'Female',
+            },
+          ])
+          expect(response.personalDetails.aliases[0]).toEqual({
+            alias: 'First Name Last Name',
+            dateOfBirth: '01/01/2022',
+            sex: 'Male',
+          })
+          expect(response.personalDetails.aliases[1]).toEqual({
+            alias: 'First Middle Last',
+            dateOfBirth: '01/01/2023',
+            sex: 'Female',
+          })
+        })
       })
 
-      it('Maps multiple aliases', async () => {
-        const response = await getResponseWithAliases([
-          { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
-          { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
-        ])
-        expect(response.personalDetails.aliases[0]).toEqual({
-          alias: 'First Name Last Name',
-          dateOfBirth: '01/01/2022',
+      describe('Aliases from Person Integration API after an update', () => {
+        const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
+          personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
+          const service = constructService()
+          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
+        }
+
+        it('Handles no pseudonyms', async () => {
+          const response = await getResponseWithPseudonyms([])
+          expect(response.personalDetails.aliases).toEqual([])
         })
-        expect(response.personalDetails.aliases[1]).toEqual({
-          alias: 'First Middle Last',
-          dateOfBirth: '01/01/2023',
+
+        it('Handles only working name pseudonym', async () => {
+          const response = await getResponseWithPseudonyms([
+            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
+          ])
+          expect(response.personalDetails.aliases).toEqual([])
+        })
+
+        it('Maps multiple pseudonyms', async () => {
+          const male = { description: 'Male' } as ReferenceDataValue
+          const female = { description: 'Female' } as ReferenceDataValue
+
+          const response = await getResponseWithPseudonyms([
+            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2022-01-01',
+              firstName: 'First name',
+              lastName: 'Last name',
+              sex: male,
+            } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleName1: 'Middleone',
+              lastName: 'Last',
+              sex: female,
+            } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleName1: 'Middleone',
+              middleName2: 'Middletwo',
+              lastName: 'Last',
+              sex: female,
+            } as PseudonymResponseDto,
+          ])
+
+          expect(response.personalDetails.aliases[0]).toEqual({
+            alias: 'First Name Last Name',
+            dateOfBirth: '01/01/2022',
+            sex: 'Male',
+          })
+          expect(response.personalDetails.aliases[1]).toEqual({
+            alias: 'First Middleone Last',
+            dateOfBirth: '01/01/2023',
+            sex: 'Female',
+          })
+          expect(response.personalDetails.aliases[2]).toEqual({
+            alias: 'First Middleone Middletwo Last',
+            dateOfBirth: '01/01/2023',
+            sex: 'Female',
+          })
+        })
+
+        it('Falls back to Prisoner Search results if Person Integration API call fails', async () => {
+          personIntegrationApiClient.getPseudonyms = async () => {
+            throw new Error()
+          }
+          const service = constructService()
+          const prisonerData = { ...PrisonerMockDataA }
+          prisonerData.aliases = [
+            {
+              dateOfBirth: '2022-01-01',
+              firstName: 'First name',
+              lastName: 'Last name',
+            } as Alias,
+          ]
+          const response = await service.get('token', prisonerData, false, false, null, { fieldName: 'full-name' })
+          expect(response.personalDetails.aliases).toEqual([
+            {
+              alias: 'First Name Last Name',
+              dateOfBirth: '01/01/2022',
+            },
+          ])
         })
       })
     })
@@ -161,9 +293,80 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
-      it('Maps the smoker or vaper field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.smokerOrVaper).toEqual('No')
+      describe.skip('Smoker or vaper', () => {
+        it.each([
+          // This isn't provided by the health mock at the moment so is 'Not entered'
+          [true, 'Not entered'],
+          [false, 'No'],
+        ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
+          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
+          expect(response.personalDetails.smokerOrVaper).toEqual(expectedValue)
+        })
+      })
+
+      describe('Food allergies', () => {
+        it.each([
+          [true, [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg' }]],
+          [false, []],
+        ])(
+          'Maps the food allergies field (Diet and allergies enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.foodAllergies).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Medical diet', () => {
+        it.each([
+          [true, [{ id: 'MEDICAL_DIET_COELIAC', description: 'Coeliac' }]],
+          [false, []],
+        ])(
+          'Maps the medical diet field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Personalised diet', () => {
+        it.each([
+          [true, [{ id: 'PERSONALISED_DIET_VEGAN', description: 'Vegan' }]],
+          [false, []],
+        ])(
+          'Maps the medical diet field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Diet and allergy modification details', () => {
+        it.each([
+          [true, '2 July 2024'],
+          [false, ''],
+        ])(
+          'Maps the lastModifiedAt field to the latest timestamp (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: 'Moorland (HMP & YOI)' }) as Prison)
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.lastModifiedAt).toEqual(expectedValue)
+          },
+        )
+
+        it.each([
+          [true, 'Moorland (HMP & YOI)'],
+          [false, ''],
+        ])(
+          'Maps the lastModifiedPrison field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: expectedValue }) as Prison)
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.lastModifiedPrison).toEqual(expectedValue)
+          },
+        )
       })
 
       it('Maps the social care needed field', async () => {
@@ -188,7 +391,7 @@ describe('PersonalPageService', () => {
 
       describe('Other languages', () => {
         it('Correctly handles no secondary languages', async () => {
-          prisonApiClient.getSecondaryLanguages = jest.fn(async () => [])
+          prisonApiClient.getSecondaryLanguages = jest.fn(async (): Promise<SecondaryLanguage[]> => [])
           const response = await constructService().get('token', PrisonerMockDataA)
           expect(response.personalDetails.otherLanguages).toEqual([])
         })
@@ -227,7 +430,8 @@ describe('PersonalPageService', () => {
         )
         expect(personalDetails.marriageOrCivilPartnership).toEqual(PrisonerMockDataA.maritalStatus)
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
-        expect(personalDetails.placeOfBirth).toEqual(inmateDetailMock.birthPlace)
+        expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
+        expect(personalDetails.countryOfBirth).toEqual(EnglandCountryReferenceDataCodeMock.description)
         expect(personalDetails.preferredName).toEqual(
           formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
         )
@@ -240,11 +444,14 @@ describe('PersonalPageService', () => {
   describe('Identity numbers', () => {
     it('Maps the data from the API', async () => {
       const { identityNumbers } = await constructService().get('token', PrisonerMockDataA)
-      expect(identityNumbers.croNumber).toEqual(PrisonerMockDataA.croNumber)
-      expect(identityNumbers.drivingLicenceNumber).toEqual('ABCD/123456/AB9DE')
-      expect(identityNumbers.homeOfficeReferenceNumber).toEqual('A1234567')
-      expect(identityNumbers.nationalInsuranceNumber).toEqual('QQ123456C')
-      expect(identityNumbers.pncNumber).toEqual(PrisonerMockDataA.pncNumber)
+      expect(identityNumbers.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
+      expect(identityNumbers.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
+      expect(identityNumbers.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
+      expect(identityNumbers.nationalInsuranceNumber).toEqual([{ value: 'QQ123456C' }])
+      expect(identityNumbers.pncNumber).toEqual([
+        { comment: 'P/CONS', value: '08/359381C' },
+        { comment: 'P/CONS - fixed', value: '8/359381C' },
+      ])
       expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
     })
   })
@@ -263,7 +470,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => null)
+      prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)
       const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBe(undefined)
       expect(addressSummary).toEqual([])
@@ -295,146 +502,17 @@ describe('PersonalPageService', () => {
     })
   })
 
-  describe('Next of kin', () => {
-    it('Only maps the active next of kin', async () => {
-      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
-      expect(nextOfKin.length).toEqual(3)
-    })
-
-    it('Gets the addresses for each active next of kin', async () => {
-      await constructService().get('token', PrisonerMockDataA)
-      expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
-
-      const expectedPersonIds = mockOffenderContacts.offenderContacts
-        .filter(contact => contact.active && contact.nextOfKin)
-        .map(({ personId }) => personId)
-
-      expectedPersonIds.forEach(personId =>
-        expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledWith(personId),
-      )
-    })
-
-    it('Maps the primary address for the contact', async () => {
-      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
-      const expectedAddress = mockAddresses[0]
-      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
-      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
-
-      nextOfKin.forEach(contact => {
-        const { address } = contact
-
-        expect(address.phones).toEqual(expectedPhones)
-        expect(address.addressTypes).toEqual(expectedTypes)
-        const { country, county, flat, locality, postalCode, premise, street, town } = address.address
-
-        expect(country).toEqual(expectedAddress.country)
-        expect(county).toEqual(expectedAddress.county)
-        expect(flat).toEqual(expectedAddress.flat)
-        expect(locality).toEqual(expectedAddress.locality)
-        expect(postalCode).toEqual(expectedAddress.postalCode)
-        expect(premise).toEqual(expectedAddress.premise)
-        expect(street).toEqual(expectedAddress.street)
-        expect(town).toEqual(expectedAddress.town)
-      })
-    })
-
-    it('Maps the data for the contact from the API', async () => {
-      const offenderContacts: OffenderContacts = {
-        offenderContacts: [
-          {
-            bookingId: 12345,
-            approvedVisitor: true,
-            contactType: 'Person',
-            active: true,
-            nextOfKin: true,
-            emergencyContact: true,
-            firstName: 'First',
-            middleName: 'Middle',
-            lastName: 'Last',
-            relationshipCode: 'CODE',
-            relationshipDescription: 'Relationship description',
-            phones: [
-              {
-                number: '12345',
-                type: 'MOB',
-              },
-              {
-                number: '54321',
-                type: 'MOB',
-              },
-            ],
-            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
-          },
-        ],
-      }
-      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
-      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
-      const contact = nextOfKin[0]
-
-      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
-      expect(contact.phones).toEqual(['12345', '54321'])
-
-      expect(contact.name).toEqual('First Middle Last')
-      expect(contact.nextOfKin).toEqual(true)
-      expect(contact.emergencyContact).toEqual(true)
-      expect(contact.relationship).toEqual('Relationship description')
-    })
-
-    it('Handles no addresses defined for the contact', async () => {
-      const offenderContacts: OffenderContacts = {
-        offenderContacts: [
-          {
-            bookingId: 12345,
-            approvedVisitor: true,
-            contactType: 'Person',
-            active: true,
-            nextOfKin: true,
-            emergencyContact: true,
-            firstName: 'First',
-            middleName: 'Middle',
-            lastName: 'Last',
-            relationshipCode: 'CODE',
-            relationshipDescription: 'Relationship description',
-            phones: [
-              {
-                number: '12345',
-                type: 'MOB',
-              },
-              {
-                number: '54321',
-                type: 'MOB',
-              },
-            ],
-            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
-          },
-        ],
-      }
-      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
-      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
-      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
-      const contact = nextOfKin[0]
-
-      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
-      expect(contact.phones).toEqual(['12345', '54321'])
-
-      expect(contact.name).toEqual('First Middle Last')
-      expect(contact.nextOfKin).toEqual(true)
-      expect(contact.emergencyContact).toEqual(true)
-      expect(contact.relationship).toEqual('Relationship description')
-    })
-  })
-
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
       const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
-      expect(physicalCharacteristics.height).toEqual('1.88m')
-      expect(physicalCharacteristics.weight).toEqual('86kg')
+      expect(physicalCharacteristics.height).toEqual('1m')
+      expect(physicalCharacteristics.weight).toEqual('100kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
       expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
       expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
-      expect(physicalCharacteristics.shapeOfFace).toEqual('Angular')
-      expect(physicalCharacteristics.build).toEqual('Proportional')
-      expect(physicalCharacteristics.shoeSize).toEqual('10')
+      expect(physicalCharacteristics.shapeOfFace).toEqual('Oval')
+      expect(physicalCharacteristics.build).toEqual('Average')
+      expect(physicalCharacteristics.shoeSize).toEqual('11')
       expect(physicalCharacteristics.warnedAboutTattooing).toEqual('Yes')
       expect(physicalCharacteristics.warnedNotToChangeAppearance).toEqual('Yes')
 
@@ -473,326 +551,233 @@ describe('PersonalPageService', () => {
       expect(security.interestToImmigration).toEqual('Yes')
       expect(security.travelRestrictions).toEqual('some travel restrictions')
     })
-
-    describe('X-ray information', () => {
-      const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
-        personalCareNeedId: 1,
-        commentText: '',
-        problemCode: 'BSC5.5',
-        problemDescription: 'Body scan',
-        problemStatus: 'ON',
-        problemType: 'BSCAN',
-        startDate: addDays(startOfYear(new Date()), daysAfterStartOfYear).toISOString(),
-      })
-
-      beforeEach(() => {
-        setCodeReferences([
-          {
-            description: 'X-ray body scan',
-            code: 'BSCAN',
-            activeFlag: 'Y',
-            domain: 'HEALTH',
-          },
-        ])
-      })
-
-      describe('Given no x-ray care needs', () => {
-        it('Returns no xray security information', async () => {
-          setPersonalCareNeeds([])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(0)
-          expect(xrays.since).toBeUndefined()
-        })
-      })
-
-      describe('Given x-rays for this year', () => {
-        it('Returns the correct number of x-rays and the start date', async () => {
-          setPersonalCareNeeds([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(4)
-          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
-        })
-      })
-
-      describe('Given x-rays over multiple years', () => {
-        it('Returns the correct number of x-rays for this year and the start date', async () => {
-          setPersonalCareNeeds([
-            xrayNeed(-10),
-            xrayNeed(-20),
-            xrayNeed(-40),
-            xrayNeed(0),
-            xrayNeed(10),
-            xrayNeed(20),
-            xrayNeed(40),
-          ])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(4)
-          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
-        })
-      })
-    })
-  })
-
-  describe('Care needs', () => {
-    it('Handles empty personal care needs', async () => {
-      setPersonalCareNeeds([])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Only maps care needs with problem status ON', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-        {
-          personalCareNeedId: 2,
-          problemCode: 'code',
-          problemStatus: 'OFF',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(1)
-    })
-
-    it('Doesnt map care needs without matching health codes', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'A',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Doesnt map care needs with problem code NR', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'NR',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Doesnt map care needs with problem type BSCAN', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'BSC5.5',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'BSCAN',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'BSCAN',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Maps the personal care needs', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(1)
-      expect(careNeeds.personalCareNeeds[0].description).toEqual('problem description')
-      expect(careNeeds.personalCareNeeds[0].startDate).toEqual('start date')
-      expect(careNeeds.personalCareNeeds[0].type).toEqual('Code reference description')
-      expect(careNeeds.personalCareNeeds[0].comment).toEqual('Comment text')
-    })
-
-    it('Gets the reasonable adjustments for the domain types', async () => {
-      prisonApiClient.getReferenceCodesByDomain = jest.fn(
-        async () =>
-          [
-            {
-              domain: 'HEALTH_TREAT',
-              code: 'AC',
-              description: 'Accessible Cell',
-              activeFlag: 'Y',
-              listSeq: 99,
-              systemDataFlag: 'N',
-              subCodes: [],
-            },
-            {
-              domain: 'HEALTH_TREAT',
-              code: 'AMP TEL',
-              description: 'Amplified telephone',
-              activeFlag: 'Y',
-              listSeq: 99,
-              systemDataFlag: 'N',
-              subCodes: [],
-            },
-          ] as ReferenceCode[],
-      )
-      await constructService().get('token', PrisonerMockDataA)
-      expect(prisonApiClient.getReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, [
-        'AC',
-        'AMP TEL',
-      ])
-    })
-
-    it('Maps the reasonable adjustments to the matching care needs', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-        {
-          personalCareNeedId: 2,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
-        reasonableAdjustments: [
-          {
-            personalCareNeedId: 1,
-            treatmentCode: 'BEH/BODY LAN',
-            commentText: 'psych care type adjustment comment goes here',
-            startDate: '1999-06-09',
-            agencyId: 'MDI',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            treatmentDescription: 'Behavioural responses/Body language',
-          },
-        ],
-      }))
-
-      const {
-        careNeeds: { personalCareNeeds },
-      } = await constructService().get('token', PrisonerMockDataA)
-
-      const { reasonableAdjustments } = personalCareNeeds[0]
-      expect(personalCareNeeds[1].reasonableAdjustments.length).toEqual(0)
-      expect(reasonableAdjustments.length).toEqual(1)
-      expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
-      expect(reasonableAdjustments[0].comment).toEqual('psych care type adjustment comment goes here')
-      expect(reasonableAdjustments[0].startDate).toEqual('1999-06-09')
-      expect(reasonableAdjustments[0].agency).toEqual('Moorland (HMP & YOI)')
-    })
   })
 
   describe('Addresses returns undefined', () => {
     it('Sets the address to empty', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => undefined)
+      prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => undefined)
       const { addresses } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBeUndefined()
     })
   })
 
   describe('Get Learner Neurodivergence information', () => {
-    it('Sets the address to empty', async () => {
+    const neurodivergenceEnabledPrison = 'BLI'
+    const neurodivergenceDisabledPrison = 'MDI'
+    const prisonerData = { ...PrisonerMockDataA, prisonId: neurodivergenceEnabledPrison }
+
+    it('Gets the neurodivergence information', async () => {
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
-      const data = await constructService().get('token', PrisonerMockDataA)
-      expect(data.learnerNeurodivergence).toBe(LearnerNeurodivergenceMock)
+      const data = await constructService().get('token', prisonerData)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrNull()).toEqual(LearnerNeurodivergenceMock)
+    })
+
+    it('Handles a 404 from the Curious API, which is presented to the service as null', async () => {
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async (): Promise<LearnerNeurodivergence[]> => null)
+      const data = await constructService().get('token', prisonerData)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrThrow()).toBeNull()
+    })
+
+    it('Handles a Curious API failure', async () => {
+      const curiousApiError = {
+        status: 501,
+        data: {
+          status: 501,
+          userMessage: 'An unexpected error occurred',
+          developerMessage: 'An unexpected error occurred',
+        },
+      }
+      const apiErrorCallback = jest.fn()
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
+      const data = await constructService().get('token', prisonerData, false, false, apiErrorCallback)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
+      expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
+    })
+
+    it('should not return neurodiversity if not at supported prison', async () => {
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async (): Promise<LearnerNeurodivergence[]> => null)
+      const data = await constructService().get('token', { ...prisonerData, prisonId: neurodivergenceDisabledPrison })
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrNull()).toEqual([])
+    })
+  })
+
+  describe('Prison Person API Enabled', () => {
+    it('Gets the height and weight from the prison person API', async () => {
+      const data = await constructService().get('token', PrisonerMockDataA, true)
+      expect(data.physicalCharacteristics.height).toBe('1m')
+      expect(data.physicalCharacteristics.weight).toBe('100kg')
+    })
+  })
+
+  describe('Update physical attributes', () => {
+    it('Makes a call to the prison person api to update physical attributes', async () => {
+      await constructService().updatePhysicalAttributes('token', prisonUserMock, 'A1234AA', { height: 123 })
+      expect(personIntegrationApiClient.getPhysicalAttributes).toHaveBeenCalledWith('A1234AA')
+      expect(personIntegrationApiClient.updatePhysicalAttributes).toHaveBeenCalledWith('A1234AA', {
+        ...corePersonPhysicalAttributesMock,
+        height: 123,
+      })
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['height'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update Smoker or Vaper', () => {
+    it('Updates the smoker or vaper on the API', async () => {
+      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'A1234AA', 'SMOKER_YES')
+      expect(healthAndMedicationApiClient.updateSmokerStatus).toHaveBeenCalledWith('A1234AA', {
+        smokerStatus: 'SMOKER_YES',
+      })
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['smokerOrVaper'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Get diet and allergy data', () => {
+    it('Gets the data from the API when diet and allergy is enabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true, false)
+
+      expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
+
+      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
+      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([
+        { description: 'Coeliac', id: 'MEDICAL_DIET_COELIAC' },
+      ])
+      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([
+        { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
+      ])
+      expect(personalDetails.dietAndAllergy.cateringInstructions).toEqual('Some catering instructions.')
+      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('2 July 2024')
+      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
+    })
+
+    it('Handles missing dietAndAllergy fields', async () => {
+      healthAndMedicationApiClient.getHealthAndMedication = jest.fn(async () => ({
+        dietAndAllergy: {
+          ...dietAndAllergyMock,
+          cateringInstructions: undefined as ValueWithMetadata<string>,
+        },
+      }))
+
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true, false)
+
+      expect(personalDetails.dietAndAllergy.cateringInstructions).toBeFalsy()
+      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('1 July 2024')
+      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
+    })
+
+    it('Does not get the data from the API when diet and allergy is disabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false, false)
+
+      expect(healthAndMedicationApiClient.getHealthAndMedication).not.toHaveBeenCalledWith(
+        PrisonerMockDataA.prisonerNumber,
+      )
+
+      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
+      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
+      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([])
+    })
+  })
+
+  describe('Update diet and food allergies', () => {
+    it('Updates the diet and food allergies on the health and medication api', async () => {
+      const update = {
+        foodAllergies: [{ value: 'FOOD_ALLERGY' }],
+        medicalDietaryRequirements: [{ value: 'MEDICAL_DIET' }],
+        personalisedDietaryRequirements: [{ value: 'PERSONALISED_DIET' }],
+      }
+
+      await constructService().updateDietAndFoodAllergies('token', prisonUserMock, 'ABC123', update)
+      expect(healthAndMedicationApiClient.updateDietAndAllergyData).toHaveBeenCalledWith('ABC123', update)
+      expect(metricsService.trackHealthAndMedicationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'ABC123',
+        fieldsUpdated: ['foodAllergies', 'medicalDietaryRequirements', 'personalisedDietaryRequirements'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update city or town of birth', () => {
+    it('Updates the birth place using Person Integration API', async () => {
+      await constructService().updateCityOrTownOfBirth('token', prisonUserMock, 'A1234AA', 'London')
+      expect(personIntegrationApiClient.updateBirthPlace).toHaveBeenCalledWith('A1234AA', 'London')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['cityOrTownOfBirth'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update country of birth', () => {
+    it('Updates the country of birth using Person Integration API', async () => {
+      await constructService().updateCountryOfBirth('token', prisonUserMock, 'A1234AA', 'France')
+      expect(personIntegrationApiClient.updateCountryOfBirth).toHaveBeenCalledWith('A1234AA', 'France')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['countryOfBirth'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update religion', () => {
+    it('Updates the religion using Person Integration API', async () => {
+      await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+      expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['religion'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update nationality', () => {
+    it('Updates the nationality using Person Integration API', async () => {
+      await constructService().updateNationality('token', prisonUserMock, 'A1234AA', 'BRIT', 'Some other nationality')
+      expect(personIntegrationApiClient.updateNationality).toHaveBeenCalledWith(
+        'A1234AA',
+        'BRIT',
+        'Some other nationality',
+      )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['nationality', 'otherNationalities'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update sexual orientation', () => {
+    it('Updates the sexual orientation using Person Integration API', async () => {
+      await constructService().updateSexualOrientation('token', prisonUserMock, 'A1234AA', 'HET')
+      expect(personIntegrationApiClient.updateSexualOrientation).toHaveBeenCalledWith('A1234AA', 'HET')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['sexualOrientation'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('getMilitaryRecords', () => {
+    it('should get military records from the API', async () => {
+      const service = constructService()
+      personIntegrationApiClient.getMilitaryRecords = jest.fn(async () => MilitaryRecordsMock)
+
+      const result = await service.getMilitaryRecords('token', 'A1234AA')
+      expect(result).toEqual(MilitaryRecordsMock)
+      expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith('A1234AA')
     })
   })
 })

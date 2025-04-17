@@ -1,18 +1,23 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Functional skills level", id: "functional-skills-level"}) -%}
-    <p>These functional skills levels are from the prisoner’s induction assessment. To view their recent functional skills levels, go to courses and qualifications.</p>
-    {% if(learnerLatestAssessments[0].length > 0) %}
-        {% for list in learnerLatestAssessments[0] %}
-            {{ govukSummaryList({
-                classes: 'govuk-summary-list--no-border',
-                rows: [list.type, list.date, list.location]
-            }) }}
-            {% if(loop.last === false) %}
-                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6" />
-            {% endif %}
-        {% endfor %}
+    {% if learnerLatestAssessments.status === 'fulfilled' %}
+        {% set assessments = learnerLatestAssessments.value %}
+        <p>These functional skills levels are from the prisoner’s induction assessment. To view their recent functional skills levels, go to courses and qualifications.</p>
+        {% if(assessments[0].length > 0) %}
+            {% for list in assessments[0] %}
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border',
+                    rows: [list.type, list.date, list.location]
+                }) }}
+                {% if(loop.last === false) %}
+                    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6" />
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>The prisoner does not have any assessments.</p>
+        {% endif %}
     {% else %}
-        <p>The prisoner does not have any assessments.</p>
+        {% include './curiousApiError.njk' %}
     {% endif %}
 {%- endcall -%}

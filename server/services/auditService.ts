@@ -1,7 +1,7 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
+import { HmppsUser } from '../interfaces/HmppsUser'
+import { isInUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
@@ -10,7 +10,14 @@ export enum Page {
   AddAlert = 'ADD_ALERT',
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
+  AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
+  AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
+  AddNewAlias = 'ADD_NEW_ALIAS',
+  AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
+  Addresses = 'ADDRESSES',
+  AddWithheld = 'ADD_WITHHELD_IMAGE',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Alerts = 'ALERTS',
   AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
@@ -18,7 +25,41 @@ export enum Page {
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
-  VirtualCampusGoals = 'VC2_GOALS',
+  DistinguishingMarkAllPhotos = 'DISTINGUISHING_MARK_ALL_PHOTOS',
+  EditAppointment = 'EDIT_APPOINTMENT',
+  EditBuild = 'EDIT_BUILD',
+  EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
+  EditConflicts = 'EDIT_CONFLICTS',
+  EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
+  EditDateOfBirth = 'EDIT_DATE_OF_BIRTH',
+  EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
+  EditDischargeDetails = 'EDIT_DISCHARGE_DETAILS',
+  EditDisciplinaryAction = 'EDIT_DISCIPLINARY_ACTION',
+  EditDistinguishingMark = 'EDIT_DISTINGUISHING_MARK',
+  EditDistinguishingMarkPhoto = 'EDIT_DISTINGUISHING_MARK_PHOTO',
+  EditEyeColour = 'EDIT_EYE_COLOUR',
+  EditEthnicBackground = 'EDIT_ETHNIC_BACKGROUND',
+  EditEthnicGroup = 'EDIT_ETHNIC_GROUP',
+  EditFaceShape = 'EDIT_FACE_SHAPE',
+  EditFacialHair = 'EDIT_FACIAL_HAIR',
+  EditHairTypeOrColour = 'EDIT_HAIR_TYPE_OR_COLOUR',
+  EditHeight = 'EDIT_HEIGHT',
+  EditMainLanguage = 'EDIT_MAIN_LANGUAGE',
+  EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
+  EditNameCorrection = 'EDIT_NAME_CORRECTION',
+  EditNameLegal = 'EDIT_NAME_LEGAL',
+  EditNamePurpose = 'EDIT_NAME_PURPOSE',
+  EditNationality = 'EDIT_NATIONALITY',
+  EditOtherLanguages = 'EDIT_OTHER_LANGUAGES',
+  EditPrePostAppointments = 'EDIT_PRE_POST_APPOINTMENTS',
+  EditReligion = 'EDIT_RELIGION',
+  EditSexualOrientation = 'EDIT_SEXUAL_ORIENTATION',
+  EditShoeSize = 'EDIT_SHOE_SIZE',
+  EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
+  EditWeight = 'EDIT_WEIGHT',
+  EditProfileImage = 'EDIT_PROFILE_IMAGE',
+  EditUploadedProfileImage = 'EDIT_UPLOADED_PROFILE_IMAGE',
+  EditProfileImageWithheld = 'EDIT_PROFILE_IMAGE_WITHHELD',
   InactiveAlerts = 'INACTIVE_ALERTS',
   MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
   MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
@@ -26,28 +67,51 @@ export enum Page {
   MoneySpends = 'MONEY_SPENDS',
   Offences = 'OFFENCES',
   Overview = 'OVERVIEW',
+  PastCareNeeds = 'PAST_CARE_NEEDS',
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
+  PhotoList = 'PHOTO_LIST',
   PostAddAlert = 'POST_ADD_ALERT',
   PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',
-  PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
-  PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
   PostAlertAddMoreDetails = 'POST_ALERT_ADD_MORE_DETAILS',
   PostAlertClose = 'POST_ALERT_CLOSE',
+  PostEditAppointment = 'POST_EDIT_APPOINTMENT',
+  PostEditBuild = 'POST_EDIT_BUILD',
+  PostEditCityOrTownOfBirth = 'POST_EDIT_CITY_OR_TOWN_OF_BIRTH',
+  PostEditCountryOfBirth = 'POST_EDIT_COUNTRY_OF_BIRTH',
+  PostEditDietAndFoodAllergies = 'POST_EDIT_DIET_AND_FOOD_ALLERGIES',
+  PostEditEyeColour = 'POST_EDIT_EYE_COLOUR',
+  PostEditFaceShape = 'POST_EDIT_FACE_SHAPE',
+  PostEditFacialHair = 'POST_EDIT_FACIAL_HAIR',
+  PostEditHairTypeOrColour = 'POST_EDIT_HAIR_TYPE_OR_COLOUR',
+  PostEditHeight = 'POST_EDIT_HEIGHT',
+  PostEditNationality = 'POST_EDIT_NATIONALITY',
+  PostEditPrePostAppointments = 'POST_EDIT_PRE_POST_APPOINTMENTS',
+  PostEditReligion = 'POST_EDIT_RELIGION',
+  PostEditSexualOrientation = 'POST_EDIT_SEXUAL_ORIENTATION',
+  PostEditShoeSize = 'POST_EDIT_SHOE_SIZE',
+  PostEditSmokerOrVaper = 'POST_EDIT_SMOKER_OR_VAPER',
+  PostEditWeight = 'POST_EDIT_WEIGHT',
+  PostEditProfileImageWithheld = 'POST_EDIT_PROFILE_IMAGE_WITHHELD',
+  PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
+  PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
   PrePostAppointmentConfirmation = 'PRE_POST_APPOINTMENT_CONFIRMATION',
   PrePostAppointments = 'PRE_POST_APPOINTMENTS',
   PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
+  ProbationDocuments = 'PROBATION_DOCUMENTS',
   ReligionBeliefHistory = 'RELIGION_BELIEF_HISTORY',
   Schedule = 'SCHEDULE',
   UpdateCaseNote = 'UPDATE_CASE_NOTE',
+  VirtualCampusGoals = 'VC2_GOALS',
+  VisitDetails = 'VISIT_DETAILS',
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
-  ProbationDocuments = 'PROBATION_DOCUMENTS',
 }
 
 // eslint-disable-next-line no-shadow
 export enum ApiAction {
+  AddressLookup = 'ADDRESS_LOOKUP',
   Image = 'IMAGE',
   LocationEvents = 'LOCATION_EVENTS',
   OffenderEvents = 'OFFENDER_EVENTS',
@@ -56,11 +120,47 @@ export enum ApiAction {
 
 // eslint-disable-next-line no-shadow
 export enum PostAction {
+  AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
+  AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
+  AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
+  AddNewAlias = 'ADD_NEW_ALIAS',
   Alert = 'ADD_ALERT',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
+  EditBuild = 'EDIT_BUILD',
+  EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
+  EditConflicts = 'EDIT_CONFLICTS',
+  EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
+  EditDateOfBirth = 'EDIT_DATE_OF_BIRTH',
+  EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
+  EditDischargeDetails = 'EDIT_DISCHARGE_DETAILS',
+  EditDisciplinaryAction = 'EDIT_DISCIPLINARY_ACTION',
+  EditDistinguishingMark = 'EDIT_DISTINGUISHING_MARK',
+  EditDistinguishingMarkPhoto = 'EDIT_DISTINGUISHING_MARK_PHOTO',
+  EditEyeColour = 'EDIT_EYE_COLOUR',
+  EditEthnicBackground = 'EDIT_ETHNIC_BACKGROUND',
+  EditEthnicGroup = 'EDIT_ETHNIC_GROUP',
+  EditFaceShape = 'EDIT_FACE_SHAPE',
+  EditFacialHair = 'EDIT_FACIAL_HAIR',
+  EditHairTypeOrColour = 'EDIT_HAIR_TYPE_OR_COLOUR',
+  EditHeight = 'EDIT_HEIGHT',
+  EditMainLanguage = 'EDIT_MAIN_LANGUAGE',
+  EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
+  EditNameCorrection = 'EDIT_NAME_CORRECTION',
+  EditNameLegal = 'EDIT_NAME_LEGAL',
+  EditNamePurpose = 'EDIT_NAME_PURPOSE',
+  EditNationality = 'EDIT_NATIONALITY',
+  EditOtherLanguages = 'EDIT_OTHER_LANGUAGES',
+  EditProfileImage = 'EDIT_PROFILE_IMAGE',
+  EditProfileImageWithheld = 'EDIT_PROFILE_IMAGE_WITHHELD',
+  EditReligion = 'EDIT_RELIGION',
+  EditSexualOrientation = 'EDIT_SEXUAL_ORIENTATION',
+  EditShoeSize = 'EDIT_SHOE_SIZE',
+  EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
+  EditWeight = 'EDIT_WEIGHT',
 }
 
 // eslint-disable-next-line no-shadow
@@ -81,17 +181,14 @@ export enum SubjectType {
 }
 
 export interface AccessAttemptAudit {
-  userId: string
-  userRoles: string
+  user: HmppsUser
   prisonerNumber: string
   page: Page | ApiAction
   correlationId: string
 }
 
 export interface PageViewAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
-  userRoles: string[]
+  user: HmppsUser
   prisonerNumber: string
   prisonId: string
   page: Page
@@ -99,16 +196,14 @@ export interface PageViewAudit {
 }
 
 interface AddAppointmentAudit {
-  userId: string
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   details: object
 }
 
 interface SearchAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
-  userRoles: string[]
+  user: HmppsUser
   prisonerNumber: string
   prisonId: string
   correlationId: string
@@ -117,8 +212,7 @@ interface SearchAudit {
 }
 
 interface PostAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   action: PostAction
@@ -126,8 +220,7 @@ interface PostAudit {
 }
 
 interface PutAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   action: PutAction
@@ -195,24 +288,24 @@ export const auditService = ({
     }
   }
 
-  const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
+  const sendAccessAttempt = async ({ user, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
     await sendMessage({
       what: `ACCESS_ATTEMPT_${page.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details: JSON.stringify({ build, userRoles }),
+      details: JSON.stringify({ build, userRoles: user.userRoles }),
     })
   }
 
-  const sendPostAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+  const sendPostAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
       what: `POST_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -221,11 +314,11 @@ export const auditService = ({
     })
   }
 
-  const sendPostSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+  const sendPostSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
       what: `POST_SUCCESS_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -234,11 +327,11 @@ export const auditService = ({
     })
   }
 
-  const sendPutAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+  const sendPutAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
     await sendMessage({
       what: `PUT_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -247,11 +340,11 @@ export const auditService = ({
     })
   }
 
-  const sendPutSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+  const sendPutSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
     await sendMessage({
       what: `PUT_SUCCESS_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -260,26 +353,18 @@ export const auditService = ({
     })
   }
 
-  const sendPageView = async ({
-    userId,
-    userCaseLoads,
-    userRoles,
-    prisonerNumber,
-    prisonId,
-    page,
-    correlationId,
-  }: PageViewAudit) => {
+  const sendPageView = async ({ user, prisonerNumber, prisonId, page, correlationId }: PageViewAudit) => {
     const details = {
-      globalView: !prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads),
+      globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
-      userRoles,
+      userRoles: user.userRoles,
       build,
     }
 
     await sendMessage({
       what: `PAGE_VIEW_${page.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -288,7 +373,7 @@ export const auditService = ({
     })
   }
 
-  const sendAddAppointment = async ({ userId, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
+  const sendAddAppointment = async ({ user, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
     await sendMessage({
       what: 'ADD_APPOINTMENT',
       correlationId,
@@ -297,11 +382,11 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       when: new Date(),
-      who: userId,
+      who: user.username,
     })
   }
 
-  const sendSearch = async ({ userId, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
+  const sendSearch = async ({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
     await sendMessage({
       what: `SEARCH_${searchPage}`,
       correlationId,
@@ -310,7 +395,7 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,
       when: new Date(),
-      who: userId,
+      who: user.username,
     })
   }
 

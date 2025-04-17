@@ -1,8 +1,8 @@
 import RestClient from './restClient'
 import config from '../config'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
-import { PrisonerProfileDeliusApiClient } from './interfaces/prisonerProfileDeliusApiClient'
-import { ProbationDocuments } from '../interfaces/deliusApi/probationDocuments'
+import CommunityManager from './interfaces/deliusApi/CommunityManager'
+import { PrisonerProfileDeliusApiClient } from './interfaces/deliusApi/prisonerProfileDeliusApiClient'
+import ProbationDocuments from './interfaces/deliusApi/ProbationDocuments'
 
 export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfileDeliusApiClient {
   private readonly restClient: RestClient
@@ -11,17 +11,16 @@ export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfi
     this.restClient = new RestClient('Prisoner Profile Delius API', config.apis.prisonerProfileDeliusApi, token)
   }
 
-  async getCommunityManager(prisonerNumber: string): Promise<CommunityManager | null | undefined> {
-    try {
-      return await this.restClient.get<CommunityManager | null>({
-        path: `/probation-cases/${prisonerNumber}/community-manager`,
-        ignore404: true,
-      })
-    } catch (e) {
-      return undefined
-    }
+  async getCommunityManager(prisonerNumber: string): Promise<CommunityManager | null> {
+    return this.restClient.get<CommunityManager | null>({
+      path: `/probation-cases/${prisonerNumber}/community-manager`,
+      ignore404: true,
+    })
   }
 
-  getProbationDocuments = (prisonerNumber: string): Promise<ProbationDocuments> =>
-    this.restClient.get<ProbationDocuments>({ path: `/probation-cases/${prisonerNumber}/documents` })
+  async getProbationDocuments(prisonerNumber: string): Promise<ProbationDocuments> {
+    return this.restClient.get<ProbationDocuments>({
+      path: `/probation-cases/${prisonerNumber}/documents`,
+    })
+  }
 }

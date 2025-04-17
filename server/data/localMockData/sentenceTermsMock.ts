@@ -1,7 +1,7 @@
-import { CourtCaseDataMappedUnsentenced } from '../../interfaces/courtCaseDataMapped'
-import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
-import { SentenceSummaryCourtCaseExtended } from '../../interfaces/prisonApi/sentenceSummary'
-import { SentenceTerm } from '../../interfaces/prisonApi/sentenceTerms'
+import UnsentencedCourtCase from '../../services/interfaces/offencesPageService/UnsentencedCourtCase'
+import { SentenceSummaryCourtCaseExtended } from '../interfaces/prisonApi/SentenceSummary'
+import SentenceTerm from '../interfaces/prisonApi/SentenceTerms'
+import { CourtHearing } from '../interfaces/prisonApi/CourtCase'
 
 export const sentenceTermsMock: SentenceTerm[] = [
   {
@@ -263,9 +263,8 @@ export const MappedSentenceSummaryCourtCasesMock: SentenceSummaryCourtCaseExtend
   },
 ]
 
-export const MappedUnsentencedCourtCasesMock: CourtCaseDataMappedUnsentenced[] = [
+export const MappedUnsentencedCourtCasesMock: UnsentencedCourtCase[] = [
   {
-    nextCourtAppearance: {} as CourtHearing,
     courtHearings: [
       {
         id: 325084884,

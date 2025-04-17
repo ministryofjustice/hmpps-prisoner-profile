@@ -1,18 +1,25 @@
 import { isBefore, isFuture } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { AlertsPageData } from '../interfaces/pages/alertsPageData'
-import { Prisoner } from '../interfaces/prisoner'
+import AlertsPageData from './interfaces/alertsService/AlertsPageData'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
-import { AlertTypeFilter } from '../interfaces/alertsMetadata'
+import { SortOption } from '../interfaces/SortParams'
+import AlertTypeFilter from './interfaces/alertsService/AlertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
-import { Alert, AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
+import HmppsError from '../interfaces/HmppsError'
 import { RestClientBuilder } from '../data'
+import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { capitaliseAlertDisplayNames, toAlertsApiCreateAlert } from './mappers/alertMapper'
+import {
+  Alert,
+  AlertChanges,
+  AlertForm,
+  AlertsApiQueryParams,
+  AlertSummaryData,
+} from '../data/interfaces/alertsApi/Alert'
+import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
 
 export default class AlertsService {
-  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+  constructor(private readonly alertsApiClientBuilder: RestClientBuilder<AlertsApiClient>) {}
 
   /**
    * Validate alert filters and return errors if appropriate
@@ -42,19 +49,35 @@ export default class AlertsService {
   }
 
   /**
-   * Map query params from the browser to values suitable for sending to the API.
+   * Map query params from the browser to values suitable for sending to the Alerts API.
    *
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
-    const apiParams = { ...queryParams }
+  private mapToAlertsApiParams(queryParams: AlertsListQueryParams): AlertsApiQueryParams {
+    /* Add sort param createdAt to all queries and lastModifiedAt to inactive queries so results are ordered in an expected way */
+    const sortParams = [queryParams.sort]
+      .flat()
+      .filter(Boolean)
+      .map(s => {
+        return s.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo')
+      })
+    if (sortParams.some(s => s.includes('activeTo'))) {
+      const direction = sortParams.some(s => s.includes('ASC')) ? 'ASC' : 'DESC'
+      sortParams.push(`lastModifiedAt,${direction}`)
+    }
+    const direction = sortParams.some(s => s.includes('ASC')) ? 'ASC' : 'DESC'
+    sortParams.push(`createdAt,${direction}`)
 
-    if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
-    if (apiParams.to) apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
-    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
-
-    return apiParams
+    return {
+      ...(queryParams.alertType && { alertType: queryParams.alertType }),
+      ...(queryParams.from && { activeFromStart: formatDateISO(parseDate(queryParams.from)) }),
+      ...(queryParams.to && { activeFromEnd: formatDateISO(parseDate(queryParams.to)) }),
+      ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      sort: sortParams,
+      isActive: queryParams.alertStatus === 'ACTIVE',
+      size: queryParams?.showAll ? 9999 : 20,
+    }
   }
 
   /**
@@ -62,44 +85,35 @@ export default class AlertsService {
    *
    * @param clientToken
    * @param prisonerData
+   * @param alertSummaryData
    * @param queryParams
-   * @param canUpdateAlert
    */
   public async get(
     clientToken: string,
     prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
-    canUpdateAlert: boolean,
+    alertSummaryData: AlertSummaryData,
+    queryParams: AlertsListQueryParams,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
-    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
-    const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(
-      prisonerData.bookingId,
-    )
+    const alertsApiClient = this.alertsApiClientBuilder(clientToken)
 
-    // Get Filter data and map in query params
-    const alertTypesFilter: { [key: string]: AlertTypeFilter } = {}
-    alerts
-      .filter(alert => alert.active === isActiveAlertsQuery)
-      .forEach(alert => {
-        alertTypesFilter[alert.alertType] = {
-          code: alert.alertType,
-          description: alert.alertTypeDescription,
-          count: alertTypesFilter[alert.alertType] ? alertTypesFilter[alert.alertType].count + 1 : 1,
-          checked: false,
-        }
-      })
-    const alertTypes: AlertTypeFilter[] = Object.keys(alertTypesFilter).map(k => ({
-      ...alertTypesFilter[k],
-      checked: Array.isArray(queryParams.alertType)
-        ? queryParams.alertType?.some(type => type === alertTypesFilter[k].code)
-        : queryParams.alertType === alertTypesFilter[k].code,
-    }))
+    const { activeAlertCount, inactiveAlertCount, activeAlertTypesFilter, inactiveAlertTypesFilter } = alertSummaryData
+
+    const alertTypesFilter = isActiveAlertsQuery ? activeAlertTypesFilter : inactiveAlertTypesFilter
+
+    const alertTypes: AlertTypeFilter[] = Object.keys(alertTypesFilter)
+      .map(k => ({
+        ...alertTypesFilter[k],
+        checked: Array.isArray(queryParams.alertType)
+          ? queryParams.alertType?.some(type => type === alertTypesFilter[k].code)
+          : queryParams.alertType === alertTypesFilter[k].code,
+      }))
+      .sort((a, b) => a.description.localeCompare(b.description))
 
     // Determine sort options
     const sortOptions: SortOption[] = [
-      { value: 'dateCreated,DESC', description: 'Created (most recent)' },
-      { value: 'dateCreated,ASC', description: 'Created (oldest)' },
+      { value: 'dateCreated,DESC', description: 'Start date (most recent)' },
+      { value: 'dateCreated,ASC', description: 'Start date (oldest)' },
     ]
     if (!isActiveAlertsQuery) {
       sortOptions.push(
@@ -109,25 +123,13 @@ export default class AlertsService {
     }
 
     const errors = this.validateFilters(queryParams.from, queryParams.to)
+    const shouldGetActiveAlerts = activeAlertCount && isActiveAlertsQuery
+    const shouldGetInactiveAlerts = inactiveAlertCount && !isActiveAlertsQuery
 
-    let pagedAlerts: PagedList<Alert>
-
-    if (!errors.length) {
-      if ((activeAlertCount && isActiveAlertsQuery) || (inactiveAlertCount && !isActiveAlertsQuery)) {
-        pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
-        pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
-          ...alert,
-          addMoreDetailsLinkUrl:
-            canUpdateAlert &&
-            alert.active &&
-            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`,
-          closeAlertLinkUrl:
-            canUpdateAlert && alert.active && `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
-          addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
-          expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
-        }))
-      }
-    }
+    const pagedAlerts =
+      !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
+        ? await this.getPagedAlerts(alertsApiClient, prisonerData, queryParams)
+        : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
     const params = queryParams
@@ -136,7 +138,7 @@ export default class AlertsService {
 
     return {
       pagedAlerts,
-      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alert', sortOptions, 'Sort by'),
+      listMetadata: generateListMetadata(pagedAlerts, params, 'alert', sortOptions, 'Sort by', true),
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,
@@ -145,30 +147,50 @@ export default class AlertsService {
     }
   }
 
-  public async createAlert(token: string, bookingId: number, alert: AlertForm) {
-    const prisonApiClient = this.prisonApiClientBuilder(token)
-
-    return prisonApiClient.createAlert(bookingId, {
-      ...alert,
-      alertDate: formatDateISO(parseDate(alert.alertDate)),
-      expiryDate: alert.expiryDate ? formatDateISO(parseDate(alert.expiryDate)) : null,
-    })
-  }
-
-  public async getAlertDetails(token: string, bookingId: number, alertId: number) {
-    const prisonApiClient = this.prisonApiClientBuilder(token)
-
-    const alert = await prisonApiClient.getAlertDetails(bookingId, alertId)
-
+  private async getPagedAlerts(
+    alertsApiClient: AlertsApiClient,
+    prisonerData: Prisoner,
+    queryParams: AlertsListQueryParams,
+  ): Promise<PagedList<Alert> | null> {
+    const pagedAlerts = await alertsApiClient.getAlerts(
+      prisonerData.prisonerNumber,
+      this.mapToAlertsApiParams(queryParams),
+    )
     return {
-      ...alert,
-      addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
-      expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
+      ...pagedAlerts,
+      content: pagedAlerts.content.map(capitaliseAlertDisplayNames),
     }
   }
 
-  public async updateAlert(token: string, bookingId: number, alertId: number, alertChanges: AlertChanges) {
-    const prisonApiClient = this.prisonApiClientBuilder(token)
-    return prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  public async createAlert(
+    clientToken: string,
+    { prisonerNumber, alertForm }: { prisonerNumber: string; alertForm: AlertForm },
+  ) {
+    const alertsApiClient = this.alertsApiClientBuilder(clientToken)
+    const alert = await alertsApiClient.createAlert(prisonerNumber, toAlertsApiCreateAlert(alertForm))
+
+    return capitaliseAlertDisplayNames(alert)
+  }
+
+  public async getAlertDetails(token: string, alertId: string) {
+    const alertsApiClient = this.alertsApiClientBuilder(token)
+    const alert = await alertsApiClient.getAlertDetails(alertId)
+
+    return capitaliseAlertDisplayNames(alert)
+  }
+
+  public async updateAlert(clientToken: string, alertId: string, alertChanges: AlertChanges) {
+    const alertsApiClient = this.alertsApiClientBuilder(clientToken)
+    const alert = await alertsApiClient.updateAlert(alertId, alertChanges)
+
+    return capitaliseAlertDisplayNames(alert)
+  }
+
+  public async getAlertTypes(token: string) {
+    const alertsApiClient = this.alertsApiClientBuilder(token)
+    const alertTypes = await alertsApiClient.getAlertTypes()
+
+    return alertTypes.filter(alertType => alertType.alertCodes?.length) // Exclude alert types with no alert codes as they cannot be selected
   }
 }

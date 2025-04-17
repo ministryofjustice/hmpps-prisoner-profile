@@ -8,6 +8,10 @@
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
     @include govuk-responsive-margin(3, 'bottom');
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
 
     h3,
     h2 {
@@ -22,6 +26,17 @@
     padding-top: 15px;
   }
 
+  &__actions {
+    margin: 0;
+    justify-content: right;
+    text-align: right;
+  }
+
+  &__action {
+    margin-left: 10px;
+    list-style: none;
+  }
+
   &__body {
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
@@ -33,5 +48,9 @@
 
   .govuk-summary-list__row:last-of-type {
     border-bottom: none;
+  }
+
+  .card-subheading {
+    font-size: 21px;
   }
 }

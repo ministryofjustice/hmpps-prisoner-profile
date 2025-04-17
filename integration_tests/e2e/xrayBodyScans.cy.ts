@@ -25,6 +25,7 @@ context('X-Ray body scans', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 10 })
   })

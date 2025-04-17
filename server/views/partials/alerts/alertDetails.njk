@@ -6,13 +6,10 @@
             {% for alert in alerts %}
                 <div class="alert-details" role="listitem">
                     <div class="alert-details__content">
-                        <div class="alert-details__sub-title">{{ alert.alertTypeDescription }}</div>
-                        <h2 class="alert-details__title">{{ alert.alertCodeDescription }}</h2>
-                        <pre class="alert-details__notes govuk-body">{{ alert.comment }}</pre>
-                        <div class="alert-details__metadata"><span>Created:</span> {{ alert.dateCreated | formatDate }} {% if alert.addedByFullName %} by {{ alert.addedByFullName }} {% endif %}</div>
-                        {% if not alert.active %}
-                            <div class="alert-details__metadata"><span>Closed:</span> {{ alert.dateExpires | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
-                        {% endif %}
+                        <div class="alert-details__sub-title">{{ alert.alertCode.alertTypeDescription }}</div>
+                        <h2 class="alert-details__title">{{ alert.alertCode.description }}</h2>
+                        <pre class="alert-details__notes govuk-body">{{ alert.description }}</pre>
+                        <div class="alert-details__metadata"><span>Created:</span> {{ alert.createdAt | formatDate }} {% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }} {% endif %}</div>
                     </div>
                     <div class="alert-details__link">
                         {% if alert.addMoreDetailsLinkUrl %}

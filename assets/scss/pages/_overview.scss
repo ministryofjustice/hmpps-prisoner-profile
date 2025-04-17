@@ -4,7 +4,7 @@
   }
 }
 
-.non-association-summary {
+.external-contacts-summary {
   height: calc(100% - 15px);
 
   div.govuk-summary-list__row--no-border {
@@ -20,4 +20,38 @@
       }
     }
   }
+}
+
+.mini-card-wrapper {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 23px 30px;
+
+  > .mini-card {
+    flex: 1 1 260px;
+  }
+
+  // Old overview page layout - delete this once fully moved over to the new layout
+  > .mini-card-v1 {
+    flex: 1 1 260px;
+  }
+}
+
+.mini-card--categories {
+  --mini-card-lines: 4;
+}
+
+.mini-card--incentives {
+  height: 100%;
+  --mini-card-lines: 6;
+}
+
+.mini-card--csra {
+  --mini-card-lines: 4;
+}
+
+.mini-card--csip {
+  --mini-card-lines: 6;
 }

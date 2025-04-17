@@ -32,21 +32,19 @@ describe('Money Controller', () => {
       params: { prisonerNumber: 'A9999AA' },
       query: {},
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
       headers: {
         referer: 'http://referer',
       },
       path: 'money/spends',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
       flash: jest.fn(),
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
+          displayName: 'A Name',
           userRoles: [Role.PrisonUser],
           staffId: 487023,
           caseLoads: CaseLoadsDummyDataA,
@@ -120,11 +118,11 @@ describe('Money Controller', () => {
     await controller['getDamageObligations'](req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.bookingId,
     )
     expect(moneyService.getDamageObligations).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
     )
     expect(mapToObligationTableRows).toHaveBeenCalledWith(damageObligationsMock, [AgenciesMock])
@@ -200,7 +198,7 @@ describe('Money Controller', () => {
     )
 
     expect(moneyService.getTransactions).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
       AccountCode.Spends,
       0,
@@ -225,11 +223,11 @@ describe('Money Controller', () => {
     await controller['getTransactions'](AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.bookingId,
     )
     expect(moneyService.getTransactions).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
       AccountCode.Spends,
       month,

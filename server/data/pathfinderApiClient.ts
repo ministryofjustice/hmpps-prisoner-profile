@@ -1,6 +1,6 @@
 import RestClient from './restClient'
-import { PathfinderApiClient } from './interfaces/pathfinderApiClient'
-import { Nominal } from '../interfaces/pathfinderApi/nominal'
+import { PathfinderApiClient } from './interfaces/pathfinderApi/pathfinderApiClient'
+import Nominal from './interfaces/manageSocCasesApi/Nominal'
 import config from '../config'
 
 export default class PathfinderApiRestClient implements PathfinderApiClient {

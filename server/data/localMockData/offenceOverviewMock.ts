@@ -1,5 +1,6 @@
-import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
-import { MainOffence } from '../../interfaces/prisonApi/mainOffence'
+import FullStatus from '../interfaces/prisonApi/FullStatus'
+import MainOffence from '../interfaces/prisonApi/MainOffence'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export const mainOffenceMock: MainOffence[] = [
   {
@@ -44,77 +45,9 @@ export const fullStatusRemandMock: FullStatus = {
   establishmentName: 'Transfer',
 }
 
-export const offenceOverviewMock: object = {
+export const offenceOverviewMock: OverviewPageData['offencesOverview'] = {
   conditionalReleaseDate: undefined,
   confirmedReleaseDate: undefined,
-  courtCaseData: [
-    {
-      agency: {
-        active: true,
-        agencyId: 'SHEFCC',
-        agencyType: 'CRT',
-        courtType: 'CC',
-        description: 'Sheffield Crown Court',
-        longDescription: 'Sheffield Crown Court',
-      },
-      beginDate: '2016-05-30',
-      caseInfoNumber: 'T20167348',
-      caseSeq: 1,
-      caseStatus: 'ACTIVE',
-      caseType: 'Adult',
-      courtHearings: [
-        {
-          dateTime: '2020-06-18T10:00:00',
-          id: 407072650,
-          location: {
-            active: true,
-            agencyId: 'SHEFCC',
-            agencyType: 'CRT',
-            courtType: 'CC',
-            description: 'Sheffield Crown Court',
-            longDescription: 'Sheffield Crown Court',
-          },
-        },
-        {
-          dateTime: '2016-05-30T10:00:00',
-          id: 304966745,
-          location: {
-            active: true,
-            agencyId: 'DONCMC',
-            agencyType: 'CRT',
-            courtType: 'MC',
-            description: 'Doncaster Magistrates Court',
-            longDescription: 'Doncaster Magistrates Court',
-          },
-        },
-        {
-          dateTime: '2016-06-27T10:00:00',
-          id: 304966783,
-          location: {
-            active: true,
-            agencyId: 'SHEFCC',
-            agencyType: 'CRT',
-            courtType: 'CC',
-            description: 'Sheffield Crown Court',
-            longDescription: 'Sheffield Crown Court',
-          },
-        },
-        {
-          dateTime: '2016-06-30T10:00:00',
-          id: 305411026,
-          location: {
-            active: true,
-            agencyId: 'SHEFCC',
-            agencyType: 'CRT',
-            courtType: 'CC',
-            description: 'Sheffield Crown Court',
-            longDescription: 'Sheffield Crown Court',
-          },
-        },
-      ],
-      id: 1563148,
-    },
-  ],
   fullStatus: {
     bookingBeginDate: '2016-05-30',
     bookingId: 1102484,
@@ -133,5 +66,4 @@ export const offenceOverviewMock: object = {
   },
   imprisonmentStatusDescription: undefined,
   mainOffenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
-  nextCourtAppearance: {},
 }

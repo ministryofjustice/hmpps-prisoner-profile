@@ -2,9 +2,11 @@ import type { Router } from 'express'
 import express from 'express'
 import passport from 'passport'
 import flash from 'connect-flash'
+import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import config from '../config'
 import auth from '../authentication/auth'
 import logger from '../../logger'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 const router = express.Router()
 
@@ -15,10 +17,14 @@ export default function setUpAuth(): Router {
   router.use(passport.session())
   router.use(flash())
 
-  router.get('/autherror', (req, res) => {
-    res.status(401)
-    return res.render('autherror')
-  })
+  router.get(
+    '/autherror',
+    dpsComponents.getPageComponents({ dpsUrl: config.serviceUrls.digitalPrison }),
+    (req, res) => {
+      res.status(401)
+      return res.render('autherror')
+    },
+  )
 
   router.get('/sign-in', passport.authenticate('oauth2'))
 
@@ -69,7 +75,7 @@ export default function setUpAuth(): Router {
   })
 
   router.use((req, res, next) => {
-    res.locals.user = req.user
+    res.locals.user = req.user as HmppsUser
     next()
   })
 

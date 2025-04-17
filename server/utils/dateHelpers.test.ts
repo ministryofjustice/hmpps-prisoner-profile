@@ -1,10 +1,14 @@
+import { format, subDays, subMonths, subYears } from 'date-fns'
 import {
+  ageAsString,
   calculateEndDate,
   dateToIsoDate,
   formatDate,
   formatDateISO,
   formatDateTime,
   formatDateTimeISO,
+  formatDateToPattern,
+  formatDateWithAge,
   formatDateWithTime,
   isRealDate,
   parseDate,
@@ -98,16 +102,24 @@ describe('isRealDate', () => {
 
 describe('format date', () => {
   it.each([
-    [null, null, undefined, ''],
-    ['[default]', '2023-01-20', undefined, '20 January 2023'],
-    ['long', '2023-01-20', 'long', '20 January 2023'],
-    ['short', '2023-01-20', 'short', '20/01/2023'],
-    ['full', '2023-01-20', 'full', 'Friday, 20 January 2023'],
-    ['medium', '2023-01-20', 'medium', '20 Jan 2023'],
+    [null, null, undefined, undefined, ''],
+    ['null with return value', null, undefined, 'Not entered', 'Not entered'],
+    ['[default]', '2023-01-20', undefined, undefined, '20 January 2023'],
+    ['[default]', '2023-01-20', undefined, 'Not entered', '20 January 2023'],
+    ['long', '2023-01-20', 'long', undefined, '20 January 2023'],
+    ['short', '2023-01-20', 'short', undefined, '20/01/2023'],
+    ['full', '2023-01-20', 'full', undefined, 'Friday 20 January 2023'],
+    ['medium', '2023-01-20', 'medium', undefined, '20 Jan 2023'],
   ])(
     '%s: formatDate(%s, %s)',
-    (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
-      expect(formatDate(a, b)).toEqual(expected)
+    (
+      _: string,
+      isoDate: string,
+      style: undefined | 'short' | 'full' | 'long' | 'medium',
+      emptyReturnValue: string,
+      expected: string,
+    ) => {
+      expect(formatDate(isoDate, style, emptyReturnValue)).toEqual(expected)
     },
   )
 })
@@ -118,7 +130,7 @@ describe('format datetime', () => {
     ['[default]', '2023-01-20T12:13:14', undefined, '20 January 2023 at 12:13'],
     ['long', '2023-01-20T12:13:14', 'long', '20 January 2023 at 12:13'],
     ['short', '2023-01-20T12:13:14', 'short', '20/01/2023 12:13'],
-    ['full', '2023-01-20T12:13:14', 'full', 'Friday, 20 January 2023 at 12:13'],
+    ['full', '2023-01-20T12:13:14', 'full', 'Friday 20 January 2023 at 12:13'],
     ['medium', '2023-01-20T12:13:14', 'medium', '20 Jan 2023 at 12:13'],
   ])(
     '%s: formatDateTime(%s, %s)',
@@ -170,4 +182,50 @@ describe('calculateEndDate', () => {
   ])('Calculate end date from %s %s %s times', (date: Date, repeatPeriod: string, times: number, expected: Date) => {
     expect(calculateEndDate(date, repeatPeriod, times)).toEqual(expected)
   })
+})
+
+describe('ageAsString', () => {
+  it.each([
+    [{ y: 18, m: 0, d: 0 }, '18 years old'],
+    [{ y: 1, m: 0, d: 0 }, '1 year old'],
+    [{ y: 0, m: 11, d: 0 }, '11 months old'],
+    [{ y: 0, m: 1, d: 0 }, '1 month old'],
+    [{ y: 0, m: 0, d: 12 }, '12 days old'],
+    [{ y: 0, m: 0, d: 1 }, '1 day old'],
+  ])('Calculate the age as a string for age %s', ({ y, m, d }, expected) => {
+    const dob = subDays(subMonths(subYears(new Date(), y), m), d)
+    const result = ageAsString(format(dob, 'yyyy-MM-dd'))
+    expect(result).toEqual(expected)
+  })
+
+  it('Show not entered message', () => {
+    expect(ageAsString(undefined)).toEqual('date of birth not entered')
+  })
+})
+
+describe('formatDateToPattern', () => {
+  it.each([
+    ['2023-01-20', 'dd/MM/yyyy', '', '20/01/2023'],
+    ['2023-01-20', 'MMMM yyyy', '', 'January 2023'],
+    [null, 'dd/MM/yyyy', 'Not entered', 'Not entered'],
+  ])('should format %s with pattern %s and return %s', (isoDate, pattern, emptyReturnValue, expected) => {
+    expect(formatDateToPattern(isoDate, pattern, emptyReturnValue)).toEqual(expected)
+  })
+})
+
+describe('formatDateWithAge', () => {
+  it.each([
+    ['1985-06-15', 'long', '', '15 June 1985 (39 years old)'],
+    ['1990-12-01', 'long', '', '1 December 1990 (34 years old)'],
+    ['2000-05-20', 'short', '', '20/05/2000 (24 years old)'],
+    ['1975-03-10', 'full', '', 'Monday 10 March 1975 (50 years old)'],
+    ['1995-09-25', 'medium', '', '25 Sept 1995 (29 years old)'],
+    [null, 'long', 'Not entered', 'Not entered'],
+    [undefined, 'long', 'Not entered', 'Not entered'],
+  ])(
+    'should format %s with style %s and emptyReturnValue %s, expect %s',
+    (isoDate: string, style: 'short' | 'full' | 'long' | 'medium', emptyReturnValue: string, expected: string) => {
+      expect(formatDateWithAge(isoDate, style, emptyReturnValue)).toEqual(expected)
+    },
+  )
 })

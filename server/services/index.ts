@@ -1,21 +1,19 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
+import { ApolloClient, InMemoryCache } from '@apollo/client/core'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
 import CaseNotesService from './caseNotesService'
 import OffencesPageService from './offencesPageService'
 import OffenderService from './offenderService'
-import OverviewPageService from './overviewPageService'
 import PersonalPageService from './personalPageService'
 import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
-import ReferenceDataService from './referenceDataService'
 import CsraService from './csraService'
-import ComponentService from './componentService'
 import MoneyService from './moneyService'
 import AppointmentService from './appointmentService'
-import prisonerLocationHistoryService from './prisonerLocationHistoryService'
+import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
@@ -23,11 +21,34 @@ import BeliefService from './beliefService'
 import LocationDetailsService from './locationDetailsService'
 import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 import ProbationDocumentsService from './probationDocumentsService'
+import OffencesService from './offencesService'
+import { VisitsService } from './visitsService'
+import AddressService from './addressService'
+import PrisonService from './prisonService'
+import AdjudicationsService from './adjudicationsService'
+import PrisonerScheduleService from './prisonerScheduleService'
+import IncentivesService from './incentivesService'
+import ContentfulService from './contentfulService'
+import CuriousService from './curiousService'
+import FeatureToggleService from './featureToggleService'
+import CareNeedsService from './careNeedsService'
+import PermissionsService from './permissionsService'
+import MetricsService from './metrics/metricsService'
+import DistinguishingMarksService from './distinguishingMarksService'
+import CsipService from './csipService'
+import ReferenceDataService from './referenceData/referenceDataService'
+import MilitaryRecordsService from './militaryRecordsService'
+import { ReferenceDataSourceFactory } from './referenceData/referenceDataSourceFactory'
+import PhotoService from './photoService'
+import AliasService from './aliasService'
+import LanguagesService from './languagesService'
+import ContactsService from './contactsService'
 
 export const services = () => {
   const {
-    hmppsAuthClientBuilder,
     prisonApiClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
     caseNotesApiClientBuilder,
     prisonerSearchApiClientBuilder,
     allocationManagerApiClientBuilder,
@@ -36,11 +57,24 @@ export const services = () => {
     curiousApiClientBuilder,
     adjudicationsApiClientBuilder,
     nonAssociationsApiClientBuilder,
-    componentApiClientBuilder,
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
-    manageUsersApiClientBuilder,
+    bookAVideoLinkApiClientBuilder,
     complexityApiClientBuilder,
+    calculateReleaseDatesApiClientBuilder,
+    prisonRegisterApiClientBuilder,
+    alertsApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    csipApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
+    personCommunicationNeedsApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
+    prisonRegisterStore,
+    referenceDataStore,
+    featureToggleStore,
+    telemetryClient,
+    osPlacesApiClient,
+    curiousApiToken,
   } = dataAccess
 
   const auditService = AuditService({
@@ -51,50 +85,108 @@ export const services = () => {
     enabled: config.apis.audit.enabled,
   })
 
+  const metricsService = new MetricsService(telemetryClient)
+  const featureToggleService = new FeatureToggleService(featureToggleStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
-  const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
-  const offenderService = new OffenderService(prisonApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
+  const userService = new UserService(prisonApiClientBuilder)
+  const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsService = new AlertsService(prisonApiClientBuilder)
+  const alertsService = new AlertsService(alertsApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
-  const overviewPageService = new OverviewPageService(
-    prisonApiClientBuilder,
-    allocationManagerApiClientBuilder,
-    keyworkerApiClientBuilder,
-    incentivesApiClientBuilder,
-    adjudicationsApiClientBuilder,
-    offencesPageService,
-    curiousApiClientBuilder,
-    nonAssociationsApiClientBuilder,
-    prisonerProfileDeliusApiClientBuilder,
-    complexityApiClientBuilder,
+  const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
+  const referenceDataSourceFactory = new ReferenceDataSourceFactory(
+    personIntegrationApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
+    personCommunicationNeedsApiClientBuilder,
   )
-  const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
+  const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
+  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
+  const personalPageService = new PersonalPageService(
+    prisonApiClientBuilder,
+    curiousApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
+    referenceDataService,
+    prisonService,
+    metricsService,
+    curiousApiToken,
+    personalRelationshipsApiClientBuilder,
+  )
+  const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
     prisonApiClientBuilder,
     personalLearningPlansService,
+    curiousApiToken,
   )
-  const prisonerLocationDetailsPageService = new LocationDetailsService(prisonApiClientBuilder)
-  const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
-  const componentService = new ComponentService(componentApiClientBuilder)
+  const locationDetailsService = new LocationDetailsService(
+    prisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+  )
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
   const appointmentService = new AppointmentService(
+    locationDetailsService,
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
-    manageUsersApiClientBuilder,
+    bookAVideoLinkApiClientBuilder,
   )
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     keyworkerApiClientBuilder,
+    complexityApiClientBuilder,
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
+  const visitsService = new VisitsService(prisonApiClientBuilder)
+  const addressService = new AddressService(prisonApiClientBuilder, osPlacesApiClient)
+  const prisonerLocationHistoryService = new PrisonerLocationHistoryService(
+    prisonApiClientBuilder,
+    whereaboutsApiClientBuilder,
+    caseNotesApiClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
+  )
+  const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
+  const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
+  const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
+  const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
+  const permissionsService = new PermissionsService(userService)
+  const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
+  const csipService = new CsipService(csipApiClientBuilder)
+  const militaryRecordsService = new MilitaryRecordsService(
+    personIntegrationApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
+  const photoService = new PhotoService(prisonApiClientBuilder)
+  const aliasService = new AliasService(personIntegrationApiClientBuilder, metricsService)
+  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
+  const languagesService = new LanguagesService(
+    personCommunicationNeedsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
+  const contactsService = new ContactsService(personalRelationshipsApiClientBuilder)
+
+  const apolloClient = new ApolloClient({
+    cache: new InMemoryCache(),
+    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
+    headers: {
+      Authorization: `Bearer ${config.apis.contentful.accessToken}`,
+    },
+    ssrMode: true,
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'cache-and-network',
+      },
+    },
+  })
+  const contentfulService = new ContentfulService(apolloClient)
 
   return {
     dataAccess,
@@ -104,26 +196,39 @@ export const services = () => {
     caseNotesService,
     prisonerSearchService,
     alertsService,
-    overviewPageService,
     personalPageService,
     workAndSkillsPageService,
     personalLearningPlansService,
     offencesPageService,
-    referenceDataService,
-    componentService,
     csraService,
     moneyService,
     appointmentService,
-    prisonerLocationDetailsPageService,
-    prisonerLocationHistoryService: prisonerLocationHistoryService({
-      prisonApiClientBuilder,
-      whereaboutsApiClientBuilder,
-      caseNotesApiClientBuilder,
-    }),
+    locationDetailsService,
+    prisonerLocationHistoryService,
     professionalContactsService,
     beliefService,
     auditService,
     probationDocumentsService,
+    offencesService,
+    visitsService,
+    addressService,
+    prisonService,
+    adjudicationsService,
+    prisonerScheduleService,
+    incentivesService,
+    contentfulService,
+    curiousService,
+    featureToggleService,
+    careNeedsService,
+    permissionsService,
+    distinguishingMarksService,
+    csipService,
+    militaryRecordsService,
+    photoService,
+    aliasService,
+    languagesService,
+    referenceDataService,
+    contactsService,
   }
 }
 

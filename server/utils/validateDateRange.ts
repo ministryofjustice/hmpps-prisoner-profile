@@ -1,5 +1,5 @@
 import { isBefore, isFuture } from 'date-fns'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import { isRealDate, parseDate } from './dateHelpers'
 
 export default (startDate: string, endDate: string) => {

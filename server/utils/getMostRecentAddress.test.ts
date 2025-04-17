@@ -1,5 +1,5 @@
-import { addDays, subDays, format } from 'date-fns'
-import { Address } from '../interfaces/prisonApi/address'
+import { addDays, format, subDays } from 'date-fns'
+import Address from '../data/interfaces/prisonApi/Address'
 import { getMostRecentAddress } from './getMostRecentAddress'
 
 describe('getMostRecentAddress', () => {
@@ -22,21 +22,22 @@ describe('getMostRecentAddress', () => {
   describe('Given no active addresses', () => {
     it('returns undefined', () => {
       const addresses: Address[] = [
-        { primary: true, noFixedAddress: false, endDate: dateInThePast(3) },
-        { primary: false, noFixedAddress: false, endDate: dateInThePast(30) },
+        { primary: true, mail: false, noFixedAddress: false, endDate: dateInThePast(3) },
+        { primary: false, mail: false, noFixedAddress: false, endDate: dateInThePast(30) },
       ]
 
       expect(getMostRecentAddress(addresses)).toBeUndefined()
     })
   })
 
+  // TODO add "mail" and "primary and mail" tests
   describe('Given active addresses', () => {
     describe('and there is a primary address', () => {
       describe('with no end date', () => {
         it('returns the primary address', () => {
           const addresses: Address[] = [
-            { primary: false, noFixedAddress: false, premise: 'Some address' },
-            { primary: true, noFixedAddress: false, premise: 'Example address' },
+            { primary: false, mail: false, noFixedAddress: false, premise: 'Some address' },
+            { primary: true, mail: false, noFixedAddress: false, premise: 'Example address' },
           ]
 
           expect(getMostRecentAddress(addresses)).toEqual(addresses[1])
@@ -47,8 +48,8 @@ describe('getMostRecentAddress', () => {
         it('returns the primary address', () => {
           const endDate: string = formatDate(addDays(new Date(), 3))
           const addresses: Address[] = [
-            { primary: false, noFixedAddress: false, premise: 'Some address', endDate },
-            { primary: true, noFixedAddress: false, premise: 'Example address', endDate },
+            { primary: false, mail: false, noFixedAddress: false, premise: 'Some address', endDate },
+            { primary: true, mail: false, noFixedAddress: false, premise: 'Example address', endDate },
           ]
 
           expect(getMostRecentAddress(addresses)).toEqual(addresses[1])
@@ -60,8 +61,8 @@ describe('getMostRecentAddress', () => {
       describe('and there is a home address', () => {
         it.each(['home', 'HOME', 'HoMe'])('returns the home address (type: %s)', (type: string) => {
           const addresses: Address[] = [
-            { primary: false, noFixedAddress: false, premise: 'Some other address', addressType: 'away' },
-            { primary: false, noFixedAddress: false, premise: 'Some address', addressType: type },
+            { primary: false, mail: false, noFixedAddress: false, premise: 'Some other address', addressType: 'away' },
+            { primary: false, mail: false, noFixedAddress: false, premise: 'Some address', addressType: type },
           ]
 
           expect(getMostRecentAddress(addresses)).toEqual(addresses[1])
@@ -72,6 +73,7 @@ describe('getMostRecentAddress', () => {
           const addresses: Address[] = [
             {
               primary: false,
+              mail: false,
               noFixedAddress: false,
               premise: 'Some other address',
               addressType: 'home',
@@ -79,6 +81,7 @@ describe('getMostRecentAddress', () => {
             },
             {
               primary: false,
+              mail: false,
               noFixedAddress: false,
               premise: 'Some address',
               addressType: 'home',
@@ -92,7 +95,9 @@ describe('getMostRecentAddress', () => {
       describe('and no addresses are a home address', () => {
         describe('and there is one address', () => {
           it('returns the address', () => {
-            const addresses: Address[] = [{ primary: false, noFixedAddress: false, premise: 'Some other address' }]
+            const addresses: Address[] = [
+              { primary: false, mail: false, noFixedAddress: false, premise: 'Some other address' },
+            ]
 
             expect(getMostRecentAddress(addresses)).toEqual(addresses[0])
           })
@@ -103,12 +108,14 @@ describe('getMostRecentAddress', () => {
             const addresses: Address[] = [
               {
                 primary: false,
+                mail: false,
                 noFixedAddress: false,
                 premise: 'Some other address',
                 startDate: dateInThePast(3),
               },
               {
                 primary: false,
+                mail: false,
                 noFixedAddress: false,
                 premise: 'Some address',
                 startDate: dateInThePast(30),

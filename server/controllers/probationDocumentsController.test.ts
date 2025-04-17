@@ -4,8 +4,9 @@ import ProbationDocumentsController from './probationDocumentsController'
 import ProbationDocumentsService from '../services/probationDocumentsService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import config from '../config'
-import { ProbationDocument } from '../interfaces/deliusApi/probationDocument'
-import { Conviction } from '../interfaces/deliusApi/conviction'
+import { ProbationDocument } from '../data/interfaces/deliusApi/ProbationDocuments'
+import Conviction from '../data/interfaces/deliusApi/Conviction'
+import { Result } from '../utils/result/result'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'ABC123'
@@ -36,23 +37,22 @@ describe('Prisoner schedule', () => {
     spy.mockRestore()
   })
 
-  describe('displayProfessionalContacts', () => {
+  describe('displayDocuments', () => {
     it('should call the service and render the page', async () => {
       const probationDocuments = {
-        notFound: false,
-        data: { documents: { offenderDocuments: [] as ProbationDocument[], convictions: [] as Conviction[] } },
+        documents: { offenderDocuments: [] as ProbationDocument[], convictions: [] as Conviction[] },
       }
-      jest
-        .spyOn<any, string>(controller['probationDocumentsService'], 'getDocuments')
-        .mockResolvedValue(probationDocuments)
+      const result = Result.fulfilled(probationDocuments)
+
+      jest.spyOn<any, string>(controller['probationDocumentsService'], 'getDocuments').mockResolvedValue(result)
 
       await controller.displayDocuments(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/probationDocuments/probationDocuments', {
-        ...probationDocuments.data,
+        pageTitle: 'Probation documents',
+        probationDocuments: expect.objectContaining({ status: 'fulfilled', value: probationDocuments }),
         prisonerNumber: 'G6123VU',
         dpsUrl: config.serviceUrls.digitalPrison,
         prisonerBreadcrumbName: 'Saunders, John',
-        probationDocumentsNotFound: probationDocuments.notFound,
       })
     })
   })

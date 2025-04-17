@@ -1,0 +1,231 @@
+.personal-distinguishing-marks {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 50px;
+  margin-bottom: 15px;
+
+  dl {
+    margin: 0;
+    &:not(:last-of-type) {
+      border-bottom: 1px solid $govuk-canvas-background-colour;
+      margin-bottom: govuk-spacing(3);
+    }
+  }
+
+  dt {
+    @include govuk-font($size: 19, $weight: 'bold');
+  }
+
+
+  &__row {
+    margin-bottom: govuk-spacing(3);
+    border-bottom: 1px solid $govuk-border-colour;
+
+    &__empty {
+      display: flex;
+      padding-bottom: govuk-spacing(3);
+
+      dt {
+        min-width: 105px;
+      }
+    }
+
+    &__populated {
+      position: relative;
+
+      dd {
+        margin: 0;
+
+        summary.govuk-details__summary {
+          color: govuk-colour('black');
+        }
+
+        div.govuk-details__text {
+          padding-bottom: 0;
+        }
+      }
+
+      details {
+        margin-bottom: govuk-spacing(2);
+
+        &:not(:last-of-type) {
+          padding-bottom: govuk-spacing(2);
+          border-bottom: 1px solid $govuk-canvas-background-colour;
+        }
+      }
+
+      &__mark {
+        display: flex;
+        justify-content: space-between;
+
+        &:not(:last-of-type) {
+          padding-bottom: govuk-spacing(3);
+          margin-bottom: govuk-spacing(3);
+          border-bottom: 1px solid $govuk-canvas-background-colour;
+        }
+
+        dl {
+          &:not(:last-child) {
+            margin-bottom: govuk-spacing(3);
+          }
+        }
+
+        dd {
+          max-width: 350px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+      }
+
+      &__row {
+        &:not(:last-of-type) {
+          padding: 0 0 govuk-spacing(3) 0;
+        }
+
+        &__image-list {
+          display: flex;
+          flex-direction: column;
+          img {
+            &:not(:last-of-type) {
+              margin-bottom: govuk-spacing(2);
+            }
+          }
+        }
+      }
+
+      .personal-distinguishing-marks__row__actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
+
+    &__actions {
+      padding-right: 0;
+      flex-grow: 1;
+      text-align: right;
+    }
+  }
+
+  &__info {
+    flex: 2;
+  }
+
+  &__image-container {
+    position: relative;
+    flex: 1;
+    flex-basis: 10%;
+    height: fit-content;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    .dm-base-image {
+      display: block;
+      margin-top: 23px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .dm-base-label-front {
+      position: absolute;
+      left: calc(23% - 18.5px);
+      top: 0;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .dm-base-label-back {
+      position: absolute;
+      left: calc(76% - 17.5px);
+      top: 0;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .dm-overlay-face {
+      position: absolute;
+      top: calc(0.2% + 23px);
+      left: 15.7%;
+      width: 15.85%;
+    }
+
+    .dm-overlay-neck {
+      position: absolute;
+      top: calc(10.65% + 20px);
+      left: 19%;
+      width: 9.2%;
+    }
+
+    .dm-overlay-torso {
+      position: absolute;
+      top: calc(13.25% + 20px);
+      left: 8.7%;
+      width: 29.7%;
+    }
+
+    .dm-overlay-right-arm {
+      position: absolute;
+      top: calc(15.95% + 20px);
+      left: 0;
+      width: 11.3%;
+    }
+
+    .dm-overlay-right-hand {
+      position: absolute;
+      top: calc(46.75% + 13px);
+      left: 0;
+      width: 9.1%;
+    }
+
+    .dm-overlay-left-arm {
+      position: absolute;
+      top: calc(15.95% + 20px);
+      left: 35.8%;
+      width: 11.3%;
+    }
+
+    .dm-overlay-left-hand {
+      position: absolute;
+      top: calc(46.75% + 13px);
+      left: 38.2%;
+      width: 9.1%;
+    }
+
+    .dm-overlay-right-leg {
+      position: absolute;
+      top: calc(45.4% + 13px);
+      left: 9.4%;
+      width: 14.4%;
+    }
+
+    .dm-overlay-right-foot {
+      position: absolute;
+      top: calc(89.4% + 3px);
+      left: 12.4%;
+      width: 8.85%;
+    }
+
+    .dm-overlay-left-leg {
+      position: absolute;
+      top: calc(45.4% + 13px);
+      left: 23.4%;
+      width: 14.4%;
+    }
+
+    .dm-overlay-left-foot {
+      position: absolute;
+      top: calc(89.4% + 3px);
+      left: 26.1%;
+      width: 8.85%;
+    }
+
+    .dm-overlay-back {
+      position: absolute;
+      top: calc(13.25% + 20px);
+      left: 61.3%;
+      width: 29.6%;
+    }
+  }
+}

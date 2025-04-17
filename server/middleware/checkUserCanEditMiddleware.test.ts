@@ -16,16 +16,17 @@ describe('CheckUserCanEditMiddleware', () => {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
     }
     res = {
       locals: {
         user: {
+          authSource: 'nomis',
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
     }
@@ -56,7 +57,7 @@ describe('CheckUserCanEditMiddleware', () => {
       expect(next).toHaveBeenCalledWith()
     })
 
-    it('should return next() if prisoner is in caseload', async () => {
+    it('should return next() if prisoner is NOT in caseload', async () => {
       req.middleware = {
         prisonerData: { ...PrisonerMockDataA, prisonId: 'ZZZ', restrictedPatient: true },
       }

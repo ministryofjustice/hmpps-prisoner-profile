@@ -1,4 +1,4 @@
-import { Prisoner } from '../../server/interfaces/prisoner'
+import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { Role } from '../../server/data/enums/role'
 import NotFoundPage from '../pages/notFoundPage'
 import Page from '../pages/page'
@@ -9,7 +9,7 @@ export function permissionsTests<TPage extends Page>({
   visitPage,
   pageToDisplay,
   pageWithTitleToDisplay,
-  options = { additionalRoles: [] },
+  options = { additionalRoles: [], preventGlobalAccess: false },
 }: {
   prisonerNumber: string
   visitPage: (prisonerDataOverrides: Partial<Prisoner>) => void
@@ -17,6 +17,7 @@ export function permissionsTests<TPage extends Page>({
   pageWithTitleToDisplay?: { page: new (title: string) => TPage; title: string }
   options?: {
     additionalRoles: Role[]
+    preventGlobalAccess?: boolean
   }
 }) {
   const verifyPageDisplayed = () => {
@@ -37,9 +38,17 @@ export function permissionsTests<TPage extends Page>({
       const overrides: Partial<Prisoner> = { prisonId: 'ABC' }
 
       beforeEach(() => {
-        cy.setupUserAuth({
-          caseLoads: [{ caseLoadId: '123', caseloadFunction: '', currentlyActive: true, description: '', type: '' }],
-          roles: [Role.PrisonUser, ...options.additionalRoles],
+        cy.setupUserAuth({ roles: [Role.PrisonUser, ...options.additionalRoles] })
+        cy.setupComponentsData({
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
         cy.task('stubPrisonerData', { prisonerNumber, overrides })
       })
@@ -53,17 +62,32 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the GLOBAL_SEARCH role', () => {
       const overrides: Partial<Prisoner> = { prisonId: 'ABC' }
       beforeEach(() => {
-        cy.setupUserAuth({
-          roles: [Role.GlobalSearch, ...options.additionalRoles],
-          caseLoads: [{ caseLoadId: '123', caseloadFunction: '', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, ...options.additionalRoles] })
+        cy.setupComponentsData({
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
         cy.task('stubPrisonerData', { prisonerNumber, overrides })
       })
 
-      it('Displays the page', () => {
-        visitPage(overrides)
-        verifyPageDisplayed()
-      })
+      if (options?.preventGlobalAccess) {
+        it('Does not display the page', () => {
+          visitPage(overrides)
+          new NotFoundPage().shouldBeDisplayed()
+        })
+      } else {
+        it('Displays the page', () => {
+          visitPage(overrides)
+          verifyPageDisplayed()
+        })
+      }
     })
   })
 
@@ -87,6 +111,7 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
         cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings, ...options.additionalRoles] })
+        cy.setupComponentsData()
       })
 
       it('Displays the page', () => {
@@ -105,6 +130,7 @@ export function permissionsTests<TPage extends Page>({
     context('The user does not have the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
         cy.setupUserAuth({ roles: ['ROLE_PRISON', ...options.additionalRoles] })
+        cy.setupComponentsData()
       })
 
       it('Displays page not found', () => {
@@ -116,6 +142,7 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
         cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings, ...options.additionalRoles] })
+        cy.setupComponentsData()
       })
 
       it('Displays the page', () => {
@@ -127,6 +154,7 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.GlobalSearch, ...options.additionalRoles] })
+        cy.setupComponentsData()
       })
 
       it('Displays the page', () => {

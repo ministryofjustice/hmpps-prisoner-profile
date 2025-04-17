@@ -13,26 +13,26 @@ export default class ProbationDocumentsController {
 
   public async displayDocuments(req: Request, res: Response) {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const [communityDocuments] = await Promise.all([
-      this.probationDocumentsService.getDocuments(res.locals.clientToken, prisonerNumber),
-    ])
+
+    const probationDocuments = await this.probationDocumentsService.getDocuments(
+      req.middleware.clientToken,
+      prisonerNumber,
+    )
 
     this.auditService.sendPageView({
+      user: res.locals.user,
       correlationId: req.id,
       page: Page.ProbationDocuments,
       prisonerNumber,
       prisonId,
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
     })
 
     res.render('pages/probationDocuments/probationDocuments', {
+      pageTitle: 'Probation documents',
       dpsUrl: config.serviceUrls.digitalPrison,
       prisonerNumber,
       prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-      probationDocumentsNotFound: communityDocuments.notFound,
-      ...communityDocuments.data,
+      probationDocuments,
     })
   }
 }

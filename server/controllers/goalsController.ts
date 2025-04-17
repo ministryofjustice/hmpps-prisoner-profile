@@ -13,12 +13,14 @@ export default class GoalsController {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const prisonerData = req.middleware?.prisonerData
 
-    const workAndSkillsPageData = await this.workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
+    const workAndSkillsPageData = await this.workAndSkillsPageService.get(
+      req.middleware.clientToken,
+      prisonerData,
+      res.locals.apiErrorCallback,
+    )
 
     await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
+      user: res.locals.user,
       prisonerNumber,
       prisonId,
       correlationId: req.id,

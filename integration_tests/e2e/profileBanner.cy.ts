@@ -1,7 +1,9 @@
+import { subDays } from 'date-fns'
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
 import { Role } from '../../server/data/enums/role'
+import { formatDateISO } from '../../server/utils/dateHelpers'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -13,11 +15,20 @@ context('Profile banner', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('Displays the banner', () => {
@@ -31,31 +42,140 @@ context('Profile banner', () => {
         overviewPage.csraWithoutLink().should('exist')
       })
     })
+
+    context('Given the prisoner arrived today', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+    })
+
+    context('Given the prisoner arrived 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
+    })
   })
 
   context('Given the prisoner is within the users caseload', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_PRISON'],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    context('Given the prisoner arrived over 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 3)))
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
     })
 
-    it('Hides the banner', () => {
-      visitOverviewPage()
-      cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+    context('Given the prisoner arrived 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+      })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+
+      it('Does display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('be.visible')
+      })
+    })
+
+    context('Given the prisoner arrived today', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+      })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('be.visible')
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
     })
   })
 
   context('Given the prisoner is released from prison', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch, Role.InactiveBookings],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'OUT', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.InactiveBookings] })
+      cy.setupComponentsData()
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -85,10 +205,7 @@ context('Profile banner', () => {
   context('Given the prisoner is being transferred', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch, Role.InactiveBookings],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'TRN', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.InactiveBookings] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -124,17 +241,15 @@ context('Profile banner', () => {
   context('Given the prisoner has alerts', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_PRISON'],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubAlertDetails')
     })
 
     it('Shows clickable alert flags', () => {
       visitOverviewPage()
       const overviewPage = new OverviewPage()
-      overviewPage.alertFlags().children().should('have.length', '7')
+      overviewPage.alertFlags().children().should('have.length', '8')
       overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
       overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
       overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
@@ -142,6 +257,7 @@ context('Profile banner', () => {
       overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
       overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Hidden disability')
       overviewPage.alertFlags().find(':nth-child(7)').should('contain', 'Veteran')
+      overviewPage.alertFlags().find(':nth-child(8)').should('contain', '+74 active alerts')
     })
 
     it('Shows modal when clicking alert flag', () => {

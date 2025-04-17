@@ -14,14 +14,17 @@
     }
 ] %}
 {% block body %}
-
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1>Alert details</h1>
+            {{ miniBanner(miniBannerData) }}
         </div>
     </div>
 
-    {{ miniBanner(miniBannerData) }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-!-margin-top-0">Alert details</h1>
+        </div>
+    </div>
 
     {% for alert in alerts %}
     <div class="govuk-grid-row">
@@ -35,7 +38,7 @@
                     </div>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            {{ alert.alertCodeDescription }}
+                            {{ alert.alertCode.description }}
                         </div>
                     </div>
                 </div>
@@ -49,11 +52,11 @@
                     </div>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            {{ alert.addedByFullName }} on {{ alert.dateCreated | formatDate }}
+                            {{ alert.createdByDisplayName }} on {{ alert.createdAt | formatDate }}
                         </div>
                     </div>
                 </div>
-                {% if alert.modifiedDateTime %}
+                {% if alert.lastModifiedAt %}
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full govuk-!-font-weight-bold">
@@ -62,7 +65,7 @@
                     </div>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            {{ alert.expiredByFullName }} on {{ alert.modifiedDateTime | formatDate }}
+                            {{ alert.lastModifiedByDisplayName }} on {{ alert.lastModifiedAt | formatDate }}
                         </div>
                     </div>
                 </div>
@@ -77,7 +80,7 @@
                     </div>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            {{ alert.dateCreated | formatDate }}
+                            {{ alert.activeFrom | formatDate }}
                         </div>
                     </div>
                 </div>
@@ -91,7 +94,7 @@
                     </div>
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            <pre class="govuk-body">{{ alert.comment }}</pre>
+                            <pre class="govuk-body">{{ alert.description }}</pre>
                         </div>
                     </div>
                 </div>

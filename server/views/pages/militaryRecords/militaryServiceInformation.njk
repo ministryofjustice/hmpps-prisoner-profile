@@ -1,0 +1,246 @@
+{% extends "../../partials/layout.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+
+
+{% macro rankRadios(options, postfix) %}
+    {{ govukRadios({
+        idPrefix: "militaryRankCode" + postfix,
+        name: "militaryRankCode",
+        fieldset: {
+            legend: {
+                text: "Rank at discharge",
+                classes: "govuk-fieldset__legend--s"
+            }
+        },
+        items: options
+    }) }}
+{% endmacro %}
+
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{%
+  set breadCrumbs = [
+      {
+          text: 'Digital Prison Services',
+          href:  "/" | prependBaseUrl
+      },
+      {
+          text: miniBannerData.prisonerName,
+          href: "/prisoner/" + prisonerNumber
+      },
+      {
+          text: 'Personal',
+          href: "/prisoner/" + prisonerNumber + "/personal"
+      }
+  ]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+  {% block body %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    </div>
+
+    {% if errors.length > 0 %}
+      {{
+        govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
+        })
+      }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Record UK military service information</span>
+    <h1 class="govuk-heading-l">{{ title }}</h1>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        <form method="post" novalidate="novalidate" autocomplete="off">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+          {{
+            govukInput({
+                label: {
+                    text: 'Service number (optional)',
+                    classes: 'govuk-label--s'
+                },
+                id: 'serviceNumber',
+                name: 'serviceNumber',
+                value: formValues.serviceNumber,
+                classes: 'govuk-input--width-10',
+                errorMessage: errors | findError('serviceNumber')
+            })
+          }}
+            {{
+            govukRadios({
+                idPrefix: "militaryBranchCode",
+                name: "militaryBranchCode",
+                fieldset: {
+                    legend: {
+                        text: "Military branch",
+                        classes: "govuk-fieldset__legend--s"
+                    }
+                },
+                items: [
+                    {
+                        value: "ARM",
+                        text: "Army",
+                        checked: formValues.militaryBranchCode == 'ARM',
+                        conditional: {
+                            html: rankRadios(rankOptionsArmy, 'Army')
+                        },
+                        attributes: { "data-qa": "branch-radio-army" }
+                    },
+                    {
+                        value: "NAV",
+                        text: "Navy",
+                        checked: formValues.militaryBranchCode == 'NAV',
+                        conditional: {
+                            html: rankRadios(rankOptionsNavy, 'Navy')
+                        },
+                        attributes: { "data-qa": "branch-radio-navy" }
+                    },
+                    {
+                        value: "RAF",
+                        text: "RAF",
+                        checked: formValues.militaryBranchCode == 'RAF',
+                        conditional: {
+                            html: rankRadios(rankOptionsRAF, 'RAF')
+                        },
+                        attributes: { "data-qa": "branch-radio-raf" }
+                    },
+                    {
+                        value: "RMA",
+                        text: "Royal Marines",
+                        checked: formValues.militaryBranchCode == 'RMA',
+                        conditional: {
+                            html: rankRadios(rankOptionsRoyalMarines, 'RoyalMarines')
+                        },
+                        attributes: { "data-qa": "branch-radio-royal-marines" }
+                    }
+                ],
+                errorMessage: errors | findError('militaryBranchCode')
+            })
+            }}
+
+            {{
+            govukInput({
+                label: {
+                    text: 'Unit name (optional)',
+                    classes: 'govuk-label--s'
+                },
+                id: 'unitNumber',
+                name: 'unitNumber',
+                value: formValues.unitNumber,
+                classes: 'govuk-input--width-30',
+                errorMessage: errors | findError('unitNumber')
+            })
+            }}
+
+            {% set monthErrorClass = ' govuk-input--error' if (errors | findError("startDate-month")) or (errors | findError("startDate")) else '' %}
+            {% set yearErrorClass = ' govuk-input--error' if (errors | findError("startDate-year")) or (errors | findError("startDate")) else '' %}
+
+            {{ govukDateInput({
+                id: "startDate",
+                namePrefix: "startDate",
+                fieldset: {
+                    legend: {
+                        text: "When did they enlist in the armed forces?",
+                        classes: "govuk-fieldset__legend--s"
+                    }
+                },
+                hint: {
+                    text: "For example, 10 2021."
+                },
+                items: [
+                    {
+                        name: "month",
+                        attributes: { maxlength: 2 },
+                        classes: "govuk-input--width-2" + monthErrorClass,
+                        value: formValues['startDate-month']
+                    },
+                    {
+                        name: "year",
+                        attributes: { maxlength: 4 },
+                        classes: "govuk-input--width-4" + yearErrorClass,
+                        value: formValues['startDate-year']
+                    }
+                ],
+                value: formValues.startDate,
+                errorMessage: (errors | findError('startDate')) or (errors | findError('startDate-month')) or (errors | findError('startDate-year'))
+            }) }}
+
+            {{
+            govukInput({
+                label: {
+                    text: 'Enlistment location (optional)',
+                    classes: 'govuk-label--s'
+                },
+                id: 'enlistmentLocation',
+                name: 'enlistmentLocation',
+                value: formValues.enlistmentLocation,
+                classes: 'govuk-input--width-30',
+                errorMessage: errors | findError('enlistmentLocation')
+            })
+            }}
+
+            {{ govukCharacterCount({
+                label: {
+                    text: "Comments (optional)",
+                    classes: "govuk-!-font-weight-bold"
+                },
+                id: "description",
+                name: "description",
+                maxlength: 240,
+                rows: 5,
+                value: formValues.description,
+                classes: 'govuk-input--width-30',
+                errorMessage: errors | findError('description')
+            }) }}
+
+            <div class="govuk-button-group">
+              {{
+                govukButton({
+                    text: "Save and return to profile",
+                    type: "submit",
+                    preventDoubleClick: true,
+                    attributes: { "data-qa": "save-and-return-submit-button" }
+                })
+              }}
+              {{
+                govukButton({
+                    text: "Save and continue to conflicts",
+                    type: "submit",
+                    classes: "govuk-button--secondary",
+                    preventDoubleClick: true,
+                    attributes: { name: "action", value: "continue", "data-qa": "save-and-continue-submit-button" }
+                })
+              }}
+            <a
+              href="/prisoner/{{ prisonerNumber }}/personal#military-service-information"
+              class="govuk-link govuk-link--no-visited-state"
+              data-qa="cancel-button"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/militaryRankRadios.js" nonce="{{ cspNonce }}"></script>
+{% endblock %}

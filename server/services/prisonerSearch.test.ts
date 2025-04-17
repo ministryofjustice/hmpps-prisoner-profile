@@ -1,6 +1,6 @@
 import PrisonerSearchService from './prisonerSearch'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { PrisonerSearchClient } from '../data/interfaces/prisonerSearchClient'
+import { PrisonerSearchClient } from '../data/interfaces/prisonerSearchApi/prisonerSearchClient'
 
 jest.mock('../data/prisonerSearchClient')
 

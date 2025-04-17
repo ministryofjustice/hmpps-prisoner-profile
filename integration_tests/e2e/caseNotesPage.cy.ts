@@ -2,7 +2,7 @@ import Page from '../pages/page'
 import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
-import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
+import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -18,6 +18,7 @@ context('Case Notes Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubGetCaseNoteTypes')
   })
 
@@ -29,7 +30,7 @@ context('Case Notes Page', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       caseNotesPage = visitCaseNotesPage()
     })
 
@@ -42,10 +43,23 @@ context('Case Notes Page', () => {
       caseNotesPage.addCaseNoteButton()
     })
 
-    it('Displays the add more details link for the case note authored by the user', () => {
+    it('Displays the add more details link for the case note authored with staff id', () => {
       caseNotesPage
         .caseNotesList()
         .get('.hmpps-case-note-card-list-item:nth-of-type(2) [data-qa="case-notes-add-more-details-link"]')
+    })
+
+    it('Displays the add more details link for the case note authored with username', () => {
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(3) [data-qa="case-notes-add-more-details-link"]')
+    })
+
+    it('Does not display the add more details link for case notes authored by somebody else', () => {
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(4) [data-qa="case-notes-add-more-details-link"]')
+        .should('not.exist')
     })
 
     it('Displays the list with 20 items', () => {
@@ -90,7 +104,7 @@ context('Case Notes Page', () => {
       })
       cy.task('stubPrisonerDetail', 'A1234BC')
       cy.task('stubGetCaseNotesUsage', 'A1234BC')
-      cy.task('stubGetCaseNotes', 'A1234BC')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'A1234BC' })
       caseNotesPage = visitEmptyCaseNotesPage()
     })
 
@@ -116,7 +130,7 @@ context('Case Notes Page', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesPage2', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
@@ -141,13 +155,13 @@ context('Case Notes Page', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesSorted', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
 
     it('Displays the case notes and sorts results by Created (oldest)', () => {
-      caseNotesPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
+      caseNotesPage.sort().invoke('attr', 'value').should('eq', 'creationDateTime,DESC') // Default sort - Created (most recent)
       caseNotesPage.caseNotesListItem().first().contains('18 April 2023 at 17:15')
       caseNotesPage.caseNotesListItem().first().contains('Created by: John Smith')
 
@@ -167,7 +181,7 @@ context('Case Notes Page', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesFiltered', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
@@ -189,21 +203,19 @@ context('Sensitive Case Notes', () => {
   context('POM User - No role to delete sensitive case notes', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PomUser],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PomUser] })
+      cy.setupComponentsData()
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
 
-    it('Displays the delete link for the sensitive case note', () => {
+    it('Does not display the delete link for the sensitive case note', () => {
       caseNotesPage.filterType().select('OMIC')
       caseNotesPage.filterApplyButton().click()
 
@@ -217,16 +229,14 @@ context('Sensitive Case Notes', () => {
   context('POM User - Has role to delete sensitive case notes', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PomUser, Role.DeleteSensitiveCaseNotes],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PomUser, Role.DeleteSensitiveCaseNotes] })
+      cy.setupComponentsData()
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
@@ -247,12 +257,13 @@ context('Incentive slips', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubGetCaseNoteTypes')
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.task('stubInmateDetail', { bookingId: 1102484 })
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
-    cy.task('stubGetCaseNotes', 'G6123VU')
+    cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
   })
 
   context('Positive encouragement', () => {
@@ -285,10 +296,17 @@ context('Incentive slips', () => {
 context('Case Notes Page Not Found', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      roles: [Role.GlobalSearch],
-      caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-      activeCaseLoadId: 'ZZZ',
+    cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
+    cy.setupComponentsData({
+      caseLoads: [
+        {
+          caseloadFunction: '',
+          caseLoadId: 'ZZZ',
+          currentlyActive: true,
+          description: '',
+          type: '',
+        },
+      ],
     })
     cy.task('stubGetCaseNoteTypes')
   })
@@ -299,12 +317,32 @@ context('Case Notes Page Not Found', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     })
 
     it('Displays Page Not Found', () => {
       cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/case-notes' })
       Page.verifyOnPage(NotFoundPage)
     })
+  })
+})
+
+context('Case Notes API Unavailable', () => {
+  let caseNotesPage
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+    cy.setupComponentsData()
+    cy.task('stubGetCaseNoteTypes')
+    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+    cy.task('stubInmateDetail', { bookingId: 1102484 })
+    cy.task('stubPrisonerDetail', 'G6123VU')
+    cy.task('stubGetCaseNotesUsage', 'G6123VU')
+    caseNotesPage = visitCaseNotesPage()
+  })
+
+  it('Display the API unavailable banner', () => {
+    caseNotesPage.apiUnavailableBanner().should('be.visible')
+    caseNotesPage.apiUnavailableBanner().should('contain', 'Case notes are currently unavailable')
   })
 })

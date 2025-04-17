@@ -1,0 +1,16 @@
+{# Goals summary card content for when the prisoner has both VC2 goals, and at least 1 in progress (active) LWP goal #}
+
+<div data-qa="lwp-vc2-goals">
+  <p class="govuk-body" data-qa="goals-info-text">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
+
+  {% for goal in personalLearningPlanActionPlan.activeGoals | sort(attribute = 'targetCompletionDate') %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Achieve goal by {{ goal.targetCompletionDate | formatDate }}</h3>
+    <div class="hmpps-goal-container">
+      <p class="govuk-body app-u-multiline-text">{{ goal.title }}</p>
+    </div>
+  {% endfor %}
+
+  <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
+  <p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-7">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
+  <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ vc2goalsUrl }}">View previous goals from Virtual Campus</a></p>
+</div>

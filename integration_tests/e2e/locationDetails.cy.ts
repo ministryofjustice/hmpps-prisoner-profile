@@ -22,7 +22,7 @@ context('Location details page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId })
     cy.task('stubAssessments', bookingId)

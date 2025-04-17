@@ -5,12 +5,14 @@ import LocationDetailsController from './locationDetailsController'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { AuditService } from '../services/auditService'
 import config from '../config'
-import { prisonerLocationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
+import { locationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
 import LocationDetailsService from '../services/locationDetailsService'
-import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
+import LocationDetailsPageData from '../services/interfaces/locationDetailsService/LocationDetailsPageData'
 import { Role } from '../data/enums/role'
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from '../services/interfaces/locationDetailsService/LocationDetails'
+import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import LocationDetailsConverter from './converters/locationDetailsConverter'
 
 describe('Prisoner Location Details', () => {
@@ -24,8 +26,10 @@ describe('Prisoner Location Details', () => {
   beforeEach(() => {
     req = {
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
+        permissions: { cellMove: { edit: true } },
       },
       originalUrl: 'http://localhost',
       params: { offenderNo },
@@ -34,7 +38,6 @@ describe('Prisoner Location Details', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           userRoles: ['CELL_MOVE'],
           staffId: 487023,
@@ -46,7 +49,7 @@ describe('Prisoner Location Details', () => {
       redirect: jest.fn(),
     }
 
-    locationDetailsService = prisonerLocationDetailsServiceMock() as LocationDetailsService
+    locationDetailsService = locationDetailsServiceMock() as LocationDetailsService
     locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(false)
     locationDetailsService.getInmatesAtLocation = jest
       .fn()
@@ -77,9 +80,20 @@ describe('Prisoner Location Details', () => {
     })
 
     describe('should provide "Change cell" and "Move to reception" functionality', () => {
-      it('should not display the "Move to reception" or "Change cell" buttons when user does not have the CELL_MOVE role', async () => {
+      it('should not display the "Move to reception" or "Change cell" buttons when user does not have cellMove.edit permissions', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
-        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
+        const reqNoPermission = {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            permissions: {
+              cellMove: {
+                edit: false,
+              },
+            },
+          },
+        }
+        await controller.displayLocationDetails(reqNoPermission, res, PrisonerMockDataA)
 
         expect(locationDetailsService.isReceptionFull).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
@@ -134,31 +148,26 @@ describe('Prisoner Location Details', () => {
         })
       })
 
-      it('should not display the "Current location" section or action buttons for TRN prisoners', async () => {
+      it('should not display the "Current location" section or action buttons for users without cellMove.edit permission', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
+        const reqNoPermission = {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            permissions: {
+              cellMove: {
+                edit: false,
+              },
+            },
+          },
+        }
 
-        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+        await controller.displayLocationDetails(reqNoPermission, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
 
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           prisonId: 'TRN',
           isTransfer: true,
-          canViewCellMoveButton: false,
-          canViewMoveToReceptionButton: false,
-          currentLocation: null,
-          occupants: [],
-        })
-      })
-
-      it('should not display the "Current location" section or action buttons for OUT prisoners', async () => {
-        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
-
-        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
-
-        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
-          ...locationDetailsPageData,
-          prisonId: 'OUT',
-          isReleased: true,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
           currentLocation: null,

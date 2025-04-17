@@ -1,9 +1,10 @@
-import { GovSummaryItem } from '../../interfaces/govSummaryItem'
+import GovSummaryItem from '../../interfaces/GovSummaryItem'
 
 export const addressSummaryMock: GovSummaryItem[] = [
   {
     key: { text: 'Address' },
     value: { html: 'Flat 7, premises address, street field<br/>Leeds<br/>West Yorkshire<br/>LS1 AAA<br/>England' },
+    classes: 'govuk-summary-list__row--no-border',
   },
   {
     key: { text: 'Type of address' },

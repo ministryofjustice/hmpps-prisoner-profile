@@ -1,9 +1,9 @@
-import { AlertForm } from '../../interfaces/prisonApi/alert'
+import { AlertForm } from '../interfaces/alertsApi/Alert'
 
 export const alertFormMock: AlertForm = {
   alertType: 'A',
   alertCode: 'A1',
-  alertDate: '30/01/2023',
-  comment: 'Comment',
-  expiryDate: '30/01/2024',
+  description: 'Comment',
+  activeFrom: '30/01/2023',
+  activeTo: '30/01/2024',
 }

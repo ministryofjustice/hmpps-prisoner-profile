@@ -1,4 +1,4 @@
-import { LearnerEmployabilitySkills } from '../../interfaces/learnerEmployabilitySkills'
+import LearnerEmployabilitySkills from '../interfaces/curiousApi/LearnerEmployabilitySkills'
 
 export const learnerEmployabilitySkills: LearnerEmployabilitySkills = {
   content: [

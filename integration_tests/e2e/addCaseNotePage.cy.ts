@@ -14,10 +14,10 @@ context('Add Case Note Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.task('stubGetCaseNotes', 'G6123VU')
+    cy.setupComponentsData()
+    cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubGetCaseNoteTypesForUser')
     cy.task('stubAddCaseNote')
   })
 
@@ -117,10 +117,17 @@ context('Add Case Note Page', () => {
   context('As a user without prisoner in their caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.task('stubGetCaseNoteTypes')
     })
@@ -131,7 +138,7 @@ context('Add Case Note Page', () => {
         cy.task('stubInmateDetail', { bookingId: 1102484 })
         cy.task('stubPrisonerDetail', 'G6123VU')
         cy.task('stubGetCaseNotesUsage', 'G6123VU')
-        cy.task('stubGetCaseNotes', 'G6123VU')
+        cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       })
 
       it('Displays Page Not Found', () => {

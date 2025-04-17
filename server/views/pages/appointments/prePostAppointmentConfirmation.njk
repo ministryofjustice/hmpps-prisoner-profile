@@ -1,5 +1,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% extends "../../partials/layout.njk" %}
 
@@ -20,12 +21,26 @@
     {% block body %}
 
         <div class="govuk-panel govuk-panel--confirmation">
-            <h1 class="govuk-panel__title">The video link has been booked</h1>
+            <h1 class="govuk-panel__title">{{ pageTitle }}</h1>
         </div>
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h2>Video link details</h2>
+
+                {% if mustContactTheCourt %}
+                {% set html %}
+                  <h3 class="govuk-notification-banner__heading">
+                    You must email {{ probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court }} to confirm the booking.
+                  </h3>
+                  <p class="govuk-body">This is because they do not yet have access to the Book a video link service.</p>
+                {% endset %}
+
+                {{ govukNotificationBanner({
+                  html: html,
+                  titleText: 'Email ' + probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court + ' to confirm the booking'
+                }) }}
+                {% endif %}
 
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border appointment-details-list',
@@ -40,44 +55,44 @@
                         },
                         {
                             key: {
-                            text: "Prison"
-                        },
+                                text: "Prison"
+                            },
                             value: {
-                            text: prisonName
-                        }
+                                text: prisonName
+                            }
                         },
                         {
                             key: {
-                            text: "Prison room",
-                            classes: 'govuk-!-padding-bottom-6'
-                        },
+                                text: "Prison room",
+                                classes: 'govuk-!-padding-bottom-6'
+                            },
                             value: {
-                            text: location
-                        }
+                                text: location
+                            }
                         },
                         {
                             key: {
-                            text: "Date"
-                        },
+                                text: "Date"
+                            },
                             value: {
-                            text: date
-                        }
+                                text: date
+                            }
                         },
                         {
                             key: {
-                            text: "Start time"
-                        },
+                                text: "Start time"
+                            },
                             value: {
-                            text: startTime
-                        }
+                                text: startTime
+                            }
                         },
                         {
                             key: {
-                            text: "End time"
-                        },
+                                text: "End time"
+                            },
                             value: {
-                            text: endTime
-                        }
+                                text: endTime
+                            }
                         }
                     ]
                 }) }}
@@ -101,11 +116,11 @@
                         rows: [
                             {
                                 key: {
-                                text: "Pre-court hearing briefing"
-                            },
+                                    text: "Pre-court hearing briefing"
+                                },
                                 value: {
-                                text: pre
-                            }
+                                    text: pre
+                                }
                             }
                         ]
                     }) }}
@@ -117,11 +132,11 @@
                         rows: [
                             {
                                 key: {
-                                text: "Post-court hearing briefing"
-                            },
+                                    text: "Post-court hearing briefing"
+                                },
                                 value: {
-                                text: post
-                            }
+                                    text: post
+                                }
                             }
                         ]
                     }) }}
@@ -132,12 +147,28 @@
                     rows: [
                         {
                             key: {
-                            text: "Court location"
-                        },
+                                text: "Probation team" if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else "Court location"
+                            },
                             value: {
-                            text: court
-                        }
-                        }
+                                text: probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court
+                            }
+                        },
+                        {
+                            key: {
+                                text: "Meeting type" if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else "Hearing type"
+                            },
+                            value: {
+                                text: meetingType if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else hearingType
+                            }
+                        },
+                        {
+                            key: {
+                                text: "Court hearing link"
+                            },
+                            value: {
+                                text: videoLinkUrl or "Not yet known"
+                            }
+                        } if bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()
                     ]
                 }) }}
 

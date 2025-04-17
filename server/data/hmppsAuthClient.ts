@@ -1,28 +1,27 @@
 import { URLSearchParams } from 'url'
 import superagent from 'superagent'
 
-import type TokenStore from './tokenStore'
 import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
-import RestClient from './restClient'
-import { CaseLoad } from '../interfaces/caseLoad'
+import TokenStore from './tokenStore/tokenStore'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url
 
-function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagent.Response> {
-  const clientToken = generateOauthClientToken(
-    config.apis.hmppsAuth.systemClientId,
-    config.apis.hmppsAuth.systemClientSecret,
-  )
+function getClientTokenFromHmppsAuth(
+  clientId: string,
+  clientSecret: string,
+  username?: string,
+): Promise<superagent.Response> {
+  const clientToken = generateOauthClientToken(clientId, clientSecret)
 
   const grantRequest = new URLSearchParams({
     grant_type: 'client_credentials',
     ...(username && { username }),
   }).toString()
 
-  logger.info(`${grantRequest} HMPPS Auth request for client id '${config.apis.hmppsAuth.systemClientId}''`)
+  logger.info(`HMPPS Auth request for client id '${clientId}': ${grantRequest}`)
 
   return superagent
     .post(`${hmppsAuthUrl}/oauth/token`)
@@ -32,38 +31,19 @@ function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagen
     .timeout(timeoutSpec)
 }
 
-export interface User {
-  name: string
-  activeCaseLoadId: string
-  userRoles: string[]
-  caseLoads: CaseLoad[]
+function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagent.Response> {
+  return getClientTokenFromHmppsAuth(
+    config.apis.hmppsAuth.systemClientId,
+    config.apis.hmppsAuth.systemClientSecret,
+    username,
+  )
 }
 
-export interface UserRole {
-  roleCode: string
-}
-
-export default class HmppsAuthClient {
-  private readonly restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('HMPPS AuthClient', config.apis.hmppsAuth, token)
-  }
-
-  private static restClient(token: string): RestClient {
-    return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
-  }
-
-  getUser(): Promise<User> {
-    logger.info(`Getting user details: calling HMPPS Auth`)
-    return this.restClient.get({ path: '/api/user/me' }) as Promise<User>
-  }
-
-  getUserRoles(): Promise<string[]> {
-    return this.restClient
-      .get({ path: '/api/user/me/roles' })
-      .then(roles => (<UserRole[]>roles).map(role => role.roleCode))
-  }
+function getCuriousClientTokenFromHmppsAuth(): Promise<superagent.Response> {
+  return getClientTokenFromHmppsAuth(
+    config.apis.hmppsAuth.systemClientIdCurious,
+    config.apis.hmppsAuth.systemClientSecretCurious,
+  )
 }
 
 export const systemTokenBuilder =
@@ -81,3 +61,22 @@ export const systemTokenBuilder =
 
     return newToken.body.access_token
   }
+
+// Wrapper to help typing enforce that the wrong token is not used for Curious API
+export interface CuriousApiToken {
+  curiousApiToken: string
+}
+
+export const curiousApiTokenBuilder = (tokenStore: TokenStore) => async (): Promise<CuriousApiToken> => {
+  const key = 'CURIOUS_API'
+  const curiousApiToken = await tokenStore.getToken(key)
+  if (curiousApiToken) {
+    return { curiousApiToken }
+  }
+
+  const newToken = await getCuriousClientTokenFromHmppsAuth()
+  // set TTL slightly less than expiry of token. Async but no need to wait
+  await tokenStore.setToken(key, newToken.body.access_token, newToken.body.expires_in - 60)
+
+  return { curiousApiToken: newToken.body.access_token }
+}

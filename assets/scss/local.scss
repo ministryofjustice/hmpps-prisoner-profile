@@ -8,8 +8,9 @@
   }
 }
 
-.govuk-link, a.govuk-tabs__tab {
-  text-underline-offset: .1em;
+.govuk-link,
+a.govuk-tabs__tab {
+  text-underline-offset: 0.1em;
 }
 
 .hmpps-profile-banner + .govuk-error-summary {
@@ -21,12 +22,18 @@
   width: 41%;
 }
 
+.govuk-summary-list__value {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 .hmpps-print-link {
   font-size: 16px;
   display: inline-block;
   position: relative;
   padding: 5px 5px 5px 38px;
-  background: url("/assets/images/printer_icon.svg") no-repeat 10px 50%;
+  background: url('/assets/images/printer_icon.svg') no-repeat 10px 50%;
   background-size: 16px 18px;
 }
 
@@ -34,4 +41,75 @@
   padding-top: 10px;
   margin-bottom: 10px;
   clear: both;
+}
+
+.app-u-multiline-text {
+  white-space: pre-line;
+}
+
+// Override govuk accordion styling to support only having toggle as link
+.govuk-frontend-supported .govuk-accordion__section-button {
+  border-top: none;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 10px;
+  width: auto;
+}
+
+.govuk-frontend-supported .govuk-accordion__section-toggle {
+  margin-bottom: 5px;
+}
+
+.dps-banner {
+  font-weight: 300;
+  padding: 22px;
+  margin: 0;
+  min-height: 26px;
+  border-left: 8px solid govuk-colour('green');
+  background-color: govuk-colour('light-grey');
+
+  &__error {
+    border-left: 8px solid govuk-colour('red');
+  }
+
+  &__small {
+    padding: 0 22px;
+    min-height: auto;
+  }
+
+  p {
+    padding: 0;
+    margin: 0;
+
+    a:link,
+    a:visited {
+      color: $govuk-text-colour;
+    }
+  }
+}
+
+.govuk-\!-border-none {
+  border: none !important;
+}
+
+.hmpps-profile-photo__large {
+  width: 100%;
+}
+
+.hmpps-\!-display-print-only {
+  display: none;
+
+  @media print {
+    display: block;
+  }
+}
+
+.hmpps-warning__blue {
+  border: 5px solid govuk-colour('blue');
+  padding: 20px;
+
+  .govuk-warning-text__icon {
+    border-color: govuk-colour('blue');
+    background-color: govuk-colour('blue');
+  }
 }

@@ -1,19 +1,26 @@
 import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
-import { Address } from '../interfaces/address'
-import { HmppsError } from '../interfaces/hmppsError'
-import { ListMetadata } from '../interfaces/listMetadata'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { Prisoner } from '../interfaces/prisoner'
-import { User } from '../data/hmppsAuthClient'
+import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { SortOption } from '../interfaces/SortParams'
+import HmppsError from '../interfaces/HmppsError'
+import ListMetadata from '../interfaces/ListMetadata'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { Role } from '../data/enums/role'
 import config from '../config'
-import { type OverviewNonAssociation } from '../interfaces/overviewPage'
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
-import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
+import OverviewNonAssociation from '../services/interfaces/overviewPageService/OverviewNonAssociation'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
+import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
+import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
+import Address from '../data/interfaces/prisonApi/Address'
+import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import { HmppsUser } from '../interfaces/HmppsUser'
+import Pom from '../data/interfaces/allocationManagerApi/Pom'
+import logger from '../../logger'
+import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
+import { pluralise } from './pluralise'
+import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -21,6 +28,8 @@ const properCase = (word: string): string =>
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
 export const isEmpty = (array: Array<unknown>): boolean => !array || (Array.isArray(array) && !array.length)
+
+export const withheldPhotoCategoryCodes = ['A', 'H', 'P']
 
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
@@ -96,22 +105,13 @@ export const formatMoney = (
   return ((val || 0) / (usePence ? 100 : 1)).toLocaleString('en-GB', { style: 'currency', currency })
 }
 
-/**
- * Format a number of privileged visits into a summary string.
- *
- * @param count
- */
-export const formatPrivilegedVisitsSummary = (count: number): string => {
-  return `Including ${count} privileged visits`
-}
-
-export const arrayToQueryString = (array: string[] | number[] | boolean[], key: string): string =>
+export const arrayToQueryString = (array: QueryParamValue[], key: string): string =>
   array && array.map(item => `${key}=${encodeURIComponent(item)}`).join('&')
 
-export const mapToQueryString = (params: Record<never, never>): string => {
+export const mapToQueryString = (params: QueryParams): string => {
   if (!params) return ''
   return Object.keys(params)
-    .filter(key => params[key])
+    .filter(key => params[key] !== undefined && params[key] !== null)
     .map(key => {
       if (Array.isArray(params[key])) return arrayToQueryString(params[key], key)
       return `${key}=${encodeURIComponent(params[key])}`
@@ -213,13 +213,14 @@ export const convertNameCommaToHuman = (name: string): string => {
  * @param sortOptions
  * @param sortLabel
  */
-export const generateListMetadata = (
+export const generateListMetadata = <T extends PagedListQueryParams>(
   pagedList: PagedList<PagedListItem>,
-  queryParams: PagedListQueryParams,
+  queryParams: T,
   itemDescription: string,
-  sortOptions: SortOption[],
-  sortLabel: string,
-): ListMetadata => {
+  sortOptions?: SortOption[],
+  sortLabel?: string,
+  enableShowAll?: boolean,
+): ListMetadata<T> => {
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
@@ -289,21 +290,24 @@ export const generateListMetadata = (
 
   const viewAllUrl = [`?${mapToQueryString(queryParams)}`, 'showAll=true'].filter(Boolean).join('&')
 
-  return <ListMetadata>{
+  return <ListMetadata<T>>{
     filtering: {
       ...queryParams,
       queryParams: { sort: queryParams.sort },
     },
-    sorting: {
-      id: 'sort',
-      label: sortLabel,
-      options: sortOptions,
-      sort: queryParams.sort,
-      queryParams: {
-        ...queryParams,
-        sort: undefined,
-      },
-    },
+    sorting:
+      sortOptions && sortLabel
+        ? {
+            id: 'sort',
+            label: sortLabel,
+            options: sortOptions,
+            sort: queryParams.sort,
+            queryParams: {
+              ...queryParams,
+              sort: undefined,
+            },
+          }
+        : null,
     pagination: {
       itemDescription,
       previous,
@@ -316,6 +320,7 @@ export const generateListMetadata = (
       elementsOnPage: pagedList?.numberOfElements,
       pages,
       viewAllUrl,
+      enableShowAll: enableShowAll === undefined ? false : enableShowAll,
     },
   }
 }
@@ -323,7 +328,15 @@ export const generateListMetadata = (
 export const formatCurrency = (number: number, currency: string): string =>
   typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
 
-export const addressToLines = ({ flat, premise, street, town, county, postalCode, country }: Address): string[] => {
+export const addressToLines = ({
+  flat,
+  premise,
+  street,
+  town,
+  county,
+  postalCode,
+  country,
+}: Addresses['address']): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
@@ -331,6 +344,20 @@ export const addressToLines = ({ flat, premise, street, town, county, postalCode
   const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
   if (addressArray.length !== 1 || !country) return addressArray
   return []
+}
+
+export const contactAddressToHtml = (address: Partial<PersonalRelationshipsContact>): string => {
+  const { flat, property, street, cityDescription, postcode } = address || {}
+  let lineOne = [property, street]
+    .filter(s => s)
+    .join(' ')
+    .trim()
+  if (flat) {
+    lineOne = [`Flat ${flat}`, lineOne].filter(Boolean).join(', ')
+  }
+  const addressArray = [lineOne, cityDescription, postcode].filter(s => s)
+  if (addressArray.length) return addressArray.join('<br/>')
+  return 'Not entered'
 }
 
 /**
@@ -354,15 +381,14 @@ export const findError = (errors: HmppsError[], formFieldId: string) => {
   return null
 }
 
-/**
- * Whether or not the prisoner belongs to any of the users case loads
- *
- * @param prisonerAgencyId
- * @param userCaseLoads
- */
-export const prisonerBelongsToUsersCaseLoad = (prisonerAgencyId: string, userCaseLoads: CaseLoad[]): boolean => {
-  return userCaseLoads.some(caseLoad => caseLoad.caseLoadId === prisonerAgencyId)
-}
+export const isActiveCaseLoad = (prisonId: string, user: HmppsUser) =>
+  user.authSource === 'nomis' && user.activeCaseLoadId === prisonId
+
+export const includesActiveCaseLoad = (prisons: string[], user: HmppsUser) =>
+  user.authSource === 'nomis' && prisons.includes(user.activeCaseLoadId)
+
+export const isInUsersCaseLoad = (prisonId: string, user: HmppsUser): boolean =>
+  user.authSource === 'nomis' && user.caseLoads.some(caseLoad => caseLoad.caseLoadId === prisonId)
 
 /**
  * Whether any of the roles exist for the given user allowing for conditional role based access on any number of roles
@@ -391,9 +417,9 @@ export const userHasAllRoles = (rolesToCheck: string[], userRoles: string[]): bo
  * @param user
  * @param prisoner
  */
-export const userCanEdit = (user: User, prisoner: Partial<Prisoner>): boolean => {
+export const userCanEdit = (user: HmppsUser, prisoner: Partial<Prisoner>): boolean => {
   return (
-    user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId) ||
+    (user.authSource === 'nomis' && user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId)) ||
     (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
     (prisoner.restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
   )
@@ -478,10 +504,14 @@ export enum SortType {
   DESC = 'DESC',
 }
 
-export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: string, sortType: SortType): object[] => {
+export const sortArrayOfObjectsByDate = <T>(
+  arrayOfObjects: T[],
+  dateKey: keyof (typeof arrayOfObjects)[number],
+  sortType: SortType,
+): T[] => {
   return arrayOfObjects.sort((a, b) => {
-    const dateA = new Date(a[dateKey]).getTime()
-    const dateB = new Date(b[dateKey]).getTime()
+    const dateA = new Date(a[dateKey] as string | number | Date).getTime()
+    const dateB = new Date(b[dateKey] as string | number | Date).getTime()
     if (sortType === SortType.DESC) {
       return dateA < dateB ? 1 : -1
     }
@@ -532,11 +562,11 @@ export const extractLocation = (location: string, agencyId: string): string => {
   return formatLocation(withoutAgency)
 }
 
-export const groupBy = <T>(array: T[], key: string): Record<string, T[]> =>
+export const groupBy = <T>(array: T[], key: keyof (typeof array)[number]): Record<string, T[]> =>
   array &&
   array.length &&
   array.reduce((acc, currentItem) => {
-    const groupKey = currentItem[key]
+    const groupKey = currentItem[key] as keyof typeof acc
     const existingGroupedItems = acc[groupKey] || []
 
     return { ...acc, [groupKey]: [...existingGroupedItems, currentItem] }
@@ -577,8 +607,30 @@ export interface SelectOption {
   selected?: boolean
   attributes?: {
     hidden?: 'hidden'
+    disabled?: 'disabled'
   }
 }
+
+export interface RadioOption {
+  text: string
+  value: string | number
+  checked?: boolean
+  attributes?: {
+    hidden?: 'hidden'
+    disabled?: 'disabled'
+  }
+}
+
+export interface CheckboxOptions {
+  text: string
+  value: string
+  subValues?: {
+    title: string
+    hint: string
+    options: CheckboxOptions[]
+  }
+}
+
 export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
   return refData.map(r => ({
     text: r.description,
@@ -586,19 +638,61 @@ export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[]
   }))
 }
 
-export const objectToSelectOptions = (array: object[], id: string, description: string): SelectOption[] => {
+export const objectToRadioOptions = <T>(
+  array: T[],
+  id: keyof (typeof array)[number],
+  description: keyof (typeof array)[number],
+  checked?: string | number,
+): RadioOption[] => {
   return array.map(obj => ({
-    text: obj[description],
-    value: obj[id],
+    text: obj[description] as string,
+    value: obj[id] as string | number,
+    ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),
+  }))
+}
+
+export const objectToSelectOptions = <T>(
+  array: T[],
+  id: keyof (typeof array)[number],
+  description: keyof (typeof array)[number],
+  selected?: string,
+): SelectOption[] => {
+  return array.map(obj => ({
+    text: obj[description] as string,
+    value: obj[id] as string | number,
+    ...(selected && obj[id as keyof typeof obj] === selected && { selected: true }),
   }))
 }
 
 export const formatCommunityManager = (communityManager: CommunityManager): string => {
-  if (communityManager === null) return 'Not assigned' // Delius has returned 404 because it cannot find the prisoner
-  if (communityManager === undefined) return 'We cannot show these details right now' // Delius has returned an error, e.g. timeout
+  if (!communityManager) return 'Not assigned' // Delius has returned 404 because it cannot find the prisoner
   if (communityManager.unallocated) return `${communityManager.team.description} (COM not yet allocated)`
 
   return formatName(communityManager.name.forename, null, communityManager.name.surname)
+}
+
+export const formatPomName = (pomName: string): string => {
+  if (!pomName) return null
+
+  if (!pomName.includes(', ')) {
+    logger.warn(`Incorrect format supplied for pomName, ${pomName}`)
+    return pomName
+  }
+
+  return formatName(pomName.split(', ')[1], null, pomName.split(', ')[0])
+}
+
+export const formatPrisonOffenderManagerNames = (
+  pom: Pom,
+): { prisonOffenderManagerName: string; coworkingPrisonOffenderManagerName: string } => {
+  return {
+    prisonOffenderManagerName: pom.primary_pom?.name
+      ? formatName(pom.primary_pom.name.split(', ')[1], null, pom.primary_pom.name.split(', ')[0])
+      : undefined,
+    coworkingPrisonOffenderManagerName: pom.secondary_pom?.name
+      ? formatName(pom.secondary_pom.name.split(', ')[1], null, pom.secondary_pom.name.split(', ')[0])
+      : undefined,
+  }
 }
 
 export const putLastNameFirst = (firstName: string, lastName: string): string => {
@@ -607,4 +701,127 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
   if (firstName && !lastName) return properCaseName(firstName)
 
   return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
+}
+
+export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
+  if (!address) return []
+
+  const addressSummary = {
+    key: { text: 'Address' },
+    value: { html: address.noFixedAddress ? 'No fixed address' : addressToLines(address).join('<br/>') },
+    classes: 'govuk-summary-list__row--no-border',
+  }
+
+  const addressUsage = {
+    key: { text: 'Type of address' },
+    value: {
+      html: address.addressUsages.filter(usage => usage.activeFlag).length
+        ? address.addressUsages
+            .filter(usage => usage.activeFlag)
+            .map(usage => usage.addressUsageDescription)
+            .join('<br/>')
+        : 'Not entered',
+    },
+  }
+
+  const phones = address.phones?.length
+    ? {
+        key: { text: 'Phone' },
+        value: {
+          html: address.phones.map(phone => phone.number).join('<br/>'),
+        },
+      }
+    : undefined
+
+  const comment = address.comment
+    ? {
+        key: { text: 'Comment' },
+        value: { text: address.comment },
+      }
+    : undefined
+
+  return [addressSummary, addressUsage, phones, comment].filter(Boolean)
+}
+
+export const apiErrorMessage = 'We cannot show these details right now. Try again later.'
+
+export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
+
+export const addDefaultSelectedValue = (
+  items: SelectOption[],
+  text: string,
+  setHidden = true,
+): SelectOption[] | null => {
+  if (!items) return null
+
+  return [
+    {
+      text,
+      value: '',
+      selected: true,
+      attributes: setHidden ? { hidden: 'hidden' } : undefined,
+    },
+    ...items,
+  ]
+}
+
+export const camelToSnakeCase = (str: string): string => str?.replace(/([A-Z])/g, '_$1').toUpperCase()
+
+export const snakeToCamelCase = (str: string): string => str?.toLowerCase().replace(/(_\w)/g, m => m[1].toUpperCase())
+
+export const formatHeight = (height: number): string => {
+  return height || height === 0 ? `${(height / 100).toString()}m` : 'Not entered'
+}
+
+export const formatWeight = (weight: number): string => {
+  return weight || weight === 0 ? `${weight}kg` : 'Not entered'
+}
+
+export const sortByLatestAndUuid = (list: PersonIntegrationDistinguishingMarkImageDetail[]) => {
+  return list.sort((a, b) => {
+    if (b.latest === a.latest) {
+      return b.id > a.id ? 1 : -1
+    }
+    return b.latest ? 1 : -1
+  })
+}
+
+export const latestImageId = (list: PersonIntegrationDistinguishingMarkImageDetail[]) => {
+  return list.find(img => img.latest === true)?.id
+}
+
+export const lengthOfService = (startDate: string, endDate: string): string => {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  const totalMonths = differenceInMonths(end, start)
+
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
+
+  if (months === 0) {
+    return pluralise(years, 'year')
+  }
+
+  if (years) {
+    return `${pluralise(years, 'year')}, ${pluralise(months, 'month')}`
+  }
+
+  return pluralise(months, 'month')
+}
+
+export const requestStringToBoolean = (value: string): boolean => {
+  if (value === undefined) return undefined
+  return value === 'true'
+}
+
+export const formatPhoneNumber = (phoneNumber: string): string => {
+  if (!phoneNumber?.trim()) return null
+
+  // If 11 digits after spaces and non-numeric characters have been removed, format as 01234 567890
+  const cleanedNumber = phoneNumber.replace(/[^0-9]/g, '')
+  if (cleanedNumber.length === 11) {
+    return `${cleanedNumber.slice(0, 5)} ${cleanedNumber.slice(5)}`
+  }
+  return phoneNumber.trim()
 }

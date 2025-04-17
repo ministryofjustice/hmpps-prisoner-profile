@@ -2,15 +2,15 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { format, parseISO } from 'date-fns'
 import { formatMoney, formatName, isEmpty } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import MoneyService from '../services/moneyService'
 import { AccountCode } from '../data/enums/accountCode'
-import { Transaction } from '../interfaces/prisonApi/transaction'
+import Transaction from '../data/interfaces/prisonApi/Transaction'
 import { formatDate } from '../utils/dateHelpers'
 import { TransactionPostingType } from '../data/enums/transactionPostingType'
-import { Agency } from '../interfaces/prisonApi/agency'
+import Agency from '../data/interfaces/prisonApi/Agency'
 import { TransactionType } from '../data/enums/transactionType'
-import { DamageObligation } from '../interfaces/prisonApi/damageObligation'
+import DamageObligation from '../data/interfaces/prisonApi/DamageObligation'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
 
@@ -49,7 +49,7 @@ export default class MoneyController {
 
   private async getDamageObligations(req: Request, res: Response) {
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const [accountBalances, damageObligations] = await Promise.all([
       this.moneyService.getAccountBalances(clientToken, bookingId),
@@ -62,9 +62,7 @@ export default class MoneyController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -92,7 +90,7 @@ export default class MoneyController {
     const month: number = req.query.month === undefined ? now.getMonth() : +req.query.month
     const year: number = +req.query.year || now.getFullYear()
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const isPrivateCash = accountCode === AccountCode.PrivateCash
 
     const [accountBalances, allTransactions, addHoldFunds, withheldFunds] = await Promise.all([
@@ -205,9 +203,7 @@ export default class MoneyController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,

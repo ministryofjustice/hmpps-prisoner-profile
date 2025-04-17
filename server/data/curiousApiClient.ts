@@ -1,18 +1,19 @@
 import RestClient from './restClient'
 import config from '../config'
-import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
-import { LearnerProfile } from '../interfaces/learnerProfile'
-import { LearnerEducation } from '../interfaces/learnerEducation'
-import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
-import { LearnerGoals } from '../interfaces/learnerGoals'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { CuriousApiClient } from './interfaces/curiousApiClient'
+import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
+import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
+import LearnerProfile from './interfaces/curiousApi/LearnerProfile'
+import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
+import LearnerLatestAssessment from './interfaces/curiousApi/LearnerLatestAssessment'
+import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
+import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
+import { CuriousApiToken } from './hmppsAuthClient'
 
 export default class CuriousRestApiClient implements CuriousApiClient {
   private readonly restClient: RestClient
 
-  constructor(token: string) {
-    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token)
+  constructor(token: CuriousApiToken) {
+    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
   }
 
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {
@@ -29,9 +30,12 @@ export default class CuriousRestApiClient implements CuriousApiClient {
     })
   }
 
-  async getLearnerEducation(offenderNumber: string): Promise<LearnerEducation> {
-    return this.restClient.get<LearnerEducation>({
+  async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
+    return this.restClient.get<LearnerEductionPagedResponse>({
       path: `/learnerEducation/${offenderNumber}`,
+      query: {
+        page,
+      },
       ignore404: true,
     })
   }

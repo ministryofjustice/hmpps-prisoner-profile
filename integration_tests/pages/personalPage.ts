@@ -24,20 +24,14 @@ export default class PersonalPage extends Page {
         spoken: (): PageElement => cardData('languages').find('[data-qa=spoken-language]'),
         written: (): PageElement => cardData('languages').find('[data-qa=written-language]'),
         otherLanguages: (language: string) => ({
-          language: (): PageElement =>
-            cardData('languages')
-              .find('[data-qa=other-languages-list]')
-              .find(`[data-qa=other-language-${language}-key]`),
-          proficiency: (): PageElement =>
-            cardData('languages').find('[data-qa=other-languages-list]').find(`[data-qa=other-language-${language}]`),
+          language: (): PageElement => cardData('languages').find(`[data-qa=other-language-${language}-key]`),
+          proficiency: (): PageElement => cardData('languages').find(`[data-qa=other-language-${language}]`),
         }),
       }),
-      aliasList: (): PageElement => cardData('alias-list'),
-      preferredName: (): PageElement => cardData('preferred-name'),
       dateOfBirth: () => cardData('date-of-birth'),
-      placeOfBirth: () => cardData('place-of-birth'),
+      cityOrTownOfBirth: () => cardData('city-or-town-of-birth'),
+      countryOfBirth: () => cardData('country-of-birth'),
       nationality: () => cardData('nationality'),
-      otherNationalities: () => cardData('other-nationalities'),
       ethnicGroup: () => cardData('ethnic-group'),
       religionOrBelief: () => cardData('religion-or-belief'),
       sex: () => cardData('sex'),
@@ -46,11 +40,27 @@ export default class PersonalPage extends Page {
       numberOfChildren: () => cardData('number-of-children'),
       otherLanguages: () => cardData('other-languages'),
       typeOfDiet: () => cardData('type-of-diet'),
+      dietAndFoodAllergies: () => cardData('diet-and-food-allergies'),
       smokeOrVaper: () => cardData('smoker-or-vaper'),
       domesticAbusePerpetrator: () => cardData('domestic-abuse-perpetrator'),
       domesticAbuseVictim: () => cardData('domestic-abuse-victim'),
       socialCareNeeded: () => cardData('social-care-needed'),
       youthOffender: () => cardData('youth-offender'),
+      militaryRecords: () => ({
+        serviceNumber: (): PageElement => cardData('military-records').find('[data-qa=service-number]'),
+        branch: (): PageElement => cardData('military-records').find('[data-qa=branch]'),
+        unitNumber: (): PageElement => cardData('military-records').find('[data-qa=unit-number]'),
+        rank: (): PageElement => cardData('military-records').find('[data-qa=rank]'),
+        comments: (): PageElement => cardData('military-records').find('[data-qa=comments]'),
+        enlistmentDate: (): PageElement => cardData('military-records').find('[data-qa=enlistment-date]'),
+        enlistmentLocation: (): PageElement => cardData('military-records').find('[data-qa=enlistment-location]'),
+        conflict: (): PageElement => cardData('military-records').find('[data-qa=conflict]'),
+        disciplinaryAction: (): PageElement => cardData('military-records').find('[data-qa=disciplinary-action]'),
+        dischargeDate: (): PageElement => cardData('military-records').find('[data-qa=discharge-date]'),
+        dischargeLocation: (): PageElement => cardData('military-records').find('[data-qa=discharge-location]'),
+        dischargeDescription: (): PageElement => cardData('military-records').find('[data-qa=discharge-description]'),
+        lengthOfService: (): PageElement => cardData('military-records').find('[data-qa=length-of-service]'),
+      }),
     }
   }
 
@@ -91,21 +101,20 @@ export default class PersonalPage extends Page {
   }
 
   contacts = () => {
-    const cardData = () => cy.getDataQa('next-of-kin')
+    const cardData = () => cy.get('#next-of-kin')
     return {
       contact: contactNumber => {
-        const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
-        const details = () => contactData().find('[data-qa=contact-details]').find('.govuk-summary-list__value')
+        const contactData = () => cardData().find('[data-qa=contact-item]').eq(contactNumber)
 
         return {
+          nextOfKin: () => contactData().find('[data-qa=next-of-kin]'),
+          emergencyContact: () => contactData().find('[data-qa=emergency-contact]'),
           name: () => contactData().find('[data-qa=contact-name]'),
           relationship: () => contactData().find('[data-qa=contact-relationship]'),
-          emergencyContact: () => contactData().find('[data-qa=contact-emergency-contact]'),
-          phones: () => contactData().find('[data-qa=contact-numbers]'),
-          address: () => details().eq(0),
-          addressTypes: () => details().eq(1),
-          addressPhones: () => details().eq(2),
-          emails: () => details().eq(3),
+          phoneNumber: () => contactData().find('[data-qa=contact-phone]'),
+          additionalDetails: () => contactData().find('.govuk-details__summary-text'),
+          dateOfBirth: () => contactData().find('.govuk-summary-list > :nth-child(1) > .govuk-summary-list__value'),
+          address: () => contactData().find('.govuk-summary-list > :nth-child(2) > .govuk-summary-list__value'),
         }
       },
     }
@@ -136,6 +145,24 @@ export default class PersonalPage extends Page {
           orientation: () => mark().findDataQa('mark-orientation'),
           comment: () => mark().findDataQa('mark-comment'),
           image: () => mark().findDataQa('mark-image'),
+        }
+      },
+      personIntegrationDistinguishingMarks: () => {
+        const marks = () => cy.get('.personal-distinguishing-marks__info')
+        const scarsDetail = () => marks().findDataQa('distinguishing-marks-scars').find('details')
+        const tattoosDetail = () => marks().findDataQa('distinguishing-marks-tattoos').find('details')
+        return {
+          tattoos: () => marks().findDataQa('distinguishing-marks-tattoos'),
+          scars: () => marks().findDataQa('distinguishing-marks-scars'),
+          others: () => marks().findDataQa('distinguishing-marks-others'),
+          scarsDetail: () => ({
+            detail: () => scarsDetail(),
+            content: () => scarsDetail().find('div.govuk-details__text'),
+          }),
+          tattoosDetail: () => ({
+            detail: () => tattoosDetail(),
+            content: () => tattoosDetail().find('div.govuk-details__text'),
+          }),
         }
       },
     }
@@ -184,6 +211,8 @@ export default class PersonalPage extends Page {
         comment: () => reasonableAdjustmentValue(row).findDataQa('comment'),
         addedOn: () => reasonableAdjustmentValue(row).findDataQa('added-on'),
       }),
+      pastCareNeedsLink: () => cy.getDataQa('past-care-needs-link'),
+      noCareNeedsMessage: () => cy.getDataQa('no-care-needs-message'),
     }
   }
 

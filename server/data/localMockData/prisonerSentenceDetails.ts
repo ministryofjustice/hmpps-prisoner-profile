@@ -1,4 +1,4 @@
-import { PrisonerSentenceDetails } from '../../interfaces/prisonerSentenceDetails'
+import PrisonerSentenceDetails from '../interfaces/prisonApi/PrisonerSentenceDetails'
 
 export const prisonerSentenceDetailsMock: PrisonerSentenceDetails = {
   bookingId: 1102484,

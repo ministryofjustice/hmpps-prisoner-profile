@@ -1,7 +1,7 @@
 import { RestClientBuilder } from '../data'
-import { EducationAndWorkPlanApiClient } from '../data/interfaces/educationAndWorkPlanApiClient'
-import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
-import toPersonalLearningPlanActionPlan from '../interfaces/mappers/personalLearningPlanActionPlanMapper'
+import EducationAndWorkPlanApiClient from '../data/interfaces/educationAndWorkPlanApi/EducationAndWorkPlanApiClient'
+import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+import toPersonalLearningPlanActionPlan from './mappers/personalLearningPlanActionPlanMapper'
 import logger from '../../logger'
 import PersonalLearningPlanService from './personalLearningPlanService'
 
@@ -16,10 +16,12 @@ export default class EducationAndWorkPlanApiPersonalLearningPlanService extends 
 
   async getPrisonerActionPlan(prisonerNumber: string, systemToken: string): Promise<PersonalLearningPlanActionPlan> {
     try {
-      const plpActionPlan =
-        await this.educationAndWorkPlanApiClientBuilder(systemToken).getPrisonerActionPlan(prisonerNumber)
-      return toPersonalLearningPlanActionPlan(plpActionPlan)
+      const allGoals = await this.educationAndWorkPlanApiClientBuilder(systemToken).getAllGoals(prisonerNumber)
+      return toPersonalLearningPlanActionPlan(prisonerNumber, allGoals)
     } catch (error) {
+      if (error.status === 404) {
+        return toPersonalLearningPlanActionPlan(prisonerNumber, { goals: [] })
+      }
       logger.error('Error calling the Education And Work Plan API to get the prisoner action plan', error)
       return { problemRetrievingData: true } as PersonalLearningPlanActionPlan
     }

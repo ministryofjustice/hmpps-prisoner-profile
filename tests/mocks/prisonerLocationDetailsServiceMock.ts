@@ -1,12 +1,16 @@
 import LocationDetailsService from '../../server/services/locationDetailsService'
+import Interface from './Interface'
 
-type Interface<T> = {
-  [P in keyof T]: T[P]
-}
-
-export const prisonerLocationDetailsServiceMock = (): Interface<LocationDetailsService> => ({
+export const locationDetailsServiceMock = (): Interface<LocationDetailsService> => ({
   getInmatesAtLocation: jest.fn(),
   isReceptionFull: jest.fn(),
   getLocationDetailsByLatestFirst: jest.fn(),
   getLocationDetailsGroupedByPeriodAtAgency: jest.fn(),
+  getLocationMappingUsingNomisLocationId: jest.fn(),
+  getLocation: jest.fn(),
+  getLocationByKey: jest.fn(),
+  getLocationByNomisLocationId: jest.fn(),
+  getLocationMappingUsingDpsLocationId: jest.fn(),
+  getLocationMappingUsingDpsLocationKey: jest.fn(),
+  getLocationsForAppointments: jest.fn(),
 })

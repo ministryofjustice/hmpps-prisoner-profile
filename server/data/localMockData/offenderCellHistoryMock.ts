@@ -1,4 +1,4 @@
-import { OffenderCellHistory, OffenderCellHistoryItem } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
+import OffenderCellHistory, { OffenderCellHistoryItem } from '../interfaces/prisonApi/OffenderCellHistoryInterface'
 
 export const mockCellHistoryItem1: OffenderCellHistoryItem = {
   bookingId: 1234134,

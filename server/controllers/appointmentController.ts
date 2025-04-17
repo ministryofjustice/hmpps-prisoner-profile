@@ -1,28 +1,29 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addMinutes, set, subMinutes } from 'date-fns'
-import { NotifyClient } from 'notifications-node-client'
 import AppointmentService from '../services/appointmentService'
 import {
   apostrophe,
   formatLocation,
   formatName,
-  formatNamePart,
+  objectToRadioOptions,
   objectToSelectOptions,
   refDataToSelectOptions,
 } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import {
   AppointmentDefaults,
+  AppointmentDetails,
   AppointmentForm,
   PrePostAppointmentDetails,
   repeatOptions,
-} from '../interfaces/whereaboutsApi/appointment'
+} from '../data/interfaces/whereaboutsApi/Appointment'
 import {
   calculateEndDate,
   dateToIsoDate,
   formatDate,
   formatDateISO,
   formatDateTimeISO,
+  formatDateToPattern,
   parseDate,
   timeFormat,
 } from '../utils/dateHelpers'
@@ -30,13 +31,18 @@ import { PrisonerSearchService } from '../services'
 import { pluralise } from '../utils/pluralise'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
-import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
-import config from '../config'
 import logger from '../../logger'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import LocationDetailsService from '../services/locationDetailsService'
+import CreateVideoBookingRequest, {
+  AmendVideoBookingRequest,
+  VideoLinkBooking,
+} from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
+import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
+import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
-const { confirmBookingPrisonTemplateId, emails } = config.notifications
 
 /**
  * Parse requests for appointments routes and orchestrate response
@@ -46,39 +52,123 @@ export default class AppointmentController {
     private readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly auditService: AuditService,
-    private readonly notifyClient: NotifyClient | { sendEmail(): void },
+    private readonly locationDetailsService: LocationDetailsService,
   ) {}
 
   public displayAddAppointment(): RequestHandler {
+    const buildAppointmentForm = async (
+      clientToken: string,
+      bookingId: number,
+      prisonId: string,
+      appointmentFromFlash: string[],
+      appointment: AppointmentDetails,
+    ): Promise<AppointmentForm> => {
+      if (appointmentFromFlash?.length) {
+        return appointmentFromFlash[0] as AppointmentForm
+      }
+
+      if (!appointment) {
+        return {
+          bookingId,
+          prisonId,
+          date: formatDate(new Date().toISOString(), 'short'),
+        }
+      }
+
+      const appointmentForm = {
+        appointmentId: appointment.appointment.id,
+        appointmentType: appointment.appointment.appointmentTypeCode,
+        location: (
+          await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+            clientToken,
+            appointment.appointment.locationId,
+          )
+        ).dpsLocationId,
+        date: formatDate(appointment.appointment.startTime, 'short'),
+        startTimeHours: formatDateToPattern(appointment.appointment.startTime, 'HH'),
+        startTimeMinutes: formatDateToPattern(appointment.appointment.startTime, 'mm'),
+        endTimeHours: formatDateToPattern(appointment.appointment.endTime, 'HH'),
+        endTimeMinutes: formatDateToPattern(appointment.appointment.endTime, 'mm'),
+        recurring: appointment.recurring ? 'yes' : 'no',
+        repeats: appointment.recurring?.repeatPeriod,
+        times: appointment.recurring?.count,
+        comments: appointment.appointment.comment,
+        bookingId,
+        prisonId,
+      } as AppointmentForm
+
+      if (
+        appointment.appointment.appointmentTypeCode === 'VLB' ||
+        appointment.appointment.appointmentTypeCode === 'VLPM'
+      ) {
+        const vlb = await this.getVideoLinkBookingFromAppointment(clientToken, appointment)
+        const { mainAppointment } = this.extractPrisonAppointmentsFromBooking(vlb)
+
+        return {
+          ...appointmentForm,
+          location: await this.mapLocationKeyToId(clientToken, mainAppointment.prisonLocKey),
+          date: formatDate(mainAppointment.appointmentDate, 'short'),
+          startTimeHours: mainAppointment.startTime.split(':')[0],
+          startTimeMinutes: mainAppointment.startTime.split(':')[1],
+          endTimeHours: mainAppointment.endTime.split(':')[0],
+          endTimeMinutes: mainAppointment.endTime.split(':')[1],
+          probationTeam: (bvlsMasteredVlpmFeatureToggleEnabled() && vlb.probationTeamCode) || undefined,
+          officerDetailsNotKnown:
+            bvlsMasteredVlpmFeatureToggleEnabled() &&
+            vlb.bookingType === 'PROBATION' &&
+            vlb.additionalBookingDetails?.contactName === undefined
+              ? 'true'
+              : undefined,
+          officerFullName:
+            (bvlsMasteredVlpmFeatureToggleEnabled() &&
+              vlb.bookingType === 'PROBATION' &&
+              vlb.additionalBookingDetails?.contactName) ||
+            undefined,
+          officerEmail:
+            (bvlsMasteredVlpmFeatureToggleEnabled() &&
+              vlb.bookingType === 'PROBATION' &&
+              vlb.additionalBookingDetails?.contactEmail) ||
+            undefined,
+          officerTelephone:
+            (bvlsMasteredVlpmFeatureToggleEnabled() &&
+              vlb.bookingType === 'PROBATION' &&
+              vlb.additionalBookingDetails?.contactNumber) ||
+            undefined,
+          meetingType: (bvlsMasteredVlpmFeatureToggleEnabled() && vlb.probationMeetingType) || undefined,
+        }
+      }
+
+      return appointmentForm
+    }
+
     return async (req: Request, res: Response, next: NextFunction) => {
-      const {
-        clientToken,
-        user: { activeCaseLoadId },
-      } = res.locals
+      const { appointmentId } = req.params
+      const { clientToken } = req.middleware
       const { prisonerNumber } = req.params
       const { firstName, lastName, bookingId, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const user = res.locals.user as PrisonUser
 
-      const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
-        clientToken,
-        activeCaseLoadId,
-      )
+      const appointment = appointmentId
+        ? await this.appointmentService.getAppointment(clientToken, +appointmentId)
+        : null
 
-      const now = new Date()
+      const { appointmentTypes, probationTeams, meetingTypes, locations } =
+        await this.appointmentService.getAddAppointmentRefData(clientToken, user.activeCaseLoadId)
+
       const appointmentFlash = req.flash('appointmentForm')
-      const formValues: AppointmentForm = appointmentFlash?.length
-        ? (appointmentFlash[0] as never)
-        : {
-            bookingId,
-            date: formatDate(now.toISOString(), 'short'),
-          }
+      const formValues: AppointmentForm = await buildAppointmentForm(
+        clientToken,
+        bookingId,
+        prisonId,
+        appointmentFlash,
+        appointment,
+      )
       const errors = req.flash('errors')
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -87,19 +177,22 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/addAppointment', {
-        pageTitle: 'Add an appointment',
+        pageTitle: appointmentId ? 'Change appointment details' : 'Add an appointment',
         miniBannerData: {
           prisonerName,
           prisonerNumber,
           cellLocation: formatLocation(cellLocation),
         },
         appointmentTypes: refDataToSelectOptions(appointmentTypes),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        probationTeams: objectToSelectOptions(probationTeams, 'code', 'description'),
+        meetingTypes: objectToRadioOptions(meetingTypes, 'code', 'description'),
+        locations: objectToSelectOptions(locations, 'id', 'localName'),
         repeatOptions,
-        today: formatDate(now.toISOString(), 'short'),
+        today: formatDate(new Date().toISOString(), 'short'),
         formValues,
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
+        appointmentId,
       })
     }
   }
@@ -107,11 +200,18 @@ export default class AppointmentController {
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const userToken = res.locals.user.token
+      const { clientToken } = req.middleware
 
       const {
+        appointmentId,
         appointmentType,
+        probationTeam,
         location,
+        officerDetailsNotKnown,
+        officerFullName,
+        officerEmail,
+        officerTelephone,
+        meetingType,
         date,
         startTimeHours,
         startTimeMinutes,
@@ -122,12 +222,20 @@ export default class AppointmentController {
         times,
         comments,
         bookingId,
+        prisonId,
         refererUrl,
       } = req.body
 
       const appointmentForm: AppointmentForm = {
+        appointmentId: appointmentId ? +appointmentId : undefined,
         appointmentType,
+        probationTeam,
         location,
+        officerDetailsNotKnown,
+        officerFullName,
+        officerEmail,
+        officerTelephone: officerTelephone || undefined,
+        meetingType,
         date,
         startTimeHours,
         startTimeMinutes,
@@ -138,17 +246,23 @@ export default class AppointmentController {
         times,
         comments,
         bookingId,
+        prisonId,
       }
 
       const errors = req.errors || []
       if (!errors.length) {
         const startTime = formatDateTimeISO(set(parseDate(date), { hours: startTimeHours, minutes: startTimeMinutes }))
         const endTime = formatDateTimeISO(set(parseDate(date), { hours: endTimeHours, minutes: endTimeMinutes }))
-
+        // non-bvl locations identified via UUID/integer form id.  BVL locations identified via key
+        let nomisLocationId
+        if (location) {
+          const result = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(clientToken, location)
+          nomisLocationId = result.nomisLocationId
+        }
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: Number(location),
+          locationId: nomisLocationId || 0,
           startTime,
           endTime,
           comment: comments,
@@ -167,11 +281,13 @@ export default class AppointmentController {
             appointmentForm,
           })
 
-          return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
+          return appointmentId
+            ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}`)
+            : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
         }
 
         try {
-          await this.appointmentService.createAppointments(userToken, appointmentsToCreate)
+          await this.createOrAmendAppointments(clientToken, prisonerNumber, appointmentsToCreate, appointmentForm)
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })
@@ -184,13 +300,14 @@ export default class AppointmentController {
       if (errors.length) {
         req.flash('errors', errors)
         req.flash('refererUrl', refererUrl)
-        return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
+        return appointmentId
+          ? res.redirect(`/prisoner/${prisonerNumber}/edit-appointment/${appointmentId}`)
+          : res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
 
       this.auditService
         .sendPostAttempt({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Appointment,
@@ -205,10 +322,8 @@ export default class AppointmentController {
   public displayAppointmentConfirmation(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
-      const {
-        clientToken,
-        user: { activeCaseLoadId },
-      } = res.locals
+      const { clientToken } = req.middleware
+      const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('appointmentForm')
 
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
@@ -216,10 +331,8 @@ export default class AppointmentController {
         return res.redirect(`/prisoner/${prisonerNumber}/schedule`)
       }
 
-      const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
-        clientToken,
-        activeCaseLoadId,
-      )
+      const { appointmentTypes, locations, probationTeams, meetingTypes } =
+        await this.appointmentService.getAddAppointmentRefData(clientToken, user.activeCaseLoadId)
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
@@ -236,26 +349,27 @@ export default class AppointmentController {
       const lastAppointmentISODate = formatDateISO(
         calculateEndDate(parseDate(appointmentDetails.date), appointmentDetails.repeats, appointmentDetails.times),
       )
-      const lastAppointmentDate = formatDate(lastAppointmentISODate, 'long')
-      const appointmentType = appointmentTypes.find(
-        type => type.code === appointmentDetails.appointmentType,
-      )?.description
-      const location = locations.find(loc => loc.locationId === Number(appointmentDetails.location))?.userDescription
-      const repeats = repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text
 
       const appointmentData = {
         heading,
         prisonerName,
         prisonerNumber,
-        appointmentType,
-        location,
+        appointmentTypeCode: appointmentDetails.appointmentType,
+        appointmentType: appointmentTypes.find(type => type.code === appointmentDetails.appointmentType)?.description,
+        probationTeam: probationTeams.find(team => team.code === appointmentDetails.probationTeam)?.description,
+        location: locations.find(loc => loc.id === appointmentDetails.location)?.localName,
+        officerDetailsNotKnown: appointmentDetails.officerDetailsNotKnown,
+        officerFullName: appointmentDetails.officerFullName,
+        officerEmail: appointmentDetails.officerEmail,
+        officerTelephone: appointmentDetails.officerTelephone,
+        meetingType: meetingTypes.find(ht => ht.code === appointmentDetails.meetingType)?.description,
         date: formatDate(dateToIsoDate(appointmentDetails.date), 'long'),
         startTime: `${appointmentDetails.startTimeHours}:${appointmentDetails.startTimeMinutes}`,
         endTime: `${appointmentDetails.endTimeHours}:${appointmentDetails.endTimeMinutes}`,
         recurring: appointmentDetails.recurring,
-        repeats,
+        repeats: repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text,
         numberAdded: appointmentDetails.times,
-        lastAppointmentDate,
+        lastAppointmentDate: formatDate(lastAppointmentISODate, 'long'),
         comment: appointmentDetails.comments,
       }
 
@@ -269,9 +383,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -290,33 +402,82 @@ export default class AppointmentController {
   }
 
   public displayPrePostAppointments(): RequestHandler {
+    const buildPrePostAppointmentDetails = async (
+      clientToken: string,
+      appointmentFromFlash: string[],
+      appointment: AppointmentDetails,
+    ): Promise<PrePostAppointmentDetails> => {
+      const { appointmentDefaults, appointmentForm, formValues } =
+        appointmentFromFlash[0] as unknown as PrePostAppointmentDetails
+
+      if (formValues) {
+        return { appointmentDefaults, appointmentForm, formValues }
+      }
+
+      const formValuesFromAppointment = appointment
+        ? await this.getVideoLinkBookingFromAppointment(clientToken, appointment).then(async vlb => {
+            const { preAppointment, postAppointment } = this.extractPrisonAppointmentsFromBooking(vlb)
+
+            const [preLocation, postLocation] = await Promise.all([
+              preAppointment ? this.mapLocationKeyToId(clientToken, preAppointment.prisonLocKey) : undefined,
+              postAppointment ? this.mapLocationKeyToId(clientToken, postAppointment.prisonLocKey) : undefined,
+            ])
+
+            return {
+              bookingType: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.bookingType : undefined,
+              preAppointment: preAppointment ? 'yes' : 'no',
+              preAppointmentLocation: preLocation,
+              postAppointment: postAppointment ? 'yes' : 'no',
+              postAppointmentLocation: postLocation,
+              court: vlb.courtCode,
+              probationTeam: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.probationTeamCode : undefined,
+              hearingType: vlb.courtHearingType,
+              meetingType: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.probationMeetingType : undefined,
+              cvpRequired: vlb.videoLinkUrl ? 'yes' : 'no',
+              videoLinkUrl: vlb.videoLinkUrl,
+            }
+          })
+        : undefined
+
+      return { appointmentDefaults, appointmentForm, formValues: formValuesFromAppointment }
+    }
+
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = req.params
-      const {
-        clientToken,
-        user: { activeCaseLoadId },
-      } = res.locals
+      const { prisonerNumber, appointmentId } = req.params
+      const { clientToken } = req.middleware
+      const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('prePostAppointmentDetails')
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
       if (!appointmentFlash?.length) {
         throw new ServerError('PrePostAppointmentDetails not found in request')
       }
 
-      const { courts, locations } = await this.appointmentService.getPrePostAppointmentRefData(
-        clientToken,
-        activeCaseLoadId,
-      )
-      courts.push({ id: 'other', name: 'Other' })
+      const { courts, probationTeams, hearingTypes, meetingTypes, locations } =
+        await this.appointmentService.getPrePostAppointmentRefData(clientToken, user.activeCaseLoadId)
 
-      const { firstName, lastName, cellLocation, bookingId, prisonId } = req.middleware.prisonerData
+      const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
-      const { appointmentDefaults, appointmentForm, formValues } =
-        appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
-      const location = locations.find(loc => loc.locationId === appointmentDefaults.locationId)?.userDescription
+      const appointment = appointmentId
+        ? await this.appointmentService.getAppointment(clientToken, +appointmentId)
+        : null
+
+      const { appointmentDefaults, appointmentForm, formValues } = await buildPrePostAppointmentDetails(
+        clientToken,
+        appointmentFlash,
+        appointment,
+      )
+
+      let location
+      if (appointmentDefaults.locationId) {
+        const { dpsLocationId } = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+        location = locations.find(loc => loc.id === dpsLocationId)?.localName
+      }
 
       const appointmentData = {
-        bookingId,
         miniBannerData: {
           prisonerName,
           prisonerNumber,
@@ -336,9 +497,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -347,29 +506,38 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointments', {
-        pageTitle: 'Video link booking details',
+        pageTitle: appointmentId ? 'Change appointment details' : 'Video link booking details',
         ...appointmentData,
-        courts: objectToSelectOptions(courts, 'id', 'name'),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        courts: objectToSelectOptions(courts, 'code', 'description'),
+        probationTeams: objectToSelectOptions(probationTeams, 'code', 'description'),
+        locations: objectToSelectOptions(locations, 'id', 'localName'),
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
+        hearingTypes: objectToSelectOptions(hearingTypes, 'code', 'description'),
+        meetingTypes: objectToSelectOptions(meetingTypes, 'code', 'description'),
+        appointmentId,
       })
     }
   }
 
   public postVideoLinkBooking(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerNumber } = req.params
-      const userToken = res.locals.user.token
+      const { prisonerNumber, appointmentId } = req.params
+      const { clientToken } = req.middleware
 
+      // TODO: Remove probation fields here when feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
       const {
-        bookingId,
+        bookingType,
         preAppointment,
         preAppointmentLocation,
         postAppointment,
         postAppointmentLocation,
         court,
-        otherCourt,
+        probationTeam,
+        hearingType,
+        meetingType,
+        cvpRequired,
+        videoLinkUrl,
       } = req.body
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
@@ -377,48 +545,35 @@ export default class AppointmentController {
       }
       const { appointmentDefaults, appointmentForm } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
+      const prePostAppointmentDetails = {
+        appointmentId: +appointmentId,
+        appointmentDefaults,
+        appointmentForm,
+        formValues: {
+          bookingType,
+          preAppointment,
+          preAppointmentLocation,
+          postAppointment,
+          postAppointmentLocation,
+          court,
+          probationTeam,
+          hearingType,
+          meetingType,
+          cvpRequired,
+          videoLinkUrl,
+        },
+      }
+
       const errors = req.errors || []
       if (!errors.length) {
-        const preAppointmentStartTime = subMinutes(
-          new Date(appointmentDefaults.startTime),
-          PRE_POST_APPOINTMENT_DURATION_MINS,
-        )
-        const postAppointmentEndTime = addMinutes(
-          new Date(appointmentDefaults.endTime),
-          PRE_POST_APPOINTMENT_DURATION_MINS,
-        )
-
-        const videoLinkBookingForm: VideoLinkBookingForm = {
-          bookingId,
-          courtId: court,
-          court: court === 'other' ? otherCourt : undefined,
-          comment: appointmentDefaults.comment,
-          madeByTheCourt: false,
-          pre:
-            preAppointment === 'yes'
-              ? {
-                  locationId: preAppointmentLocation,
-                  startTime: formatDateTimeISO(preAppointmentStartTime),
-                  endTime: appointmentDefaults.startTime,
-                }
-              : undefined,
-          main: {
-            locationId: appointmentDefaults.locationId,
-            startTime: appointmentDefaults.startTime,
-            endTime: appointmentDefaults.endTime,
-          },
-          post:
-            postAppointment === 'yes'
-              ? {
-                  locationId: postAppointmentLocation,
-                  startTime: appointmentDefaults.endTime,
-                  endTime: formatDateTimeISO(postAppointmentEndTime),
-                }
-              : undefined,
-        }
-
         try {
-          await this.appointmentService.addVideoLinkBooking(userToken, videoLinkBookingForm)
+          await this.createOrAmendAppointments(
+            clientToken,
+            prisonerNumber,
+            appointmentDefaults,
+            appointmentForm,
+            prePostAppointmentDetails,
+          )
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })
@@ -426,28 +581,18 @@ export default class AppointmentController {
         }
       }
 
-      req.flash('prePostAppointmentDetails', {
-        appointmentDefaults,
-        appointmentForm,
-        formValues: {
-          preAppointment,
-          preAppointmentLocation,
-          postAppointment,
-          postAppointmentLocation,
-          court,
-          otherCourt,
-        },
-      })
+      req.flash('prePostAppointmentDetails', prePostAppointmentDetails)
 
       if (errors.length) {
         req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
+        return appointmentId
+          ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}`)
+          : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
       }
 
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Appointment,
@@ -460,36 +605,43 @@ export default class AppointmentController {
   }
 
   public displayPrePostAppointmentConfirmation(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const {
-        clientToken,
-        user: { activeCaseLoadId, username },
-      } = res.locals
+      const { clientToken } = req.middleware
+      const user = res.locals.user as PrisonUser
+      const { activeCaseLoadId } = user
 
       const appointmentFlash = req.flash('prePostAppointmentDetails')
       if (!appointmentFlash?.length) {
-        return new ServerError('PrePostAppointmentDetails not found in request')
+        throw new ServerError('PrePostAppointmentDetails not found in request')
       }
-      const { appointmentDefaults, formValues } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentId, appointmentDefaults, formValues } =
+        appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
-      const [{ courts, locations }, prison, userEmailData] = await Promise.all([
+      const [{ courts, probationTeams, hearingTypes, meetingTypes, locations }, prison] = await Promise.all([
         this.appointmentService.getPrePostAppointmentRefData(clientToken, activeCaseLoadId),
         this.appointmentService.getAgencyDetails(clientToken, prisonId),
-        this.appointmentService.getUserEmail(clientToken, username),
       ])
 
-      const location = locations.find(loc => loc.locationId === Number(appointmentDefaults.locationId))?.userDescription
-      const preLocation = locations.find(
-        loc => loc.locationId === Number(formValues.preAppointmentLocation),
-      )?.userDescription
-      const postLocation = locations.find(
-        loc => loc.locationId === Number(formValues.postAppointmentLocation),
-      )?.userDescription
-      const courtDescription = courts.find(court => court.id === formValues.court)?.name
+      let apptDefaultsLocationMap = {} as NomisSyncLocation
+      if (appointmentDefaults.locationId) {
+        apptDefaultsLocationMap = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+      }
+
+      const location = locations.find(loc => loc.id === apptDefaultsLocationMap.dpsLocationId)?.localName
+
+      const preLocation = locations.find(loc => loc.id === formValues.preAppointmentLocation)?.localName
+
+      const postLocation = locations.find(loc => loc.id === formValues.postAppointmentLocation)?.localName
+
+      const courtDescription = courts.find(court => court.code === formValues.court)?.description
+      const probationTeamDescription = probationTeams.find(team => team.code === formValues.probationTeam)?.description
 
       const preAppointmentStartTime = subMinutes(
         new Date(appointmentDefaults.startTime),
@@ -501,6 +653,9 @@ export default class AppointmentController {
       )
 
       const appointmentData = {
+        bookingType: formValues.bookingType,
+        appointmentTypeCode: 'VLB',
+        appointmentType: 'Video Link - Court Hearing',
         prisonerName,
         prisonerNumber,
         prisonName: prison.description,
@@ -521,57 +676,28 @@ export default class AppointmentController {
                 formatDateTimeISO(postAppointmentEndTime),
               )}`
             : undefined,
-        court: formValues.court === 'other' ? formValues.otherCourt : courtDescription,
+        court: courtDescription,
+        probationTeam: probationTeamDescription,
+        hearingType: hearingTypes.find(ht => ht.code === formValues.hearingType)?.description,
+        meetingType: meetingTypes.find(ht => ht.code === formValues.meetingType)?.description,
+        videoLinkUrl: formValues.cvpRequired === 'yes' && formValues.videoLinkUrl,
+        mustContactTheCourt:
+          courts.find(court => court.code === formValues.court)?.enabled === false ||
+          probationTeams.find(team => team.code === formValues.probationTeam)?.enabled === false,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
       req.session.movementSlipData = {
         ...appointmentData,
-        appointmentType: 'Video Link Booking',
         comment: appointmentData.comments,
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
         createdBy: res.locals.user.displayName,
       }
 
-      // Send confirmation email
-      if (userEmailData && userEmailData.email) {
-        const personalisation = {
-          startTime: appointmentData.startTime,
-          endTime: appointmentData.endTime,
-          comments: appointmentData.comments || 'None entered.',
-          firstName: formatNamePart(firstName),
-          lastName: formatNamePart(lastName),
-          offenderNo: appointmentData.prisonerNumber,
-          prison: appointmentData.prisonName,
-          date: appointmentData.date,
-          location: appointmentData.location,
-          preAppointmentInfo: appointmentData.pre || 'None requested',
-          postAppointmentInfo: appointmentData.post || 'None requested',
-        }
-
-        try {
-          await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, userEmailData.email, {
-            personalisation,
-            reference: null,
-          })
-
-          if (emails[activeCaseLoadId] && emails[activeCaseLoadId].omu) {
-            await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, emails[activeCaseLoadId].omu, {
-              personalisation,
-              reference: null,
-            })
-          }
-        } catch (error) {
-          logger.error(`Failed to send email via Notify: ${error.response.status} - ${error.response.statusText}`)
-        }
-      }
-
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -580,7 +706,7 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointmentConfirmation', {
-        pageTitle: 'Video link has been booked',
+        pageTitle: appointmentId ? 'The video link has been updated' : 'The video link has been booked',
         ...appointmentData,
         profileUrl: `/prisoner/${prisonerNumber}`,
         movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
@@ -602,9 +728,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -622,18 +746,30 @@ export default class AppointmentController {
 
   public getOffenderEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const {
-        user: { activeCaseLoadId },
-        clientToken,
-      } = res.locals
+      const { clientToken } = req.middleware
+      const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
       const prisonerNumber = req.query.prisonerNumber as string
+      const { appointmentId } = req.query
 
-      const [prisonerData, events] = await Promise.all([
+      const prisonerAndEventsPromise = Promise.all([
         this.prisonerSearchService.getPrisonerDetails(clientToken, prisonerNumber),
-        this.appointmentService.getExistingEventsForOffender(clientToken, activeCaseLoadId, isoDate, prisonerNumber),
+        this.appointmentService.getExistingEventsForOffender(
+          clientToken,
+          user.activeCaseLoadId,
+          isoDate,
+          prisonerNumber,
+        ),
       ])
+
+      const appointmentPromise = appointmentId
+        ? this.appointmentService
+            .getAppointment(clientToken, +appointmentId)
+            .then(appointment => this.fetchSeparateAppointmentsIfVlb(clientToken, appointment))
+        : Promise.resolve([])
+
+      const [[prisonerData, events], appointments] = await Promise.all([prisonerAndEventsPromise, appointmentPromise])
 
       this.auditService
         .sendEvent({
@@ -645,8 +781,19 @@ export default class AppointmentController {
         })
         .catch(error => logger.error(error))
 
+      const filteredEvents = events.filter(
+        e =>
+          !appointments.some(
+            a =>
+              a.offenderNo === e.offenderNo &&
+              a.location === +e.locationId &&
+              a.startTime === e.startTime &&
+              a.endTime === e.endTime,
+          ),
+      )
+
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
-        events,
+        events: filteredEvents,
         date: formatDate(isoDate, 'long'),
         prisonerName: formatName(prisonerData.firstName, null, prisonerData.lastName),
         type: 'offender',
@@ -656,36 +803,97 @@ export default class AppointmentController {
 
   public getLocationExistingEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const {
-        user: { activeCaseLoadId },
-        clientToken,
-      } = res.locals
+      const { clientToken } = req.middleware
+      const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
-      const locationId = +req.query.locationId
+      const { locationId, appointmentId } = req.query
 
-      const [location, events] = await Promise.all([
-        this.appointmentService.getLocation(clientToken, locationId),
-        this.appointmentService.getExistingEventsForLocation(clientToken, activeCaseLoadId, locationId, isoDate),
+      const { nomisLocationId } = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(
+        clientToken,
+        locationId as string,
+      )
+
+      const locationAndEventsPromise = Promise.all([
+        this.locationDetailsService.getLocation(clientToken, locationId as string),
+        this.appointmentService.getExistingEventsForLocation(
+          clientToken,
+          user.activeCaseLoadId,
+          nomisLocationId,
+          isoDate,
+        ),
       ])
+
+      const appointmentPromise = appointmentId
+        ? this.appointmentService
+            .getAppointment(clientToken, +appointmentId)
+            .then(appointment => this.fetchSeparateAppointmentsIfVlb(clientToken, appointment))
+        : Promise.resolve([])
+
+      const [[location, events], appointments] = await Promise.all([locationAndEventsPromise, appointmentPromise])
 
       this.auditService
         .sendEvent({
-          who: res.locals.user.username,
-          subjectId: activeCaseLoadId,
+          who: user.username,
+          subjectId: user.activeCaseLoadId,
           correlationId: req.id,
           what: `API_${ApiAction.LocationEvents}`,
           details: JSON.stringify({ locationId }),
         })
         .catch(error => logger.error(error))
 
+      const filteredEvents = events.filter(
+        e =>
+          !appointments.some(
+            a =>
+              a.offenderNo === e.offenderNo &&
+              a.location === +e.locationId &&
+              a.startTime === e.startTime &&
+              a.endTime === e.endTime,
+          ),
+      )
+
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
-        events,
+        events: filteredEvents,
         date: formatDate(isoDate, 'long'),
-        header: `Schedule for ${location.userDescription}`,
+        header: `Schedule for ${location.localName}`,
         type: 'location',
       })
     }
+  }
+
+  private async fetchSeparateAppointmentsIfVlb(clientToken: string, appointment: AppointmentDetails) {
+    if (appointment.appointment.appointmentTypeCode === 'VLB') {
+      const vlb = await this.getVideoLinkBookingFromAppointment(clientToken, appointment)
+      const { preAppointment, mainAppointment, postAppointment } = this.extractPrisonAppointmentsFromBooking(vlb)
+
+      const mappedAppointments = await Promise.all(
+        [preAppointment, mainAppointment, postAppointment].map(async appt => {
+          if (!appt) return undefined
+          const locationMapping = await this.locationDetailsService.getLocationMappingUsingDpsLocationKey(
+            clientToken,
+            appt.prisonLocKey,
+          )
+          return {
+            offenderNo: appt.prisonerNumber,
+            location: locationMapping.nomisLocationId,
+            startTime: appt.startTime,
+            endTime: appt.endTime,
+          }
+        }),
+      )
+
+      return mappedAppointments.filter(Boolean) // Remove undefined entries
+    }
+
+    return [
+      {
+        offenderNo: appointment.appointment.offenderNo,
+        location: appointment.appointment.locationId,
+        startTime: formatDateToPattern(appointment.appointment.startTime, 'HH:mm'),
+        endTime: formatDateToPattern(appointment.appointment.endTime, 'HH:mm'),
+      },
+    ]
   }
 
   public getRecurringEndDate(): RequestHandler {
@@ -696,7 +904,140 @@ export default class AppointmentController {
 
       const endDate = formatDateISO(calculateEndDate(date, repeats, times))
 
-      return res.send(formatDate(endDate, 'full').replace(',', ''))
+      res.send(formatDate(endDate, 'full'))
+    }
+  }
+
+  private getVideoLinkBookingFromAppointment = async (clientToken: string, appointment: AppointmentDetails) => {
+    const app = appointment.appointment
+    return this.appointmentService.getVideoLinkBooking(clientToken, {
+      prisonerNumber: app.offenderNo,
+      locationKey: (await this.locationDetailsService.getLocationByNomisLocationId(clientToken, app.locationId)).key,
+      date: formatDateToPattern(app.startTime, 'yyyy-MM-dd'),
+      startTime: formatDateToPattern(app.startTime, 'HH:mm'),
+      endTime: formatDateToPattern(app.endTime, 'HH:mm'),
+    })
+  }
+
+  private createOrAmendAppointments = async (
+    token: string,
+    prisonerNumber: string,
+    appointments: AppointmentDefaults,
+    appointmentForm: AppointmentForm,
+    prePostAppointmentForm?: PrePostAppointmentDetails,
+  ) => {
+    if (
+      appointmentForm.appointmentType !== 'VLB' &&
+      (appointmentForm.appointmentType !== 'VLPM' || !bvlsMasteredVlpmFeatureToggleEnabled())
+    ) {
+      return this.appointmentService.createAppointments(token, appointments)
+    }
+
+    const preAppointmentStartTime = subMinutes(new Date(appointments.startTime), PRE_POST_APPOINTMENT_DURATION_MINS)
+    const postAppointmentEndTime = addMinutes(new Date(appointments.endTime), PRE_POST_APPOINTMENT_DURATION_MINS)
+
+    const [preLocation, mainLocation, postLocation] = await Promise.all([
+      prePostAppointmentForm?.formValues?.preAppointmentLocation
+        ? this.locationDetailsService.getLocation(token, prePostAppointmentForm?.formValues?.preAppointmentLocation)
+        : undefined,
+      this.locationDetailsService.getLocation(token, appointmentForm.location),
+      prePostAppointmentForm?.formValues?.postAppointmentLocation
+        ? this.locationDetailsService.getLocation(token, prePostAppointmentForm?.formValues?.postAppointmentLocation)
+        : undefined,
+    ])
+
+    let mainAppointmentType
+    let bookingType
+    if (bvlsMasteredVlpmFeatureToggleEnabled()) {
+      mainAppointmentType = appointmentForm.appointmentType === 'VLB' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION'
+      bookingType = appointmentForm.appointmentType === 'VLB' ? 'COURT' : 'PROBATION'
+    } else {
+      mainAppointmentType =
+        prePostAppointmentForm.formValues.bookingType === 'COURT' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION'
+      bookingType = prePostAppointmentForm.formValues.bookingType
+    }
+
+    const videoLinkBookingForm = {
+      bookingType,
+      prisoners: [
+        {
+          prisonCode: appointmentForm.prisonId,
+          prisonerNumber,
+          appointments: [
+            prePostAppointmentForm?.formValues.preAppointment === 'yes'
+              ? {
+                  type: 'VLB_COURT_PRE',
+                  locationKey: preLocation.key,
+                  date: formatDateISO(parseDate(appointmentForm.date)),
+                  startTime: timeFormat(formatDateTimeISO(preAppointmentStartTime)),
+                  endTime: timeFormat(appointments.startTime),
+                }
+              : undefined,
+            {
+              type: mainAppointmentType,
+              locationKey: mainLocation.key,
+              date: formatDateISO(parseDate(appointmentForm.date)),
+              startTime: timeFormat(appointments.startTime),
+              endTime: timeFormat(appointments.endTime),
+            },
+            prePostAppointmentForm?.formValues?.postAppointment === 'yes'
+              ? {
+                  type: 'VLB_COURT_POST',
+                  locationKey: postLocation.key,
+                  date: formatDateISO(parseDate(appointmentForm.date)),
+                  startTime: timeFormat(appointments.endTime),
+                  endTime: timeFormat(formatDateTimeISO(postAppointmentEndTime)),
+                }
+              : undefined,
+          ].filter(Boolean),
+        },
+      ],
+      courtCode: prePostAppointmentForm?.formValues?.court,
+      probationTeamCode: !bvlsMasteredVlpmFeatureToggleEnabled()
+        ? prePostAppointmentForm.formValues.probationTeam
+        : appointmentForm.probationTeam,
+      courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
+      probationMeetingType: !bvlsMasteredVlpmFeatureToggleEnabled()
+        ? prePostAppointmentForm.formValues.meetingType
+        : appointmentForm.meetingType,
+      comments: appointments.comment || undefined,
+      videoLinkUrl:
+        (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' && prePostAppointmentForm.formValues.videoLinkUrl) ||
+        undefined,
+      additionalBookingDetails:
+        bvlsMasteredVlpmFeatureToggleEnabled() &&
+        appointmentForm.appointmentType === 'VLPM' &&
+        !appointmentForm.officerDetailsNotKnown
+          ? {
+              contactName: appointmentForm.officerFullName,
+              contactEmail: appointmentForm.officerEmail,
+              contactNumber: appointmentForm.officerTelephone,
+            }
+          : undefined,
+    } as CreateVideoBookingRequest
+
+    if (appointmentForm.appointmentId) {
+      const appointment = await this.appointmentService.getAppointment(token, appointmentForm.appointmentId)
+      const vlb = await this.getVideoLinkBookingFromAppointment(token, appointment)
+      return this.appointmentService.amendVideoLinkBooking(
+        token,
+        vlb.videoLinkBookingId,
+        videoLinkBookingForm as AmendVideoBookingRequest,
+      )
+    }
+    return this.appointmentService.addVideoLinkBooking(token, videoLinkBookingForm)
+  }
+
+  private mapLocationKeyToId = async (clientToken: string, prisonLocKey: string) =>
+    (await this.locationDetailsService.getLocationByKey(clientToken, prisonLocKey)).id
+
+  private extractPrisonAppointmentsFromBooking = (booking: VideoLinkBooking) => {
+    const getAppointment = (type: string) => booking.prisonAppointments.find(a => a.appointmentType === type)
+
+    return {
+      preAppointment: getAppointment('VLB_COURT_PRE'),
+      mainAppointment: getAppointment('VLB_COURT_MAIN') || getAppointment('VLB_PROBATION'),
+      postAppointment: getAppointment('VLB_COURT_POST'),
     }
   }
 }

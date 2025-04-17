@@ -1,5 +1,5 @@
 import { addDays, format, startOfToday } from 'date-fns'
-import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHistory'
+import OffenderAttendanceHistory from '../interfaces/prisonApi/OffenderAttendanceHistory'
 
 export const OffenderAttendanceHistoryMock = (): OffenderAttendanceHistory => {
   const attendanceDate = format(addDays(startOfToday(), -10), 'yyyy-MM-dd')

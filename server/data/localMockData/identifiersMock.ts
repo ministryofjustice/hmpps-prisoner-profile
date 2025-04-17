@@ -1,4 +1,4 @@
-import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
+import OffenderIdentifier from '../interfaces/prisonApi/OffenderIdentifier'
 
 export const identifiersMock: OffenderIdentifier[] = [
   {
@@ -14,6 +14,14 @@ export const identifiersMock: OffenderIdentifier[] = [
     value: '08/359381C',
     offenderNo: 'G6123VU',
     issuedAuthorityText: 'P/CONS',
+    caseloadType: 'INST',
+    whenCreated: '2012-02-13T13:48:31.664201',
+  },
+  {
+    type: 'PNC',
+    value: '8/359381C',
+    offenderNo: 'G6123VU',
+    issuedAuthorityText: 'P/CONS - fixed',
     caseloadType: 'INST',
     whenCreated: '2012-02-13T13:48:31.664201',
   },

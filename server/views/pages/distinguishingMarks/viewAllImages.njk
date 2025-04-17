@@ -1,0 +1,69 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
+{% set pageTitle =  "View all images for " + markType + " - Prisoner personal details" %}
+
+{% block body %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
+    </div>
+</div>
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+                govukErrorSummary({
+                    titleText: "There is a problem",
+                    errorList: errors,
+                    attributes: { 'data-qa-errors': true },
+                    classes: 'govuk-!-margin-bottom-6'
+                })
+            }}
+        </div>
+    </div>
+{% endif %}
+
+<div class="mark-images__header-container">
+    <h1>{{ prisonerName | apostrophe }} {{ mark | toBodyPartDescription | lower }} {{ markType }} photos</h1>
+    <div class="print-link">
+        <a href="#"
+           class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print"
+           data-qa="mark-images-print-link"
+        >Print all</a>
+    </div>
+</div>
+<div class="mark-images__container">
+    <div class="mark-images__summary">
+        <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Location</span>
+        <p>{{ mark | toMarkLocationDescription }}</p>
+        <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Description</span>
+        <p>
+        {% if mark.comment.length %}
+            {{ mark.comment }}
+        {% else %}
+           Not entered
+        {% endif %}
+        </p>
+    </div>
+    <div class="mark-images__image-display-container">
+        {% for photoDetails in mark.photographUuids | sortByLatestAndUuid %}
+            <img src="/api/distinguishing-mark-image/{{photoDetails.id}}?nocache={{ currentTimeMillis() }}"
+                 alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}"
+                 class="mark-images__image-display-item" />
+        {% endfor %}
+    </div>
+</div>
+<div class="govuk-!-margin-top-4">
+    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
+       href="{{ refererUrl }}"
+       data-qa="mark-images-back-link">Return to the prisoner's profile</a>
+</div>
+
+{% endblock %}

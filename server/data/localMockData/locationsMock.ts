@@ -1,6 +1,11 @@
-import { Location } from '../../interfaces/prisonApi/location'
+import Location from '../interfaces/prisonApi/Location'
 import { SelectOption } from '../../utils/utils'
+import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
+export const locationsApiMock: LocationsApiLocation[] = [
+  { id: 'location-1', localName: 'Local name one', key: 'ABC' },
+  { id: 'location-2', localName: 'Local name two', key: 'ABC' },
+]
 export const locationsMock: Location[] = [
   {
     locationId: 27000,
@@ -21,6 +26,17 @@ export const locationsMock: Location[] = [
     currentOccupancy: 0,
     locationPrefix: 'MDI-PROG_ACT-CHAP',
     userDescription: 'Chapel',
+  },
+]
+
+export const locationsApiSelectOptionsMock: SelectOption[] = [
+  {
+    text: 'Local name one',
+    value: 'location-1',
+  },
+  {
+    text: 'Local name two',
+    value: 'location-2',
   },
 ]
 

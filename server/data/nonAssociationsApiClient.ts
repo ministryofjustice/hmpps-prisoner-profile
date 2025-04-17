@@ -1,8 +1,8 @@
 import config from '../config'
-import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
+import { NonAssociationsApiClient } from './interfaces/nonAssociationsApi/nonAssociationsApiClient'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import { PrisonerNonAssociations } from '../interfaces/nonAssociationsApi/prisonerNonAssociations'
+import PrisonerNonAssociations from './interfaces/nonAssociationsApi/PrisonerNonAssociations'
 
 export default class NonAssociationsApiRestClient implements NonAssociationsApiClient {
   private restClient: RestClient

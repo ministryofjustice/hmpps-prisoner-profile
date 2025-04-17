@@ -2,17 +2,14 @@ import { Router } from 'express'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
-import { formatName, sortArrayOfObjectsByDate, SortType, userHasRoles } from '../utils/utils'
+import { userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import caseNotesRouter from './caseNotesRouter'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
-import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
@@ -25,10 +22,20 @@ import BeliefHistoryController from '../controllers/beliefHistoryController'
 import locationDetailsRouter from './locationDetailsRouter'
 import { getRequest } from './routerUtils'
 import probationDocumentsRouter from './probationDocumentsRouter'
+import visitsRouter from './visitsRouter'
+import addressRouter from './addressRouter'
+import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
+import CareNeedsController from '../controllers/careNeedsController'
+import permissionsGuard from '../middleware/permissionsGuard'
+import personalRouter from './personalRouter'
+import imageRouter from './imageRouter'
+
+export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   router.use(async (req, res, next) => {
     res.locals = {
@@ -39,10 +46,20 @@ export default function routes(services: Services): Router {
   })
 
   const overviewController = new OverviewController(
-    services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
     services.auditService,
+    services.offencesService,
+    services.moneyService,
+    services.adjudicationsService,
+    services.visitsService,
+    services.prisonerScheduleService,
+    services.incentivesService,
+    services.personalPageService,
+    services.offenderService,
+    services.professionalContactsService,
+    services.csipService,
+    services.contactsService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
@@ -50,12 +67,13 @@ export default function routes(services: Services): Router {
     services.auditService,
   )
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
+  const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
 
   get(
-    '/api/prisoner/:prisonerNumber/image',
+    `/api${basePath}/image`,
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     services.commonApiRoutes.prisonerImage,
   )
 
@@ -65,109 +83,64 @@ export default function routes(services: Services): Router {
     services.commonApiRoutes.image,
   )
 
-  get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
+  get(
+    '/api/distinguishing-mark-image/:imageId',
+    auditPageAccessAttempt({ services, page: ApiAction.Image }),
+    services.commonApiRoutes.distinguishingMarkImage,
+  )
 
   get(
-    '/prisoner/:prisonerNumber',
+    `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+      return overviewController.displayOverview(req, res)
     },
   )
 
   get(
-    '/prisoner/:prisonerNumber/image',
-    auditPageAccessAttempt({ services, page: Page.Photo }),
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-
-      await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.Photo,
-      })
-
-      res.render('pages/photoPage', {
-        pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user),
-      })
-    },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/personal',
-    auditPageAccessAttempt({ services, page: Page.Personal }),
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-
-      const { personalPageService } = services
-      const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
-
-      await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.Personal,
-      })
-
-      res.render('pages/personalPage', {
-        pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'personal'),
-        ...personalPageData,
-      })
-    },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/work-and-skills',
+    `${basePath}/work-and-skills`,
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    retrieveCuriousInPrisonCourses(services.curiousService),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { workAndSkillsPageService } = services
-      const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(
+        req.middleware.clientToken,
+        prisonerData,
+        res.locals.apiErrorCallback,
+      )
 
-      const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
-      const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
+      const canEditLearningAndWorkPlan = userHasRoles([Role.LearningAndWorkProgressManager], res.locals.user.userRoles)
 
+      const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
-        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+        curiousGoals.isFulfilled() &&
+        (curiousGoals.getOrNull()?.employmentGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.personalGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.shortTermGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.longTermGoals?.length > 0)
 
-      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
+      const hasAnyLwpGoals =
+        workAndSkillsPageData.personalLearningPlanActionPlan?.activeGoals?.length > 0 ||
+        workAndSkillsPageData.personalLearningPlanActionPlan?.archivedGoals?.length > 0 ||
+        workAndSkillsPageData.personalLearningPlanActionPlan?.completedGoals?.length > 0
+      const hasActiveLwpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.activeGoals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
-        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
-        workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
+        !curiousGoals.isFulfilled() || workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -175,36 +148,36 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'work-and-skills'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'work-and-skills'),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
         vc2goalsUrl,
-        canEditEducationWorkPlan,
+        canEditLearningAndWorkPlan,
         hasVc2Goals,
-        hasPlpGoals,
+        hasAnyLwpGoals,
+        hasActiveLwpGoals,
         problemRetrievingPrisonerGoalData,
       })
     },
   )
 
   get(
-    '/prisoner/:prisonerNumber/offences',
+    `${basePath}/offences`,
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { offencesPageService } = services
-      const { courtCaseData, releaseDates } = await offencesPageService.get(res.locals.clientToken, prisonerData)
+      const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -213,7 +186,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'offences'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'offences'),
         courtCaseData,
         releaseDates,
         activeTab: true,
@@ -229,12 +202,16 @@ export default function routes(services: Services): Router {
   router.use(goalsRouter(services))
   router.use(locationDetailsRouter(services))
   router.use(probationDocumentsRouter(services))
+  router.use(visitsRouter(services))
+  router.use(addressRouter(services))
+  router.use(personalRouter(services))
+  router.use(imageRouter(services))
 
   get(
-    '/prisoner/:prisonerNumber/schedule',
+    `${basePath}/schedule`,
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
@@ -242,41 +219,19 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/x-ray-body-scans',
+    `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    getPrisonerData(services, { minimal: true }),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-      const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
-
-      await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.XRayBodyScans,
-      })
-
-      res.render('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'x-ray-body-scans', true),
-        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
-          style: NameFormatStyle.firstLast,
-        }),
-        bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
-      })
+      return careNeedsController.displayXrayBodyScans(req, res)
     },
   )
 
   get(
-    '/prisoner/:prisonerNumber/location-history',
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    `${basePath}/location-history`,
+    getPrisonerData(services, { minimal: true }),
+    permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(
@@ -287,19 +242,29 @@ export default function routes(services: Services): Router {
   )
 
   router.use(
-    '/prisoner/:prisonerNumber/money',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+    `${basePath}/money`,
+    getPrisonerData(services, { minimal: true }),
+    permissionsGuard(services.permissionsService.getMoneyPermissions),
     moneyRouter(services),
   )
 
   get(
-    '/prisoner/:prisonerNumber/religion-belief-history',
+    `${basePath}/religion-belief-history`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
+    },
+  )
+
+  get(
+    `${basePath}/past-care-needs`,
+    auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
+    getPrisonerData(services, { minimal: true }),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    async (req, res, next) => {
+      return careNeedsController.displayPastCareNeeds(req, res)
     },
   )
 

@@ -1,24 +1,70 @@
-import { VideoLinkBookingForm } from '../../interfaces/whereaboutsApi/videoLinkBooking'
+import { VideoLinkBooking } from '../interfaces/bookAVideoLinkApi/VideoLinkBooking'
 
-export const videoLinkBookingMock: VideoLinkBookingForm = {
-  bookingId: 1,
-  court: undefined,
-  courtId: 'NEWC',
-  comment: 'Comment',
-  madeByTheCourt: false,
-  pre: {
-    locationId: 1,
-    startTime: '2023-01-01T10:00:00',
-    endTime: '2023-01-01T10:15:00',
-  },
-  main: {
-    locationId: 1,
-    startTime: '2023-01-01T10:15:00',
-    endTime: '2023-01-01T11:15:00',
-  },
-  post: {
-    locationId: 1,
-    startTime: '2023-01-01T11:15:00',
-    endTime: '2023-01-01T11:30:00',
+export const courtBookingMock: VideoLinkBooking = {
+  videoLinkBookingId: 1,
+  statusCode: 'ACTIVE',
+  bookingType: 'COURT',
+  courtCode: 'ABERCV',
+  courtDescription: 'Aberystwyth Civil',
+  courtHearingType: 'APPEAL',
+  courtHearingTypeDescription: 'Appeal',
+  comments: 'Comment',
+  videoLinkUrl: 'http://bvls.test.url',
+  prisonAppointments: [
+    {
+      prisonCode: 'MDI',
+      prisonLocKey: 'ABC',
+      prisonerNumber: 'ABC123',
+      appointmentDate: '2023-01-01',
+      startTime: '12:34',
+      endTime: '13:34',
+      appointmentType: 'VLB_COURT_MAIN',
+    },
+    {
+      prisonCode: 'MDI',
+      prisonLocKey: 'ABC',
+      prisonerNumber: 'ABC123',
+      appointmentDate: '2023-01-01',
+      startTime: '12:19',
+      endTime: '12:34',
+      appointmentType: 'VLB_COURT_PRE',
+    },
+    {
+      prisonCode: 'MDI',
+      prisonLocKey: 'ABC',
+      prisonerNumber: 'ABC123',
+      appointmentDate: '2023-01-01',
+      startTime: '13:34',
+      endTime: '13:49',
+      appointmentType: 'VLB_COURT_POST',
+    },
+  ],
+}
+
+export const probationBookingMock: VideoLinkBooking = {
+  videoLinkBookingId: 1,
+  statusCode: 'ACTIVE',
+  bookingType: 'PROBATION',
+  probationTeamCode: 'BLACKPP',
+  probationTeamDescription: 'Blackpool',
+  probationMeetingType: 'PSR',
+  probationMeetingTypeDescription: 'Post-sentence report',
+  comments: 'Comment',
+  videoLinkUrl: 'http://bvls.test.url',
+  prisonAppointments: [
+    {
+      prisonCode: 'MDI',
+      prisonLocKey: 'ABC',
+      prisonerNumber: 'ABC123',
+      appointmentDate: '2023-01-01',
+      startTime: '12:34',
+      endTime: '13:34',
+      appointmentType: 'VLB_PROBATION',
+    },
+  ],
+  additionalBookingDetails: {
+    contactName: 'Test name',
+    contactEmail: 'Test email',
+    contactNumber: 'Test number',
   },
 }

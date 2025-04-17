@@ -16,6 +16,7 @@ context('Prisoner schedule for this week ', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPrisonerSchedulePageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
@@ -48,6 +49,7 @@ context('Prisoner schedule for next week', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPrisonerSchedulePageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })

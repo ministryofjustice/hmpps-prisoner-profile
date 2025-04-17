@@ -1,5 +1,5 @@
 import { Validator } from '../middleware/validationMiddleware'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import { pluralise } from '../utils/pluralise'
 
 export const prisonApiAdditionalCaseNoteTextLength = 53

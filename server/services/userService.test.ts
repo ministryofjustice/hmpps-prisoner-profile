@@ -1,46 +1,57 @@
 import UserService from './userService'
-import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 const token = 'some token'
 
-jest.mock('../data/hmppsAuthClient')
-
-describe('User service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
+describe('HmppsUser service', () => {
+  let prisonApiClient: PrisonApiClient
   let userService: UserService
   let expectedCaseLoads: CaseLoad[]
 
-  describe('getUser', () => {
-    beforeEach(() => {
-      hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-      hmppsAuthClient.getUser.mockResolvedValue({ name: 'john smith' } as User)
+  beforeEach(() => {
+    prisonApiClient = prisonApiClientMock()
+    expectedCaseLoads = [{ caseloadFunction: '', caseLoadId: '1', currentlyActive: true, description: '', type: '' }]
+    prisonApiClient.getUserCaseLoads = jest.fn(async () => expectedCaseLoads)
 
-      const prisonApiClient = prisonApiClientMock()
-      expectedCaseLoads = [{ caseloadFunction: '', caseLoadId: '1', currentlyActive: true, description: '', type: '' }]
-      prisonApiClient.getUserCaseLoads = jest.fn(async () => expectedCaseLoads)
+    userService = new UserService(() => prisonApiClient)
+  })
 
-      userService = new UserService(
-        () => hmppsAuthClient,
-        () => prisonApiClient,
-      )
+  describe('getStaffRoles', () => {
+    describe('when the user is a prison user', () => {
+      it('should retrieve and return staff roles from prison api', async () => {
+        prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'role1' }, { role: 'role2' }])
+
+        const result = await userService.getStaffRoles(token, {
+          authSource: 'nomis',
+          staffId: 1,
+          activeCaseLoadId: 'MDI',
+        } as HmppsUser)
+
+        expect(result).toEqual([{ role: 'role1' }, { role: 'role2' }])
+      })
     })
 
-    it('Retrieves and formats user name', async () => {
-      const result = await userService.getUser(token)
-      expect(result.displayName).toEqual('John Smith')
+    describe('when the user is not a prison user', () => {
+      it.each(['delius', 'external'])('should return an empty list', async authSource => {
+        const result = await userService.getStaffRoles(token, { authSource } as HmppsUser)
+
+        expect(result).toEqual([])
+      })
     })
 
-    it('Retrieves case loads', async () => {
-      const result = await userService.getUserCaseLoads(token)
-      expect(result).toEqual(expectedCaseLoads)
-    })
+    describe('when the user does not have an active caseload', () => {
+      it('should return an empty list', async () => {
+        const result = await userService.getStaffRoles(token, {
+          authSource: 'nomis',
+          staffId: 1,
+          activeCaseLoadId: undefined,
+        } as HmppsUser)
 
-    it('Propagates error', async () => {
-      hmppsAuthClient.getUser.mockRejectedValue(new Error('some error'))
-
-      await expect(userService.getUser(token)).rejects.toEqual(new Error('some error'))
+        expect(result).toEqual([])
+      })
     })
   })
 })

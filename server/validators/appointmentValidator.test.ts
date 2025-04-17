@@ -1,16 +1,24 @@
 import { addDays, addYears, subDays } from 'date-fns'
 import { AppointmentValidator } from './appointmentValidator'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
+import config from '../config'
 
 const todayStr = formatDate(formatDateISO(new Date()), 'short')
 const futureDate = formatDateISO(addDays(new Date(), 7))
 const futureDateYear = formatDateISO(addYears(new Date(), 1))
 
-describe('Validation middleware', () => {
+describe.each([[true], [false]])('Validation middleware - VLPM feature toggle %s', toggle => {
+  beforeEach(() => {
+    config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = toggle
+  })
+
   it('should pass validation with good data', async () => {
     const appointmentForm = {
-      appointmentType: 'TYPE',
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
       location: '27000',
+      officerDetailsNotKnown: toggle ? 'true' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
       date: formatDate(futureDate, 'short'),
       startTimeHours: '10',
       startTimeMinutes: '30',
@@ -52,6 +60,153 @@ describe('Validation middleware', () => {
       { text: 'Enter the end time', href: '#endTime' },
       { text: 'Select if this is a recurring appointment or not', href: '#recurring' },
     ])
+  })
+
+  it('should fail validation with no data for VLPM type', async () => {
+    const appointmentForm = {
+      appointmentType: 'VLPM',
+      location: '27000',
+      date: formatDate(futureDate, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    if (toggle) {
+      expect(result).toEqual([
+        {
+          href: '#probationTeam',
+          text: 'Select the probation team',
+        },
+        {
+          href: '#officerDetailsOrUnknown',
+          text: "Enter the probation officer's details",
+        },
+        {
+          href: '#meetingType',
+          text: 'Select the meeting type',
+        },
+      ])
+    } else {
+      expect(result).toEqual([])
+    }
+  })
+
+  it('should fail validation when both not yet known selected and some officer details entered', async () => {
+    const appointmentForm = {
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
+      location: '27000',
+      officerDetailsNotKnown: toggle ? 'true' : undefined,
+      officerFullName: toggle ? 'Test name' : undefined,
+      officerEmail: toggle ? 'Test email' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
+      date: formatDate(futureDate, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    if (toggle) {
+      expect(result).toEqual([
+        {
+          href: '#officerDetailsOrUnknown',
+          text: "Enter either the probation officer's details, or select 'Not yet known'",
+        },
+      ])
+    } else {
+      expect(result).toEqual([])
+    }
+  })
+
+  it('should fail validation when officer details are not entered', async () => {
+    const appointmentForm = {
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
+      location: '27000',
+      officerFullName: toggle ? '' : undefined,
+      officerEmail: toggle ? '' : undefined,
+      officerTelephone: toggle ? '07777777777' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
+      date: formatDate(futureDate, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    if (toggle) {
+      expect(result).toEqual([
+        {
+          href: '#officerFullName',
+          text: "Enter the probation officer's full name",
+        },
+        {
+          href: '#officerEmail',
+          text: "Enter the probation officer's email address",
+        },
+      ])
+    } else {
+      expect(result).toEqual([])
+    }
+  })
+
+  it('should fail validation when for an invalid email and phone number', async () => {
+    const appointmentForm = {
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
+      location: '27000',
+      officerFullName: toggle ? 'Test name' : undefined,
+      officerEmail: toggle ? 'invalid' : undefined,
+      officerTelephone: toggle ? 'invalid' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
+      date: formatDate(futureDate, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    if (toggle) {
+      expect(result).toEqual([
+        {
+          href: '#officerEmail',
+          text: "'Enter a valid email address'",
+        },
+        {
+          href: '#officerTelephone',
+          text: 'Enter a valid UK phone number',
+        },
+      ])
+    } else {
+      expect(result).toEqual([])
+    }
   })
 
   it('should fail validation with bad data', async () => {
@@ -111,8 +266,11 @@ describe('Validation middleware', () => {
 
   it('should fail validation with date beyond a year in the future', async () => {
     const appointmentForm = {
-      appointmentType: 'TYPE',
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
       location: '27000',
+      officerDetailsNotKnown: toggle ? 'true' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
       date: formatDate(futureDateYear, 'short'),
       startTimeHours: '10',
       startTimeMinutes: '30',
@@ -138,8 +296,11 @@ describe('Validation middleware', () => {
   it('should pass validation with date befpre a year in the future', async () => {
     const dayBeforeFutureDateYear = formatDateISO(subDays(new Date(futureDateYear), 1))
     const appointmentForm = {
-      appointmentType: 'TYPE',
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
       location: '27000',
+      officerDetailsNotKnown: toggle ? 'true' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
       date: formatDate(dayBeforeFutureDateYear, 'short'),
       startTimeHours: '10',
       startTimeMinutes: '30',
@@ -238,8 +399,11 @@ describe('Validation middleware', () => {
   it('should fail validation with WEEKDAY repeats starting on a weekend', async () => {
     const nextWeekendDate = formatDateISO(addDays(new Date(), 6 - new Date().getDay() || 7))
     const appointmentForm = {
-      appointmentType: 'TYPE',
+      appointmentType: 'VLPM',
+      probationTeam: toggle ? 'TEAM_CODE' : undefined,
       location: '27000',
+      officerDetailsNotKnown: toggle ? 'true' : undefined,
+      meetingType: toggle ? 'MEETING_TYPE' : undefined,
       date: formatDate(nextWeekendDate, 'short'),
       startTimeHours: '10',
       startTimeMinutes: '30',

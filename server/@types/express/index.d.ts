@@ -1,14 +1,15 @@
-import { UserDetails } from '../../services/userService'
-import { HmppsError } from '../../interfaces/hmppsError'
+import HmppsError from '../../interfaces/HmppsError'
+import { HmppsUser } from '../../interfaces/HmppsUser'
+import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
+import { AlertSummaryData } from '../../data/interfaces/alertsApi/Alert'
+import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import { Permissions } from '../../services/permissionsService'
 
-export default {}
-
-declare module 'express-session' {
+export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    userDetails: UserDetails
     userBackLink: string
     movementSlipData: object
   }
@@ -26,9 +27,23 @@ export declare global {
       verified?: boolean
       id: string
       errors?: HmppsError[]
-      middleware?: Record
+      middleware?: {
+        clientToken?: string
+        prisonerData?: Prisoner
+        alertSummaryData?: AlertSummaryData
+        inmateDetail?: InmateDetail
+        usingGuard?: number
+        errors?: { [key: number]: Error[] }
+        permissions?: Permissions
+      }
+
       logout(done: (err: unknown) => void): void
+
       flash(type: string, message: unknown): number
+    }
+
+    interface Locals {
+      user: HmppsUser
     }
   }
 }

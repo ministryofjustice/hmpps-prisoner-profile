@@ -1,0 +1,31 @@
+export default interface ReleaseDates {
+  actualParoleDate: string
+  automaticReleaseDate: string
+  confirmedReleaseDate?: string
+  conditionalRelease: string
+  detentionTrainingOrderPostRecallDate: string
+  earlyRemovalSchemeEligibilityDate: string
+  earlyTermDate: string
+  earlyTransferDate: string
+  homeDetentionCurfewActualDate: string
+  homeDetentionCurfewEligibilityDate: string
+  lateTermDate: string
+  lateTransferDate: string
+  licenceExpiryDate?: string
+  midTermDate: string
+  midTransferDate: string
+  nonDtoReleaseDate: string
+  nonParoleDate: string
+  paroleEligibilityCalculatedDate: string
+  postRecallDate: string
+  releaseOnTemporaryLicenceDate: string
+  sentenceExpiryDate?: string
+  sentenceLicenceExpiryDate?: string
+  tariffDate: string
+  tariffEarlyRemovalSchemeEligibilityDate: string
+  topupSupervisionExpiryDate: string
+  automaticReleaseDateNonDto?: string
+  conditionalReleaseNonDto?: string
+  nonParoleDateNonDto?: string
+  postRecallDateNonDto?: string
+}

@@ -1,62 +1,64 @@
 import { Readable } from 'stream'
 import config from '../config'
 import RestClient from './restClient'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { PrisonApiClient } from './interfaces/prisonApiClient'
-import { AccountBalances } from '../interfaces/accountBalances'
-import { VisitSummary } from '../interfaces/visitSummary'
-import { VisitBalances } from '../interfaces/visitBalances'
-import { Assessment } from '../interfaces/prisonApi/assessment'
-import { ContactDetail } from '../interfaces/staffContacts'
+import CaseLoad from './interfaces/prisonApi/CaseLoad'
+import {
+  CaseNoteSummaryByTypesParams,
+  PrisonApiClient,
+  TransactionHistoryParams,
+} from './interfaces/prisonApi/prisonApiClient'
+import AccountBalances from './interfaces/prisonApi/AccountBalances'
+import VisitSummary from './interfaces/prisonApi/VisitSummary'
+import VisitBalances from './interfaces/prisonApi/VisitBalances'
+import Assessment from './interfaces/prisonApi/Assessment'
+import { ContactDetail } from './interfaces/prisonApi/StaffContacts'
 import { mapToQueryString } from '../utils/utils'
-import { CaseNote } from '../interfaces/caseNote'
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
-import { PrisonerDetail } from '../interfaces/prisonerDetail'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
-import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
-import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
-import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
-import { CourtCase } from '../interfaces/prisonApi/courtCase'
-import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
-import { OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
-import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
-import { Address } from '../interfaces/prisonApi/address'
-import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
-import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
-import { ReasonableAdjustments } from '../interfaces/prisonApi/reasonableAdjustment'
-import { CaseNoteUsage } from '../interfaces/prisonApi/caseNoteUsage'
+import CaseNote, { CaseNoteCount, CaseNoteUsage } from './interfaces/prisonApi/CaseNote'
+import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
+import PrisonerDetail from './interfaces/prisonApi/PrisonerDetail'
+import InmateDetail from './interfaces/prisonApi/InmateDetail'
+import PersonalCareNeeds from './interfaces/prisonApi/PersonalCareNeeds'
+import OffenderActivitiesHistory from './interfaces/prisonApi/OffenderActivitiesHistory'
+import OffenderAttendanceHistory from './interfaces/prisonApi/OffenderAttendanceHistory'
+import SecondaryLanguage from './interfaces/prisonApi/SecondaryLanguage'
+import PropertyContainer from './interfaces/prisonApi/PropertyContainer'
+import CourtCase from './interfaces/prisonApi/CourtCase'
+import OffenceHistoryDetail from './interfaces/prisonApi/OffenceHistoryDetail'
+import OffenderSentenceTerms from './interfaces/prisonApi/OffenderSentenceTerms'
+import PrisonerSentenceDetails from './interfaces/prisonApi/PrisonerSentenceDetails'
+import Address from './interfaces/prisonApi/Address'
+import ReferenceCode, { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
+import { ReasonableAdjustments } from './interfaces/prisonApi/ReasonableAdjustment'
 import { formatDateISO } from '../utils/dateHelpers'
-import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
-import { CourtDateResults } from '../interfaces/courtDateResults'
-import { MainOffence } from '../interfaces/prisonApi/mainOffence'
-import { FullStatus } from '../interfaces/prisonApi/fullStatus'
-import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
-import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
-import { StaffRole } from '../interfaces/prisonApi/staffRole'
-import { AgenciesEmail, AgencyDetails } from '../interfaces/prisonApi/agencies'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
-import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
-import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
-import { Alert, AlertChanges, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
-import { Transaction } from '../interfaces/prisonApi/transaction'
-import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
-import { Movement } from '../interfaces/prisonApi/movement'
+import CourtDateResults from './interfaces/prisonApi/CourtDateResults'
+import MainOffence from './interfaces/prisonApi/MainOffence'
+import FullStatus from './interfaces/prisonApi/FullStatus'
+import SentenceSummary from './interfaces/prisonApi/SentenceSummary'
+import OffenderIdentifier from './interfaces/prisonApi/OffenderIdentifier'
+import StaffRole from './interfaces/prisonApi/StaffRole'
+import { AgenciesEmail, AgencyDetails } from './interfaces/prisonApi/Agency'
+import StaffDetails from './interfaces/prisonApi/StaffDetails'
+import OffenderBooking from './interfaces/prisonApi/OffenderBooking'
+import OffenderCellHistory from './interfaces/prisonApi/OffenderCellHistoryInterface'
+import CsraAssessment, { CsraAssessmentSummary } from './interfaces/prisonApi/CsraAssessment'
+import Transaction from './interfaces/prisonApi/Transaction'
+import { DamageObligationContainer } from './interfaces/prisonApi/DamageObligation'
+import Movement from './interfaces/prisonApi/Movement'
 import { MovementType } from './enums/movementType'
-import { OffenderSentenceDetail } from '../interfaces/prisonApi/offenderSentenceDetail'
-import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
-import { Location } from '../interfaces/prisonApi/location'
-import { Details } from '../interfaces/prisonApi/details'
-import { AttributesForLocation } from '../interfaces/prisonApi/attributesForLocation'
-import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
-import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
-import { Telephone } from '../interfaces/prisonApi/telephone'
-import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
-import { Belief } from '../interfaces/prisonApi/belief'
-import { Reception } from '../interfaces/prisonApi/reception'
+import OffenderSentenceDetail from './interfaces/prisonApi/OffenderSentenceDetail'
+import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces/prisonApi/PrisonerSchedule'
+import Details from './interfaces/prisonApi/Details'
+import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
+import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
+import Telephone from './interfaces/prisonApi/Telephone'
+import Belief from './interfaces/prisonApi/Belief'
+import Reception from './interfaces/prisonApi/Reception'
+import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
+import PagedList, { VisitsListQueryParams } from './interfaces/prisonApi/PagedList'
+import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
+import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
+import CourtEvent from './interfaces/prisonApi/CourtEvent'
+import ImageDetails from './interfaces/prisonApi/ImageDetails'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -133,7 +135,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return prisoner
   }
 
-  async getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]> {
+  async getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]> {
     try {
       return await this.restClient.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` })
     } catch (error) {
@@ -168,18 +170,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
     return this.restClient.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
-  }
-
-  async getAlerts(bookingId: number, queryParams?: PagedListQueryParams): Promise<PagedList<Alert>> {
-    // Set defaults then apply queryParams
-    const params: PagedListQueryParams = {
-      size: queryParams?.showAll ? 9999 : 20,
-      ...queryParams,
-    }
-    return this.restClient.get<PagedList<Alert>>({
-      path: `/api/bookings/${bookingId}/alerts/v2`,
-      query: mapToQueryString(params),
-    })
   }
 
   async getProperty(bookingId: number): Promise<PropertyContainer[]> {
@@ -229,7 +219,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
+  async getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]> {
     return this.restClient.get<ReferenceCode[]>({
       path: `/api/reference-domains/domains/${domain}`,
       headers: { 'page-limit': '1000' },
@@ -277,9 +267,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]> {
+  async getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]> {
     return this.restClient.get<OffenderIdentifier[]>({
-      path: `/api/bookings/${bookingId}/identifiers`,
+      path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=false`,
     })
   }
 
@@ -290,7 +280,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]> {
-    return this.restClient.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles` })
+    return this.restClient.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles`, ignore404: true })
   }
 
   async getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {
@@ -300,7 +290,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
+  async getOffenderCellHistory(
+    bookingId: number,
+    params: { page?: number; size?: number },
+  ): Promise<OffenderCellHistory> {
     return this.restClient.get<OffenderCellHistory>({
       path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
     })
@@ -310,31 +303,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<StaffDetails>({ path: `/api/users/${username}`, ignore404: true })
   }
 
-  async getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]> {
+  async getInmatesAtLocation(locationId: number): Promise<OffenderBooking[]> {
     return this.restClient.get<OffenderBooking[]>({
-      path: `/api/locations/${locationId}/inmates?${mapToQueryString(params)}`,
+      path: `/api/locations/${locationId}/inmates`,
     })
-  }
-
-  async getAlertTypes(): Promise<AlertType[]> {
-    return this.restClient.get<AlertType[]>({
-      path: `/api/reference-domains/domains/ALERT?withSubCodes=true`,
-      headers: { 'page-limit': '1000' },
-    })
-  }
-
-  async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
-    return this.restClient.post<Alert>({
-      path: `/api/bookings/${bookingId}/alert`,
-      data: alert,
-    })
-  }
-
-  async updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert> {
-    return (await this.restClient.put({
-      path: `/api/bookings/${bookingId}/alert/${alertId}`,
-      data: alertChanges,
-    })) as Alert
   }
 
   async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
@@ -349,7 +321,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]> {
+  async getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]> {
     return this.restClient.get<Transaction[]>({
       path: `/api/offenders/${prisonerNumber}/transaction-history`,
       query: mapToQueryString(params),
@@ -381,10 +353,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query: mapToQueryString({ movementTypes, latestOnly }),
       data: prisonerNumbers,
     })) as Movement[]
-  }
-
-  async getLocationsForAppointments(agencyId: string): Promise<Location[]> {
-    return this.restClient.get<Location[]>({ path: `/api/agencies/${agencyId}/locations?eventType=APP` })
   }
 
   async getAppointmentTypes(): Promise<ReferenceCode[]> {
@@ -451,10 +419,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })) as PrisonerSchedule[]
   }
 
-  async getLocation(locationId: number): Promise<Location> {
-    return this.restClient.get<Location>({ path: `/api/locations/${locationId}` })
-  }
-
   async getActivitiesAtLocation(
     locationId: number,
     date: string,
@@ -486,10 +450,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getAttributesForLocation(locationId: string): Promise<AttributesForLocation> {
-    return this.restClient.get<AttributesForLocation>({ path: `/api/cell/${locationId}/attributes` })
-  }
-
   async getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
     return this.restClient.get<HistoryForLocationItem[]>({
       path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
@@ -519,12 +479,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getAlertDetails(bookingId: number, alertId: number): Promise<Alert> {
-    return this.restClient.get<Alert>({
-      path: `/api/bookings/${bookingId}/alerts/${alertId}`,
-    })
-  }
-
   async getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
     return this.restClient.get<Reception[]>({
       path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
@@ -535,6 +489,48 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<Belief[]>({
       path: `/api/offenders/${prisonerNumber}/belief-history`,
       query: bookingId ? `bookingId=${bookingId}` : undefined,
+    })
+  }
+
+  async getVisitsForBookingWithVisitors(
+    bookingId: number,
+    params: VisitsListQueryParams,
+  ): Promise<PagedList<VisitWithVisitors>> {
+    return this.restClient.get<PagedList<VisitWithVisitors>>({
+      path: `/api/bookings/${bookingId}/visits-with-visitors`,
+      query: mapToQueryString(params),
+    })
+  }
+
+  async getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]> {
+    return this.restClient.get<PrisonDetails[]>({
+      path: `/api/bookings/${bookingId}/visits/prisons`,
+    })
+  }
+
+  async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
+    return this.restClient.get<CourtEvent>({ path: `/api/court/${bookingId}/next-court-event` })
+  }
+
+  async getActiveCourtCasesCount(bookingId: number): Promise<number> {
+    return this.restClient.get<number>({ path: `/api/court/${bookingId}/count-active-cases` })
+  }
+
+  async getLatestArrivalDate(prisonerNumber: string): Promise<string> {
+    return this.restClient.get<string>({
+      path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
+    })
+  }
+
+  async getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]> {
+    return this.restClient.get<ImageDetails[]>({
+      path: `/api/images/offenders/${prisonerNumber}`,
+    })
+  }
+
+  async getImageDetail(imageId: number): Promise<ImageDetails> {
+    return this.restClient.get<ImageDetails>({
+      path: `/api/images/${imageId}`,
     })
   }
 }

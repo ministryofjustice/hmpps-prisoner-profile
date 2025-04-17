@@ -5,8 +5,8 @@ generic-service:
 
   ingress:
     host: prisoner-dev.digital.prison.service.justice.gov.uk
-    modsecurity_enabled: true
-    modsecurity_audit_enabled: true
+    modsecurity_enabled: false
+    modsecurity_audit_enabled: false
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
@@ -17,14 +17,18 @@ generic-service:
       SecRuleUpdateActionById 949110 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
       SecRuleUpdateActionById 959100 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
       SecAction "id:900000,phase:1,nolog,pass,t:none,setvar:tx.paranoia_level=2"
+
   env:
     ENVIRONMENT_NAME: "DEV"
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
+    CONTENTFUL_ENVIRONMENT: "master"
+    BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED: "true"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"
+    ASSESS_FOR_EARLY_RELEASE_UI_URL: "https://assess-for-early-release-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
     DPS_HOME_PAGE_URL: "https://digital-dev.prison.service.justice.gov.uk"
@@ -37,11 +41,15 @@ generic-service:
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-dev.prison.service.justice.gov.uk"
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk"
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-dev.prison.service.justice.gov.uk"
+    INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
+    CCRD_UI_URL: "https://court-cases-release-dates-dev.hmpps.service.justice.gov.uk"
+    CSIP_UI_URL: "https://csip-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
     ALLOCATION_MANAGER_ENDPOINT_URL: "https://dev.moic.service.justice.gov.uk"
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
+    BOOK_A_VIDEO_LINK_API_URL: "https://book-a-video-link-api-dev.prison.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://dev.offender-case-notes.service.justice.gov.uk"
     COMPLEXITY_OF_NEED_API_URL: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk"
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
@@ -51,14 +59,25 @@ generic-service:
     KEYWORKER_API_URL: "https://keyworker-api-dev.prison.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api-dev.hmpps.service.justice.gov.uk"
     MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk"
-    MANAGE_USERS_API_URL: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
     PATHFINDER_API_URL: "https://dev-api.pathfinder.service.justice.gov.uk"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-dev.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
+    LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk
+    NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
     RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api-dev.hmpps.service.justice.gov.uk"
+    PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
+    CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
+    ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
+    PERSON_INTEGRATION_API_URL: "https://person-integration-api-dev.hmpps.service.justice.gov.uk"
+    CSIP_API_URL: "https://csip-api-dev.hmpps.service.justice.gov.uk"
+    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-dev.hmpps.service.justice.gov.uk"
+    CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
+    PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api-dev.hmpps.service.justice.gov.uk"
+    PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-dev.hmpps.service.justice.gov.uk"
+
     # Feature flags
     AUDIT_ENABLED: "true"
     COMPONENT_API_LATEST: "true"
@@ -66,7 +85,26 @@ generic-service:
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS: "AGI,BZI,DHI,DWI,ESI,EWI,FHI,LNI,NHI,PFI,SDI,STI"
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
-    USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
+    USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
+    COURT_CASES_SUMMARY_ENABLED: "true"
+    DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
+    DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"
+    DIET_AND_ALLERGY_ENABLED_FROM: "2025-04-11T13:00:00"
+    EDIT_PROFILE_ENABLED: "true"
+    EDIT_PROFILE_ENABLED_PRISONS: "KMI"
+    MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
+    EXTERNAL_CONTACTS_ENABLED_PRISONS: "KMI"
+    NEW_OVERVIEW_PAGE_LAYOUT_ENABLED: "true"
+
+  scheduledDowntime:
+    enabled: true
+    startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
+    shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
+
+  elastiCacheAlertsClusterIds:
+    cp-263d93efba298fad-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-263d93efba298fad-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"

@@ -11,7 +11,7 @@ export default function setUpStaticResources(): Router {
   router.use(compression())
 
   //  Static Resources Configuration
-  const cacheControl = { maxAge: config.staticResourceCacheDuration * 1000 }
+  const cacheControl = { maxAge: config.staticResourceCacheDuration }
 
   Array.of(
     '/assets',
@@ -22,6 +22,7 @@ export default function setUpStaticResources(): Router {
     '/node_modules/@ministryofjustice/frontend/moj/assets',
     '/node_modules/@ministryofjustice/frontend',
     '/node_modules/jquery/dist',
+    '/node_modules/cropperjs/dist',
   ).forEach(dir => {
     router.use('/assets', express.static(path.join(process.cwd(), dir), cacheControl))
   })

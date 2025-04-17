@@ -1,0 +1,22 @@
+.hmpps-api-error-banner {
+  padding: 16px 22px;
+  background-color: govuk-colour('light-grey');
+  border-left: 8px solid govuk-colour('red');
+  margin-top: 20px;
+
+  p {
+    font-size: 19px;
+    line-height: 25px;
+    font-weight: 700;
+    color: govuk-colour('black');
+    margin: 5px 0;
+  }
+
+  p + p {
+    font-size: 19px;
+    line-height: 25px;
+    font-weight: 300;
+    color: govuk-colour('black');
+    margin-top: 0;
+  }
+}

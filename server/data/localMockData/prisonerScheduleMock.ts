@@ -1,6 +1,5 @@
 import { add, format, startOfToday } from 'date-fns'
-import { formatDate } from '../../utils/dateHelpers'
-import { ScheduledEvent } from '../../interfaces/scheduledEvent'
+import ScheduledEvent from '../interfaces/prisonApi/ScheduledEvent'
 
 export const PrisonerScheduleThisWeekMock = {
   pageTitle: 'Schedule',
@@ -9,10 +8,7 @@ export const PrisonerScheduleThisWeekMock = {
   prisonId: 'MDI',
   days: [
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 0 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 0 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -20,10 +16,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 1 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 1 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -31,10 +24,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 2 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 2 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -42,10 +32,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 3 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 3 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -53,10 +40,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 4 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 4 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -64,10 +48,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 5 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 5 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -75,10 +56,7 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 6 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 6 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -97,10 +75,7 @@ export const PrisonerScheduleNextWeekMock = {
   prisonId: 'MDI',
   days: [
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 7 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 7 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -108,10 +83,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 8 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 8 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -119,10 +91,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 9 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 9 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -130,10 +99,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 10 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 10 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -141,10 +107,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 11 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 11 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -152,10 +115,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 12 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 12 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],
@@ -163,10 +123,7 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
     {
-      date: formatDate(new Date(format(add(startOfToday(), { days: 13 }), 'd MMMM yyyy')).toString(), 'full').replace(
-        ',',
-        '',
-      ),
+      date: format(add(startOfToday(), { days: 13 }), 'EEEE d MMMM yyyy'),
       periods: {
         afternoonActivities: undefined as ScheduledEvent[],
         eveningActivities: undefined as ScheduledEvent[],

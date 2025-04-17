@@ -1,9 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import PathfinderApiRestClient from './pathfinderApiClient'
-import { PathfinderApiClient } from './interfaces/pathfinderApiClient'
-
-jest.mock('./tokenStore')
+import { PathfinderApiClient } from './interfaces/pathfinderApi/pathfinderApiClient'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

@@ -1,0 +1,158 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "../../macros/otherLanguagesText.njk" import otherLanguagesText %}
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: miniBannerData.prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + prisonerNumber + "/personal"
+    }
+] %}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+    {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            }) }}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">{{ title }}</h1>
+
+                <form id="otherLanguagesForm" method="post" novalidate="novalidate" autocomplete="off">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <input type="hidden" id="languageError" name="languageError" value="{{ invalidInput }}" />
+
+                    {{ govukSelect({
+                        id: "language",
+                        name: "language",
+                        label: {
+                            text: languageLabel,
+                            classes: 'govuk-label--s'
+                        },
+                        items: languageOptions,
+                        errorMessage: errors | findError("language"),
+                        classes: "js-autocomplete-select",
+                        attributes: {
+                            "data-qa": "select-language-input"
+                        }
+                    }) }}
+
+                    {% call govukFieldset({
+                        legend: {
+                            text: 'Which skills do they have in this language?',
+                            classes: "govuk-fieldset__legend--s",
+                            isPageHeading: false
+                        }
+                    }) %}
+                        {{ govukCheckboxes({
+                            name: "languageSkills",
+                            hint: { text: 'Select all that apply.' },
+                            items: [
+                                {
+                                    value: "canSpeak",
+                                    text: "Speaks",
+                                    checked: formValues.canSpeak
+                                },
+                                {
+                                    value: "canWrite",
+                                    text: "Writes",
+                                    checked: formValues.canWrite
+                                },
+                                {
+                                    value: "canRead",
+                                    text: "Reads",
+                                    checked: formValues.canRead
+                                }
+                            ]
+                        }) }}
+                    {% endcall %}
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Save and add another language",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            classes: "js-autocomplete-submit govuk-button--secondary",
+                            attributes: { name: "action", value: "another", "data-qa": "save-and-add-another-button" }
+                        }) }}
+                    </div>
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Save",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            classes: "js-autocomplete-submit",
+                            attributes: { "data-qa": "save-button" }
+                        }) }}
+                        <a href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
+                            class="govuk-link govuk-link--no-visited-state"
+                            data-qa="cancel-button">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <aside class="other-languages-sidebar">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Main language</h2>
+                    {% if not (mainLanguage.preferredSpokenLanguage or mainLanguage.preferredWrittenLanguage) %}
+                        <div data-qa="no-language-entered">Not entered</div>
+                    {% else %}
+                        <div data-qa="spoken-language">
+                            {% if mainLanguage.preferredSpokenLanguage %}
+                                {{ mainLanguage.preferredSpokenLanguage.description }}
+                                {{ "(interpreter required)" if mainLanguage.interpreterRequired }}
+                            {% endif %}
+                        </div>
+                        <div data-qa="written-language">
+                            {% if mainLanguage.preferredWrittenLanguage and mainLanguage.preferredWrittenLanguage.code != mainLanguage.preferredSpokenLanguage.code %}
+                                {{ mainLanguage.preferredWrittenLanguage.description }}
+                                (written)
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if otherLanguages.length > 0 %}
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-4">Other languages</h2>
+                    {% for lang in otherLanguages %}
+                        <div class="govuk-!-padding-bottom-2">
+                            {{ lang.language.description }} ({{ otherLanguagesText(lang, false) }})
+                        </div>
+                    {% endfor %}
+                </aside>
+                {% endif %}
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/accessible-autocomplete.min.js"></script>
+    <script src="/assets/js/languages.js"></script>
+{% endblock %}

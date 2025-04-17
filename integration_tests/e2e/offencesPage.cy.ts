@@ -23,6 +23,7 @@ context('Offences Page Sentenced', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })

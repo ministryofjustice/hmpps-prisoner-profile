@@ -1,5 +1,19 @@
-import { add, addBusinessDays, addDays, addMonths, addWeeks, format, formatISO, isValid, parse } from 'date-fns'
+import {
+  add,
+  addBusinessDays,
+  addDays,
+  addMonths,
+  addWeeks,
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+  format,
+  formatISO,
+  isValid,
+  parse,
+} from 'date-fns'
 import logger from '../../logger'
+import { pluralise } from './pluralise'
 
 /**
  * Format a Date object as an ISO-8601 string, rendering only the date part.
@@ -81,23 +95,32 @@ export const isRealDate = (date: string): boolean => {
  * Formats an ISO-8601 date string to standard gov.uk display format, e.g. 20 January 2023
  *
  * Also supports passing in an optional style string to output other standard formats:
- * short, full and medium - e.g. '20/01/2023', 'Friday, 20 January 2023' and '20 Jan 2023'
+ * short, full and medium - e.g. '20/01/2023', 'Friday 20 January 2023' and '20 Jan 2023'
+ *
+ * Note, that we additionally remove commas from the 'full' format.
  *
  * @param isoDate ISO-8601 format date string
  * @param style formatting style to use - long (default), short, full, medium
+ * @param emptyReturnValue optional string to return if the input date is empty
  * @returns formatted date string
  */
-export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | 'medium' = 'long'): string => {
-  if (!isoDate) return ''
+export const formatDate = (
+  isoDate: string,
+  style: 'short' | 'full' | 'long' | 'medium' = 'long',
+  emptyReturnValue: string = '',
+): string => {
+  if (!isoDate) return emptyReturnValue
 
-  return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
+  return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })?.replaceAll(',', '')
 }
 
 /**
  * Formats an ISO-8601 datetime string to a human readable string, e.g. 20 January 2023 at 16:27
  *
  * Also supports passing in an optional style string to output other standard formats:
- * short, full and medium - e.g. '20/01/2023 16:27', 'Friday, 20 January 2023 at 16:27' and '20 Jan 2023 at 16:27'
+ * short, full and medium - e.g. '20/01/2023 16:27', 'Friday 20 January 2023 at 16:27' and '20 Jan 2023 at 16:27'
+ *
+ * Note, that we additionally remove commas from the 'full' format.
  *
  * @param isoDate ISO-8601 format date string
  * @param style formatting style to use - long (default), short, full, medium
@@ -111,7 +134,7 @@ export const formatDateTime = (
 ): string => {
   if (!isoDate) return ''
 
-  let datetimeStr = new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
+  let datetimeStr = formatDate(isoDate, style)
   if (!separator) {
     if (style === 'short') {
       datetimeStr += ' '
@@ -158,4 +181,58 @@ export const calculateEndDate = (startDate: Date, repeatPeriod: string, times: n
     default:
       return null
   }
+}
+
+/**
+ * Formats the date of birth into an age string
+ * Return 'date of birth not entered' if none is given
+ * @param dateOfBirth date of birth in the format yyyy-MM-dd
+ * @returns age with correct number of days and months
+ */
+export const ageAsString = (dateOfBirth?: string): string => {
+  if (!dateOfBirth) return 'date of birth not entered'
+
+  const ageInYears = differenceInYears(new Date(), new Date(dateOfBirth))
+
+  if (ageInYears === 0) {
+    const parsedDate = new Date(dateOfBirth)
+    const months = differenceInMonths(new Date(), parsedDate)
+
+    if (months === 0) {
+      const days = differenceInDays(new Date(), parsedDate)
+      return `${pluralise(days, 'day')} old`
+    }
+
+    return `${pluralise(months, 'month')} old`
+  }
+  return `${pluralise(ageInYears, 'year')} old`
+}
+
+/**
+ * Formats an ISO-8601 date string as month and year for addresses, e.g. January 2023
+ *
+ * @param isoDate ISO-8601 format date string
+ * @returns formatted date string
+ */
+export const formatAddressDate = (isoDate: string): string => {
+  if (!isoDate) return ''
+
+  return format(isoDate, 'MMMM yyyy')
+}
+
+export const formatDateToPattern = (isoDate: string, pattern: string, emptyReturnValue: string = ''): string => {
+  if (!isoDate) return emptyReturnValue
+
+  return format(isoDate, pattern)
+}
+
+export const formatDateWithAge = (
+  isoDate: string,
+  style: 'short' | 'full' | 'long' | 'medium' = 'long',
+  emptyReturnValue: string = '',
+) => {
+  if (!isoDate) return emptyReturnValue
+
+  const formattedDate = formatDate(isoDate, style, emptyReturnValue)
+  return `${formattedDate} (${ageAsString(isoDate)})`
 }

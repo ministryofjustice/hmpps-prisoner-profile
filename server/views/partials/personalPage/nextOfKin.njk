@@ -1,55 +1,100 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from "../../macros/arrayToLines.njk" import arrayToLines %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% macro prisonerContact(contactInfo) %}
-  <div class="hmpps-contact" data-qa="emergency-contact">
-    {% if contactInfo.emergencyContact | default(false) %}
-      <p class="hmpps-contact__emergency-contact" data-qa="contact-emergency-contact">Emergency contact</p>
-    {% endif %}
-    <p class="hmpps-contact__next-of-kin">Next of kin</p>
-    <p class="hmpps-contact__name" data-qa="contact-name">{{ contactInfo.name }}</p>
-    <p class="hmpps-contact__relationship" data-qa="contact-relationship">{{ contactInfo.relationship }}</p>
-    <p class="hmpps-contact__contact-number" data-qa="contact-numbers">
-      {% for phone in contactInfo.phoneNumbers %}
-        {{ phone }} <br />
-      {% endfor %}
-    </p>
-    <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
-      <summary class="govuk-details__summary govuk-!-display-none-print">
-        <span class="govuk-details__summary-text">View details</span>
-      </summary>
-      <div class="govuk-details__text" data-qa="contact-details">
-        {{ govukSummaryList({
-        rows: [
-          { key: { text: "Address"}, value: { html: arrayToLines(contactInfo.address.address | addressToLines, "Not entered")} },
-          { key: { text: "Address type"}, value: { html: arrayToLines(contactInfo.address.addressTypes, "Not entered")} },
-          { key: { text: "Address phone"}, value: { html: arrayToLines(contactInfo.address.phones, "Not entered")} },
-          { key: { text: "Email"}, value: { html: arrayToLines(contactInfo.emails, "Not entered")} }
-        ]
-      }) }}
-      </div>
-    </details>
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+
+{% macro additionalDetails(contact) %}
+  <div class="contact-additional-details">
+    {{ govukSummaryList({
+      classes: 'govuk-summary-list--no-border',
+      rows: [
+        {
+          key: {
+            text: "Date of birth"
+          },
+          value: {
+            text: contact.dateOfBirth | formatDateWithAge('long', 'Not entered')
+          },
+          attributes: {
+            'data-qa': 'contact-date-of-birth'
+          }
+        },
+        {
+          key: {
+            text: "Address"
+          },
+          value: {
+            html: contact | contactAddressToHtml
+          },
+          attributes: {
+            'data-qa': 'contact-address'
+          }
+        }
+      ]
+    }) }}
   </div>
 {% endmacro %}
-{%- call summaryCard({title: "Next of kin", id: "next-of-kin"}) -%}
-  <div class="govuk-grid-row" data-qa="next-of-kin">
-    <div class="govuk-grid-column-full">
-      {% if not nextOfKin.length %}
-        <p>No next of kin entered.</p>
-      {% endif %}
-      {% for contact in nextOfKin %}
-        {{ prisonerContact({
-          emergencyContact: contact.emergencyContact,
-          name: contact.name,
-          relationship: contact.relationship,
-          phoneNumbers: contact.phones,
-          emails: contact.emails,
-          address: contact.address
-        }) }}
-        {% if not loop.last %}
-        <hr class="govuk-section-break govuk-section-break--visible" />
+
+
+{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'next-of-kin-emergency-contacts' }] if editEnabled }) -%}
+  {% if not hasNextOfKin %}
+    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
+      <div class="govuk-grid-column-full">
+        {% if newArrival72 %}
+          <div class="not-entered-tag not-entered-tag--heading">Not entered</div>
         {% endif %}
-      {% endfor %}
+        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-3">No next of kin</h3>
+        <p>No contact details have been entered.</p>
+      </div>
     </div>
-  </div>
+  {% endif %}
+  {% if not hasNextOfKin and not hasEmergencyContact %}
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+  {% endif %}
+  {% if not hasEmergencyContact %}
+    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
+      <div class="govuk-grid-column-full">
+        {% if newArrival72 %}
+          <div class="not-entered-tag not-entered-tag--heading">Not entered</div>
+        {% endif %}
+        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-3">No emergency contact</h3>
+        <p>No contact details have been entered.</p>
+      </div>
+    </div>
+  {% endif %}
+  {% if hasNextOfKin != hasEmergencyContact %}
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+  {% endif %}
+  {% for contact in nextOfKinAndEmergencyContacts %}
+    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
+      <div class="govuk-grid-column-full">
+        <div class="contact-status-bar">
+          <div class="contact-type-pills">
+            {% if contact.isNextOfKin %}
+            <div class="contact-type-pill contact-type-pill--next-of-kin" data-qa="next-of-kin">
+              <span>Next of kin</span>
+            </div>
+            {% endif %}
+            {% if contact.isEmergencyContact %}
+            <div class="contact-type-pill contact-type-pill--emergency-contact" data-qa="emergency-contact">
+              <span>Emergency contact</span>
+            </div>
+            {% endif %}
+          </div>
+          {% if editEnabled %}
+          <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact's details</a></div>
+          {% endif %}
+        </div>
+        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
+        <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
+        <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1 {{ 'hmpps-red-text' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
+        {{ govukDetails({
+          summaryText: "Additional details",
+          html: additionalDetails(contact)
+        }) }}
+      </div>
+    </div>
+    {% if not loop.last %}
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+    {% endif %}
+  {% endfor %}
 {%- endcall -%}

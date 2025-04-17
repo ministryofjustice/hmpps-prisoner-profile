@@ -1,0 +1,169 @@
+{% extends "../../partials/layout.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+  {
+  text: 'Digital Prison Services',
+  href:  "/" | prependBaseUrl
+  },
+  {
+  text: breadcrumbPrisonerName,
+  href: "/prisoner/" + prisonerNumber
+  },
+  {
+  text: 'Personal',
+  href: "/prisoner/" + prisonerNumber + "/personal"
+  }
+  ]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+{% block body %}
+  {% set currentReligionHtml %}
+    {% if currentReligion %}
+      <span>
+        <b>Current religion, faith or belief:</b>
+        {% if currentReligion.description %}
+          {{ currentReligion.description }}
+        {% else %}
+          {{ currentReligion }}
+        {% endif %}
+      </span>
+    {% endif %}
+  {% endset %}
+  {% set reasonForChangeKnownHtml -%}
+    {{ govukTextarea({
+      name: "reasonForChange",
+      id: "reason-for-change-known",
+      value: currentReasonForChange,
+      errorMessage: errors | findError('reasonForChange'),
+      label: {
+        text: "Enter why this person's religion, faith or belief has changed"
+      }
+    }) }}
+  {% endset -%}
+  {% set reasonForChangeUnknownHtml -%}
+    {{ govukTextarea({
+      name: "reasonForChangeUnknown",
+      id: "reason-for-change-unknown",
+      value: currentReasonForChangeUnknown,
+      label: {
+        text: "Give details (optional)"
+      }
+    }) }}
+  {% endset -%}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData) }}
+    </div>
+  </div>
+
+  {% if errors.length > 0 %}
+    {{
+      govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errors,
+          attributes: { 'data-qa-errors': true },
+          classes: 'govuk-!-margin-bottom-6'
+      })
+    }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h1>Religion, faith or belief</h1>
+      {% if currentReligion %}
+        {{ govukInsetText({
+          id: "current-religion-display",
+          html: currentReligionHtml,
+          classes: "govuk-!-margin-top-2"
+        }) }}
+      {% endif %}
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <input type="hidden" name="currentReligionCode" value="{{ currentReligion.code }}" />
+        <div class="govuk-form-group">
+          {{ govukRadios({
+            idPrefix: "radio",
+            name: "religion",
+            errorMessage: errors | findError("religion"),
+            fieldset: {
+              classes: "religion-radio-fieldset",
+              legend: {
+                text: formTitle,
+                isPageHeading: false,
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            hint: {
+              text: hintText
+            },
+            items: options
+          }) }}
+        </div>
+
+        {% if currentReligion %}
+          {{ govukRadios({
+            idPrefix: "radio-yes-no",
+            name: "reasonKnown",
+            errorMessage: errors | findError("reasonKnown"),
+            fieldset: {
+              id: "reasonRadioFieldset",
+              legend: {
+                text: "Do you know why this has changed?",
+                isPageHeading: false,
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                value: "YES",
+                text: "Yes",
+                checked: currentReasonKnown === 'YES',
+                conditional: {
+                  html: reasonForChangeKnownHtml
+                }
+              },
+              {
+                value: "NO",
+                text: "No",
+                checked: currentReasonKnown === 'NO',
+                conditional: {
+                  html: reasonForChangeUnknownHtml
+                }
+              }
+            ]
+          }) }}
+          {{ govukWarningText({
+            text: "This will record a new religion, faith or belief. The current religion, faith or belief will be made inactive."
+          }) }}
+        {% endif %}
+
+        <div class="govuk-button-group">
+          {{
+          govukButton({
+            text: "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            })
+          }}
+          <a href="/prisoner/{{ prisonerNumber }}/personal#appearance" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% endblock %}

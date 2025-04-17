@@ -22,14 +22,6 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
   })
 
-  it('User name visible in header', () => {
-    cy.setupUserAuth()
-    cy.signIn()
-    cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerUserName().should('contain.text', 'J. Smith')
-  })
-
   it('User with prison role has access', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
 
@@ -38,16 +30,14 @@ context('SignIn', () => {
     Page.verifyOnPage(IndexPage)
   })
 
-  it('User with Global Search role has access', () => {
+  it('User with only global search role denied access', () => {
     cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
-    cy.signIn()
-    cy.visit('/prisoner/G6123VU')
-    Page.verifyOnPage(IndexPage)
+    cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
+    Page.verifyOnPage(AuthErrorPage)
   })
 
-  it('User with neither prison or global search role denied access', () => {
+  it('User without prison role denied access', () => {
     cy.setupUserAuth({ roles: ['ROLE_SOMETHING_ELSE'] })
-
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
     Page.verifyOnPage(AuthErrorPage)
   })
@@ -56,8 +46,8 @@ context('SignIn', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.signOut().click()
+    Page.verifyOnPage(IndexPage)
+    cy.visit('/sign-out')
     Page.verifyOnPage(AuthSignInPage)
   })
 
@@ -76,17 +66,18 @@ context('SignIn', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
+    Page.verifyOnPage(IndexPage)
+
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
     cy.request('/prisoner/G6123VU').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubAuthUser', { name: 'bobby brown' })
+    cy.setupUserAuth({ name: 'bobby brown', roles: ['ROLE_PRISON'] })
     cy.signIn()
 
-    indexPage.headerUserName().contains('B. Brown')
+    Page.verifyOnPage(IndexPage)
   })
 
   it('Root URL redirects to DPS home page', () => {

@@ -1,0 +1,70 @@
+{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href: '/'
+  },
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+{% extends "../partials/layout.njk" %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row" data-qa="prisoner-photo-page">
+    <div class="govuk-grid-column-full">
+      {{ mojSubNavigation({
+      label: 'Sub navigation',
+      classes: 'govuk-!-margin-bottom-6',
+      items: [{
+          text: 'Main facial image',
+          href: '/prisoner/' + prisonerNumber + '/image'
+        }, 
+        {
+          text: 'All facial images',
+          href: '/prisoner/' + prisonerNumber + '/image/all',
+          active: true
+        }
+      ]
+    }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row govuk-!-margin-bottom-4">
+    <div class="govuk-grid-column-full">
+      <div class="photo-feedback-banner govuk-!-margin-bottom-5">This is a <span class="govuk-!-font-weight-bold">new page in DPS</span>. <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a> (opens in a new tab)</div>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-0">All facial images</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row hmpps-photo-list" data-qa="image-list">
+    <div class="govuk-grid-column-three-quarters">
+      {% for image in facialImages %}
+        <div
+          class="govuk-grid-row govuk-!-margin-left-0 govuk-!-margin-right-0
+                                    hmpps-photo-list__item {{ "
+          hmpps-photo-list__main" if image.main }}"
+          data-qa="image-list-item">
+          <div class="hmpps-photo-list__photo" data-qa="image-item-photo">
+            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
+          </div>
+          <div class="hmpps-photo-list__details" data-qa="image-item-details">
+            {% if image.main %}
+              {{ govukTag({
+                text: "Main facial image",
+                classes: "govuk-!-margin-bottom-2 govuk-!-margin-top-0"
+              }) }}
+            {% endif %}
+            <p class="govuk-body">{{ image.uploadedDateTime }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,5 +1,6 @@
-import { Status } from '../../interfaces/status'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
+type Status = OverviewPageData['statuses'][number]
 export const pregnantStatusMock: Status = {
   label: 'Pregnant',
   date: '20/01/2023',

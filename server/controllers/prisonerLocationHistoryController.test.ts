@@ -3,16 +3,17 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import PrisonerLocationHistoryController from './prisonerLocationHistoryController'
 import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
-import { GetAttributesForLocation } from '../data/localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
-import prisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
+import PrisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
+import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
+import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
 
 describe('Specific Prisoner Location History', () => {
   const offenderNo = 'ABC123'
@@ -23,6 +24,7 @@ describe('Specific Prisoner Location History', () => {
   beforeEach(() => {
     req = {
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
@@ -34,7 +36,6 @@ describe('Specific Prisoner Location History', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           userRoles: [],
           staffId: 487023,
@@ -47,12 +48,13 @@ describe('Specific Prisoner Location History', () => {
     }
 
     const prisonApiClient = prisonApiClientMock()
+    const locationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()
+    const nomisSyncPrisonerMappingApiClient = nomisSyncPrisonerMappingApiClientMock()
     const whereaboutsApiClient: WhereaboutsApiClient = {
+      getAppointment: jest.fn(),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
-      addVideoLinkBooking: jest.fn(),
       createAppointments: jest.fn(),
-      getCourts: jest.fn(),
     }
 
     const caseNotesApiClient = {
@@ -60,13 +62,12 @@ describe('Specific Prisoner Location History', () => {
       getCaseNoteTypesForUser: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
-      updateCaseNote: jest.fn(),
+      addCaseNoteAmendment: jest.fn(),
       getCaseNote: jest.fn(),
     }
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-    prisonApiClient.getAttributesForLocation = jest.fn().mockResolvedValue(GetAttributesForLocation)
     prisonApiClient.getHistoryForLocation = jest.fn().mockResolvedValue(mockHistoryForLocation())
     prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(agencyDetailsMock)
     prisonApiClient.getUserCaseLoads = jest.fn().mockResolvedValue(CaseLoadsDummyDataA)
@@ -75,12 +76,28 @@ describe('Specific Prisoner Location History', () => {
     whereaboutsApiClient.getCellMoveReason = jest.fn().mockResolvedValue(CellMoveReasonMock)
     caseNotesApiClient.getCaseNote = jest.fn().mockResolvedValue(pagedCaseNotesMock.content[0])
 
+    nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest
+      .fn()
+      .mockResolvedValue({ dpsLocationId: 'abcdefg' })
+
+    locationsInsidePrisonApiClient.getLocation = jest.fn().mockResolvedValue({
+      localName: 'Cell 1',
+      key: 'LEI-1-1',
+    })
+
+    locationsInsidePrisonApiClient.getLocationAttributes = jest.fn().mockResolvedValue([
+      { code: 'LISTENER_CRISIS', description: 'Listener / crisis cell' },
+      { code: 'SO', description: 'Single occupancy' },
+    ])
+
     controller = new PrisonerLocationHistoryController(
-      prisonerLocationHistoryService({
-        prisonApiClientBuilder: () => prisonApiClient,
-        whereaboutsApiClientBuilder: () => whereaboutsApiClient,
-        caseNotesApiClientBuilder: () => caseNotesApiClient,
-      }),
+      new PrisonerLocationHistoryService(
+        () => prisonApiClient,
+        () => whereaboutsApiClient,
+        () => caseNotesApiClient,
+        () => locationsInsidePrisonApiClient,
+        () => nomisSyncPrisonerMappingApiClient,
+      ),
     )
   })
 
@@ -97,9 +114,10 @@ describe('Specific Prisoner Location History', () => {
           locationDetails: {
             attributes: [
               {
-                code: 'LC',
-                description: 'Listener Cell',
+                code: 'LISTENER_CRISIS',
+                description: 'Listener / crisis cell',
               },
+              { code: 'SO', description: 'Single occupancy' },
             ],
             description: 'Leeds (HMP)',
             movedBy: 'John Smith',

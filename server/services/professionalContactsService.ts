@@ -1,16 +1,33 @@
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { getNamesFromString, sortByDateTime } from '../utils/utils'
-import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
-import { Address } from '../interfaces/prisonApi/address'
-import { Pom } from '../interfaces/pom'
-import { Contact, PomContact } from '../interfaces/staffContacts'
-import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
-import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
-import { KeyWorker } from '../interfaces/keyWorker'
-import { AgenciesEmail } from '../interfaces/prisonApi/agencies'
-import { Telephone } from '../interfaces/prisonApi/telephone'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import {
+  convertToTitleCase,
+  formatCommunityManager,
+  formatName,
+  formatPomName,
+  getNamesFromString,
+  sortArrayOfObjectsByDate,
+  sortByDateTime,
+  SortType,
+} from '../utils/utils'
+import Address from '../data/interfaces/prisonApi/Address'
+import StaffContacts, { Contact, YouthStaffContacts } from '../data/interfaces/prisonApi/StaffContacts'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
+import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
+import KeyWorker from '../data/interfaces/keyWorkerApi/KeyWorker'
+import { AgenciesEmail } from '../data/interfaces/prisonApi/Agency'
+import Telephone from '../data/interfaces/prisonApi/Telephone'
+import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
+import { Result } from '../utils/result/result'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import { ContactRelationship } from '../data/enums/ContactRelationship'
+import { formatDate } from '../utils/dateHelpers'
+import config from '../config'
+import { ComplexityLevel } from '../data/interfaces/complexityApi/ComplexityOfNeed'
+import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
+import Pom from '../data/interfaces/allocationManagerApi/Pom'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -23,20 +40,44 @@ interface ProfessionalContact {
   address?: Address & { label: string }
   unallocated?: boolean
 }
+
+interface ProfessionalContactApiError {
+  relationshipDescription: string
+  relationship: string
+}
+
 export default class ProfessionalContactsService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
+    private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
-  async getContacts(clientToken: string, prisonerNumber: string, bookingId: number): Promise<ProfessionalContact[]> {
+  async getContacts(
+    clientToken: string,
+    prisonerNumber: string,
+    bookingId: number,
+    isYouthPrisoner: boolean,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<Result<ProfessionalContact, ProfessionalContactApiError>[]> {
     const [contacts, allocationManager, communityManager, keyWorker] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
-      this.allocationApiClientBuilder(clientToken).getPomByOffenderNo(prisonerNumber),
-      this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
-      this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+      Result.wrap(
+        isYouthPrisoner ? null : this.allocationApiClientBuilder(clientToken).getPomByOffenderNo(prisonerNumber),
+        apiErrorCallback,
+      ),
+      Result.wrap(
+        isYouthPrisoner
+          ? null
+          : this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
+        apiErrorCallback,
+      ),
+      Result.wrap(
+        isYouthPrisoner ? null : this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+        apiErrorCallback,
+      ),
     ])
 
     // filter out COM and POM from prison API contacts as they are reliably retrieved from other API calls
@@ -59,34 +100,47 @@ export default class ProfessionalContactsService {
           const personContactDetails = await this.getPersonContactDetails(clientToken, contact.personId)
           const { addresses, emails, phones } = personContactDetails
 
+          if (addresses?.length === 0) {
+            return [mapPrisonApiContactToProfessionalContact(contact, null, emails, phones)]
+          }
+
           return addresses
             .filter(address => !address.endDate || new Date(address.endDate) >= currentDate)
             .sort((left, right) => this.sortByPrimaryAndStartDate(left, right))
-            .map<ProfessionalContact>(address =>
-              mapPrisonApiContactToProfessionalContact(contact, address, emails, phones),
-            )
+            .map(address => mapPrisonApiContactToProfessionalContact(contact, address, emails, phones))
         }),
     )
 
     return [
       ...contactForEachAddress,
-      communityManager ? mapCommunityManagerToProfessionalContact(communityManager) : [],
-      keyWorker ? mapKeyWorkerToProfessionalContact(keyWorker) : [],
-      allocationManager ? getPomContacts(allocationManager) : [],
+      mapCommunityManagerToProfessionalContact(communityManager),
+      mapKeyWorkerToProfessionalContact(keyWorker),
+      mapPomToProfessionalContact(allocationManager),
     ]
       .flat()
       .sort(this.sortProfessionalContacts)
   }
 
-  sortProfessionalContacts = (left: ProfessionalContact, right: ProfessionalContact) => {
+  private sortProfessionalContacts = (
+    left: Result<ProfessionalContact, ProfessionalContactApiError>,
+    right: Result<ProfessionalContact, ProfessionalContactApiError>,
+  ) => {
     const jobTitleOrder = [
       'Key Worker',
       'Prison Offender Manager',
       'Co-working Prison Offender Manager',
       'Community Offender Manager',
+      'CuSP Officer',
+      'CuSP Officer (backup)',
+      'Youth Justice Worker',
+      'Resettlement Practitioner',
+      'Youth Justice Service',
+      'Youth Justice Service Case Manager',
     ]
-    const leftJobTitleIndex = jobTitleOrder.indexOf(left.relationshipDescription)
-    const rightJobTitleIndex = jobTitleOrder.indexOf(right.relationshipDescription)
+    const leftRelationshipDescription = left.getOrHandle(e => e).relationshipDescription
+    const rightRelationshipDescription = right.getOrHandle(e => e).relationshipDescription
+    const leftJobTitleIndex = jobTitleOrder.indexOf(leftRelationshipDescription)
+    const rightJobTitleIndex = jobTitleOrder.indexOf(rightRelationshipDescription)
 
     // both the exceptions so compare
     if (leftJobTitleIndex !== -1 && rightJobTitleIndex !== -1) {
@@ -99,13 +153,16 @@ export default class ProfessionalContactsService {
 
     // If both have the same job title order or neither is a special case,
     // compare based on relationshipDescription and lastName
-    const relationshipCompare = left.relationshipDescription.localeCompare(right.relationshipDescription)
+    const relationshipCompare = leftRelationshipDescription.localeCompare(rightRelationshipDescription)
     if (relationshipCompare) return relationshipCompare
 
-    return left.lastName.localeCompare(right.lastName)
+    if (!left.isFulfilled()) return -1
+    if (!right.isFulfilled()) return 1
+
+    return left.getOrThrow().lastName.localeCompare(right.getOrThrow().lastName)
   }
 
-  async getPersonContactDetails(token: string, personId: number) {
+  private async getPersonContactDetails(token: string, personId: number) {
     const prisonApi = this.prisonApiClientBuilder(token)
     const [addresses, emails, phones] = await Promise.all([
       prisonApi.getAddressesForPerson(personId),
@@ -126,62 +183,190 @@ export default class ProfessionalContactsService {
 
     return sortByDateTime(right.startDate, left.startDate) // Most recently added first
   }
-}
 
-function getPomContacts(allocationManager: Pom): ProfessionalContact[] {
-  return (
-    allocationManager &&
-    Object.entries(allocationManager)
-      .filter(([, value]) => value.name)
-      .map(([key, value]) => mapPomToProfessionalContact(key as 'primary_pom' | 'secondary_pom', value))
-  )
-}
+  getProfessionalContactsOverview(
+    clientToken: string,
+    { prisonId, bookingId, prisonerNumber }: Prisoner,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<YouthStaffContacts | StaffContacts> {
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
+    return isYouthPrisoner
+      ? this.getYouthStaffContactsOverview(clientToken, bookingId)
+      : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, prisonId, apiErrorCallback)
+  }
 
-function mapCommunityManagerToProfessionalContact(communityManager: CommunityManager): ProfessionalContact {
-  const { email, telephone, unallocated } = communityManager
-  const { forename, surname } = communityManager.name
-  const { email: teamEmail, telephone: teamTelephone } = communityManager.team
+  private async getYouthStaffContactsOverview(clientToken: string, bookingId: number) {
+    const prisonApi = this.prisonApiClientBuilder(clientToken)
+    const contacts = await prisonApi.getBookingContacts(bookingId)
 
-  return {
-    firstName: forename,
-    lastName: surname,
-    teamName: communityManager.team.description,
-    emails: [email, teamEmail].filter(Boolean),
-    phones: [telephone, teamTelephone].filter(Boolean),
-    address: undefined,
-    relationshipDescription: 'Community Offender Manager',
-    relationship: 'COM',
-    unallocated,
+    const youthStaffContacts: YouthStaffContacts = {
+      cuspOfficer: null,
+      cuspOfficerBackup: null,
+      youthJusticeWorker: null,
+      resettlementPractitioner: null,
+      youthJusticeService: null,
+      youthJusticeServiceCaseManager: null,
+    }
+
+    // Return the most recently created record for each of the YOI contact relationships if available
+    sortArrayOfObjectsByDate<Contact>(contacts.otherContacts, 'createDateTime', SortType.ASC).forEach(c => {
+      switch (c.relationship) {
+        case ContactRelationship.CuspOfficer:
+          youthStaffContacts.cuspOfficer = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.CuspOfficerBackup:
+          youthStaffContacts.cuspOfficerBackup = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeWorker:
+          youthStaffContacts.youthJusticeWorker = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.ResettlementPractitioner:
+          youthStaffContacts.resettlementPractitioner = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeService:
+          youthStaffContacts.youthJusticeService = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeServiceCaseManager:
+          youthStaffContacts.youthJusticeServiceCaseManager = formatName(c.firstName, null, c.lastName)
+          break
+        default:
+      }
+    })
+
+    return youthStaffContacts
+  }
+
+  private async getStaffContactsOverview(
+    clientToken: string,
+    bookingId: number,
+    prisonerNumber: string,
+    prisonId: string,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<StaffContacts> {
+    const prisonApi = this.prisonApiClientBuilder(clientToken)
+    const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
+    const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
+
+    const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions] = await Promise.all([
+      Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
+      Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
+      Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
+      prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+    ])
+
+    return {
+      keyWorker: keyWorkerName
+        .map(name => ({
+          name,
+          lastSession:
+            keyWorkerSessions?.[0] !== undefined ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short') : '',
+        }))
+        .toPromiseSettledResult(),
+      prisonOffenderManager: allocationManager
+        .map(pom => formatPomName(pom?.primary_pom?.name))
+        .toPromiseSettledResult(),
+      coworkingPrisonOffenderManager: allocationManager
+        .map(pom => formatPomName(pom?.secondary_pom?.name))
+        .toPromiseSettledResult(),
+      communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
+    }
+  }
+
+  private getKeyWorkerName = async (clientToken: string, prisonerNumber: string, prisonId: string): Promise<string> => {
+    const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+    const complexityApiClient = this.complexityApiClientBuilder(clientToken)
+
+    const complexityLevel =
+      config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
+      (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
+
+    if (complexityLevel === ComplexityLevel.High) return 'None - high complexity of need'
+
+    const keyWorker = await keyWorkerClient.getOffendersKeyWorker(prisonerNumber)
+    return keyWorker && keyWorker.firstName
+      ? `${convertToTitleCase(keyWorker.firstName)} ${convertToTitleCase(keyWorker.lastName)}`
+      : 'Not allocated'
   }
 }
 
-function mapKeyWorkerToProfessionalContact(keyWorker: KeyWorker): ProfessionalContact {
-  const { firstName, lastName, email } = keyWorker
+function mapCommunityManagerToProfessionalContact(
+  communityManagerResult: Result<CommunityManager>,
+): Result<ProfessionalContact, ProfessionalContactApiError>[] {
+  if (communityManagerResult.isFulfilled() && communityManagerResult.getOrThrow() === null) return []
 
-  return {
-    firstName,
-    lastName,
-    emails: [email].filter(Boolean),
-    phones: [],
-    address: undefined,
-    relationshipDescription: 'Key Worker',
-    relationship: 'KW',
-  }
+  const comRelationship = { relationship: 'COM', relationshipDescription: 'Community Offender Manager' }
+
+  return [
+    communityManagerResult.map(
+      com =>
+        ({
+          ...comRelationship,
+          firstName: com.name.forename,
+          lastName: com.name.surname,
+          teamName: com.team.description,
+          emails: [com.email, com.team.email].filter(Boolean),
+          phones: [com.telephone, com.team.telephone].filter(Boolean),
+          address: undefined,
+          unallocated: com.unallocated,
+        }) as ProfessionalContact,
+      _error => comRelationship,
+    ),
+  ]
 }
 
-function mapPomToProfessionalContact(jobTitle: 'primary_pom' | 'secondary_pom', pom: PomContact): ProfessionalContact {
-  const { name } = pom
+function mapKeyWorkerToProfessionalContact(
+  keyWorkerResult: Result<KeyWorker>,
+): Result<ProfessionalContact, ProfessionalContactApiError>[] {
+  if (keyWorkerResult.isFulfilled() && keyWorkerResult.getOrThrow() === null) return []
 
-  return {
-    firstName: getNamesFromString(name)[0],
-    lastName: getNamesFromString(name).pop(),
-    emails: [],
-    phones: [],
-    address: undefined,
+  const keyworkerRelationship = { relationship: 'KW', relationshipDescription: 'Key Worker' }
+
+  return [
+    keyWorkerResult.map(
+      keyWorker =>
+        ({
+          ...keyworkerRelationship,
+          firstName: keyWorker.firstName,
+          lastName: keyWorker.lastName,
+          emails: [keyWorker.email].filter(Boolean),
+          phones: [],
+          address: undefined,
+        }) as ProfessionalContact,
+      _error => keyworkerRelationship,
+    ),
+  ]
+}
+
+function mapPomToProfessionalContact(
+  pomResult: Result<Pom>,
+): Result<ProfessionalContact, ProfessionalContactApiError>[] {
+  if (pomResult.isFulfilled() && pomResult.getOrThrow() === null) return []
+
+  const pomRelationship = (jobTitle: string) => ({
+    relationship: 'POM',
     relationshipDescription:
       jobTitle === 'primary_pom' ? 'Prison Offender Manager' : 'Co-working Prison Offender Manager',
-    relationship: 'POM',
-  }
+  })
+
+  return pomResult.handle({
+    fulfilled: (pom: Pom) => {
+      return Object.entries(pom)
+        .filter(([, value]) => value.name)
+        .map(([key, value]) => {
+          return Result.fulfilled({
+            ...pomRelationship(key),
+            firstName: getNamesFromString(value.name)[0],
+            lastName: getNamesFromString(value.name).pop(),
+            emails: [],
+            phones: [],
+            address: undefined,
+          })
+        })
+    },
+    rejected: () => {
+      return [pomRelationship('primary_pom'), pomRelationship('secondary_pom')].map(reason => Result.rejected(reason))
+    },
+  })
 }
 
 function mapPrisonApiContactToProfessionalContact(
@@ -189,16 +374,18 @@ function mapPrisonApiContactToProfessionalContact(
   address: Address,
   emails: AgenciesEmail[],
   phones: Telephone[],
-): ProfessionalContact {
+): Result<ProfessionalContact, ProfessionalContactApiError> {
   const { firstName, lastName } = contact
 
-  return {
+  return Result.fulfilled({
     firstName,
     lastName,
-    address: { ...address, label: address.primary ? 'Main address' : 'Other address' },
+    address: address
+      ? { ...address, label: address.primary ? 'Main address' : 'Other address' }
+      : { label: 'Not entered', primary: true, mail: false, noFixedAddress: false },
     emails: emails.map(email => email.email),
-    phones: [...phones, ...(address.phones ?? [])].map(phone => phone.number),
+    phones: [...phones, ...(address?.phones ?? [])].map(phone => phone.number),
     relationshipDescription: contact.relationshipDescription,
     relationship: contact.relationship,
-  }
+  })
 }

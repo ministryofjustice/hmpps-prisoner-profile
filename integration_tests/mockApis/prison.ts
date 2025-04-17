@@ -17,22 +17,13 @@ import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
-import { personalCareNeedsMock, xrayCareNeeds } from '../../server/data/localMockData/personalCareNeedsMock'
+import {
+  pastCareNeedsMock,
+  personalCareNeedsMock,
+  xrayCareNeeds,
+} from '../../server/data/localMockData/personalCareNeedsMock'
 import { mockReasonableAdjustments } from '../../server/data/localMockData/reasonableAdjustments'
-import {
-  emptyAlertsMock,
-  pagedActiveAlertsMock,
-  pagedActiveAlertsMockFiltered,
-  pagedActiveAlertsMockPage2,
-  pagedActiveAlertsMockSorted,
-  pagedInactiveAlertsMock,
-} from '../../server/data/localMockData/pagedAlertsMock'
-import {
-  CourtCasesMock,
-  CourtCasesSentencedMockA,
-  CourtCasesUnsentencedMockA,
-  CourtCaseWithNextCourtAppearance,
-} from '../../server/data/localMockData/courtCaseMock'
+import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
 import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
 import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../../server/data/localMockData/sentenceTermsMock'
 import {
@@ -43,23 +34,21 @@ import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/pri
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
-import { CaseLoad } from '../../server/interfaces/caseLoad'
-import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
+import CaseLoad from '../../server/data/interfaces/prisonApi/CaseLoad'
 
 import {
   fullStatusMock,
   fullStatusRemandMock,
   mainOffenceMock,
 } from '../../server/data/localMockData/offenceOverviewMock'
-import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
+import FullStatus from '../../server/data/interfaces/prisonApi/FullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
-import { StaffRole } from '../../server/interfaces/prisonApi/staffRole'
+import StaffRole from '../../server/data/interfaces/prisonApi/StaffRole'
 
 import {
   SentenceSummaryWithoutSentenceMock,
   SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
-import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
 import {
   PrisonerScheduleNextWeekMock,
   PrisonerScheduleThisWeekMock,
@@ -79,27 +68,45 @@ import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
-import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
 
 import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
-import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
-import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
-import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
-import { CsraAssessmentSummary } from '../../server/interfaces/prisonApi/csraAssessmentSummary'
-import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment'
+import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
+import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
+import CsraAssessment, { CsraAssessmentSummary } from '../../server/data/interfaces/prisonApi/CsraAssessment'
 import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
 import receptionsWithCapacityMock from '../../server/data/localMockData/receptionsWithCapacityMock'
 import { OffenderCellHistoryMock } from '../../server/data/localMockData/offenderCellHistoryMock'
 import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
-import { OffenderCellHistory } from '../../server/interfaces/prisonApi/offenderCellHistoryInterface'
-import { AgencyDetails } from '../../server/interfaces/prisonApi/agencies'
-import { OffenderBooking } from '../../server/interfaces/prisonApi/offenderBooking'
+import OffenderCellHistory from '../../server/data/interfaces/prisonApi/OffenderCellHistoryInterface'
+import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
+import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
+import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
+import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
+import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
+import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
+import { mockPagedVisits, pagedVisitsMock } from '../../server/data/localMockData/pagedVisitsWithVisitors'
+import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
+import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
+import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
+import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
+import { stubGetWithBody } from './utils'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
+  stubPrisonApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
+
   stubAccountBalances: (bookingId: number) => {
     return stubFor({
       request: {
@@ -175,7 +182,7 @@ export default {
       },
     })
   },
-  stubKeyWorkerSessions: (params: object) => {
+  stubKeyWorkerSessions: (params: CaseNoteSummaryByTypesParams) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -190,18 +197,18 @@ export default {
       },
     })
   },
-  stubGetOffenderContacts: (bookingId: number) => {
+  stubGetOffenderContacts: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/contacts`,
+        urlPattern: `/prison/api/bookings/\\d*/contacts`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockContactDetail,
+        jsonBody: resp ?? mockContactDetail,
       },
     })
   },
@@ -209,7 +216,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/image/data\\?fullSizeImage=true`,
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/image/data\\?fullSizeImage=.*`,
       },
       response: {
         status: 200,
@@ -269,7 +276,7 @@ export default {
     })
   },
 
-  stubAddresses: (prisonerNumber: string) => {
+  stubAddresses: ({ prisonerNumber, resp = mockAddresses }: { prisonerNumber: string; resp: unknown }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -280,7 +287,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockAddresses,
+        jsonBody: resp,
       },
     })
   },
@@ -301,7 +308,7 @@ export default {
     })
   },
 
-  stubPersonAddresses: () => {
+  stubPersonAddresses: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -312,111 +319,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockAddresses,
-      },
-    })
-  },
-
-  stubActiveAlerts: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMock
-    } else if (bookingId === 1234567) {
-      jsonResp = emptyAlertsMock
-    }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=ACTIVE(&sort=.*)?`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
-      },
-    })
-  },
-
-  stubActiveAlertsPage2: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockPage2
-    } else if (bookingId === 1234567) {
-      jsonResp = emptyAlertsMock
-    }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&sort=.*&alertStatus=ACTIVE`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
-      },
-    })
-  },
-
-  stubActiveAlertsSorted: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockSorted
-    } else if (bookingId === 1234567) {
-      jsonResp = emptyAlertsMock
-    }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=.*&alertStatus=ACTIVE`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
-      },
-    })
-  },
-
-  stubActiveAlertsFiltered: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockFiltered
-    } else if (bookingId === 1234567) {
-      jsonResp = emptyAlertsMock
-    }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=.*&alertType=.*&alertStatus=ACTIVE`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
-      },
-    })
-  },
-
-  stubInactiveAlerts: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=INACTIVE.*`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: pagedInactiveAlertsMock,
+        jsonBody: resp ?? mockAddresses,
       },
     })
   },
@@ -464,7 +367,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockReferenceDomains.health,
+        jsonBody: mockReferenceDomains(ReferenceCodeDomain.Health),
       },
     })
   },
@@ -480,7 +383,23 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockReferenceDomains.healthTreatment,
+        jsonBody: mockReferenceDomains(ReferenceCodeDomain.HealthTreatments),
+      },
+    })
+  },
+
+  stubReferenceCodeDomain: ({ referenceDomain }: { referenceDomain: ReferenceCodeDomain }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/reference-domains/domains/${referenceDomain}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockReferenceDomains(referenceDomain),
       },
     })
   },
@@ -501,7 +420,23 @@ export default {
     })
   },
 
-  stubPersonalCareNeeds: (bookingId: number) => {
+  stubPersonalCareNeeds: (resp = personalCareNeedsMock) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs\\?type=(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
+      },
+    })
+  },
+
+  stubPastCareNeeds: (bookingId: number) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -512,7 +447,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: personalCareNeedsMock,
+        jsonBody: pastCareNeedsMock,
       },
     })
   },
@@ -733,7 +668,7 @@ export default {
 
   stubGetFullStatus: (prisonerNumber: string) => {
     let jsonResp: FullStatus
-    if (prisonerNumber === 'ONREMAND') {
+    if (prisonerNumber === 'X9999XX') {
       jsonResp = fullStatusRemandMock
     } else {
       jsonResp = fullStatusMock
@@ -753,33 +688,43 @@ export default {
     })
   },
 
-  stubGetCourtCases: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1234568) {
-      jsonResp = CourtCaseWithNextCourtAppearance
-    } else {
-      jsonResp = CourtCasesSentencedMockA
-    }
+  stubGetNextCourtEvent: ({ bookingId, resp = nextCourtEventMock }: { bookingId: number; resp: CourtEvent }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+        urlPattern: `/prison/api/court/${bookingId}/next-court-event`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
       },
     })
   },
 
-  stubGetIdentifiers: (bookingId: number) => {
+  stubGetCourtCasesCount: ({ bookingId, resp = 5 }: { bookingId: number; resp: number }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+        urlPattern: `/prison/api/court/${bookingId}/count-active-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
+      },
+    })
+  },
+
+  stubGetIdentifiers: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/offender-identifiers.*`,
       },
       response: {
         status: 200,
@@ -827,7 +772,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/staff/(.*)/(.*)/roles`,
+        urlPattern: `/prison/api/staff/\\w+/\\w+/roles`,
       },
       response: {
         status: 200,
@@ -835,38 +780,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: roles,
-      },
-    })
-  },
-
-  stubGetAlertTypes: () => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/reference-domains/domains/ALERT\\?withSubCodes=true`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: alertTypesMock,
-      },
-    })
-  },
-
-  stubCreateAlert: () => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPattern: `/prison/api/bookings/1102484/alert`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: pagedActiveAlertsMock.content[0],
       },
     })
   },
@@ -1148,34 +1061,18 @@ export default {
     })
   },
 
-  stubIdentifiers: (bookingId: number) => {
+  stubPersonEmails: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+        urlPattern: `/prison/api/persons/\\d*/emails`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: identifiersMock,
-      },
-    })
-  },
-
-  stubPersonEmails: (personId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/persons/${personId}/emails`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
+        jsonBody: resp ?? [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
       },
     })
   },
@@ -1196,34 +1093,18 @@ export default {
     })
   },
 
-  stubPersonPhones: (personId: number) => {
+  stubPersonPhones: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/persons/${personId}/phones`,
+        urlPattern: `/prison/api/persons/\\d*/phones`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: [{ number: '07700000000', type: 'mobile' }],
-      },
-    })
-  },
-
-  stubGetAttributesForLocation: (locationId: string) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/cell/${locationId}/attributes`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: GetAttributesForLocation,
+        jsonBody: resp ?? [{ number: '07700000000', type: 'mobile' }],
       },
     })
   },
@@ -1245,16 +1126,16 @@ export default {
   },
 
   stubGetHistoryForLocation: ({
-    locationId,
+    nomisLocationId,
     locationHistories,
   }: {
-    locationId: string
+    nomisLocationId: number
     locationHistories: Partial<HistoryForLocationItem>[]
   }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/cell/${locationId}/history\\?fromDate=2023-07-11T14:56:16&toDate=2023-08-17T12:00:00`,
+        urlPattern: `/prison/api/cell/${nomisLocationId}/history\\?fromDate=2023-07-11T14:56:16&toDate=2023-08-17T12:00:00`,
       },
       response: {
         status: 200,
@@ -1278,38 +1159,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: getCellMoveReasonTypesMock,
-      },
-    })
-  },
-
-  stubAlertDetails: () => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/.*/alerts/\\d*`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: alertDetailsMock,
-      },
-    })
-  },
-
-  stubAlertDetailsExpires: () => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/.*/alerts/\\d*`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: alertDetailsExpiresMock,
       },
     })
   },
@@ -1356,7 +1205,12 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/cell-history\\?size=10000`,
+        urlPattern: `/prison/api/bookings/${bookingId}/cell-history.*`,
+        queryParameters: {
+          size: {
+            equalTo: '10000',
+          },
+        },
       },
       response: {
         status: 200,
@@ -1393,19 +1247,92 @@ export default {
     })
   },
 
-  stubUpdateAlert: () => {
+  stubVisitsWithVisitors: ({
+    bookingId,
+    visitsOverrides,
+    queryParams,
+  }: {
+    bookingId: number
+    visitsOverrides?: VisitWithVisitors[]
+    queryParams?: VisitsListQueryParams
+  }) => {
+    const queryString = mapToQueryString(queryParams)
+
     return stubFor({
       request: {
-        method: 'PUT',
-        urlPattern: `/prison/api/bookings/1102484/alert/2113`,
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/visits-with-visitors${queryString ? `\\?${queryString}` : ''}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedActiveAlertsMock.content[0],
+        jsonBody: visitsOverrides === undefined ? pagedVisitsMock : mockPagedVisits(visitsOverrides),
       },
+    })
+  },
+
+  stubVisitPrisons: ({ bookingId }: { bookingId: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/visits/prisons`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: visitPrisonsMock,
+      },
+    })
+  },
+
+  stubGetLatestArrivalDate: (resp?: never) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/api/movements/offenders/[a-zA-Z][0-9]{4}[a-zA-Z]{2}/latest-arrival-date',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp ?? '2000-01-01',
+      },
+    })
+  },
+
+  stubImageDetails: () => {
+    return stubGetWithBody({
+      path: '/prison/api/images/\\d*',
+      body: {
+        imageId: 1234,
+        active: true,
+        captureDateTime: '2015-02-11T08:32:50',
+      },
+    })
+  },
+
+  stubImagesForOffender: (prisonerNumber: string) => {
+    return stubGetWithBody({
+      path: `/prison/api/images/offenders/${prisonerNumber}`,
+      body: [
+        {
+          imageId: inmateDetailMock.facialImageId,
+          active: true,
+          captureDateTime: '2025-01-11T08:32:50',
+          imageView: 'FACE',
+        },
+        {
+          imageId: 4321,
+          active: false,
+          captureDateTime: '2024-01-11T08:32:50',
+          imageView: 'FACE',
+        },
+      ],
     })
   },
 }

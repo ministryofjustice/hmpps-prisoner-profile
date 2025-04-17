@@ -47,7 +47,13 @@ export default class AlertsPage extends Page {
 
   closeAlertLink = (): PageElement => cy.get('[data-qa=close-alert-link]')
 
+  changeEndDateLink = (): PageElement => cy.get('[data-qa=change-end-date-link]')
+
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
 
   successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
+
+  bannerApiUnavailableBanner = (): PageElement => cy.get('.alerts-list .dps-banner__error')
+
+  pageApiUnavailableBanner = (): PageElement => cy.get('main .dps-banner__error')
 }

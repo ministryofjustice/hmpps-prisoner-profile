@@ -2,22 +2,22 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if  prisonerIsTRN(prisonId) %}
-        <div class="hmpps-profile-banner-alert" data-qa="TRN-establishment-banner">
+        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="TRN-establishment-banner">
             <p class="govuk-heading-m">
               This prisoner is being transferred
             </p>
             <p>Some information may be hidden</p>
         </div>
     {% elseif prisonerIsOut(prisonId) %}
-        <div class="hmpps-profile-banner-alert" data-qa="OUT-establishment-banner">
+        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="OUT-establishment-banner">
             <p class="govuk-heading-m">
               This person has been released
             </p>
             <p>Some information may be hidden</p>
         </div>
     {% else %}
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
-        <div class="hmpps-profile-banner-alert">
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) != true, id: 'outside-establishment-banner'}) -%}
+        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning">
             <p class="govuk-heading-m">
               This prisoner is not in your establishment
             </p>
@@ -25,12 +25,28 @@
         </div>
       {%- endcall -%}
     {% endif %}
+    {% if newArrival24 %}
+        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-24">
+            <p class="govuk-heading-m">
+                This prisoner has arrived today
+            </p>
+            <p>Some information may not have been entered yet</p>
+        </div>
+    {% endif %}
+    {% if newArrival72 %}
+        <div class="hmpps-profile-banner-alert  hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-72">
+            <p class="govuk-heading-m">
+                This prisoner has arrived in the last 3 days
+            </p>
+            <p>Some information may not have been entered yet</p>
+        </div>
+    {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
         <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image" data-qa="prisoner-photo-link">
           <img
             class="hmpps-profile-photo"
-            src="/api/prisoner/{{ prisonerNumber or photoType }}/image"
+            src="/api/prisoner/{{ prisonerNumber }}/image"
             alt="{{ prisonerName }}"
           />
         </a>

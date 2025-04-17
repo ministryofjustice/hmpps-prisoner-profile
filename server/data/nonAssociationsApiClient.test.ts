@@ -1,10 +1,8 @@
 import nock from 'nock'
 import config from '../config'
-import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
+import { NonAssociationsApiClient } from './interfaces/nonAssociationsApi/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import { prisonerNonAssociationsMock } from './localMockData/prisonerNonAssociationsMock'
-
-jest.mock('./tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

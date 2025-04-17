@@ -1,14 +1,7 @@
-import promClient from 'prom-client'
 import { serviceCheckFactory } from '../data/healthCheck'
-import config from '../config'
 import type { AgentConfig } from '../config'
+import config from '../config'
 import type { ApplicationInfo } from '../applicationInfo'
-
-const healthCheckGauge = new promClient.Gauge({
-  name: 'upstream_healthcheck',
-  help: 'health of an upstream dependency - 1 = healthy, 0 = not healthy',
-  labelNames: ['service'],
-})
 
 interface HealthCheckStatus {
   name: string
@@ -60,6 +53,19 @@ const apiChecks = [
         ),
       ]
     : []),
+  service('prisonerSearchApi', `${config.apis.prisonerSearchApi.url}/health/ping`, config.apis.prisonerSearchApi.agent),
+  service('prisonApi', `${config.apis.prisonApi.url}/health/ping`, config.apis.prisonApi.agent),
+  service(
+    'locationsInsidePrisonApi',
+    `${config.apis.locationsInsidePrisonApi.url}/health/ping`,
+    config.apis.locationsInsidePrisonApi.agent,
+  ),
+  service(
+    'nomisSyncPrisonerMappingApi',
+    `${config.apis.nomisSyncPrisonerMappingApi.url}/health/ping`,
+    config.apis.nomisSyncPrisonerMappingApi.agent,
+  ),
+  service('bookAVideoLinkApi', `${config.apis.bookAVideoLinkApi.url}/health/ping`, config.apis.bookAVideoLinkApi.agent),
 ]
 
 export default function healthCheck(
@@ -74,11 +80,6 @@ export default function healthCheck(
       status: allOk,
       components: checkResults.reduce(gatherCheckInfo, {}),
     }
-
-    checkResults.forEach(item => {
-      const val = item.status === 'UP' ? 1 : 0
-      healthCheckGauge.labels(item.name).set(val)
-    })
 
     callback(addAppInfo(result, applicationInfo))
   })

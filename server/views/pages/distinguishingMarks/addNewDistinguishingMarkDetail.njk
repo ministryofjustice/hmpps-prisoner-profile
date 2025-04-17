@@ -1,0 +1,130 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+
+{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal/"+ markType +"?selected="+ bodyPart %}
+{% set formConfig = bodyPart | toBodyPartSpecificFormData(markType) %}
+{% set pageTitle = formConfig.tab + " - Prisoner personal details" %}
+
+{% macro formSet(postfix) %}
+    {{ govukCharacterCount({
+        name: "description-"+postfix,
+        id: "description-"+postfix,
+        maxlength: 240,
+        rows: 5,
+        errorMessage: errors | findError('description-'+postfix),
+        label: {
+            text: "Description (optional)",
+            classes: "govuk-!-font-weight-bold"
+        },
+        attributes: { "data-qa": "description-field-"+postfix },
+        value: formValues["description-"+postfix]
+    }) }}
+    {{ govukFileUpload({
+        id: "file",
+        name: "file",
+        errorMessage: errors | findError('file'),
+        label: {
+            text: "Add a photo (optional)",
+            classes: "govuk-!-font-weight-bold"
+        },
+        hint: {
+            text: "Photos can be JPG or GIF files."
+        }
+    }) }}
+{% endmacro %}
+
+{% block body %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
+    </div>
+</div>
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            })
+            }}
+        </div>
+    </div>
+{% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="bodyPart" value="{{ bodyPart }}">
+            {% if formConfig.specificParts.length === 1 %}
+{#              Don't show the radio buttons if there is only one option #}
+                <input type="hidden" name="specificBodyPart" value="{{ formConfig.specificParts[0].name }}">
+                <span class="govuk-caption-l">Distinguishing marks</span>
+                <h1 class="govuk-heading-l">
+                    {{ formConfig.title }}
+                </h1>
+                {{ formSet(formConfig.specificParts[0].name) }}
+            {% else %}
+{#              Show the radio buttons #}
+                <div id="specific-body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <span class="govuk-caption-l">Distinguishing marks</span>
+                            <h1 class="govuk-fieldset__heading">
+                                {{ formConfig.title }}
+                            </h1>
+                        </legend>
+                        {% if errors[0].href === '#specific-body-part-selection' %}
+                            <p id="select-a-body-part-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> Select a body part
+                            </p>
+                        {% endif %}
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                {% for part in formConfig.specificParts %}
+                                    {% set errorOnDescOrPhoto = errors.length > 0 and (errors[0].href === "#description-"+part.name or errors[0].href === "#file-"+part.name) %}
+
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="{{ part.name }}"
+                                               name="specificBodyPart"
+                                               type="radio"
+                                               value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint"{% endif %}
+                                               data-aria-controls="conditional-details-form-{{ part.name }}"
+                                                {% if errorOnDescOrPhoto %} checked aria-expanded="true" {% endif %}
+                                        >
+                                        <label class="govuk-label govuk-radios__label" for="{{ part.name }}">
+                                            {{ part.desc }}
+                                        </label>
+                                        {% if part.hint %}
+                                            <div id="{{ part.name }}-hint" class="govuk-hint govuk-radios__hint">
+                                                {{ part.hint }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="govuk-radios__conditional {% if not errorOnDescOrPhoto %}govuk-radios__conditional--hidden {% endif %}" id="conditional-details-form-{{ part.name }}">
+                                        {{ formSet(part.name) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                    </fieldset>
+                </div>
+            {% endif %}
+
+            <div class="govuk-button-group">
+                {{ govukButton({ text: "Save and return to profile", attributes: { name: "action", value: "returnToProfile" }, type: "submit" }) }}
+                {{ govukButton({ text: "Save and add more "+markType+"s", attributes: { name: "action", value: "addMore" }, type: "submit", classes: "govuk-button--secondary"}) }}
+                <a href="/prisoner/{{ prisonerNumber }}/personal#marks" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

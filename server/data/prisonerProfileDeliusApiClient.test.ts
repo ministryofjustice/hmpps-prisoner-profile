@@ -1,11 +1,9 @@
 import nock from 'nock'
 import config from '../config'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
-import { PrisonerProfileDeliusApiClient } from './interfaces/prisonerProfileDeliusApiClient'
+import { PrisonerProfileDeliusApiClient } from './interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import { communityManagerMock } from './localMockData/communityManagerMock'
 import probationDocuments from './localMockData/deliusApi/probationDocuments'
-
-jest.mock('./tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

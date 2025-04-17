@@ -16,10 +16,10 @@ npm outdated
 npm update Minor version updates can be applied by running:
 
 ```
-npm update
+npx npm-check-updates -t minor -u
 ```
 
-To update major dependencies consider using ncu (obviously this may introduce breaking changes to dependencies that
+To update major dependencies run (obviously this may introduce breaking changes to dependencies that
 would need to be resolved manually):
 
 ```

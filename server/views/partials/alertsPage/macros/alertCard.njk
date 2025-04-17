@@ -1,18 +1,26 @@
 {% macro alertCard(alert) %}
 <div class="hmpps-alert-card-list-item" role="listitem">
     <div class="hmpps-alert-card-list-item__content">
-        <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertTypeDescription }}</div>
-        <div class="hmpps-alert-card-list-item__title">{{ alert.alertCodeDescription }}</div>
-        <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.comment }}</pre>
-        <div class="hmpps-alert-card-list-item__metadata"><span>Created:</span> {{ alert.dateCreated | formatDate }} {% if alert.addedByFullName %} by {{ alert.addedByFullName }} {% endif %}</div>
-        {% if not alert.active %}
-            <div class="hmpps-alert-card-list-item__metadata"><span>Closed:</span> {{ alert.dateExpires | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
+        <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertCode.alertTypeDescription }}</div>
+        <div class="hmpps-alert-card-list-item__title">{{ alert.alertCode.description }}</div>
+        <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.description }}</pre>
+        <div class="hmpps-alert-card-list-item__metadata"><span>Start date:</span> {{ alert.activeFrom | formatDate }} {% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }} {% endif %}</div>
+        {% if alert.lastModifiedAt %}
+        <div class="hmpps-alert-card-list-item__metadata"><span>Last updated:</span> {{ alert.lastModifiedAt | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% endif %}</div>
+        {% endif %}
+        {% if alert.activeTo %}
+            <div class="hmpps-alert-card-list-item__metadata"><span>End date:</span> {{ alert.activeTo | formatDate }} {% if alert.activeToLastSetByDisplayName %} by {{ alert.activeToLastSetByDisplayName }} {% else %} by {{ alert.createdByDisplayName }} {% endif %}</div>
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">
         {% if alert.addMoreDetailsLinkUrl %}
         <a href="{{ alert.addMoreDetailsLinkUrl }}" data-qa="add-more-details-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Add more details</a>
+        {% endif %}
+        {% if alert.closeAlertLinkUrl %}
         <a href="{{ alert.closeAlertLinkUrl }}" data-qa="close-alert-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Close alert</a>
+        {% endif %}
+        {% if alert.changeEndDateLinkUrl %}
+        <a href="{{ alert.changeEndDateLinkUrl }}" data-qa="change-end-date-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Change end date</a>
         {% endif %}
     </div>
 </div>

@@ -11,7 +11,13 @@ import {
 import { caseNoteTypesMock } from '../../server/data/localMockData/caseNoteTypesMock'
 
 export default {
-  stubGetCaseNotes: (prisonerNumber: string) => {
+  stubGetCaseNotes: ({
+    prisonerNumber,
+    includeSensitive = false,
+  }: {
+    prisonerNumber: string
+    includeSensitive?: boolean
+  }) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
       jsonResp = pagedCaseNotesMock
@@ -21,7 +27,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC(&page=0)?${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
       },
       response: {
         status: 200,
@@ -43,7 +49,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&page=1`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&page=1&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -65,7 +71,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CASC`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CASC&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -87,7 +93,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=ACP`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=ACP&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -103,23 +109,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/types`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: caseNoteTypesMock,
-      },
-    })
-  },
-
-  stubGetCaseNoteTypesForUser: () => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/types-for-user`,
+        urlPathPattern: `/casenotes/case-notes/types*`,
       },
       response: {
         status: 200,
@@ -141,7 +131,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=OMIC&includeSensitive=true`,
       },
       response: {
         status: 200,
@@ -167,7 +157,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=${type}`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=${type}&includeSensitive=false`,
       },
       response: {
         status: 200,

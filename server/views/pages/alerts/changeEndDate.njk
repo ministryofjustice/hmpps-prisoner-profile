@@ -1,0 +1,149 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+
+{% extends "../index.njk" %}
+
+{% set changeEndDateHtml %}
+    <div data-qa="change-end-date-section">
+        {{ hmppsDatepicker({
+            id: "activeTo",
+            name: "activeTo",
+            label: {
+                text: "End date"
+            },
+            errorMessage: errors | findError('activeTo'),
+            classes: 'hmpps-datepicker--fixed-width',
+            value: formValues.activeTo,
+            minDate: today
+        }) }}
+    </div>
+{% endset -%}
+
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ miniBanner(miniBannerData) }}
+        </div>
+    </div>
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
+        })}}
+    {% endif %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-!-margin-top-0">{{ pageTitle }}</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Alert</div>
+                <div class="govuk-body" data-qa="alert-description">{{ alert.alertCode.description }} ({{ alert.alertCode.code }})</div>
+            </div>
+        </div>
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Added by</div>
+                <div class="govuk-body" data-qa="added-by">{{ alert.createdByDisplayName }} on {{ alert.createdAt | formatDate }}</div>
+            </div>
+            {% if alert.lastModifiedAt %}
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Last updated by</div>
+                <div class="govuk-body" data-qa="last-updated-by">{{ alert.lastModifiedByDisplayName }} on {{ alert.lastModifiedAt | formatDate }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Start date</div>
+                <div class="govuk-body" data-qa="start-date">{{ alert.activeFrom | formatDate }}</div>
+            </div>
+            {% if alert.activeTo %}
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">End date</div>
+                <div class="govuk-body" data-qa="end-date">{{ alert.activeTo | formatDate  }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" novalidate="novalidate" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="startDate" value="{{ alert.dateCreated }}" />
+
+            {{ govukCharacterCount({
+                name: "description",
+                id: "description",
+                maxlength: 4000,
+                rows: 10,
+                value: formValues.description,
+                errorMessage: errors | findError('description'),
+                label: {
+                    text: "Comments",
+                    classes: "govuk-!-font-weight-bold"
+                },
+                attributes: { "data-qa": "description-field" }
+            }) }}
+
+            {{ govukRadios({
+                idPrefix: "removeEndDate",
+                name: "removeEndDate",
+                errorMessage: errors | findError('removeEndDate'),
+                formGroup : {
+                    classes: "js-remove-end-date-radios"
+                },
+                fieldset: {
+                    id: 'removeEndDateFieldset',
+                    legend: {
+                        text: "What would you like to change?",
+                        classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                items: [{
+                        value: "no",
+                        text: "Choose a different end date",
+                        checked: formValues.removeEndDate == 'no',
+                        conditional: {
+                            html: changeEndDateHtml
+                        },
+                        attributes: { "data-qa": "change-end-date-radio" }
+                    },
+                    {
+                        value: "yes",
+                        text: "Remove the end date",
+                        checked: formValues.removeEndDate == 'yes',
+                        attributes: { "data-qa": "remove-end-date-radio" }
+                    }
+                ]
+            }) }}
+
+            <div class="govuk-button-group govuk-!-display-none-print">
+                {{ govukButton({
+                    text: "Confirm",
+                    type: "submit",
+                    preventDoubleClick: true,
+                    attributes: { "data-qa": "confirm-button" }
+                }) }}
+                <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-button">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

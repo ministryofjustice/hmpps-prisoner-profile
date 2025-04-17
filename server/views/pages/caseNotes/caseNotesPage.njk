@@ -9,48 +9,61 @@
 ]%}
 {% block body %}
 
-    {% if errors.length > 0 %}
-        {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errors,
-            attributes: { 'data-qa-errors': true }
-        })}}
-    {% endif %}
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <h1 id="caseNotes">Case notes</h1>
-        </div>
-    </div>
-
-    <div class="govuk-grid-row govuk-!-display-none-print">
-        <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
-        <div class="govuk-grid-column-three-quarters">
-            {% if addCaseNoteLinkUrl %}
-            <div class="hmpps-action-header">
-                {{ hmppsActionButton({ text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl }) }}
+    {% if caseNotesApiUnavailable %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 id="caseNotes">Case notes</h1>
             </div>
-            {% endif %}
         </div>
-    </div>
 
-    {% if (hasCaseNotes) %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
-            {% include '../../partials/caseNotesPage/caseNotesFilter.njk' %}
+        <div class="dps-banner dps-banner__error">
+            <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Case notes are currently unavailable</p>
+            <p>Reload the page or try again later. Case notes might still be available in other parts of DPS.</p>
         </div>
-        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-            {% include '../../partials/caseNotesPage/caseNotesList.njk' %}
-        </div>
-    </div>
     {% else %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full" data-qa="case-notes-empty-state">
-            {{ fullName }} does not have any case notes
+
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })}}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 id="caseNotes">Case notes</h1>
+            </div>
         </div>
-    </div>
+
+        <div class="govuk-grid-row govuk-!-display-none-print">
+            <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
+            <div class="govuk-grid-column-three-quarters">
+                {% if addCaseNoteLinkUrl %}
+                <div class="hmpps-action-header">
+                    {{ hmppsActionButton({ text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl }) }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if (hasCaseNotes) %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
+                {% include '../../partials/caseNotesPage/caseNotesFilter.njk' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
+                {% include '../../partials/caseNotesPage/caseNotesList.njk' %}
+            </div>
+        </div>
+        {% else %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full" data-qa="case-notes-empty-state">
+                {{ fullName }} does not have any case notes
+            </div>
+        </div>
+        {% endif %}
+
+        {% include "../../partials/backToTop.njk" %}
     {% endif %}
-
-    {% include "../../partials/backToTop.njk" %}
-
 {% endblock %}
