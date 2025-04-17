@@ -95,10 +95,10 @@ export default {
     prisonApi: {
       url: get('PRISON_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('PRISON_API_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('PRISON_API_TIMEOUT_DEADLINE', 3000)),
+        response: Number(get('PRISON_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PRISON_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_DEADLINE', 3000))),
+      agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_DEADLINE', 10000))),
     },
     locationsInsidePrisonApi: {
       url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8082', requiredInProduction),
