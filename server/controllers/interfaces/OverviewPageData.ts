@@ -51,7 +51,7 @@ export default interface OverviewPageData {
 export interface CourtCaseSummary {
   nextCourtAppearance: CourtAppearanceSummary | null
   activeCourtCasesCount: number
-  latestCalculation: LatestCalculationSummary | null
+  latestCalculation: Result<LatestCalculationSummary>
   link: {
     text: string
     href: string

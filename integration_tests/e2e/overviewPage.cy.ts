@@ -820,6 +820,37 @@ context('Overview Page', () => {
     })
   })
 
+  context('Given API call to get latest release calculation fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubGetLatestCalculation', {
+        status: 500,
+        resp: {
+          errorCode: 'VC5001',
+          errorMessage: 'Service unavailable',
+          httpStatusCode: 500,
+        },
+      })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the card', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const nextCourtAppearance = overviewPage.courtCasesAndReleaseDates().nextCourtAppearance()
+      const latestCalculation = overviewPage.courtCasesAndReleaseDates().latestCalculation()
+
+      overviewPage.offencesHeader().should('not.exist')
+      nextCourtAppearance.location().should('contain.text', 'Test court location')
+      latestCalculation
+        .placeHolderText()
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
+
   context('Given external contacts is not yet enabled in the prison', () => {
     beforeEach(() => {
       cy.task('reset')

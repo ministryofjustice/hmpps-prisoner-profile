@@ -54,6 +54,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
+    const { apiErrorCallback } = res.locals
     const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
@@ -89,41 +90,30 @@ export default class OverviewController {
       manageSocCasesApiClient.getNominal(prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
-      showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
+      showCourtCaseSummary
+        ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
       permissions.money?.view ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
       permissions.adjudications?.view
-        ? Result.wrap(
-            this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId),
-            res.locals.apiErrorCallback,
-          )
+        ? Result.wrap(this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId), apiErrorCallback)
         : null,
       permissions.visits?.view ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       permissions.incentives?.view ? this.incentivesService.getIncentiveOverview(clientToken, bookingId) : null,
-      Result.wrap(
-        this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber),
-        res.locals.apiErrorCallback,
-      ),
+      Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.offenderService.getPrisoner(clientToken, prisonerNumber),
-      this.professionalContactsService.getProfessionalContactsOverview(
-        clientToken,
-        prisonerData,
-        res.locals.apiErrorCallback,
-      ),
+      this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
       this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
       Result.wrap(
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
-        res.locals.apiErrorCallback,
+        apiErrorCallback,
       ),
       isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
-        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
+        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       externalContactsEnabled(prisonId)
-        ? Result.wrap(
-            this.contactsService.getExternalContactsCount(clientToken, prisonerNumber),
-            res.locals.apiErrorCallback,
-          )
+        ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
         : null,
     ])
 
