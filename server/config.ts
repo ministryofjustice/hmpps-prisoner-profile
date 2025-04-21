@@ -344,6 +344,7 @@ export default {
     courtCaseReleaseDates: get('CCRD_UI_URL', 'http://localhost:3001', requiredInProduction),
     csip: get('CSIP_UI_URL', 'http://localhost:3001', requiredInProduction),
     assessForEarlyRelease: get('ASSESS_FOR_EARLY_RELEASE_UI_URL', 'http://localhost:3001', requiredInProduction),
+    contacts: get('CONTACTS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),

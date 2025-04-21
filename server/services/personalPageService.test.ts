@@ -91,6 +91,7 @@ describe('PersonalPageService', () => {
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
+      getContactCount: jest.fn(async () => ({ official: 1, social: 1 })),
     }
   })
 
