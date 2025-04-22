@@ -131,6 +131,16 @@ describe('personalRelationshipsApiRestClient', () => {
       const output = await personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
       expect(output).toEqual(numberOfChildren)
     })
+
+    it('should allow 404 responses', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/prisoner/${prisonerNumber}/number-of-children`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
+      expect(output).toBeNull()
+    })
   })
 
   describe('updateNumberOfChildren', () => {
