@@ -43,7 +43,14 @@ import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
-import { PersonalRelationshipsContactsDtoMock } from '../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
+} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../data/localMockData/personalRelationshipsApiMock'
 import NextOfKinService from './nextOfKinService'
 
 jest.mock('./metrics/metricsService')
@@ -54,6 +61,7 @@ describe('PersonalPageService', () => {
   let curiousApiClient: CuriousApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
+  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
   let referenceDataService: ReferenceDataService
   let prisonService: PrisonService
   let metricsService: MetricsService
@@ -89,6 +97,14 @@ describe('PersonalPageService', () => {
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
 
+    personalRelationshipsApiClient = {
+      getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
+      getContactCount: jest.fn(async () => ({ official: 1, social: 1 })),
+      getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      createContact: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
+    }
     nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>
     nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
   })
@@ -99,6 +115,7 @@ describe('PersonalPageService', () => {
       () => curiousApiClient,
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
+      () => personalRelationshipsApiClient,
       referenceDataService,
       prisonService,
       metricsService,
@@ -777,6 +794,28 @@ describe('PersonalPageService', () => {
       const result = await service.getMilitaryRecords('token', 'A1234AA')
       expect(result).toEqual(MilitaryRecordsMock)
       expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith('A1234AA')
+    })
+  })
+
+  describe('number of children', () => {
+    it('Gets the number of children from the Personal Relationships API', async () => {
+      const service = constructService()
+      personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+        async () => PersonalRelationshipsNumberOfChildrenMock,
+      )
+
+      const result = await service.getNumberOfChildren('token', 'A1234AA')
+      expect(result).toEqual(PersonalRelationshipsNumberOfChildrenMock)
+      expect(personalRelationshipsApiClient.getNumberOfChildren).toHaveBeenCalledWith('A1234AA')
+    })
+
+    it('Updates the number of children using the Personal Relationships API', async () => {
+      const request: PersonalRelationshipsNumberOfChildrenUpdateRequest = {
+        numberOfChildren: 5,
+        requestedBy: prisonUserMock.username,
+      }
+      await constructService().updateNumberOfChildren('token', prisonUserMock, 'A1234AA', 5)
+      expect(personalRelationshipsApiClient.updateNumberOfChildren).toHaveBeenCalledWith('A1234AA', request)
     })
   })
 })

@@ -2,9 +2,12 @@ import RestClient from './restClient'
 import config from '../config'
 import {
   PersonalRelationshipsApiClient,
+  PersonalRelationshipsContactCount,
   PersonalRelationshipsContactQueryParams,
   PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
   PersonalRelationshipsReferenceCode,
   PersonalRelationshipsReferenceDataDomain,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
@@ -22,6 +25,21 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto> {
     return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) })
+  }
+
+  getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact/count` })
+  }
+
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/number-of-children` })
+  }
+
+  updateNumberOfChildren(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
+  ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
+    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest })
   }
 
   getReferenceDataCodes(

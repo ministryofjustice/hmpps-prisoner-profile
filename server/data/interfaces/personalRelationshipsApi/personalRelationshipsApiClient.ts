@@ -85,12 +85,30 @@ export interface PersonalRelationshipsPaginationDto {
   totalPages?: number
 }
 
+export interface PersonalRelationshipsNumberOfChildrenDto {
+  id: number
+  numberOfChildren?: string
+  active: boolean
+  createdTime?: string
+  createdBy?: string
+}
+
+export interface PersonalRelationshipsNumberOfChildrenUpdateRequest {
+  numberOfChildren: number
+  requestedBy?: string
+}
+
 export interface PersonalRelationshipsContactQueryParams extends QueryParams {
   emergencyContactOrNextOfKin?: boolean
   isRelationshipActive?: boolean
   relationshipType?: PersonalRelationshipType
   page?: number
   size?: number
+}
+
+export interface PersonalRelationshipsContactCount {
+  official: number
+  social: number
 }
 
 export interface PersonalRelationshipsContactRequest {
@@ -127,13 +145,20 @@ export interface PersonalRelationshipsContactRequestPhoneNumber {
   phoneType?: string
   phoneNumber?: string
 }
-
 export interface PersonalRelationshipsApiClient {
   getContacts(
     prisonerNumber: string,
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto>
 
+  getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount>
+
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto>
+
+  updateNumberOfChildren(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
+  ): Promise<PersonalRelationshipsNumberOfChildrenDto>
   getReferenceDataCodes(domain: PersonalRelationshipsReferenceDataDomain): Promise<PersonalRelationshipsReferenceCode[]>
   createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
 }

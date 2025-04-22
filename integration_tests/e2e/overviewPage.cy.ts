@@ -233,7 +233,10 @@ context('Overview Page', () => {
         overviewPage
           .externalContacts()
           .link()
-          .contains('a[href="/prisoner/G6123VU/contacts/list"]', 'Social and official contacts')
+          .contains(
+            'a[href="http://localhost:9091/contacts/prisoner/G6123VU/contacts/list"]',
+            'Social and official contacts',
+          )
       })
     })
 

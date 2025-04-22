@@ -44,6 +44,7 @@ generic-service:
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui.hmpps.service.justice.gov.uk"
     CSIP_UI_URL: "https://csip.hmpps.service.justice.gov.uk"
+    CONTACTS_UI_URL: "https://contacts.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"

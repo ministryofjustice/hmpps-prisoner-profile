@@ -173,6 +173,7 @@ export const services = () => {
     curiousApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
     referenceDataService,
     prisonService,
     metricsService,

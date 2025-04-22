@@ -1,5 +1,6 @@
 import {
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsReferenceCode,
 } from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
@@ -146,6 +147,14 @@ export const PersonalRelationshipsContactsDtoMock: PersonalRelationshipsContacts
     },
   ],
   page: { size: 10, number: 0, totalElements: 3, totalPages: 1 },
+}
+
+export const PersonalRelationshipsNumberOfChildrenMock: PersonalRelationshipsNumberOfChildrenDto = {
+  id: 1,
+  numberOfChildren: '2',
+  active: true,
+  createdTime: '2025-01-01T12:00:00.123456',
+  createdBy: 'test-user',
 }
 
 export const SocialRelationshipsReferenceCodesMock: PersonalRelationshipsReferenceCode[] = [

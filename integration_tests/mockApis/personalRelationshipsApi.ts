@@ -1,11 +1,8 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
-  personalRelationshipsOfficialMock,
-  personalRelationshipsSocialMock,
-} from '../../server/data/localMockData/personalRelationshipsApiMock'
-import {
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsReferenceCode,
   PersonalRelationshipsReferenceDataDomain,
   PersonalRelationshipType,
@@ -13,66 +10,29 @@ import {
 
 const baseUrl = '/personalRelationships'
 
-const stubPersonalRelationshipCount = (params: {
+const stubPersonalRelationshipsCount = (params: {
   prisonerNumber: string
   relationshipType: PersonalRelationshipType
 }) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPathPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact`,
-      queryParameters: {
-        relationshipType: {
-          equalTo: params.relationshipType,
-        },
-        page: {
-          equalTo: '0',
-        },
-        size: {
-          equalTo: '1',
-        },
-      },
+      urlPathPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact/count`,
     },
     response: {
       status: 200,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody:
-        params.relationshipType === PersonalRelationshipType.Official
-          ? personalRelationshipsOfficialMock
-          : personalRelationshipsSocialMock,
+      jsonBody: { official: 2, social: 1 },
     },
-  })
-
-const stubOfficialRelationshipsCount = (params: { prisonerNumber: string }): SuperAgentRequest =>
-  stubPersonalRelationshipCount({
-    prisonerNumber: params.prisonerNumber,
-    relationshipType: PersonalRelationshipType.Official,
-  })
-
-const stubSocialRelationshipsCount = (params: { prisonerNumber: string }): SuperAgentRequest =>
-  stubPersonalRelationshipCount({
-    prisonerNumber: params.prisonerNumber,
-    relationshipType: PersonalRelationshipType.Social,
   })
 
 const stubPersonalRelationshipsCountError = (params: { prisonerNumber: string }): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPathPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact`,
-      queryParameters: {
-        relationshipType: {
-          equalTo: PersonalRelationshipType.Social,
-        },
-        page: {
-          equalTo: '0',
-        },
-        size: {
-          equalTo: '1',
-        },
-      },
+      urlPathPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact/count`,
     },
     response: {
       status: 500,
@@ -93,6 +53,42 @@ const stubPersonalRelationshipsContacts = (params: {
     request: {
       method: 'GET',
       urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact\\?.*`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
+const stubPersonalRelationshipsGetNumberOfChildren = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsNumberOfChildrenDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/number-of-children`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
+const stubPersonalRelationshipsUpdateNumberOfChildren = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsNumberOfChildrenDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/number-of-children`,
     },
     response: {
       status: 200,
@@ -136,10 +132,11 @@ const stubPersonalRelationshipsCreateContact = (): SuperAgentRequest =>
   })
 
 export default {
-  stubOfficialRelationshipsCount,
-  stubSocialRelationshipsCount,
+  stubPersonalRelationshipsCount,
   stubPersonalRelationshipsCountError,
   stubPersonalRelationshipsContacts,
+  stubPersonalRelationshipsGetNumberOfChildren,
+  stubPersonalRelationshipsUpdateNumberOfChildren,
   stubPersonalRelationshipsGetReferenceData,
   stubPersonalRelationshipsCreateContact,
 }

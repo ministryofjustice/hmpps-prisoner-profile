@@ -8,7 +8,10 @@ import {
   MilitaryRecordsMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
-import { PersonalRelationshipsContactsDtoMock } from '../../server/data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../server/data/localMockData/personalRelationshipsApiMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -82,8 +85,7 @@ Cypress.Commands.add(
     cy.setupComponentsData({ caseLoads })
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
-    cy.task('stubOfficialRelationshipsCount', { prisonerNumber })
-    cy.task('stubSocialRelationshipsCount', { prisonerNumber })
+    cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
   },
 )
 
@@ -177,6 +179,10 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
   cy.task('stubPersonalCareNeeds')
   cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, resp: PersonalRelationshipsContactsDtoMock })
+  cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
+    prisonerNumber,
+    resp: PersonalRelationshipsNumberOfChildrenMock,
+  })
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
