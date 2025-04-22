@@ -51,6 +51,7 @@ import {
   PersonalRelationshipsContactsDtoMock,
   PersonalRelationshipsNumberOfChildrenMock,
 } from '../data/localMockData/personalRelationshipsApiMock'
+import NextOfKinService from './nextOfKinService'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -60,10 +61,11 @@ describe('PersonalPageService', () => {
   let curiousApiClient: CuriousApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
+  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
   let referenceDataService: ReferenceDataService
   let prisonService: PrisonService
   let metricsService: MetricsService
-  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
+  let nextOfKinService: NextOfKinService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -100,7 +102,11 @@ describe('PersonalPageService', () => {
       getContactCount: jest.fn(async () => ({ official: 1, social: 1 })),
       getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
       updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      createContact: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
     }
+    nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>
+    nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
   })
 
   const constructService = () =>
@@ -109,11 +115,12 @@ describe('PersonalPageService', () => {
       () => curiousApiClient,
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
+      () => personalRelationshipsApiClient,
       referenceDataService,
       prisonService,
       metricsService,
       () => Promise.resolve({ curiousApiToken: 'token' }),
-      () => personalRelationshipsApiClient,
+      nextOfKinService,
     )
 
   describe('Getting information from the Prison API', () => {

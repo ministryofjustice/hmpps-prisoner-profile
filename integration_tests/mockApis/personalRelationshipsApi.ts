@@ -3,6 +3,8 @@ import { stubFor } from './wiremock'
 import {
   PersonalRelationshipsContactsDto,
   PersonalRelationshipsNumberOfChildrenDto,
+  PersonalRelationshipsReferenceCode,
+  PersonalRelationshipsReferenceDataDomain,
   PersonalRelationshipType,
 } from '../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
@@ -97,10 +99,44 @@ const stubPersonalRelationshipsUpdateNumberOfChildren = (params: {
     },
   })
 
+const stubPersonalRelationshipsGetReferenceData = (params: {
+  domain: PersonalRelationshipsReferenceDataDomain
+  referenceData: PersonalRelationshipsReferenceCode[]
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `${baseUrl}/reference-codes/group/${params.domain}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.referenceData,
+    },
+  })
+
+const stubPersonalRelationshipsCreateContact = (): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPathPattern: `${baseUrl}/contact`,
+    },
+    response: {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+    },
+  })
+
 export default {
   stubPersonalRelationshipsCount,
   stubPersonalRelationshipsCountError,
   stubPersonalRelationshipsContacts,
   stubPersonalRelationshipsGetNumberOfChildren,
   stubPersonalRelationshipsUpdateNumberOfChildren,
+  stubPersonalRelationshipsGetReferenceData,
+  stubPersonalRelationshipsCreateContact,
 }

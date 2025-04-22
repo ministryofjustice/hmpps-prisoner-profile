@@ -24,6 +24,8 @@ describe('ContactsService', () => {
       })),
       getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
       updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      getReferenceDataCodes: jest.fn(),
+      createContact: jest.fn(),
     }
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest
