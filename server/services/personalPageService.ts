@@ -180,6 +180,7 @@ export default class PersonalPageService {
       militaryRecords,
       physicalAttributes,
       personalRelationshipContacts,
+      personalRelationshipsNumberOfChildren,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -198,6 +199,7 @@ export default class PersonalPageService {
         emergencyContactOrNextOfKin: true,
         size: 100,
       }),
+      personalRelationsipsApiClient.getNumberOfChildren(prisonerNumber),
     ])
 
     const nextOfKinAndEmergencyContacts = personalRelationshipContacts.content.sort(this.nextOfKinSorter)
@@ -218,6 +220,7 @@ export default class PersonalPageService {
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
+        personalRelationshipsNumberOfChildren.numberOfChildren,
         flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
@@ -282,6 +285,7 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
+    numberOfChildren: string,
     flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
@@ -330,9 +334,7 @@ export default class PersonalPageService {
       },
       marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
       nationality,
-      numberOfChildren: formatNumberOfChildren(
-        getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation),
-      ),
+      numberOfChildren: formatNumberOfChildren(numberOfChildren),
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
         language: description,
         code,
@@ -662,6 +664,24 @@ export default class PersonalPageService {
     })
 
     return response
+  }
+
+  async getNumberOfChildren(clientToken: string, prisonerNumber: string) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    return personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
+  }
+
+  async updateNumberOfChildren(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    numberOfChildren: number,
+  ) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    return personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
+      numberOfChildren,
+      requestedBy: user.username,
+    })
   }
 
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {

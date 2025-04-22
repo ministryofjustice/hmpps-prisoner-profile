@@ -11,7 +11,10 @@ import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/l
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
-import { PersonalRelationshipsContactsDtoMock } from '../../../server/data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../../server/data/localMockData/personalRelationshipsApiMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -68,6 +71,10 @@ context('When signed in', () => {
       cy.task('stubPersonalRelationshipsContacts', {
         prisonerNumber: 'G6123VU',
         resp: PersonalRelationshipsContactsDtoMock,
+      })
+      cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
+        prisonerNumber,
+        resp: PersonalRelationshipsNumberOfChildrenMock,
       })
       visitPersonalDetailsPage()
     })
