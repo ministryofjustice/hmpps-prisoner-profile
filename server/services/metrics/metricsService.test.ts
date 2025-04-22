@@ -56,4 +56,44 @@ describe('Metrics Service', () => {
       })
     })
   })
+
+  describe('trackPersonCommunicationNeedsUpdate', () => {
+    it('should call telemetry client', async () => {
+      metricsService.trackPersonCommunicationNeedsUpdate({
+        fieldsUpdated: ['field1', 'field2'],
+        prisonerNumber: 'A1234AA',
+        user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
+      })
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-person-communication-needs-updated',
+        properties: {
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['field1', 'field2'],
+          username: 'USER1',
+          activeCaseLoad: 'MDI',
+        },
+      })
+    })
+  })
+
+  describe('trackPersonalRelationshipsUpdate', () => {
+    it('should call telemetry client', async () => {
+      metricsService.trackPersonalRelationshipsUpdate({
+        fieldsUpdated: ['field1', 'field2'],
+        prisonerNumber: 'A1234AA',
+        user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
+      })
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-personal-relationships-updated',
+        properties: {
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['field1', 'field2'],
+          username: 'USER1',
+          activeCaseLoad: 'MDI',
+        },
+      })
+    })
+  })
 })

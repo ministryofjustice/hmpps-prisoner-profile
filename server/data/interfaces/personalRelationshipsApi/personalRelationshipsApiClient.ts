@@ -6,6 +6,23 @@ export enum PersonalRelationshipType {
   Social = 'S',
 }
 
+// eslint-disable-next-line no-shadow
+export enum PersonalRelationshipsReferenceDataDomain {
+  Title = 'TITLE',
+  OfficialRelationship = 'OFFICIAL_RELATIONSHIP',
+  SocialRelationship = 'SOCIAL_RELATIONSHIP',
+  City = 'CITY',
+}
+
+export interface PersonalRelationshipsReferenceCode {
+  referenceCodeId: number
+  groupCode: string
+  code: string
+  description: string
+  displayOrder: number
+  isActive: boolean
+}
+
 export interface PersonalRelationshipsContactsDto {
   content: PersonalRelationshipsContact[]
   page?: PersonalRelationshipsPaginationDto
@@ -94,6 +111,40 @@ export interface PersonalRelationshipsContactCount {
   social: number
 }
 
+export interface PersonalRelationshipsContactRequest {
+  titleCode?: string
+  lastName: string
+  firstName: string
+  middleNames?: string
+  dateOfBirth?: string
+  isStaff: boolean
+  relationship: PersonalRelationshipsContactRequestRelationship
+  addresses?: PersonalRelationshipsContactRequestAddress[]
+  phoneNumbers?: PersonalRelationshipsContactRequestPhoneNumber[]
+  createdBy: string
+}
+
+export interface PersonalRelationshipsContactRequestRelationship {
+  prisonerNumber: string
+  relationshipTypeCode: string
+  relationshipToPrisonerCode: string
+  isNextOfKin: boolean
+  isEmergencyContact: boolean
+  isApprovedVisitor: boolean
+}
+
+export interface PersonalRelationshipsContactRequestAddress {
+  property?: string
+  street?: string
+  cityCode?: string
+  postcode?: string
+  noFixedAddress: boolean
+}
+
+export interface PersonalRelationshipsContactRequestPhoneNumber {
+  phoneType?: string
+  phoneNumber?: string
+}
 export interface PersonalRelationshipsApiClient {
   getContacts(
     prisonerNumber: string,
@@ -108,4 +159,6 @@ export interface PersonalRelationshipsApiClient {
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto>
+  getReferenceDataCodes(domain: PersonalRelationshipsReferenceDataDomain): Promise<PersonalRelationshipsReferenceCode[]>
+  createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
 }

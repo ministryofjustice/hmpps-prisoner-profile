@@ -43,6 +43,7 @@ import PhotoService from './photoService'
 import AliasService from './aliasService'
 import LanguagesService from './languagesService'
 import ContactsService from './contactsService'
+import NextOfKinService from './nextOfKinService'
 
 export const services = () => {
   const {
@@ -99,20 +100,10 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personCommunicationNeedsApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
   )
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
-  const personalPageService = new PersonalPageService(
-    prisonApiClientBuilder,
-    curiousApiClientBuilder,
-    personIntegrationApiClientBuilder,
-    healthAndMedicationApiClientBuilder,
-    referenceDataService,
-    prisonService,
-    metricsService,
-    curiousApiToken,
-    personalRelationshipsApiClientBuilder,
-  )
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
@@ -172,6 +163,23 @@ export const services = () => {
     metricsService,
   )
   const contactsService = new ContactsService(personalRelationshipsApiClientBuilder)
+  const nextOfKinService = new NextOfKinService(
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
+  const personalPageService = new PersonalPageService(
+    prisonApiClientBuilder,
+    curiousApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    prisonService,
+    metricsService,
+    curiousApiToken,
+    nextOfKinService,
+  )
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -229,6 +237,7 @@ export const services = () => {
     languagesService,
     referenceDataService,
     contactsService,
+    nextOfKinService,
   }
 }
 

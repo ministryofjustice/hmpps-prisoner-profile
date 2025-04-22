@@ -30,6 +30,7 @@ import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
+import nextOfKinRouter from './nextOfKinRouter'
 import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
 
 export default function personalRouter(services: Services): Router {
@@ -100,6 +101,14 @@ export default function personalRouter(services: Services): Router {
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     languagesRouter(services, editProfileChecks),
+  )
+
+  // Next of kin and emergency contacts
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    nextOfKinRouter(services, editProfileChecks),
   )
 
   // Edit routes

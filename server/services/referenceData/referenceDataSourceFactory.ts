@@ -11,9 +11,16 @@ import {
   HealthAndMedicationApiClient,
   HealthAndMedicationReferenceDataDomain,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { PersonCommunicationNeedsReferenceDataDomain } from '../../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
-import PersonCommunicationNeedsApiRestClient from '../../data/personCommunicationNeedsApiRestClient'
+import {
+  PersonCommunicationNeedsApiClient,
+  PersonCommunicationNeedsReferenceDataDomain,
+} from '../../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import PersonCommunicationNeedsApiReferenceDataSource from './personCommunicationNeedsApiReferenceDataSource'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsReferenceDataDomain,
+} from '../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import PersonalRelationshipsApiReferenceDataSource from './personalRelationshipsApiReferenceDataSource'
 
 export class ReferenceDataSourceFactory {
   private readonly referenceDataSources = new Map<ReferenceDataDomain, ReferenceDataSource>()
@@ -21,12 +28,16 @@ export class ReferenceDataSourceFactory {
   constructor(
     personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
-    personCommunicationNeedsApiClientBuilder: RestClientBuilder<PersonCommunicationNeedsApiRestClient>,
+    personCommunicationNeedsApiClientBuilder: RestClientBuilder<PersonCommunicationNeedsApiClient>,
+    personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
   ) {
     const personIntegrationSource = new PersonIntegrationApiReferenceDataSource(personIntegrationApiClientBuilder)
     const healthAndMedicationSource = new HealthAndMedicationApiReferenceDataSource(healthAndMedicationApiClientBuilder)
     const personCommunicationNeedsSource = new PersonCommunicationNeedsApiReferenceDataSource(
       personCommunicationNeedsApiClientBuilder,
+    )
+    const personalRelationshipsSource = new PersonalRelationshipsApiReferenceDataSource(
+      personalRelationshipsApiClientBuilder,
     )
 
     Object.values(CorePersonRecordReferenceDataDomain).forEach(domain => {
@@ -39,6 +50,10 @@ export class ReferenceDataSourceFactory {
 
     Object.values(PersonCommunicationNeedsReferenceDataDomain).forEach(domain => {
       this.referenceDataSources.set(domain, personCommunicationNeedsSource)
+    })
+
+    Object.values(PersonalRelationshipsReferenceDataDomain).forEach(domain => {
+      this.referenceDataSources.set(domain, personalRelationshipsSource)
     })
   }
 

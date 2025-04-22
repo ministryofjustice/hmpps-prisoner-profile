@@ -2,12 +2,15 @@ import nock from 'nock'
 import config from '../config'
 import {
   PersonalRelationshipsApiClient,
+  PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactsDto,
   PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsNumberOfChildrenUpdateRequest,
+  PersonalRelationshipsReferenceDataDomain,
   PersonalRelationshipType,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
+import { personalRelationshipsSocialMock } from './localMockData/personalRelationshipsApiMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -150,6 +153,58 @@ describe('personalRelationshipsApiRestClient', () => {
 
       const output = await personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, request)
       expect(output).toEqual(updatedNumberOfChildren)
+    })
+  })
+
+  describe('getReferenceDataCodes', () => {
+    const domain = PersonalRelationshipsReferenceDataDomain.SocialRelationship
+    const referenceCodes = personalRelationshipsSocialMock
+
+    it('should return reference data codes from the API', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/reference-codes/group/${domain}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, referenceCodes)
+
+      const output = await personalRelationshipsApiClient.getReferenceDataCodes(domain)
+      expect(output).toEqual(referenceCodes)
+    })
+
+    it('should return an empty array when no reference codes are found', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/reference-codes/group/${domain}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, [])
+
+      const output = await personalRelationshipsApiClient.getReferenceDataCodes(domain)
+      expect(output).toEqual([])
+    })
+  })
+
+  describe('createContact', () => {
+    const contactRequest: PersonalRelationshipsContactRequest = {
+      lastName: 'Doe',
+      firstName: 'Rick',
+      isStaff: false,
+      relationship: {
+        prisonerNumber: 'G4790GH',
+        relationshipTypeCode: 'S',
+        relationshipToPrisonerCode: 'BRO',
+        isNextOfKin: false,
+        isEmergencyContact: true,
+        isApprovedVisitor: false,
+      },
+      createdBy: 'JD000001',
+    }
+
+    it('should create a new contact successfully', async () => {
+      fakePersonalRelationshipsApi
+        .post('/contact')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(201)
+
+      await personalRelationshipsApiClient.createContact(contactRequest)
+      expect(fakePersonalRelationshipsApi.isDone()).toBe(true)
     })
   })
 })

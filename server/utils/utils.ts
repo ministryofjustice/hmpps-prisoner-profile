@@ -825,3 +825,25 @@ export const formatPhoneNumber = (phoneNumber: string): string => {
   }
   return phoneNumber.trim()
 }
+
+/**
+ * Checks if a value is included in an array or matches a string.
+ *
+ * @param {string[] | string} array - The array or string to be searched.
+ * @param {string} value - The value to search for within the array or string.
+ * @return {boolean} Returns true if the value is found in the array or matches the string; otherwise, returns false.
+ */
+export const arrayIncludes = (array: string[] | string, value: string): boolean => {
+  return Array.isArray(array) ? array.includes(value) : array === value
+}
+
+// Next of kin
+export const RELATIONSHIP_DESCRIPTIONS: Record<string, string> = {
+  OTH: 'Other official relationship',
+  NONE: 'No social relationship',
+  OTHER: 'Other social relationship',
+}
+
+export const mapRelationshipDescriptionByCode = (code: string, fallbackDescription: string): string => {
+  return RELATIONSHIP_DESCRIPTIONS[code] || fallbackDescription
+}

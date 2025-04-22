@@ -8,6 +8,7 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
+  arrayIncludes,
   contactAddressToHtml,
   findError,
   formatMoney,
@@ -220,4 +221,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
   njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
+  njkEnv.addFilter('includes', arrayIncludes)
 }
