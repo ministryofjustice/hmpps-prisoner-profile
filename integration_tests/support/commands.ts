@@ -82,8 +82,7 @@ Cypress.Commands.add(
     cy.setupComponentsData({ caseLoads })
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
-    cy.task('stubOfficialRelationshipsCount', { prisonerNumber })
-    cy.task('stubSocialRelationshipsCount', { prisonerNumber })
+    cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
   },
 )
 

@@ -25,6 +25,8 @@ describe('personalRelationshipsApiRestClient', () => {
 
   const prisonerNumber = 'A1234BC'
 
+  const contactCount = { offical: 1, social: 1 }
+
   const contacts: PersonalRelationshipsContactsDto = {
     content: [
       {
@@ -93,6 +95,18 @@ describe('personalRelationshipsApiRestClient', () => {
 
       const output = await personalRelationshipsApiClient.getContacts(prisonerNumber, { page, size })
       expect(output).toEqual(contacts)
+    })
+  })
+
+  describe('getContactCount', () => {
+    it('should return data from api', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/prisoner/${prisonerNumber}/contact/count`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, contactCount)
+
+      const output = await personalRelationshipsApiClient.getContactCount(prisonerNumber)
+      expect(output).toEqual(contactCount)
     })
   })
 })

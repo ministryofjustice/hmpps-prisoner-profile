@@ -76,9 +76,15 @@ export interface PersonalRelationshipsContactQueryParams extends QueryParams {
   size?: number
 }
 
+export interface PersonalRelationshipsContactCount {
+  official: number
+  social: number
+}
+
 export interface PersonalRelationshipsApiClient {
   getContacts(
     prisonerNumber: string,
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto>
+  getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount>
 }
