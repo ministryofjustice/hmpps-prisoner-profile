@@ -43,8 +43,14 @@ import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
-import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
-import { PersonalRelationshipsContactsDtoMock } from '../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
+} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../data/localMockData/personalRelationshipsApiMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -92,6 +98,8 @@ describe('PersonalPageService', () => {
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
       getContactCount: jest.fn(async () => ({ official: 1, social: 1 })),
+      getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
     }
   })
 
@@ -779,6 +787,28 @@ describe('PersonalPageService', () => {
       const result = await service.getMilitaryRecords('token', 'A1234AA')
       expect(result).toEqual(MilitaryRecordsMock)
       expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith('A1234AA')
+    })
+  })
+
+  describe('number of children', () => {
+    it('Gets the number of children from the Personal Relationships API', async () => {
+      const service = constructService()
+      personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+        async () => PersonalRelationshipsNumberOfChildrenMock,
+      )
+
+      const result = await service.getNumberOfChildren('token', 'A1234AA')
+      expect(result).toEqual(PersonalRelationshipsNumberOfChildrenMock)
+      expect(personalRelationshipsApiClient.getNumberOfChildren).toHaveBeenCalledWith('A1234AA')
+    })
+
+    it('Updates the number of children using the Personal Relationships API', async () => {
+      const request: PersonalRelationshipsNumberOfChildrenUpdateRequest = {
+        numberOfChildren: 5,
+        requestedBy: prisonUserMock.username,
+      }
+      await constructService().updateNumberOfChildren('token', prisonUserMock, 'A1234AA', 5)
+      expect(personalRelationshipsApiClient.updateNumberOfChildren).toHaveBeenCalledWith('A1234AA', request)
     })
   })
 })

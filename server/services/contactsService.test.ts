@@ -1,7 +1,10 @@
 import { RestClientBuilder } from '../data'
 import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import ContactsService from './contactsService'
-import { personalRelationshipsSocialMock } from '../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsNumberOfChildrenMock,
+  personalRelationshipsSocialMock,
+} from '../data/localMockData/personalRelationshipsApiMock'
 
 describe('ContactsService', () => {
   let clientToken: string
@@ -19,6 +22,8 @@ describe('ContactsService', () => {
         official: 1,
         social: 1,
       })),
+      getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
     }
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest

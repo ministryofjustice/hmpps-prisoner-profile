@@ -11,6 +11,7 @@ import {
   cityOrTownOfBirthFieldData,
   heightFieldData,
   nationalityFieldData,
+  numberOfChildrenFieldData,
   RadioFieldData,
   sexualOrientationFieldData,
   shoeSizeFieldData,
@@ -48,6 +49,7 @@ import {
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
+import { PersonalRelationshipsNumberOfChildrenMock } from '../../data/localMockData/personalRelationshipsApiMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -115,6 +117,7 @@ describe('PersonalController', () => {
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
+    personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
@@ -2389,6 +2392,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
           formTitle: `Select First Last's religion, faith or belief`,
+          redirectAnchor: 'personal-details',
           prisonerNumber: 'ABC123',
           currentReasonForChange: undefined,
           currentReasonForChangeUnknown: undefined,
@@ -2799,6 +2803,166 @@ describe('PersonalController', () => {
           correlationId: request.id,
           action: PostAction.EditSexualOrientation,
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Number of children', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.numberOfChildren().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/children', {
+          pageTitle: 'Children - Prisoner personal details',
+          formTitle: `Does First Last have any children?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+          radioFieldValue: 'YES',
+          currentNumberOfChildren: '2',
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field values from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            radioFieldValue: 'YES',
+            currentNumberOfChildren: '4',
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditNumberOfChildren,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.numberOfChildren().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { hasChildren: 'YES', numberOfChildren: '5' },
+          flash: jest.fn(),
+        } as any
+
+        personalPageService.updateNumberOfChildren = jest.fn()
+      })
+
+      it('Updates the number of children', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 5)
+      })
+
+      it(`Updates the number of children to 0 if 'NO' selected as answer`, async () => {
+        await action(
+          {
+            ...validRequest,
+            body: { hasChildren: 'NO' },
+          },
+          res,
+        )
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Children updated',
+          type: FlashMessageType.success,
+          fieldName: 'numberOfChildren',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateNumberOfChildren = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/children')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { hasChildren: 'YES', numberOfChildren: '5' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditNumberOfChildren,
+          details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
         }
 
         await action(request, res)

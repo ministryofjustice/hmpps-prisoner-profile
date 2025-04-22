@@ -1,4 +1,7 @@
-import { PersonalRelationshipsContactsDto } from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
+} from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 export const personalRelationshipsOfficialMock: PersonalRelationshipsContactsDto = {
   content: [
@@ -143,4 +146,12 @@ export const PersonalRelationshipsContactsDtoMock: PersonalRelationshipsContacts
     },
   ],
   page: { size: 10, number: 0, totalElements: 3, totalPages: 1 },
+}
+
+export const PersonalRelationshipsNumberOfChildrenMock: PersonalRelationshipsNumberOfChildrenDto = {
+  id: 1,
+  numberOfChildren: '2',
+  active: true,
+  createdTime: '2025-01-01T12:00:00.123456',
+  createdBy: 'test-user',
 }
