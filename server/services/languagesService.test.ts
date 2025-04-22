@@ -49,6 +49,7 @@ describe('LanguagesService', () => {
       trackHealthAndMedicationUpdate: jest.fn(),
       trackPersonIntegrationUpdate: jest.fn(),
       trackPrisonPersonUpdate: jest.fn(),
+      trackPersonalRelationshipsUpdate: jest.fn(),
     } as jest.Mocked<MetricsService>
 
     languagesService = new LanguagesService(

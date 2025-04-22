@@ -35,7 +35,7 @@
 {% endmacro %}
 
 
-{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'next-of-kin-emergency-contacts' }] if editEnabled }) -%}
+{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'personal/next-of-kin-emergency-contacts' }] if editEnabled }) -%}
   {% if not hasNextOfKin %}
     <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
       <div class="govuk-grid-column-full">
@@ -61,7 +61,7 @@
       </div>
     </div>
   {% endif %}
-  {% if hasNextOfKin != hasEmergencyContact %}
+  {% if hasNextOfKin !== hasEmergencyContact %}
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
   {% endif %}
   {% for contact in nextOfKinAndEmergencyContacts %}

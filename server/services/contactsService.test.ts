@@ -18,6 +18,8 @@ describe('ContactsService', () => {
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => personalRelationshipsSocialMock),
+      getReferenceDataCodes: jest.fn(),
+      createContact: jest.fn(),
     }
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest

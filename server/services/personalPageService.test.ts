@@ -43,8 +43,8 @@ import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
-import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { PersonalRelationshipsContactsDtoMock } from '../data/localMockData/personalRelationshipsApiMock'
+import NextOfKinService from './nextOfKinService'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -57,7 +57,7 @@ describe('PersonalPageService', () => {
   let referenceDataService: ReferenceDataService
   let prisonService: PrisonService
   let metricsService: MetricsService
-  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
+  let nextOfKinService: NextOfKinService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -89,9 +89,8 @@ describe('PersonalPageService', () => {
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
 
-    personalRelationshipsApiClient = {
-      getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
-    }
+    nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>
+    nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
   })
 
   const constructService = () =>
@@ -104,7 +103,7 @@ describe('PersonalPageService', () => {
       prisonService,
       metricsService,
       () => Promise.resolve({ curiousApiToken: 'token' }),
-      () => personalRelationshipsApiClient,
+      nextOfKinService,
     )
 
   describe('Getting information from the Prison API', () => {

@@ -3,6 +3,7 @@ import {
   addressToLines,
   addressToSummaryItems,
   apostrophe,
+  arrayIncludes,
   arrayToQueryString,
   calculateAge,
   camelToSnakeCase,
@@ -1118,6 +1119,49 @@ describe('utils', () => {
       ['Null address', null, 'Not entered'],
     ])('%s', (_: string, address: PersonalRelationshipsContact, expected: string) => {
       expect(contactAddressToHtml(address)).toEqual(expected)
+    })
+  })
+
+  describe('arrayIncludes', () => {
+    it('should return true when the value is present in the array', () => {
+      const array = ['apple', 'banana', 'cherry']
+      const value = 'banana'
+      expect(arrayIncludes(array, value)).toBe(true)
+    })
+
+    it('should return false when the value is not present in the array', () => {
+      const array = ['apple', 'banana', 'cherry']
+      const value = 'grape'
+      expect(arrayIncludes(array, value)).toBe(false)
+    })
+
+    it('should return true when the value equals the string (string input)', () => {
+      const array = 'banana'
+      const value = 'banana'
+      expect(arrayIncludes(array, value)).toBe(true)
+    })
+
+    it('should return false when the string does not equal the value (string input)', () => {
+      const array = 'banana'
+      const value = 'grape'
+      expect(arrayIncludes(array, value)).toBe(false)
+    })
+
+    it('should return false for an empty array', () => {
+      const array: string[] = []
+      const value = 'banana'
+      expect(arrayIncludes(array, value)).toBe(false)
+    })
+
+    it('should return false for an empty string', () => {
+      const array = ''
+      const value = 'banana'
+      expect(arrayIncludes(array, value)).toBe(false)
+    })
+
+    it('should return false for null or undefined array', () => {
+      expect(arrayIncludes(null as unknown as string[], 'banana')).toBe(false)
+      expect(arrayIncludes(undefined as unknown as string[], 'banana')).toBe(false)
     })
   })
 })
