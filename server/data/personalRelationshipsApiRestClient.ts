@@ -29,7 +29,7 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
   }
 
   getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/number-of-children` })
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/number-of-children`, ignore404: true })
   }
 
   updateNumberOfChildren(
