@@ -162,7 +162,7 @@
                     <div class="govuk-!-static-margin-bottom-5">
                         <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{count.charge.offenceDescription}}</p>
                         {% if count.charge.offenceDate and count.charge.offenceEndDate %}
-                            <p>Committed from {{count.charge.offenceEndDate | formatDate}} to {{count.charge.offenceDate | formatDate}}</p>
+                            <p>Committed from {{count.charge.offenceDate | formatDate}} to {{count.charge.offenceEndDate | formatDate}}</p>
                         {% elseif count.charge.offenceDate %}
                             <p>Committed on {{count.charge.offenceDate | formatDate}}</p>
                         {% endif %}
