@@ -141,6 +141,8 @@ export default class OverviewPage extends Page {
 
   manageCategoryActionLink = (): PageElement => cy.get('[data-qa=manage-category-action-link]')
 
+  manageActivityAllocationsActionLink = (): PageElement => cy.get('[data-qa=manage-allocations-link]')
+
   addKeyWorkerSessionActionLink = (): PageElement => cy.getDataQa('add-key-worker-session-action-link')
 
   // More Info

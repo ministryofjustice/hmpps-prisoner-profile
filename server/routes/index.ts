@@ -29,6 +29,8 @@ import CareNeedsController from '../controllers/careNeedsController'
 import permissionsGuard from '../middleware/permissionsGuard'
 import personalRouter from './personalRouter'
 import imageRouter from './imageRouter'
+import isServiceNavEnabled from '../utils/isServiceEnabled'
+import getActivityPermissions from '../services/utils/permissions/getActivityPermissions'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -119,8 +121,13 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
+      const manageAllocationsLinkUrl = `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditLearningAndWorkPlan = userHasRoles([Role.LearningAndWorkProgressManager], res.locals.user.userRoles)
+      const canManageAllocations =
+        config.featureToggles.manageAllocationsEnabled &&
+        getActivityPermissions(res.locals.user, prisonerData).edit &&
+        isServiceNavEnabled('activities', res.locals.feComponents?.sharedData)
 
       const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
@@ -154,6 +161,8 @@ export default function routes(services: Services): Router {
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
+        manageAllocationsLinkUrl,
+        canManageAllocations,
         vc2goalsUrl,
         canEditLearningAndWorkPlan,
         hasVc2Goals,

@@ -113,5 +113,18 @@ export default (
     })
   }
 
+  if (
+    config.featureToggles.manageAllocationsEnabled &&
+    permissions.activity?.edit &&
+    isServiceNavEnabled('activities', feComponentsSharedData)
+  ) {
+    actions.push({
+      text: 'Manage activity allocations',
+      icon: Icon.ManageAllocations,
+      url: `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`,
+      dataQA: 'manage-allocations-link',
+    })
+  }
+
   return actions
 }

@@ -326,6 +326,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.manageCategoryActionLink().should('not.exist')
       })
+
+      it('should not display Manage activity allocations link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.manageActivityAllocationsActionLink().should('not.exist')
+      })
     })
 
     context('More Info', () => {
