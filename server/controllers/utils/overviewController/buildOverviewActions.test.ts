@@ -275,4 +275,41 @@ describe('buildOverviewActions', () => {
       },
     )
   })
+
+  describe('Manage activity allocations', () => {
+    test.each`
+      manageAllocationsEnabled | perms                            | availableServices                            | visible
+      ${false}                 | ${{ activity: { edit: true } }}  | ${[{ id: 'activities', navEnabled: true }]}  | ${false}
+      ${true}                  | ${{ activity: { edit: true } }}  | ${[{ id: 'activities', navEnabled: true }]}  | ${true}
+      ${true}                  | ${{ activity: { edit: true } }}  | ${[{ id: 'activities', navEnabled: true }]}  | ${true}
+      ${true}                  | ${{ activity: { edit: true } }}  | ${[{ id: 'activities', navEnabled: false }]} | ${false}
+      ${true}                  | ${{ activity: { edit: false } }} | ${[{ id: 'activities', navEnabled: true }]}  | ${false}
+    `(
+      'user with activity.edit: $perms.activity.edit and navEnabled: $availableServices.0.navEnabled can see Log an activity application: $visible',
+      ({ manageAllocationsEnabled, perms, availableServices, visible }) => {
+        const resp = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          prisonUserMock,
+          {
+            ...config,
+            featureToggles: {
+              ...config.featureToggles,
+              manageAllocationsEnabled,
+            },
+          },
+          { services: availableServices } as HeaderFooterSharedData,
+          perms,
+        )
+        expect(
+          !!resp.find(
+            action =>
+              action.url ===
+              `${config.serviceUrls.activities}/prisoner-allocations/${PrisonerMockDataA.prisonerNumber}`,
+          ),
+        ).toEqual(visible)
+      },
+    )
+  })
 })

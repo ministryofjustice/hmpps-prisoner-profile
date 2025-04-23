@@ -11,4 +11,5 @@ export enum Icon {
   ChangeCell = 'change-cell',
   LogActivityApplication = 'log-an-activity-appointment',
   MakeCSIPReferral = 'make-csip-referral',
+  ManageAllocations = 'manage-allocations',
 }
