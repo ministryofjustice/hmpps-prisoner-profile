@@ -1,7 +1,11 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { PersonalRelationshipsDomesticStatusMock } from '../../../../server/data/localMockData/personalRelationshipsApiMock'
+import {
+  DomesticStatusReferenceCodesMock,
+  PersonalRelationshipsDomesticStatusMock,
+} from '../../../../server/data/localMockData/personalRelationshipsApiMock'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Edit domestic status', () => {
   const prisonerNumber = 'G6123VU'
@@ -25,6 +29,10 @@ context('Edit domestic status', () => {
       cy.task('stubPersonalRelationshipsUpdateDomesticStatus', {
         prisonerNumber,
         resp: PersonalRelationshipsDomesticStatusMock,
+      })
+      cy.task('stubPersonalRelationshipsGetReferenceData', {
+        domain: PersonalRelationshipsReferenceDataDomain.DomesticStatus,
+        referenceData: DomesticStatusReferenceCodesMock,
       })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/marital-status`,
