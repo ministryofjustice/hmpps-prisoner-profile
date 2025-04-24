@@ -2,6 +2,7 @@ import { RestClientBuilder } from '../data'
 import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import ContactsService from './contactsService'
 import {
+  PersonalRelationshipsDomesticStatusMock,
   PersonalRelationshipsNumberOfChildrenMock,
   personalRelationshipsSocialMock,
 } from '../data/localMockData/personalRelationshipsApiMock'
@@ -24,6 +25,8 @@ describe('ContactsService', () => {
       })),
       getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
       updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      getDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
+      updateDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
       getReferenceDataCodes: jest.fn(),
       createContact: jest.fn(),
     }

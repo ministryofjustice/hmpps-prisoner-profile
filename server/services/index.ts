@@ -44,6 +44,7 @@ import AliasService from './aliasService'
 import LanguagesService from './languagesService'
 import ContactsService from './contactsService'
 import NextOfKinService from './nextOfKinService'
+import DomesticStatusService from './domesticStatusService'
 
 export const services = () => {
   const {
@@ -168,6 +169,11 @@ export const services = () => {
     referenceDataService,
     metricsService,
   )
+  const domesticStatusService = new DomesticStatusService(
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
@@ -179,6 +185,7 @@ export const services = () => {
     metricsService,
     curiousApiToken,
     nextOfKinService,
+    domesticStatusService,
   )
 
   const apolloClient = new ApolloClient({

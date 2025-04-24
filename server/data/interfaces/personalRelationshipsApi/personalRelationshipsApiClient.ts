@@ -12,6 +12,7 @@ export enum PersonalRelationshipsReferenceDataDomain {
   OfficialRelationship = 'OFFICIAL_RELATIONSHIP',
   SocialRelationship = 'SOCIAL_RELATIONSHIP',
   City = 'CITY',
+  DomesticStatus = 'DOMESTIC_STS',
 }
 
 export interface PersonalRelationshipsReferenceCode {
@@ -93,8 +94,22 @@ export interface PersonalRelationshipsNumberOfChildrenDto {
   createdBy?: string
 }
 
+export interface PersonalRelationshipsDomesticStatusDto {
+  id: number
+  domesticStatusCode: string
+  domesticStatusDescription: string
+  active: boolean
+  createdTime?: string
+  createdBy?: string
+}
+
 export interface PersonalRelationshipsNumberOfChildrenUpdateRequest {
   numberOfChildren: number
+  requestedBy?: string
+}
+
+export interface PersonalRelationshipsDomesticStatusUpdateRequest {
+  domesticStatusCode: string
   requestedBy?: string
 }
 
@@ -159,6 +174,15 @@ export interface PersonalRelationshipsApiClient {
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto>
+
+  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto>
+
+  updateDomesticStatus(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
+  ): Promise<PersonalRelationshipsDomesticStatusDto>
+
   getReferenceDataCodes(domain: PersonalRelationshipsReferenceDataDomain): Promise<PersonalRelationshipsReferenceCode[]>
+
   createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
 }

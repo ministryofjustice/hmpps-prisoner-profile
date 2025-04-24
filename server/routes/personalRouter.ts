@@ -443,5 +443,17 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  editRoute({
+    path: 'marital-status',
+    edit: {
+      audit: Page.EditDomesticStatus,
+      method: personalController.domesticStatus().edit,
+    },
+    submit: {
+      audit: Page.PostEditDomesticStatus,
+      method: personalController.domesticStatus().submit,
+    },
+  })
+
   return router
 }

@@ -13,6 +13,7 @@ import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localM
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
 import {
   PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsDomesticStatusMock,
   PersonalRelationshipsNumberOfChildrenMock,
 } from '../../../server/data/localMockData/personalRelationshipsApiMock'
 
@@ -75,6 +76,10 @@ context('When signed in', () => {
       cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
         prisonerNumber,
         resp: PersonalRelationshipsNumberOfChildrenMock,
+      })
+      cy.task('stubPersonalRelationshipsGetDomesticStatus', {
+        prisonerNumber,
+        resp: PersonalRelationshipsDomesticStatusMock,
       })
       visitPersonalDetailsPage()
     })
@@ -170,7 +175,10 @@ context('When signed in', () => {
           )
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual or straight')
-        page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
+        page
+          .personalDetails()
+          .marriageOrCivilPartnership()
+          .should('have.text', 'Single - never married or in a civil partnership')
         page.personalDetails().numberOfChildren().should('have.text', '2')
         page.personalDetails().typeOfDiet().should('not.exist')
         page

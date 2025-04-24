@@ -2,6 +2,7 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsReferenceCode,
   PersonalRelationshipsReferenceDataDomain,
@@ -99,6 +100,42 @@ const stubPersonalRelationshipsUpdateNumberOfChildren = (params: {
     },
   })
 
+const stubPersonalRelationshipsGetDomesticStatus = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsDomesticStatusDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/domestic-status`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
+const stubPersonalRelationshipsUpdateDomesticStatus = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsDomesticStatusDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/domestic-status`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
 const stubPersonalRelationshipsGetReferenceData = (params: {
   domain: PersonalRelationshipsReferenceDataDomain
   referenceData: PersonalRelationshipsReferenceCode[]
@@ -137,6 +174,8 @@ export default {
   stubPersonalRelationshipsContacts,
   stubPersonalRelationshipsGetNumberOfChildren,
   stubPersonalRelationshipsUpdateNumberOfChildren,
+  stubPersonalRelationshipsGetDomesticStatus,
+  stubPersonalRelationshipsUpdateDomesticStatus,
   stubPersonalRelationshipsGetReferenceData,
   stubPersonalRelationshipsCreateContact,
 }

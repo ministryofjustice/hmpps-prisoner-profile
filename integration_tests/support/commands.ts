@@ -10,6 +10,7 @@ import {
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 import {
   PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsDomesticStatusMock,
   PersonalRelationshipsNumberOfChildrenMock,
 } from '../../server/data/localMockData/personalRelationshipsApiMock'
 
@@ -182,6 +183,10 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
     prisonerNumber,
     resp: PersonalRelationshipsNumberOfChildrenMock,
+  })
+  cy.task('stubPersonalRelationshipsGetDomesticStatus', {
+    prisonerNumber,
+    resp: PersonalRelationshipsDomesticStatusMock,
   })
 })
 

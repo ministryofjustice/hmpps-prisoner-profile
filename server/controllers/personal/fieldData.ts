@@ -210,3 +210,12 @@ export const numberOfChildrenFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditNumberOfChildren,
   redirectAnchor: 'personal-details',
 }
+
+export const domesticStatusFieldData: RadioFieldData = {
+  url: 'marital-status',
+  fieldName: 'domesticStatus',
+  pageTitle: 'Marital or civil partnership status',
+  auditEditPageLoad: Page.EditDomesticStatus,
+  auditEditPostAction: PostAction.EditDomesticStatus,
+  redirectAnchor: 'personal-details',
+}
