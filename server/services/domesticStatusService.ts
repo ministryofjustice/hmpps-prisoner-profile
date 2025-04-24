@@ -9,6 +9,7 @@ import {
   PersonalRelationshipsReferenceDataDomain,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { compareStrings } from '../utils/utils'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 const domesticStatusMapping: Record<string, string> = {
   S: 'Single – never married or in a civil partnership',
@@ -45,11 +46,18 @@ export default class DomesticStatusService {
 
   async updateDomesticStatus(
     clientToken: string,
+    user: PrisonUser,
     prisonerNumber: string,
     request: PersonalRelationshipsDomesticStatusUpdateRequest,
   ): Promise<PersonalRelationshipsDomesticStatusDto> {
     const personalRelationShipsApiClient = this.personalRelationShipsApiClientBuilder(clientToken)
     const response = await personalRelationShipsApiClient.updateDomesticStatus(prisonerNumber, request)
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['domesticStatus'],
+      prisonerNumber,
+      user,
+    })
 
     return (
       response && {

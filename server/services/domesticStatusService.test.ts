@@ -7,6 +7,8 @@ import {
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import DomesticStatusService from './domesticStatusService'
 import { PersonalRelationshipsDomesticStatusMock } from '../data/localMockData/personalRelationshipsApiMock'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import { prisonUserMock } from '../data/localMockData/user'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -107,11 +109,12 @@ describe('DomesticStatusService', () => {
 
   describe('updateDomesticStatus', () => {
     const request = { domesticStatusCode: 'M' }
+    const user: PrisonUser = prisonUserMock
 
-    it('should update domestic status value correctly', async () => {
+    it('should update domestic status value and send metrics', async () => {
       personalRelationshipsApiClient.updateDomesticStatus.mockResolvedValue(PersonalRelationshipsDomesticStatusMock)
 
-      const result = await domesticStatusService.updateDomesticStatus(clientToken, prisonerNumber, request)
+      const result = await domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, request)
 
       expect(personalRelationshipsApiClientBuilder).toHaveBeenCalledWith(clientToken)
       expect(personalRelationshipsApiClient.updateDomesticStatus).toHaveBeenCalledWith(prisonerNumber, request)
@@ -123,12 +126,17 @@ describe('DomesticStatusService', () => {
           active: true,
         }),
       )
+      expect(metricsService.trackPersonalRelationshipsUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['domesticStatus'],
+        prisonerNumber: 'A1234BC',
+        user,
+      })
     })
 
     it('Handles a null response from the API client', async () => {
       personalRelationshipsApiClient.getDomesticStatus.mockResolvedValue(null)
 
-      const result = await domesticStatusService.updateDomesticStatus(clientToken, prisonerNumber, request)
+      const result = await domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, request)
 
       expect(personalRelationshipsApiClientBuilder).toHaveBeenCalledWith(clientToken)
       expect(personalRelationshipsApiClient.updateDomesticStatus).toHaveBeenCalledWith(prisonerNumber, request)

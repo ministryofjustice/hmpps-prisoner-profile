@@ -833,13 +833,19 @@ describe('PersonalPageService', () => {
       expect(personalRelationshipsApiClient.getNumberOfChildren).toHaveBeenCalledWith('A1234AA')
     })
 
-    it('Updates the number of children using the Personal Relationships API', async () => {
+    it('Updates the number of children using the Personal Relationships API and records metrics', async () => {
+      const user = prisonUserMock
       const request: PersonalRelationshipsNumberOfChildrenUpdateRequest = {
         numberOfChildren: 5,
-        requestedBy: prisonUserMock.username,
+        requestedBy: user.username,
       }
       await constructService().updateNumberOfChildren('token', prisonUserMock, 'A1234AA', 5)
       expect(personalRelationshipsApiClient.updateNumberOfChildren).toHaveBeenCalledWith('A1234AA', request)
+      expect(metricsService.trackPersonalRelationshipsUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['numberOfChildren'],
+        prisonerNumber: 'A1234AA',
+        user,
+      })
     })
   })
 
@@ -873,13 +879,14 @@ describe('PersonalPageService', () => {
 
     it('Updates the number of children using the Personal Relationships API', async () => {
       domesticStatusService.updateDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+      const user = prisonUserMock
       const request: PersonalRelationshipsDomesticStatusUpdateRequest = {
         domesticStatusCode: 'M',
         requestedBy: prisonUserMock.username,
       }
-      const response = await constructService().updateDomesticStatus('token', prisonUserMock, 'A1234AA', 'M')
+      const response = await constructService().updateDomesticStatus('token', user, 'A1234AA', 'M')
       expect(response).toEqual(PersonalRelationshipsDomesticStatusMock)
-      expect(domesticStatusService.updateDomesticStatus).toHaveBeenCalledWith('token', 'A1234AA', request)
+      expect(domesticStatusService.updateDomesticStatus).toHaveBeenCalledWith('token', user, 'A1234AA', request)
     })
   })
 })

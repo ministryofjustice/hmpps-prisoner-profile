@@ -677,10 +677,18 @@ export default class PersonalPageService {
     numberOfChildren: number,
   ) {
     const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
-    return personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
+    const response = personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
       numberOfChildren,
       requestedBy: user.username,
     })
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['numberOfChildren'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
@@ -702,7 +710,7 @@ export default class PersonalPageService {
     prisonerNumber: string,
     domesticStatusCode: string,
   ) {
-    return this.domesticStatusService.updateDomesticStatus(clientToken, prisonerNumber, {
+    return this.domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, {
       domesticStatusCode,
       requestedBy: user.username,
     })
