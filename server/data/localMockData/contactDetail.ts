@@ -244,6 +244,34 @@ export const mockContactDetailYouthEstate: ContactDetail = {
   ],
 }
 
+export const mockContactDetailStaffContacts: ContactDetail = {
+  bookingId: 0,
+  nextOfKin: [],
+  otherContacts: [
+    {
+      lastName: 'SMIRNOV',
+      firstName: 'IVAN',
+      contactType: 'O',
+      contactTypeDescription: 'Official',
+      relationship: 'RESW',
+      relationshipDescription: 'Resettlement Worker',
+      commentText: 'Some additional information',
+      emergencyContact: false,
+      nextOfKin: false,
+      relationshipId: 10466278,
+      personId: 5871792,
+      activeFlag: true,
+      expiryDate: '2024-01-31',
+      approvedVisitorFlag: true,
+      canBeContactedFlag: false,
+      awareOfChargesFlag: true,
+      contactRootOffenderId: 5871791,
+      bookingId: 2468081,
+      createDateTime: '2023-07-05T10:35:17',
+    },
+  ],
+}
+
 export default {
   offenderContact: mockContactDetail,
 }
