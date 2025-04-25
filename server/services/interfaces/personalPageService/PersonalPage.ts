@@ -55,7 +55,6 @@ export interface PersonalDetails {
     canWrite: boolean
   }[]
   otherNationalities: string
-  preferredName: string
   religionOrBelief: string
   sex: string
   sexualOrientation: string
