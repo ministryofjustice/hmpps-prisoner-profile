@@ -5,7 +5,10 @@ import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
-import { mockContactDetailYouthEstate } from '../../server/data/localMockData/contactDetail'
+import {
+  mockContactDetailStaffContacts,
+  mockContactDetailYouthEstate,
+} from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import IndexPage from '../pages'
 
@@ -650,6 +653,7 @@ context('Overview Page', () => {
         bookingId: 1102484,
         complexityLevel: ComplexityLevel.High,
       })
+      cy.task('stubGetOffenderContacts', mockContactDetailStaffContacts)
       visitOverviewPage()
     })
 
@@ -661,6 +665,7 @@ context('Overview Page', () => {
           .staffContacts()
           .find('[data-qa=keyworker-details]')
           .should('contain.text', 'None - high complexity of need')
+        overviewPage.resettlementWorkerName().should('contain.text', 'Ivan Smirnov')
       })
     })
   })

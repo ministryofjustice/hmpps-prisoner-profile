@@ -28,6 +28,7 @@ import config from '../config'
 import { ComplexityLevel } from '../data/interfaces/complexityApi/ComplexityOfNeed'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -134,6 +135,7 @@ export default class ProfessionalContactsService {
       'CuSP Officer (backup)',
       'Youth Justice Worker',
       'Resettlement Practitioner',
+      'Resettlement Worker',
       'Youth Justice Service',
       'Youth Justice Service Case Manager',
     ]
@@ -247,11 +249,12 @@ export default class ProfessionalContactsService {
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
     const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
 
-    const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions] = await Promise.all([
+    const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions, bookingContacts] = await Promise.all([
       Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
       Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
       Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
       prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+      prisonApi.getBookingContacts(bookingId),
     ])
 
     return {
@@ -269,6 +272,12 @@ export default class ProfessionalContactsService {
         .map(pom => formatPomName(pom?.secondary_pom?.name))
         .toPromiseSettledResult(),
       communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
+      resettlementWorker: bookingContacts.otherContacts
+        ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
+        .sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
+        .map(contact =>
+          formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
+        )?.[0],
     }
   }
 
