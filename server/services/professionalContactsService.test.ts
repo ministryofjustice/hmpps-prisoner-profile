@@ -16,7 +16,7 @@ import { Result } from '../utils/result/result'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import { complexityOfNeedHighMock } from '../data/localMockData/complexityOfNeedMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
+import { mockContactDetail, mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -534,6 +534,20 @@ describe('professionalContactsService', () => {
 
   describe('getProfessionalContactsOverview', () => {
     let professionalContactsService: ProfessionalContactsService
+    const mockResettlementWorkerContacts: ContactDetail = {
+      bookingId: 1,
+      nextOfKin: [],
+      otherContacts: [
+        PrisonerContactBuilder({
+          personId: 1,
+          firstName: 'Ivan',
+          lastName: 'Smirnov',
+          relationship: ContactRelationship.ResettlementWorker,
+          relationshipDescription: 'Resettlement Worker',
+        }),
+      ],
+    }
+
     beforeEach(() => {
       professionalContactsService = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -545,6 +559,8 @@ describe('professionalContactsService', () => {
     })
 
     it('should get the staff contact details for an adult prisoner', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
+
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
@@ -558,6 +574,7 @@ describe('professionalContactsService', () => {
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+        resettlementWorker: 'Ivan Smirnov',
       })
     })
 
@@ -579,6 +596,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should get the staff contact details for a prisoner with complex needs', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
       complexityApiClient.getComplexityOfNeed = jest.fn().mockResolvedValue(complexityOfNeedHighMock)
       const result = await professionalContactsService.getProfessionalContactsOverview('token', {
         ...PrisonerMockDataA,
@@ -600,6 +618,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting keyworkers name', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
       keyWorkerApiClient.getOffendersKeyWorker = jest.fn().mockRejectedValue('Some error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -612,6 +631,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting pom names', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
       allocationManagerApiClient.getPomByOffenderNo = jest.fn().mockRejectedValue('API error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -630,6 +650,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting com name', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
       professionalContactsClient.getCommunityManager = jest.fn().mockRejectedValue('API error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
