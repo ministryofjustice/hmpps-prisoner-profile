@@ -169,7 +169,10 @@ describe('LanguagesController', () => {
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditMainLanguage,
-        details: { formValues },
+        details: {
+          languagePreferences: formValues,
+          previousLanguagePreferences: CommunicationNeedsDtoMock.languagePreferences,
+        },
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
@@ -424,7 +427,10 @@ describe('LanguagesController', () => {
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditOtherLanguages,
-        details: { formValues },
+        details: {
+          secondaryLanguages: formValues,
+          previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
+        },
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
