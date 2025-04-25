@@ -159,7 +159,7 @@ describe('NextOfKinController', () => {
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         fieldName: 'next-of-kin',
         type: 'success',
-        text: 'Next of kin emergency contact has been added',
+        text: 'Next of kin and emergency contacts added',
       })
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith({

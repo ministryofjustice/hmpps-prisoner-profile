@@ -141,7 +141,7 @@ export default class NextOfKinController {
       }
 
       req.flash('flashMessage', {
-        text: `Next of kin emergency contact has been added`,
+        text: `Next of kin and emergency contacts added`,
         type: FlashMessageType.success,
         ...(formValues.action === 'continue' ? {} : { fieldName: 'next-of-kin' }),
       })
