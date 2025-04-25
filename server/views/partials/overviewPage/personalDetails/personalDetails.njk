@@ -8,7 +8,6 @@
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
       <dl class="govuk-summary-list govuk-summary-list--no-border">
-        {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName or 'Not entered', "preferred-name") }}
         {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'Not entered', "date-of-birth") }}
         {{ summaryListRow("Age", age, "age") }}
         {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
