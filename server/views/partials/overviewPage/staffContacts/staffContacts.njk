@@ -39,46 +39,56 @@
                 {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
             {% endif %}
 
+            {% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}
+
             {{ govukSummaryList({
                 classes: 'govuk-summary-list--no-border',
                 rows: [
                     {
                         key: {
-                        text: "Key worker"
-                    },
+                            text: "Key worker"
+                        },
                         value: {
-                        html: keyWorkerHtml
-                    }
-                    },
-                    {
-                        key: {
-                        text: "Prison Offender Manager"
-                    },
-                        value: {
-                        text: prisonOffenderManager,
-                        attributes: {
-                            "data-qa": "primary-pom-name"
+                            html: keyWorkerHtml
                         }
-                    }
                     },
                     {
                         key: {
-                        text: "Co-working Prison Offender Manager"
-                    },
+                            text: "Prison Offender Manager"
+                        },
                         value: {
-                        text: coworkingPrisonOffenderManager,
-                        attributes: {
-                            "data-qa": "secondary-pom-name"
+                            text: prisonOffenderManager,
+                            attributes: {
+                                "data-qa": "primary-pom-name"
+                            }
                         }
-                    }
                     },
                     {
                         key: {
-                        text: "Community Offender Manager"
-                    },
+                            text: "Co-working Prison Offender Manager"
+                        },
                         value: {
-                        text: communityOffenderManager
-                    }
+                            text: coworkingPrisonOffenderManager,
+                            attributes: {
+                                "data-qa": "secondary-pom-name"
+                            }
+                        }
+                    },
+                    {
+                        key: {
+                            text: "Community Offender Manager"
+                        },
+                        value: {
+                            text: communityOffenderManager
+                        }
+                    },
+                    {
+                        key: {
+                            text: "Resettlement Worker"
+                        },
+                        value: {
+                            text: resettlementWorker
+                        }
                     }
                 ] | summaryListOneHalfWidth
             }) }}
