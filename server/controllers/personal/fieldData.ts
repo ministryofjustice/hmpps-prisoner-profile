@@ -13,6 +13,7 @@ export interface FieldData {
   auditEditPostAction: PostAction
   redirectAnchor: string
   hintText?: string
+  successFlashFieldName?: string
 }
 
 export interface TextFieldData extends FieldData {
@@ -209,6 +210,7 @@ export const numberOfChildrenFieldData: RadioFieldData = {
   auditEditPageLoad: Page.EditNumberOfChildren,
   auditEditPostAction: PostAction.EditNumberOfChildren,
   redirectAnchor: 'personal-details',
+  successFlashFieldName: 'Number of children',
 }
 
 export const domesticStatusFieldData: RadioFieldData = {

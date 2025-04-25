@@ -2944,7 +2944,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Children updated',
+          text: 'Number of children updated',
           type: FlashMessageType.success,
           fieldName: 'numberOfChildren',
         })

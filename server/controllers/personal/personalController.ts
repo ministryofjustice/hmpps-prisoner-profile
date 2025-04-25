@@ -1529,13 +1529,13 @@ export default class PersonalController {
     fieldData: FieldData
     auditDetails: object
   }) {
-    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor } = fieldData
+    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
 
     try {
       await submit()
 
       req.flash('flashMessage', {
-        text: `${pageTitle} updated`,
+        text: `${successFlashFieldName ?? pageTitle} updated`,
         type: FlashMessageType.success,
         fieldName,
       })

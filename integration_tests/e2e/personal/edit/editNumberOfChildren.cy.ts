@@ -26,7 +26,7 @@ context('Edit number of children', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/children`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders have any children?',
-    successfulFlashMessage: 'Children updated',
+    successfulFlashMessage: 'Number of children updated',
     validInputs: [
       { radioInputs: { hasChildren: 'NO' } },
       { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '4' } },
