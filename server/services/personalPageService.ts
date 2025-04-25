@@ -217,8 +217,8 @@ export default class PersonalPageService {
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
-        personalRelationshipsNumberOfChildren.numberOfChildren,
-        personalRelationshipsDomesticStatus.domesticStatusDescription,
+        personalRelationshipsNumberOfChildren?.numberOfChildren || 'Not entered',
+        personalRelationshipsDomesticStatus?.domesticStatusDescription || 'Not entered',
         flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
@@ -342,11 +342,6 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      preferredName: formatName(
-        prisonerDetail?.currentWorkingFirstName,
-        undefined,
-        prisonerDetail?.currentWorkingLastName,
-      ),
       religionOrBelief: inmateDetail.religion || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:

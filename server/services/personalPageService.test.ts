@@ -461,9 +461,6 @@ describe('PersonalPageService', () => {
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
         expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
         expect(personalDetails.countryOfBirth).toEqual(EnglandCountryReferenceDataCodeMock.description)
-        expect(personalDetails.preferredName).toEqual(
-          formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
-        )
         expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
         expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
       })
