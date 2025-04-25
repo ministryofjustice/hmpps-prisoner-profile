@@ -61,6 +61,7 @@ import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import NextOfKinService from './nextOfKinService'
 import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import DomesticStatusService from './domesticStatusService'
 
 export default class PersonalPageService {
   constructor(
@@ -74,6 +75,7 @@ export default class PersonalPageService {
     private readonly metricsService: MetricsService,
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
     private readonly nextOfKinService: NextOfKinService,
+    private readonly domesticStatusService: DomesticStatusService,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -180,6 +182,7 @@ export default class PersonalPageService {
       physicalAttributes,
       nextOfKinAndEmergencyContacts,
       personalRelationshipsNumberOfChildren,
+      personalRelationshipsDomesticStatus,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -195,6 +198,7 @@ export default class PersonalPageService {
       this.getPhysicalAttributes(token, prisonerNumber),
       this.getNextOfKinAndEmergencyContacts(token, prisonerNumber),
       personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber),
+      this.getDomesticStatus(token, prisonerNumber),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -214,6 +218,7 @@ export default class PersonalPageService {
         countryOfBirth,
         healthAndMedication,
         personalRelationshipsNumberOfChildren.numberOfChildren,
+        personalRelationshipsDomesticStatus.domesticStatusDescription,
         flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
@@ -279,6 +284,7 @@ export default class PersonalPageService {
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
     numberOfChildren: string,
+    domesticStatus: string,
     flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
@@ -325,7 +331,7 @@ export default class PersonalPageService {
         spoken: inmateDetail.language,
         written: inmateDetail.writtenLanguage,
       },
-      marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
+      marriageOrCivilPartnership: domesticStatus || 'Not entered',
       nationality,
       numberOfChildren: formatNumberOfChildren(numberOfChildren),
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
@@ -671,10 +677,18 @@ export default class PersonalPageService {
     numberOfChildren: number,
   ) {
     const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
-    return personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
+    const response = personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
       numberOfChildren,
       requestedBy: user.username,
     })
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['numberOfChildren'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
@@ -684,5 +698,25 @@ export default class PersonalPageService {
 
   async getNextOfKinAndEmergencyContacts(clientToken: string, prisonerNumber: string) {
     return this.nextOfKinService.getNextOfKinEmergencyContacts(clientToken, prisonerNumber)
+  }
+
+  async getDomesticStatus(clientToken: string, prisonerNumber: string) {
+    return this.domesticStatusService.getDomesticStatus(clientToken, prisonerNumber)
+  }
+
+  async updateDomesticStatus(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    domesticStatusCode: string,
+  ) {
+    return this.domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, {
+      domesticStatusCode,
+      requestedBy: user.username,
+    })
+  }
+
+  async getDomesticStatusReferenceData(clientToken: string) {
+    return this.domesticStatusService.getReferenceData(clientToken)
   }
 }

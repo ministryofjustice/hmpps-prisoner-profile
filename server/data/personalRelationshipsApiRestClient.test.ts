@@ -4,6 +4,8 @@ import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsDomesticStatusDto,
+  PersonalRelationshipsDomesticStatusUpdateRequest,
   PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsNumberOfChildrenUpdateRequest,
   PersonalRelationshipsReferenceDataDomain,
@@ -163,6 +165,58 @@ describe('personalRelationshipsApiRestClient', () => {
 
       const output = await personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, request)
       expect(output).toEqual(updatedNumberOfChildren)
+    })
+  })
+
+  describe('getNumberOfChildren', () => {
+    const domesticStatus: PersonalRelationshipsDomesticStatusDto = {
+      id: 1,
+      domesticStatusCode: 'S',
+      domesticStatusDescription: 'Single (nor married or in a civil partnership)',
+      active: true,
+    }
+
+    it('should return data from api', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/prisoner/${prisonerNumber}/domestic-status`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, domesticStatus)
+
+      const output = await personalRelationshipsApiClient.getDomesticStatus(prisonerNumber)
+      expect(output).toEqual(domesticStatus)
+    })
+
+    it('should allow 404 responses', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/prisoner/${prisonerNumber}/domestic-status`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await personalRelationshipsApiClient.getDomesticStatus(prisonerNumber)
+      expect(output).toBeNull()
+    })
+  })
+
+  describe('updateDomesticStatus', () => {
+    const updatedDomesticStatus: PersonalRelationshipsDomesticStatusDto = {
+      id: 1,
+      domesticStatusCode: 'C',
+      domesticStatusDescription: 'Co-habiting (living with a partner)',
+      active: true,
+    }
+    const request: PersonalRelationshipsDomesticStatusUpdateRequest = {
+      domesticStatusCode: 'C',
+      requestedBy: 'test-user',
+    }
+
+    it('should return data from api', async () => {
+      fakePersonalRelationshipsApi
+        .put(`/prisoner/${prisonerNumber}/domestic-status`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, updatedDomesticStatus)
+
+      const output = await personalRelationshipsApiClient.updateDomesticStatus(prisonerNumber, request)
+      expect(output).toEqual(updatedDomesticStatus)
     })
   })
 

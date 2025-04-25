@@ -9,6 +9,7 @@ import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
 import {
   cityOrTownOfBirthFieldData,
+  domesticStatusFieldData,
   heightFieldData,
   nationalityFieldData,
   numberOfChildrenFieldData,
@@ -49,7 +50,11 @@ import {
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
-import { PersonalRelationshipsNumberOfChildrenMock } from '../../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../data/localMockData/personalRelationshipsApiMock'
+import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -118,6 +123,7 @@ describe('PersonalController', () => {
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
     personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
+    personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
@@ -2963,6 +2969,186 @@ describe('PersonalController', () => {
           correlationId: request.id,
           action: PostAction.EditNumberOfChildren,
           details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Domestic status', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.domesticStatus().edit(req, response, () => {})
+      const referenceData: ReferenceDataCodeDto[] = [
+        {
+          id: '1',
+          code: 'S',
+          description: 'Single',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '2',
+          code: 'M',
+          description: 'Married',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '3',
+          code: 'N',
+          description: 'Prefer not to say',
+          listSequence: 99,
+          isActive: true,
+        },
+      ]
+
+      beforeEach(() => {
+        personalPageService.getDomesticStatusReferenceData = jest.fn(async () => referenceData)
+      })
+
+      it('Renders the default edit page with the correct data', async () => {
+        const expectedOptions = [
+          { text: 'Single', value: 'S', checked: true },
+          { text: 'Married', value: 'M' },
+          { divider: 'Or' },
+          { text: 'Prefer not to say', value: 'N' },
+        ]
+
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Marital or civil partnership status - Prisoner personal details',
+          formTitle: `What is First Last’s marital or civil partnership status?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          hintText: undefined,
+          errors: [],
+          options: expectedOptions,
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([expect.objectContaining({ value: 'M', checked: true })]),
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditDomesticStatus,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.domesticStatus().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'M' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the domestic status', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'M')
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Marital or civil partnership status updated',
+          type: FlashMessageType.success,
+          fieldName: 'domesticStatus',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateDomesticStatus = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/marital-status')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'M' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditDomesticStatus,
+          details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
         }
 
         await action(request, res)

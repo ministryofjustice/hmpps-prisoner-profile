@@ -212,3 +212,12 @@ export const numberOfChildrenFieldData: RadioFieldData = {
   redirectAnchor: 'personal-details',
   successFlashFieldName: 'Number of children',
 }
+
+export const domesticStatusFieldData: RadioFieldData = {
+  url: 'marital-status',
+  fieldName: 'domesticStatus',
+  pageTitle: 'Marital or civil partnership status',
+  auditEditPageLoad: Page.EditDomesticStatus,
+  auditEditPostAction: PostAction.EditDomesticStatus,
+  redirectAnchor: 'personal-details',
+}

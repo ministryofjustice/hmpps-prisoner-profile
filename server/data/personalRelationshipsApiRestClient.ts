@@ -6,6 +6,8 @@ import {
   PersonalRelationshipsContactQueryParams,
   PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsDomesticStatusDto,
+  PersonalRelationshipsDomesticStatusUpdateRequest,
   PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsNumberOfChildrenUpdateRequest,
   PersonalRelationshipsReferenceCode,
@@ -40,6 +42,17 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
     return this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest })
+  }
+
+  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/domestic-status`, ignore404: true })
+  }
+
+  updateDomesticStatus(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
+  ): Promise<PersonalRelationshipsDomesticStatusDto> {
+    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest })
   }
 
   getReferenceDataCodes(

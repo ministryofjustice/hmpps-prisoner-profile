@@ -1,5 +1,6 @@
 import {
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsReferenceCode,
 } from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
@@ -152,6 +153,15 @@ export const PersonalRelationshipsContactsDtoMock: PersonalRelationshipsContacts
 export const PersonalRelationshipsNumberOfChildrenMock: PersonalRelationshipsNumberOfChildrenDto = {
   id: 1,
   numberOfChildren: '2',
+  active: true,
+  createdTime: '2025-01-01T12:00:00.123456',
+  createdBy: 'test-user',
+}
+
+export const PersonalRelationshipsDomesticStatusMock: PersonalRelationshipsDomesticStatusDto = {
+  id: 1,
+  domesticStatusCode: 'S',
+  domesticStatusDescription: 'Single (not married or in a civil partnership)',
   active: true,
   createdTime: '2025-01-01T12:00:00.123456',
   createdBy: 'test-user',
@@ -706,6 +716,65 @@ export const CityReferenceCodesMock: PersonalRelationshipsReferenceCode[] = [
     code: 'BIR',
     description: 'Birmingham',
     displayOrder: 0,
+    isActive: true,
+  },
+]
+
+export const DomesticStatusReferenceCodesMock: PersonalRelationshipsReferenceCode[] = [
+  {
+    referenceCodeId: 3,
+    groupCode: 'DOMESTIC_STS',
+    code: 'S',
+    description: 'Single (not married or in a civil partnership)',
+    displayOrder: 1,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 4,
+    groupCode: 'DOMESTIC_STS',
+    code: 'C',
+    description: 'Co-habiting (living with partner)',
+    displayOrder: 2,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 5,
+    groupCode: 'DOMESTIC_STS',
+    code: 'M',
+    description: 'Married or in a civil partnership',
+    displayOrder: 3,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 6,
+    groupCode: 'DOMESTIC_STS',
+    code: 'D',
+    description: 'Divorced or dissolved marriage',
+    displayOrder: 4,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 7,
+    groupCode: 'DOMESTIC_STS',
+    code: 'P',
+    description: 'Separated (no longer living with legal partner)',
+    displayOrder: 5,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 8,
+    groupCode: 'DOMESTIC_STS',
+    code: 'W',
+    description: 'Widowed',
+    displayOrder: 6,
+    isActive: true,
+  },
+  {
+    referenceCodeId: 9,
+    groupCode: 'DOMESTIC_STS',
+    code: 'N',
+    description: 'Not known',
+    displayOrder: 7,
     isActive: true,
   },
 ]
