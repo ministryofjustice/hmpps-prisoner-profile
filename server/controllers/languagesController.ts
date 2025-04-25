@@ -129,6 +129,10 @@ export default class LanguagesController {
         formValues.interpreterRequired = undefined
       }
 
+      const previousLanguagePreferences = (
+        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      )?.languagePreferences
+
       await this.languagesService.updateMainLanguage(
         clientToken,
         res.locals.user as PrisonUser,
@@ -148,7 +152,7 @@ export default class LanguagesController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.EditMainLanguage,
-          details: { formValues },
+          details: { languagePreferences: formValues, previousLanguagePreferences },
         })
         .catch(error => logger.error(error))
 
@@ -249,6 +253,10 @@ export default class LanguagesController {
         )
       }
 
+      const previousSecondaryLanguages = (
+        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      )?.secondaryLanguages
+
       if (formValues.language) {
         await this.languagesService.updateOtherLanguage(
           clientToken,
@@ -285,7 +293,7 @@ export default class LanguagesController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.EditOtherLanguages,
-          details: { formValues },
+          details: { secondaryLanguages: formValues, previousSecondaryLanguages },
         })
         .catch(error => logger.error(error))
       return res.redirect(
