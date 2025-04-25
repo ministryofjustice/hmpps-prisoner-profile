@@ -273,7 +273,7 @@ export default class ProfessionalContactsService {
         .toPromiseSettledResult(),
       communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
       resettlementWorker: bookingContacts.otherContacts
-        ?.filter(contact => contact.relationship === 'RESW' && contact.activeFlag)
+        ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
         .sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
         .map(contact =>
           formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),

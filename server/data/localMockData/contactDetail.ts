@@ -253,7 +253,7 @@ export const mockContactDetailStaffContacts: ContactDetail = {
       firstName: 'IVAN',
       contactType: 'O',
       contactTypeDescription: 'Official',
-      relationship: 'RESW',
+      relationship: 'RW',
       relationshipDescription: 'Resettlement Worker',
       commentText: 'Some additional information',
       emergencyContact: false,
