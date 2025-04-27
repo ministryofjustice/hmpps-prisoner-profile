@@ -784,6 +784,22 @@ export default {
     })
   },
 
+  stubCheckStaffRole: ({ role, staffMemberHasRole }: { role: string; staffMemberHasRole: boolean }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/staff/\\w+/\\w+/roles/${role}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: staffMemberHasRole,
+      },
+    })
+  },
+
   stubCsraReview: ({
     bookingId,
     assessmentSeq,

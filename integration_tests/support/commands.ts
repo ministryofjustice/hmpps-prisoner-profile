@@ -190,6 +190,14 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   })
 })
 
+Cypress.Commands.add(
+  'setupPermissionsCheckStubs',
+  ({ prisonerNumber, keyworker = false, restrictedPatient = false, prisonerDataOverrides = {} }) => {
+    cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, prisonerDataOverrides })
+    cy.task('stubCheckStaffRole', { role: 'KW', staffMemberHasRole: keyworker })
+  },
+)
+
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
   cy.task('stubPrisonerData', { prisonerNumber })
   cy.task('stubInmateDetail', { bookingId })
