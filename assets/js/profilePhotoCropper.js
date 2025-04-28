@@ -101,17 +101,16 @@ function setSelectionListener() {
   })
 }
 
-function toggleCrop(e) {
-  e.preventDefault()
+function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
     document.getElementById('image-cropper-container').style.display = 'none'
-    document.getElementById('rotate-button-group').style.display = 'none'
+    // document.getElementById('rotate-button-group').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
     document.getElementById('image-cropper-container').style.display = 'block'
-    document.getElementById('rotate-button-group').style.display = 'block'
+    // document.getElementById('rotate-button-group').style.display = 'block'
     cropping = true
     if (!croppingInit) {
       document.querySelector('cropper-selection').$reset().$render()
@@ -154,13 +153,10 @@ function resetSelectionLocation() {
 
 function rotateImage(degrees) {
   const cropperImage = document.querySelector('cropper-image')
-  // ="Picture" initial-center-size="contain" rotatable skewable scalable translatable></cropper-image>
   cropperImage.rotatable = true
   cropperImage.scalable = true
   cropperImage.translatable = true
   cropperImage.skewable = true
-
-  console.log("???")
 
   cropperImage.$rotate(`${degrees}deg`).$center('contain')
 
@@ -178,15 +174,14 @@ const rotateClockwise = e => {
   rotateImage(90)
 }
 
-const rotateAnticlockwise = e => {
-  e.preventDefault()
-  rotateImage(-90)
-}
-
 function setButtonListeners() {
-  document.getElementById('toggle-crop-button').addEventListener('click', toggleCrop)
-  document.getElementById('rotate-clockwise').addEventListener('click', rotateClockwise)
-  document.getElementById('rotate-anti-clockwise').addEventListener('click', rotateAnticlockwise)
+  document.querySelectorAll('.toggle-crop').forEach(button =>
+    button.addEventListener('click', e => {
+      e.preventDefault()
+      toggleCrop()
+    }),
+  )
+  document.querySelectorAll('.rotate-clockwise').forEach(button => button.addEventListener('click', rotateClockwise))
 }
 
 function pageInit() {
@@ -197,4 +192,8 @@ function pageInit() {
   setButtonListeners()
 }
 
-pageInit()
+window.onload = () => {
+  pageInit()
+  toggleCrop()
+  setFormPhotoToCroppedResult()
+}

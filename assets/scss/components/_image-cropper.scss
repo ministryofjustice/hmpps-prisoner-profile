@@ -34,7 +34,11 @@
   height: 570px;
 }
 
-.hmpps-photo-cropper-container {
+#photo-cropper-container {
+  display: none;
+}
+
+#photo-preview-container {
   display: none;
 }
 
