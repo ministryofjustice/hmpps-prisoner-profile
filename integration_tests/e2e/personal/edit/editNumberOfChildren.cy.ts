@@ -29,7 +29,8 @@ context('Edit number of children', () => {
     successfulFlashMessage: 'Number of children updated',
     validInputs: [
       { radioInputs: { hasChildren: 'NO' } },
-      { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '4' } },
+      { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '1' } },
+      { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '99' } },
     ],
     invalidInputs: [
       {
@@ -40,7 +41,12 @@ context('Edit number of children', () => {
       {
         testDescription: 'Negative number of children',
         input: { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '-1' } },
-        errorMessages: [`Enter the number of children.`],
+        errorMessages: [`Number of children must be between 1 and 99.`],
+      },
+      {
+        testDescription: 'Exceeds maximum number of children',
+        input: { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '100' } },
+        errorMessages: [`Number of children must be between 1 and 99.`],
       },
       {
         testDescription: 'Non-integer number of children',
