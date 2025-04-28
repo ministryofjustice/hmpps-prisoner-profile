@@ -3,7 +3,7 @@ import { validateMandatoryName, validateName } from './nameValidator'
 import HmppsError from '../../interfaces/HmppsError'
 import { validateDate } from './dateValidator'
 
-export const nextOfKinValidator: Validator = (body: Record<string, string>) => {
+export const nextOfKinValidator: Validator = (body: Record<string, string>): HmppsError[] => {
   const {
     contactType,
     firstName,
@@ -31,7 +31,7 @@ export const nextOfKinValidator: Validator = (body: Record<string, string>) => {
       dateOfBirthYear,
       'dateOfBirth',
       'Date of birth',
-      'Enter this person’s date of birth',
+      'Date of birth must include a day, month and year',
       true,
       false,
     ),

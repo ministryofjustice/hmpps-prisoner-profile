@@ -45,17 +45,15 @@ export const validateDate = (
   const errors: HmppsError[] = []
   const date = day && month && year ? `${day}/${month}/${year}` : null
 
-  if (isRequired) {
-    if ([day, year, month].filter(it => !it).length > 1)
-      errors.push({
-        text: missingText || `Enter a ${label.toLowerCase()}`,
-        href: `#${namePrefix}`,
-      })
-    else if (!day) errors.push({ text: `${label} must include a day`, href: `#${namePrefix}-day` })
+  const missingFields = [day, month, year].filter(it => !it).length
+
+  if ((isRequired && missingFields > 1) || (!isRequired && missingFields === 2)) {
+    errors.push({ text: missingText || `Enter a ${label.toLowerCase()}`, href: `#${namePrefix}` })
+  } else if (isRequired || missingFields === 1) {
+    if (!day) errors.push({ text: `${label} must include a day`, href: `#${namePrefix}-day` })
     else if (!month) errors.push({ text: `${label} must include a month`, href: `#${namePrefix}-month` })
     else if (!year) errors.push({ text: `${label} must include a year`, href: `#${namePrefix}-year` })
   }
-
   if (date && !isRealDate(date)) {
     errors.push({ text: `${label} must be a real date`, href: `#${namePrefix}` })
   }

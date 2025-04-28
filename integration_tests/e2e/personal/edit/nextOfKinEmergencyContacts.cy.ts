@@ -54,7 +54,7 @@ context('Edit next of kin and emergency contacts', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/next-of-kin-emergency-contacts`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Add a next of kin or emergency contact',
-    successfulFlashMessage: 'Next of kin emergency contact has been added',
+    successfulFlashMessage: 'Next of kin and emergency contacts added',
     validInputs: [
       {
         // Test case 1: Next of kin only with minimal required fields
