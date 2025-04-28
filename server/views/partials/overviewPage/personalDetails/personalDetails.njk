@@ -12,12 +12,12 @@
         {{ summaryListRow("Age", age, "age") }}
         {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
         {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
+        {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
       </dl>
     </div>
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
       <dl class="govuk-summary-list govuk-summary-list--no-border">
         {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup or 'Not entered', "ethnic-group") }}
-        {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
         {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber or 'Not entered', "cro-number") }}
         {{ summaryListRow("PNC number", personalDetails.personalDetailsSide.pncNumber or 'Not entered', "pnc-number") }}
       </dl>
