@@ -1,5 +1,7 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
 import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+import { PermissionsService as PrisonPermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -45,6 +47,7 @@ import LanguagesService from './languagesService'
 import ContactsService from './contactsService'
 import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
+import logger from '../../logger'
 
 export const services = () => {
   const {
@@ -77,6 +80,7 @@ export const services = () => {
     telemetryClient,
     osPlacesApiClient,
     curiousApiToken,
+    tokenStore,
   } = dataAccess
 
   const auditService = AuditService({
@@ -85,6 +89,14 @@ export const services = () => {
     serviceName: config.apis.audit.serviceName,
     build: config.gitRef,
     enabled: config.apis.audit.enabled,
+  })
+
+  const prisonPermissionsService = PrisonPermissionsService.create({
+    prisonApiConfig: config.apis.prisonApi,
+    prisonerSearchConfig: config.apis.prisonerSearchApi,
+    authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
+    logger,
+    telemetryClient,
   })
 
   const metricsService = new MetricsService(telemetryClient)
@@ -245,6 +257,7 @@ export const services = () => {
     referenceDataService,
     contactsService,
     nextOfKinService,
+    prisonPermissionsService,
   }
 }
 

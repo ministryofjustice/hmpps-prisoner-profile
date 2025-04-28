@@ -50,7 +50,13 @@ declare global {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
-        caseLoads?: CaseLoad[]
+      }): Chainable<AUTWindow>
+
+      setupPermissionsCheckStubs(options: {
+        prisonerNumber: string
+        keyworker?: boolean
+        restrictedPatient?: boolean
+        prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
 
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates?: boolean }): Chainable<AUTWindow>
