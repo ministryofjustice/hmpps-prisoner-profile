@@ -5,7 +5,7 @@ import { BodySubmission, FileUploadRequest } from '../validators/personal/distin
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
 
 export type Validator = (
-  body: FileUploadRequest | Record<string, string> | BodySubmission | DietAndFoodAllergiesSubmission,
+  body: FileUploadRequest | Record<string, string | string[]> | BodySubmission | DietAndFoodAllergiesSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
 export default function validationMiddleware(
