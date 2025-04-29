@@ -57,6 +57,7 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
 
                     {{ govukCheckboxes({
+                        idPrefix: "contactType",
                         name: "contactType",
                         hint: { text: 'Select at least one.' },
                         fieldset: {
@@ -65,6 +66,7 @@
                                 classes: "govuk-fieldset__legend--m"
                             }
                         },
+                        errorMessage: errors | findError("contactType"),
                         items: [
                             {
                                 value: "nextOfKin",
