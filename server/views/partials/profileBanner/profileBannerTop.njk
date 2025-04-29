@@ -43,7 +43,7 @@
     {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
-        <a href="/prisoner/{{ prisonerNumber }}/image?referer={{ prisonerUrlPath }}" class="hmpps-clickable-image" data-qa="prisoner-photo-link">
+        <a href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}" class="hmpps-clickable-image {{ prisonerUrlPath }}" data-qa="prisoner-photo-link">
           <img
             class="hmpps-profile-photo"
             src="/api/prisoner/{{ prisonerNumber }}/image"
