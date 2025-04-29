@@ -67,7 +67,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         prisonerData.newArrival24 = isToday(arrival)
         prisonerData.newArrival72 = isWithinInterval(arrival, {
           start: subDays(startOfToday(), 2),
-          end: subDays(startOfToday(), 1),
+          end: startOfToday(),
         })
       }
 

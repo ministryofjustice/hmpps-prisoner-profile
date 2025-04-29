@@ -1,4 +1,5 @@
 import { NextFunction } from 'express'
+import { startOfToday, subDays } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -16,6 +17,7 @@ import FeatureToggleService from '../services/featureToggleService'
 import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
 import { Alert, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { formatDateISO } from '../utils/dateHelpers'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
@@ -43,6 +45,7 @@ describe('GetPrisonerDataMiddleware', () => {
     res = {
       locals: {
         user: {
+          authSource: 'nomis',
           activeCaseLoadId: 'MDI',
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,
@@ -140,5 +143,31 @@ describe('GetPrisonerDataMiddleware', () => {
       highPublicInterestPrisoner: false,
     })
     expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should set the newArrival24 flag if latest arrival date is today', async () => {
+    const arrivalDate = new Date()
+    const arrivalDateString = formatDateISO(arrivalDate)
+    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
+    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
+
+    await getPrisonerData(services)(req, res, next)
+
+    expect(prisonApiClient.getLatestArrivalDate).toHaveBeenCalled()
+    expect(req.middleware.prisonerData.newArrival24).toBe(true)
+  })
+
+  it.each([
+    ['today', new Date()],
+    ['yesterday', subDays(startOfToday(), 1)],
+    ['day before yesterday', subDays(startOfToday(), 2)],
+  ])('should set newArrival72 to true when arrival date is %s', async (_label, arrivalDate) => {
+    const arrivalDateString = formatDateISO(arrivalDate)
+    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
+
+    await getPrisonerData(services)(req, res, next)
+
+    expect(prisonApiClient.getLatestArrivalDate).toHaveBeenCalledWith('G6123VU')
+    expect(req.middleware.prisonerData.newArrival72).toBe(true)
   })
 })

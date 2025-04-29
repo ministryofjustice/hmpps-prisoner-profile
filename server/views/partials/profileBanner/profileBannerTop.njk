@@ -33,7 +33,7 @@
             <p>Some information may not have been entered yet</p>
         </div>
     {% endif %}
-    {% if newArrival72 %}
+    {% if newArrival72 and not newArrival24 %}
         <div class="hmpps-profile-banner-alert  hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-72">
             <p class="govuk-heading-m">
                 This prisoner has arrived in the last 3 days
