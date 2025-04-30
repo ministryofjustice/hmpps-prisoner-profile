@@ -199,6 +199,7 @@ export default class NextOfKinController {
         ...(cityCode && { cityCode }),
         ...(postcode && { postcode }),
         noFixedAddress,
+        countryCode: 'ENG',
       },
     ]
     const phone = phoneNumber
