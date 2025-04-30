@@ -39,6 +39,7 @@ export default function imageRouter(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
+      const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
       const { prisonerNumber } = prisonerData
       const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
@@ -72,6 +73,7 @@ export default function imageRouter(services: Services): Router {
         photoStatus,
         referer,
         breadCrumbs: imagePageBreadcrumbs(prisonerName, prisonerNumber, referer),
+        editEnabled: userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId),
       })
     },
   )
@@ -82,6 +84,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
+      const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { prisonerNumber } = prisonerData
       const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
@@ -119,6 +122,7 @@ export default function imageRouter(services: Services): Router {
         facialImages,
         referer,
         breadCrumbs: imagePageBreadcrumbs(prisonerName, prisonerNumber, referer),
+        editEnabled: userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId),
       })
     },
   )

@@ -9,13 +9,20 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set hideBackLink = true %}
-{% block beforeContent %}
-  {{ govukBackLink({
-    text: "Back",
-    href: "/prisoner/" + prisonerNumber +"/image"
-  }) }}
-{% endblock %}
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href: '/'
+  },
+  {
+    text: miniBannerData.prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  },
+  {
+    text: 'Photo',
+    href: "/prisoner/" + prisonerNumber + "/image"
+  }
+] %}
 {% set fileHtml %}
 <div class="hmpps-photo-upload">
   <div id="file-upload" class="hmpps-photo-upload__upload">
@@ -47,6 +54,14 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ govukBackLink({
+        text: "Back",
+        href: "/prisoner/" + prisonerNumber +"/image"
+      }) }}
     </div>
   </div>
   {% if errors.length > 0 %}
@@ -102,7 +117,10 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a href="/prisoner/{{ prisonerNumber }}/image" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+          <a
+            href="/prisoner/{{ prisonerNumber }}/image"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button">
             Cancel</a>
         </div>
       </form>

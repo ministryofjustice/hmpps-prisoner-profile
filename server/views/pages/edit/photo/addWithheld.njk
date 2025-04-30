@@ -9,16 +9,32 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% block beforeContent %}
-  {{ govukBackLink({
-    text: "Back",
-    href: "/prisoner/" + prisonerNumber +"/image/new"
-  }) }}
-{% endblock %}
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href: '/'
+  },
+  {
+    text: miniBannerData.prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  },
+  {
+    text: 'Photo',
+    href: "/prisoner/" + prisonerNumber + "/image"
+  }
+] %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ govukBackLink({
+        text: "Back",
+        href: "/prisoner/" + prisonerNumber +"/image/new"
+      }) }}
     </div>
   </div>
   {% if errors.length > 0 %}
@@ -38,7 +54,7 @@
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
         <div class="govuk-!-margin-bottom-4">
-          <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}" />
+          <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}"/>
         </div>
         <div class="govuk-button-group">
           {{ govukButton({
@@ -47,7 +63,10 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a href="/prisoner/{{ prisonerNumber }}/image" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+          <a
+            href="/prisoner/{{ prisonerNumber }}/image"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button">
             Cancel</a>
         </div>
       </form>
