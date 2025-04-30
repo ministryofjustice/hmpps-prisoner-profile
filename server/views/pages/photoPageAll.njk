@@ -2,7 +2,9 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% extends "../partials/layout.njk" %}
+{% set photoHref = "/prisoner/" + prisonerNumber + "/image" + ("?referer=" + referer if referer) %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -14,10 +16,7 @@
       <nav class="moj-sub-navigation govuk-!-margin-bottom-6" aria-label="Sub navigation">
         <ul class="moj-sub-navigation__list">
           <li class="moj-sub-navigation__item">
-            <a
-              class="moj-sub-navigation__link"
-              href="/prisoner/{{ prisonerNumber }}/image/all{{ "
-              ?referer="+ referer if referer }}">Main facial image</a>
+            <a class="moj-sub-navigation__link" href="{{ photoHref }}">Main facial image</a>
           </li>
           <li class="moj-sub-navigation__item">
             <a class="moj-sub-navigation__link" aria-current="page">All facial images</a>
