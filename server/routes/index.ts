@@ -44,6 +44,7 @@ export default function routes(services: Services): Router {
     res.locals = {
       ...res.locals,
       currentUrlPath: req.baseUrl + req.path,
+      prisonerUrlPath: req.path.replace(/^\/prisoner\/[a-zA-Z][0-9]{4}[a-zA-Z]{2}\/?/, ''),
     }
     next()
   })

@@ -2,16 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href: '/'
-  },
-  {
-    text: prisonerName,
-    href: "/prisoner/" + prisonerNumber
-  }
-] %}
+
 {% extends "../partials/layout.njk" %}
 {% block content %}
   <div class="govuk-grid-row">
@@ -26,11 +17,11 @@
       classes: 'govuk-!-margin-bottom-6',
       items: [{
           text: 'Main facial image',
-          href: '/prisoner/' + prisonerNumber + '/image'
+          href: '/prisoner/' + prisonerNumber + '/image' + ('?referer=' + referer if referer)
         }, 
         {
           text: 'All facial images',
-          href: '/prisoner/' + prisonerNumber + '/image/all',
+          href: '#',
           active: true
         }
       ]

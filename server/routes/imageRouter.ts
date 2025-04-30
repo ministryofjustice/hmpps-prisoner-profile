@@ -19,6 +19,7 @@ import logger from '../../logger'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { editPhotoValidator } from '../validators/editPhotoValidator'
 import ImageController from '../controllers/imageController'
+import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -39,6 +40,11 @@ export default function imageRouter(services: Services): Router {
     async (req, res, next) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
+      const { prisonerNumber } = prisonerData
+      const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
+        style: NameFormatStyle.lastCommaFirst,
+      })
+      const referer = req.query.referer as string
       let imageUploadedDate = ''
 
       // As long as there's a photo ID we can get information about it
@@ -49,23 +55,23 @@ export default function imageRouter(services: Services): Router {
 
       await services.auditService.sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
+        prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.Photo,
       })
 
       return res.render('pages/photoPage', {
-        pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
+        pageTitle: `Picture of ${prisonerNumber}`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
         miniBannerData: {
-          prisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-            style: NameFormatStyle.firstLast,
-          }),
-          prisonerNumber: prisonerData.prisonerNumber,
+          prisonerName,
+          prisonerNumber,
         },
         imageUploadedDate,
         photoStatus,
+        referer,
+        breadCrumbs: imagePageBreadcrumbs(prisonerName, prisonerNumber, referer),
       })
     },
   )
@@ -77,6 +83,11 @@ export default function imageRouter(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
+      const { prisonerNumber } = prisonerData
+      const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
+        style: NameFormatStyle.lastCommaFirst,
+      })
+      const referer = req.query.referer as string
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
       // Do not display this page for prisoners with their photos withheld or with no image
@@ -85,14 +96,14 @@ export default function imageRouter(services: Services): Router {
       }
 
       const facialImages = await services.photoService.getAllFacialPhotos(
-        prisonerData.prisonerNumber,
+        prisonerNumber,
         inmateDetail.facialImageId,
         clientToken,
       )
 
       await services.auditService.sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
+        prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.PhotoList,
@@ -102,12 +113,12 @@ export default function imageRouter(services: Services): Router {
         pageTitle: `All facial images`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
         miniBannerData: {
-          prisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-            style: NameFormatStyle.firstLast,
-          }),
-          prisonerNumber: prisonerData.prisonerNumber,
+          prisonerName,
+          prisonerNumber,
         },
         facialImages,
+        referer,
+        breadCrumbs: imagePageBreadcrumbs(prisonerName, prisonerNumber, referer),
       })
     },
   )
