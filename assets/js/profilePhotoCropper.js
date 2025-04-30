@@ -4,8 +4,9 @@ let cropping = false
 let croppingInit = false
 let constrainImage = false
 
-const MAX_WIDTH = 427
-const MAX_HEIGHT = 570
+// This is the dimensions of the canvas
+const MAX_WIDTH = 221
+const MAX_HEIGHT = 295
 const RATIO = MAX_WIDTH / MAX_HEIGHT
 
 const uploadedPhoto = document.getElementById('photo-preview')
@@ -76,7 +77,7 @@ function setCropperListener(fileName, fileType) {
   const canvas = document.querySelector('cropper-canvas')
   const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
-    selector.$toCanvas().then(canvas => {
+    selector.$toCanvas({ width: 427, height: 570 }).then(canvas => {
       canvas.toBlob(blob => {
         const file = new File([blob], fileName, {
           type: fileType,
@@ -175,13 +176,15 @@ const rotateClockwise = e => {
 }
 
 function setButtonListeners() {
-  document.querySelectorAll('.toggle-crop').forEach(button =>
+  document.querySelectorAll('.hmpps-button__toggle-crop').forEach(button =>
     button.addEventListener('click', e => {
       e.preventDefault()
       toggleCrop()
     }),
   )
-  document.querySelectorAll('.rotate-clockwise').forEach(button => button.addEventListener('click', rotateClockwise))
+  document
+    .querySelectorAll('.hmpps-button__rotate-clockwise')
+    .forEach(button => button.addEventListener('click', rotateClockwise))
 }
 
 function pageInit() {

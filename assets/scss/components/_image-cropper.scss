@@ -1,37 +1,42 @@
-.cropper-container {
-  fieldset {
-    border: 1px solid var(--vp-c-divider);
-    border-radius: 0.375rem;
-    margin-bottom: 1rem;
-    padding: 0.25rem 0.75rem 0.75rem 0.75rem;
+$hmpps-cropper-width: 221px;
+$hmpps-cropper-height: 295px;
 
-    > input {
-      margin: 0 0.25rem 0 0;
-      transform: translateY(-0.5px);
-      vertical-align: middle;
-    }
+.hmpps-cropper-photo-container {
+  @include govuk-responsive-padding(2);
+  @include govuk-responsive-margin(6, "bottom");
+  border: 1px solid $govuk-border-colour;
+  width: 100%;
 
-    > label {
-      margin-right: 0.5rem;
+  &__content {
+    display: flex;
+  }
+
+  &__photo-preview {
+    img {
+      width: $hmpps-cropper-width;
+      height: $hmpps-cropper-height;
     }
+  }
+
+  &__description {
+    @include govuk-responsive-padding(2, "top");
+    margin-left: 24px;
+
+    h2 {
+      @include govuk-responsive-margin(3, "bottom");
+    }
+  }
+
+  &__controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
   }
 
   cropper-canvas {
-    width: 427px;
-    height: 570px;
+    width: $hmpps-cropper-width;
+    height: $hmpps-cropper-height;
   }
-}
-
-.cropper-viewers {
-  margin-top: 0.5rem;
-}
-
-.cropper-viewers > cropper-viewer {
-  border: 1px solid var(--vp-c-divider);
-  display: inline-block;
-  margin-right: 0.25rem;
-  width: 427px;
-  height: 570px;
 }
 
 #photo-cropper-container {
@@ -44,4 +49,22 @@
 
 #rotate-button-group {
   display: none;
+}
+
+
+.hmpps-button__toggle-crop,
+.hmpps-button__rotate-clockwise {
+  width: calc(($hmpps-cropper-width/2) - 3px);
+  margin-bottom: 0 !important;
+}
+
+.hmpps-image-cropper-button-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: auto;
+    height: auto;
+  }
 }
