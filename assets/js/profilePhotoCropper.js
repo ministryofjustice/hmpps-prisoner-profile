@@ -106,12 +106,10 @@ function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
     document.getElementById('image-cropper-container').style.display = 'none'
-    // document.getElementById('rotate-button-group').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
     document.getElementById('image-cropper-container').style.display = 'block'
-    // document.getElementById('rotate-button-group').style.display = 'block'
     cropping = true
     if (!croppingInit) {
       document.querySelector('cropper-selection').$reset().$render()
