@@ -77,6 +77,7 @@ function setCropperListener(fileName, fileType) {
   const canvas = document.querySelector('cropper-canvas')
   const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
+    // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
     selector.$toCanvas({ width: 427, height: 570 }).then(canvas => {
       canvas.toBlob(blob => {
         const file = new File([blob], fileName, {
