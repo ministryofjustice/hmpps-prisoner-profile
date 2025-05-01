@@ -155,6 +155,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
   }
 
+  async getPersonalCareNeedsByDomain(
+    bookingId: number,
+    domain: ReferenceCodeDomain | string,
+  ): Promise<PersonalCareNeeds> {
+    return this.restClient.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs/${domain}` })
+  }
+
   async getOffenderActivitiesHistory(
     prisonerNumber: string,
     earliestEndDate: string,
@@ -229,6 +236,15 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
     return this.restClient.get<ReasonableAdjustments>({
       path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
+    })
+  }
+
+  async getReasonableAdjustmentsByDomain(
+    bookingId: number,
+    domain: ReferenceCodeDomain | string,
+  ): Promise<ReasonableAdjustments> {
+    return this.restClient.get<ReasonableAdjustments>({
+      path: `/api/bookings/${bookingId}/reasonable-adjustments/${domain}`,
     })
   }
 
