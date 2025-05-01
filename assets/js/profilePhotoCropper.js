@@ -4,8 +4,9 @@ let cropping = false
 let croppingInit = false
 let constrainImage = false
 
-const MAX_WIDTH = 427
-const MAX_HEIGHT = 570
+// This is the dimensions of the canvas
+const MAX_WIDTH = 221
+const MAX_HEIGHT = 295
 const RATIO = MAX_WIDTH / MAX_HEIGHT
 
 const uploadedPhoto = document.getElementById('photo-preview')
@@ -76,7 +77,8 @@ function setCropperListener(fileName, fileType) {
   const canvas = document.querySelector('cropper-canvas')
   const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
-    selector.$toCanvas().then(canvas => {
+    // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
+    selector.$toCanvas({ width: 427, height: 570 }).then(canvas => {
       canvas.toBlob(blob => {
         const file = new File([blob], fileName, {
           type: fileType,
@@ -101,17 +103,14 @@ function setSelectionListener() {
   })
 }
 
-function toggleCrop(e) {
-  e.preventDefault()
+function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
     document.getElementById('image-cropper-container').style.display = 'none'
-    document.getElementById('rotate-button-group').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
     document.getElementById('image-cropper-container').style.display = 'block'
-    document.getElementById('rotate-button-group').style.display = 'block'
     cropping = true
     if (!croppingInit) {
       document.querySelector('cropper-selection').$reset().$render()
@@ -154,13 +153,10 @@ function resetSelectionLocation() {
 
 function rotateImage(degrees) {
   const cropperImage = document.querySelector('cropper-image')
-  // ="Picture" initial-center-size="contain" rotatable skewable scalable translatable></cropper-image>
   cropperImage.rotatable = true
   cropperImage.scalable = true
   cropperImage.translatable = true
   cropperImage.skewable = true
-
-  console.log("???")
 
   cropperImage.$rotate(`${degrees}deg`).$center('contain')
 
@@ -178,15 +174,16 @@ const rotateClockwise = e => {
   rotateImage(90)
 }
 
-const rotateAnticlockwise = e => {
-  e.preventDefault()
-  rotateImage(-90)
-}
-
 function setButtonListeners() {
-  document.getElementById('toggle-crop-button').addEventListener('click', toggleCrop)
-  document.getElementById('rotate-clockwise').addEventListener('click', rotateClockwise)
-  document.getElementById('rotate-anti-clockwise').addEventListener('click', rotateAnticlockwise)
+  document.querySelectorAll('.hmpps-button__toggle-crop').forEach(button =>
+    button.addEventListener('click', e => {
+      e.preventDefault()
+      toggleCrop()
+    }),
+  )
+  document
+    .querySelectorAll('.hmpps-button__rotate-clockwise')
+    .forEach(button => button.addEventListener('click', rotateClockwise))
 }
 
 function pageInit() {
@@ -197,4 +194,8 @@ function pageInit() {
   setButtonListeners()
 }
 
-pageInit()
+window.onload = () => {
+  pageInit()
+  toggleCrop()
+  setFormPhotoToCroppedResult()
+}
