@@ -93,3 +93,5 @@ export const Result = {
     toPromiseSettledResult: () => ({ status: 'rejected', reason: error }),
   }),
 }
+
+export const noCallbackOnErrorBecause = (_explanation: string) => (_error: Error) => {}

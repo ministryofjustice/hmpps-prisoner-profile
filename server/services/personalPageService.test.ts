@@ -56,6 +56,7 @@ import {
 } from '../data/localMockData/personalRelationshipsApiMock'
 import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -320,15 +321,9 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
-      describe.skip('Smoker or vaper', () => {
-        it.each([
-          // This isn't provided by the health mock at the moment so is 'Not entered'
-          [true, 'Not entered'],
-          [false, 'No'],
-        ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
-          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
-          expect(response.personalDetails.smokerOrVaper).toEqual(expectedValue)
-        })
+      it('Maps the smoker or vaper field', async () => {
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.smokerOrVaper).toEqual('No')
       })
 
       describe('Food allergies', () => {
@@ -404,6 +399,53 @@ describe('PersonalPageService', () => {
       it('Maps the type of diet field', async () => {
         const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.typeOfDiet).toEqual('Voluntary - Pork Free/Fish Free')
+      })
+    })
+
+    describe('Marriage or civil partnership status', () => {
+      it('Gets the status from the domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual(
+          PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
+        )
+      })
+
+      it('Handles errors from domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => Promise.reject(new Error('error!')))
+
+        const response = await constructService().get('token', {
+          ...PrisonerMockDataA,
+          maritalStatus: 'something else',
+        })
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual('something else')
+      })
+    })
+
+    describe('Number of children', () => {
+      it('Gets the number of children from the Personal Relationships API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+          async () => PersonalRelationshipsNumberOfChildrenMock,
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual(
+          PersonalRelationshipsNumberOfChildrenMock.numberOfChildren,
+        )
+      })
+
+      it('Handles errors from Personal Relationships API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(async () => Promise.reject(Error('error!')))
+        prisonApiClient.getInmateDetail = jest.fn(async () =>
+          Promise.resolve({
+            ...inmateDetailMock,
+            profileInformation: [{ type: 'CHILD', resultValue: '5' }],
+          } as InmateDetail),
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual('5')
       })
     })
 
