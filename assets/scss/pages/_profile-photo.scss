@@ -10,17 +10,40 @@
 .photo-feedback-banner {
   @include govuk-font(16);
   display: inline-block;
-  border: 1px solid #594D00;
+  border: 1px solid #594d00;
   padding: 8px 8px 6px;
   margin-bottom: 15px;
-  background: #FFF7BF;
-  color: #594D00;
+  background: #fff7bf;
+  color: #594d00;
 
-  a, a:visited {
-    color: #594D00 !important;
+  a,
+  a:visited {
+    color: #594d00 !important;
   }
 
-  a:hover, a:active {
-    color: #2F2900 !important;
+  a:hover,
+  a:active {
+    color: #2f2900 !important;
+  }
+}
+
+.hmpps-profile-photo {
+  display: flex;
+
+  &__placeholder,
+  &__withheld {
+    img {
+      width: 170px;
+    }
+  }
+
+  &__photo {
+    img {
+      width: 270px;
+    }
+  }
+
+  &__description {
+    margin-left: 30px;
   }
 }

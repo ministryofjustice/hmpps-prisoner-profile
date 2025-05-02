@@ -4,6 +4,53 @@
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% extends "../partials/layout.njk" %}
+{% set photoAllHref = "/prisoner/" + prisonerNumber + "/image/all" + ("?referer=" + referer if referer) %}
+{% macro photo(classSuffix) %}
+  <div class="hmpps-profile-photo__{{ classSuffix }}">
+    <img src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+  </div>
+{% endmacro %}
+{% macro description() %}
+  {% if not photoStatus.placeholder %}
+    <div class="hmpps-profile-photo__description">
+      <div class="photo-feedback-banner">This is a
+        <span class="govuk-!-font-weight-bold">new page in DPS</span>.
+        <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
+        (opens in a new tab)
+      </div>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "Uploaded"
+            },
+            value: {
+              text: imageUploadedDate
+            }
+          }
+        ]
+      }) }}
+      {% if not photoStatus.withheld %}
+        <span class="govuk-!-padding-top-4">
+          <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link">
+            Print photo
+          </a>
+        </span>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="hmpps-profile-photo__description">
+      <div class="photo-feedback-banner">This is a
+        <span class="govuk-!-font-weight-bold">new page in DPS</span>.
+        <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
+        (opens in a new tab)
+      </div>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
+      <p class="govuk-body">This prisoner does not have any facial images.</p>
+    </div>
+  {% endif %}
+{% endmacro %}
 {% block content %}
   <div class="govuk-grid-row govuk-!-display-none-print">
     <div class="govuk-grid-column-full">
@@ -19,7 +66,7 @@
               <a class="moj-sub-navigation__link" aria-current="page" href="#">Main facial image</a>
             </li>
             <li class="moj-sub-navigation__item">
-              <a class="moj-sub-navigation__link" href="/prisoner/{{ prisonerNumber }}/image/all{{"?referer=" + referer if referer}}">All facial images</a>
+              <a class="moj-sub-navigation__link" href="{{ photoAllHref }}">All facial images</a>
             </li>
             {% if editEnabled %}
               <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
@@ -28,8 +75,8 @@
                   href: "/prisoner/" + prisonerNumber + "/image/new",
                   classes: "govuk-!-margin-bottom-0"
                 }) }}
+              </li>
             {% endif %}
-            </li>
           </ul>
         </nav>
       </div>
@@ -56,50 +103,27 @@
   </div>
   <div class="govuk-grid-row govuk-!-display-none-print">
     <div class="govuk-grid-column-three-quarters">
-      <div class="govuk-grid-row">
+      <div class="hmpps-profile-photo">
         {% if photoStatus.placeholder %}
-          <div class="govuk-grid-column-one-third">
-            <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
-          </div>
-          <div class="govuk-grid-column-two-thirds">
-            <div class="photo-feedback-banner">This is a
-              <span class="govuk-!-font-weight-bold">new page in DPS</span>.
-              <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
-              (opens in a new tab)</div>
-            <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
-            <p class="govuk-body">This prisoner does not have any facial images.</p>
-          </div>
-        </div>
-      {% else %}
-        <div class="govuk-grid-column-one-third">
-          <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
-        </div>
-        <div class="govuk-grid-column-two-thirds">
-          <div class="photo-feedback-banner">This is a
-            <span class="govuk-!-font-weight-bold">new page in DPS</span>.
-            <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
-            (opens in a new tab)</div>
-          <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
-          {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-          {{ govukSummaryList({
-                  rows: [
-                    {
-                      key: {
-                        text: "Uploaded"
-                      },
-                      value: {
-                        text: imageUploadedDate
-                      }
-                    }
-                  ]
-                }) }}
-          <span class="govuk-!-padding-top-4">
-            <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link">
-              Print photo
-            </a>
-          </span>
-        </div>
-      {% endif %}
+          {{ photo("placeholder") }}
+        {% elif photoStatus.withheld %}
+          {{ photo("withheld") }}
+        {% else %}
+          {{ photo("photo") }}
+        {% endif %}
+        {{ description() }}
+      </div>
     </div>
+    {% if (photoStatus.withheld or photoStatus.placeholder) and editEnabled %}
+      <div class="govuk-grid-column-one-quarter">
+        <div class="hmpps-!-float-right">
+          {{ govukButton({
+            text: "Add a new facial image",
+            href: "/prisoner/" + prisonerNumber + "/image/new",
+            classes: "govuk-!-margin-bottom-0"
+          }) }}
+        </div>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
