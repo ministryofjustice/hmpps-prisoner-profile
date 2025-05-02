@@ -34,7 +34,7 @@ import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
-import { Result } from '../utils/result/result'
+import { noCallbackOnErrorBecause, Result } from '../utils/result/result'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
@@ -60,7 +60,11 @@ import logger from '../../logger'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import NextOfKinService from './nextOfKinService'
-import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsDomesticStatusDto,
+  PersonalRelationshipsNumberOfChildrenDto,
+} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import DomesticStatusService from './domesticStatusService'
 
 export default class PersonalPageService {
@@ -164,7 +168,6 @@ export default class PersonalPageService {
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
-    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(token)
 
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
@@ -197,8 +200,14 @@ export default class PersonalPageService {
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
       this.getNextOfKinAndEmergencyContacts(token, prisonerNumber),
-      personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber),
-      this.getDomesticStatus(token, prisonerNumber),
+      Result.wrap(
+        this.getNumberOfChildren(token, prisonerNumber),
+        noCallbackOnErrorBecause('we are falling back to prisoner search data'),
+      ),
+      Result.wrap(
+        this.getDomesticStatus(token, prisonerNumber),
+        noCallbackOnErrorBecause('we are falling back to prison api data'),
+      ),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -217,8 +226,8 @@ export default class PersonalPageService {
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
-        personalRelationshipsNumberOfChildren?.numberOfChildren || 'Not entered',
-        personalRelationshipsDomesticStatus?.domesticStatusDescription || 'Not entered',
+        personalRelationshipsNumberOfChildren,
+        personalRelationshipsDomesticStatus,
         flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
@@ -283,8 +292,8 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
-    numberOfChildren: string,
-    domesticStatus: string,
+    numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
+    domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
     flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
@@ -331,9 +340,22 @@ export default class PersonalPageService {
         spoken: inmateDetail.language,
         written: inmateDetail.writtenLanguage,
       },
-      marriageOrCivilPartnership: domesticStatus || 'Not entered',
+      marriageOrCivilPartnership:
+        domesticStatus
+          .map(status => status.domesticStatusDescription)
+          .getOrHandle(_e => {
+            // revert back to using Prisoner Search sourced data:
+            return prisonerData.maritalStatus
+          }) || 'Not entered',
       nationality,
-      numberOfChildren: formatNumberOfChildren(numberOfChildren),
+      numberOfChildren: formatNumberOfChildren(
+        numberOfChildren
+          .map(dto => dto.numberOfChildren)
+          .getOrHandle(_e => {
+            // revert back to using Prison API sourced data:
+            return getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation)
+          }),
+      ),
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
         language: description,
         code,
