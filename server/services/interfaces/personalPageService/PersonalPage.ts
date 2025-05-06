@@ -14,9 +14,7 @@ export default interface PersonalPage {
   property: PropertyItem[]
   addresses: Addresses
   addressSummary: GovSummaryItem[]
-  nextOfKinAndEmergencyContacts: PersonalRelationshipsContact[]
-  hasNextOfKin: boolean
-  hasEmergencyContact: boolean
+  nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
@@ -63,6 +61,12 @@ export interface PersonalDetails {
   typeOfDiet: string
   youthOffender: string
   dietAndAllergy: DietAndAllergyDetails
+}
+
+export interface NextOfKinAndEmergencyContactsDetails {
+  contacts: PersonalRelationshipsContact[]
+  hasNextOfKin: boolean
+  hasEmergencyContact: boolean
 }
 
 export interface DietAndAllergyDetails {
