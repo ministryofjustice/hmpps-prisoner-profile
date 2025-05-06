@@ -536,6 +536,25 @@ describe('PersonalPageService', () => {
     })
   })
 
+  describe('Next of kin and emergency contacts', () => {
+    it('Maps data from the next of kin service', async () => {
+      nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
+      const result = await constructService().get('token', PrisonerMockDataA)
+      const nextOfKinAndEmergencyContacts = result.nextOfKinAndEmergencyContacts.getOrThrow()
+
+      expect(nextOfKinAndEmergencyContacts.contacts).toEqual(PersonalRelationshipsContactsDtoMock.content)
+      expect(nextOfKinAndEmergencyContacts.hasNextOfKin).toEqual(true)
+      expect(nextOfKinAndEmergencyContacts.hasEmergencyContact).toEqual(true)
+    })
+
+    it('Handles an error from the next of kin service', async () => {
+      nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => Promise.reject(new Error('error!')))
+      const { nextOfKinAndEmergencyContacts } = await constructService().get('token', PrisonerMockDataA)
+
+      expect(nextOfKinAndEmergencyContacts.isFulfilled()).toEqual(false)
+    })
+  })
+
   describe('Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
       prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)

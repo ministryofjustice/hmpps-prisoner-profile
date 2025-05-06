@@ -718,4 +718,28 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
     })
   })
+
+  context('Given API call to get next of kin and emergency contacts fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, error: true })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays a page error banner and error message replacing the next of kin and emergency contact details', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+
+      page.apiErrorBanner().should('exist')
+      page.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      page
+        .contacts()
+        .apiErrorMessage()
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
 })

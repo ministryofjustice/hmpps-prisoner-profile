@@ -49,6 +49,7 @@ const stubPersonalRelationshipsCountError = (params: { prisonerNumber: string })
 const stubPersonalRelationshipsContacts = (params: {
   prisonerNumber: string
   resp: PersonalRelationshipsContactsDto
+  error: boolean
 }): SuperAgentRequest =>
   stubFor({
     request: {
@@ -56,11 +57,16 @@ const stubPersonalRelationshipsContacts = (params: {
       urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact\\?.*`,
     },
     response: {
-      status: 200,
+      status: params.error ? 500 : 200,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: params.resp,
+      jsonBody: params.error
+        ? {
+            errorMessage: 'Service unavailable',
+            httpStatusCode: 500,
+          }
+        : params.resp,
     },
   })
 
