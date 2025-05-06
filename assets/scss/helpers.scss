@@ -20,9 +20,11 @@
 .hmpps-clickable-image {
   width: 0;
 
-  &:focus img {
-    outline: 4px solid $govuk-focus-colour;
-    outline-offset: -1px;
+  &:focus {
+    img {
+      outline: 4px solid $govuk-focus-colour;
+      outline-offset: -1px;
+    }
   }
 }
 
@@ -193,9 +195,9 @@ div.hmpps-merged-key-summary-list-row {
 }
 
 .hmpps-vertical-align-top {
-    vertical-align: top;
+  vertical-align: top;
 }
 
 .hmpps-\!-float-right {
-  float: right
+  float: right;
 }

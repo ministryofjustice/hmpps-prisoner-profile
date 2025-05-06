@@ -3,11 +3,11 @@
   margin: 0 -15px;
 
   &--warning {
-    background-color: rgba(govuk-colour("orange"), 0.25);
+    background-color: rgba(govuk-colour('orange'), 0.25);
   }
 
   &--info {
-    background-color: rgba(govuk-colour("green"), 0.25);
+    background-color: rgba(govuk-colour('green'), 0.25);
   }
 
   p {
@@ -43,6 +43,47 @@
     .hmpps-profile-photo {
       grid-area: photo;
     }
+
+    .hmpps-profile-banner-photo {
+      img {
+        width: 120px;
+        height: 150px;
+        position: absolute;
+      }
+
+      .hmpps-clickable-image {
+        &:focus {
+          .hmpps-clickable-image__overlay {
+            opacity: 1;
+          }
+        }
+
+        &__overlay {
+          // Account for the border
+          width: calc(120px - 6px);
+          height: calc(150px - 6px);
+          position: absolute;
+          opacity: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: 0.3s ease;
+          background-color: rgba(255, 255, 255, 0.95);
+          border: 3px solid #adbdcb;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          p {
+            margin: 0;
+            color: $govuk-link-colour;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
     .hmpps-profile-prisoner-name {
       grid-area: name;
       line-height: 26px;
@@ -78,12 +119,6 @@
         white-space: nowrap;
         margin-bottom: 0;
       }
-    }
-
-    img {
-      width: 120px;
-      height: 150px;
-      position: absolute;
     }
 
     background-color: govuk-colour('blue');
@@ -170,7 +205,6 @@
   }
 
   .hmpps-profile-banner-bottom {
-
     & > div {
       padding: 0 15px;
 
