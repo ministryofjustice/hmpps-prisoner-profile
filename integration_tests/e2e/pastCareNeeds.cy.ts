@@ -17,7 +17,7 @@ context('Past care needs page', () => {
     cy.task('stubPastCareNeeds', 1102484)
     cy.task('stubHealthReferenceDomain')
     cy.task('stubHealthTreatmentReferenceDomain')
-    cy.task('stubReasonableAdjustments', 1102484)
+    cy.task('stubReasonableAdjustments', { bookingId: '1102484', domain: 'HEALTH_TREAT' })
 
     pastCareNeedsPage = visitPastCareNeedsPage()
   })

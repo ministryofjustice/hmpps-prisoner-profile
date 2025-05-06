@@ -62,7 +62,7 @@ context('When signed in', () => {
       cy.task('stubImages')
       cy.task('stubHealthReferenceDomain')
       cy.task('stubHealthTreatmentReferenceDomain')
-      cy.task('stubReasonableAdjustments', 1102484)
+      cy.task('stubReasonableAdjustments', { bookingId: '1102484', domain: 'HEALTH_TREAT' })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
