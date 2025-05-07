@@ -199,7 +199,7 @@ export default class PersonalPageService {
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
-      this.getNextOfKinAndEmergencyContacts(token, prisonerNumber),
+      Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback),
       Result.wrap(
         this.getNumberOfChildren(token, prisonerNumber),
         noCallbackOnErrorBecause('we are falling back to prisoner search data'),
@@ -234,9 +234,11 @@ export default class PersonalPageService {
       property: this.property(property),
       addresses,
       addressSummary: this.addressSummary(addresses),
-      nextOfKinAndEmergencyContacts,
-      hasNextOfKin: nextOfKinAndEmergencyContacts.some(contact => contact.isNextOfKin),
-      hasEmergencyContact: nextOfKinAndEmergencyContacts.some(contact => contact.isEmergencyContact),
+      nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
+        contacts,
+        hasNextOfKin: contacts.some(contact => contact.isNextOfKin),
+        hasEmergencyContact: contacts.some(contact => contact.isEmergencyContact),
+      })),
       physicalCharacteristics: this.physicalCharacteristics(inmateDetail, physicalAttributes),
       security: {
         interestToImmigration: getProfileInformationValue(

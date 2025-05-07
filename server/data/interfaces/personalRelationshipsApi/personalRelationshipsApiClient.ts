@@ -160,6 +160,7 @@ export interface PersonalRelationshipsContactRequestPhoneNumber {
   phoneType?: string
   phoneNumber?: string
 }
+
 export interface PersonalRelationshipsApiClient {
   getContacts(
     prisonerNumber: string,
@@ -167,6 +168,8 @@ export interface PersonalRelationshipsApiClient {
   ): Promise<PersonalRelationshipsContactsDto>
 
   getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount>
+
+  createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
 
   getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto>
 
@@ -183,6 +186,4 @@ export interface PersonalRelationshipsApiClient {
   ): Promise<PersonalRelationshipsDomesticStatusDto>
 
   getReferenceDataCodes(domain: PersonalRelationshipsReferenceDataDomain): Promise<PersonalRelationshipsReferenceCode[]>
-
-  createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
 }
