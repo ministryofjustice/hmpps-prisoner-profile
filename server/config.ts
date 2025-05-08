@@ -363,6 +363,7 @@ export default {
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
+    personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     dietAndAllergyEnabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []),

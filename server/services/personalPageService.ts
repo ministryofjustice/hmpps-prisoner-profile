@@ -163,6 +163,7 @@ export default class PersonalPageService {
     prisonerData: Prisoner,
     dietAndAllergyIsEnabled: boolean = false,
     editProfileEnabled: boolean = false,
+    personalRelationshipsApiReadEnabled: boolean = true,
     apiErrorCallback: (error: Error) => void = () => null,
     flashMessage: { fieldName: string } = null,
   ): Promise<PersonalPage> {
@@ -200,14 +201,18 @@ export default class PersonalPageService {
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
       Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback),
-      Result.wrap(
-        this.getNumberOfChildren(token, prisonerNumber),
-        noCallbackOnErrorBecause('we are falling back to prisoner search data'),
-      ),
-      Result.wrap(
-        this.getDomesticStatus(token, prisonerNumber),
-        noCallbackOnErrorBecause('we are falling back to prison api data'),
-      ),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getNumberOfChildren(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prisoner search data'),
+          )
+        : Result.rejected<PersonalRelationshipsNumberOfChildrenDto, Error>(undefined),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getDomesticStatus(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prison api data'),
+          )
+        : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
     ])
 
     const addresses: Addresses = this.addresses(addressList)

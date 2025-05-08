@@ -216,7 +216,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
+          return service.get('token', PrisonerMockDataA, false, false, true, null, { fieldName: 'fullName' })
         }
 
         it('Handles no pseudonyms', async () => {
@@ -290,7 +290,9 @@ describe('PersonalPageService', () => {
               lastName: 'Last name',
             } as Alias,
           ]
-          const response = await service.get('token', prisonerData, false, false, null, { fieldName: 'full-name' })
+          const response = await service.get('token', prisonerData, false, false, true, null, {
+            fieldName: 'full-name',
+          })
           expect(response.personalDetails.aliases).toEqual([
             {
               alias: 'First Name Last Name',
@@ -695,7 +697,7 @@ describe('PersonalPageService', () => {
       }
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
-      const data = await constructService().get('token', prisonerData, false, false, apiErrorCallback)
+      const data = await constructService().get('token', prisonerData, false, false, true, apiErrorCallback)
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
