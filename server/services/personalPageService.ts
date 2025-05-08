@@ -314,7 +314,7 @@ export default class PersonalPageService {
       inmateDetail?.profileInformation?.find(entry => entry.type === 'NAT')?.resultValue || 'Not entered'
 
     const formatNumberOfChildren = (count: string) => {
-      if (count === null) return 'Not entered'
+      if (count === null || count === undefined) return 'Not entered'
       if (count === '0') return 'None'
       return count
     }
@@ -344,7 +344,7 @@ export default class PersonalPageService {
       },
       marriageOrCivilPartnership:
         domesticStatus
-          .map(status => status.domesticStatusDescription)
+          .map(status => status?.domesticStatusDescription)
           .getOrHandle(_e => {
             // revert back to using Prisoner Search sourced data:
             return prisonerData.maritalStatus
@@ -352,7 +352,7 @@ export default class PersonalPageService {
       nationality,
       numberOfChildren: formatNumberOfChildren(
         numberOfChildren
-          .map(dto => dto.numberOfChildren)
+          .map(dto => dto?.numberOfChildren)
           .getOrHandle(_e => {
             // revert back to using Prison API sourced data:
             return getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation)

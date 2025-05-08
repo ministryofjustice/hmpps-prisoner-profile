@@ -47,6 +47,7 @@ import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsDomesticStatusUpdateRequest,
+  PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipsNumberOfChildrenUpdateRequest,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import {
@@ -412,6 +413,13 @@ describe('PersonalPageService', () => {
         )
       })
 
+      it('Handles null response from domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => null as PersonalRelationshipsDomesticStatusDto)
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual('Not entered')
+      })
+
       it('Handles errors from domestic status service', async () => {
         domesticStatusService.getDomesticStatus = jest.fn(async () => Promise.reject(new Error('error!')))
 
@@ -433,6 +441,15 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.numberOfChildren).toEqual(
           PersonalRelationshipsNumberOfChildrenMock.numberOfChildren,
         )
+      })
+
+      it('Handles null response from API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+          async () => null as PersonalRelationshipsNumberOfChildrenDto,
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual('Not entered')
       })
 
       it('Handles errors from Personal Relationships API', async () => {

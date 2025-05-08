@@ -98,6 +98,11 @@ generic-service:
     NEW_OVERVIEW_PAGE_LAYOUT_ENABLED: "true"
     MANAGE_ALLOCATIONS_ENABLED: "true"
 
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - moj_cloud_platform
+
   scheduledDowntime:
     enabled: true
     startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
