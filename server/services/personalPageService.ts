@@ -530,7 +530,7 @@ export default class PersonalPageService {
       .map(contact => {
         const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
         return {
-          address: this.addresses(personAddresses.addresses),
+          address: this.addresses(personAddresses?.addresses),
           emails: contact.emails?.map(({ email }) => email) || [],
           emergencyContact: contact.emergencyContact,
           name: formatName(contact.firstName, contact.middleName, contact.lastName),
