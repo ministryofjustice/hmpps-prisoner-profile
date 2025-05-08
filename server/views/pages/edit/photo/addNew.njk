@@ -9,20 +9,6 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href: '/'
-  },
-  {
-    text: miniBannerData.prisonerName,
-    href: "/prisoner/" + prisonerNumber
-  },
-  {
-    text: 'Photo',
-    href: "/prisoner/" + prisonerNumber + "/image"
-  }
-] %}
 {% set fileHtml %}
 <div class="hmpps-photo-upload">
   <div id="file-upload" class="hmpps-photo-upload__upload">
@@ -60,7 +46,7 @@
     <div class="govuk-grid-column-full">
       {{ govukBackLink({
         text: "Back",
-        href: "/prisoner/" + prisonerNumber +"/image"
+        href: "/prisoner/" + prisonerNumber +"/image" | appendRefererToUrl(referer)
       }) }}
     </div>
   </div>
@@ -78,7 +64,8 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
+      <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
           {{ govukRadios({
             name: "photoType",
@@ -117,10 +104,7 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a
-            href="/prisoner/{{ prisonerNumber }}/image"
-            class="govuk-link govuk-link--no-visited-state"
-            data-qa="edit-cancel-button">
+          <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
             Cancel</a>
         </div>
       </form>

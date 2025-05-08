@@ -158,6 +158,24 @@ describe('ImageController', () => {
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image/new-withheld')
       })
+
+      it('Withheld: Redirects with referer', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          body: { photoType: 'withheld' },
+          query: { referer: 'case-notes' },
+          flash: jest.fn(),
+        } as any
+
+        const response = {
+          render: jest.fn(),
+          redirect: jest.fn(),
+        } as any
+
+        await controller.updateProfileImage().newImage.post(request, response, () => {})
+
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image/new-withheld?referer=case-notes')
+      })
     })
   })
 
@@ -198,6 +216,24 @@ describe('ImageController', () => {
         type: FlashMessageType.success,
       })
       expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image')
+    })
+
+    it('Redirects with referer', async () => {
+      const request = {
+        body: { photoType: 'new' },
+        query: { referer: 'case-notes' },
+        file,
+        flash: jest.fn(),
+        middleware: defaultMiddleware,
+      } as any
+
+      const response = {
+        locals: { user: {} },
+        redirect: jest.fn(),
+      } as any
+
+      await controller.updateProfileImage().submitImage(request, response, () => {})
+      expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
     })
   })
 
@@ -294,6 +330,24 @@ describe('ImageController', () => {
           type: FlashMessageType.success,
         })
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image')
+      })
+
+      it('Redirects with referer', async () => {
+        const request = {
+          body: { photoType: 'new' },
+          query: { referer: 'case-notes' },
+          file,
+          flash: jest.fn(),
+          middleware: defaultMiddleware,
+        } as any
+
+        const response = {
+          locals: { user: {} },
+          redirect: jest.fn(),
+        } as any
+
+        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
       })
     })
   })
