@@ -9,20 +9,6 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href: '/'
-  },
-  {
-    text: miniBannerData.prisonerName,
-    href: "/prisoner/" + prisonerNumber
-  },
-  {
-    text: 'Photo',
-    href: "/prisoner/" + prisonerNumber + "/image"
-  }
-] %}
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -33,7 +19,7 @@
     <div class="govuk-grid-column-full">
       {{ govukBackLink({
         text: "Back",
-        href: "/prisoner/" + prisonerNumber +"/image/new"
+        href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
       }) }}
     </div>
   </div>
@@ -51,7 +37,8 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
+      <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
         <div class="govuk-!-margin-bottom-4">
           <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}"/>
@@ -63,11 +50,9 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a
-            href="/prisoner/{{ prisonerNumber }}/image"
-            class="govuk-link govuk-link--no-visited-state"
-            data-qa="edit-cancel-button">
-            Cancel</a>
+          <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+            Cancel
+          </a>
         </div>
       </form>
     </div>
