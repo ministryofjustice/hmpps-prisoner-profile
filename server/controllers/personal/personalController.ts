@@ -82,6 +82,7 @@ export default class PersonalController {
       const { user, flashMessage, apiErrorCallback } = res.locals
       const { activeCaseLoadId, userRoles } = user as PrisonUser
       const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
+      const { personalRelationshipsApiReadEnabled } = config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(
@@ -89,7 +90,7 @@ export default class PersonalController {
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),
           profileEditEnabled,
-          config.featureToggles.personalRelationshipsApiReadEnabled,
+          personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           flashMessage,
         ),
@@ -124,6 +125,7 @@ export default class PersonalController {
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
+        personalRelationshipsApiReadEnabled,
       })
     }
   }

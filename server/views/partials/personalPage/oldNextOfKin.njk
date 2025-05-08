@@ -1,0 +1,57 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/arrayToLines.njk" import arrayToLines %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro prisonerContact(contactInfo) %}
+    <div class="hmpps-contact" data-qa="emergency-contact">
+        {% if contactInfo.emergencyContact | default(false) %}
+            <p class="hmpps-contact__emergency-contact" data-qa="contact-emergency-contact">Emergency contact</p>
+        {% endif %}
+        <p class="hmpps-contact__next-of-kin">Next of kin</p>
+        <p class="hmpps-contact__name" data-qa="contact-name">{{ contactInfo.name }}</p>
+        <p class="hmpps-contact__relationship" data-qa="contact-relationship">{{ contactInfo.relationship }}</p>
+        <p class="hmpps-contact__contact-number" data-qa="contact-numbers">
+            {% for phone in contactInfo.phoneNumbers %}
+                {{ phone }} <br />
+            {% endfor %}
+        </p>
+        <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
+            <summary class="govuk-details__summary govuk-!-display-none-print">
+                <span class="govuk-details__summary-text">View details</span>
+            </summary>
+            <div class="govuk-details__text" data-qa="contact-details">
+                {{ govukSummaryList({
+                    rows: [
+                        { key: { text: "Address"}, value: { html: arrayToLines(contactInfo.address.address | addressToLines, "Not entered")} },
+                        { key: { text: "Address type"}, value: { html: arrayToLines(contactInfo.address.addressTypes, "Not entered")} },
+                        { key: { text: "Address phone"}, value: { html: arrayToLines(contactInfo.address.phones, "Not entered")} },
+                        { key: { text: "Email"}, value: { html: arrayToLines(contactInfo.emails, "Not entered")} }
+                    ]
+                }) }}
+            </div>
+        </details>
+    </div>
+{% endmacro %}
+
+{%- call summaryCard({title: "Next of kin", id: "next-of-kin"}) -%}
+    <div class="govuk-grid-row" data-qa="next-of-kin">
+        <div class="govuk-grid-column-full">
+            {% if not nextOfKin.length %}
+                <p>No next of kin entered.</p>
+            {% endif %}
+            {% for contact in nextOfKin %}
+                {{ prisonerContact({
+                    emergencyContact: contact.emergencyContact,
+                    name: contact.name,
+                    relationship: contact.relationship,
+                    phoneNumbers: contact.phones,
+                    emails: contact.emails,
+                    address: contact.address
+                }) }}
+                {% if not loop.last %}
+                    <hr class="govuk-section-break govuk-section-break--visible" />
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{%- endcall -%}
