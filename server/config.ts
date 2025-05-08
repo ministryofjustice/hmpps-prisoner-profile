@@ -318,10 +318,10 @@ export default {
     personalRelationshipsApi: {
       url: get('PERSONAL_RELATIONSHIPS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 3000)),
+        response: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 3000))),
+      agent: new AgentConfig(Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000))),
     },
   },
   serviceUrls: {
