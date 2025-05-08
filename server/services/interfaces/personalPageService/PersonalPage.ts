@@ -14,6 +14,7 @@ export default interface PersonalPage {
   property: PropertyItem[]
   addresses: Addresses
   addressSummary: GovSummaryItem[]
+  nextOfKin: NextOfKin[]
   nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
