@@ -2,7 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "../macros/newFacialImageButton.njk" import newFacialImageButton %}
 {% extends "../partials/layout.njk" %}
 {% set photoAllHref = "/prisoner/" + prisonerNumber + "/image/all" + ("?referer=" + referer if referer) %}
 {% macro photo(classSuffix) %}
@@ -68,15 +68,7 @@
             <li class="moj-sub-navigation__item">
               <a class="moj-sub-navigation__link" href="{{ photoAllHref }}">All facial images</a>
             </li>
-            {% if editEnabled %}
-              <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
-                {{ govukButton({
-                  text: "Add a new facial image",
-                  href: "/prisoner/" + prisonerNumber + "/image/new",
-                  classes: "govuk-!-margin-bottom-0"
-                }) }}
-              </li>
-            {% endif %}
+            {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
           </ul>
         </nav>
       </div>
@@ -117,11 +109,7 @@
     {% if (photoStatus.withheld or photoStatus.placeholder) and editEnabled %}
       <div class="govuk-grid-column-one-quarter">
         <div class="hmpps-!-float-right">
-          {{ govukButton({
-            text: "Add a new facial image",
-            href: "/prisoner/" + prisonerNumber + "/image/new",
-            classes: "govuk-!-margin-bottom-0"
-          }) }}
+          {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
         </div>
       </div>
     {% endif %}
