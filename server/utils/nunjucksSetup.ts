@@ -66,6 +66,7 @@ import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociatio
 import categorySummaryToMiniSummaryOldLayout from '../views/dataUtils/categorySummaryToMiniSummaryOldLayout'
 import incentiveSummaryToMiniSummaryOldLayout from '../views/dataUtils/incentiveSummaryToMiniSummaryOldLayout'
 import visitsSummaryToMiniSummaryOldLayout from '../views/dataUtils/visitsSummaryToMiniSummaryOldLayout'
+import appendRefererToUrl from './appendRefererToUrl'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -216,4 +217,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
   njkEnv.addFilter('includes', arrayIncludes)
+  njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
 }

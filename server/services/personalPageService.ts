@@ -2,6 +2,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   Addresses,
   IdentityNumbers,
+  NextOfKin,
   PersonalDetails,
   PhysicalCharacteristics,
   PropertyItem,
@@ -62,10 +63,12 @@ import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import NextOfKinService from './nextOfKinService'
 import {
   PersonalRelationshipsApiClient,
+  PersonalRelationshipsContact,
   PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsNumberOfChildrenDto,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import DomesticStatusService from './domesticStatusService'
+import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 
 export default class PersonalPageService {
   constructor(
@@ -163,6 +166,7 @@ export default class PersonalPageService {
     prisonerData: Prisoner,
     dietAndAllergyIsEnabled: boolean = false,
     editProfileEnabled: boolean = false,
+    personalRelationshipsApiReadEnabled: boolean = true,
     apiErrorCallback: (error: Error) => void = () => null,
     flashMessage: { fieldName: string } = null,
   ): Promise<PersonalPage> {
@@ -176,6 +180,7 @@ export default class PersonalPageService {
       secondaryLanguages,
       property,
       addressList,
+      offenderContacts,
       identifiers,
       beliefs,
       distinguishingMarks,
@@ -192,6 +197,7 @@ export default class PersonalPageService {
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       prisonApiClient.getAddresses(prisonerNumber),
+      prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
@@ -199,15 +205,21 @@ export default class PersonalPageService {
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
-      Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback),
-      Result.wrap(
-        this.getNumberOfChildren(token, prisonerNumber),
-        noCallbackOnErrorBecause('we are falling back to prisoner search data'),
-      ),
-      Result.wrap(
-        this.getDomesticStatus(token, prisonerNumber),
-        noCallbackOnErrorBecause('we are falling back to prison api data'),
-      ),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback)
+        : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getNumberOfChildren(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prisoner search data'),
+          )
+        : Result.rejected<PersonalRelationshipsNumberOfChildrenDto, Error>(undefined),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getDomesticStatus(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prison api data'),
+          )
+        : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -234,6 +246,7 @@ export default class PersonalPageService {
       property: this.property(property),
       addresses,
       addressSummary: this.addressSummary(addresses),
+      nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),
       nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
         contacts,
         hasNextOfKin: contacts.some(contact => contact.isNextOfKin),
@@ -501,6 +514,39 @@ export default class PersonalPageService {
       sealMark: sealMark || 'Not entered',
       location: location?.userDescription || 'Not entered',
     }))
+  }
+
+  private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
+    const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
+    let contactAddresses: { personId: number; addresses: Address[] }[] = []
+    if (activeNextOfKinContacts) {
+      contactAddresses = await Promise.all(
+        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId, prisonApiClient)),
+      )
+    }
+
+    return contacts.offenderContacts
+      ?.filter(contact => contact.nextOfKin && contact.active)
+      .map(contact => {
+        const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
+        return {
+          address: this.addresses(personAddresses?.addresses),
+          emails: contact.emails?.map(({ email }) => email) || [],
+          emergencyContact: contact.emergencyContact,
+          name: formatName(contact.firstName, contact.middleName, contact.lastName),
+          nextOfKin: contact.nextOfKin,
+          phones: contact.phones?.map(({ number }) => number),
+          relationship: contact.relationshipDescription,
+        }
+      })
+  }
+
+  private async addressForPerson(
+    personId: number,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<{ personId: number; addresses: Address[] }> {
+    const addresses = await prisonApiClient.getAddressesForPerson(personId)
+    return { personId, addresses }
   }
 
   private addresses(addresses: Address[]): Addresses | undefined {

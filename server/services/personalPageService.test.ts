@@ -58,6 +58,7 @@ import {
 import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -216,7 +217,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
+          return service.get('token', PrisonerMockDataA, false, false, true, null, { fieldName: 'fullName' })
         }
 
         it('Handles no pseudonyms', async () => {
@@ -290,7 +291,9 @@ describe('PersonalPageService', () => {
               lastName: 'Last name',
             } as Alias,
           ]
-          const response = await service.get('token', prisonerData, false, false, null, { fieldName: 'full-name' })
+          const response = await service.get('token', prisonerData, false, false, true, null, {
+            fieldName: 'full-name',
+          })
           expect(response.personalDetails.aliases).toEqual([
             {
               alias: 'First Name Last Name',
@@ -553,6 +556,135 @@ describe('PersonalPageService', () => {
     })
   })
 
+  describe('Next of kin (used when personalRelationshipsApiReadEnabled is false)', () => {
+    it('Only maps the active next of kin', async () => {
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      expect(nextOfKin.length).toEqual(3)
+    })
+
+    it('Gets the addresses for each active next of kin', async () => {
+      await constructService().get('token', PrisonerMockDataA)
+      expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
+
+      const expectedPersonIds = mockOffenderContacts.offenderContacts
+        .filter(contact => contact.active && contact.nextOfKin)
+        .map(({ personId }) => personId)
+
+      expectedPersonIds.forEach(personId =>
+        expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledWith(personId),
+      )
+    })
+
+    it('Maps the primary address for the contact', async () => {
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      nextOfKin.forEach(contact => {
+        const { address } = contact
+
+        expect(address.phones).toEqual(expectedPhones)
+        expect(address.addressTypes).toEqual(expectedTypes)
+        const { country, county, flat, locality, postalCode, premise, street, town } = address.address
+
+        expect(country).toEqual(expectedAddress.country)
+        expect(county).toEqual(expectedAddress.county)
+        expect(flat).toEqual(expectedAddress.flat)
+        expect(locality).toEqual(expectedAddress.locality)
+        expect(postalCode).toEqual(expectedAddress.postalCode)
+        expect(premise).toEqual(expectedAddress.premise)
+        expect(street).toEqual(expectedAddress.street)
+        expect(town).toEqual(expectedAddress.town)
+      })
+    })
+
+    it('Maps the data for the contact from the API', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+
+    it('Handles no addresses defined for the contact', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+  })
+
   describe('Next of kin and emergency contacts', () => {
     it('Maps data from the next of kin service', async () => {
       nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
@@ -695,7 +827,7 @@ describe('PersonalPageService', () => {
       }
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
-      const data = await constructService().get('token', prisonerData, false, false, apiErrorCallback)
+      const data = await constructService().get('token', prisonerData, false, false, true, apiErrorCallback)
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })

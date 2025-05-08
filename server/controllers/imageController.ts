@@ -34,7 +34,9 @@ export default class ImageController {
           const { prisonerData } = req.middleware
 
           if (req.body.photoType === 'withheld') {
-            return res.redirect(`/prisoner/${prisonerData.prisonerNumber}/image/new-withheld`)
+            return res.redirect(
+              `/prisoner/${prisonerData.prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+            )
           }
 
           const file = req.file as MulterFile
@@ -69,7 +71,9 @@ export default class ImageController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/image`)
+        return res.redirect(
+          `/prisoner/${prisonerNumber}/image${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+        )
       },
 
       newWithheldImage: {
@@ -124,7 +128,9 @@ export default class ImageController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/image`)
+          return res.redirect(
+            `/prisoner/${prisonerNumber}/image${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+          )
         },
       },
     }

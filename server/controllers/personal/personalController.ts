@@ -63,6 +63,7 @@ import {
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import config from '../../config'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -81,6 +82,7 @@ export default class PersonalController {
       const { user, flashMessage, apiErrorCallback } = res.locals
       const { activeCaseLoadId, userRoles } = user as PrisonUser
       const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
+      const { personalRelationshipsApiReadEnabled } = config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(
@@ -88,6 +90,7 @@ export default class PersonalController {
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),
           profileEditEnabled,
+          personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           flashMessage,
         ),
@@ -122,6 +125,7 @@ export default class PersonalController {
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
+        personalRelationshipsApiReadEnabled,
       })
     }
   }
