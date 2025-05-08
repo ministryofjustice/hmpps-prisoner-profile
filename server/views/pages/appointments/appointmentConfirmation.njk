@@ -46,7 +46,7 @@
                             value: {
                                 text: probationTeam
                             }
-                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        } if appointmentTypeCode == 'VLPM',
                         {
                             key: {
                                 text: "Location",
@@ -63,7 +63,7 @@
                             value: {
                                 text: "Not yet known" if officerDetailsNotKnown else officerFullName
                             }
-                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        } if appointmentTypeCode == 'VLPM',
                         {
                             key: {
                                 text: "Email address"
@@ -71,7 +71,7 @@
                             value: {
                                 text: "Not yet known" if officerDetailsNotKnown else officerEmail
                             }
-                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        } if appointmentTypeCode == 'VLPM',
                         {
                             key: {
                                 text: "UK phone number",
@@ -80,7 +80,7 @@
                             value: {
                                 text: "Not yet known" if officerDetailsNotKnown else (officerTelephone or "None entered")
                             }
-                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        } if appointmentTypeCode == 'VLPM',
                         {
                             key: {
                                 text: "Meeting type",
@@ -89,7 +89,7 @@
                             value: {
                                 text: meetingType
                             }
-                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        } if appointmentTypeCode == 'VLPM',
                         {
                             key: {
                                 text: "Date"
