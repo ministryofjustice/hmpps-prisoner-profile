@@ -48,7 +48,7 @@
             href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}"
             class="hmpps-clickable-image {{ prisonerUrlPath }}"
             data-qa="prisoner-photo-link">
-            <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}"/>
+            <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber }}/image?imageId={{ prisonerPhotoId }}" alt="{{ prisonerName }}"/>
             <div class="hmpps-clickable-image__overlay">
               <p class="govuk-body govuk-!-text-align-centre">
                 Facial<br/> images
