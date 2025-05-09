@@ -1,12 +1,11 @@
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
-import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 // eslint-disable-next-line import/prefer-default-export
 export const PrePostAppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
 
-  if ((bvlsMasteredVlpmFeatureToggleEnabled() || body.bookingType === 'COURT') && !body.preAppointment) {
+  if (!body.preAppointment) {
     errors.push({
       text: 'Select if a room is needed for the pre-court hearing briefing',
       href: '#preAppointment',
@@ -17,7 +16,7 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Select a room for the pre-court hearing briefing', href: '#preAppointmentLocation' })
   }
 
-  if ((bvlsMasteredVlpmFeatureToggleEnabled() || body.bookingType === 'COURT') && !body.postAppointment) {
+  if (!body.postAppointment) {
     errors.push({
       text: 'Select if a room is needed for the post-court hearing briefing',
       href: '#postAppointment',
@@ -28,27 +27,15 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Select a room for the post-court hearing briefing', href: '#postAppointmentLocation' })
   }
 
-  if (!bvlsMasteredVlpmFeatureToggleEnabled() && !body.bookingType) {
-    errors.push({ text: 'Select a booking type', href: '#bookingType' })
-  }
-
-  if ((bvlsMasteredVlpmFeatureToggleEnabled() || body.bookingType === 'COURT') && !body.court) {
+  if (!body.court) {
     errors.push({ text: 'Select which court the hearing is for', href: '#court' })
   }
 
-  if (!bvlsMasteredVlpmFeatureToggleEnabled() && body.bookingType === 'PROBATION' && !body.probationTeam) {
-    errors.push({ text: 'Select which probation team the meeting is with', href: '#probationTeam' })
-  }
-
-  if ((bvlsMasteredVlpmFeatureToggleEnabled() || body.bookingType === 'COURT') && !body.hearingType) {
+  if (!body.hearingType) {
     errors.push({ text: 'Select the hearing type', href: '#hearingType' })
   }
 
-  if (!bvlsMasteredVlpmFeatureToggleEnabled() && body.bookingType === 'PROBATION' && !body.meetingType) {
-    errors.push({ text: 'Select the meeting type', href: '#meetingType' })
-  }
-
-  if ((bvlsMasteredVlpmFeatureToggleEnabled() || body.bookingType === 'COURT') && !body.cvpRequired) {
+  if (!body.cvpRequired) {
     errors.push({ text: 'Select if you know the court hearing link', href: '#cvpRequired' })
   }
 

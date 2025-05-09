@@ -31,14 +31,14 @@
                 {% if mustContactTheCourt %}
                 {% set html %}
                   <h3 class="govuk-notification-banner__heading">
-                    You must email {{ probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court }} to confirm the booking.
+                    You must email {{ court }} to confirm the booking.
                   </h3>
                   <p class="govuk-body">This is because they do not yet have access to the Book a video link service.</p>
                 {% endset %}
 
                 {{ govukNotificationBanner({
                   html: html,
-                  titleText: 'Email ' + probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court + ' to confirm the booking'
+                  titleText: 'Email ' + court + ' to confirm the booking'
                 }) }}
                 {% endif %}
 
@@ -147,18 +147,18 @@
                     rows: [
                         {
                             key: {
-                                text: "Probation team" if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else "Court location"
+                                text: "Court location"
                             },
                             value: {
-                                text: probationTeam if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else court
+                                text: court
                             }
                         },
                         {
                             key: {
-                                text: "Meeting type" if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else "Hearing type"
+                                text: "Hearing type"
                             },
                             value: {
-                                text: meetingType if (bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled()) else hearingType
+                                text: hearingType
                             }
                         },
                         {
@@ -168,7 +168,7 @@
                             value: {
                                 text: videoLinkUrl or "Not yet known"
                             }
-                        } if bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()
+                        }
                     ]
                 }) }}
 

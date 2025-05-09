@@ -26,7 +26,6 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
-    BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED: "true"
 
     # UI Service urls
     ASSESS_FOR_EARLY_RELEASE_UI_URL: "https://assess-for-early-release.hmpps.service.justice.gov.uk"

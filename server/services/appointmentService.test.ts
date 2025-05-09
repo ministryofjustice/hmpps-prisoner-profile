@@ -16,7 +16,6 @@ import CreateVideoBookingRequest, {
   VideoBookingSearchRequest,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import LocationDetailsService from './locationDetailsService'
-import config from '../config'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
@@ -73,11 +72,7 @@ describe('Appointment Service', () => {
     jest.restoreAllMocks()
   })
 
-  describe.each([[true], [false]])('getAddAppointmentRefData - bvlsMasteredVlpmFeatureToggleEnabled %s', toggle => {
-    beforeEach(() => {
-      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = toggle
-    })
-
+  describe('getAddAppointmentRefData - bvls', () => {
     it('should call API to get ref data', async () => {
       locationDetailsService.getLocationsForAppointments = jest.fn().mockResolvedValue(locationsApiMock)
       const refData = await appointmentService.getAddAppointmentRefData('', 'MDI')
@@ -85,33 +80,18 @@ describe('Appointment Service', () => {
       expect(prisonApiClient.getAppointmentTypes).toHaveBeenCalled()
       expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalledWith('', 'MDI')
 
-      if (toggle) {
-        expect(bookAVideoLinkApiClient.getProbationTeams).toHaveBeenCalled()
-        expect(bookAVideoLinkApiClient.getProbationMeetingTypes).toHaveBeenCalled()
-        expect(refData).toEqual({
-          appointmentTypes: appointmentTypesMock,
-          locations: locationsApiMock,
-          probationTeams: probationTeamsMock,
-          meetingTypes: probationMeetingTypes,
-        })
-      } else {
-        expect(bookAVideoLinkApiClient.getProbationTeams).not.toHaveBeenCalled()
-        expect(bookAVideoLinkApiClient.getProbationMeetingTypes).not.toHaveBeenCalled()
-        expect(refData).toEqual({
-          appointmentTypes: appointmentTypesMock,
-          locations: locationsApiMock,
-          probationTeams: [],
-          meetingTypes: [],
-        })
-      }
+      expect(bookAVideoLinkApiClient.getProbationTeams).toHaveBeenCalled()
+      expect(bookAVideoLinkApiClient.getProbationMeetingTypes).toHaveBeenCalled()
+      expect(refData).toEqual({
+        appointmentTypes: appointmentTypesMock,
+        locations: locationsApiMock,
+        probationTeams: probationTeamsMock,
+        meetingTypes: probationMeetingTypes,
+      })
     })
   })
 
-  describe.each([[true], [false]])('getPrePostAppointmentRefData - bvlsMasteredVlpmFeatureToggleEnabled %s', toggle => {
-    beforeEach(() => {
-      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = toggle
-    })
-
+  describe('getPrePostAppointmentRefData - bvls', () => {
     it('should call API to get ref data', async () => {
       locationDetailsService.getLocationsForAppointments = jest.fn().mockResolvedValue(locationsApiMock)
       const refData = await appointmentService.getPrePostAppointmentRefData('', 'MDI')
@@ -120,27 +100,15 @@ describe('Appointment Service', () => {
       expect(bookAVideoLinkApiClient.getCourtHearingTypes).toHaveBeenCalled()
       expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalled()
 
-      if (toggle) {
-        expect(bookAVideoLinkApiClient.getProbationTeams).not.toHaveBeenCalled()
-        expect(bookAVideoLinkApiClient.getProbationMeetingTypes).not.toHaveBeenCalled()
-        expect(refData).toEqual({
-          courts: courtLocationsMock,
-          hearingTypes: courtHearingTypes,
-          probationTeams: [],
-          meetingTypes: [],
-          locations: locationsApiMock,
-        })
-      } else {
-        expect(bookAVideoLinkApiClient.getProbationTeams).toHaveBeenCalled()
-        expect(bookAVideoLinkApiClient.getProbationMeetingTypes).toHaveBeenCalled()
-        expect(refData).toEqual({
-          courts: courtLocationsMock,
-          hearingTypes: courtHearingTypes,
-          probationTeams: probationTeamsMock,
-          meetingTypes: probationMeetingTypes,
-          locations: locationsApiMock,
-        })
-      }
+      expect(bookAVideoLinkApiClient.getProbationTeams).not.toHaveBeenCalled()
+      expect(bookAVideoLinkApiClient.getProbationMeetingTypes).not.toHaveBeenCalled()
+      expect(refData).toEqual({
+        courts: courtLocationsMock,
+        hearingTypes: courtHearingTypes,
+        probationTeams: [],
+        meetingTypes: [],
+        locations: locationsApiMock,
+      })
     })
   })
 

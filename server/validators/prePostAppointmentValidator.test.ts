@@ -1,11 +1,6 @@
 import { PrePostAppointmentValidator } from './prePostAppointmentValidator'
-import config from '../config'
 
 describe('Validation middleware', () => {
-  beforeEach(() => {
-    config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = true
-  })
-
   it('should pass validation with good data', async () => {
     const vlbForm = {
       preAppointment: 'no',
@@ -88,47 +83,5 @@ describe('Validation middleware', () => {
     expect(result).toEqual([
       { text: 'Enter a court hearing link which is 120 characters or less', href: '#videoLinkUrl' },
     ])
-  })
-
-  describe('VLPM feature toggle off', () => {
-    beforeEach(() => {
-      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = false
-    })
-
-    it('should fail validation for booking type missing', async () => {
-      const vlbForm = {
-        bookingType: '',
-      }
-
-      const result = PrePostAppointmentValidator(vlbForm)
-
-      expect(result).toEqual([
-        {
-          href: '#bookingType',
-          text: 'Select a booking type',
-        },
-      ])
-    })
-
-    it('should fail validation for meeting type and probation team missing', async () => {
-      const vlbForm = {
-        bookingType: 'PROBATION',
-        probationTeam: '',
-        meetingType: '',
-      }
-
-      const result = PrePostAppointmentValidator(vlbForm)
-
-      expect(result).toEqual([
-        {
-          href: '#probationTeam',
-          text: 'Select which probation team the meeting is with',
-        },
-        {
-          href: '#meetingType',
-          text: 'Select the meeting type',
-        },
-      ])
-    })
   })
 })

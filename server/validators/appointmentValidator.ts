@@ -4,7 +4,6 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
-import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
@@ -22,7 +21,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (bvlsMasteredVlpmFeatureToggleEnabled() && body.appointmentType === 'VLPM' && !body.probationTeam) {
+  if (body.appointmentType === 'VLPM' && !body.probationTeam) {
     errors.push({
       text: 'Select the probation team',
       href: '#probationTeam',
@@ -36,7 +35,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (bvlsMasteredVlpmFeatureToggleEnabled() && body.appointmentType === 'VLPM') {
+  if (body.appointmentType === 'VLPM') {
     const hasOfficerDetails = !!(body.officerFullName || body.officerEmail || body.officerTelephone)
     const isUnknownSelected = !!body.officerDetailsNotKnown
 

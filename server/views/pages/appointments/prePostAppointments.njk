@@ -71,10 +71,10 @@
                     rows: [
                         {
                             key: {
-                                text: "Court" if (formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()) else "Probation team"
+                                text: "Court"
                             },
                             value: {
-                                text: (courts | find('value', formValues.court)).text if (formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()) else (probationTeams | find('value', formValues.probationTeam)).text
+                                text: (courts | find('value', formValues.court)).text
                             }
                         } if appointmentId,
                         {
@@ -96,7 +96,7 @@
                         },
                         {
                             key: {
-                                text: "Court hearing start time" if (formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()) else "Probation meeting start time"
+                                text: "Court hearing start time"
                             },
                             value: {
                                 text: startTime
@@ -104,7 +104,7 @@
                         },
                         {
                             key: {
-                                text: "Court hearing end time" if (formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled()) else "Probation meeting end time"
+                                text: "Court hearing end time"
                             },
                             value: {
                                 text: endTime
@@ -127,85 +127,72 @@
                 <form method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" id="date" name="date" value="{{ date }}"/>
-                    {% if not bvlsMasteredVlpmFeatureToggleEnabled() %}
-                        <input type="hidden" id="bookingType" name="bookingType" value="{{ formValues.bookingType or "COURT" }}"/>
-                    {% endif %}
 
-                    {% if formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled() %}
-                        <div class="govuk-grid-row">
-                            <div class="govuk-grid-column-full">
-                                {{ govukRadios({
-                                    idPrefix: "preAppointment",
-                                    name: "preAppointment",
-                                    errorMessage: errors | findError('preAppointment'),
-                                    fieldset: {
-                                        legend: {
-                                            text: "Do you want to add a pre-court hearing briefing?",
-                                            classes: "govuk-fieldset__legend--s"
-                                        }
-                                    },
-                                    items: [{
-                                        value: "yes",
-                                        text: "Yes",
-                                        checked: formValues.preAppointment == 'yes',
-                                        conditional: {
-                                            html: preAppointmentHtml
-                                        }
-                                    },
-                                        {
-                                            value: "no",
-                                            text: "No",
-                                            checked: formValues.preAppointment == 'no'
-                                        }
-                                    ]
-                                }) }}
-                            </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukRadios({
+                                idPrefix: "preAppointment",
+                                name: "preAppointment",
+                                errorMessage: errors | findError('preAppointment'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you want to add a pre-court hearing briefing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [{
+                                    value: "yes",
+                                    text: "Yes",
+                                    checked: formValues.preAppointment == 'yes',
+                                    conditional: {
+                                        html: preAppointmentHtml
+                                    }
+                                },
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.preAppointment == 'no'
+                                    }
+                                ]
+                            }) }}
                         </div>
+                    </div>
 
-                        <div class="govuk-grid-row">
-                            <div class="govuk-grid-column-full">
-                                {{ govukRadios({
-                                    idPrefix: "postAppointment",
-                                    name: "postAppointment",
-                                    errorMessage: errors | findError('postAppointment'),
-                                    fieldset: {
-                                        legend: {
-                                            text: "Do you want to add a post-court hearing briefing?",
-                                            classes: "govuk-fieldset__legend--s"
-                                        }
-                                    },
-                                    items: [{
-                                        value: "yes",
-                                        text: "Yes",
-                                        checked: formValues.postAppointment == 'yes',
-                                        conditional: {
-                                            html: postAppointmentHtml
-                                        }
-                                    },
-                                        {
-                                            value: "no",
-                                            text: "No",
-                                            checked: formValues.postAppointment == 'no'
-                                        }
-                                    ]
-                                }) }}
-                            </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukRadios({
+                                idPrefix: "postAppointment",
+                                name: "postAppointment",
+                                errorMessage: errors | findError('postAppointment'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you want to add a post-court hearing briefing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [{
+                                    value: "yes",
+                                    text: "Yes",
+                                    checked: formValues.postAppointment == 'yes',
+                                    conditional: {
+                                        html: postAppointmentHtml
+                                    }
+                                },
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.postAppointment == 'no'
+                                    }
+                                ]
+                            }) }}
                         </div>
-                    {% else %}
-                        <input type="hidden" id="preAppointment" name="preAppointment" value="no"/>
-                        <input type="hidden" id="postAppointment" name="postAppointment" value="no"/>
-                    {% endif %}
+                    </div>
 
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
                             {% if appointmentId %}
                                 <span class="govuk-visually-hidden" id="appointment-id">{{ appointmentId }}</span>
-                                {% if formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled() %}
-                                    <input type="hidden" id="court" name="court" value="{{ formValues.court }}" />
-                                {% endif %}
-                                {% if formValues.bookingType == 'PROBATION' and not bvlsMasteredVlpmFeatureToggleEnabled() %}
-                                    <input type="hidden" id="court" name="probationTeam" value="{{ formValues.probationTeam }}" />
-                                {% endif %}
+                                <input type="hidden" id="court" name="court" value="{{ formValues.court }}" />
                             {% else %}
                                 {{ govukSelect({
                                     name: "court",
@@ -219,68 +206,55 @@
                                 }) }}
                             {% endif %}
 
-                            {% if formValues.bookingType != 'PROBATION' or bvlsMasteredVlpmFeatureToggleEnabled() %}
-                                {{ govukSelect({
-                                    name: "hearingType",
-                                    id: "hearingType",
+                            {{ govukSelect({
+                                name: "hearingType",
+                                id: "hearingType",
+                                label: {
+                                    text: "What is the hearing type?",
+                                    classes: 'govuk-!-font-weight-bold'
+                                },
+                                items: hearingTypes | addDefaultSelectedValue('Select hearing type') | setSelected(formValues.hearingType),
+                                errorMessage: errors | findError("hearingType")
+                            }) }}
+
+                            {% set courtHearingLinkHtml %}
+                                {{ govukInput({
+                                    name: "videoLinkUrl",
+                                    id: "videoLinkUrl",
                                     label: {
-                                        text: "What is the hearing type?",
-                                        classes: 'govuk-!-font-weight-bold'
+                                        text: "Court hearing link"
                                     },
-                                    items: hearingTypes | addDefaultSelectedValue('Select hearing type') | setSelected(formValues.hearingType),
-                                    errorMessage: errors | findError("hearingType")
+                                    value: formValues.videoLinkUrl,
+                                    errorMessage: errors | findError("videoLinkUrl")
                                 }) }}
+                            {% endset %}
 
-                                {% set courtHearingLinkHtml %}
-                                    {{ govukInput({
-                                        name: "videoLinkUrl",
-                                        id: "videoLinkUrl",
-                                        label: {
-                                            text: "Court hearing link"
-                                        },
-                                        value: formValues.videoLinkUrl,
-                                        errorMessage: errors | findError("videoLinkUrl")
-                                    }) }}
-                                {% endset %}
-
-                                {{ govukRadios({
-                                    idPrefix: "cvpRequired",
-                                    name: "cvpRequired",
-                                    errorMessage: errors | findError('cvpRequired'),
-                                    fieldset: {
-                                        legend: {
-                                            text: "Do you know the link for this video link hearing?",
-                                            classes: "govuk-fieldset__legend--s"
+                            {{ govukRadios({
+                                idPrefix: "cvpRequired",
+                                name: "cvpRequired",
+                                errorMessage: errors | findError('cvpRequired'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you know the link for this video link hearing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [
+                                    {
+                                        value: "yes",
+                                        text: "Yes",
+                                        checked: formValues.cvpRequired == 'yes',
+                                        conditional: {
+                                            html: courtHearingLinkHtml
                                         }
                                     },
-                                    items: [
-                                        {
-                                            value: "yes",
-                                            text: "Yes",
-                                            checked: formValues.cvpRequired == 'yes',
-                                            conditional: {
-                                                html: courtHearingLinkHtml
-                                            }
-                                        },
-                                        {
-                                            value: "no",
-                                            text: "No",
-                                            checked: formValues.cvpRequired == 'no'
-                                        }
-                                    ]
-                                }) }}
-                            {% else %}
-                                {{ govukSelect({
-                                    name: "meetingType",
-                                    id: "meetingType",
-                                    label: {
-                                        text: "What is the meeting type?",
-                                        classes: 'govuk-!-font-weight-bold'
-                                    },
-                                    items: meetingTypes | addDefaultSelectedValue('Select meeting type') | setSelected(formValues.meetingType),
-                                    errorMessage: errors | findError("meetingType")
-                                }) }}
-                            {% endif %}
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.cvpRequired == 'no'
+                                    }
+                                ]
+                            }) }}
                         </div>
                     </div>
 

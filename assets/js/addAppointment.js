@@ -73,11 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function showHideProbationFields() {
     const appointmentType = appointmentTypeSelect.value
 
-    // TODO remove this when the feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
-    if (!probationTeamSelect || !probationMeetingRadios || !probationOfficerDetails) {
-      return
-    }
-
     if (appointmentType === 'VLPM') {
       probationTeamSelect.removeAttribute("style");
       probationMeetingRadios.removeAttribute("style");
