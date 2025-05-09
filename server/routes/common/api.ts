@@ -9,7 +9,7 @@ const placeHolderImage = '/assets/images/prisoner-profile-image.png'
 
 // This is unused but kept for the path for now
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const categoryAImage = '/assets/images/category-a-prisoner-image.png'
+const categoryAImage = '/assets/images/category-a-prisoner-image.jpg'
 
 export default class CommonApiRoutes {
   public constructor(

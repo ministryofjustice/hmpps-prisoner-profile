@@ -19,7 +19,7 @@ export default class PrisonerProfileApiRestClient implements PrisonerProfileApiC
 
   async getWithheldPrisonerPhoto(): Promise<Readable> {
     return this.restClient.stream({
-      path: '/assets/images/category-a-prisoner-image.png',
+      path: '/assets/images/category-a-prisoner-image.jpg',
     })
   }
 }
