@@ -404,11 +404,11 @@ export default {
     })
   },
 
-  stubReasonableAdjustments: (bookingId: number) => {
+  stubReasonableAdjustments: (bookingId: number, domain: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments\\?type=(.*)`,
+        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments/${domain}`,
       },
       response: {
         status: 200,
@@ -424,7 +424,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs\\?type=(.*)`,
+        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs/HEALTH`,
       },
       response: {
         status: 200,

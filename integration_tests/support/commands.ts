@@ -165,7 +165,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubImages')
   cy.task('stubHealthReferenceDomain')
   cy.task('stubHealthTreatmentReferenceDomain')
-  cy.task('stubReasonableAdjustments', bookingId)
+  cy.task('stubReasonableAdjustments', { bookingId: '1102484', domain: 'HEALTH_TREAT' })
   cy.task('stubGetIdentifiers', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubBeliefHistory')
