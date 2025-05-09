@@ -5,8 +5,11 @@ let croppingInit = false
 let constrainImage = false
 
 // This is the dimensions of the canvas
+const FINAL_WIDTH = 480
+const FINAL_HEIGHT = 600
+
 const MAX_WIDTH = 221
-const MAX_HEIGHT = 295
+const MAX_HEIGHT = 276
 const RATIO = MAX_WIDTH / MAX_HEIGHT
 
 const uploadedPhoto = document.getElementById('photo-preview')
@@ -78,7 +81,7 @@ function setCropperListener(fileName, fileType) {
   const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
     // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
-    selector.$toCanvas({ width: 427, height: 570 }).then(canvas => {
+    selector.$toCanvas({ width: FINAL_WIDTH, height: FINAL_HEIGHT }).then(canvas => {
       canvas.toBlob(blob => {
         const file = new File([blob], fileName, {
           type: fileType,
