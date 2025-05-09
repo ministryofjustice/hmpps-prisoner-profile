@@ -8,7 +8,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
 import NotFoundError from '../utils/notFoundError'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../utils/featureToggles'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
@@ -68,6 +68,13 @@ export default function personalRouter(services: Services): Router {
       return next()
     }
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
+  }
+
+  const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
+    if (editProfileChecks() || editReligionEnabled()) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access edit religion routes', HmppsStatusCode.NOT_FOUND))
   }
 
   // Distinguishing marks
@@ -413,6 +420,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    permissionsCheck: editReligionCheck,
   })
 
   editRoute({

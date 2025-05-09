@@ -13,6 +13,9 @@ export const militaryHistoryEnabled = () =>
   config.featureToggles.militaryHistoryEnabledFrom &&
   isAfter(Date.now(), config.featureToggles.militaryHistoryEnabledFrom)
 
+export const editReligionEnabled = () =>
+  config.featureToggles.editReligionEnabledFrom && isAfter(Date.now(), config.featureToggles.editReligionEnabledFrom)
+
 export const newOverviewPageLayoutEnabled = () => config.featureToggles.newOverviewPageLayoutEnabled
 
 export const externalContactsEnabled = (activeCaseLoadId: string) =>

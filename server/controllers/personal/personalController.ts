@@ -23,7 +23,7 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
 import {
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
@@ -106,6 +106,8 @@ export default class PersonalController {
         page: Page.Personal,
       })
 
+      const editEnabled = profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles)
+
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
@@ -118,13 +120,14 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        editEnabled: profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editEnabled,
         dietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editDietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
+        editReligionEnabled: editEnabled || (editReligionEnabled() && prisonerData.prisonId === activeCaseLoadId),
         personalRelationshipsApiReadEnabled,
       })
     }
