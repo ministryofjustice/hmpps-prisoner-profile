@@ -1189,10 +1189,31 @@ export default class PersonalController {
   religion() {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
 
+    const currentReligionValue = (req: Request, referenceData: ReferenceDataCodeDto[]) => {
+      const { inmateDetail } = req.middleware
+      const profileInformationValue = getProfileInformationValue(
+        ProfileInformationType.Religion,
+        inmateDetail.profileInformation,
+      )
+      const currentValue =
+        profileInformationValue &&
+        (referenceData.find(
+          religion =>
+            religion.description.toLowerCase() === profileInformationValue.toLowerCase() ||
+            religion.code === profileInformationValue,
+        ) ?? { code: '?', description: profileInformationValue })
+
+      const override = religionFieldData.referenceDataOverrides.find(o => o.id === currentValue?.code)
+      return {
+        ...currentValue,
+        description: override?.description ?? currentValue.description,
+      }
+    }
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken, inmateDetail, prisonerData } = req.middleware
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{
           religion: string
@@ -1204,7 +1225,8 @@ export default class PersonalController {
 
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-        const otherReligionCodes = ['OTH', 'NIL', 'UNKN']
+        // 'UNKN' will be deactivated as part of the religion reference data migration in NOMIS (and can then be removed from here)
+        const otherReligionCodes = ['OTH', 'NIL', 'TPRNTS', 'UNKN']
         const religionReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
           CorePersonRecordReferenceDataDomain.religion,
@@ -1212,16 +1234,11 @@ export default class PersonalController {
         const religionOptions = religionReferenceData
           .filter(it => !otherReligionCodes.includes(it.code))
           .sort((a, b) => a.description.localeCompare(b.description))
-        const otherReligionOptions = otherReligionCodes.map(code => religionReferenceData.find(it => it.code === code))
-        const profileInformationValue = getProfileInformationValue(
-          ProfileInformationType.Religion,
-          inmateDetail.profileInformation,
-        )
-        const currentReligion = profileInformationValue
-          ? religionReferenceData.filter(
-              religion => religion.description === profileInformationValue || religion.code === profileInformationValue,
-            )[0] || { code: '?', description: profileInformationValue }
-          : profileInformationValue
+        const otherReligionOptions = otherReligionCodes
+          .map(code => religionReferenceData.find(it => it.code === code))
+          .filter(Boolean)
+
+        const currentReligion = currentReligionValue(req, religionReferenceData)
         const fieldValue = requestBodyFlash?.religion
         const currentReasonKnown = requestBodyFlash?.reasonKnown
         const currentReasonForChange = requestBodyFlash?.reasonForChange
@@ -1247,9 +1264,21 @@ export default class PersonalController {
           redirectAnchor,
           errors,
           options: [
-            ...objectToRadioOptions(religionOptions, 'code', 'description', fieldValue),
-            { divider: 'Or other, none or unknown' },
-            ...objectToRadioOptions(otherReligionOptions, 'code', 'description', fieldValue),
+            ...objectToRadioOptions(
+              religionOptions,
+              'code',
+              'description',
+              fieldValue,
+              religionFieldData.referenceDataOverrides,
+            ),
+            { divider: 'Or' },
+            ...objectToRadioOptions(
+              otherReligionOptions,
+              'code',
+              'description',
+              fieldValue,
+              religionFieldData.referenceDataOverrides,
+            ),
           ],
           miniBannerData: {
             prisonerName: prisonerBannerName,
@@ -1318,12 +1347,13 @@ export default class PersonalController {
         ProfileInformationType.SexualOrientation,
         inmateDetail.profileInformation,
       )
-      return profileInformationValue
-        ? sexualOrientationReferenceData.filter(
-            orientation =>
-              orientation.description === profileInformationValue || orientation.code === profileInformationValue,
-          )[0]?.code
-        : profileInformationValue
+      return (
+        profileInformationValue &&
+        sexualOrientationReferenceData.find(
+          orientation =>
+            orientation.description === profileInformationValue || orientation.code === profileInformationValue,
+        )?.code
+      )
     }
 
     return {

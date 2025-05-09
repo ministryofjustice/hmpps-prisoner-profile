@@ -87,7 +87,7 @@ export const ReligionReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDt
   {
     id: 'RELF_OTH',
     code: 'OTH',
-    description: 'Other religion',
+    description: 'Other',
     listSequence: 4,
     isActive: true,
   },
@@ -99,9 +99,9 @@ export const ReligionReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDt
     isActive: true,
   },
   {
-    id: 'RELF_UNKN',
-    code: 'UNKN',
-    description: 'Unknown',
+    id: 'RELF_TPRNTS',
+    code: 'TPRNTS',
+    description: 'They prefer not to say',
     listSequence: 6,
     isActive: true,
   },
