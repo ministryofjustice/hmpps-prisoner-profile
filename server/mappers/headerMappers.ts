@@ -104,6 +104,7 @@ export function mapHeaderData(
     prisonerName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName, {
       style: NameFormatStyle.lastCommaFirst,
     }),
+    prisonerPhotoId: inmateDetail.facialImageId,
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alertSummaryData,
