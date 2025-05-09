@@ -79,7 +79,11 @@
       {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/nextOfKin.njk" %}
+            {% if personalRelationshipsApiReadEnabled %}
+              {% include "../partials/personalPage/nextOfKin.njk" %}
+            {% else %}
+              {% include "../partials/personalPage/oldNextOfKin.njk" %}
+            {% endif %}
           </div>
         </div>
       {%- endcall -%}
