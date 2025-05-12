@@ -1,7 +1,6 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { ReligionReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { inmateDetailMock } from '../../../../server/data/localMockData/inmateDetailMock'
 
 context('Edit religion, faith or belief', () => {
@@ -21,10 +20,6 @@ context('Edit religion, faith or belief', () => {
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
         cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
-        cy.task('stubPersonIntegrationGetReferenceData', {
-          domain: 'RELF',
-          referenceData: ReligionReferenceDataCodesMock,
-        })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,
@@ -96,10 +91,6 @@ context('Edit religion, faith or belief', () => {
         })
         cy.task('stubPersonalCareNeeds')
         cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
-        cy.task('stubPersonIntegrationGetReferenceData', {
-          domain: 'RELF',
-          referenceData: ReligionReferenceDataCodesMock,
-        })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,

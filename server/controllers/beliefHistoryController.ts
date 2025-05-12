@@ -4,6 +4,7 @@ import { AuditService, Page } from '../services/auditService'
 import BeliefService from '../services/beliefService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
+import { religionFieldData } from './personal/fieldData'
 
 export default class BeliefHistoryController {
   constructor(
@@ -15,7 +16,13 @@ export default class BeliefHistoryController {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
-    const beliefs = await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)
+    const beliefs = (await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)).map(belief => {
+      const override = religionFieldData.referenceDataOverrides.find(o => o.id === belief.beliefCode)
+      return {
+        ...belief,
+        beliefDescription: override?.description ?? belief.beliefDescription,
+      }
+    })
 
     this.auditService
       .sendPageView({

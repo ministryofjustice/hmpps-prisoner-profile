@@ -370,6 +370,7 @@ export default {
     dietAndAllergyEnabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
 
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
+    editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     newOverviewPageLayoutEnabled: toBoolean(get('NEW_OVERVIEW_PAGE_LAYOUT_ENABLED', 'false')),

@@ -4,6 +4,7 @@ import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataOverride } from './referenceDataOverride'
 
 export interface FieldData {
   url: string
@@ -28,6 +29,7 @@ export interface PhysicalAttributesTextFieldData extends TextFieldData {
 export interface RadioFieldData extends FieldData {
   code?: keyof CorePersonPhysicalAttributesRequest
   domain?: CorePersonRecordReferenceDataDomain
+  referenceDataOverrides?: ReferenceDataOverride[]
 }
 
 export interface CheckboxFieldData extends FieldData {
@@ -185,13 +187,61 @@ export const dietAndFoodAllergiesFieldData: FieldData = {
   redirectAnchor: 'personal-details',
 }
 
-export const religionFieldData: FieldData = {
+export const religionFieldData: RadioFieldData = {
   url: 'religion',
   fieldName: 'religion',
   pageTitle: 'Religion, faith or belief',
   auditEditPageLoad: Page.EditReligion,
   auditEditPostAction: PostAction.EditReligion,
   redirectAnchor: 'personal-details',
+  referenceDataOverrides: [
+    {
+      id: 'COFE',
+      description: 'Christian - Anglican',
+      hint: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+    },
+    {
+      id: 'CHRODX',
+      hint: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+    },
+    {
+      id: 'CHRST',
+      hint: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+    },
+    {
+      id: 'CHJCLDS',
+      description: 'Church of Jesus Christ of Latter-day Saints',
+    },
+    {
+      id: 'HNDHAR',
+      description: 'Hindu or Hare Krishna',
+    },
+    {
+      id: 'PAGDRU',
+      description: 'Pagan or Druid',
+    },
+    {
+      id: 'SECULR',
+      description: 'Secularist',
+    },
+    {
+      id: 'SHNTAO',
+      description: 'Shinto or Taoist',
+    },
+    {
+      id: 'SUNI',
+      hint: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+    },
+    {
+      id: 'OTH',
+      description: 'Other religion, faith or belief',
+      hint: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+    },
+    {
+      id: 'NIL',
+      description: 'No religion, faith or belief',
+    },
+  ],
 }
 
 export const sexualOrientationFieldData: RadioFieldData = {
