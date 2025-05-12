@@ -8,7 +8,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
 import NotFoundError from '../utils/notFoundError'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../utils/featureToggles'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
@@ -63,6 +63,17 @@ export default function personalRouter(services: Services): Router {
 
   // Temporary edit check for now
   const editProfileChecks = () => (req: Request, res: Response, next: NextFunction) => {
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
+  }
+
+  const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
+    if (editReligionEnabled()) {
+      return next()
+    }
     const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
     if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
       return next()
@@ -413,6 +424,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    permissionsCheck: editReligionCheck,
   })
 
   editRoute({
