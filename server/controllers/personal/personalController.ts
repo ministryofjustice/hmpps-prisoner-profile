@@ -1213,6 +1213,30 @@ export default class PersonalController {
       }
     }
 
+    // Options are already sorted alphabetically, this then applies additional non-alphabetical sorting
+    const religionOptionsSorter = (a: RadioOption, b: RadioOption): number => {
+      if (
+        (a.text.startsWith('Christian - ') && b.text.startsWith('Christian - ')) ||
+        (a.text.startsWith('Muslim') && b.text.startsWith('Muslim'))
+      ) {
+        if (a.text.endsWith('Other')) {
+          return b.text.endsWith('Other') ? 0 : 1
+        }
+        if (b.text.endsWith('Other')) {
+          return a.text.endsWith('Other') ? 0 : -1
+        }
+      }
+
+      if (a.text.endsWith('- Oriental Orthodox') && b.text.endsWith('- Orthodox')) {
+        return 1
+      }
+      if (b.text.endsWith('- Oriental Orthodox') && a.text.endsWith('- Orthodox')) {
+        return -1
+      }
+
+      return 0
+    }
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
@@ -1273,7 +1297,7 @@ export default class PersonalController {
               'description',
               fieldValue,
               religionFieldData.referenceDataOverrides,
-            ),
+            ).sort(religionOptionsSorter),
             { divider: 'Or' },
             ...objectToRadioOptions(
               otherReligionOptions,
