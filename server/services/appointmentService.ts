@@ -16,7 +16,6 @@ import CreateVideoBookingRequest, {
 import Court, { ProbationTeam } from '../data/interfaces/bookAVideoLinkApi/Court'
 import LocationDetailsService from './locationDetailsService'
 import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
-import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 export interface AddAppointmentRefData {
   appointmentTypes: ReferenceCode[]
@@ -91,10 +90,8 @@ export default class AppointmentService {
     const [appointmentTypes, locations, probationTeams, meetingTypes] = await Promise.all([
       this.prisonApiClientBuilder(token).getAppointmentTypes(),
       this.locationDetailsService.getLocationsForAppointments(token, prisonId),
-      bvlsMasteredVlpmFeatureToggleEnabled() ? this.bookAVideoLinkApiClientBuilder(token).getProbationTeams() : [],
-      bvlsMasteredVlpmFeatureToggleEnabled()
-        ? this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes()
-        : [],
+      this.bookAVideoLinkApiClientBuilder(token).getProbationTeams(),
+      this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes(),
     ])
 
     return {
@@ -114,11 +111,9 @@ export default class AppointmentService {
   public async getPrePostAppointmentRefData(token: string, prisonId: string): Promise<PrePostAppointmentRefData> {
     const [courts, probationTeams, hearingTypes, meetingTypes, locations] = await Promise.all([
       this.bookAVideoLinkApiClientBuilder(token).getCourts(),
-      !bvlsMasteredVlpmFeatureToggleEnabled() ? this.bookAVideoLinkApiClientBuilder(token).getProbationTeams() : [],
+      [],
       this.bookAVideoLinkApiClientBuilder(token).getCourtHearingTypes(),
-      !bvlsMasteredVlpmFeatureToggleEnabled()
-        ? this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes()
-        : [],
+      [],
       this.locationDetailsService.getLocationsForAppointments(token, prisonId),
     ])
 
