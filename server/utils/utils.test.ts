@@ -35,6 +35,7 @@ import {
   lengthOfService,
   mapToQueryString,
   neurodiversityEnabled,
+  objectToRadioOptions,
   objectToSelectOptions,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
@@ -69,6 +70,7 @@ import Address from '../data/interfaces/prisonApi/Address'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -700,6 +702,69 @@ describe('utils', () => {
           { text: 'NMI-RECP' },
           { text: 'Rival Gang' },
         ],
+      ])
+    })
+  })
+
+  describe('objectToRadioOptions', () => {
+    it('should map objects to radio options', () => {
+      const data: { id: string; desc: string; random: string }[] = [
+        {
+          id: 'id1',
+          desc: 'desc1',
+          random: 'random1',
+        },
+        {
+          id: 'id2',
+          desc: 'desc2',
+          random: 'random2',
+        },
+      ]
+      const radioOptions = objectToRadioOptions(data, 'id', 'desc', 'id2')
+
+      expect(radioOptions).toEqual([
+        { value: 'id1', text: 'desc1' },
+        { value: 'id2', text: 'desc2', checked: true },
+      ])
+    })
+
+    it('should apply overrides if provided', () => {
+      const data: { id: string; desc: string }[] = [
+        {
+          id: 'id1',
+          desc: 'desc1',
+        },
+        {
+          id: 'id2',
+          desc: 'desc2',
+        },
+        {
+          id: 'id3',
+          desc: 'desc3',
+        },
+      ]
+      const overrides: ReferenceDataOverride[] = [
+        {
+          id: 'id1',
+          description: 'description 1',
+        },
+        {
+          id: 'id2',
+          description: 'description 2',
+          hint: 'hint 2',
+        },
+        {
+          id: 'id4',
+          description: 'description 4',
+          hint: 'hint 4',
+        },
+      ]
+      const radioOptions = objectToRadioOptions(data, 'id', 'desc', 'id2', overrides)
+
+      expect(radioOptions).toEqual([
+        { value: 'id1', text: 'description 1' },
+        { value: 'id2', text: 'description 2', hint: { text: 'hint 2' }, checked: true },
+        { value: 'id3', text: 'desc3' },
       ])
     })
   })

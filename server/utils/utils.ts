@@ -21,6 +21,7 @@ import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
 import { pluralise } from './pluralise'
 import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -611,10 +612,15 @@ export interface SelectOption {
   }
 }
 
+export interface RadioOptionHint {
+  text: string
+}
+
 export interface RadioOption {
   text: string
   value: string | number
   checked?: boolean
+  hint?: RadioOptionHint
   attributes?: {
     hidden?: 'hidden'
     disabled?: 'disabled'
@@ -643,12 +649,18 @@ export const objectToRadioOptions = <T>(
   id: keyof (typeof array)[number],
   description: keyof (typeof array)[number],
   checked?: string | number,
+  overrides?: ReferenceDataOverride[],
 ): RadioOption[] => {
-  return array.map(obj => ({
-    text: obj[description] as string,
-    value: obj[id] as string | number,
-    ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),
-  }))
+  return array.map(obj => {
+    const value = obj[id] as string | number
+    const override = overrides?.find(o => o.id === value)
+    return {
+      text: override?.description ? override.description : (obj[description] as string),
+      value,
+      hint: override?.hint ? { text: override.hint } : undefined,
+      ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),
+    }
+  })
 }
 
 export const objectToSelectOptions = <T>(

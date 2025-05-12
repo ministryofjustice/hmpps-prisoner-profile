@@ -84,7 +84,7 @@ describe('PersonalController', () => {
           resultValue: 'Some other nationality',
           type: ProfileInformationType.OtherNationalities,
         },
-        { question: 'Religion', resultValue: 'Druid', type: ProfileInformationType.Religion },
+        { question: 'Religion', resultValue: 'Buddhist', type: ProfileInformationType.Religion },
         {
           question: 'Sexual orientation',
           resultValue: 'Heterosexual / Straight',
@@ -2376,15 +2376,52 @@ describe('PersonalController', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) => controller.religion().edit(req, response, () => {})
 
-      it('Renders the default edit page with the correct data from the prison API', async () => {
+      it('Renders the default edit page with the correct data from the prison API, overriding option text and sorting correctly', async () => {
         const expectedOptions = [
-          { text: 'Druid', value: 'DRU' },
-          { text: 'Pagan', value: 'PAG' },
+          { text: 'Buddhist', value: 'BUDD' },
+          {
+            text: 'Christian - Anglican',
+            value: 'COFE',
+            hint: {
+              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+            },
+          },
+          { text: 'Christian - Methodist', value: 'METH' },
+          {
+            text: 'Christian - Orthodox',
+            value: 'CHRODX',
+            hint: {
+              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+            },
+          },
+          { text: 'Christian - Oriental Orthodox', value: 'OORTH' },
+          {
+            text: 'Christian - Other',
+            value: 'CHRST',
+            hint: {
+              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+            },
+          },
+          { text: 'Muslim - Shia', value: 'SHIA' },
+          {
+            text: 'Muslim - Sunni',
+            value: 'SUNI',
+            hint: {
+              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+            },
+          },
+          { text: 'Muslim - Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO' },
-          { divider: 'Or other, none or unknown' },
-          { text: 'Other religion', value: 'OTH' },
-          { text: 'No religion', value: 'NIL' },
-          { text: 'Unknown', value: 'UNKN' },
+          { divider: 'Or' },
+          {
+            text: 'Other religion, faith or belief',
+            value: 'OTH',
+            hint: {
+              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+            },
+          },
+          { text: 'No religion, faith or belief', value: 'NIL' },
+          { text: 'They prefer not to say', value: 'TPRNTS' },
         ]
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2404,11 +2441,11 @@ describe('PersonalController', () => {
           currentReasonForChangeUnknown: undefined,
           currentReasonKnown: undefined,
           currentReligion: {
-            id: 'RELF_DRU',
-            code: 'DRU',
-            description: 'Druid',
+            id: 'RELF_BUDD',
+            code: 'BUDD',
+            description: 'Buddhist',
             isActive: true,
-            listSequence: 1,
+            listSequence: 99,
           },
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
@@ -2436,13 +2473,50 @@ describe('PersonalController', () => {
 
       it('Populates the religion radio buttons from the flash', async () => {
         const expectedOptions = [
-          { text: 'Druid', value: 'DRU' },
-          { text: 'Pagan', value: 'PAG' },
+          { text: 'Buddhist', value: 'BUDD' },
+          {
+            text: 'Christian - Anglican',
+            value: 'COFE',
+            hint: {
+              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+            },
+          },
+          { text: 'Christian - Methodist', value: 'METH' },
+          {
+            text: 'Christian - Orthodox',
+            value: 'CHRODX',
+            hint: {
+              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+            },
+          },
+          { text: 'Christian - Oriental Orthodox', value: 'OORTH' },
+          {
+            text: 'Christian - Other',
+            value: 'CHRST',
+            hint: {
+              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+            },
+          },
+          { text: 'Muslim - Shia', value: 'SHIA' },
+          {
+            text: 'Muslim - Sunni',
+            value: 'SUNI',
+            hint: {
+              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+            },
+          },
+          { text: 'Muslim - Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO', checked: true },
-          { divider: 'Or other, none or unknown' },
-          { text: 'Other religion', value: 'OTH' },
-          { text: 'No religion', value: 'NIL' },
-          { text: 'Unknown', value: 'UNKN' },
+          { divider: 'Or' },
+          {
+            text: 'Other religion, faith or belief',
+            value: 'OTH',
+            hint: {
+              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+            },
+          },
+          { text: 'No religion, faith or belief', value: 'NIL' },
+          { text: 'They prefer not to say', value: 'TPRNTS' },
         ]
 
         const req = {

@@ -2,7 +2,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import BeliefHistoryController from './beliefHistoryController'
 import BeliefService from '../services/beliefService'
-import { beliefHistoryMock } from '../data/localMockData/beliefHistoryMock'
+import { beliefHistoryMock, beliefHistoryOverrideMock } from '../data/localMockData/beliefHistoryMock'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
@@ -57,6 +57,24 @@ describe('Prisoner belief history', () => {
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
         pageTitle: 'Religion or belief history',
         beliefs: beliefHistoryMock,
+        prisonerNumber,
+        breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
+        prisonerName: formatName('John', '', 'Saunders'),
+      })
+    })
+
+    it('should use religion field date override values to render the belief descriptions', async () => {
+      jest
+        .spyOn<any, string>(controller['beliefService'], 'getBeliefHistory')
+        .mockResolvedValue(beliefHistoryOverrideMock)
+
+      await controller.displayBeliefHistory(req, res)
+      expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
+        pageTitle: 'Religion or belief history',
+        beliefs: [
+          { ...beliefHistoryOverrideMock[0], beliefDescription: 'Other religion, faith or belief' },
+          beliefHistoryOverrideMock[1],
+        ],
         prisonerNumber,
         breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
         prisonerName: formatName('John', '', 'Saunders'),
