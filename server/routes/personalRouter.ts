@@ -71,10 +71,14 @@ export default function personalRouter(services: Services): Router {
   }
 
   const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
-    if (editProfileChecks() || editReligionEnabled()) {
+    if (editReligionEnabled()) {
       return next()
     }
-    return next(new NotFoundError('User cannot access edit religion routes', HmppsStatusCode.NOT_FOUND))
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
   }
 
   // Distinguishing marks

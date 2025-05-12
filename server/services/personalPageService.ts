@@ -69,6 +69,7 @@ import {
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import DomesticStatusService from './domesticStatusService'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
+import { religionFieldData } from '../controllers/personal/fieldData'
 
 export default class PersonalPageService {
   constructor(
@@ -230,6 +231,7 @@ export default class PersonalPageService {
 
     return {
       personalDetails: await this.personalDetails(
+        token,
         id => this.prisonService.getPrisonByPrisonId(id, token),
         personIntegrationApiClient,
         prisonerData,
@@ -299,6 +301,7 @@ export default class PersonalPageService {
   }
 
   private async personalDetails(
+    token: string,
     prison: (prisonId: string) => Promise<Prison>,
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
@@ -324,7 +327,7 @@ export default class PersonalPageService {
     }
 
     const nationality =
-      inmateDetail?.profileInformation?.find(entry => entry.type === 'NAT')?.resultValue || 'Not entered'
+      getProfileInformationValue(ProfileInformationType.Nationality, profileInformation) || 'Not entered'
 
     const formatNumberOfChildren = (count: string) => {
       if (count === null || count === undefined) return 'Not entered'
@@ -379,7 +382,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      religionOrBelief: inmateDetail.religion || 'Not entered',
+      religionOrBelief: await this.formatReligion(token, inmateDetail.religion),
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
@@ -397,6 +400,18 @@ export default class PersonalPageService {
         lastModifiedPrison: lastUpdatedAgency?.prisonName ?? '',
       },
     }
+  }
+
+  private async formatReligion(token: string, religion?: string): Promise<string> {
+    if (!religion) {
+      return 'Not entered'
+    }
+
+    const refData = await this.getReferenceDataCodes(token, CorePersonRecordReferenceDataDomain.religion)
+    const code = refData.find(r => r.description?.toLowerCase() === religion.toLowerCase() || r.code === religion)
+    const override = religionFieldData.referenceDataOverrides.find(o => o.id === code?.code)
+
+    return override ? (override.description ?? religion) : religion
   }
 
   private aliases = async (

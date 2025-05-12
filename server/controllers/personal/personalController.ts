@@ -1209,7 +1209,7 @@ export default class PersonalController {
       const override = religionFieldData.referenceDataOverrides.find(o => o.id === currentValue?.code)
       return {
         ...currentValue,
-        description: override?.description ?? currentValue.description,
+        description: override?.description ?? currentValue?.description,
       }
     }
 

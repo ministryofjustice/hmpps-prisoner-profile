@@ -29,6 +29,7 @@ import ReferenceDataService from './referenceData/referenceDataService'
 import {
   EnglandCountryReferenceDataCodeMock,
   MilitaryRecordsMock,
+  ReligionReferenceDataCodesMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import {
   HealthAndMedicationApiClient,
@@ -99,6 +100,7 @@ describe('PersonalPageService', () => {
 
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
+    referenceDataService.getActiveReferenceDataCodes = jest.fn(async () => ReligionReferenceDataCodesMock)
 
     prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
     prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
