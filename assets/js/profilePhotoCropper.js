@@ -109,15 +109,15 @@ function setSelectionListener() {
 function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
-    document.getElementById('image-cropper-container').style.display = 'none'
+    document.getElementById('photo-cropper-container').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
-    document.getElementById('image-cropper-container').style.display = 'block'
+    document.getElementById('photo-cropper-container').style.display = 'block'
     cropping = true
     if (!croppingInit) {
-      document.querySelector('cropper-selection').$reset().$render()
-      document.querySelector('cropper-image').$center('contain')
+      // document.querySelector('cropper-selection').$reset().$render()
+      // document.querySelector('cropper-image').$center('contain')
       resetSelectionLocation()
       setSelectionListener()
       croppingInit = true
@@ -200,5 +200,19 @@ function pageInit() {
 window.onload = () => {
   pageInit()
   toggleCrop()
+
+  const cropperImage = document.querySelector('cropper-image')
+  cropperImage.rotatable = true
+  cropperImage.scalable = true
+  cropperImage.translatable = true
+  cropperImage.skewable = true
+
+  cropperImage.$center('contain')
+
+  cropperImage.rotatable = false
+  cropperImage.scalable = false
+  cropperImage.translatable = false
+  cropperImage.skewable = false
+  resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
