@@ -37,6 +37,21 @@ function setFormPhoto(file) {
   input.files = container.files
 }
 
+function withImageManipulation(callback) {
+  const cropperImage = document.querySelector('cropper-image')
+  cropperImage.rotatable = true
+  cropperImage.scalable = true
+  cropperImage.translatable = true
+  cropperImage.skewable = true
+
+  callback(cropperImage)
+
+  cropperImage.rotatable = false
+  cropperImage.scalable = false
+  cropperImage.translatable = false
+  cropperImage.skewable = false
+}
+
 function constrainedToImage(selection) {
   const cropperCanvas = document.querySelector('cropper-canvas')
   const image = document.querySelector('cropper-image')
@@ -109,15 +124,13 @@ function setSelectionListener() {
 function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
-    document.getElementById('image-cropper-container').style.display = 'none'
+    document.getElementById('photo-cropper-container').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
-    document.getElementById('image-cropper-container').style.display = 'block'
+    document.getElementById('photo-cropper-container').style.display = 'block'
     cropping = true
     if (!croppingInit) {
-      document.querySelector('cropper-selection').$reset().$render()
-      document.querySelector('cropper-image').$center('contain')
       resetSelectionLocation()
       setSelectionListener()
       croppingInit = true
@@ -155,19 +168,7 @@ function resetSelectionLocation() {
 }
 
 function rotateImage(degrees) {
-  const cropperImage = document.querySelector('cropper-image')
-  cropperImage.rotatable = true
-  cropperImage.scalable = true
-  cropperImage.translatable = true
-  cropperImage.skewable = true
-
-  cropperImage.$rotate(`${degrees}deg`).$center('contain')
-
-  cropperImage.rotatable = false
-  cropperImage.scalable = false
-  cropperImage.translatable = false
-  cropperImage.skewable = false
-
+  withImageManipulation(cropperImage => cropperImage.$rotate(`${degrees}deg`).$center('contain'))
   resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
@@ -200,5 +201,7 @@ function pageInit() {
 window.onload = () => {
   pageInit()
   toggleCrop()
+  withImageManipulation(cropperImage => cropperImage.$center('contain'))
+  resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
