@@ -131,8 +131,6 @@ function toggleCrop() {
     document.getElementById('photo-cropper-container').style.display = 'block'
     cropping = true
     if (!croppingInit) {
-      // document.querySelector('cropper-selection').$reset().$render()
-      // document.querySelector('cropper-image').$center('contain')
       resetSelectionLocation()
       setSelectionListener()
       croppingInit = true
