@@ -37,6 +37,21 @@ function setFormPhoto(file) {
   input.files = container.files
 }
 
+function withImageManipulation(callback) {
+  const cropperImage = document.querySelector('cropper-image')
+  cropperImage.rotatable = true
+  cropperImage.scalable = true
+  cropperImage.translatable = true
+  cropperImage.skewable = true
+
+  callback(cropperImage)
+
+  cropperImage.rotatable = false
+  cropperImage.scalable = false
+  cropperImage.translatable = false
+  cropperImage.skewable = false
+}
+
 function constrainedToImage(selection) {
   const cropperCanvas = document.querySelector('cropper-canvas')
   const image = document.querySelector('cropper-image')
@@ -155,19 +170,7 @@ function resetSelectionLocation() {
 }
 
 function rotateImage(degrees) {
-  const cropperImage = document.querySelector('cropper-image')
-  cropperImage.rotatable = true
-  cropperImage.scalable = true
-  cropperImage.translatable = true
-  cropperImage.skewable = true
-
-  cropperImage.$rotate(`${degrees}deg`).$center('contain')
-
-  cropperImage.rotatable = false
-  cropperImage.scalable = false
-  cropperImage.translatable = false
-  cropperImage.skewable = false
-
+  withImageManipulation(cropperImage => cropperImage.$rotate(`${degrees}deg`).$center('contain'))
   resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
@@ -200,19 +203,7 @@ function pageInit() {
 window.onload = () => {
   pageInit()
   toggleCrop()
-
-  const cropperImage = document.querySelector('cropper-image')
-  cropperImage.rotatable = true
-  cropperImage.scalable = true
-  cropperImage.translatable = true
-  cropperImage.skewable = true
-
-  cropperImage.$center('contain')
-
-  cropperImage.rotatable = false
-  cropperImage.scalable = false
-  cropperImage.translatable = false
-  cropperImage.skewable = false
+  withImageManipulation(cropperImage => cropperImage.$center('contain'))
   resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
