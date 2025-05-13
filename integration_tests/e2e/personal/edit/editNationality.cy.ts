@@ -18,6 +18,7 @@ context('Edit nationality', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationNationalityUpdate', { prisonerNumber })
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'NAT',

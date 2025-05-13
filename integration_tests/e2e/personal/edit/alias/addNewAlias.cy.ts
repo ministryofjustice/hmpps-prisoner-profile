@@ -22,6 +22,7 @@ context('Add new alias', () => {
         prisonerNumber,
         response: PseudonymResponseMock,
       })
+      cy.task('stubAllPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/enter-alias-details`,
     personalPageHref: 'personal/enter-alias-details',

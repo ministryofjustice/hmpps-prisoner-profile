@@ -18,6 +18,7 @@ context('Edit face shape', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'FACE',
         referenceData: faceCodesMock,

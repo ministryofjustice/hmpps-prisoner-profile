@@ -19,6 +19,7 @@ context('Edit religion, faith or belief', () => {
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
+        cy.task('stubAllPersonalCareNeeds')
         cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,
@@ -90,6 +91,7 @@ context('Edit religion, faith or belief', () => {
           },
         })
         cy.task('stubPersonalCareNeeds')
+        cy.task('stubAllPersonalCareNeeds')
         cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,

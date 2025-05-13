@@ -18,6 +18,7 @@ context('Edit smoker or vaper', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubSmokerStatusUpdate', { prisonerNumber })
 
       cy.setupHealthAndMedicationRefDataStubs({ smokerCodes: smokerStatusCodesMock })

@@ -18,6 +18,7 @@ context('Edit sexual orientation', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdate', { prisonerNumber })
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'SEXO',

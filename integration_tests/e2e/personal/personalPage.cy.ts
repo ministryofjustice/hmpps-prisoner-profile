@@ -29,6 +29,7 @@ context('When signed in', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
 
       visitPersonalDetailsPage({ failOnStatusCode: false })
     }
@@ -64,6 +65,7 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
@@ -129,6 +131,7 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       visitPersonalDetailsPage()
     })
 
@@ -504,6 +507,7 @@ context('When signed in', () => {
     context('Prisoner has current care needs and no past care needs', () => {
       it('Displays the care needs', () => {
         cy.task('stubPersonalCareNeeds')
+        cy.task('stubAllPersonalCareNeeds')
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
         page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
@@ -556,6 +560,7 @@ context('When signed in', () => {
     context('Prisoner has current care needs and past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', pastCareNeedsMock)
+        cy.task('stubAllPersonalCareNeeds', pastCareNeedsMock)
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('exist')
@@ -566,6 +571,7 @@ context('When signed in', () => {
     context('Prisoner has no current care needs but does have past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', onlyPastCareNeedsMock)
+        cy.task('stubAllPersonalCareNeeds', onlyPastCareNeedsMock)
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('exist')
@@ -579,6 +585,7 @@ context('When signed in', () => {
     context('Prisoner has no current care needs or past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', { offenderNo: 'G6123VU', personalCareNeeds: [] })
+        cy.task('stubAllPersonalCareNeeds', { offenderNo: 'G6123VU', personalCareNeeds: [] })
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('not.exist')
@@ -594,6 +601,7 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
     })
 
     context('With less than the limit', () => {
@@ -633,6 +641,7 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
     })
 
     context('Page section', () => {
@@ -683,6 +692,7 @@ context('When signed in', () => {
       })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
       visitPersonalDetailsPage()
@@ -726,6 +736,7 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, error: true })
       visitPersonalDetailsPage()
     })

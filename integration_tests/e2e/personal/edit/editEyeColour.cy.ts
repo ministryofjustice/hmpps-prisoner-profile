@@ -19,6 +19,7 @@ context('Edit eye colour - both eyes the same colour', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'L_EYE_C',
         referenceData: eyeColourCodesMock,
@@ -53,6 +54,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'L_EYE_C',
         referenceData: eyeColourCodesMock,
@@ -83,6 +85,7 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
     cy.setupComponentsData()
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubPersonalCareNeeds')
+    cy.task('stubAllPersonalCareNeeds')
     cy.task('stubPersonIntegrationGetReferenceData', {
       domain: 'L_EYE_C',
       referenceData: eyeColourCodesMock,

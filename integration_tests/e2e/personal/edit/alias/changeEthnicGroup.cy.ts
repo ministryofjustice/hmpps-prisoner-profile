@@ -31,6 +31,7 @@ context('Change ethnic group', () => {
       pseudonymId: PseudonymResponseMock.sourceSystemId,
       response: PseudonymResponseMock,
     })
+    cy.task('stubAllPersonalCareNeeds')
   })
 
   context('Permissions', () => {
