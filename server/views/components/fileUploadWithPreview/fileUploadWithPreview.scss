@@ -1,0 +1,42 @@
+.hmpps-file-upload-with-preview {
+  &__upload {
+    display: block;
+  }
+
+  &__preview {
+    display: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    column-gap: 20px;
+    justify-content: space-between;
+    padding: 14px 15px;
+    border: 1px solid $govuk-border-colour;
+
+    a {
+      color: $govuk-link-colour;
+    }
+
+    > .image-preview {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      column-gap: 20px;
+      justify-content: start;
+    }
+  }
+
+  &__photo {
+    width: 120px;
+    min-width: 120px;
+  }
+
+  &__file-name {
+    // Prevents overflowing the container due to flexbox
+    min-width: 0;
+    word-break: break-all;
+  }
+
+  &__change {
+    margin-left: auto;
+  }
+}
