@@ -1,18 +1,34 @@
-var fileUploadDiv = document.getElementById('file-upload')
-var previewDiv = document.getElementById('file-upload-preview')
-var previewFileName = document.getElementById('file-name')
+const imageInput = document.getElementById('file')
+const inputContainer = document.getElementById('file-upload')
+const previewImage = document.getElementById('preview-image')
+const previewFilename = document.getElementById('preview-filename')
+const previewContainer = document.getElementById('preview-container')
+const changeLink = document.getElementById('change-photo-link')
 
-var loadFile = function (event) {
-  var reader = new FileReader()
-  reader.onload = function () {
-    var output = document.getElementById('output')
-    output.src = reader.result
+// Show the image preview and hide upload controls when adding a new distinguishing mark photo
+function previewSelectedImage() {
+  const file = imageInput.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = function (e) {
+      previewImage.src = e.target.result
+      previewImage.alt = 'Preview of uploaded image'
+      previewFilename.innerText = imageInput.files[0].name
+      previewContainer.style.display = 'flex'
+      inputContainer.style.display = 'none'
+    }
   }
-  reader.readAsDataURL(event.target.files[0])
-
-  fileUploadDiv.style.display = 'none'
-  previewDiv.style.display = 'flex'
-  previewFileName.textContent = event.target.files[0].name
 }
 
-document.getElementById('photo-upload').addEventListener('change', loadFile)
+imageInput.addEventListener('change', previewSelectedImage)
+
+// Hide the photo preview and show upload controls when 'change' link is clicked
+function showUploadControls() {
+  imageInput.value = null
+  previewFilename.innerText = ''
+  previewContainer.style.display = 'none'
+  inputContainer.style.display = 'block'
+}
+
+changeLink.addEventListener('click', showUploadControls)

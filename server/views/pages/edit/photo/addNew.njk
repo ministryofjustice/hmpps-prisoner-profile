@@ -1,6 +1,7 @@
 {% extends "../../../partials/layout.njk" %}
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from '../../../components/fileUploadWithPreview/macro.njk' import fileUploadWithPreview %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -10,31 +11,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set fileHtml %}
-<div class="hmpps-photo-upload">
-  <div id="file-upload" class="hmpps-photo-upload__upload">
-    {{ govukFileUpload({
-    id: "photo-upload",
-    name: "file",
-    label: {
-      text: "Upload a file"
-    },
-    attributes: {
-      accept: "image/jpeg, image/gif"
-    }
-  }) }}
-  </div>
-  <div id="file-upload-preview" class="hmpps-photo-upload__preview">
-    <img class="hmpps-photo-upload__photo" id="output"/>
-    <div class="hmpps-photo-upload__file-name">
-      <p id="file-name" class="govuk-body">File name</p>
-    </div>
-    <div class="hmpps-photo-upload__change">
-      <a class="govuk-link govuk-link--no-visited-state" href="#">
-        <label class="govuk-!-font-size-19" id="change-file" for="file-upload-1">Change</label>
-      </a>
-    </div>
-  </div>
-</div>
+{{ fileUploadWithPreview("file") }}
 {% endset -%}
 {% block content %}
   <div class="govuk-grid-row">

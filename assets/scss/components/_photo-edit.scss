@@ -1,14 +1,32 @@
+#mark-preview-image-container {
+}
+
 .hmpps-photo-upload {
   &__upload {
     display: block;
   }
 
   &__preview {
-    border: 1px solid $govuk-border-colour;
     display: none;
-    gap: 20px;
-    padding: 14px 15px;
-    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    column-gap: 20px;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid $govuk-border-colour;
+    margin-bottom: 30px;
+
+    a {
+      color: $govuk-link-colour;
+    }
+
+    > .image-preview {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      column-gap: 20px;
+      justify-content: start;
+    }
   }
 
   &__photo {
