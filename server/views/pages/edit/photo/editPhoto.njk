@@ -55,7 +55,7 @@
     </div>
   {% endif %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-two-thirds">
       <form method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/submit" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <input type="file" id="js-cropped-image-input" name="file" hidden/>
