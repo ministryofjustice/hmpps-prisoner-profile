@@ -767,6 +767,49 @@ describe('utils', () => {
         { value: 'id3', text: 'desc3' },
       ])
     })
+
+    it('should output curly apostrophes', () => {
+      const data: { id: string; desc: string }[] = [
+        {
+          id: 'id1',
+          desc: "it's",
+        },
+        {
+          id: 'id2',
+          desc: "let's",
+        },
+      ]
+      const radioOptions = objectToRadioOptions(data, 'id', 'desc', 'id2')
+
+      expect(radioOptions).toEqual([
+        { value: 'id1', text: 'it’s' },
+        { value: 'id2', text: 'let’s', checked: true },
+      ])
+    })
+
+    it('should replace " - " with en-dash', () => {
+      const data: { id: string; desc: string }[] = [
+        {
+          id: 'id1',
+          desc: 'Option - One - A',
+        },
+        {
+          id: 'id2',
+          desc: 'Option - Two - B',
+        },
+        {
+          id: 'id3',
+          desc: 'hyphenated-word',
+        },
+      ]
+      const radioOptions = objectToRadioOptions(data, 'id', 'desc', 'id2')
+
+      expect(radioOptions).toEqual([
+        { value: 'id1', text: 'Option – One – A' },
+        { value: 'id2', text: 'Option – Two – B', checked: true },
+        { value: 'id3', text: 'hyphenated-word' },
+      ])
+    })
   })
 
   describe('refDataToSelectOptions', () => {
