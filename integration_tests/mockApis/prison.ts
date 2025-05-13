@@ -452,6 +452,22 @@ export default {
     })
   },
 
+  stubAllPastCareNeeds: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs/all`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pastCareNeedsMock,
+      },
+    })
+  },
+
   stubPastCareNeeds: (bookingId: number) => {
     return stubFor({
       request: {
