@@ -31,6 +31,14 @@ $hmpps-cropper-height: 276px;
     width: 100%;
     display: flex;
     justify-content: space-between;
+
+    &__full-width {
+      width: 100%;
+    }
+
+    &__half-width {
+      width: calc(($hmpps-cropper-width/2) - 3px);
+    }
   }
 
   cropper-canvas {
@@ -64,7 +72,6 @@ $hmpps-cropper-height: 276px;
 
 .hmpps-button__toggle-crop,
 .hmpps-button__rotate-clockwise {
-  width: calc(($hmpps-cropper-width/2) - 3px);
   margin-bottom: 0 !important;
 }
 

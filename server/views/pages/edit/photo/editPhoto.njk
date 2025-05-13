@@ -11,12 +11,12 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set cropHtml %}
 <div class="hmpps-image-cropper-button-text">
-  <img src="/assets/images/imageEditing/crop.svg" role="presentation" alt=""/> Crop
+  Edit the photo
 </div>
 {% endset %}
 {% set previewHtml %}
 <div class="hmpps-image-cropper-button-text">
-  <img src="/assets/images/imageEditing/crop.svg" role="presentation" alt=""/> Preview
+  Preview
 </div>
 {% endset %}
 {% set rotateHtml %}
@@ -69,14 +69,7 @@
                   html: cropHtml,
                   type: "button",
                   id: "toggle-crop-button",
-                  classes: "hmpps-button__toggle-crop govuk-button--secondary",
-                  preventDoubleClick: true
-                }) }}
-                {{ govukButton({
-                  html: rotateHtml,
-                  classes: "hmpps-button__rotate-clockwise govuk-button--secondary",
-                  type: "button",
-                  disabled: true,
+                  classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__full-width govuk-button--secondary",
                   preventDoubleClick: true
                 }) }}
               </div>
@@ -93,13 +86,7 @@
                 <cropper-canvas background class="govuk-!-margin-bottom-2">
                   <cropper-image src='{{ imgSrc }}' alt="Picture" initial-center-size="contain" rotatable="false" skewable="false" scalable="false" translatable="false"></cropper-image>
                   <cropper-shade hidden></cropper-shade>
-                  <cropper-selection
-                    id="cropperSelection"
-                    aspect-ratio="0.8"
-                    movable
-                    resizable
-                    outlined
-                    keyboard>
+                  <cropper-selection id="cropperSelection" aspect-ratio="0.8" movable resizable outlined keyboard>
                     <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0)"></cropper-handle>
                     <cropper-handle action="n-resize"></cropper-handle>
                     <cropper-handle action="e-resize"></cropper-handle>
@@ -113,19 +100,19 @@
                 </cropper-canvas>
                 <div class="hmpps-cropper-photo-container__controls govuk-!-margin-bottom-0">
                   {{ govukButton({
-                  html: previewHtml,
-                  type: "button",
-                  id: "toggle-crop-button",
-                  classes: "hmpps-button__toggle-crop govuk-button--secondary",
-                  preventDoubleClick: true
-                }) }}
+                    html: rotateHtml,
+                    type: "button",
+                    id: "rotate-clockwise",
+                    classes: "hmpps-button__rotate-clockwise hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
+                    preventDoubleClick: true
+                  }) }}
                   {{ govukButton({
-                  html: rotateHtml,
-                  type: "button",
-                  id: "rotate-clockwise",
-                  classes: "hmpps-button__rotate-clockwise govuk-button--secondary",
-                  preventDoubleClick: true
-                }) }}
+                    html: previewHtml,
+                    type: "button",
+                    id: "toggle-crop-button",
+                    classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
+                    preventDoubleClick: true
+                  }) }}
                 </div>
               </div>
             </div>
