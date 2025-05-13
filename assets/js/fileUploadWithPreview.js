@@ -5,7 +5,7 @@ const previewFilename = document.getElementById('preview-filename')
 const previewContainer = document.getElementById('preview-container')
 const changeLink = document.getElementById('change-photo-link')
 
-// Show the image preview and hide upload controls when adding a new distinguishing mark photo
+// Show the image preview and hide upload controls when adding a new photo
 function previewSelectedImage() {
   const file = imageInput.files[0]
   if (file) {
