@@ -1,0 +1,35 @@
+{# When including this, ensure you also include the script "fileUploadWithPreview.js" to enable the preview #}
+
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% macro fileUploadWithPreview(fileUploadName) %}
+  <div class="hmpps-file-upload-with-preview">
+    <div id="file-upload" class="hmpps-file-upload-with-preview__upload">
+      {{ govukFileUpload({
+        id: "file",
+        name: fileUploadName,
+        label: {
+          text: "Select an image"
+        },
+        hint: {
+          text: "The photo must be a JPEG or GIF."
+        },
+        attributes: {
+          accept: "image/jpeg, image/gif"
+        }
+      }) }}
+    </div>
+    <div id="preview-container" class="hmpps-file-upload-with-preview__preview">
+      <div class="image-preview">
+        <img class="hmpps-file-upload-with-preview__photo" id="preview-image"/>
+        <div class="hmpps-file-upload-with-preview__file-name">
+          <p id="preview-filename" class="govuk-body">File name</p>
+        </div>
+      </div>
+      <div class="hmpps-file-upload-with-preview__change">
+        <p class="govuk-body">
+          <a id="change-photo-link" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

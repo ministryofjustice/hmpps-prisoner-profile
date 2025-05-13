@@ -655,7 +655,9 @@ export const objectToRadioOptions = <T>(
     const value = obj[id] as string | number
     const override = overrides?.find(o => o.id === value)
     return {
-      text: override?.description ? override.description : (obj[description] as string),
+      text: (override?.description ? override.description : (obj[description] as string))
+        ?.replaceAll(' - ', ' – ')
+        ?.replaceAll("'", '’'),
       value,
       hint: override?.hint ? { text: override.hint } : undefined,
       ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),

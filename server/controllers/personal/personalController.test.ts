@@ -2380,37 +2380,37 @@ describe('PersonalController', () => {
         const expectedOptions = [
           { text: 'Buddhist', value: 'BUDD' },
           {
-            text: 'Christian - Anglican',
+            text: 'Christian – Anglican',
             value: 'COFE',
             hint: {
               text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
             },
           },
-          { text: 'Christian - Methodist', value: 'METH' },
+          { text: 'Christian – Methodist', value: 'METH' },
           {
-            text: 'Christian - Orthodox',
+            text: 'Christian – Orthodox',
             value: 'CHRODX',
             hint: {
               text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
             },
           },
-          { text: 'Christian - Oriental Orthodox', value: 'OORTH' },
+          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
           {
-            text: 'Christian - Other',
+            text: 'Christian – Other',
             value: 'CHRST',
             hint: {
               text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
             },
           },
-          { text: 'Muslim - Shia', value: 'SHIA' },
+          { text: 'Muslim – Shia', value: 'SHIA' },
           {
-            text: 'Muslim - Sunni',
+            text: 'Muslim – Sunni',
             value: 'SUNI',
             hint: {
               text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
             },
           },
-          { text: 'Muslim - Other', value: 'MUSOTH' },
+          { text: 'Muslim – Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO' },
           { divider: 'Or' },
           {
@@ -2434,7 +2434,7 @@ describe('PersonalController', () => {
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
-          formTitle: `Select First Last's religion, faith or belief`,
+          formTitle: `Select First Last’s religion, faith or belief`,
           redirectAnchor: 'personal-details',
           prisonerNumber: 'ABC123',
           currentReasonForChange: undefined,
@@ -2475,37 +2475,37 @@ describe('PersonalController', () => {
         const expectedOptions = [
           { text: 'Buddhist', value: 'BUDD' },
           {
-            text: 'Christian - Anglican',
+            text: 'Christian – Anglican',
             value: 'COFE',
             hint: {
               text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
             },
           },
-          { text: 'Christian - Methodist', value: 'METH' },
+          { text: 'Christian – Methodist', value: 'METH' },
           {
-            text: 'Christian - Orthodox',
+            text: 'Christian – Orthodox',
             value: 'CHRODX',
             hint: {
               text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
             },
           },
-          { text: 'Christian - Oriental Orthodox', value: 'OORTH' },
+          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
           {
-            text: 'Christian - Other',
+            text: 'Christian – Other',
             value: 'CHRST',
             hint: {
               text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
             },
           },
-          { text: 'Muslim - Shia', value: 'SHIA' },
+          { text: 'Muslim – Shia', value: 'SHIA' },
           {
-            text: 'Muslim - Sunni',
+            text: 'Muslim – Sunni',
             value: 'SUNI',
             hint: {
               text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
             },
           },
-          { text: 'Muslim - Other', value: 'MUSOTH' },
+          { text: 'Muslim – Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO', checked: true },
           { divider: 'Or' },
           {
