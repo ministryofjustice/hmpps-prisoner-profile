@@ -74,7 +74,8 @@ function constrainedToImage(selection) {
 
 function setFormPhotoToCroppedResult() {
   const selector = document.querySelector('cropper-selection')
-  selector.$toCanvas().then(canvas => {
+  // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
+  selector.$toCanvas({ width: FINAL_WIDTH, height: FINAL_HEIGHT }).then(canvas => {
     canvas.toBlob(blob => {
       const file = new File([blob], fileName, {
         type: fileType,
@@ -93,24 +94,8 @@ function setFormPhotoToCroppedResult() {
 
 function setCropperListener(fileName, fileType) {
   const canvas = document.querySelector('cropper-canvas')
-  const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
-    // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
-    selector.$toCanvas({ width: FINAL_WIDTH, height: FINAL_HEIGHT }).then(canvas => {
-      canvas.toBlob(blob => {
-        const file = new File([blob], fileName, {
-          type: fileType,
-          lastModified: new Date().getTime(),
-        })
-        const callback = dataUrl => {
-          document.getElementById('photo-preview').src = dataUrl
-        }
-        const a = new FileReader()
-        a.onload = e => callback(e.target.result)
-        a.readAsDataURL(blob)
-        setFormPhoto(file)
-      })
-    })
+    setFormPhotoToCroppedResult()
   })
 }
 
@@ -155,12 +140,12 @@ function resetSelectionLocation() {
   const selectionY = cropperImageRect.top - cropperCanvasRect.top
   if (heightWithMinWidth < MAX_HEIGHT) {
     // Scale the width so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, minWidth * 0.9)
+    selection.$change(selectionX, selectionY, minWidth * 0.9).$center()
   } else {
     // Set the height in the cases the width overflows the height
     const minHeight = Math.min(cropperImageRect.height, cropperCanvasRect.height)
     // Scale the height so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, 0, minHeight * 0.9)
+    selection.$change(selectionX, selectionY, 0, minHeight * 0.9).$center()
   }
 
   // Reenable constraining
