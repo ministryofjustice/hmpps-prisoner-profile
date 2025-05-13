@@ -196,6 +196,10 @@ export const religionFieldData: RadioFieldData = {
   redirectAnchor: 'personal-details',
   referenceDataOverrides: [
     {
+      id: 'BAHA',
+      description: 'Baháʼí',
+    },
+    {
       id: 'COFE',
       description: 'Christian - Anglican',
       hint: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
@@ -226,7 +230,7 @@ export const religionFieldData: RadioFieldData = {
     },
     {
       id: 'SHNTAO',
-      description: 'Shinto or Taoist',
+      description: 'Shintoist or Taoist',
     },
     {
       id: 'SUNI',
@@ -240,6 +244,10 @@ export const religionFieldData: RadioFieldData = {
     {
       id: 'NIL',
       description: 'No religion, faith or belief',
+    },
+    {
+      id: 'TPRNTS',
+      description: 'They prefer not to say',
     },
   ],
 }
