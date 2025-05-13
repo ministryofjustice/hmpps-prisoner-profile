@@ -3,7 +3,7 @@ $hmpps-cropper-height: 276px;
 
 .hmpps-cropper-photo-container {
   @include govuk-responsive-padding(2);
-  @include govuk-responsive-margin(6, "bottom");
+  @include govuk-responsive-margin(6, 'bottom');
   border: 1px solid $govuk-border-colour;
   width: 100%;
 
@@ -19,11 +19,11 @@ $hmpps-cropper-height: 276px;
   }
 
   &__description {
-    @include govuk-responsive-padding(2, "top");
+    @include govuk-responsive-padding(2, 'top');
     margin-left: 24px;
 
     h2 {
-      @include govuk-responsive-margin(3, "bottom");
+      @include govuk-responsive-margin(3, 'bottom');
     }
   }
 
@@ -36,6 +36,17 @@ $hmpps-cropper-height: 276px;
   cropper-canvas {
     width: $hmpps-cropper-width;
     height: $hmpps-cropper-height;
+  }
+
+  cropper-selection {
+    outline: 1px solid $govuk-focus-colour;
+  }
+
+  $handles: 'n-resize', 'ne-resize', 'e-resize', 'se-resize', 's-resize', 'sw-resize', 'w-resize', 'nw-resize';
+  @each $handle in $handles {
+    cropper-handle[action='#{$handle}']::after {
+      background-color: $govuk-focus-colour;
+    }
   }
 }
 
@@ -50,7 +61,6 @@ $hmpps-cropper-height: 276px;
 #rotate-button-group {
   display: none;
 }
-
 
 .hmpps-button__toggle-crop,
 .hmpps-button__rotate-clockwise {
