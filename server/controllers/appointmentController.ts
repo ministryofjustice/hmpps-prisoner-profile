@@ -239,12 +239,14 @@ export default class AppointmentController {
       if (!errors.length) {
         const startTime = formatDateTimeISO(set(parseDate(date), { hours: startTimeHours, minutes: startTimeMinutes }))
         const endTime = formatDateTimeISO(set(parseDate(date), { hours: endTimeHours, minutes: endTimeMinutes }))
-        // non-bvl locations identified via UUID/integer form id.  BVL locations identified via key
+
+        // Non-bvl locations are identified via UUID/integer. BVL locations are identified via location.key
         let nomisLocationId
         if (location) {
           const result = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(clientToken, location)
           nomisLocationId = result.nomisLocationId
         }
+
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
@@ -433,6 +435,7 @@ export default class AppointmentController {
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('prePostAppointmentDetails')
+
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
       if (!appointmentFlash?.length) {
         throw new ServerError('PrePostAppointmentDetails not found in request')
@@ -477,8 +480,14 @@ export default class AppointmentController {
         appointmentDate: formatDate(appointmentDefaults.startTime, 'long'),
         formValues,
       }
+
       const errors = req.flash('errors')
 
+      // If redirected here from a submission error we need to clear down any flash contents for 'postVLBDetails'
+      // as it may contain values from a previously failed post in this session.
+      this.clearStoredFlashMessages(req, 'postVLBDetails')
+
+      // Store the current details for use on the next page - there can be only 1 entry in this flash key
       req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
 
       this.auditService
@@ -522,10 +531,13 @@ export default class AppointmentController {
         cvpRequired,
         videoLinkUrl,
       } = req.body
+
+      // Use the values provided from the previous page - it has already ensured there will be only 1entry
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
         throw new ServerError('PostVideoLinkBooking: Appointment data not found in request')
       }
+
       const { appointmentDefaults, appointmentForm } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const prePostAppointmentDetails = {
@@ -558,7 +570,9 @@ export default class AppointmentController {
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })
-          } else throw error
+          } else {
+            throw error
+          }
         }
       }
 
@@ -697,14 +711,13 @@ export default class AppointmentController {
 
   public displayPrisonerMovementSlips(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const data = req.session.movementSlipData
       const { prisonerNumber, prisonId } = req.middleware.prisonerData
-      if (!data) throw new NotFoundError('Movement slip data not found in session')
-
-      res.locals = {
-        ...res.locals,
-        hideBackLink: true,
+      const data = req.session.movementSlipData
+      if (!data) {
+        throw new NotFoundError('Movement slip data not found in session')
       }
+
+      res.locals = { ...res.locals, hideBackLink: true }
       delete req.session.movementSlipData
 
       this.auditService
@@ -717,9 +730,7 @@ export default class AppointmentController {
         })
         .catch(error => logger.error(error))
 
-      return res.render('pages/appointments/movementSlips', {
-        ...data,
-      })
+      return res.render('pages/appointments/movementSlips', { ...data })
     }
   }
 
@@ -1002,6 +1013,13 @@ export default class AppointmentController {
       preAppointment: getAppointment('VLB_COURT_PRE'),
       mainAppointment: getAppointment('VLB_COURT_MAIN') || getAppointment('VLB_PROBATION'),
       postAppointment: getAppointment('VLB_COURT_POST'),
+    }
+  }
+
+  private clearStoredFlashMessages = (req: Request, flash: string) => {
+    const checkFlashDetails = req.flash(flash)
+    if (checkFlashDetails && checkFlashDetails.length > 0) {
+      logger.info(`Cleared stale flash entry for ${flash}`)
     }
   }
 }
