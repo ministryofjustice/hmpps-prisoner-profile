@@ -32,7 +32,7 @@
     </div>
   {% endif %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-two-thirds">
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">

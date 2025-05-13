@@ -2,8 +2,8 @@
 
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 {% macro fileUploadWithPreview(fileUploadName) %}
-  <div class="hmpps-photo-upload">
-    <div id="file-upload" class="hmpps-photo-upload__upload">
+  <div class="hmpps-file-upload-with-preview">
+    <div id="file-upload" class="hmpps-file-upload-with-preview__upload">
       {{ govukFileUpload({
         id: "file",
         name: fileUploadName,
@@ -18,14 +18,14 @@
         }
       }) }}
     </div>
-    <div id="preview-container" class="hmpps-photo-upload__preview">
+    <div id="preview-container" class="hmpps-file-upload-with-preview__preview">
       <div class="image-preview">
-        <img class="hmpps-photo-upload__photo" id="preview-image"/>
-        <div class="hmpps-photo-upload__file-name">
+        <img class="hmpps-file-upload-with-preview__photo" id="preview-image"/>
+        <div class="hmpps-file-upload-with-preview__file-name">
           <p id="preview-filename" class="govuk-body">File name</p>
         </div>
       </div>
-      <div class="hmpps-photo-upload__change">
+      <div class="hmpps-file-upload-with-preview__change">
         <p class="govuk-body">
           <a id="change-photo-link" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
         </p>
