@@ -18,7 +18,6 @@ context('Edit hair', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'HAIR',
         referenceData: hairCodesMock,

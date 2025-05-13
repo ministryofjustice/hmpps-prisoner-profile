@@ -29,7 +29,6 @@ context('When signed in', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
 
       visitPersonalDetailsPage({ failOnStatusCode: false })
     }
@@ -131,7 +130,6 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       visitPersonalDetailsPage()
     })
 
@@ -507,7 +505,6 @@ context('When signed in', () => {
     context('Prisoner has current care needs and no past care needs', () => {
       it('Displays the care needs', () => {
         cy.task('stubPersonalCareNeeds')
-        cy.task('stubAllPersonalCareNeeds')
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
         page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
@@ -601,7 +598,6 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
     })
 
     context('With less than the limit', () => {
@@ -641,7 +637,6 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
     })
 
     context('Page section', () => {
@@ -692,7 +687,6 @@ context('When signed in', () => {
       })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
       visitPersonalDetailsPage()
@@ -736,7 +730,6 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, error: true })
       visitPersonalDetailsPage()
     })

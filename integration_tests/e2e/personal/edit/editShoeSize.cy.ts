@@ -17,7 +17,6 @@ context('Edit shoe size', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/shoe-size`,

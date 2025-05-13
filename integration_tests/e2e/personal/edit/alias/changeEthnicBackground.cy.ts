@@ -58,7 +58,6 @@ export function changeEthnicBackground(options: { group: string; pageTitle: stri
           pseudonymId: PseudonymResponseMock.sourceSystemId,
           response: PseudonymResponseMock,
         })
-        cy.task('stubAllPersonalCareNeeds')
       },
       editUrl: `prisoner/${prisonerNumber}/personal/${options.group}`,
       editPageWithTitle: EditPage,

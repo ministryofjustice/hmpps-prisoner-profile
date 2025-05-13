@@ -23,7 +23,6 @@ context('Edit next of kin and emergency contacts', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonalRelationshipsGetReferenceData', {
         domain: PersonalRelationshipsReferenceDataDomain.Title,
         referenceData: [

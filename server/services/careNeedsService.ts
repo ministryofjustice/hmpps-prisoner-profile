@@ -40,10 +40,6 @@ export default class CareNeedsService {
    */
   public async getCareNeedsAndAdjustments(token: string, bookingId: number): Promise<CareNeed[]> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    // const [healthCodes, treatmentCodes] = await Promise.all([
-    //   prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
-    //   prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
-    // ])
     const [healthCodes] = await Promise.all([prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health)])
     const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
       prisonApiClient.getAllPersonalCareNeeds(bookingId),

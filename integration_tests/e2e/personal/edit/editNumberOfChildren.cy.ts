@@ -18,7 +18,6 @@ context('Edit number of children', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonalRelationshipsUpdateNumberOfChildren', {
         prisonerNumber,
         resp: PersonalRelationshipsNumberOfChildrenMock,

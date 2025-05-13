@@ -29,7 +29,6 @@ context('Edit medical diet', () => {
       cy.task('stubDietAndAllergyUpdate', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/diet-and-food-allergies`,
     editPageWithTitle: EditPage,

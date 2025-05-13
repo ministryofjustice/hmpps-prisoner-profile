@@ -18,7 +18,6 @@ context('Edit build', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'BUILD',
         referenceData: buildCodesMock,

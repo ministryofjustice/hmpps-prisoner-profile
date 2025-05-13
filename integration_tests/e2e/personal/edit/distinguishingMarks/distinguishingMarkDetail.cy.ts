@@ -41,7 +41,6 @@ context('New distinguishing mark on face', () => {
       cy.task('stubPostNewDistinguishingMark', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
     })
 
     function testAddDistinguishingMarkDetailWithRadios(title, bodyPartSelectorAlt) {

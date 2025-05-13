@@ -22,7 +22,6 @@ context('Edit domestic status', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubPersonalRelationshipsGetDomesticStatus', {
         prisonerNumber,
         resp: PersonalRelationshipsDomesticStatusMock,

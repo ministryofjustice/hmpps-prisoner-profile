@@ -20,7 +20,6 @@ context('Change Name Purpose Page', () => {
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-    cy.task('stubAllPersonalCareNeeds')
   })
 
   context('Permissions', () => {

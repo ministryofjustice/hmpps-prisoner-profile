@@ -19,7 +19,6 @@ context('Edit main language', () => {
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
-        cy.task('stubAllPersonalCareNeeds')
         cy.task('stubPersonCommunicationNeedsGetCommunicationNeeds', {
           prisonerNumber,
           languagePreferences: {
@@ -115,7 +114,6 @@ context('Edit main language', () => {
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
-        cy.task('stubAllPersonalCareNeeds')
         cy.task('stubPersonCommunicationNeedsGetCommunicationNeeds', {
           prisonerNumber,
           languagePreferences: {},
