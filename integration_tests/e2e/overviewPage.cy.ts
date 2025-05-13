@@ -528,7 +528,7 @@ context('Overview Page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ViewProbationDocuments] })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, staffRoles: [{ role: 'KW' }] })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, isAKeyWorker: true })
       visitOverviewPage()
     })
 

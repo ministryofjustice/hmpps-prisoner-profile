@@ -13,7 +13,6 @@ import getIncentivesPermissions from './utils/permissions/getIncentivesPermissio
 import getCategoryPermissions from './utils/permissions/getCategoryPermissions'
 import getCalculateReleaseDatesPermissions from './utils/permissions/getCalculateReleaseDatesPermissions'
 import getCaseNotesPermissions from './utils/permissions/getCaseNotesPermissions'
-import getKeyWorkerPermissions from './utils/permissions/getKeyworkerPermissions'
 import getAppointmentPermissions from './utils/permissions/getAppointmentPermissions'
 import getUseOfForcePermissions from './utils/permissions/getUseOfForcePermissions'
 import getActivityPermissions from './utils/permissions/getActivityPermissions'
@@ -81,11 +80,6 @@ jest.mock('./utils/permissions/getCalculateReleaseDatesPermissions', () => ({
 }))
 
 jest.mock('./utils/permissions/getCaseNotesPermissions', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
-
-jest.mock('./utils/permissions/getKeyworkerPermissions', () => ({
   __esModule: true,
   default: jest.fn(),
 }))
@@ -189,7 +183,6 @@ describe('permissionsService', () => {
       ;(getCategoryPermissions as jest.Mock).mockReturnValue('category')
       ;(getCalculateReleaseDatesPermissions as jest.Mock).mockReturnValue('calculate release dates')
       ;(getCaseNotesPermissions as jest.Mock).mockReturnValue('case notes')
-      ;(getKeyWorkerPermissions as jest.Mock).mockReturnValue('key worker')
       ;(getAppointmentPermissions as jest.Mock).mockReturnValue('appointment')
       ;(getUseOfForcePermissions as jest.Mock).mockReturnValue('use of force')
       ;(getActivityPermissions as jest.Mock).mockReturnValue('activity')
@@ -211,7 +204,6 @@ describe('permissionsService', () => {
         category: 'category',
         calculateReleaseDates: 'calculate release dates',
         caseNotes: 'case notes',
-        keyWorker: 'key worker',
         appointment: 'appointment',
         useOfForce: 'use of force',
         activity: 'activity',

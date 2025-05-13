@@ -2,5 +2,5 @@ import Interface from './Interface'
 import { UserService } from '../../server/services'
 
 export const userServiceMock = (): Interface<UserService> => ({
-  getStaffRoles: jest.fn(),
+  isUserAKeyWorker: jest.fn(),
 })

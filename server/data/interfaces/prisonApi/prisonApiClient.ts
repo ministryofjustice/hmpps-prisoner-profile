@@ -26,7 +26,6 @@ import MainOffence from './MainOffence'
 import FullStatus from './FullStatus'
 import SentenceSummary from './SentenceSummary'
 import OffenderIdentifier from './OffenderIdentifier'
-import StaffRole from './StaffRole'
 import { AgenciesEmail, AgencyDetails } from './Agency'
 import OffenderCellHistory from './OffenderCellHistoryInterface'
 import StaffDetails from './StaffDetails'
@@ -143,7 +142,7 @@ export interface PrisonApiClient {
 
   getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]>
 
-  getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
+  hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean>
 
   getAgencyDetails(agencyId: string): Promise<AgencyDetails>
 
