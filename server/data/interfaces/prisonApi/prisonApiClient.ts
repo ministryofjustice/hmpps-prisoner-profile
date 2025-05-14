@@ -26,7 +26,6 @@ import MainOffence from './MainOffence'
 import FullStatus from './FullStatus'
 import SentenceSummary from './SentenceSummary'
 import OffenderIdentifier from './OffenderIdentifier'
-import StaffRole from './StaffRole'
 import { AgenciesEmail, AgencyDetails } from './Agency'
 import OffenderCellHistory from './OffenderCellHistoryInterface'
 import StaffDetails from './StaffDetails'
@@ -88,6 +87,7 @@ export interface PrisonApiClient {
   getInmateDetail(bookingId: number): Promise<InmateDetail>
 
   getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds>
+  getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds>
 
   getOffenderActivitiesHistory(prisonerNumber: string, earliestEndDate: string): Promise<OffenderActivitiesHistory>
 
@@ -121,7 +121,7 @@ export interface PrisonApiClient {
 
   getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]>
 
-  getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
+  getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments>
 
   getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
 
@@ -143,7 +143,7 @@ export interface PrisonApiClient {
 
   getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]>
 
-  getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
+  hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean>
 
   getAgencyDetails(agencyId: string): Promise<AgencyDetails>
 

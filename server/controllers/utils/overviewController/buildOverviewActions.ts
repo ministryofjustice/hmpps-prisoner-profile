@@ -41,7 +41,7 @@ export default (
     })
   }
 
-  if (permissions.keyWorker?.edit) {
+  if (user.authSource === 'nomis' && user.keyWorkerAtPrisons?.[prisonerData.prisonId]) {
     actions.push({
       text: 'Add key worker session',
       icon: Icon.AddKeyWorkerSession,

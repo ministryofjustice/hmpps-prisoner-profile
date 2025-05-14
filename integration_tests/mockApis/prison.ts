@@ -43,7 +43,6 @@ import {
 } from '../../server/data/localMockData/offenceOverviewMock'
 import FullStatus from '../../server/data/interfaces/prisonApi/FullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
-import StaffRole from '../../server/data/interfaces/prisonApi/StaffRole'
 
 import {
   SentenceSummaryWithoutSentenceMock,
@@ -408,7 +407,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments\\?type=(.*)`,
+        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments/all`,
       },
       response: {
         status: 200,
@@ -432,6 +431,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: resp,
+      },
+    })
+  },
+
+  stubAllPersonalCareNeeds: (resp = personalCareNeedsMock) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs/all`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
+      },
+    })
+  },
+
+  stubAllPastCareNeeds: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs/all`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pastCareNeedsMock,
       },
     })
   },
@@ -768,18 +799,18 @@ export default {
     })
   },
 
-  stubGetStaffRoles: (roles: StaffRole[]) => {
+  stubHasStaffRole: ({ roleType, response }: { roleType: string; response: boolean }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/staff/\\w+/\\w+/roles`,
+        urlPattern: `/prison/api/staff/\\w+/\\w+/roles/${roleType}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: roles,
+        jsonBody: response,
       },
     })
   },
