@@ -13,7 +13,6 @@ import getSocPermissions from './utils/permissions/getSocPermissions'
 import getPathfinderPermissions from './utils/permissions/getPathfinderPermissions'
 import getActivityPermissions from './utils/permissions/getActivityPermissions'
 import getAppointmentPermissions from './utils/permissions/getAppointmentPermissions'
-import getKeyWorkerPermissions from './utils/permissions/getKeyworkerPermissions'
 import getCaseNotesPermissions from './utils/permissions/getCaseNotesPermissions'
 import getCalculateReleaseDatesPermissions from './utils/permissions/getCalculateReleaseDatesPermissions'
 import getCategoryPermissions from './utils/permissions/getCategoryPermissions'
@@ -39,7 +38,6 @@ export interface Permissions {
   category?: PermissionItem
   calculateReleaseDates?: PermissionItem
   caseNotes?: PermissionItem
-  keyWorker?: PermissionItem
   appointment?: PermissionItem
   useOfForce?: PermissionItem
   activity?: PermissionItem
@@ -58,11 +56,9 @@ export default class PermissionsService {
     this.getOverviewPermissions = this.getOverviewPermissions.bind(this)
   }
 
-  public async getOverviewPermissions(user: HmppsUser, prisoner: Prisoner, clientToken?: string): Promise<Permissions> {
+  public async getOverviewPermissions(user: HmppsUser, prisoner: Prisoner): Promise<Permissions> {
     const accessCode = getOverviewAccessStatusCode(user, prisoner)
     if (accessCode !== HmppsStatusCode.OK) return { accessCode }
-
-    const staffRoles = await this.userService.getStaffRoles(clientToken, user)
 
     return {
       accessCode,
@@ -74,7 +70,6 @@ export default class PermissionsService {
       category: getCategoryPermissions(user),
       calculateReleaseDates: getCalculateReleaseDatesPermissions(user),
       caseNotes: getCaseNotesPermissions(user, prisoner),
-      keyWorker: getKeyWorkerPermissions(staffRoles),
       appointment: getAppointmentPermissions(user, prisoner),
       useOfForce: getUseOfForcePermissions(user, prisoner),
       activity: getActivityPermissions(user, prisoner),

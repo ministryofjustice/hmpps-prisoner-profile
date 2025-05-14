@@ -26,7 +26,6 @@ import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments
 import { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
-import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
@@ -295,13 +294,13 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getStaffRoles', () => {
+  describe('hasStaffRole', () => {
     it('Should return data from the API', async () => {
       const staffNumber = 12345
       const agencyId = 'Agency'
-      mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles`, mockStaffRoles)
-      const output = await prisonApiClient.getStaffRoles(staffNumber, agencyId)
-      expect(output).toEqual(mockStaffRoles)
+      mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles/KW`, true)
+      const output = await prisonApiClient.hasStaffRole(staffNumber, agencyId, 'KW')
+      expect(output).toEqual(true)
     })
   })
 

@@ -32,6 +32,7 @@ import personalRouter from './personalRouter'
 import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import getActivityPermissions from '../services/utils/permissions/getActivityPermissions'
+import checkIfKeyWorkerAtPrison from '../middleware/checkIfKeyWorkerAtPrison'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -98,6 +99,7 @@ export default function routes(services: Services): Router {
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
+    checkIfKeyWorkerAtPrison(services.userService),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return overviewController.displayOverview(req, res)
