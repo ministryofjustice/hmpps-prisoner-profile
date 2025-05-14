@@ -15,6 +15,7 @@ context('Past care needs page', () => {
     cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubPastCareNeeds', 1102484)
+    cy.task('stubAllPastCareNeeds', 1102484)
     cy.task('stubHealthReferenceDomain')
     cy.task('stubHealthTreatmentReferenceDomain')
     cy.task('stubReasonableAdjustments', 1102484)
