@@ -1,17 +1,23 @@
+import {
+  isGranted,
+  PathfinderPermission,
+  PrisonerPermissions,
+  ProbationDocumentsPermission,
+  SOCPermission,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 import config from '../../../config'
-import { Permissions } from '../../../services/permissionsService'
 
 export default function buildOverviewInfoLinks(
   prisonerData: Prisoner,
   pathfinderNominal: Nominal,
   socNominal: Nominal,
-  permissions: Permissions,
+  permissions: PrisonerPermissions,
 ): { text: string; url: string; dataQA: string }[] {
   const links: { text: string; url: string; dataQA: string }[] = []
 
-  if (permissions.probationDocuments?.view) {
+  if (isGranted(ProbationDocumentsPermission.read, permissions)) {
     links.push({
       text: 'Probation documents',
       url: `/prisoner/${prisonerData.prisonerNumber}/probation-documents`,
@@ -19,7 +25,7 @@ export default function buildOverviewInfoLinks(
     })
   }
 
-  if (permissions.pathfinder?.view && pathfinderNominal) {
+  if (isGranted(PathfinderPermission.read, permissions) && pathfinderNominal) {
     links.push({
       text: 'Pathfinder profile',
       url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
@@ -27,7 +33,7 @@ export default function buildOverviewInfoLinks(
     })
   }
 
-  if (permissions.soc?.view && socNominal) {
+  if (isGranted(SOCPermission.read, permissions) && socNominal) {
     links.push({
       text: 'SOC profile',
       url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,

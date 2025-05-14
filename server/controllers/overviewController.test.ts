@@ -61,7 +61,7 @@ import config from '../config'
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
 const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
-const permissions = {} as PrisonerPermissions
+const prisonerPermissions = {} as PrisonerPermissions
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -78,7 +78,7 @@ const getResLocals = ({
       caseLoads,
       token: 'USER_TOKEN',
     },
-    permissions,
+    prisonerPermissions,
   }
 }
 
@@ -797,5 +797,5 @@ describe('overviewController', () => {
 })
 
 function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
-  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === permissions && granted)
+  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
 }

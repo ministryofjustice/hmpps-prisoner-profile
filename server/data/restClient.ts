@@ -12,7 +12,6 @@ interface GetRequest {
   query?: object | string
   headers?: Record<string, string>
   responseType?: string
-  raw?: boolean
   ignore404?: boolean
 }
 
@@ -21,7 +20,6 @@ interface PostRequest {
   headers?: Record<string, string>
   responseType?: string
   data?: object | string[]
-  raw?: boolean
   query?: object | string
   files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
@@ -31,7 +29,6 @@ interface PutRequest {
   headers?: Record<string, string>
   responseType?: string
   data?: object | string[]
-  raw?: boolean
   query?: object | string
   files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
@@ -67,7 +64,6 @@ export default class RestClient {
     query = '',
     headers = {},
     responseType = '',
-    raw = false,
     ignore404 = false,
   }: GetRequest): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
@@ -85,7 +81,7 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       if (ignore404 && error.response?.status === 404) return null
 
@@ -95,14 +91,7 @@ export default class RestClient {
     }
   }
 
-  async post<T>({
-    path = null,
-    query = '',
-    headers = {},
-    responseType = '',
-    data = {},
-    raw = false,
-  }: PostRequest = {}): Promise<T> {
+  async post<T>({ path = null, query = '', headers = {}, responseType = '', data = {} }: PostRequest = {}): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -119,7 +108,7 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
@@ -134,7 +123,6 @@ export default class RestClient {
     responseType = '',
     files = null,
     data = {},
-    raw = false,
   }: PostRequest = {}): Promise<T> {
     return this.requestMultipart('POST', {
       path,
@@ -143,7 +131,6 @@ export default class RestClient {
       responseType,
       files,
       data,
-      raw,
     })
   }
 
@@ -154,7 +141,6 @@ export default class RestClient {
     responseType = '',
     files = null,
     data = {},
-    raw = false,
   }: PutRequest | PostRequest = {}): Promise<T> {
     return this.requestMultipart('PUT', {
       path,
@@ -163,7 +149,6 @@ export default class RestClient {
       responseType,
       files,
       data,
-      raw,
     })
   }
 
@@ -176,7 +161,6 @@ export default class RestClient {
       responseType = '',
       files = null,
       data = {},
-      raw = false,
     }: PutRequest | PostRequest = {},
   ): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
@@ -205,7 +189,7 @@ export default class RestClient {
 
     try {
       const result = await request
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: ${method}`)
@@ -213,14 +197,7 @@ export default class RestClient {
     }
   }
 
-  async put<T>({
-    path = null,
-    query = '',
-    headers = {},
-    responseType = '',
-    data = {},
-    raw = false,
-  }: PutRequest = {}): Promise<T> {
+  async put<T>({ path = null, query = '', headers = {}, responseType = '', data = {} }: PutRequest = {}): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -237,7 +214,7 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'PUT'`)
@@ -245,14 +222,7 @@ export default class RestClient {
     }
   }
 
-  async patch<T>({
-    path = null,
-    query = '',
-    headers = {},
-    responseType = '',
-    data = {},
-    raw = false,
-  }: PutRequest = {}): Promise<T> {
+  async patch<T>({ path = null, query = '', headers = {}, responseType = '', data = {} }: PutRequest = {}): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -269,7 +239,7 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'PATCH'`)
@@ -307,13 +277,7 @@ export default class RestClient {
     })
   }
 
-  async delete<T>({
-    path = null,
-    query = '',
-    headers = {},
-    responseType = '',
-    raw = false,
-  }: GetRequest = {}): Promise<T> {
+  async delete<T>({ path = null, query = '', headers = {}, responseType = '' }: GetRequest = {}): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -325,7 +289,7 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
+      return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'DELETE'`)

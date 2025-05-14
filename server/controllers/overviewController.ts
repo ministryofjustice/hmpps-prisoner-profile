@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import {
   isGranted,
+  PersonInterventionsPermission,
   PersonPrisonCategoryPermission,
   PersonSentenceCalculationPermission,
   PrisonerAdjudicationsPermission,
@@ -8,6 +9,7 @@ import {
   PrisonerMoneyPermission,
   PrisonerVisitsAndVisitorsPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
@@ -63,7 +65,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
-    const { apiErrorCallback, permissions } = res.locals
+    const { apiErrorCallback, prisonerPermissions } = res.locals
     const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
@@ -72,7 +74,7 @@ export default class OverviewController {
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
-    const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, permissions)
+    const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
 
     const [
       pathfinderNominal,
@@ -91,6 +93,7 @@ export default class OverviewController {
       staffContacts,
       offencesOverview,
       nonAssociationSummary,
+
       currentCsipDetail,
       externalContactsSummary,
     ] = await Promise.all([
@@ -101,17 +104,17 @@ export default class OverviewController {
       showCourtCaseSummary
         ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      isGranted(PrisonerMoneyPermission.read, permissions)
+      isGranted(PrisonerMoneyPermission.read, prisonerPermissions)
         ? this.moneyService.getAccountBalances(clientToken, bookingId)
         : null,
-      isGranted(PrisonerAdjudicationsPermission.read, permissions)
+      isGranted(PrisonerAdjudicationsPermission.read, prisonerPermissions)
         ? Result.wrap(this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId), apiErrorCallback)
         : null,
-      isGranted(PrisonerVisitsAndVisitorsPermission.read, permissions)
+      isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions)
         ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber)
         : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
-      isGranted(PrisonerIncentivesPermission.read, permissions)
+      isGranted(PrisonerIncentivesPermission.read, prisonerPermissions)
         ? this.incentivesService.getIncentiveOverview(clientToken, bookingId)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
@@ -123,7 +126,8 @@ export default class OverviewController {
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
         apiErrorCallback,
       ),
-      isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
+      isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) &&
+      isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions)
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       externalContactsEnabled(prisonId)
@@ -138,7 +142,7 @@ export default class OverviewController {
       res.locals.user,
       config,
       res.locals.feComponents?.sharedData,
-      res.locals.permissions,
+      prisonerPermissions,
     )
 
     this.auditOverviewPageView(req, res, prisonerData)
@@ -153,18 +157,18 @@ export default class OverviewController {
       categorySummary: getCategorySummary(
         prisonerData,
         inmateDetail,
-        isGranted(PersonPrisonCategoryPermission.edit, permissions),
+        isGranted(PersonPrisonCategoryPermission.edit, prisonerPermissions),
       ),
       csraSummary: getCsraSummary(prisonerData),
       schedule,
       incentiveSummary,
       overviewActions,
-      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, permissions),
+      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, prisonerPermissions),
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
         latestReleaseDate,
-        isGranted(PersonSentenceCalculationPermission.edit_adjustments, res.locals.permissions),
+        isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
       statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
