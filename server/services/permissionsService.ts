@@ -37,10 +37,6 @@ export default class PermissionsService {
     return { accessCode: getMoneyAccessStatusCode(user, prisoner) }
   }
 
-  public getStandardAccessPermission(user: HmppsUser, prisoner: Prisoner): Permissions {
-    return { accessCode: getOverviewAccessStatusCode(user, prisoner) }
-  }
-
   public getAppointmentPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
     return { accessCode: getActiveCaseLoadOnlyAccessStatusCode(user, prisoner) }
   }
