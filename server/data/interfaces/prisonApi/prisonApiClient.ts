@@ -87,7 +87,6 @@ export interface PrisonApiClient {
   getInmateDetail(bookingId: number): Promise<InmateDetail>
 
   getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds>
-  getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds>
 
   getOffenderActivitiesHistory(prisonerNumber: string, earliestEndDate: string): Promise<OffenderActivitiesHistory>
 
@@ -121,7 +120,7 @@ export interface PrisonApiClient {
 
   getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]>
 
-  getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments>
+  getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
 
   getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
 
