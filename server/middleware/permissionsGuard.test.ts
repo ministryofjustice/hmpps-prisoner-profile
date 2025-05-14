@@ -16,12 +16,12 @@ describe('permissionsGuard', () => {
     jest.clearAllMocks()
   })
 
-  it('should return server error if no prisoner date found in middleware', async () => {
+  it('should return server error if no prisoner data found in middleware', async () => {
     const req: any = { middleware: {} }
     const res: any = {}
     const permissionService = permissionsServiceMock()
 
-    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
+    await permissionsGuard(permissionService.getMoneyPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledWith(new Error('No PrisonerData found in middleware'))
   })
@@ -31,9 +31,9 @@ describe('permissionsGuard', () => {
     const res: any = { locals: { user: prisonUserMock } }
 
     const permissionService = permissionsServiceMock()
-    permissionService.getOverviewPermissions = jest.fn().mockResolvedValue({ accessCode: HmppsStatusCode.OK })
+    permissionService.getMoneyPermissions = jest.fn().mockResolvedValue({ accessCode: HmppsStatusCode.OK })
 
-    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
+    await permissionsGuard(permissionService.getMoneyPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith()
@@ -50,9 +50,9 @@ describe('permissionsGuard', () => {
     const res: any = { locals: { user: prisonUserMock } }
 
     const permissionService = permissionsServiceMock()
-    permissionService.getOverviewPermissions = jest.fn().mockResolvedValue({ accessCode: status })
+    permissionService.getMoneyPermissions = jest.fn().mockResolvedValue({ accessCode: status })
 
-    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
+    await permissionsGuard(permissionService.getMoneyPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith([req, next, new NotFoundError(message, status)])
