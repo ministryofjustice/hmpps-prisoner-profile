@@ -3,6 +3,7 @@ import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
+import { Permissions } from '../../../services/permissionsService'
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }
@@ -29,25 +30,21 @@ describe('buildOverviewActions', () => {
   })
 
   describe('Add key worker session', () => {
-    test.each`
-      perms                             | visible
-      ${{ keyWorker: { edit: true } }}  | ${true}
-      ${{ keyWorker: { edit: false } }} | ${false}
-    `('user with keyWorker.view: $perms.keyWorker.view, can see add key worker: $visible', ({ perms, visible }) => {
+    it.each([true, false])('When user is a keyworker: %s', (keyworker: boolean) => {
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominal,
         socNominal,
-        prisonUserMock,
+        { ...prisonUserMock, keyWorkerAtPrisons: keyworker ? { MDI: true } : {} },
         config,
         undefined,
-        perms,
+        {} as Permissions,
       )
       expect(
         !!resp.find(
           action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA&subType=KS`,
         ),
-      ).toEqual(visible)
+      ).toEqual(keyworker)
     })
   })
 

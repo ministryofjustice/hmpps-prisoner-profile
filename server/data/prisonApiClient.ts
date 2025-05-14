@@ -35,7 +35,6 @@ import MainOffence from './interfaces/prisonApi/MainOffence'
 import FullStatus from './interfaces/prisonApi/FullStatus'
 import SentenceSummary from './interfaces/prisonApi/SentenceSummary'
 import OffenderIdentifier from './interfaces/prisonApi/OffenderIdentifier'
-import StaffRole from './interfaces/prisonApi/StaffRole'
 import { AgenciesEmail, AgencyDetails } from './interfaces/prisonApi/Agency'
 import StaffDetails from './interfaces/prisonApi/StaffDetails'
 import OffenderBooking from './interfaces/prisonApi/OffenderBooking'
@@ -289,8 +288,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]> {
-    return this.restClient.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles`, ignore404: true })
+  async hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean> {
+    return this.restClient.get<boolean>({
+      path: `/api/staff/${staffId}/${agencyId}/roles/${roleType}`,
+      ignore404: true,
+    })
   }
 
   async getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {

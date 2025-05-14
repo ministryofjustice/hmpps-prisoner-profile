@@ -12,6 +12,7 @@ export declare module 'express-session' {
     nowInMinutes: number
     userBackLink: string
     movementSlipData: object
+    keyWorkerAtPrisons: Record<string, boolean>
   }
 }
 
