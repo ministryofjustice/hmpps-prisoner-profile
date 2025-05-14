@@ -1,3 +1,13 @@
+import {
+  isGranted,
+  PersonPrisonCategoryPermission,
+  PrisonerAdjudicationsPermission,
+  PrisonerIncentivesPermission,
+  PrisonerMoneyPermission,
+  PrisonerPermission,
+  PrisonerPermissions,
+  PrisonerVisitsAndVisitorsPermission,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import OverviewController from './overviewController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import {
@@ -48,6 +58,11 @@ import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import config from '../config'
 
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
+
+const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
+const permissions = {} as PrisonerPermissions
+
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
   caseLoads = CaseLoadsDummyDataA,
@@ -63,6 +78,7 @@ const getResLocals = ({
       caseLoads,
       token: 'USER_TOKEN',
     },
+    permissions,
   }
 }
 
@@ -94,13 +110,6 @@ describe('overviewController', () => {
         inmateDetail: inmateDetailMock,
         alertSummaryData: {
           alertFlags: [],
-        },
-        permissions: {
-          money: { view: true },
-          adjudications: { view: true },
-          visits: { view: true, edit: true },
-          category: { view: true },
-          incentives: { view: true },
         },
       },
       originalUrl: 'http://localhost',
@@ -151,6 +160,8 @@ describe('overviewController', () => {
 
   describe('moneySummary', () => {
     it('should call moneyService.getMoneySummary and include response', async () => {
+      mockPermissionCheck(PrisonerMoneyPermission.read, true)
+
       moneyService.getAccountBalances = jest
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
@@ -164,16 +175,14 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call moneyService.getMoneySummary if user doesnt have money.view permission', async () => {
-      const reqNoMoney = {
-        ...req,
-        middleware: { ...req.middleware, permissions: { money: { view: false } } },
-      }
+    it('should not call moneyService.getMoneySummary if user doesnt have permission', async () => {
+      mockPermissionCheck(PrisonerMoneyPermission.read, false)
+
       moneyService.getAccountBalances = jest
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
 
-      await controller.displayOverview(reqNoMoney, res)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -185,6 +194,8 @@ describe('overviewController', () => {
 
   describe('adjudicationsSummary', () => {
     it('should call adjudicationsService.getAdjudicationsOverview and include response', async () => {
+      mockPermissionCheck(PrisonerAdjudicationsPermission.read, true)
+
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
         .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
@@ -198,20 +209,20 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call adjudicationsService.getAdjudicationsOverview if user doesnt have adjudications.view permission', async () => {
+    it('should not call adjudicationsService.getAdjudicationsOverview if user doesnt have permission', async () => {
+      mockPermissionCheck(PrisonerAdjudicationsPermission.read, false)
+
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
       }
-      const reqNoAdj = {
-        ...req,
-        middleware: { ...req.middleware, permissions: { adjudications: { view: false } } },
-      }
+
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
         .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
-      await controller.displayOverview(reqNoAdj, resNotInCaseload)
+      await controller.displayOverview(req, resNotInCaseload)
+
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -241,6 +252,8 @@ describe('overviewController', () => {
 
   describe('visitsSummary', () => {
     it('should call visitsService.getVisitsOverview and include response', async () => {
+      mockPermissionCheck(PrisonerVisitsAndVisitorsPermission.read, true)
+
       visitsService.getVisitsOverview = jest
         .fn()
         .mockResolvedValue({ startDate: '2030-03-02', remainingVo: 2, remainingPvo: 2 })
@@ -255,19 +268,18 @@ describe('overviewController', () => {
     })
 
     it('should not call visitsService.getVisitsOverview if prisoner is not in caseload', async () => {
+      mockPermissionCheck(PrisonerVisitsAndVisitorsPermission.read, false)
+
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
       }
-      const reqNoVisits = {
-        ...req,
-        middleware: { ...req.middleware, permissions: { visits: { view: false } } },
-      }
+
       visitsService.getVisitsOverview = jest
         .fn()
         .mockResolvedValue({ startDate: '2030-03-02', remainingVo: 2, remainingPvo: 2 })
 
-      await controller.displayOverview(reqNoVisits, resNotInCaseload)
+      await controller.displayOverview(req, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -295,6 +307,8 @@ describe('overviewController', () => {
 
   describe('categorySummary', () => {
     it('should get data and map category summary data', async () => {
+      mockPermissionCheck(PersonPrisonCategoryPermission.edit, false)
+
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
@@ -317,14 +331,15 @@ describe('overviewController', () => {
       )
     })
 
-    it('should set userCanManage to true when user has category.edit permission', async () => {
+    it('should set userCanManage to true when user has permission', async () => {
+      mockPermissionCheck(PersonPrisonCategoryPermission.edit, true)
+
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
       const reqEditCategory = {
         ...req,
         middleware: {
           ...req.middleware,
-          permissions: { category: { edit: true } },
           prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
         },
       }
@@ -371,6 +386,8 @@ describe('overviewController', () => {
 
   describe('incentiveSummary', () => {
     it('should call incentiveService.getIncentiveOverview and include response', async () => {
+      mockPermissionCheck(PrisonerIncentivesPermission.read, true)
+
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
         negativeBehaviourCount: 1,
@@ -392,11 +409,9 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call incentiveService.getIncentiveOverview if user does not have incentives.view permission', async () => {
-      const reqNoIncentives = {
-        ...req,
-        middleware: { ...req.middleware, permissions: { incentives: { view: false } } },
-      }
+    it('should not call incentiveService.getIncentiveOverview if user does not have permission', async () => {
+      mockPermissionCheck(PrisonerIncentivesPermission.read, false)
+
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
         negativeBehaviourCount: 1,
@@ -404,37 +419,11 @@ describe('overviewController', () => {
         daysOverdue: undefined,
       })
 
-      await controller.displayOverview(reqNoIncentives, res)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
           incentiveSummary: null,
-        }),
-      )
-    })
-
-    it('should call adjudicationsService.getAdjudicationsOverview if user is Global search user', async () => {
-      const resRole = {
-        ...res,
-        locals: getResLocals({ caseLoads: CaseLoadsDummyDataB, userRoles: [Role.PrisonUser, Role.GlobalSearch] }),
-      }
-      incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
-        positiveBehaviourCount: 1,
-        negativeBehaviourCount: 1,
-        nextReviewDate: '2026-01-01',
-        daysOverdue: undefined,
-      })
-
-      await controller.displayOverview(req, resRole)
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          incentiveSummary: {
-            positiveBehaviourCount: 1,
-            negativeBehaviourCount: 1,
-            nextReviewDate: '2026-01-01',
-            daysOverdue: undefined,
-          },
         }),
       )
     })
@@ -806,3 +795,7 @@ describe('overviewController', () => {
     })
   })
 })
+
+function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
+  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === permissions && granted)
+}

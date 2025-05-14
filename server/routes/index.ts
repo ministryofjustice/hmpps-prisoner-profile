@@ -100,7 +100,7 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
     checkIfKeyWorkerAtPrison(services.userService),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res, next) => {
       return overviewController.displayOverview(req, res)
     },
