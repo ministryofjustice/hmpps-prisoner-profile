@@ -6,7 +6,6 @@ import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessS
 import type PermissionItem from './interfaces/permissionsService/PermissionItem'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
-import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -61,9 +60,5 @@ export default class PermissionsService {
       accessCode,
       cellMove: getCellMovePermissions(user),
     }
-  }
-
-  public getProbationDocumentsPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
-    return { accessCode: getProbationDocumentsAccessStatusCode(user, prisoner) }
   }
 }
