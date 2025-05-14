@@ -407,7 +407,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments/all`,
+        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments\\?type=(.*)`,
       },
       response: {
         status: 200,
@@ -431,38 +431,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: resp,
-      },
-    })
-  },
-
-  stubAllPersonalCareNeeds: (resp = personalCareNeedsMock) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs/all`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: resp,
-      },
-    })
-  },
-
-  stubAllPastCareNeeds: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs/all`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: pastCareNeedsMock,
       },
     })
   },
