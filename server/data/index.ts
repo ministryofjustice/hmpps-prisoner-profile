@@ -97,4 +97,4 @@ export const dataAccess = {
 
 export type DataAccess = typeof dataAccess
 
-export { RestClientBuilder, CuriousRestClientBuilder }
+export type { RestClientBuilder, CuriousRestClientBuilder }

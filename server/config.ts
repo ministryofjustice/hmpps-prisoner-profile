@@ -360,7 +360,6 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),

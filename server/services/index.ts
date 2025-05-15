@@ -92,7 +92,6 @@ export const services = () => {
   })
 
   const prisonPermissionsService = PrisonPermissionsService.create({
-    prisonApiConfig: config.apis.prisonApi,
     prisonerSearchConfig: config.apis.prisonerSearchApi,
     authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
     logger,
