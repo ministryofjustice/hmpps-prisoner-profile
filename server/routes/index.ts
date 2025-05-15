@@ -3,6 +3,7 @@ import {
   isGranted,
   PrisonerBaseLocationPermission,
   PrisonerBasePermission,
+  PrisonerMoneyPermission,
   prisonerPermissionsGuard,
   PrisonerSchedulePermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
@@ -33,7 +34,6 @@ import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 import CareNeedsController from '../controllers/careNeedsController'
-import permissionsGuard from '../middleware/permissionsGuard'
 import personalRouter from './personalRouter'
 import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
@@ -266,7 +266,7 @@ export default function routes(services: Services): Router {
   router.use(
     `${basePath}/money`,
     getPrisonerData(services, { minimal: true }),
-    permissionsGuard(services.permissionsService.getMoneyPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerMoneyPermission.read] }),
     moneyRouter(services),
   )
 
