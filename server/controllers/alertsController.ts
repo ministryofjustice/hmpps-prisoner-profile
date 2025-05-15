@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
 import { HttpError } from 'http-errors'
+import { isGranted, PrisonerAlertsPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { formatLocation, formatName, sortByDateTime } from '../utils/utils'
@@ -26,12 +27,13 @@ export default class AlertsController {
   public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
     // Get data from middleware
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
+    const { user, prisonerPermissions } = res.locals
 
     if (alertSummaryData.apiUnavailable) {
       // Render banner
       return res.render('pages/alerts/alertsPage', {
         pageTitle: 'Alerts',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, 'alerts'),
       })
     }
 
@@ -51,7 +53,7 @@ export default class AlertsController {
       queryParams.sort = 'dateCreated,DESC'
     }
 
-    const canUpdateAlert = req.middleware.permissions.alerts?.edit
+    const canUpdateAlert = isGranted(PrisonerAlertsPermission.edit, prisonerPermissions)
     const addAlertLinkUrl = canUpdateAlert ? `/prisoner/${prisonerData.prisonerNumber}/add-alert` : undefined
 
     // Get alerts based on given query params
