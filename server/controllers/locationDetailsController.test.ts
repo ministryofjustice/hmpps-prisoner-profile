@@ -1,3 +1,9 @@
+import {
+  isGranted,
+  PrisonerBaseLocationPermission,
+  PrisonerPermission,
+  PrisonerPermissions,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -8,12 +14,16 @@ import config from '../config'
 import { locationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
 import LocationDetailsService from '../services/locationDetailsService'
 import LocationDetailsPageData from '../services/interfaces/locationDetailsService/LocationDetailsPageData'
-import { Role } from '../data/enums/role'
 import LocationDetails, {
   LocationDetailsGroupedByPeriodAtAgency,
 } from '../services/interfaces/locationDetailsService/LocationDetails'
 import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import LocationDetailsConverter from './converters/locationDetailsConverter'
+
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
+
+const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
+const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Prisoner Location Details', () => {
   const offenderNo = 'ABC123'
@@ -29,7 +39,6 @@ describe('Prisoner Location Details', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
-        permissions: { cellMove: { edit: true } },
       },
       originalUrl: 'http://localhost',
       params: { offenderNo },
@@ -38,6 +47,7 @@ describe('Prisoner Location Details', () => {
     }
     res = {
       locals: {
+        prisonerPermissions,
         user: {
           userRoles: ['CELL_MOVE'],
           staffId: 487023,
@@ -48,6 +58,8 @@ describe('Prisoner Location Details', () => {
       render: jest.fn(),
       redirect: jest.fn(),
     }
+
+    mockPermissionCheck(PrisonerBaseLocationPermission.move_cell, true)
 
     locationDetailsService = locationDetailsServiceMock() as LocationDetailsService
     locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(false)
@@ -80,20 +92,10 @@ describe('Prisoner Location Details', () => {
     })
 
     describe('should provide "Change cell" and "Move to reception" functionality', () => {
-      it('should not display the "Move to reception" or "Change cell" buttons when user does not have cellMove.edit permissions', async () => {
-        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
-        const reqNoPermission = {
-          ...req,
-          middleware: {
-            ...req.middleware,
-            permissions: {
-              cellMove: {
-                edit: false,
-              },
-            },
-          },
-        }
-        await controller.displayLocationDetails(reqNoPermission, res, PrisonerMockDataA)
+      it('should not display the "Move to reception" or "Change cell" buttons when user does not have move cell permissions', async () => {
+        mockPermissionCheck(PrisonerBaseLocationPermission.move_cell, false)
+
+        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
         expect(locationDetailsService.isReceptionFull).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
@@ -148,21 +150,10 @@ describe('Prisoner Location Details', () => {
         })
       })
 
-      it('should not display the "Current location" section or action buttons for users without cellMove.edit permission', async () => {
-        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
-        const reqNoPermission = {
-          ...req,
-          middleware: {
-            ...req.middleware,
-            permissions: {
-              cellMove: {
-                edit: false,
-              },
-            },
-          },
-        }
+      it('should not display the "Current location" section or action buttons for users without move cell permission', async () => {
+        mockPermissionCheck(PrisonerBaseLocationPermission.move_cell, false)
 
-        await controller.displayLocationDetails(reqNoPermission, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
 
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
@@ -272,3 +263,7 @@ describe('Prisoner Location Details', () => {
     isReleased: false,
   }
 })
+
+function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
+  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
+}
