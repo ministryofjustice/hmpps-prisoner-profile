@@ -3,8 +3,6 @@ import type Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { type HmppsUser } from '../interfaces/HmppsUser'
 import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewAccessStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
-import getCaseNotesAccessStatusCode from './utils/permissions/access/getCaseNotesAccessStatusCode'
-import getSensitiveCaseNotesPermissions from './utils/permissions/getSensitiveCaseNotesPermissions'
 import type PermissionItem from './interfaces/permissionsService/PermissionItem'
 import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/getActiveCaseLoadOnlyAccessStatusCode'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
@@ -37,16 +35,6 @@ export interface Permissions {
 export default class PermissionsService {
   public getMoneyPermissions(user: HmppsUser, prisoner: Prisoner, _clientToken?: string): Permissions {
     return { accessCode: getMoneyAccessStatusCode(user, prisoner) }
-  }
-
-  public getCaseNotesPermissions(user: HmppsUser, prisoner: Prisoner, _clientToken?: string): Permissions {
-    const accessCode = getCaseNotesAccessStatusCode(user, prisoner)
-    if (accessCode !== HmppsStatusCode.OK) return { accessCode }
-
-    return {
-      accessCode,
-      sensitiveCaseNotes: getSensitiveCaseNotesPermissions(user),
-    }
   }
 
   public getStandardAccessPermission(user: HmppsUser, prisoner: Prisoner): Permissions {

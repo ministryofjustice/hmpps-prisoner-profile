@@ -4,8 +4,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewAccessStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
-import getCaseNotesAccessStatusCode from './utils/permissions/access/getCaseNotesAccessStatusCode'
-import getSensitiveCaseNotesPermissions from './utils/permissions/getSensitiveCaseNotesPermissions'
 import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/getActiveCaseLoadOnlyAccessStatusCode'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
@@ -17,11 +15,6 @@ jest.mock('./utils/permissions/access/getOverviewAccessStatusCode', () => ({
 }))
 
 jest.mock('./utils/permissions/access/getMoneyAccessStatusCode', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
-
-jest.mock('./utils/permissions/access/getCaseNotesAccessStatusCode', () => ({
   __esModule: true,
   default: jest.fn(),
 }))
@@ -72,35 +65,6 @@ describe('permissionsService', () => {
 
       expect(permissions).toEqual({
         accessCode: statusCode,
-      })
-    })
-  })
-
-  describe('getCaseNotesPermissions', () => {
-    it.each([
-      HmppsStatusCode.RESTRICTED_PATIENT,
-      HmppsStatusCode.NOT_IN_CASELOAD,
-      HmppsStatusCode.PRISONER_IS_TRANSFERRING,
-      HmppsStatusCode.PRISONER_IS_RELEASED,
-    ])('should return just the access code if it is %s', statusCode => {
-      ;(getCaseNotesAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
-
-      const permissions = service.getCaseNotesPermissions(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: statusCode,
-      })
-    })
-
-    it('should retrieve the sensitive case notes permissions if access code is HmppsStatusCode.OK', () => {
-      ;(getCaseNotesAccessStatusCode as jest.Mock).mockReturnValue(HmppsStatusCode.OK)
-      ;(getSensitiveCaseNotesPermissions as jest.Mock).mockReturnValue('sensitive case notes')
-
-      const permissions = service.getCaseNotesPermissions(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: HmppsStatusCode.OK,
-        sensitiveCaseNotes: 'sensitive case notes',
       })
     })
   })

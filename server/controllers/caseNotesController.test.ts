@@ -1,4 +1,10 @@
 import { NextFunction } from 'express'
+import {
+  CaseNotesPermission,
+  isGranted,
+  PrisonerPermission,
+  PrisonerPermissions,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
@@ -22,8 +28,12 @@ let res: any
 let next: NextFunction
 let controller: any
 
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/caseNotesService.ts')
 jest.mock('../data/prisonApiClient.ts')
+
+const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
+const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Case Notes Controller', () => {
   let prisonApiClient: PrisonApiClient
@@ -59,13 +69,6 @@ describe('Case Notes Controller', () => {
         alertSummaryData: {
           alertFlags: [],
         },
-        permissions: {
-          sensitiveCaseNotes: {
-            view: false,
-            edit: false,
-            delete: false,
-          },
-        },
       },
       path: 'case-notes',
       flash: jest.fn(),
@@ -73,6 +76,7 @@ describe('Case Notes Controller', () => {
     res = {
       locals: {
         user,
+        prisonerPermissions,
       },
       render: jest.fn(),
       redirect: jest.fn(),
@@ -82,6 +86,8 @@ describe('Case Notes Controller', () => {
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getCaseNotesUsage = jest.fn(async () => caseNoteUsageMock)
     controller = new CaseNotesController(() => prisonApiClient, new CaseNotesService(null), auditServiceMock())
+    mockPermissionCheck(CaseNotesPermission.read_sensitive, false)
+    mockPermissionCheck(CaseNotesPermission.edit_sensitive, false)
   })
 
   describe('displayCaseNotes', () => {
@@ -144,22 +150,9 @@ describe('Case Notes Controller', () => {
       })
       jest.spyOn(headerMappers, 'mapHeaderData')
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+      mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
 
-      const reqWithPermission = {
-        ...req,
-        middleware: {
-          ...req.middleware,
-          permissions: {
-            sensitiveCaseNotes: {
-              view: true,
-              edit: false,
-              delete: false,
-            },
-          },
-        },
-      }
-
-      await controller.displayCaseNotes()(reqWithPermission, res)
+      await controller.displayCaseNotes()(req, res)
 
       expect(getCaseNotesSpy).toHaveBeenCalledWith({
         token: req.middleware.clientToken,
@@ -285,6 +278,8 @@ describe('Case Notes Controller', () => {
     })
 
     it('should not permit creation of a case note with wrong type', async () => {
+      mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
+
       const caseNoteForm = {
         type: 'REPORTS',
         subType: 'REP_IEP',
@@ -294,23 +289,10 @@ describe('Case Notes Controller', () => {
         minutes: '30',
       }
       req = {
-        params: {
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        },
+        ...req,
         body: {
           ...caseNoteForm,
           refererUrl: 'http://referer',
-        },
-        flash: jest.fn(),
-        middleware: {
-          ...req.middleware,
-          permissions: {
-            sensitiveCaseNotes: {
-              view: true,
-              edit: false,
-              delete: false,
-            },
-          },
         },
       }
 
@@ -368,22 +350,9 @@ describe('Case Notes Controller', () => {
     it('should display update page for a sensitive case note for the appropriate permissions', async () => {
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
       jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      mockPermissionCheck(CaseNotesPermission.edit_sensitive, true)
 
-      const reqWithPermission = {
-        ...req,
-        middleware: {
-          ...req.middleware,
-          permissions: {
-            sensitiveCaseNotes: {
-              view: false,
-              edit: true,
-              delete: false,
-            },
-          },
-        },
-      }
-
-      await controller.displayUpdateCaseNote()(reqWithPermission, res, next)
+      await controller.displayUpdateCaseNote()(req, res, next)
 
       expect(res.render).toHaveBeenCalled()
     })
@@ -438,32 +407,20 @@ describe('Case Notes Controller', () => {
     })
 
     it('should permit update of a sensitive case note for the appropriate permissions', async () => {
+      mockPermissionCheck(CaseNotesPermission.edit_sensitive, true)
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
-      const reqWithPermission = {
+      const reqWithBody = {
         ...req,
-        params: {
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        },
         body: {
           text: 'Note text',
           refererUrl: 'http://referer',
-        },
-        middleware: {
-          ...req.middleware,
-          permissions: {
-            sensitiveCaseNotes: {
-              view: false,
-              edit: true,
-              delete: false,
-            },
-          },
         },
       }
 
       const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
       jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
 
-      await controller.postUpdate()(reqWithPermission, res, next)
+      await controller.postUpdate()(reqWithBody, res, next)
 
       expect(updateCaseNoteSpy).toHaveBeenCalled()
     })
@@ -492,3 +449,7 @@ describe('Case Notes Controller', () => {
     })
   })
 })
+
+function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
+  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
+}
