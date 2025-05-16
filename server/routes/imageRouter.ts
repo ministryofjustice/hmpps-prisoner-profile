@@ -1,11 +1,11 @@
 import { NextFunction, Request, RequestHandler, Response, Router } from 'express'
 import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
+import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
-import permissionsGuard from '../middleware/permissionsGuard'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { formatName, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -26,6 +26,7 @@ export default function imageRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const { prisonPermissionsService } = services
   const imageController = new ImageController(
     services.dataAccess.personIntegrationApiClientBuilder,
     services.dataAccess.prisonerProfileApiClientBuilder,
@@ -51,7 +52,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
@@ -95,7 +96,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/all`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {
       const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
@@ -150,7 +151,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     buildBreadcrumbsAndReferer(),
     imageController.updateProfileImage().newImage.get,
@@ -160,7 +161,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     dpsComponents.getPageComponents({
       logger,
@@ -179,7 +180,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/submit`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     dpsComponents.getPageComponents({
       logger,
@@ -194,7 +195,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImageWithheld }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     buildBreadcrumbsAndReferer(),
     imageController.updateProfileImage().newWithheldImage.get,
@@ -204,7 +205,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.PostEditProfileImageWithheld }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     buildBreadcrumbsAndReferer(),
     imageController.updateProfileImage().newWithheldImage.post,

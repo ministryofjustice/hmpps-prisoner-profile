@@ -158,7 +158,7 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
-  const permissionsService = new PermissionsService(userService)
+  const permissionsService = new PermissionsService()
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
