@@ -15,7 +15,7 @@ export default class UpdateCaseNotePage extends Page {
 
   errorBlock = (): PageElement => cy.get('.govuk-error-summary')
 
-  omicWarning = (): PageElement => cy.get('[data-qa=omic-open-warning]')
+  typeWarning = (): PageElement => cy.get('[data-qa=open-warning]')
 
   omicHint = (): PageElement => cy.get('[data-qa=omic-open-hint]')
 }
