@@ -3,7 +3,6 @@ import PermissionsService from '../../server/services/permissionsService'
 
 export const permissionsServiceMock = (): Interface<PermissionsService> => ({
   getMoneyPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
-  getCaseNotesPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
   getProbationDocumentsPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
   getStandardAccessPermission: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
   getAppointmentPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
