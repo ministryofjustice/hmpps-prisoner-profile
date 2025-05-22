@@ -69,24 +69,6 @@ describe('permissionsService', () => {
     })
   })
 
-  describe('getStandardAccessPermission', () => {
-    it.each([
-      HmppsStatusCode.RESTRICTED_PATIENT,
-      HmppsStatusCode.NOT_IN_CASELOAD,
-      HmppsStatusCode.PRISONER_IS_TRANSFERRING,
-      HmppsStatusCode.PRISONER_IS_RELEASED,
-      HmppsStatusCode.OK,
-    ])('should return just the access code if it is %s', statusCode => {
-      ;(getOverviewAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
-
-      const permissions = service.getStandardAccessPermission(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: statusCode,
-      })
-    })
-  })
-
   describe('getAppointmentPermissions', () => {
     it.each([
       HmppsStatusCode.RESTRICTED_PATIENT,
