@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { CaseNotesPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import CaseNotesController from '../controllers/caseNotesController'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -8,13 +9,13 @@ import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { UpdateCaseNoteValidator } from '../validators/updateCaseNoteValidator'
-import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
   const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const { prisonPermissionsService } = services
 
   const caseNotesController = new CaseNotesController(
     services.dataAccess.prisonApiClientBuilder,
@@ -26,7 +27,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/case-notes`,
     auditPageAccessAttempt({ services, page: Page.CaseNotes }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getCaseNotesPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.read] }),
     caseNotesController.displayCaseNotes(),
   )
 
@@ -34,7 +35,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.AddCaseNote }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getCaseNotesPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.edit] }),
     caseNotesController.displayAddCaseNote(),
   )
 
@@ -42,7 +43,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getCaseNotesPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.edit] }),
     validationMiddleware([CaseNoteValidator]),
     caseNotesController.post(),
   )
@@ -51,7 +52,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.UpdateCaseNote }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getCaseNotesPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.edit] }),
     caseNotesController.displayUpdateCaseNote(),
   )
 
@@ -59,7 +60,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.PostUpdateCaseNote }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getCaseNotesPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.edit] }),
     validationMiddleware([UpdateCaseNoteValidator]),
     caseNotesController.postUpdate(),
   )
