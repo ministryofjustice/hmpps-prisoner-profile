@@ -136,7 +136,7 @@
     "redis": "^4.7.1",
     "superagent": "^9.0.2",
     "url-value-parser": "^2.2.0",
-    "uuid": "^9.0.1"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
