@@ -99,7 +99,7 @@
   "dependencies": {
     "@apollo/client": "3.13.8",
     "@aws-sdk/client-sqs": "^3.812.0",
-    "@contentful/rich-text-html-renderer": "^16.6.10",
+    "@contentful/rich-text-html-renderer": "^17.0.0",
     "@contentful/rich-text-types": "^16.8.5",
     "@ministryofjustice/frontend": "^2.2.5",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1-alpha.4",
