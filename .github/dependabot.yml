@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    ignore:
+      - dependency-name: "@types/node"
+        versions:
+          - ">=23"
+    schedule:
+      interval: weekly
+      day: wednesday
+    groups:
+      development:
+        dependency-type: "development"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: wednesday
