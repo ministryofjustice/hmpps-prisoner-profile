@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { isGranted, PrisonerBaseLocationPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName } from '../utils/utils'
@@ -24,7 +25,8 @@ export default class LocationDetailsController {
     const { prisonerNumber, bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
     const profileUrl = `/prisoner/${prisonerNumber}`
-    const { clientToken, permissions } = req.middleware
+    const { clientToken } = req.middleware
+    const { prisonerPermissions } = res.locals
 
     const isTransfer = prisonId === 'TRN'
     const isReleased = prisonId === 'OUT'
@@ -39,7 +41,7 @@ export default class LocationDetailsController {
     const currentLocation = !isInactiveBooking && locationDetailsLatestFirst[0]
     const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
 
-    const canViewCellMoveButton = permissions.cellMove?.edit
+    const canViewCellMoveButton = isGranted(PrisonerBaseLocationPermission.move_cell, prisonerPermissions)
     const canViewMoveToReceptionButton = canViewCellMoveButton && currentLocation?.location !== 'Reception'
     const receptionIsFull =
       canViewMoveToReceptionButton && (await this.locationDetailsService.isReceptionFull(clientToken, prisonId))

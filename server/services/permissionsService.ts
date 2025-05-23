@@ -5,7 +5,6 @@ import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewA
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
 import type PermissionItem from './interfaces/permissionsService/PermissionItem'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
-import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -50,15 +49,5 @@ export default class PermissionsService {
     const accessCode = alertsPermissions?.edit ? HmppsStatusCode.OK : HmppsStatusCode.NOT_FOUND
 
     return { accessCode, alerts: alertsPermissions }
-  }
-
-  public getLocationPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
-    const accessCode = getOverviewAccessStatusCode(user, prisoner, { allowGlobal: false })
-    if (accessCode !== HmppsStatusCode.OK) return { accessCode }
-
-    return {
-      accessCode,
-      cellMove: getCellMovePermissions(user),
-    }
   }
 }
