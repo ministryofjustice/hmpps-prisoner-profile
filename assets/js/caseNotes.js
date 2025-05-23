@@ -1,5 +1,3 @@
-const subTypesShowWarning = ['OMIC.OPEN_COMM', 'KA.KE', 'KA.KS']
-
 const WARNING = {
   'OMIC.OPEN_COMM': 'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
   'KA.KE': 'Use this option to record an activity related to key work that was not a full session. This could include recording when a session did not take place or any other interaction with an allocated prisoner.',
@@ -39,7 +37,7 @@ function toggleOpenCaseNoteWarning() {
     openCaseNoteHint.forEach(el => el.classList.add('is-visible'))
   }
 
-  if (subTypesShowWarning.includes(typeSubTypeKey)) {
+  if (Object.keys(WARNING).includes(typeSubTypeKey)) {
     openCaseNoteWarning.forEach(el => el.classList.add('is-visible'))
     document.querySelector('.case-notes-open-warning > strong').innerText = WARNING[typeSubTypeKey]
   }
