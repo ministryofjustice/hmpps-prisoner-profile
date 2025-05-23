@@ -55,10 +55,10 @@
 
             {% if isOMICOpen %}
                 {{ govukWarningText({
-                    text: "This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.",
+                    text: "",
                     iconFallbackText: "Warning",
                     classes: 'govuk-grid-column-full',
-                    attributes: { 'data-qa': 'omic-open-warning'}
+                    attributes: { 'data-qa': 'open-warning'}
                 }) }}
 
                 {% set hint = {

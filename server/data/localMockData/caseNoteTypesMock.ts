@@ -53,4 +53,24 @@ export const caseNoteTypesMock: CaseNoteType[] = [
       },
     ],
   },
+  {
+    code: 'KA',
+    description: 'Key Worker Activity',
+    subCodes: [
+      {
+        code: 'KE',
+        description: 'Key Worker Entry',
+        active: true,
+        sensitive: false,
+        restrictedUse: false,
+      },
+      {
+        code: 'KS',
+        description: 'Key Worker Session',
+        active: true,
+        sensitive: false,
+        restrictedUse: false,
+      },
+    ],
+  },
 ]

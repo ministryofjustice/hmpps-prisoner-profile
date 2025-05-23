@@ -69,10 +69,10 @@
             }) }}
 
             {{ govukWarningText({
-                text: "This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.",
+                text: "",
                 iconFallbackText: "Warning",
-                classes: 'case-notes-omic-open case-notes-omic-open-warning',
-                attributes: { 'data-qa': 'omic-open-warning'}
+                classes: 'case-notes-open case-notes-open-warning',
+                attributes: { 'data-qa': 'open-warning'}
             }) }}
 
             {{ govukCharacterCount({
@@ -88,7 +88,7 @@
                 },
                 hint: {
                     text: 'Do not save any sensitive information as an OMiC open case note.',
-                    classes: 'case-notes-omic-open',
+                    classes: 'case-notes-open case-notes-open-hint',
                     attributes: { 'data-qa': 'omic-open-hint'}
                 }
             }) }}

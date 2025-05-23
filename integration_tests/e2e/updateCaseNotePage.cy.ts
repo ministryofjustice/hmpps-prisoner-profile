@@ -70,7 +70,7 @@ context('Update Case Note Page', () => {
       })
 
       it('should show OMiC Open Case Note warning and hint', () => {
-        updateCaseNotePage.omicWarning().should('be.visible')
+        updateCaseNotePage.typeWarning().should('be.visible')
         updateCaseNotePage.omicHint().should('be.visible')
       })
     })

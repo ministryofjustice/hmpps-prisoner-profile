@@ -1,5 +1,5 @@
 .case-notes-behaviour-prompt,
-.case-notes-omic-open {
+.case-notes-open {
   display: none;
 
   &.is-visible {
@@ -7,7 +7,7 @@
   }
 }
 
-.case-notes-omic-open-warning {
+.case-notes-open-warning {
   max-width: 28em;
 }
 

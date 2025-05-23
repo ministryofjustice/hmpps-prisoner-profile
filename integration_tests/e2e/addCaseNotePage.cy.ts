@@ -67,8 +67,42 @@ context('Add Case Note Page', () => {
       it('should show OMiC Open Case Note warning and hint', () => {
         addCaseNotePage.typeField().select('OMiC')
         addCaseNotePage.subTypeField().select('Open Case Note')
-        addCaseNotePage.omicWarning().should('be.visible')
+        addCaseNotePage
+          .typeWarning()
+          .should(
+            'contain.text',
+            'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
+          )
+        addCaseNotePage.typeWarning().should('be.visible')
         addCaseNotePage.omicHint().should('be.visible')
+      })
+    })
+
+    context('Choosing Key Worker Activity type', () => {
+      it('should show Key Worker Entry warning and hint', () => {
+        addCaseNotePage.typeField().select('Key Worker Activity')
+        addCaseNotePage.subTypeField().select('Key Worker Entry')
+        addCaseNotePage.typeWarning().should('be.visible')
+        addCaseNotePage
+          .typeWarning()
+          .should(
+            'contain.text',
+            'Use this option to record an activity related to key work that was not a full session. This could include recording when a session did not take place or any other interaction with an allocated prisoner.',
+          )
+        addCaseNotePage.omicHint().should('not.be.visible')
+      })
+
+      it('should show Key Worker Session warning and hint', () => {
+        addCaseNotePage.typeField().select('Key Worker Activity')
+        addCaseNotePage.subTypeField().select('Key Worker Session')
+        addCaseNotePage.typeWarning().should('be.visible')
+        addCaseNotePage
+          .typeWarning()
+          .should(
+            'contain.text',
+            'You should only use this option when you’ve completed a full key worker session with a prisoner. Any other interaction should be recorded as an entry.',
+          )
+        addCaseNotePage.omicHint().should('not.be.visible')
       })
     })
 

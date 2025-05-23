@@ -103,6 +103,7 @@ HEALTH_AND_MEDICATION_API_URL=https://health-and-medication-api-dev.hmpps.servic
 ALERTS_API_URL=https://alerts-api-dev.hmpps.service.justice.gov.uk
 PERSON_INTEGRATION_API_URL=https://person-integration-api-dev.hmpps.service.justice.gov.uk
 PERSONAL_RELATIONSHIPS_API_URL=https://personal-relationships-api-dev.hmpps.service.justice.gov.uk
+CSIP_API_URL=https://csip-api-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>
