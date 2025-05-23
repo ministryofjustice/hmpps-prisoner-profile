@@ -4,7 +4,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewAccessStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
-import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/getActiveCaseLoadOnlyAccessStatusCode'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
@@ -62,24 +61,6 @@ describe('permissionsService', () => {
       ;(getMoneyAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
 
       const permissions = service.getMoneyPermissions(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: statusCode,
-      })
-    })
-  })
-
-  describe('getAppointmentPermissions', () => {
-    it.each([
-      HmppsStatusCode.RESTRICTED_PATIENT,
-      HmppsStatusCode.NOT_IN_CASELOAD,
-      HmppsStatusCode.PRISONER_IS_TRANSFERRING,
-      HmppsStatusCode.PRISONER_IS_RELEASED,
-      HmppsStatusCode.OK,
-    ])('should return just the access code if it is %s', statusCode => {
-      ;(getActiveCaseLoadOnlyAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
-
-      const permissions = service.getAppointmentPermissions(prisonUserMock, PrisonerMockDataA)
 
       expect(permissions).toEqual({
         accessCode: statusCode,

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
+import { prisonerPermissionsGuard, PrisonerSchedulePermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
 import AppointmentController from '../controllers/appointmentController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
@@ -10,7 +11,6 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import { getRequest, postRequest } from './routerUtils'
-import permissionsGuard from '../middleware/permissionsGuard'
 import NotFoundError from '../utils/notFoundError'
 
 export default function appointmentRouter(services: Services): Router {
@@ -18,6 +18,7 @@ export default function appointmentRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const { prisonPermissionsService } = services
 
   const appointmentController = new AppointmentController(
     services.appointmentService,
@@ -54,22 +55,28 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayAddAppointment(),
   )
+
   post(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
     validationMiddleware([AppointmentValidator]),
     appointmentController.post(),
   )
+
   get(
     `${basePath}/edit-appointment/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.EditAppointment }),
     isEditAppointmentEnabled,
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayAddAppointment(),
   )
   post(
@@ -83,7 +90,9 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayAppointmentConfirmation(),
   )
 
@@ -91,7 +100,9 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayPrePostAppointments(),
   )
   post(
@@ -105,7 +116,9 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.EditPrePostAppointments }),
     isEditAppointmentEnabled,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayPrePostAppointments(),
   )
   post(
@@ -119,7 +132,9 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/prepost-appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayPrePostAppointmentConfirmation(),
   )
 
@@ -127,7 +142,9 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/movement-slips`,
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.displayPrisonerMovementSlips(),
   )
 
@@ -139,7 +156,9 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: ApiAction.OffenderEvents }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services, { minimal: true }),
-    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.getOffenderEvents(),
   )
 
