@@ -4,10 +4,8 @@ import { type HmppsUser } from '../interfaces/HmppsUser'
 import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewAccessStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
 import type PermissionItem from './interfaces/permissionsService/PermissionItem'
-import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/getActiveCaseLoadOnlyAccessStatusCode'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
-import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -37,10 +35,6 @@ export default class PermissionsService {
     return { accessCode: getMoneyAccessStatusCode(user, prisoner) }
   }
 
-  public getAppointmentPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
-    return { accessCode: getActiveCaseLoadOnlyAccessStatusCode(user, prisoner) }
-  }
-
   public getAlertsPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
     const accessCode = getOverviewAccessStatusCode(user, prisoner)
     if (accessCode !== HmppsStatusCode.OK) return { accessCode }
@@ -66,9 +60,5 @@ export default class PermissionsService {
       accessCode,
       cellMove: getCellMovePermissions(user),
     }
-  }
-
-  public getProbationDocumentsPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
-    return { accessCode: getProbationDocumentsAccessStatusCode(user, prisoner) }
   }
 }
