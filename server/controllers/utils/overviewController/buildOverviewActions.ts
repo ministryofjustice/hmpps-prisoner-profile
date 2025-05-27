@@ -1,4 +1,15 @@
 import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import {
+  CaseNotesPermission,
+  isGranted,
+  PathfinderPermission,
+  PersonInterventionsPermission,
+  PersonPrisonCategoryPermission,
+  PrisonerPermissions,
+  PrisonerSchedulePermission,
+  SOCPermission,
+  UseOfForcePermission,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { Icon } from '../../../data/enums/icon'
@@ -6,7 +17,6 @@ import { includesActiveCaseLoad } from '../../../utils/utils'
 import conf from '../../../config'
 import isServiceNavEnabled from '../../../utils/isServiceEnabled'
 import { HmppsUser } from '../../../interfaces/HmppsUser'
-import { Permissions } from '../../../services/permissionsService'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 
 export default (
@@ -16,23 +26,14 @@ export default (
   user: HmppsUser,
   config: typeof conf,
   feComponentsSharedData: HeaderFooterSharedData | undefined,
-  permissions: Permissions,
+  permissions: PrisonerPermissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
   const addAppointmentUrl = config.featureToggles.profileAddAppointmentEnabled
     ? `/prisoner/${prisonerData.prisonerNumber}/add-appointment`
     : `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`
 
-  if (!config.featureToggles.courCasesSummaryEnabled && permissions.calculateReleaseDates?.edit) {
-    actions.push({
-      text: 'Calculate release dates',
-      icon: Icon.CalculateReleaseDates,
-      url: `${config.serviceUrls.calculateReleaseDates}/?prisonId=${prisonerData.prisonerNumber}`,
-      dataQA: 'calculate-release-dates-action-link',
-    })
-  }
-
-  if (permissions.caseNotes?.edit) {
+  if (isGranted(CaseNotesPermission.edit, permissions)) {
     actions.push({
       text: 'Add case note',
       icon: Icon.AddCaseNote,
@@ -41,7 +42,7 @@ export default (
     })
   }
 
-  if (permissions.keyWorker?.edit) {
+  if (user.authSource === 'nomis' && user.keyWorkerAtPrisons?.[prisonerData.prisonId]) {
     actions.push({
       text: 'Add key worker session',
       icon: Icon.AddKeyWorkerSession,
@@ -50,7 +51,7 @@ export default (
     })
   }
 
-  if (permissions.appointment?.edit) {
+  if (isGranted(PrisonerSchedulePermission.edit_appointment, permissions)) {
     actions.push({
       text: 'Add appointment',
       icon: Icon.AddAppointment,
@@ -58,8 +59,10 @@ export default (
       dataQA: 'add-appointment-action-link',
     })
   }
-
-  if (permissions.useOfForce?.edit && !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)) {
+  if (
+    isGranted(UseOfForcePermission.edit, permissions) &&
+    !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)
+  ) {
     actions.push({
       text: 'Report use of force',
       icon: Icon.ReportUseOfForce,
@@ -68,7 +71,10 @@ export default (
     })
   }
 
-  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsSharedData)) {
+  if (
+    isGranted(PrisonerSchedulePermission.edit_activity, permissions) &&
+    isServiceNavEnabled('activities', feComponentsSharedData)
+  ) {
     actions.push({
       text: 'Log an activity application',
       icon: Icon.LogActivityApplication,
@@ -77,7 +83,7 @@ export default (
     })
   }
 
-  if (permissions.pathfinder?.edit && !pathfinderNominal) {
+  if (isGranted(PathfinderPermission.edit, permissions) && !pathfinderNominal) {
     actions.push({
       text: 'Refer to Pathfinder',
       icon: Icon.ReferToPathfinder,
@@ -86,7 +92,7 @@ export default (
     })
   }
 
-  if (permissions.soc?.edit && !socNominal) {
+  if (isGranted(SOCPermission.edit, permissions) && !socNominal) {
     actions.push({
       text: 'Add to SOC',
       icon: Icon.AddToSOC,
@@ -95,7 +101,7 @@ export default (
     })
   }
 
-  if (permissions.offenderCategorisation?.edit) {
+  if (isGranted(PersonPrisonCategoryPermission.edit, permissions)) {
     actions.push({
       text: 'Manage category',
       icon: Icon.ManageCategory,
@@ -104,12 +110,28 @@ export default (
     })
   }
 
-  if (isServiceNavEnabled('csipUI', feComponentsSharedData) && permissions.csip?.view) {
+  if (
+    isGranted(PersonInterventionsPermission.read_csip, permissions) &&
+    isServiceNavEnabled('csipUI', feComponentsSharedData)
+  ) {
     actions.push({
       text: 'Make CSIP referral',
       icon: Icon.MakeCSIPReferral,
       url: `${config.serviceUrls.csip}/prisoners/${prisonerData.prisonerNumber}/referral/start`,
       dataQA: 'make-csip-referral-action-link',
+    })
+  }
+
+  if (
+    isGranted(PrisonerSchedulePermission.edit_activity, permissions) &&
+    config.featureToggles.manageAllocationsEnabled &&
+    isServiceNavEnabled('activities', feComponentsSharedData)
+  ) {
+    actions.push({
+      text: 'Manage activity allocations',
+      icon: Icon.ManageAllocations,
+      url: `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`,
+      dataQA: 'manage-allocations-link',
     })
   }
 

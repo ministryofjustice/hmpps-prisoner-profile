@@ -4,8 +4,12 @@ let cropping = false
 let croppingInit = false
 let constrainImage = false
 
-const MAX_WIDTH = 427
-const MAX_HEIGHT = 570
+// This is the dimensions of the canvas
+const FINAL_WIDTH = 480
+const FINAL_HEIGHT = 600
+
+const MAX_WIDTH = 221
+const MAX_HEIGHT = 276
 const RATIO = MAX_WIDTH / MAX_HEIGHT
 
 const uploadedPhoto = document.getElementById('photo-preview')
@@ -33,6 +37,21 @@ function setFormPhoto(file) {
   input.files = container.files
 }
 
+function withImageManipulation(callback) {
+  const cropperImage = document.querySelector('cropper-image')
+  cropperImage.rotatable = true
+  cropperImage.scalable = true
+  cropperImage.translatable = true
+  cropperImage.skewable = true
+
+  callback(cropperImage)
+
+  cropperImage.rotatable = false
+  cropperImage.scalable = false
+  cropperImage.translatable = false
+  cropperImage.skewable = false
+}
+
 function constrainedToImage(selection) {
   const cropperCanvas = document.querySelector('cropper-canvas')
   const image = document.querySelector('cropper-image')
@@ -55,7 +74,8 @@ function constrainedToImage(selection) {
 
 function setFormPhotoToCroppedResult() {
   const selector = document.querySelector('cropper-selection')
-  selector.$toCanvas().then(canvas => {
+  // The width and height the image gets scaled to in the API, this prevents the image becoming pixellated
+  selector.$toCanvas({ width: FINAL_WIDTH, height: FINAL_HEIGHT }).then(canvas => {
     canvas.toBlob(blob => {
       const file = new File([blob], fileName, {
         type: fileType,
@@ -74,23 +94,8 @@ function setFormPhotoToCroppedResult() {
 
 function setCropperListener(fileName, fileType) {
   const canvas = document.querySelector('cropper-canvas')
-  const selector = document.querySelector('cropper-selection')
   canvas.addEventListener('actionend', actionEvent => {
-    selector.$toCanvas().then(canvas => {
-      canvas.toBlob(blob => {
-        const file = new File([blob], fileName, {
-          type: fileType,
-          lastModified: new Date().getTime(),
-        })
-        const callback = dataUrl => {
-          document.getElementById('photo-preview').src = dataUrl
-        }
-        const a = new FileReader()
-        a.onload = e => callback(e.target.result)
-        a.readAsDataURL(blob)
-        setFormPhoto(file)
-      })
-    })
+    setFormPhotoToCroppedResult()
   })
 }
 
@@ -101,21 +106,16 @@ function setSelectionListener() {
   })
 }
 
-function toggleCrop(e) {
-  e.preventDefault()
+function toggleCrop() {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
-    document.getElementById('image-cropper-container').style.display = 'none'
-    document.getElementById('rotate-button-group').style.display = 'none'
+    document.getElementById('photo-cropper-container').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
-    document.getElementById('image-cropper-container').style.display = 'block'
-    document.getElementById('rotate-button-group').style.display = 'block'
+    document.getElementById('photo-cropper-container').style.display = 'block'
     cropping = true
     if (!croppingInit) {
-      document.querySelector('cropper-selection').$reset().$render()
-      document.querySelector('cropper-image').$center('contain')
       resetSelectionLocation()
       setSelectionListener()
       croppingInit = true
@@ -140,12 +140,12 @@ function resetSelectionLocation() {
   const selectionY = cropperImageRect.top - cropperCanvasRect.top
   if (heightWithMinWidth < MAX_HEIGHT) {
     // Scale the width so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, minWidth * 0.9)
+    selection.$change(selectionX, selectionY, minWidth * 0.9).$center()
   } else {
     // Set the height in the cases the width overflows the height
     const minHeight = Math.min(cropperImageRect.height, cropperCanvasRect.height)
     // Scale the height so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, 0, minHeight * 0.9)
+    selection.$change(selectionX, selectionY, 0, minHeight * 0.9).$center()
   }
 
   // Reenable constraining
@@ -153,22 +153,7 @@ function resetSelectionLocation() {
 }
 
 function rotateImage(degrees) {
-  const cropperImage = document.querySelector('cropper-image')
-  // ="Picture" initial-center-size="contain" rotatable skewable scalable translatable></cropper-image>
-  cropperImage.rotatable = true
-  cropperImage.scalable = true
-  cropperImage.translatable = true
-  cropperImage.skewable = true
-
-  console.log("???")
-
-  cropperImage.$rotate(`${degrees}deg`).$center('contain')
-
-  cropperImage.rotatable = false
-  cropperImage.scalable = false
-  cropperImage.translatable = false
-  cropperImage.skewable = false
-
+  withImageManipulation(cropperImage => cropperImage.$rotate(`${degrees}deg`).$center('contain'))
   resetSelectionLocation()
   setFormPhotoToCroppedResult()
 }
@@ -178,15 +163,16 @@ const rotateClockwise = e => {
   rotateImage(90)
 }
 
-const rotateAnticlockwise = e => {
-  e.preventDefault()
-  rotateImage(-90)
-}
-
 function setButtonListeners() {
-  document.getElementById('toggle-crop-button').addEventListener('click', toggleCrop)
-  document.getElementById('rotate-clockwise').addEventListener('click', rotateClockwise)
-  document.getElementById('rotate-anti-clockwise').addEventListener('click', rotateAnticlockwise)
+  document.querySelectorAll('.hmpps-button__toggle-crop').forEach(button =>
+    button.addEventListener('click', e => {
+      e.preventDefault()
+      toggleCrop()
+    }),
+  )
+  document
+    .querySelectorAll('.hmpps-button__rotate-clockwise')
+    .forEach(button => button.addEventListener('click', rotateClockwise))
 }
 
 function pageInit() {
@@ -197,4 +183,10 @@ function pageInit() {
   setButtonListeners()
 }
 
-pageInit()
+window.onload = () => {
+  pageInit()
+  toggleCrop()
+  withImageManipulation(cropperImage => cropperImage.$center('contain'))
+  resetSelectionLocation()
+  setFormPhotoToCroppedResult()
+}

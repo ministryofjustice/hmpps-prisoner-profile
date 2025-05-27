@@ -129,6 +129,10 @@ export default class LanguagesController {
         formValues.interpreterRequired = undefined
       }
 
+      const previousLanguagePreferences = (
+        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      )?.languagePreferences
+
       await this.languagesService.updateMainLanguage(
         clientToken,
         res.locals.user as PrisonUser,
@@ -148,7 +152,7 @@ export default class LanguagesController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.EditMainLanguage,
-          details: { formValues },
+          details: { languagePreferences: formValues, previousLanguagePreferences },
         })
         .catch(error => logger.error(error))
 
@@ -238,7 +242,14 @@ export default class LanguagesController {
 
       const errors = req.errors || []
 
-      const invalidInput = this.validateSecondaryLanguageRequest(formValues, languageCode, errors)
+      const previousSecondaryLanguages = (
+        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      )?.secondaryLanguages
+
+      const languageDescription = previousSecondaryLanguages.find(lang => lang.language.code === languageCode)?.language
+        ?.description
+
+      const invalidInput = this.validateSecondaryLanguageRequest(formValues, languageCode, languageDescription, errors)
 
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
@@ -279,13 +290,15 @@ export default class LanguagesController {
         fieldName: 'languages',
       })
 
+      const { languageError: unused, ...cleanFormValues } = formValues
+
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.EditOtherLanguages,
-          details: { formValues },
+          details: { secondaryLanguages: cleanFormValues, previousSecondaryLanguages },
         })
         .catch(error => logger.error(error))
       return res.redirect(
@@ -342,10 +355,11 @@ export default class LanguagesController {
       languageError?: string
     },
     languageCode: string,
+    languageDescription: string,
     errors: HmppsError[],
   ) {
     const [errorType, invalidInput] = formValues.languageError?.split(':') ?? []
-    if (errorType === 'DUPLICATE') {
+    if (errorType === 'DUPLICATE' && languageDescription !== invalidInput) {
       errors.push({
         text: 'Language must be different from the saved languages',
         href: '#language',

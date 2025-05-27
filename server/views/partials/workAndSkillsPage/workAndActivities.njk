@@ -34,6 +34,13 @@
               </p>
             {%- endcall -%}
           {% endif %}
+          {% if canManageAllocations %}
+            <p class="govuk-body">
+              <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="{{ manageAllocationsLinkUrl }}"
+                >Manage {{ workAndSkillsPrisonerName | apostrophe }} activity allocations</a
+              >
+            </p>
+          {% endif %}
         </div>
       </div>
 

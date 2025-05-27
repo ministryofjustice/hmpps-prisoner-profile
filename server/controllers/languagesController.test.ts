@@ -169,7 +169,10 @@ describe('LanguagesController', () => {
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditMainLanguage,
-        details: { formValues },
+        details: {
+          languagePreferences: formValues,
+          previousLanguagePreferences: CommunicationNeedsDtoMock.languagePreferences,
+        },
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
@@ -387,7 +390,9 @@ describe('LanguagesController', () => {
   })
 
   describe('submitUpdateOtherLanguages', () => {
-    const formValues: SecondaryLanguageRequest = {
+    const formValues: SecondaryLanguageRequest & {
+      languageError?: string
+    } = {
       language: 'ARA',
       canRead: true,
       canWrite: true,
@@ -424,7 +429,10 @@ describe('LanguagesController', () => {
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditOtherLanguages,
-        details: { formValues },
+        details: {
+          secondaryLanguages: formValues,
+          previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
+        },
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
@@ -458,6 +466,41 @@ describe('LanguagesController', () => {
       ])
       expect(req.flash).toHaveBeenCalledWith('invalidInput', 'English')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/other-languages`)
+    })
+
+    it('should validate that skills can be changed without changing language', async () => {
+      formValues.language = 'FRE'
+
+      req.body = {
+        language: 'FRE',
+        languageSkills: ['canRead', 'canWrite', 'canSpeak'],
+        languageError: 'DUPLICATE:French',
+      }
+      req.params.languageCode = 'FRE'
+
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Languages updated',
+        type: FlashMessageType.success,
+        fieldName: 'languages',
+      })
+
+      const { languageError, ...cleanFormValues } = formValues
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditOtherLanguages,
+        details: {
+          secondaryLanguages: cleanFormValues,
+          previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
+        },
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
     })
 
     it('should validate that language is a valid language', async () => {

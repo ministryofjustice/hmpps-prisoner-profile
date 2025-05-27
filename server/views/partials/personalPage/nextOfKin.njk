@@ -35,66 +35,78 @@
 {% endmacro %}
 
 
-{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'next-of-kin-emergency-contacts' }] if editEnabled }) -%}
-  {% if not hasNextOfKin %}
-    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
-      <div class="govuk-grid-column-full">
-        {% if newArrival72 %}
-          <div class="not-entered-tag not-entered-tag--heading">Not entered</div>
-        {% endif %}
-        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-3">No next of kin</h3>
-        <p>No contact details have been entered.</p>
+{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'personal/next-of-kin-emergency-contacts' }] if editEnabled }) -%}
+  {% if nextOfKinAndEmergencyContacts.status === 'fulfilled'  %}
+    {% set hasNextOfKin = nextOfKinAndEmergencyContacts.value.hasNextOfKin %}
+    {% set hasEmergencyContact = nextOfKinAndEmergencyContacts.value.hasEmergencyContact %}
+    {% set contacts = nextOfKinAndEmergencyContacts.value.contacts %}
+
+    {% if not hasNextOfKin %}
+      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
+        <div class="govuk-grid-column-full">
+          {% if newArrival72 %}
+            <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
+          {% endif %}
+          <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1">No next of kin</h3>
+          <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
+        </div>
       </div>
-    </div>
-  {% endif %}
-  {% if not hasNextOfKin and not hasEmergencyContact %}
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
-  {% endif %}
-  {% if not hasEmergencyContact %}
-    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
-      <div class="govuk-grid-column-full">
-        {% if newArrival72 %}
-          <div class="not-entered-tag not-entered-tag--heading">Not entered</div>
-        {% endif %}
-        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-3">No emergency contact</h3>
-        <p>No contact details have been entered.</p>
+    {% endif %}
+    {% if not hasNextOfKin and not hasEmergencyContact %}
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+    {% endif %}
+    {% if not hasEmergencyContact %}
+      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
+        <div class="govuk-grid-column-full">
+          {% if newArrival72 %}
+            <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
+          {% endif %}
+          <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1">No emergency contact</h3>
+          <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
+        </div>
       </div>
-    </div>
-  {% endif %}
-  {% if hasNextOfKin != hasEmergencyContact %}
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
-  {% endif %}
-  {% for contact in nextOfKinAndEmergencyContacts %}
-    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
-      <div class="govuk-grid-column-full">
-        <div class="contact-status-bar">
-          <div class="contact-type-pills">
-            {% if contact.isNextOfKin %}
-            <div class="contact-type-pill contact-type-pill--next-of-kin" data-qa="next-of-kin">
-              <span>Next of kin</span>
+    {% endif %}
+    {% if hasNextOfKin !== hasEmergencyContact %}
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+    {% endif %}
+    {% for contact in contacts %}
+      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
+        <div class="govuk-grid-column-full">
+          <div class="contact-status-bar">
+            <div class="contact-type-pills">
+              {% if contact.isNextOfKin %}
+              <div class="contact-type-pill contact-type-pill--next-of-kin" data-qa="next-of-kin">
+                <span>Next of kin</span>
+              </div>
+              {% endif %}
+              {% if contact.isEmergencyContact %}
+              <div class="contact-type-pill contact-type-pill--emergency-contact" data-qa="emergency-contact">
+                <span>Emergency contact</span>
+              </div>
+              {% endif %}
             </div>
-            {% endif %}
-            {% if contact.isEmergencyContact %}
-            <div class="contact-type-pill contact-type-pill--emergency-contact" data-qa="emergency-contact">
-              <span>Emergency contact</span>
-            </div>
+            {% if editEnabled %}
+            <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact's details</a></div>
             {% endif %}
           </div>
-          {% if editEnabled %}
-          <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact's details</a></div>
-          {% endif %}
+          <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
+          <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
+          <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1 {{ 'hmpps-red-text' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
+          {{ govukDetails({
+            summaryText: "Additional details",
+            html: additionalDetails(contact)
+          }) }}
         </div>
-        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
-        <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
-        <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1 {{ 'hmpps-red-text' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
-        {{ govukDetails({
-          summaryText: "Additional details",
-          html: additionalDetails(contact)
-        }) }}
+      </div>
+      {% if not loop.last %}
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-api-error">
+      <div class="govuk-grid-column-full">
+        <p class="govuk-!-margin-bottom-5">{{ standardApiErrorText() }}</p>
       </div>
     </div>
-    {% if not loop.last %}
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
-    {% endif %}
-  {% endfor %}
+  {% endif %}
 {%- endcall -%}

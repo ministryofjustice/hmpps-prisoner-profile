@@ -29,6 +29,7 @@ import ReferenceDataService from './referenceData/referenceDataService'
 import {
   EnglandCountryReferenceDataCodeMock,
   MilitaryRecordsMock,
+  ReligionReferenceDataCodesMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import {
   HealthAndMedicationApiClient,
@@ -43,8 +44,22 @@ import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
-import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
-import { PersonalRelationshipsContactsDtoMock } from '../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsDomesticStatusDto,
+  PersonalRelationshipsDomesticStatusUpdateRequest,
+  PersonalRelationshipsNumberOfChildrenDto,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
+} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../data/localMockData/personalRelationshipsApiMock'
+import NextOfKinService from './nextOfKinService'
+import DomesticStatusService from './domesticStatusService'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -54,10 +69,12 @@ describe('PersonalPageService', () => {
   let curiousApiClient: CuriousApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
+  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
   let referenceDataService: ReferenceDataService
   let prisonService: PrisonService
   let metricsService: MetricsService
-  let personalRelationshipsApiClient: PersonalRelationshipsApiClient
+  let nextOfKinService: NextOfKinService
+  let domesticStatusService: DomesticStatusService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -83,6 +100,7 @@ describe('PersonalPageService', () => {
 
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
+    referenceDataService.getActiveReferenceDataCodes = jest.fn(async () => ReligionReferenceDataCodesMock)
 
     prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
     prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
@@ -91,7 +109,24 @@ describe('PersonalPageService', () => {
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
+      getContactCount: jest.fn(async () => ({ official: 1, social: 1 })),
+      getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      getDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
+      updateDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
+      createContact: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
     }
+
+    nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>
+    nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
+
+    domesticStatusService = new DomesticStatusService(
+      null,
+      referenceDataService,
+      metricsService,
+    ) as jest.Mocked<DomesticStatusService>
+    domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
   })
 
   const constructService = () =>
@@ -100,11 +135,13 @@ describe('PersonalPageService', () => {
       () => curiousApiClient,
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
+      () => personalRelationshipsApiClient,
       referenceDataService,
       prisonService,
       metricsService,
       () => Promise.resolve({ curiousApiToken: 'token' }),
-      () => personalRelationshipsApiClient,
+      nextOfKinService,
+      domesticStatusService,
     )
 
   describe('Getting information from the Prison API', () => {
@@ -182,7 +219,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
+          return service.get('token', PrisonerMockDataA, false, false, true, null, { fieldName: 'fullName' })
         }
 
         it('Handles no pseudonyms', async () => {
@@ -256,7 +293,9 @@ describe('PersonalPageService', () => {
               lastName: 'Last name',
             } as Alias,
           ]
-          const response = await service.get('token', prisonerData, false, false, null, { fieldName: 'full-name' })
+          const response = await service.get('token', prisonerData, false, false, true, null, {
+            fieldName: 'full-name',
+          })
           expect(response.personalDetails.aliases).toEqual([
             {
               alias: 'First Name Last Name',
@@ -278,11 +317,6 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.domesticAbuseVictim).toEqual('Not stated')
       })
 
-      it('Maps the number of children field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.numberOfChildren).toEqual('2')
-      })
-
       it('Maps the other nationalities field', async () => {
         const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.otherNationalities).toEqual('multiple nationalities field')
@@ -293,15 +327,9 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
-      describe.skip('Smoker or vaper', () => {
-        it.each([
-          // This isn't provided by the health mock at the moment so is 'Not entered'
-          [true, 'Not entered'],
-          [false, 'No'],
-        ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
-          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
-          expect(response.personalDetails.smokerOrVaper).toEqual(expectedValue)
-        })
+      it('Maps the smoker or vaper field', async () => {
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.smokerOrVaper).toEqual('No')
       })
 
       describe('Food allergies', () => {
@@ -380,6 +408,69 @@ describe('PersonalPageService', () => {
       })
     })
 
+    describe('Marriage or civil partnership status', () => {
+      it('Gets the status from the domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual(
+          PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
+        )
+      })
+
+      it('Handles null response from domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => null as PersonalRelationshipsDomesticStatusDto)
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual('Not entered')
+      })
+
+      it('Handles errors from domestic status service', async () => {
+        domesticStatusService.getDomesticStatus = jest.fn(async () => Promise.reject(new Error('error!')))
+
+        const response = await constructService().get('token', {
+          ...PrisonerMockDataA,
+          maritalStatus: 'something else',
+        })
+        expect(response.personalDetails.marriageOrCivilPartnership).toEqual('something else')
+      })
+    })
+
+    describe('Number of children', () => {
+      it('Gets the number of children from the Personal Relationships API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+          async () => PersonalRelationshipsNumberOfChildrenMock,
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual(
+          PersonalRelationshipsNumberOfChildrenMock.numberOfChildren,
+        )
+      })
+
+      it('Handles null response from API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+          async () => null as PersonalRelationshipsNumberOfChildrenDto,
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual('Not entered')
+      })
+
+      it('Handles errors from Personal Relationships API', async () => {
+        personalRelationshipsApiClient.getNumberOfChildren = jest.fn(async () => Promise.reject(Error('error!')))
+        prisonApiClient.getInmateDetail = jest.fn(async () =>
+          Promise.resolve({
+            ...inmateDetailMock,
+            profileInformation: [{ type: 'CHILD', resultValue: '5' }],
+          } as InmateDetail),
+        )
+
+        const response = await constructService().get('token', PrisonerMockDataA)
+        expect(response.personalDetails.numberOfChildren).toEqual('5')
+      })
+    })
+
     describe('Languages', () => {
       it('Maps the primary language and interpreter requirement', async () => {
         const response = await constructService().get('token', PrisonerMockDataA)
@@ -428,13 +519,12 @@ describe('PersonalPageService', () => {
         expect(personalDetails.fullName).toEqual(
           formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
         )
-        expect(personalDetails.marriageOrCivilPartnership).toEqual(PrisonerMockDataA.maritalStatus)
+        expect(personalDetails.marriageOrCivilPartnership).toEqual(
+          PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
+        )
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
         expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
         expect(personalDetails.countryOfBirth).toEqual(EnglandCountryReferenceDataCodeMock.description)
-        expect(personalDetails.preferredName).toEqual(
-          formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
-        )
         expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
         expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
       })
@@ -465,6 +555,154 @@ describe('PersonalPageService', () => {
       expect(property[1].containerType).toEqual('Confiscated')
       expect(property[1].sealMark).toEqual('Not entered')
       expect(property[1].location).toEqual('Property Box 15')
+    })
+  })
+
+  describe('Next of kin (used when personalRelationshipsApiReadEnabled is false)', () => {
+    it('Only maps the active next of kin', async () => {
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      expect(nextOfKin.length).toEqual(3)
+    })
+
+    it('Gets the addresses for each active next of kin', async () => {
+      await constructService().get('token', PrisonerMockDataA)
+      expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
+
+      const expectedPersonIds = mockOffenderContacts.offenderContacts
+        .filter(contact => contact.active && contact.nextOfKin)
+        .map(({ personId }) => personId)
+
+      expectedPersonIds.forEach(personId =>
+        expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledWith(personId),
+      )
+    })
+
+    it('Maps the primary address for the contact', async () => {
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      nextOfKin.forEach(contact => {
+        const { address } = contact
+
+        expect(address.phones).toEqual(expectedPhones)
+        expect(address.addressTypes).toEqual(expectedTypes)
+        const { country, county, flat, locality, postalCode, premise, street, town } = address.address
+
+        expect(country).toEqual(expectedAddress.country)
+        expect(county).toEqual(expectedAddress.county)
+        expect(flat).toEqual(expectedAddress.flat)
+        expect(locality).toEqual(expectedAddress.locality)
+        expect(postalCode).toEqual(expectedAddress.postalCode)
+        expect(premise).toEqual(expectedAddress.premise)
+        expect(street).toEqual(expectedAddress.street)
+        expect(town).toEqual(expectedAddress.town)
+      })
+    })
+
+    it('Maps the data for the contact from the API', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+
+    it('Handles no addresses defined for the contact', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+  })
+
+  describe('Next of kin and emergency contacts', () => {
+    it('Maps data from the next of kin service', async () => {
+      nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
+      const result = await constructService().get('token', PrisonerMockDataA)
+      const nextOfKinAndEmergencyContacts = result.nextOfKinAndEmergencyContacts.getOrThrow()
+
+      expect(nextOfKinAndEmergencyContacts.contacts).toEqual(PersonalRelationshipsContactsDtoMock.content)
+      expect(nextOfKinAndEmergencyContacts.hasNextOfKin).toEqual(true)
+      expect(nextOfKinAndEmergencyContacts.hasEmergencyContact).toEqual(true)
+    })
+
+    it('Handles an error from the next of kin service', async () => {
+      nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => Promise.reject(new Error('error!')))
+      const { nextOfKinAndEmergencyContacts } = await constructService().get('token', PrisonerMockDataA)
+
+      expect(nextOfKinAndEmergencyContacts.isFulfilled()).toEqual(false)
     })
   })
 
@@ -591,7 +829,7 @@ describe('PersonalPageService', () => {
       }
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
-      const data = await constructService().get('token', prisonerData, false, false, apiErrorCallback)
+      const data = await constructService().get('token', prisonerData, false, false, true, apiErrorCallback)
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
@@ -778,6 +1016,86 @@ describe('PersonalPageService', () => {
       const result = await service.getMilitaryRecords('token', 'A1234AA')
       expect(result).toEqual(MilitaryRecordsMock)
       expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith('A1234AA')
+    })
+  })
+
+  describe('number of children', () => {
+    it('Gets the number of children from the Personal Relationships API', async () => {
+      const service = constructService()
+      personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+        async () => PersonalRelationshipsNumberOfChildrenMock,
+      )
+
+      const result = await service.getNumberOfChildren('token', 'A1234AA')
+      expect(result).toEqual(PersonalRelationshipsNumberOfChildrenMock)
+      expect(personalRelationshipsApiClient.getNumberOfChildren).toHaveBeenCalledWith('A1234AA')
+    })
+
+    it('Handles a null response from the Personal Relationships API', async () => {
+      const service = constructService()
+      personalRelationshipsApiClient.getNumberOfChildren = jest.fn(
+        async (): Promise<PersonalRelationshipsDomesticStatusDto> => null,
+      )
+
+      const result = await service.getNumberOfChildren('token', 'A1234AA')
+      expect(result).toBeNull()
+      expect(personalRelationshipsApiClient.getNumberOfChildren).toHaveBeenCalledWith('A1234AA')
+    })
+
+    it('Updates the number of children using the Personal Relationships API and records metrics', async () => {
+      const user = prisonUserMock
+      const request: PersonalRelationshipsNumberOfChildrenUpdateRequest = {
+        numberOfChildren: 5,
+        requestedBy: user.username,
+      }
+      await constructService().updateNumberOfChildren('token', prisonUserMock, 'A1234AA', 5)
+      expect(personalRelationshipsApiClient.updateNumberOfChildren).toHaveBeenCalledWith('A1234AA', request)
+      expect(metricsService.trackPersonalRelationshipsUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['numberOfChildren'],
+        prisonerNumber: 'A1234AA',
+        user,
+      })
+    })
+  })
+
+  describe('domestic status', () => {
+    it('Gets the domestic status from the domestic status service', async () => {
+      const service = constructService()
+      domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+
+      const result = await service.getDomesticStatus('token', 'A1234AA')
+      expect(result).toEqual(PersonalRelationshipsDomesticStatusMock)
+      expect(domesticStatusService.getDomesticStatus).toHaveBeenCalledWith('token', 'A1234AA')
+    })
+
+    it('Gets the domestic status reference data from the domestic status service', async () => {
+      const service = constructService()
+      const referenceData = [
+        {
+          id: '1',
+          code: 'S',
+          description: 'Single',
+          listSequence: 99,
+          isActive: true,
+        },
+      ]
+      domesticStatusService.getReferenceData = jest.fn(async () => referenceData)
+
+      const result = await service.getDomesticStatusReferenceData('token')
+      expect(result).toEqual(referenceData)
+      expect(domesticStatusService.getReferenceData).toHaveBeenCalledWith('token')
+    })
+
+    it('Updates the number of children using the Personal Relationships API', async () => {
+      domesticStatusService.updateDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+      const user = prisonUserMock
+      const request: PersonalRelationshipsDomesticStatusUpdateRequest = {
+        domesticStatusCode: 'M',
+        requestedBy: prisonUserMock.username,
+      }
+      const response = await constructService().updateDomesticStatus('token', user, 'A1234AA', 'M')
+      expect(response).toEqual(PersonalRelationshipsDomesticStatusMock)
+      expect(domesticStatusService.updateDomesticStatus).toHaveBeenCalledWith('token', user, 'A1234AA', request)
     })
   })
 })

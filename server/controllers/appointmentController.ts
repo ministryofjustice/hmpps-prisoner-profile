@@ -40,7 +40,6 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
-import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -112,29 +111,16 @@ export default class AppointmentController {
           startTimeMinutes: mainAppointment.startTime.split(':')[1],
           endTimeHours: mainAppointment.endTime.split(':')[0],
           endTimeMinutes: mainAppointment.endTime.split(':')[1],
-          probationTeam: (bvlsMasteredVlpmFeatureToggleEnabled() && vlb.probationTeamCode) || undefined,
+          probationTeam: vlb.probationTeamCode || undefined,
           officerDetailsNotKnown:
-            bvlsMasteredVlpmFeatureToggleEnabled() &&
-            vlb.bookingType === 'PROBATION' &&
-            vlb.additionalBookingDetails?.contactName === undefined
+            vlb.bookingType === 'PROBATION' && vlb.additionalBookingDetails?.contactName === undefined
               ? 'true'
               : undefined,
-          officerFullName:
-            (bvlsMasteredVlpmFeatureToggleEnabled() &&
-              vlb.bookingType === 'PROBATION' &&
-              vlb.additionalBookingDetails?.contactName) ||
-            undefined,
-          officerEmail:
-            (bvlsMasteredVlpmFeatureToggleEnabled() &&
-              vlb.bookingType === 'PROBATION' &&
-              vlb.additionalBookingDetails?.contactEmail) ||
-            undefined,
+          officerFullName: (vlb.bookingType === 'PROBATION' && vlb.additionalBookingDetails?.contactName) || undefined,
+          officerEmail: (vlb.bookingType === 'PROBATION' && vlb.additionalBookingDetails?.contactEmail) || undefined,
           officerTelephone:
-            (bvlsMasteredVlpmFeatureToggleEnabled() &&
-              vlb.bookingType === 'PROBATION' &&
-              vlb.additionalBookingDetails?.contactNumber) ||
-            undefined,
-          meetingType: (bvlsMasteredVlpmFeatureToggleEnabled() && vlb.probationMeetingType) || undefined,
+            (vlb.bookingType === 'PROBATION' && vlb.additionalBookingDetails?.contactNumber) || undefined,
+          meetingType: vlb.probationMeetingType || undefined,
         }
       }
 
@@ -253,12 +239,14 @@ export default class AppointmentController {
       if (!errors.length) {
         const startTime = formatDateTimeISO(set(parseDate(date), { hours: startTimeHours, minutes: startTimeMinutes }))
         const endTime = formatDateTimeISO(set(parseDate(date), { hours: endTimeHours, minutes: endTimeMinutes }))
-        // non-bvl locations identified via UUID/integer form id.  BVL locations identified via key
+
+        // Non-bvl locations are identified via UUID/integer. BVL locations are identified via location.key
         let nomisLocationId
         if (location) {
           const result = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(clientToken, location)
           nomisLocationId = result.nomisLocationId
         }
+
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
@@ -424,15 +412,15 @@ export default class AppointmentController {
             ])
 
             return {
-              bookingType: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.bookingType : undefined,
+              bookingType: undefined as string,
               preAppointment: preAppointment ? 'yes' : 'no',
               preAppointmentLocation: preLocation,
               postAppointment: postAppointment ? 'yes' : 'no',
               postAppointmentLocation: postLocation,
               court: vlb.courtCode,
-              probationTeam: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.probationTeamCode : undefined,
+              probationTeam: undefined as string,
               hearingType: vlb.courtHearingType,
-              meetingType: !bvlsMasteredVlpmFeatureToggleEnabled() ? vlb.probationMeetingType : undefined,
+              meetingType: undefined as string,
               cvpRequired: vlb.videoLinkUrl ? 'yes' : 'no',
               videoLinkUrl: vlb.videoLinkUrl,
             }
@@ -447,6 +435,7 @@ export default class AppointmentController {
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('prePostAppointmentDetails')
+
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
       if (!appointmentFlash?.length) {
         throw new ServerError('PrePostAppointmentDetails not found in request')
@@ -491,8 +480,14 @@ export default class AppointmentController {
         appointmentDate: formatDate(appointmentDefaults.startTime, 'long'),
         formValues,
       }
+
       const errors = req.flash('errors')
 
+      // If redirected here from a submission error we need to clear down any flash contents for 'postVLBDetails'
+      // as it may contain values from a previously failed post in this session.
+      this.clearStoredFlashMessages(req, 'postVLBDetails')
+
+      // Store the current details for use on the next page - there can be only 1 entry in this flash key
       req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
 
       this.auditService
@@ -525,7 +520,6 @@ export default class AppointmentController {
       const { prisonerNumber, appointmentId } = req.params
       const { clientToken } = req.middleware
 
-      // TODO: Remove probation fields here when feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
       const {
         bookingType,
         preAppointment,
@@ -533,16 +527,17 @@ export default class AppointmentController {
         postAppointment,
         postAppointmentLocation,
         court,
-        probationTeam,
         hearingType,
-        meetingType,
         cvpRequired,
         videoLinkUrl,
       } = req.body
+
+      // Use the values provided from the previous page - it has already ensured there will be only 1entry
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
         throw new ServerError('PostVideoLinkBooking: Appointment data not found in request')
       }
+
       const { appointmentDefaults, appointmentForm } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const prePostAppointmentDetails = {
@@ -556,9 +551,7 @@ export default class AppointmentController {
           postAppointment,
           postAppointmentLocation,
           court,
-          probationTeam,
           hearingType,
-          meetingType,
           cvpRequired,
           videoLinkUrl,
         },
@@ -577,7 +570,9 @@ export default class AppointmentController {
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })
-          } else throw error
+          } else {
+            throw error
+          }
         }
       }
 
@@ -716,14 +711,13 @@ export default class AppointmentController {
 
   public displayPrisonerMovementSlips(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const data = req.session.movementSlipData
       const { prisonerNumber, prisonId } = req.middleware.prisonerData
-      if (!data) throw new NotFoundError('Movement slip data not found in session')
-
-      res.locals = {
-        ...res.locals,
-        hideBackLink: true,
+      const data = req.session.movementSlipData
+      if (!data) {
+        throw new NotFoundError('Movement slip data not found in session')
       }
+
+      res.locals = { ...res.locals, hideBackLink: true }
       delete req.session.movementSlipData
 
       this.auditService
@@ -736,9 +730,7 @@ export default class AppointmentController {
         })
         .catch(error => logger.error(error))
 
-      return res.render('pages/appointments/movementSlips', {
-        ...data,
-      })
+      return res.render('pages/appointments/movementSlips', { ...data })
     }
   }
 
@@ -926,10 +918,7 @@ export default class AppointmentController {
     appointmentForm: AppointmentForm,
     prePostAppointmentForm?: PrePostAppointmentDetails,
   ) => {
-    if (
-      appointmentForm.appointmentType !== 'VLB' &&
-      (appointmentForm.appointmentType !== 'VLPM' || !bvlsMasteredVlpmFeatureToggleEnabled())
-    ) {
+    if (appointmentForm.appointmentType !== 'VLB' && appointmentForm.appointmentType !== 'VLPM') {
       return this.appointmentService.createAppointments(token, appointments)
     }
 
@@ -946,16 +935,8 @@ export default class AppointmentController {
         : undefined,
     ])
 
-    let mainAppointmentType
-    let bookingType
-    if (bvlsMasteredVlpmFeatureToggleEnabled()) {
-      mainAppointmentType = appointmentForm.appointmentType === 'VLB' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION'
-      bookingType = appointmentForm.appointmentType === 'VLB' ? 'COURT' : 'PROBATION'
-    } else {
-      mainAppointmentType =
-        prePostAppointmentForm.formValues.bookingType === 'COURT' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION'
-      bookingType = prePostAppointmentForm.formValues.bookingType
-    }
+    const mainAppointmentType = appointmentForm.appointmentType === 'VLB' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION'
+    const bookingType = appointmentForm.appointmentType === 'VLB' ? 'COURT' : 'PROBATION'
 
     const videoLinkBookingForm = {
       bookingType,
@@ -993,21 +974,15 @@ export default class AppointmentController {
         },
       ],
       courtCode: prePostAppointmentForm?.formValues?.court,
-      probationTeamCode: !bvlsMasteredVlpmFeatureToggleEnabled()
-        ? prePostAppointmentForm.formValues.probationTeam
-        : appointmentForm.probationTeam,
+      probationTeamCode: appointmentForm.probationTeam,
       courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
-      probationMeetingType: !bvlsMasteredVlpmFeatureToggleEnabled()
-        ? prePostAppointmentForm.formValues.meetingType
-        : appointmentForm.meetingType,
+      probationMeetingType: appointmentForm.meetingType,
       comments: appointments.comment || undefined,
       videoLinkUrl:
         (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' && prePostAppointmentForm.formValues.videoLinkUrl) ||
         undefined,
       additionalBookingDetails:
-        bvlsMasteredVlpmFeatureToggleEnabled() &&
-        appointmentForm.appointmentType === 'VLPM' &&
-        !appointmentForm.officerDetailsNotKnown
+        appointmentForm.appointmentType === 'VLPM' && !appointmentForm.officerDetailsNotKnown
           ? {
               contactName: appointmentForm.officerFullName,
               contactEmail: appointmentForm.officerEmail,
@@ -1038,6 +1013,13 @@ export default class AppointmentController {
       preAppointment: getAppointment('VLB_COURT_PRE'),
       mainAppointment: getAppointment('VLB_COURT_MAIN') || getAppointment('VLB_PROBATION'),
       postAppointment: getAppointment('VLB_COURT_POST'),
+    }
+  }
+
+  private clearStoredFlashMessages = (req: Request, flash: string) => {
+    const checkFlashDetails = req.flash(flash)
+    if (checkFlashDetails && checkFlashDetails.length > 0) {
+      logger.info(`Cleared stale flash entry for ${flash}`)
     }
   }
 }

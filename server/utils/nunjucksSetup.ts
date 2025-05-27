@@ -8,6 +8,7 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
+  arrayIncludes,
   contactAddressToHtml,
   findError,
   formatMoney,
@@ -60,16 +61,12 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import {
-  bvlsMasteredVlpmFeatureToggleEnabled,
-  externalContactsEnabled,
-  militaryHistoryEnabled,
-  newOverviewPageLayoutEnabled,
-} from './featureToggles'
+import { externalContactsEnabled, militaryHistoryEnabled, newOverviewPageLayoutEnabled } from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import categorySummaryToMiniSummaryOldLayout from '../views/dataUtils/categorySummaryToMiniSummaryOldLayout'
 import incentiveSummaryToMiniSummaryOldLayout from '../views/dataUtils/incentiveSummaryToMiniSummaryOldLayout'
 import visitsSummaryToMiniSummaryOldLayout from '../views/dataUtils/visitsSummaryToMiniSummaryOldLayout'
+import appendRefererToUrl from './appendRefererToUrl'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -123,7 +120,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('useNewOverviewPageLayout', newOverviewPageLayoutEnabled)
-  njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
   njkEnv.addFilter('initialiseName', initialiseName)
@@ -220,4 +216,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
   njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
+  njkEnv.addFilter('includes', arrayIncludes)
+  njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
 }

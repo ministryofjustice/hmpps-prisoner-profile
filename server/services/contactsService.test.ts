@@ -1,10 +1,11 @@
 import { RestClientBuilder } from '../data'
-import {
-  PersonalRelationshipsApiClient,
-  PersonalRelationshipType,
-} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { PersonalRelationshipsApiClient } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import ContactsService from './contactsService'
-import { personalRelationshipsSocialMock } from '../data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+  personalRelationshipsSocialMock,
+} from '../data/localMockData/personalRelationshipsApiMock'
 
 describe('ContactsService', () => {
   let clientToken: string
@@ -18,6 +19,16 @@ describe('ContactsService', () => {
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => personalRelationshipsSocialMock),
+      getContactCount: jest.fn(async () => ({
+        official: 1,
+        social: 1,
+      })),
+      getNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      updateNumberOfChildren: jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock),
+      getDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
+      updateDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
+      getReferenceDataCodes: jest.fn(),
+      createContact: jest.fn(),
     }
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest
@@ -41,16 +52,7 @@ describe('ContactsService', () => {
 
       const result = await contactsService.getExternalContactsCount(clientToken, prisonerNumber)
 
-      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(prisonerNumber, {
-        relationshipType: PersonalRelationshipType.Official,
-        page: 0,
-        size: 1,
-      })
-      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(prisonerNumber, {
-        relationshipType: PersonalRelationshipType.Social,
-        page: 0,
-        size: 1,
-      })
+      expect(personalRelationshipsApiClient.getContactCount).toHaveBeenCalledWith(prisonerNumber)
       expect(result).toEqual(expected)
     })
   })

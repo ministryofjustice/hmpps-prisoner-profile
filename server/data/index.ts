@@ -92,8 +92,9 @@ export const dataAccess = {
   personCommunicationNeedsApiClientBuilder: (token: string) => new PersonCommunicationNeedsApiRestClient(token),
   prisonerProfileApiClientBuilder: (token: string) => new PrisonerProfileApiRestClient(token),
   personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
+  tokenStore,
 }
 
 export type DataAccess = typeof dataAccess
 
-export { RestClientBuilder, CuriousRestClientBuilder }
+export type { RestClientBuilder, CuriousRestClientBuilder }

@@ -46,6 +46,15 @@ context('Photo Page', () => {
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
   })
 
+  it('Click the breadcrumb and go to the personal page', () => {
+    cy.signIn({ redirectPath: 'prisoner/G6123VU/image?referer=personal' })
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image?referer=personal')
+    const photoPage = new PrisonerPhotoPage()
+    photoPage.breadcrumbToOverview().should('exist')
+    photoPage.breadcrumbToOverview().click()
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/personal')
+  })
+
   it('Clicking the print link should open a print dialog', () => {
     cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')

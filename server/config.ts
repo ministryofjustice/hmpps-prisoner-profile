@@ -318,10 +318,10 @@ export default {
     personalRelationshipsApi: {
       url: get('PERSONAL_RELATIONSHIPS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 3000)),
+        response: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 3000))),
+      agent: new AgentConfig(Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000))),
     },
   },
   serviceUrls: {
@@ -344,6 +344,7 @@ export default {
     courtCaseReleaseDates: get('CCRD_UI_URL', 'http://localhost:3001', requiredInProduction),
     csip: get('CSIP_UI_URL', 'http://localhost:3001', requiredInProduction),
     assessForEarlyRelease: get('ASSESS_FOR_EARLY_RELEASE_UI_URL', 'http://localhost:3001', requiredInProduction),
+    contacts: get('CONTACTS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -359,17 +360,18 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
+    personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     dietAndAllergyEnabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []),
     dietAndAllergyEnabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
 
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
-    bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
+    editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     newOverviewPageLayoutEnabled: toBoolean(get('NEW_OVERVIEW_PAGE_LAYOUT_ENABLED', 'false')),
+    manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
   },
 }

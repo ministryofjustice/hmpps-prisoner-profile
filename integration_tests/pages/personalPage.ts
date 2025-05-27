@@ -103,6 +103,8 @@ export default class PersonalPage extends Page {
   contacts = () => {
     const cardData = () => cy.get('#next-of-kin')
     return {
+      apiErrorMessage: () => cardData().find('[data-qa=next-of-kin-api-error]'),
+
       contact: contactNumber => {
         const contactData = () => cardData().find('[data-qa=contact-item]').eq(contactNumber)
 

@@ -6,6 +6,7 @@ import NotFoundPage from '../pages/notFoundPage'
 context('Offenses page - Permissions', () => {
   const prisonerNumber = 'G6123VU'
   const visitPage = prisonerDataOverrides => {
+    cy.setupPermissionsCheckStubs({ prisonerNumber, prisonerDataOverrides })
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber, bookingId: 1102484 })
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/offences' })
@@ -24,6 +25,7 @@ context('Offences Page Sentenced', () => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupComponentsData()
+    cy.setupPermissionsCheckStubs({ prisonerNumber })
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })

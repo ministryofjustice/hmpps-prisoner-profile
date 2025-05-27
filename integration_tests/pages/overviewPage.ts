@@ -97,6 +97,8 @@ export default class OverviewPage extends Page {
 
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 
+  resettlementWorkerName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
+
   primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(2) dd')
 
   secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(3) dd')
@@ -140,6 +142,8 @@ export default class OverviewPage extends Page {
   addToSocActionLink = (): PageElement => cy.get('[data-qa=add-to-soc-action-link]')
 
   manageCategoryActionLink = (): PageElement => cy.get('[data-qa=manage-category-action-link]')
+
+  manageActivityAllocationsActionLink = (): PageElement => cy.get('[data-qa=manage-allocations-link]')
 
   addKeyWorkerSessionActionLink = (): PageElement => cy.getDataQa('add-key-worker-session-action-link')
 

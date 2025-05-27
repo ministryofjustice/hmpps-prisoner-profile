@@ -2,6 +2,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   Addresses,
   IdentityNumbers,
+  NextOfKin,
   PersonalDetails,
   PhysicalCharacteristics,
   PropertyItem,
@@ -34,7 +35,7 @@ import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
-import { Result } from '../utils/result/result'
+import { noCallbackOnErrorBecause, Result } from '../utils/result/result'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
@@ -59,10 +60,16 @@ import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePerson
 import logger from '../../logger'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import NextOfKinService from './nextOfKinService'
 import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContact,
+  PersonalRelationshipsDomesticStatusDto,
+  PersonalRelationshipsNumberOfChildrenDto,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import DomesticStatusService from './domesticStatusService'
+import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
+import { religionFieldData } from '../controllers/personal/fieldData'
 
 export default class PersonalPageService {
   constructor(
@@ -70,11 +77,13 @@ export default class PersonalPageService {
     private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
+    private readonly personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
     private readonly referenceDataService: ReferenceDataService,
     private readonly prisonService: PrisonService,
     private readonly metricsService: MetricsService,
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
-    private readonly personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
+    private readonly nextOfKinService: NextOfKinService,
+    private readonly domesticStatusService: DomesticStatusService,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -158,12 +167,12 @@ export default class PersonalPageService {
     prisonerData: Prisoner,
     dietAndAllergyIsEnabled: boolean = false,
     editProfileEnabled: boolean = false,
+    personalRelationshipsApiReadEnabled: boolean = true,
     apiErrorCallback: (error: Error) => void = () => null,
     flashMessage: { fieldName: string } = null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
-    const personalRelationsipsApiClient = this.personalRelationshipsApiClientBuilder(token)
 
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
@@ -172,6 +181,7 @@ export default class PersonalPageService {
       secondaryLanguages,
       property,
       addressList,
+      offenderContacts,
       identifiers,
       beliefs,
       distinguishingMarks,
@@ -179,13 +189,16 @@ export default class PersonalPageService {
       healthAndMedication,
       militaryRecords,
       physicalAttributes,
-      personalRelationshipContacts,
+      nextOfKinAndEmergencyContacts,
+      personalRelationshipsNumberOfChildren,
+      personalRelationshipsDomesticStatus,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       prisonApiClient.getAddresses(prisonerNumber),
+      prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
@@ -193,14 +206,22 @@ export default class PersonalPageService {
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
-      personalRelationsipsApiClient.getContacts(prisonerNumber, {
-        isRelationshipActive: true,
-        emergencyContactOrNextOfKin: true,
-        size: 100,
-      }),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback)
+        : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getNumberOfChildren(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prisoner search data'),
+          )
+        : Result.rejected<PersonalRelationshipsNumberOfChildrenDto, Error>(undefined),
+      personalRelationshipsApiReadEnabled
+        ? Result.wrap(
+            this.getDomesticStatus(token, prisonerNumber),
+            noCallbackOnErrorBecause('we are falling back to prison api data'),
+          )
+        : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
     ])
-
-    const nextOfKinAndEmergencyContacts = personalRelationshipContacts.content.sort(this.nextOfKinSorter)
 
     const addresses: Addresses = this.addresses(addressList)
     const countryOfBirth =
@@ -210,6 +231,7 @@ export default class PersonalPageService {
 
     return {
       personalDetails: await this.personalDetails(
+        token,
         id => this.prisonService.getPrisonByPrisonId(id, token),
         personIntegrationApiClient,
         prisonerData,
@@ -218,15 +240,20 @@ export default class PersonalPageService {
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
+        personalRelationshipsNumberOfChildren,
+        personalRelationshipsDomesticStatus,
         flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses,
       addressSummary: this.addressSummary(addresses),
-      nextOfKinAndEmergencyContacts,
-      hasNextOfKin: nextOfKinAndEmergencyContacts.some(contact => contact.isNextOfKin),
-      hasEmergencyContact: nextOfKinAndEmergencyContacts.some(contact => contact.isEmergencyContact),
+      nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),
+      nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
+        contacts,
+        hasNextOfKin: contacts.some(contact => contact.isNextOfKin),
+        hasEmergencyContact: contacts.some(contact => contact.isEmergencyContact),
+      })),
       physicalCharacteristics: this.physicalCharacteristics(inmateDetail, physicalAttributes),
       security: {
         interestToImmigration: getProfileInformationValue(
@@ -274,6 +301,7 @@ export default class PersonalPageService {
   }
 
   private async personalDetails(
+    token: string,
     prison: (prisonId: string) => Promise<Prison>,
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
@@ -282,6 +310,8 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
+    numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
+    domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
     flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
@@ -297,10 +327,10 @@ export default class PersonalPageService {
     }
 
     const nationality =
-      inmateDetail?.profileInformation?.find(entry => entry.type === 'NAT')?.resultValue || 'Not entered'
+      getProfileInformationValue(ProfileInformationType.Nationality, profileInformation) || 'Not entered'
 
     const formatNumberOfChildren = (count: string) => {
-      if (count === null) return 'Not entered'
+      if (count === null || count === undefined) return 'Not entered'
       if (count === '0') return 'None'
       return count
     }
@@ -328,10 +358,21 @@ export default class PersonalPageService {
         spoken: inmateDetail.language,
         written: inmateDetail.writtenLanguage,
       },
-      marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
+      marriageOrCivilPartnership:
+        domesticStatus
+          .map(status => status?.domesticStatusDescription)
+          .getOrHandle(_e => {
+            // revert back to using Prisoner Search sourced data:
+            return prisonerData.maritalStatus
+          }) || 'Not entered',
       nationality,
       numberOfChildren: formatNumberOfChildren(
-        getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation),
+        numberOfChildren
+          .map(dto => dto?.numberOfChildren)
+          .getOrHandle(_e => {
+            // revert back to using Prison API sourced data:
+            return getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation)
+          }),
       ),
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
         language: description,
@@ -341,12 +382,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      preferredName: formatName(
-        prisonerDetail?.currentWorkingFirstName,
-        undefined,
-        prisonerDetail?.currentWorkingLastName,
-      ),
-      religionOrBelief: inmateDetail.religion || 'Not entered',
+      religionOrBelief: await this.formatReligion(token, inmateDetail.religion),
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
@@ -364,6 +400,18 @@ export default class PersonalPageService {
         lastModifiedPrison: lastUpdatedAgency?.prisonName ?? '',
       },
     }
+  }
+
+  private async formatReligion(token: string, religion?: string): Promise<string> {
+    if (!religion) {
+      return 'Not entered'
+    }
+
+    const refData = await this.getReferenceDataCodes(token, CorePersonRecordReferenceDataDomain.religion)
+    const code = refData.find(r => r.description?.toLowerCase() === religion.toLowerCase() || r.code === religion)
+    const override = religionFieldData.referenceDataOverrides.find(o => o.id === code?.code)
+
+    return override ? (override.description ?? religion) : religion
   }
 
   private aliases = async (
@@ -481,6 +529,39 @@ export default class PersonalPageService {
       sealMark: sealMark || 'Not entered',
       location: location?.userDescription || 'Not entered',
     }))
+  }
+
+  private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
+    const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
+    let contactAddresses: { personId: number; addresses: Address[] }[] = []
+    if (activeNextOfKinContacts) {
+      contactAddresses = await Promise.all(
+        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId, prisonApiClient)),
+      )
+    }
+
+    return contacts.offenderContacts
+      ?.filter(contact => contact.nextOfKin && contact.active)
+      .map(contact => {
+        const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
+        return {
+          address: this.addresses(personAddresses?.addresses),
+          emails: contact.emails?.map(({ email }) => email) || [],
+          emergencyContact: contact.emergencyContact,
+          name: formatName(contact.firstName, contact.middleName, contact.lastName),
+          nextOfKin: contact.nextOfKin,
+          phones: contact.phones?.map(({ number }) => number),
+          relationship: contact.relationshipDescription,
+        }
+      })
+  }
+
+  private async addressForPerson(
+    personId: number,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<{ personId: number; addresses: Address[] }> {
+    const addresses = await prisonApiClient.getAddressesForPerson(personId)
+    return { personId, addresses }
   }
 
   private addresses(addresses: Address[]): Addresses | undefined {
@@ -664,24 +745,58 @@ export default class PersonalPageService {
     return response
   }
 
+  async getNumberOfChildren(clientToken: string, prisonerNumber: string) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    return personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
+  }
+
+  async updateNumberOfChildren(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    numberOfChildren: number,
+  ) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    const response = personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
+      numberOfChildren,
+      requestedBy: user.username,
+    })
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['numberOfChildren'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
   }
 
-  private nextOfKinSorter(a: PersonalRelationshipsContact, b: PersonalRelationshipsContact): number {
-    const getPriority = (contact: PersonalRelationshipsContact): number => {
-      if (contact.isNextOfKin && !contact.isEmergencyContact) return 1
-      if (contact.isNextOfKin && contact.isEmergencyContact) return 2
-      if (!contact.isNextOfKin && contact.isEmergencyContact) return 3
-      return 4 // fallback for any other cases
-    }
+  async getNextOfKinAndEmergencyContacts(clientToken: string, prisonerNumber: string) {
+    return this.nextOfKinService.getNextOfKinEmergencyContacts(clientToken, prisonerNumber)
+  }
 
-    const priorityOrder = getPriority(a) - getPriority(b)
-    if (priorityOrder !== 0) {
-      return priorityOrder
-    }
+  async getDomesticStatus(clientToken: string, prisonerNumber: string) {
+    return this.domesticStatusService.getDomesticStatus(clientToken, prisonerNumber)
+  }
 
-    return a.firstName.localeCompare(b.firstName)
+  async updateDomesticStatus(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    domesticStatusCode: string,
+  ) {
+    return this.domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, {
+      domesticStatusCode,
+      requestedBy: user.username,
+    })
+  }
+
+  async getDomesticStatusReferenceData(clientToken: string) {
+    return this.domesticStatusService.getReferenceData(clientToken)
   }
 }

@@ -1,4 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { CaseNotesPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -34,7 +35,8 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
-      const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
+      const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
+      const { prisonerPermissions } = res.locals
 
       queryParams.sort = (req.query.sort as string) || 'creationDateTime,DESC'
       if (req.query.page) queryParams.page = +req.query.page
@@ -59,8 +61,8 @@ export default class CaseNotesController {
             token: clientToken,
             prisonerData,
             queryParams,
-            canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
-            canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
+            canViewSensitiveCaseNotes: isGranted(CaseNotesPermission.read_sensitive, prisonerPermissions),
+            canDeleteSensitiveCaseNotes: isGranted(CaseNotesPermission.delete_sensitive, prisonerPermissions),
             currentUserDetails: res.locals.user,
           }),
         ),
@@ -112,7 +114,7 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-      const { permissions } = req.middleware
+      const { prisonerPermissions } = res.locals
 
       const now = new Date()
       const caseNoteFlash = req.flash('caseNote')
@@ -131,7 +133,7 @@ export default class CaseNotesController {
 
       const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
         token: req.middleware.clientToken,
-        canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+        canEditSensitiveCaseNotes: isGranted(CaseNotesPermission.edit_sensitive, prisonerPermissions),
       })
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(caseNoteTypes, formValues.type, true)
 
@@ -173,7 +175,7 @@ export default class CaseNotesController {
 
   public post(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { permissions } = req.middleware
+      const { prisonerPermissions } = res.locals
       const { prisonerNumber } = req.params
       const { type, subType, text, date, hours, minutes, refererUrl } = req.body
       const caseNote = {
@@ -189,7 +191,7 @@ export default class CaseNotesController {
       if (!errors.length) {
         const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
           token: req.middleware.clientToken,
-          canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+          canEditSensitiveCaseNotes: isGranted(CaseNotesPermission.edit_sensitive, prisonerPermissions),
         })
         if (!allowedCaseNoteTypes.some(allowedType => allowedType.code === type)) {
           logger.info(`User not permitted to create case note of type: ${type}`)
@@ -240,14 +242,15 @@ export default class CaseNotesController {
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
-      const { clientToken, permissions } = req.middleware
+      const { clientToken } = req.middleware
+      const { prisonerPermissions } = res.locals
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
-      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
+      if (currentCaseNote.sensitive && !isGranted(CaseNotesPermission.edit_sensitive, prisonerPermissions)) {
         logger.info(`User not permitted to edit sensitive case note: ${caseNoteId}`)
         return next()
       }
@@ -300,11 +303,12 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, caseNoteId } = req.params
       const { text } = req.body
-      const { clientToken, permissions } = req.middleware
+      const { clientToken } = req.middleware
+      const { prisonerPermissions } = res.locals
       const { prisonId } = req.middleware.prisonerData
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
-      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
+      if (currentCaseNote.sensitive && !isGranted(CaseNotesPermission.edit_sensitive, prisonerPermissions)) {
         logger.info(`User not permitted to edit sensitive case notes`)
         return next()
       }

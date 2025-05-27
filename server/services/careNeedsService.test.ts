@@ -16,7 +16,8 @@ describe('beliefService', () => {
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
+    prisonApiClient.getAllPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
+    prisonApiClient.getAllReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
       mockReferenceDomains(domain),
     )
@@ -24,6 +25,13 @@ describe('beliefService', () => {
   })
 
   const setPersonalCareNeedsMock = (careNeeds: PersonalCareNeed[]) => {
+    prisonApiClient.getAllPersonalCareNeeds = jest.fn(async () => ({
+      offenderNo: 'AB1234',
+      personalCareNeeds: careNeeds,
+    }))
+  }
+
+  const setPersonalCareNeedsForXrayBodyScansMock = (careNeeds: PersonalCareNeed[]) => {
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
       offenderNo: 'AB1234',
       personalCareNeeds: careNeeds,
@@ -167,10 +175,7 @@ describe('beliefService', () => {
       ])
 
       await careNeedsService.getCareNeedsAndAdjustments('token', PrisonerMockDataA.bookingId)
-      expect(prisonApiClient.getReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, [
-        'AC',
-        'AMP TEL',
-      ])
+      expect(prisonApiClient.getAllReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId)
     })
 
     it('Maps the reasonable adjustments to the matching care needs', async () => {
@@ -204,7 +209,7 @@ describe('beliefService', () => {
         },
       ])
 
-      prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
+      prisonApiClient.getAllReasonableAdjustments = jest.fn(async () => ({
         reasonableAdjustments: [
           {
             personalCareNeedId: 1,
@@ -232,7 +237,7 @@ describe('beliefService', () => {
 
   describe('getXrayBodyScans', () => {
     it('Gets only care needs with problem type BSCAN', async () => {
-      setPersonalCareNeedsMock([
+      setPersonalCareNeedsForXrayBodyScansMock([
         {
           personalCareNeedId: 1,
           problemCode: 'BSC5.5',
@@ -292,7 +297,7 @@ describe('beliefService', () => {
 
     describe('Given no x-ray care needs', () => {
       it('Returns no xray security information', async () => {
-        setPersonalCareNeedsMock([])
+        setPersonalCareNeedsForXrayBodyScansMock([])
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(0)
         expect(xrays.since).toBeUndefined()
@@ -301,7 +306,7 @@ describe('beliefService', () => {
 
     describe('Given x-rays for this year', () => {
       it('Returns the correct number of x-rays and the start date', async () => {
-        setPersonalCareNeedsMock([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
+        setPersonalCareNeedsForXrayBodyScansMock([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(4)
         expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
@@ -310,7 +315,7 @@ describe('beliefService', () => {
 
     describe('Given x-rays over multiple years', () => {
       it('Returns the correct number of x-rays for this year and the start date', async () => {
-        setPersonalCareNeedsMock([
+        setPersonalCareNeedsForXrayBodyScansMock([
           xrayNeed(-10),
           xrayNeed(-20),
           xrayNeed(-40),

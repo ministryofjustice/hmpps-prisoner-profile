@@ -1,7 +1,6 @@
 import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
-import StaffRole from '../server/data/interfaces/prisonApi/StaffRole'
 import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
@@ -30,7 +29,7 @@ declare global {
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
         prisonId?: string
-        staffRoles?: StaffRole[]
+        isAKeyWorker?: boolean
         complexityLevel?: ComplexityLevel
       }): Chainable<AUTWindow>
 
@@ -50,7 +49,13 @@ declare global {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
-        caseLoads?: CaseLoad[]
+      }): Chainable<AUTWindow>
+
+      setupPermissionsCheckStubs(options: {
+        prisonerNumber: string
+        keyworker?: boolean
+        restrictedPatient?: boolean
+        prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
 
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates?: boolean }): Chainable<AUTWindow>

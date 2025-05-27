@@ -5,7 +5,10 @@ import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
-import { mockContactDetailYouthEstate } from '../../server/data/localMockData/contactDetail'
+import {
+  mockContactDetailStaffContacts,
+  mockContactDetailYouthEstate,
+} from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import IndexPage from '../pages'
 
@@ -233,7 +236,10 @@ context('Overview Page', () => {
         overviewPage
           .externalContacts()
           .link()
-          .contains('a[href="/prisoner/G6123VU/contacts/list"]', 'Social and official contacts')
+          .contains(
+            'a[href="http://localhost:9091/contacts/prisoner/G6123VU/contacts/list"]',
+            'Social and official contacts',
+          )
       })
     })
 
@@ -322,6 +328,11 @@ context('Overview Page', () => {
       it('should not display Manage category link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.manageCategoryActionLink().should('not.exist')
+      })
+
+      it('should not display Manage activity allocations link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.manageActivityAllocationsActionLink().should('not.exist')
       })
     })
 
@@ -517,7 +528,7 @@ context('Overview Page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ViewProbationDocuments] })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, staffRoles: [{ role: 'KW' }] })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, isAKeyWorker: true })
       visitOverviewPage()
     })
 
@@ -642,6 +653,7 @@ context('Overview Page', () => {
         bookingId: 1102484,
         complexityLevel: ComplexityLevel.High,
       })
+      cy.task('stubGetOffenderContacts', mockContactDetailStaffContacts)
       visitOverviewPage()
     })
 
@@ -653,6 +665,7 @@ context('Overview Page', () => {
           .staffContacts()
           .find('[data-qa=keyworker-details]')
           .should('contain.text', 'None - high complexity of need')
+        overviewPage.resettlementWorkerName().should('contain.text', 'Ivan Smirnov')
       })
     })
   })

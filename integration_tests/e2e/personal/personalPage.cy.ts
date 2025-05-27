@@ -11,7 +11,11 @@ import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/l
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
-import { PersonalRelationshipsContactsDtoMock } from '../../../server/data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../../server/data/localMockData/personalRelationshipsApiMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -60,6 +64,7 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubAllPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
@@ -68,6 +73,14 @@ context('When signed in', () => {
       cy.task('stubPersonalRelationshipsContacts', {
         prisonerNumber: 'G6123VU',
         resp: PersonalRelationshipsContactsDtoMock,
+      })
+      cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
+        prisonerNumber,
+        resp: PersonalRelationshipsNumberOfChildrenMock,
+      })
+      cy.task('stubPersonalRelationshipsGetDomesticStatus', {
+        prisonerNumber,
+        resp: PersonalRelationshipsDomesticStatusMock,
       })
       visitPersonalDetailsPage()
     })
@@ -163,7 +176,10 @@ context('When signed in', () => {
           )
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual or straight')
-        page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
+        page
+          .personalDetails()
+          .marriageOrCivilPartnership()
+          .should('have.text', 'Single – never married or in a civil partnership')
         page.personalDetails().numberOfChildren().should('have.text', '2')
         page.personalDetails().typeOfDiet().should('not.exist')
         page
@@ -541,6 +557,7 @@ context('When signed in', () => {
     context('Prisoner has current care needs and past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', pastCareNeedsMock)
+        cy.task('stubAllPersonalCareNeeds', pastCareNeedsMock)
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('exist')
@@ -551,6 +568,7 @@ context('When signed in', () => {
     context('Prisoner has no current care needs but does have past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', onlyPastCareNeedsMock)
+        cy.task('stubAllPersonalCareNeeds', onlyPastCareNeedsMock)
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('exist')
@@ -564,6 +582,7 @@ context('When signed in', () => {
     context('Prisoner has no current care needs or past care needs', () => {
       it('Displays the past care needs link', () => {
         cy.task('stubPersonalCareNeeds', { offenderNo: 'G6123VU', personalCareNeeds: [] })
+        cy.task('stubAllPersonalCareNeeds', { offenderNo: 'G6123VU', personalCareNeeds: [] })
         visitPersonalDetailsPage()
         const page = new PersonalPage()
         page.careNeeds().pastCareNeedsLink().should('not.exist')
@@ -701,6 +720,30 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
       page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
       page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+    })
+  })
+
+  context('Given API call to get next of kin and emergency contacts fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, error: true })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays a page error banner and error message replacing the next of kin and emergency contact details', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+
+      page.apiErrorBanner().should('exist')
+      page.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      page
+        .contacts()
+        .apiErrorMessage()
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
     })
   })
 })

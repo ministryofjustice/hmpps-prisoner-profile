@@ -24,7 +24,6 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
-    BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED: "true"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"
@@ -44,6 +43,7 @@ generic-service:
     INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates-dev.hmpps.service.justice.gov.uk"
     CSIP_UI_URL: "https://csip-dev.hmpps.service.justice.gov.uk"
+    CONTACTS_UI_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
@@ -86,7 +86,6 @@ generic-service:
     PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS: "AGI,BZI,DHI,DWI,ESI,EWI,FHI,LNI,NHI,PFI,SDI,STI"
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
-    COURT_CASES_SUMMARY_ENABLED: "true"
     DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
     DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"
     DIET_AND_ALLERGY_ENABLED_FROM: "2025-04-11T13:00:00"
@@ -95,6 +94,13 @@ generic-service:
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
     EXTERNAL_CONTACTS_ENABLED_PRISONS: "KMI"
     NEW_OVERVIEW_PAGE_LAYOUT_ENABLED: "true"
+    MANAGE_ALLOCATIONS_ENABLED: "true"
+
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - moj_cloud_platform
+      - prisons
 
   scheduledDowntime:
     enabled: true

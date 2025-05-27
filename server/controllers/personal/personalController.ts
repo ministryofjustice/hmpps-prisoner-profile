@@ -23,17 +23,19 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
 import {
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
+  domesticStatusFieldData,
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
   heightFieldData,
   heightImperialFieldData,
   nationalityFieldData,
+  numberOfChildrenFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
   religionFieldData,
@@ -61,6 +63,7 @@ import {
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import config from '../../config'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -79,6 +82,7 @@ export default class PersonalController {
       const { user, flashMessage, apiErrorCallback } = res.locals
       const { activeCaseLoadId, userRoles } = user as PrisonUser
       const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
+      const { personalRelationshipsApiReadEnabled } = config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(
@@ -86,6 +90,7 @@ export default class PersonalController {
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),
           profileEditEnabled,
+          personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           flashMessage,
         ),
@@ -101,6 +106,8 @@ export default class PersonalController {
         page: Page.Personal,
       })
 
+      const editEnabled = profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles)
+
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
@@ -113,13 +120,15 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        editEnabled: profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editEnabled,
         dietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editDietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
+        editReligionEnabled: editEnabled || (editReligionEnabled() && prisonerData.prisonId === activeCaseLoadId),
+        personalRelationshipsApiReadEnabled,
       })
     }
   }
@@ -1183,10 +1192,55 @@ export default class PersonalController {
   religion() {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
 
+    const currentReligionValue = (req: Request, referenceData: ReferenceDataCodeDto[]) => {
+      const { inmateDetail } = req.middleware
+      const profileInformationValue = getProfileInformationValue(
+        ProfileInformationType.Religion,
+        inmateDetail.profileInformation,
+      )
+      const currentValue =
+        profileInformationValue &&
+        (referenceData.find(
+          religion =>
+            religion.description.toLowerCase() === profileInformationValue.toLowerCase() ||
+            religion.code === profileInformationValue,
+        ) ?? { code: '?', description: profileInformationValue })
+
+      const override = religionFieldData.referenceDataOverrides.find(o => o.id === currentValue?.code)
+      return {
+        ...currentValue,
+        description: override?.description ?? currentValue?.description,
+      }
+    }
+
+    // Options are already sorted alphabetically, this then applies additional non-alphabetical sorting
+    const religionOptionsSorter = (a: RadioOption, b: RadioOption): number => {
+      if (
+        (a.text.startsWith('Christian – ') && b.text.startsWith('Christian – ')) ||
+        (a.text.startsWith('Muslim') && b.text.startsWith('Muslim'))
+      ) {
+        if (a.text.endsWith('Other')) {
+          return b.text.endsWith('Other') ? 0 : 1
+        }
+        if (b.text.endsWith('Other')) {
+          return a.text.endsWith('Other') ? 0 : -1
+        }
+      }
+
+      if (a.text.endsWith('– Oriental Orthodox') && b.text.endsWith('– Orthodox')) {
+        return 1
+      }
+      if (b.text.endsWith('– Oriental Orthodox') && a.text.endsWith('– Orthodox')) {
+        return -1
+      }
+
+      return 0
+    }
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken, inmateDetail, prisonerData } = req.middleware
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{
           religion: string
@@ -1198,7 +1252,8 @@ export default class PersonalController {
 
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-        const otherReligionCodes = ['OTH', 'NIL', 'UNKN']
+        // 'UNKN' will be deactivated as part of the religion reference data migration in NOMIS (and can then be removed from here)
+        const otherReligionCodes = ['OTH', 'NIL', 'TPRNTS', 'UNKN']
         const religionReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
           CorePersonRecordReferenceDataDomain.religion,
@@ -1206,16 +1261,11 @@ export default class PersonalController {
         const religionOptions = religionReferenceData
           .filter(it => !otherReligionCodes.includes(it.code))
           .sort((a, b) => a.description.localeCompare(b.description))
-        const otherReligionOptions = otherReligionCodes.map(code => religionReferenceData.find(it => it.code === code))
-        const profileInformationValue = getProfileInformationValue(
-          ProfileInformationType.Religion,
-          inmateDetail.profileInformation,
-        )
-        const currentReligion = profileInformationValue
-          ? religionReferenceData.filter(
-              religion => religion.description === profileInformationValue || religion.code === profileInformationValue,
-            )[0] || { code: '?', description: profileInformationValue }
-          : profileInformationValue
+        const otherReligionOptions = otherReligionCodes
+          .map(code => religionReferenceData.find(it => it.code === code))
+          .filter(Boolean)
+
+        const currentReligion = currentReligionValue(req, religionReferenceData)
         const fieldValue = requestBodyFlash?.religion
         const currentReasonKnown = requestBodyFlash?.reasonKnown
         const currentReasonForChange = requestBodyFlash?.reasonForChange
@@ -1231,18 +1281,31 @@ export default class PersonalController {
 
         res.render('pages/edit/religion', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: `Select ${prisonerName}'s religion, faith or belief`,
+          formTitle: `Select ${apostrophe(prisonerName)} religion, faith or belief`,
           prisonerNumber,
           currentReligion,
           currentReasonKnown,
           currentReasonForChange,
           currentReasonForChangeUnknown,
           breadcrumbPrisonerName: prisonerBannerName,
+          redirectAnchor,
           errors,
           options: [
-            ...objectToRadioOptions(religionOptions, 'code', 'description', fieldValue),
-            { divider: 'Or other, none or unknown' },
-            ...objectToRadioOptions(otherReligionOptions, 'code', 'description', fieldValue),
+            ...objectToRadioOptions(
+              religionOptions,
+              'code',
+              'description',
+              fieldValue,
+              religionFieldData.referenceDataOverrides,
+            ).sort(religionOptionsSorter),
+            { divider: 'Or' },
+            ...objectToRadioOptions(
+              otherReligionOptions,
+              'code',
+              'description',
+              fieldValue,
+              religionFieldData.referenceDataOverrides,
+            ),
           ],
           miniBannerData: {
             prisonerName: prisonerBannerName,
@@ -1311,12 +1374,13 @@ export default class PersonalController {
         ProfileInformationType.SexualOrientation,
         inmateDetail.profileInformation,
       )
-      return profileInformationValue
-        ? sexualOrientationReferenceData.filter(
-            orientation =>
-              orientation.description === profileInformationValue || orientation.code === profileInformationValue,
-          )[0]?.code
-        : profileInformationValue
+      return (
+        profileInformationValue &&
+        sexualOrientationReferenceData.find(
+          orientation =>
+            orientation.description === profileInformationValue || orientation.code === profileInformationValue,
+        )?.code
+      )
     }
 
     return {
@@ -1375,6 +1439,132 @@ export default class PersonalController {
     }
   }
 
+  numberOfChildren() {
+    const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = numberOfChildrenFieldData
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerData, clientToken } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const { prisonerNumber } = req.params
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const requestBodyFlash = requestBodyFromFlash<{ hasChildren: string; numberOfChildren?: number }>(req)
+        const errors = req.flash('errors')
+
+        const currentNumberOfChildren =
+          requestBodyFlash?.numberOfChildren ??
+          (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))?.numberOfChildren
+        const radioFieldValue =
+          (requestBodyFlash?.hasChildren ?? (currentNumberOfChildren && currentNumberOfChildren !== '0')) ? 'YES' : 'NO'
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditEditPageLoad,
+        })
+
+        res.render('pages/edit/children', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: `Does ${prisonerName} have any children?`,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          radioFieldValue,
+          currentNumberOfChildren,
+          errors,
+          redirectAnchor,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const { hasChildren, numberOfChildren } = req.body
+        const previousValue = (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))
+          ?.numberOfChildren
+
+        const parsedNumberOfChildren = hasChildren === 'YES' ? Number(numberOfChildren) : 0
+
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateNumberOfChildren(
+              clientToken,
+              user,
+              prisonerNumber,
+              parsedNumberOfChildren,
+            )
+          },
+          fieldData: numberOfChildrenFieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: numberOfChildren },
+        })
+      },
+    }
+  }
+
+  domesticStatus() {
+    const { fieldName } = domesticStatusFieldData
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { prisonerData, clientToken } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
+        const domesticStatusReferenceData = await this.personalPageService.getDomesticStatusReferenceData(clientToken)
+
+        const options = domesticStatusReferenceData.filter(it => it.code !== 'N')
+        const preferNotToSayOption = domesticStatusReferenceData.find(it => it.code === 'N')
+
+        const fieldValue =
+          requestBodyFlash?.radioField ||
+          (await this.personalPageService.getDomesticStatus(clientToken, prisonerNumber))?.domesticStatusCode
+
+        const radioOptions = [
+          ...objectToRadioOptions(options, 'code', 'description', fieldValue),
+          { divider: 'Or' },
+          ...objectToRadioOptions([preferNotToSayOption], 'code', 'description', fieldValue),
+        ]
+
+        return this.editRadioFields(
+          `What is ${apostrophe(formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }))} marital or civil partnership status?`,
+          domesticStatusFieldData,
+          radioOptions,
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const radioField = req.body.radioField || null
+        const previousValue = (await this.personalPageService.getDomesticStatus(clientToken, prisonerNumber))
+          ?.domesticStatusCode
+
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateDomesticStatus(clientToken, user, prisonerNumber, radioField)
+          },
+          fieldData: domesticStatusFieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: radioField },
+        })
+      },
+    }
+  }
+
   // This will be replaced by a request to the Health and Medication API once it masters this data:
   getSmokerStatus(inmateDetail: InmateDetail): string {
     const statusMap: Record<string, string> = {
@@ -1400,13 +1590,13 @@ export default class PersonalController {
     fieldData: FieldData
     auditDetails: object
   }) {
-    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor } = fieldData
+    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
 
     try {
       await submit()
 
       req.flash('flashMessage', {
-        text: `${pageTitle} updated`,
+        text: `${successFlashFieldName ?? pageTitle} updated`,
         type: FlashMessageType.success,
         fieldName,
       })

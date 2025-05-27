@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         if (otherLanguages.map(lang => lang.toLowerCase()).includes(autocompleteInput.toLowerCase())) {
-          autocompleteSelect.value = ''
+          const currentLanguageCode = window.location.pathname.split('/').filter(Boolean).pop()
+          if (autocompleteSelect.value !== currentLanguageCode) autocompleteSelect.value = ''
           errorField.value = `DUPLICATE:${autocompleteInput}`
         } else if (!textValues.map(value => value.toLowerCase()).includes(autocompleteInput.toLowerCase())) {
           autocompleteSelect.value = ''

@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
 import AlertsController from '../controllers/alertsController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
@@ -19,6 +20,7 @@ export default function alertsRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const { prisonPermissionsService } = services
 
   const alertsController = new AlertsController(services.alertsService, services.auditService)
 
@@ -66,7 +68,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     `${basePath}/alerts/detail`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getStandardAccessPermission),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     alertsController.displayAlert(),
   )
 
@@ -127,7 +129,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     `/api${basePath}/get-alert-details`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getStandardAccessPermission),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     alertsController.getAlertDetails(),
   )
 

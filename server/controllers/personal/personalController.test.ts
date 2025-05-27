@@ -9,8 +9,10 @@ import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
 import {
   cityOrTownOfBirthFieldData,
+  domesticStatusFieldData,
   heightFieldData,
   nationalityFieldData,
+  numberOfChildrenFieldData,
   RadioFieldData,
   sexualOrientationFieldData,
   shoeSizeFieldData,
@@ -48,6 +50,11 @@ import {
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
+import {
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../data/localMockData/personalRelationshipsApiMock'
+import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -77,7 +84,7 @@ describe('PersonalController', () => {
           resultValue: 'Some other nationality',
           type: ProfileInformationType.OtherNationalities,
         },
-        { question: 'Religion', resultValue: 'Druid', type: ProfileInformationType.Religion },
+        { question: 'Religion', resultValue: 'Buddhist', type: ProfileInformationType.Religion },
         {
           question: 'Sexual orientation',
           resultValue: 'Heterosexual / Straight',
@@ -115,6 +122,8 @@ describe('PersonalController', () => {
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
+    personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
+    personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
@@ -2367,15 +2376,52 @@ describe('PersonalController', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) => controller.religion().edit(req, response, () => {})
 
-      it('Renders the default edit page with the correct data from the prison API', async () => {
+      it('Renders the default edit page with the correct data from the prison API, overriding option text and sorting correctly', async () => {
         const expectedOptions = [
-          { text: 'Druid', value: 'DRU' },
-          { text: 'Pagan', value: 'PAG' },
+          { text: 'Buddhist', value: 'BUDD' },
+          {
+            text: 'Christian – Anglican',
+            value: 'COFE',
+            hint: {
+              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+            },
+          },
+          { text: 'Christian – Methodist', value: 'METH' },
+          {
+            text: 'Christian – Orthodox',
+            value: 'CHRODX',
+            hint: {
+              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+            },
+          },
+          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
+          {
+            text: 'Christian – Other',
+            value: 'CHRST',
+            hint: {
+              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+            },
+          },
+          { text: 'Muslim – Shia', value: 'SHIA' },
+          {
+            text: 'Muslim – Sunni',
+            value: 'SUNI',
+            hint: {
+              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+            },
+          },
+          { text: 'Muslim – Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO' },
-          { divider: 'Or other, none or unknown' },
-          { text: 'Other religion', value: 'OTH' },
-          { text: 'No religion', value: 'NIL' },
-          { text: 'Unknown', value: 'UNKN' },
+          { divider: 'Or' },
+          {
+            text: 'Other religion, faith or belief',
+            value: 'OTH',
+            hint: {
+              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+            },
+          },
+          { text: 'No religion, faith or belief', value: 'NIL' },
+          { text: 'They prefer not to say', value: 'TPRNTS' },
         ]
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2388,17 +2434,18 @@ describe('PersonalController', () => {
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
-          formTitle: `Select First Last's religion, faith or belief`,
+          formTitle: `Select First Last’s religion, faith or belief`,
+          redirectAnchor: 'personal-details',
           prisonerNumber: 'ABC123',
           currentReasonForChange: undefined,
           currentReasonForChangeUnknown: undefined,
           currentReasonKnown: undefined,
           currentReligion: {
-            id: 'RELF_DRU',
-            code: 'DRU',
-            description: 'Druid',
+            id: 'RELF_BUDD',
+            code: 'BUDD',
+            description: 'Buddhist',
             isActive: true,
-            listSequence: 1,
+            listSequence: 99,
           },
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
@@ -2426,13 +2473,50 @@ describe('PersonalController', () => {
 
       it('Populates the religion radio buttons from the flash', async () => {
         const expectedOptions = [
-          { text: 'Druid', value: 'DRU' },
-          { text: 'Pagan', value: 'PAG' },
+          { text: 'Buddhist', value: 'BUDD' },
+          {
+            text: 'Christian – Anglican',
+            value: 'COFE',
+            hint: {
+              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+            },
+          },
+          { text: 'Christian – Methodist', value: 'METH' },
+          {
+            text: 'Christian – Orthodox',
+            value: 'CHRODX',
+            hint: {
+              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+            },
+          },
+          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
+          {
+            text: 'Christian – Other',
+            value: 'CHRST',
+            hint: {
+              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+            },
+          },
+          { text: 'Muslim – Shia', value: 'SHIA' },
+          {
+            text: 'Muslim – Sunni',
+            value: 'SUNI',
+            hint: {
+              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+            },
+          },
+          { text: 'Muslim – Other', value: 'MUSOTH' },
           { text: 'Zoroastrian', value: 'ZORO', checked: true },
-          { divider: 'Or other, none or unknown' },
-          { text: 'Other religion', value: 'OTH' },
-          { text: 'No religion', value: 'NIL' },
-          { text: 'Unknown', value: 'UNKN' },
+          { divider: 'Or' },
+          {
+            text: 'Other religion, faith or belief',
+            value: 'OTH',
+            hint: {
+              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+            },
+          },
+          { text: 'No religion, faith or belief', value: 'NIL' },
+          { text: 'They prefer not to say', value: 'TPRNTS' },
         ]
 
         const req = {
@@ -2799,6 +2883,346 @@ describe('PersonalController', () => {
           correlationId: request.id,
           action: PostAction.EditSexualOrientation,
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Number of children', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.numberOfChildren().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/children', {
+          pageTitle: 'Children - Prisoner personal details',
+          formTitle: `Does First Last have any children?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+          radioFieldValue: 'YES',
+          currentNumberOfChildren: '2',
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field values from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            radioFieldValue: 'YES',
+            currentNumberOfChildren: '4',
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditNumberOfChildren,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.numberOfChildren().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { hasChildren: 'YES', numberOfChildren: '5' },
+          flash: jest.fn(),
+        } as any
+
+        personalPageService.updateNumberOfChildren = jest.fn()
+      })
+
+      it('Updates the number of children', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 5)
+      })
+
+      it(`Updates the number of children to 0 if 'NO' selected as answer`, async () => {
+        await action(
+          {
+            ...validRequest,
+            body: { hasChildren: 'NO' },
+          },
+          res,
+        )
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Number of children updated',
+          type: FlashMessageType.success,
+          fieldName: 'numberOfChildren',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateNumberOfChildren = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/children')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { hasChildren: 'YES', numberOfChildren: '5' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditNumberOfChildren,
+          details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Domestic status', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.domesticStatus().edit(req, response, () => {})
+      const referenceData: ReferenceDataCodeDto[] = [
+        {
+          id: '1',
+          code: 'S',
+          description: 'Single',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '2',
+          code: 'M',
+          description: 'Married',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '3',
+          code: 'N',
+          description: 'Prefer not to say',
+          listSequence: 99,
+          isActive: true,
+        },
+      ]
+
+      beforeEach(() => {
+        personalPageService.getDomesticStatusReferenceData = jest.fn(async () => referenceData)
+      })
+
+      it('Renders the default edit page with the correct data', async () => {
+        const expectedOptions = [
+          { text: 'Single', value: 'S', checked: true },
+          { text: 'Married', value: 'M' },
+          { divider: 'Or' },
+          { text: 'Prefer not to say', value: 'N' },
+        ]
+
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Marital or civil partnership status - Prisoner personal details',
+          formTitle: `What is First Last’s marital or civil partnership status?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          hintText: undefined,
+          errors: [],
+          options: expectedOptions,
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([expect.objectContaining({ value: 'M', checked: true })]),
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditDomesticStatus,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.domesticStatus().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'M' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the domestic status', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'M')
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Marital or civil partnership status updated',
+          type: FlashMessageType.success,
+          fieldName: 'domesticStatus',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateDomesticStatus = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/marital-status')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'M' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditDomesticStatus,
+          details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
         }
 
         await action(request, res)

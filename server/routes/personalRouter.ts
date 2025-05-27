@@ -1,14 +1,14 @@
 import { NextFunction, Request, RequestHandler, Response, Router } from 'express'
+import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { Services } from '../services'
-import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
 import NotFoundError from '../utils/notFoundError'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../utils/featureToggles'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
@@ -30,12 +30,15 @@ import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
+import nextOfKinRouter from './nextOfKinRouter'
+import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})/personal'
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
 
   const personalController = new PersonalController(
     services.personalPageService,
@@ -47,7 +50,7 @@ export default function personalRouter(services: Services): Router {
     basePath,
     auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     personalController.displayPersonalPage(),
   )
 
@@ -68,11 +71,22 @@ export default function personalRouter(services: Services): Router {
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
   }
 
+  const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
+    if (editReligionEnabled()) {
+      return next()
+    }
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
+  }
+
   // Distinguishing marks
   router.use(
     `${basePath}/:markType(tattoo|scar|mark)`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     distinguishingMarksRouter(services),
   )
@@ -81,7 +95,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     militaryRecordsRouter(services),
   )
 
@@ -89,7 +103,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     aliasRouter(services, editProfileChecks),
   )
 
@@ -97,8 +111,16 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     languagesRouter(services, editProfileChecks),
+  )
+
+  // Next of kin and emergency contacts
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    nextOfKinRouter(services, editProfileChecks),
   )
 
   // Edit routes
@@ -130,7 +152,7 @@ export default function personalRouter(services: Services): Router {
       routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
-      permissionsGuard(services.permissionsService.getOverviewPermissions),
+      prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
       permissionsCheck(),
       edit.method,
     )
@@ -140,7 +162,7 @@ export default function personalRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
         permissionsCheck(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
@@ -153,7 +175,7 @@ export default function personalRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
         permissionsCheck(),
         submit.method,
       )
@@ -403,6 +425,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    permissionsCheck: editReligionCheck,
   })
 
   editRoute({
@@ -414,6 +437,34 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditSexualOrientation,
       method: personalController.sexualOrientation().submit,
+    },
+  })
+
+  editRoute({
+    path: 'children',
+    edit: {
+      audit: Page.EditNumberOfChildren,
+      method: personalController.numberOfChildren().edit,
+    },
+    submit: {
+      audit: Page.PostEditNumberOfChildren,
+      method: personalController.numberOfChildren().submit,
+      validation: {
+        validators: [numberOfChildrenValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
+
+  editRoute({
+    path: 'marital-status',
+    edit: {
+      audit: Page.EditDomesticStatus,
+      method: personalController.domesticStatus().edit,
+    },
+    submit: {
+      audit: Page.PostEditDomesticStatus,
+      method: personalController.domesticStatus().submit,
     },
   })
 

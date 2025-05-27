@@ -21,6 +21,7 @@ describe('referenceDataService', () => {
     null,
     null,
     null,
+    null,
   ) as jest.Mocked<ReferenceDataSourceFactory>
   const referenceDataSource = new PersonIntegrationApiReferenceDataSource(
     null,

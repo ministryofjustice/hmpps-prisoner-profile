@@ -1,5 +1,7 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
 import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+import { PermissionsService as PrisonPermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -43,6 +45,9 @@ import PhotoService from './photoService'
 import AliasService from './aliasService'
 import LanguagesService from './languagesService'
 import ContactsService from './contactsService'
+import NextOfKinService from './nextOfKinService'
+import DomesticStatusService from './domesticStatusService'
+import logger from '../../logger'
 
 export const services = () => {
   const {
@@ -75,6 +80,7 @@ export const services = () => {
     telemetryClient,
     osPlacesApiClient,
     curiousApiToken,
+    tokenStore,
   } = dataAccess
 
   const auditService = AuditService({
@@ -83,6 +89,13 @@ export const services = () => {
     serviceName: config.apis.audit.serviceName,
     build: config.gitRef,
     enabled: config.apis.audit.enabled,
+  })
+
+  const prisonPermissionsService = PrisonPermissionsService.create({
+    prisonerSearchConfig: config.apis.prisonerSearchApi,
+    authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
+    logger,
+    telemetryClient,
   })
 
   const metricsService = new MetricsService(telemetryClient)
@@ -99,20 +112,10 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personCommunicationNeedsApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
   )
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
-  const personalPageService = new PersonalPageService(
-    prisonApiClientBuilder,
-    curiousApiClientBuilder,
-    personIntegrationApiClientBuilder,
-    healthAndMedicationApiClientBuilder,
-    referenceDataService,
-    prisonService,
-    metricsService,
-    curiousApiToken,
-    personalRelationshipsApiClientBuilder,
-  )
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
@@ -155,7 +158,7 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
-  const permissionsService = new PermissionsService(userService)
+  const permissionsService = new PermissionsService()
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
@@ -172,6 +175,29 @@ export const services = () => {
     metricsService,
   )
   const contactsService = new ContactsService(personalRelationshipsApiClientBuilder)
+  const nextOfKinService = new NextOfKinService(
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
+  const domesticStatusService = new DomesticStatusService(
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
+  const personalPageService = new PersonalPageService(
+    prisonApiClientBuilder,
+    curiousApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
+    referenceDataService,
+    prisonService,
+    metricsService,
+    curiousApiToken,
+    nextOfKinService,
+    domesticStatusService,
+  )
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -229,6 +255,8 @@ export const services = () => {
     languagesService,
     referenceDataService,
     contactsService,
+    nextOfKinService,
+    prisonPermissionsService,
   }
 }
 

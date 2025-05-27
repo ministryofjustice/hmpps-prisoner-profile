@@ -2,54 +2,60 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if  prisonerIsTRN(prisonId) %}
-        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="TRN-establishment-banner">
-            <p class="govuk-heading-m">
-              This prisoner is being transferred
-            </p>
-            <p>Some information may be hidden</p>
-        </div>
+      <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="TRN-establishment-banner">
+        <p class="govuk-heading-m">
+          This prisoner is being transferred
+        </p>
+        <p>Some information may be hidden</p>
+      </div>
     {% elseif prisonerIsOut(prisonId) %}
-        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="OUT-establishment-banner">
-            <p class="govuk-heading-m">
-              This person has been released
-            </p>
-            <p>Some information may be hidden</p>
-        </div>
+      <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="OUT-establishment-banner">
+        <p class="govuk-heading-m">
+          This person has been released
+        </p>
+        <p>Some information may be hidden</p>
+      </div>
     {% else %}
       {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) != true, id: 'outside-establishment-banner'}) -%}
-        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning">
-            <p class="govuk-heading-m">
-              This prisoner is not in your establishment
-            </p>
-            <p>Some information may be hidden</p>
-        </div>
+      <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning">
+        <p class="govuk-heading-m">
+          This prisoner is not in your establishment
+        </p>
+        <p>Some information may be hidden</p>
+      </div>
       {%- endcall -%}
     {% endif %}
     {% if newArrival24 %}
-        <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-24">
-            <p class="govuk-heading-m">
-                This prisoner has arrived today
-            </p>
-            <p>Some information may not have been entered yet</p>
-        </div>
+      <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-24">
+        <p class="govuk-heading-m">
+          This prisoner has arrived today
+        </p>
+        <p>Some information may not have been entered yet</p>
+      </div>
     {% endif %}
-    {% if newArrival72 %}
-        <div class="hmpps-profile-banner-alert  hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-72">
-            <p class="govuk-heading-m">
-                This prisoner has arrived in the last 3 days
-            </p>
-            <p>Some information may not have been entered yet</p>
-        </div>
+    {% if newArrival72 and not newArrival24 %}
+      <div class="hmpps-profile-banner-alert  hmpps-profile-banner-alert--info" data-qa="new-arrival-banner-72">
+        <p class="govuk-heading-m">
+          This prisoner has arrived in the last 3 days
+        </p>
+        <p>Some information may not have been entered yet</p>
+      </div>
     {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
-        <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image" data-qa="prisoner-photo-link">
-          <img
-            class="hmpps-profile-photo"
-            src="/api/prisoner/{{ prisonerNumber }}/image"
-            alt="{{ prisonerName }}"
-          />
-        </a>
+        <div class="hmpps-profile-banner-photo">
+          <a
+            href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}"
+            class="hmpps-clickable-image {{ prisonerUrlPath }}"
+            data-qa="prisoner-photo-link">
+            <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber }}/image?imageId={{ prisonerPhotoId }}" alt="{{ prisonerName }}"/>
+            <div class="hmpps-clickable-image__overlay">
+              <p class="govuk-body govuk-!-text-align-centre">
+                Facial<br/> images
+              </p>
+            </div>
+          </a>
+        </div>
         <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
         <div class="info">
           <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
@@ -62,9 +68,7 @@
                 {% if  link.url === undefined %}
                   <span data-qa="prisoner-csra-info-without-link" class="hmpps-white-font">{{ link.info }}</span>
                 {% else %}
-                  <a data-qa="prisoner-csra-info-with-link" href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
-                    >{{ link.info }}</a
-                  >
+                  <a data-qa="prisoner-csra-info-with-link" href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
                 {% endif %}
               </div>
             {% endfor %}

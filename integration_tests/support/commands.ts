@@ -6,9 +6,14 @@ import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/Refe
 import {
   CountryReferenceDataCodesMock,
   MilitaryRecordsMock,
+  ReligionReferenceDataCodesMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
-import { PersonalRelationshipsContactsDtoMock } from '../../server/data/localMockData/personalRelationshipsApiMock'
+import {
+  PersonalRelationshipsContactsDtoMock,
+  PersonalRelationshipsDomesticStatusMock,
+  PersonalRelationshipsNumberOfChildrenMock,
+} from '../../server/data/localMockData/personalRelationshipsApiMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -43,7 +48,7 @@ Cypress.Commands.add(
     ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
-    staffRoles = [],
+    isAKeyWorker = true,
     complexityLevel = ComplexityLevel.Low,
   }) => {
     cy.task('stubNonAssociations', prisonerNumber)
@@ -69,7 +74,7 @@ Cypress.Commands.add(
     cy.task('stubGetPathfinderNominal404')
     cy.task('stubGetSocNominal')
     cy.task('stubGetSocNominal404')
-    cy.task('stubGetStaffRoles', staffRoles)
+    cy.task('stubHasStaffRole', { roleType: 'KW', response: isAKeyWorker })
     cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
@@ -82,8 +87,7 @@ Cypress.Commands.add(
     cy.setupComponentsData({ caseLoads })
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
-    cy.task('stubOfficialRelationshipsCount', { prisonerNumber })
-    cy.task('stubSocialRelationshipsCount', { prisonerNumber })
+    cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
   },
 )
 
@@ -151,7 +155,7 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-  cy.task('stubGetStaffRoles', [])
+  cy.task('stubHasStaffRole', { roleType: 'KW', response: false })
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
@@ -172,12 +176,33 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     domain: 'COUNTRY',
     referenceData: CountryReferenceDataCodesMock,
   })
+  cy.task('stubPersonIntegrationGetReferenceData', {
+    domain: 'RELF',
+    referenceData: ReligionReferenceDataCodesMock,
+  })
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
   cy.task('stubPersonalCareNeeds')
   cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, resp: PersonalRelationshipsContactsDtoMock })
+  cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
+    prisonerNumber,
+    resp: PersonalRelationshipsNumberOfChildrenMock,
+  })
+  cy.task('stubPersonalRelationshipsGetDomesticStatus', {
+    prisonerNumber,
+    resp: PersonalRelationshipsDomesticStatusMock,
+  })
+  cy.task('stubAllPersonalCareNeeds')
 })
+
+Cypress.Commands.add(
+  'setupPermissionsCheckStubs',
+  ({ prisonerNumber, keyworker = false, restrictedPatient = false, prisonerDataOverrides = {} }) => {
+    cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, prisonerDataOverrides })
+    cy.task('stubCheckStaffRole', { role: 'KW', staffMemberHasRole: keyworker })
+  },
+)
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
   cy.task('stubPrisonerData', { prisonerNumber })
