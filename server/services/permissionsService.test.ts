@@ -4,6 +4,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
 
+
 jest.mock('./utils/permissions/access/getOverviewAccessStatusCode', () => ({
   __esModule: true,
   default: jest.fn(),
