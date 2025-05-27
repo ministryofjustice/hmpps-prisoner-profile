@@ -33,7 +33,9 @@ export default function imageRouter(services: Services): Router {
     services.auditService,
   )
 
-  const buildBreadcrumbsAndReferer: () => RequestHandler = () => {
+  const buildBreadcrumbsAndReferer: (includeFacialImagesLink?: boolean) => RequestHandler = (
+    includeFacialImagesLink = false,
+  ) => {
     return (req, res, next) => {
       const { prisonerData } = req.middleware
       const { prisonerNumber } = prisonerData
@@ -43,7 +45,14 @@ export default function imageRouter(services: Services): Router {
 
       const referer = req.query.referer as string
       res.locals.referer = referer
-      res.locals.breadCrumbs = imagePageBreadcrumbs(prisonerName, prisonerNumber, referer)
+      const breadcrumbs = imagePageBreadcrumbs(prisonerName, prisonerNumber, referer)
+      if (includeFacialImagesLink) {
+        breadcrumbs.push({
+          text: 'Facial images',
+          href: `/prisoner/${prisonerNumber}/image`,
+        })
+      }
+      res.locals.breadCrumbs = breadcrumbs
       next()
     }
   }
@@ -153,7 +162,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
-    buildBreadcrumbsAndReferer(),
+    buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newImage.get,
   )
 
@@ -172,7 +181,7 @@ export default function imageRouter(services: Services): Router {
       redirectBackOnError: true,
       useReq: true,
     }),
-    buildBreadcrumbsAndReferer(),
+    buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newImage.post,
   )
 
@@ -187,7 +196,7 @@ export default function imageRouter(services: Services): Router {
       includeSharedData: true,
       dpsUrl: config.serviceUrls.digitalPrison,
     }),
-    buildBreadcrumbsAndReferer(),
+    buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().submitImage,
   )
 
@@ -197,7 +206,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
-    buildBreadcrumbsAndReferer(),
+    buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newWithheldImage.get,
   )
 
@@ -207,7 +216,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
-    buildBreadcrumbsAndReferer(),
+    buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newWithheldImage.post,
   )
 
