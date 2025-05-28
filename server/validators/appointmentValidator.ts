@@ -4,6 +4,7 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
+import { bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
@@ -274,7 +275,20 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     }
   }
 
-  if (body.comments && body.comments.length > 3600) {
+  if ((body.appointmentType === 'VLPM' || body.appointmentType === 'VLB') && bvlsMasterPublicPrivateNotesEnabled()) {
+    if (body.notesForStaff && body.notesForStaff.length > 400) {
+      errors.push({
+        text: 'Enter notes for staff using 400 characters or less',
+        href: '#notesForStaff',
+      })
+    }
+    if (body.notesForPrisoners && body.notesForPrisoners.length > 400) {
+      errors.push({
+        text: 'Enter notes for prisoners using 400 characters or less',
+        href: '#notesForPrisoners',
+      })
+    }
+  } else if (body.comments && body.comments.length > 3600) {
     errors.push({
       text: 'Enter comments using 3,600 characters or less',
       href: '#comments',

@@ -161,9 +161,7 @@ describe('Appointment Controller', () => {
     appointmentService.getPrePostAppointmentRefData = jest.fn(async (): Promise<PrePostAppointmentRefData> => {
       return {
         courts: courtLocationsMock,
-        probationTeams: probationTeamsMock,
         hearingTypes: courtHearingTypes,
-        meetingTypes: probationMeetingTypes,
         locations: locationsApiMock,
       }
     })
@@ -617,12 +615,10 @@ describe('Appointment Controller', () => {
       pageTitle: 'Video link booking details',
       ...appointmentData,
       courts: courtLocationsSelectOptionsMock,
-      probationTeams: probationTeamsSelectOptionsMock,
       locations: locationsApiSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
-      meetingTypes: probationMeetingTypesSelectOptions,
     })
   })
 
@@ -692,12 +688,10 @@ describe('Appointment Controller', () => {
       pageTitle: 'Change appointment details',
       ...appointmentData,
       courts: courtLocationsSelectOptionsMock,
-      probationTeams: probationTeamsSelectOptionsMock,
       locations: locationsApiSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
-      meetingTypes: probationMeetingTypesSelectOptions,
     })
   })
 
