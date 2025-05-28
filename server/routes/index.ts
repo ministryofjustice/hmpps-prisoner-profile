@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   isGranted,
+  PrisonerBaseLocationPermission,
   PrisonerBasePermission,
   prisonerPermissionsGuard,
   PrisonerSchedulePermission,
@@ -250,7 +251,9 @@ export default function routes(services: Services): Router {
   get(
     `${basePath}/location-history`,
     getPrisonerData(services, { minimal: true }),
-    permissionsGuard(services.permissionsService.getLocationPermissions),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerBaseLocationPermission.read_location_history],
+    }),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(

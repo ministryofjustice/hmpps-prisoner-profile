@@ -5,7 +5,6 @@ import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import getOverviewAccessStatusCode from './utils/permissions/access/getOverviewAccessStatusCode'
 import getMoneyAccessStatusCode from './utils/permissions/access/getMoneyAccessStatusCode'
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
-import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 
 jest.mock('./utils/permissions/access/getOverviewAccessStatusCode', () => ({
   __esModule: true,
@@ -28,11 +27,6 @@ jest.mock('./utils/permissions/access/getActiveCaseLoadOnlyAccessStatusCode', ()
 }))
 
 jest.mock('./utils/permissions/getAlertsPermissions', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}))
-
-jest.mock('./utils/permissions/getCellMovePermissions', () => ({
   __esModule: true,
   default: jest.fn(),
 }))
@@ -113,36 +107,6 @@ describe('permissionsService', () => {
       expect(permissions).toEqual({
         accessCode: HmppsStatusCode.OK,
         alerts: { edit: true },
-      })
-    })
-  })
-
-  describe('getLocationPermissions', () => {
-    it.each([
-      HmppsStatusCode.RESTRICTED_PATIENT,
-      HmppsStatusCode.NOT_IN_CASELOAD,
-      HmppsStatusCode.PRISONER_IS_TRANSFERRING,
-      HmppsStatusCode.PRISONER_IS_RELEASED,
-      HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED,
-    ])('should return just the access code if it is %s', statusCode => {
-      ;(getOverviewAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
-
-      const permissions = service.getLocationPermissions(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: statusCode,
-      })
-    })
-
-    it('should return the access code and the alerts permissions if access code is HmppsStatusCode.OK', () => {
-      ;(getOverviewAccessStatusCode as jest.Mock).mockReturnValue(HmppsStatusCode.OK)
-      ;(getCellMovePermissions as jest.Mock).mockReturnValue('cell move')
-
-      const permissions = service.getLocationPermissions(prisonUserMock, PrisonerMockDataA)
-
-      expect(permissions).toEqual({
-        accessCode: HmppsStatusCode.OK,
-        cellMove: 'cell move',
       })
     })
   })
