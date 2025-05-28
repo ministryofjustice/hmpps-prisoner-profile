@@ -1,3 +1,4 @@
+import { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import HmppsError from '../../interfaces/HmppsError'
 import { HmppsUser } from '../../interfaces/HmppsUser'
 import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
@@ -45,6 +46,7 @@ export declare global {
 
     interface Locals {
       user: HmppsUser
+      prisonerPermissions?: PrisonerPermissions
     }
   }
 }
