@@ -97,16 +97,43 @@
                     ]
                 }) }}
 
-                <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Comments
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <pre class="govuk-body">{{ comments }}</pre>
-                        </dd>
-                    </div>
-                </dl>
+                {% if bvlsMasterPublicPrivateNotesEnabled() and appointmentTypeCode == 'VLB' %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                    text: "Notes for prison staff"
+                                },
+                                value: {
+                                    text: notesForStaff
+                                }
+                            },
+                            {
+                                key: {
+                                    text: "Notes for prisoner"
+                                },
+                                value: {
+                                    text: notesForPrisoners
+                                }
+                            }
+                        ]
+                    }) }}
+                {% else %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                    text: "Comment"
+                                },
+                                value: {
+                                    text: comments
+                                }
+                            }
+                        ]
+                    }) }}
+                {% endif %}
 
                 {% set prePostClass = 'govuk-!-margin-bottom-0' if pre and post else '' %}
 

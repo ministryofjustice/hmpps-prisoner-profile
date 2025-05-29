@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const locationEventsContainer = document.getElementById('location-events')
   const offenderEventsContainer = document.getElementById('offender-events')
   const appointmentId = document.getElementById('appointment-id')?.value || ''
+  const publicPrivateNotes = document.querySelector('.js-public-private-notes')
+  const comments = document.querySelector('.js-comments')
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
@@ -84,7 +86,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function showHidePublicPrivateNotes() {
+    if (!publicPrivateNotes) {
+      return
+    }
+
+    const appointmentType = appointmentTypeSelect.value
+
+    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
+      comments.style.display = 'none'
+      publicPrivateNotes.removeAttribute("style");
+    } else {
+      comments.removeAttribute("style");
+      publicPrivateNotes.style.display = 'none'
+    }
+  }
+
   function showHideCommentsHint() {
+    if (!comments) {
+      return
+    }
+
     const appointmentType = appointmentTypeSelect.value
 
     if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
@@ -98,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showHideRecurring()
     showHideProbationFields()
     showHideCommentsHint()
+    showHidePublicPrivateNotes()
   })
 
   appointmentLocationSelect.addEventListener('change', () => {
@@ -130,5 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
   getAppointmentEndDate()
   showHideRecurring()
   showHideProbationFields()
+  showHidePublicPrivateNotes()
   showHideCommentsHint()
 })

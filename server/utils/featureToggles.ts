@@ -20,3 +20,5 @@ export const newOverviewPageLayoutEnabled = () => config.featureToggles.newOverv
 
 export const externalContactsEnabled = (activeCaseLoadId: string) =>
   newOverviewPageLayoutEnabled() && config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
+
+export const bvlsMasterPublicPrivateNotesEnabled = () => config.featureToggles.bvlsMasterPublicPrivateNotesEnabled
