@@ -54,14 +54,14 @@ context('Change Name Purpose Page', () => {
     })
 
     it('should redirect to new name page', () => {
-      cy.get(`input[name=purpose][value=name-changed]`).click()
+      cy.get(`input[name=radioField][value=name-changed]`).click()
       page.continueButton().click()
 
       cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/enter-new-name')
     })
 
     it('should redirect to correct name page', () => {
-      cy.get(`input[name=purpose][value=name-wrong]`).click()
+      cy.get(`input[name=radioField][value=name-wrong]`).click()
       page.continueButton().click()
 
       cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/enter-corrected-name')
@@ -69,7 +69,7 @@ context('Change Name Purpose Page', () => {
 
     it('should show an error if nothing is selected', () => {
       page.continueButton().click()
-      page.errorSummary().should('contain.text', "Select why you're changing John Saunders’ name")
+      page.errorSummary().should('contain.text', 'Select why you’re changing John Saunders’ name')
     })
   })
 })

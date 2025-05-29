@@ -32,6 +32,7 @@ import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
 import nextOfKinRouter from './nextOfKinRouter'
 import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
+import addressEditRouter from './addressEditRouter'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -97,6 +98,14 @@ export default function personalRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     militaryRecordsRouter(services),
+  )
+
+  // Addresses
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    addressEditRouter(services, editProfileChecks),
   )
 
   // Aliases
