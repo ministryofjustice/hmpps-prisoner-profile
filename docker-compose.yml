@@ -28,7 +28,7 @@ services:
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8081
 
   prison-api:
-    image: quay.io/hmpps/prison-api:latest
+    image: ghcr.io/ministryofjustice/prison-api:latest
     container_name: prison-api
     networks:
       - hmpps
