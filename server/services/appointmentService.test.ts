@@ -105,8 +105,6 @@ describe('Appointment Service', () => {
       expect(refData).toEqual({
         courts: courtLocationsMock,
         hearingTypes: courtHearingTypes,
-        probationTeams: [],
-        meetingTypes: [],
         locations: locationsApiMock,
       })
     })

@@ -26,9 +26,7 @@ export interface AddAppointmentRefData {
 
 export interface PrePostAppointmentRefData {
   courts: Court[]
-  probationTeams: ProbationTeam[]
   hearingTypes: CourtHearingOrMeetingType[]
-  meetingTypes: CourtHearingOrMeetingType[]
   locations: LocationsApiLocation[]
 }
 
@@ -109,19 +107,15 @@ export default class AppointmentService {
    * @param prisonId
    */
   public async getPrePostAppointmentRefData(token: string, prisonId: string): Promise<PrePostAppointmentRefData> {
-    const [courts, probationTeams, hearingTypes, meetingTypes, locations] = await Promise.all([
+    const [courts, hearingTypes, locations] = await Promise.all([
       this.bookAVideoLinkApiClientBuilder(token).getCourts(),
-      [],
       this.bookAVideoLinkApiClientBuilder(token).getCourtHearingTypes(),
-      [],
       this.locationDetailsService.getLocationsForAppointments(token, prisonId),
     ])
 
     return {
       courts,
-      probationTeams,
       hearingTypes,
-      meetingTypes,
       locations,
     }
   }

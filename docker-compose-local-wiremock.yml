@@ -53,7 +53,7 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   prison-api:
-    image: quay.io/hmpps/prison-api:latest
+    image: ghcr.io/ministryofjustice/prison-api:latest
     container_name: prison-api
     networks:
       - hmpps

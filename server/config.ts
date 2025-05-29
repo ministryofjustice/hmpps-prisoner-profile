@@ -373,5 +373,6 @@ export default {
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     newOverviewPageLayoutEnabled: toBoolean(get('NEW_OVERVIEW_PAGE_LAYOUT_ENABLED', 'false')),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
+    bvlsMasterPublicPrivateNotesEnabled: toBoolean(get('BVLS_FEATURE_MASTER_PUBLIC_PRIVATE_NOTES', 'false')),
   },
 }
