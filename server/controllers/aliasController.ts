@@ -49,10 +49,25 @@ export default class AliasController {
         })
         .catch(error => logger.error(error))
 
-      return res.render('pages/edit/alias/changeNamePurpose', {
-        pageTitle: `Why are you changing this person's name? - Prisoner personal details`,
+      return res.render('pages/edit/radioField', {
+        pageTitle: `Why are you changing this person’s name? - Prisoner personal details`,
         formTitle: `Why are you changing ${apostrophe(titlePrisonerName)} name?`,
+        submitButtonText: 'Continue',
+        options: [
+          {
+            value: 'name-wrong',
+            text: 'Their current name is wrong',
+            hint: { text: 'For example, if it contains a typo or is missing a middle name.' },
+          },
+          {
+            value: 'name-changed',
+            text: 'Their name has legally changed',
+            hint: { text: 'For example, if they have taken their spouse’s or civil partner’s last name.' },
+          },
+        ],
         errors,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerName,
         miniBannerData: {
           prisonerNumber,
           prisonerName,
@@ -64,10 +79,12 @@ export default class AliasController {
   public submitChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { titlePrisonerName, prisonerNumber } = this.getCommonRequestData(req)
-      const { purpose } = req.body
+      const { radioField: purpose } = req.body
 
       if (!purpose) {
-        req.flash('errors', [{ text: `Select why you're changing ${apostrophe(titlePrisonerName)} name` }])
+        req.flash('errors', [
+          { text: `Select why you’re changing ${apostrophe(titlePrisonerName)} name`, href: '#radio' },
+        ])
         return res.redirect(`/prisoner/${prisonerNumber}/personal/change-name`)
       }
 
