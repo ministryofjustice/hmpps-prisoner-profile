@@ -12,6 +12,8 @@ export default interface CreateVideoBookingRequest {
     contactEmail: string
     contactNumber?: string
   }
+  notesForStaff?: string
+  notesForPrisoners?: string
 }
 
 export interface AmendVideoBookingRequest extends CreateVideoBookingRequest {}
@@ -67,4 +69,6 @@ export interface VideoLinkBooking {
     contactEmail?: string
     contactNumber?: string
   }
+  notesForStaff?: string
+  notesForPrisoners?: string
 }

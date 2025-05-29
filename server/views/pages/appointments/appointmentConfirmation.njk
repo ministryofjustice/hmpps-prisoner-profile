@@ -157,16 +157,43 @@
                 }) }}
                 {% endif %}
 
-                <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Comment
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <pre class="govuk-body">{{ comment }}</pre>
-                        </dd>
-                    </div>
-                </dl>
+                {% if bvlsMasterPublicPrivateNotesEnabled() and appointmentTypeCode == 'VLPM' %}
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                                text: "Notes for prison staff"
+                            },
+                            value: {
+                                text: notesForStaff
+                            }
+                        },
+                        {
+                            key: {
+                                text: "Notes for prisoner"
+                            },
+                            value: {
+                                text: notesForPrisoners
+                            }
+                        }
+                    ]
+                }) }}
+                {% else %}
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                                text: "Comment"
+                            },
+                            value: {
+                                text: comment
+                            }
+                        }
+                    ]
+                }) }}
+                {% endif %}
 
                 <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-8">
                     <a href="{{ movementSlipUrl }}"  class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer">Print movement slip</a>
