@@ -80,6 +80,32 @@ export default class AddressEditController {
     }
   }
 
+  public displayFindUkAddress(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const errors = req.flash('errors')
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressFindUkAddress,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/address/findUkAddress', {
+        pageTitle: 'Find a UK address - Prisoner personal details',
+        formTitle: `Find a UK address for ${titlePrisonerName}`,
+        errors,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerName,
+        miniBannerData: { prisonerNumber, prisonerName },
+      })
+    }
+  }
+
   private getCommonRequestData(req: Request) {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })

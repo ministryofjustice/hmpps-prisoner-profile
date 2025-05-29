@@ -1,0 +1,83 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + prisonerNumber + "/personal"
+    }
+] %}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+    {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
+        {{ govukBackLink({
+            text: "Back",
+            href: "/prisoner/" + prisonerNumber + "/personal/where-is-address",
+            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
+        }) }}
+
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            }) }}
+        {% endif %}
+
+        <div class="hmpps-edit-address govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                <form method="post" novalidate="novalidate" autocomplete="off">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+                    {{ govukInput({
+                        id: 'address',
+                        name: 'address',
+                        label: {
+                            text: formTitle,
+                            classes: "govuk-label--l",
+                            isPageHeading: true
+                        },
+                        hint: {
+                            text: "Start typing a postcode or address"
+                        },
+                        value: formValues.firstName,
+                        errorMessage: errors | findError('address')
+                    }) }}
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Continue",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            attributes: { "data-qa": "edit-submit-button" }
+                        }) }}
+                        <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
+                           class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+                    </div>
+
+                    <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/personal/add-uk-address">Enter the address manually</a>
+                </form>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
