@@ -46,7 +46,7 @@ export default (
     actions.push({
       text: 'Add key worker session',
       icon: Icon.AddKeyWorkerSession,
-      url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
+      url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA`,
       dataQA: 'add-key-worker-session-action-link',
     })
   }
