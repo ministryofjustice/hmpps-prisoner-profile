@@ -337,7 +337,7 @@
                               text: "Notes for prison staff (optional)",
                               classes: 'govuk-fieldset__legend--s'
                             },
-                            hint: { text: "This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required." },
+                            hint: { html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor's details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>" },
                             maxlength: "400"
                         }) }}
                         {{ govukCharacterCount({
