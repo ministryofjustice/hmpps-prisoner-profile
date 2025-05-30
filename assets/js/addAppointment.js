@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const appointmentId = document.getElementById('appointment-id')?.value || ''
   const publicPrivateNotes = document.querySelector('.js-public-private-notes')
   const comments = document.querySelector('.js-comments')
+  const courtHintText = document.getElementById('court-hint-text')
+  const probationHintText = document.getElementById('probation-hint-text')
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
@@ -95,6 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
       comments.style.display = 'none'
+
+      if (appointmentType === 'VLB') {
+        courtHintText.removeAttribute("style");
+        probationHintText.style.display = 'none'
+      } else {
+        probationHintText.removeAttribute("style");
+        courtHintText.style.display = 'none'
+      }
+
       publicPrivateNotes.removeAttribute("style");
     } else {
       comments.removeAttribute("style");
