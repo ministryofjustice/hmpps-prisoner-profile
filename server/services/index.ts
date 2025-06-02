@@ -34,7 +34,6 @@ import ContentfulService from './contentfulService'
 import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
-import PermissionsService from './permissionsService'
 import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
@@ -158,7 +157,6 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
-  const permissionsService = new PermissionsService()
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
@@ -246,7 +244,6 @@ export const services = () => {
     curiousService,
     featureToggleService,
     careNeedsService,
-    permissionsService,
     distinguishingMarksService,
     csipService,
     militaryRecordsService,

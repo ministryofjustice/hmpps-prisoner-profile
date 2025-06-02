@@ -113,6 +113,29 @@
                     ]
                 }) }}
 
+                {% if bvlsMasterPublicPrivateNotesEnabled() %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                    text: "Notes for prison staff"
+                                },
+                                value: {
+                                    text: notesForStaff
+                                }
+                            },
+                            {
+                                key: {
+                                    text: "Notes for prisoner"
+                                },
+                                value: {
+                                    text: notesForPrisoners
+                                }
+                            }
+                        ]
+                    }) }}
+                {% else %}
                 <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
@@ -123,6 +146,7 @@
                         </dd>
                     </div>
                 </dl>
+                {% endif %}
 
                 <form method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />

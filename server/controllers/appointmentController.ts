@@ -40,6 +40,7 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
+import { bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -95,7 +96,6 @@ export default class AppointmentController {
         bookingId,
         prisonId,
       } as AppointmentForm
-
       if (
         appointment.appointment.appointmentTypeCode === 'VLB' ||
         appointment.appointment.appointmentTypeCode === 'VLPM'
@@ -121,6 +121,8 @@ export default class AppointmentController {
           officerTelephone:
             (vlb.bookingType === 'PROBATION' && vlb.additionalBookingDetails?.contactNumber) || undefined,
           meetingType: vlb.probationMeetingType || undefined,
+          notesForStaff: vlb.notesForStaff || undefined,
+          notesForPrisoners: vlb.notesForPrisoners || undefined,
         }
       }
 
@@ -210,6 +212,8 @@ export default class AppointmentController {
         bookingId,
         prisonId,
         refererUrl,
+        notesForStaff,
+        notesForPrisoners,
       } = req.body
 
       const appointmentForm: AppointmentForm = {
@@ -233,6 +237,8 @@ export default class AppointmentController {
         comments,
         bookingId,
         prisonId,
+        notesForStaff,
+        notesForPrisoners,
       }
 
       const errors = req.errors || []
@@ -359,6 +365,8 @@ export default class AppointmentController {
         numberAdded: appointmentDetails.times,
         lastAppointmentDate: formatDate(lastAppointmentISODate, 'long'),
         comment: appointmentDetails.comments,
+        notesForStaff: appointmentDetails.notesForStaff,
+        notesForPrisoners: appointmentDetails.notesForPrisoners,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
@@ -418,9 +426,7 @@ export default class AppointmentController {
               postAppointment: postAppointment ? 'yes' : 'no',
               postAppointmentLocation: postLocation,
               court: vlb.courtCode,
-              probationTeam: undefined as string,
               hearingType: vlb.courtHearingType,
-              meetingType: undefined as string,
               cvpRequired: vlb.videoLinkUrl ? 'yes' : 'no',
               videoLinkUrl: vlb.videoLinkUrl,
             }
@@ -441,8 +447,10 @@ export default class AppointmentController {
         throw new ServerError('PrePostAppointmentDetails not found in request')
       }
 
-      const { courts, probationTeams, hearingTypes, meetingTypes, locations } =
-        await this.appointmentService.getPrePostAppointmentRefData(clientToken, user.activeCaseLoadId)
+      const { courts, hearingTypes, locations } = await this.appointmentService.getPrePostAppointmentRefData(
+        clientToken,
+        user.activeCaseLoadId,
+      )
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
@@ -478,6 +486,8 @@ export default class AppointmentController {
         endTime: `${appointmentForm.endTimeHours}:${appointmentForm.endTimeMinutes}`,
         comments: appointmentForm.comments,
         appointmentDate: formatDate(appointmentDefaults.startTime, 'long'),
+        notesForStaff: appointmentForm.notesForStaff,
+        notesForPrisoners: appointmentForm.notesForPrisoners,
         formValues,
       }
 
@@ -504,12 +514,10 @@ export default class AppointmentController {
         pageTitle: appointmentId ? 'Change appointment details' : 'Video link booking details',
         ...appointmentData,
         courts: objectToSelectOptions(courts, 'code', 'description'),
-        probationTeams: objectToSelectOptions(probationTeams, 'code', 'description'),
         locations: objectToSelectOptions(locations, 'id', 'localName'),
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
         hearingTypes: objectToSelectOptions(hearingTypes, 'code', 'description'),
-        meetingTypes: objectToSelectOptions(meetingTypes, 'code', 'description'),
         appointmentId,
       })
     }
@@ -610,13 +618,13 @@ export default class AppointmentController {
       if (!appointmentFlash?.length) {
         throw new ServerError('PrePostAppointmentDetails not found in request')
       }
-      const { appointmentId, appointmentDefaults, formValues } =
+      const { appointmentId, appointmentDefaults, formValues, appointmentForm } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
-      const [{ courts, probationTeams, hearingTypes, meetingTypes, locations }, prison] = await Promise.all([
+      const [{ courts, hearingTypes, locations }, prison] = await Promise.all([
         this.appointmentService.getPrePostAppointmentRefData(clientToken, activeCaseLoadId),
         this.appointmentService.getAgencyDetails(clientToken, prisonId),
       ])
@@ -636,7 +644,6 @@ export default class AppointmentController {
       const postLocation = locations.find(loc => loc.id === formValues.postAppointmentLocation)?.localName
 
       const courtDescription = courts.find(court => court.code === formValues.court)?.description
-      const probationTeamDescription = probationTeams.find(team => team.code === formValues.probationTeam)?.description
 
       const preAppointmentStartTime = subMinutes(
         new Date(appointmentDefaults.startTime),
@@ -659,6 +666,8 @@ export default class AppointmentController {
         startTime: timeFormat(appointmentDefaults.startTime),
         endTime: timeFormat(appointmentDefaults.endTime),
         comments: appointmentDefaults.comment,
+        notesForStaff: appointmentForm.notesForStaff,
+        notesForPrisoners: appointmentForm.notesForPrisoners,
         pre:
           formValues.preAppointment === 'yes'
             ? `${preLocation} - ${timeFormat(formatDateTimeISO(preAppointmentStartTime))} to ${timeFormat(
@@ -672,13 +681,9 @@ export default class AppointmentController {
               )}`
             : undefined,
         court: courtDescription,
-        probationTeam: probationTeamDescription,
         hearingType: hearingTypes.find(ht => ht.code === formValues.hearingType)?.description,
-        meetingType: meetingTypes.find(ht => ht.code === formValues.meetingType)?.description,
         videoLinkUrl: formValues.cvpRequired === 'yes' && formValues.videoLinkUrl,
-        mustContactTheCourt:
-          courts.find(court => court.code === formValues.court)?.enabled === false ||
-          probationTeams.find(team => team.code === formValues.probationTeam)?.enabled === false,
+        mustContactTheCourt: courts.find(court => court.code === formValues.court)?.enabled === false,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
@@ -977,7 +982,7 @@ export default class AppointmentController {
       probationTeamCode: appointmentForm.probationTeam,
       courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
       probationMeetingType: appointmentForm.meetingType,
-      comments: appointments.comment || undefined,
+      comments: (!bvlsMasterPublicPrivateNotesEnabled() && appointments.comment) || undefined,
       videoLinkUrl:
         (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' && prePostAppointmentForm.formValues.videoLinkUrl) ||
         undefined,
@@ -989,6 +994,8 @@ export default class AppointmentController {
               contactNumber: appointmentForm.officerTelephone,
             }
           : undefined,
+      notesForStaff: (bvlsMasterPublicPrivateNotesEnabled() && appointmentForm.notesForStaff) || undefined,
+      notesForPrisoners: (bvlsMasterPublicPrivateNotesEnabled() && appointmentForm.notesForPrisoners) || undefined,
     } as CreateVideoBookingRequest
 
     if (appointmentForm.appointmentId) {

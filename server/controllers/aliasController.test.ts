@@ -56,10 +56,25 @@ describe('Alias Controller', () => {
     it('should render the change name purpose page', async () => {
       await controller.displayChangeNamePurpose()(req, res, next)
 
-      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeNamePurpose', {
-        pageTitle: `Why are you changing this person's name? - Prisoner personal details`,
+      expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+        pageTitle: `Why are you changing this person’s name? - Prisoner personal details`,
         formTitle: `Why are you changing John Saunders’ name?`,
         errors: [],
+        breadcrumbPrisonerName: 'Saunders, John',
+        prisonerNumber: 'G6123VU',
+        submitButtonText: 'Continue',
+        options: [
+          {
+            value: 'name-wrong',
+            text: 'Their current name is wrong',
+            hint: { text: 'For example, if it contains a typo or is missing a middle name.' },
+          },
+          {
+            value: 'name-changed',
+            text: 'Their name has legally changed',
+            hint: { text: 'For example, if they have taken their spouse’s or civil partner’s last name.' },
+          },
+        ],
         miniBannerData: {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
@@ -80,14 +95,16 @@ describe('Alias Controller', () => {
       ['name-wrong', 'enter-corrected-name'],
       ['name-changed', 'enter-new-name'],
     ])('for choice %s should redirect to %s page', async (purpose: string, redirect: string) => {
-      req = { ...req, body: { purpose } } as unknown as Request
+      req = { ...req, body: { radioField: purpose } } as unknown as Request
 
       await controller.submitChangeNamePurpose()(req, res, next)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
 
       if (!purpose) {
-        expect(req.flash).toHaveBeenCalledWith('errors', [{ text: `Select why you're changing John Saunders’ name` }])
+        expect(req.flash).toHaveBeenCalledWith('errors', [
+          { text: `Select why you’re changing John Saunders’ name`, href: '#radio' },
+        ])
       } else {
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,

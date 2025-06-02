@@ -55,9 +55,7 @@ describe('buildOverviewActions', () => {
         {} as PrisonerPermissions,
       )
       expect(
-        !!resp.find(
-          action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA&subType=KS`,
-        ),
+        !!resp.find(action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA`),
       ).toEqual(keyworker)
     })
   })

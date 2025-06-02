@@ -56,6 +56,8 @@ export interface AppointmentForm {
   bookingId?: number
   prisonId?: string
   dpsLocationId?: string
+  notesForStaff?: string
+  notesForPrisoners?: string
 }
 
 export interface AppointmentDefaults {
@@ -76,7 +78,6 @@ export interface PrePostAppointmentDetails {
   appointmentDefaults: AppointmentDefaults // Summary details
   appointmentForm: AppointmentForm // The original appointment form
   // PrePost Form values
-  // TODO: Remove probation fields here when feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
   formValues?: {
     bookingType: string
     preAppointment?: string
@@ -84,9 +85,7 @@ export interface PrePostAppointmentDetails {
     postAppointment?: string
     postAppointmentLocation?: string
     court?: string
-    probationTeam?: string
     hearingType?: string
-    meetingType?: string
     cvpRequired?: string
     videoLinkUrl?: string
   }

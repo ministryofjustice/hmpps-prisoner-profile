@@ -9,6 +9,7 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 {% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
 {% from "components/timePicker/timePicker.njk" import timePicker %}
@@ -309,6 +310,7 @@
                         ]
                     }) }}
 
+                    <div class="js-comments">
                     {{ govukTextarea({
                         name: "comments",
                         id: "comments",
@@ -322,6 +324,36 @@
                             text: "For confidentiality reasons, comments for Video Link - Court Hearing and Video Link - Probation Meeting appointments will not appear on movement slips."
                         }
                     }) }}
+                    </div>
+
+                    {% if bvlsMasterPublicPrivateNotesEnabled() %}
+                    <div class="js-public-private-notes">
+                        {{ govukCharacterCount({
+                            id: "notesForStaff",
+                            name: "notesForStaff",
+                            errorMessage: errors | findError("notesForStaff"),
+                            value: formValues.notesForStaff,
+                            label: {
+                              text: "Notes for prison staff (optional)",
+                              classes: 'govuk-fieldset__legend--s'
+                            },
+                            hint: { html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor's details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>" },
+                            maxlength: "400"
+                        }) }}
+                        {{ govukCharacterCount({
+                            id: "notesForPrisoners",
+                            name: "notesForPrisoners",
+                            errorMessage: errors | findError("notesForPrisoners"),
+                            value: formValues.notesForPrisoners,
+                            label: {
+                              text: "Notes for prisoner (optional)",
+                              classes: 'govuk-fieldset__legend--s'
+                            },
+                            hint: { html: "<p class='govuk-hint'>Add information the prisoner needs to know about their video link booking. This will appear on movement slips and will be seen by the prisoner.</p><p class='govuk-hint'>Do not add anything that should not be seen by or shared with a prisoner.</p>" },
+                            maxlength: "400"
+                        }) }}
+                    </div>
+                    {% endif %}
 
                     <div class="govuk-button-group">
                         {{ govukButton({ text: "Save and continue", type: "submit", preventDoubleClick: true }) }}
