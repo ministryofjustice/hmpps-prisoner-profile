@@ -37,4 +37,48 @@ describe('nonAssociationsApiClient', () => {
       expect(output).toEqual(prisonerNonAssociationsMock)
     })
   })
+
+  describe('getNonAssociations', () => {
+    it('Should open circuit breaker after failures, then close again after timeout', async () => {
+      // Set test config
+      config.apis.nonAssociationsApi.circuitBreaker.resetTimeout = 100
+
+      // Assume the api is failing and make some requests
+      fakeNonAssociationsApi.persist().get('/prisoner/XYZ999/non-associations/').reply(500)
+
+      await Promise.all(
+        Array.from({ length: 10 }).map(() =>
+          nonAssociationsApiClient
+            .getPrisonerNonAssociations('XYZ999', {
+              includeOtherPrisons: 'true',
+            })
+            .catch(() => ''),
+        ),
+      )
+
+      // Assume the api stopped failing
+      mockSuccessfulPrisonApiCall(
+        `/prisoner/XYZ999/non-associations?includeOtherPrisons=true`,
+        prisonerNonAssociationsMock,
+      )
+
+      // Check the circuit opened and new requests are rejected
+      await expect(
+        nonAssociationsApiClient.getPrisonerNonAssociations('XYZ999', {
+          includeOtherPrisons: 'true',
+        }),
+      ).rejects.toThrow('Breaker is open')
+
+      // Wait for it to close
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      // Check it closed again
+      const output = await nonAssociationsApiClient.getPrisonerNonAssociations('XYZ999', {
+        includeOtherPrisons: 'true',
+      })
+      expect(output).toEqual(prisonerNonAssociationsMock)
+    })
+  })
 })

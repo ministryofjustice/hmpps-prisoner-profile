@@ -210,6 +210,12 @@ export default {
         response: Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_RESPONSE', 3000)),
         deadline: Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 3000)),
       },
+      circuitBreaker: {
+        timeout: 5000, // The time it takes for requests to time out in the circuit breaker
+        rollingCountTimeout: 10000, // How long in the past requests are considered for 50% timeout
+        errorThresholdPercentage: 50, // What percentage of prequests in the timeframe need to fail to open circuit
+        resetTimeout: 30000, // How long to wait before half-closing the circuit again and then closing.
+      },
       agent: new AgentConfig(Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 3000))),
     },
     prisonerProfileDeliusApi: {
