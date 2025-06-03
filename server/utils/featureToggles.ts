@@ -16,9 +16,7 @@ export const militaryHistoryEnabled = () =>
 export const editReligionEnabled = () =>
   config.featureToggles.editReligionEnabledFrom && isAfter(Date.now(), config.featureToggles.editReligionEnabledFrom)
 
-export const newOverviewPageLayoutEnabled = () => config.featureToggles.newOverviewPageLayoutEnabled
-
 export const externalContactsEnabled = (activeCaseLoadId: string) =>
-  newOverviewPageLayoutEnabled() && config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
+  config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
 
 export const bvlsMasterPublicPrivateNotesEnabled = () => config.featureToggles.bvlsMasterPublicPrivateNotesEnabled
