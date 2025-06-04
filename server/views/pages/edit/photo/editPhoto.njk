@@ -38,6 +38,7 @@
     <div class="govuk-grid-column-full">
       {{ govukBackLink({
         text: "Back",
+        classes: "govuk-!-margin-0",
         href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
       }) }}
     </div>
