@@ -149,6 +149,11 @@
 
   .govuk-summary-list {
     margin-bottom: 0;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
 }
 
 @keyframes greenToTransparent {
@@ -267,6 +272,4 @@
   dl.govuk-summary-list {
     margin-bottom: 0;
   }
-}
-
 }

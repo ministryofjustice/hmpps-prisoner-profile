@@ -542,7 +542,7 @@ describe('PersonalPageService', () => {
         { comment: 'P/CONS', value: '08/359381C' },
         { comment: 'P/CONS - fixed', value: '8/359381C' },
       ])
-      expect(identityNumbers.justice.prisonNumber).toEqual([{ value: 'G6123VU' }])
+      expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
     })
   })
 

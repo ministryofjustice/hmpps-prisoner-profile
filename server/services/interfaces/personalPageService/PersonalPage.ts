@@ -89,7 +89,7 @@ export interface IdentityNumbers {
     croNumber: IdentityNumber[]
     pncNumber: IdentityNumber[]
     prisonLegacySystemNumber: IdentityNumber[]
-    prisonNumber: IdentityNumber[]
+    prisonNumber: string
     probationLegacySystemNumber: IdentityNumber[]
     scottishPncNumber: IdentityNumber[]
     yjafNumber: IdentityNumber[]
