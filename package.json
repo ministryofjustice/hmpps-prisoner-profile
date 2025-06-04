@@ -101,7 +101,7 @@
     "@aws-sdk/client-sqs": "^3.812.0",
     "@contentful/rich-text-html-renderer": "^17.0.0",
     "@contentful/rich-text-types": "^16.8.5",
-    "@ministryofjustice/frontend": "^2.2.5",
+    "@ministryofjustice/frontend": "^3.7.2",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1-alpha.4",
     "@ministryofjustice/hmpps-connect-dps-components": "^2.1.0",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "^1.2.1",
