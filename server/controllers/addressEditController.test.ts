@@ -4,17 +4,27 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import { prisonUserMock } from '../data/localMockData/user'
 import AddressEditController from './addressEditController'
+import AddressService from '../services/addressService'
+import EphemeralDataService from '../services/EphemeralDataService'
+import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
+import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
+import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
+
+const uprn = 1234
 
 describe('Address Edit Controller', () => {
   let req: Request
   let res: Response
   let next: NextFunction
+  let addressService: AddressService
+  let ephemeralDataService: EphemeralDataService
   let auditService: AuditService
   let controller: AddressEditController
 
   beforeEach(() => {
     req = {
       id: '123',
+      query: {},
       params: { prisonerNumber: 'G6123VU' },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
       flash: jest.fn().mockReturnValue([]),
@@ -29,9 +39,11 @@ describe('Address Edit Controller', () => {
 
     next = jest.fn()
 
+    addressService = addressServiceMock() as AddressService
+    ephemeralDataService = ephemeralDataServiceMock() as EphemeralDataService
     auditService = auditServiceMock()
 
-    controller = new AddressEditController(auditService)
+    controller = new AddressEditController(addressService, ephemeralDataService, auditService)
   })
 
   describe('Where is the address page', () => {
@@ -89,6 +101,80 @@ describe('Address Edit Controller', () => {
           details: { location },
         })
       }
+    })
+  })
+
+  describe('Find UK address page', () => {
+    describe('Rendering the page', () => {
+      it('should render the find UK address page', async () => {
+        await controller.displayFindUkAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/address/findUkAddress', {
+          pageTitle: 'Find a UK address - Prisoner personal details',
+          formTitle: `Find a UK address for John Saunders`,
+          errors: [],
+          prisonerNumber: 'G6123VU',
+          breadcrumbPrisonerName: 'Saunders, John',
+          miniBannerData: { prisonerNumber: 'G6123VU', prisonerName: 'Saunders, John' },
+        })
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          prisonId: PrisonerMockDataA.prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressFindUkAddress,
+        })
+      })
+    })
+
+    describe('Submitting the page', () => {
+      it.each([
+        [undefined, 'find-uk-address'],
+        [uprn, 'confirm-address'],
+      ])(`should handle uprn: '%s' and redirect to '%s' page`, async (uprnResponse: number, redirect: string) => {
+        const address = { uprn } as OsAddress
+        req = { ...req, body: { uprn: uprnResponse } } as unknown as Request
+        addressService.getAddressesByUprn = jest.fn().mockReturnValue([address])
+
+        await controller.submitFindUkAddress()(req, res, next)
+
+        if (!uprnResponse) {
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
+          expect(req.flash).toHaveBeenCalledWith('errors', [
+            { text: 'Search for and select an address', href: '#address-autosuggest-input' },
+          ])
+        } else {
+          expect(res.redirect).toHaveBeenCalledWith(
+            expect.stringContaining(`/prisoner/G6123VU/personal/${redirect}?address=`),
+          )
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+            user: prisonUserMock,
+            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.EditAddressFindUkAddress,
+            details: { uprn },
+          })
+        }
+      })
+
+      it('throws NotFoundError if address not returned for uprn', async () => {
+        req = { ...req, body: { uprn } } as unknown as Request
+        addressService.getAddressesByUprn = jest.fn().mockReturnValue([])
+
+        await expect(controller.submitFindUkAddress()(req, res, next)).rejects.toThrow(
+          'Could not find unique address by UPRN',
+        )
+      })
+
+      it('throws NotFoundError if multiple addresses returned for uprn', async () => {
+        req = { ...req, body: { uprn } } as unknown as Request
+        addressService.getAddressesByUprn = jest.fn().mockReturnValue([{ uprn: 1 }, { uprn: 2 }])
+
+        await expect(controller.submitFindUkAddress()(req, res, next)).rejects.toThrow(
+          'Could not find unique address by UPRN',
+        )
+      })
     })
   })
 })

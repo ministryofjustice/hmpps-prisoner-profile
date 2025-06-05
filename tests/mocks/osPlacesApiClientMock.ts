@@ -2,4 +2,5 @@ import { OsPlacesApiClient } from '../../server/data/interfaces/osPlacesApi/osPl
 
 export const osPlacesApiClientMock = (): OsPlacesApiClient => ({
   getAddressesByFreeTextQuery: jest.fn(),
+  getAddressesByUprn: jest.fn(),
 })

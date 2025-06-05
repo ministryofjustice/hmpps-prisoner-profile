@@ -1,11 +1,14 @@
 import { Request, Response } from 'express'
+import Fuse from 'fuse.js'
 import { formatName } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import AddressService from '../services/addressService'
+import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 
-export const addressLookupErrorMessage: object = { message: 'Unable to perform address search.' }
+const simplePostCodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
+
 export default class AddressController {
   constructor(
     private readonly addressService: AddressService,
@@ -50,10 +53,32 @@ export default class AddressController {
 
   public async findAddressesByFreeTextQuery(req: Request, res: Response): Promise<void> {
     const { query } = req.params
+    const { optimisationOff } = req.query
+
     try {
-      res.json(await this.addressService.getAddressesMatchingQuery(query))
+      const results = (await this.addressService.getAddressesMatchingQuery(query)) || []
+
+      const bestMatchResults = new Fuse(results, {
+        shouldSort: true,
+        threshold: 0.2,
+        ignoreLocation: true,
+        keys: [{ name: 'addressString' }],
+      })
+        .search(query)
+        .map(result => result.item)
+
+      const buildingNumberSort = simplePostCodeRegex.test(query)
+        ? (a: OsAddress, b: OsAddress) =>
+            a.addressString.localeCompare(b.addressString, undefined, { numeric: true, sensitivity: 'base' })
+        : (_a: OsAddress, _b: OsAddress) => 1
+
+      const displayedResults = (bestMatchResults.length ? bestMatchResults : results)
+        .sort(buildingNumberSort)
+        .slice(0, 100)
+
+      res.json({ status: 200, results: optimisationOff ? results : displayedResults })
     } catch (error) {
-      res.status(error.status).json({ error: error.message })
+      res.status(error.status).json({ status: error.status, error: error.message })
     }
   }
 }

@@ -15,10 +15,20 @@ export default class OsPlacesApiRestClient implements OsPlacesApiClient {
   async getAddressesByFreeTextQuery(freeTextQuery: string): Promise<OsPlacesQueryResponse> {
     const queryParams: Record<string, string> = {
       query: freeTextQuery,
+      lr: 'EN',
       key: config.apis.osPlacesApi.apiKey,
     }
 
     return this.get<Promise<OsPlacesQueryResponse>>('/find', queryParams)
+  }
+
+  async getAddressesByUprn(uprn: string): Promise<OsPlacesQueryResponse> {
+    const queryParams: Record<string, string> = {
+      uprn,
+      key: config.apis.osPlacesApi.apiKey,
+    }
+
+    return this.get<Promise<OsPlacesQueryResponse>>('/uprn', queryParams)
   }
 
   async get<T>(path: string, query: Record<string, string>): Promise<T> {

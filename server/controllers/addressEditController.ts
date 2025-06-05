@@ -3,6 +3,9 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import AddressService from '../services/addressService'
+import NotFoundError from '../utils/notFoundError'
+import EphemeralDataService from '../services/EphemeralDataService'
 
 // eslint-disable-next-line no-shadow
 enum AddressLocation {
@@ -12,7 +15,11 @@ enum AddressLocation {
 }
 
 export default class AddressEditController {
-  constructor(private readonly auditService: AuditService) {}
+  constructor(
+    private readonly addressService: AddressService,
+    private readonly ephemeralDataService: EphemeralDataService,
+    private readonly auditService: AuditService,
+  ) {}
 
   public displayWhereIsTheAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
@@ -83,6 +90,8 @@ export default class AddressEditController {
   public displayFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { optimisationOff } = req.query
+
       const errors = req.flash('errors')
 
       this.auditService
@@ -100,9 +109,40 @@ export default class AddressEditController {
         formTitle: `Find a UK address for ${titlePrisonerName}`,
         errors,
         prisonerNumber,
+        optimisationOff,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })
+    }
+  }
+
+  public submitFindUkAddress(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber } = this.getCommonRequestData(req)
+      const { uprn } = req.body
+
+      if (!uprn) {
+        req.flash('errors', [{ text: 'Search for and select an address', href: '#address-autosuggest-input' }])
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/find-uk-address`)
+      }
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditAddressFindUkAddress,
+          details: { uprn },
+        })
+        .catch(error => logger.error(error))
+
+      const matchingAddresses = await this.addressService.getAddressesByUprn(uprn)
+      if (!matchingAddresses || matchingAddresses.length !== 1) {
+        throw new NotFoundError('Could not find unique address by UPRN')
+      }
+
+      const addressConfirmationUuid = await this.ephemeralDataService.cacheData(matchingAddresses[0])
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressConfirmationUuid}`)
     }
   }
 

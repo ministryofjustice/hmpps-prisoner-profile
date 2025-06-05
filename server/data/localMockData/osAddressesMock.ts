@@ -2,8 +2,8 @@ import OsAddress from '../interfaces/osPlacesApi/osAddress'
 
 export const mockOsAddresses: OsAddress[] = [
   {
-    addressString: '1, The Road, My Town, A123BC',
-    buildingNumber: 1,
+    addressString: '2, The Road, My Town, A123BC',
+    buildingNumber: 2,
     subBuildingName: '',
     thoroughfareName: 'The Road',
     dependentLocality: 'My Town',
@@ -14,8 +14,8 @@ export const mockOsAddresses: OsAddress[] = [
     uprn: 12345,
   },
   {
-    addressString: '2, The Road, My Town, A123BC',
-    buildingNumber: 2,
+    addressString: '1, The Road, My Town, A123BC',
+    buildingNumber: 1,
     subBuildingName: '',
     thoroughfareName: 'The Road',
     dependentLocality: 'My Town',

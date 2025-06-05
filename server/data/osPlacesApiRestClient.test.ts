@@ -24,7 +24,7 @@ describe('osPlacesApiRestClient', () => {
   describe('getAddressesByFreeTextQuery', () => {
     it('should return data from api', async () => {
       fakeOsPlaceApi
-        .get(`/find?query=${testQuery}&key=${config.apis.osPlacesApi.apiKey}`)
+        .get(`/find?query=${testQuery}&lr=EN&key=${config.apis.osPlacesApi.apiKey}`)
         .reply(200, mockOsPlacesAddressQueryResponse)
 
       const output = await osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)
@@ -33,7 +33,7 @@ describe('osPlacesApiRestClient', () => {
 
     it('should handle error responses', async () => {
       fakeOsPlaceApi
-        .get(`/find?query=${testQuery}&key=${config.apis.osPlacesApi.apiKey}`)
+        .get(`/find?query=${testQuery}&lr=EN&key=${config.apis.osPlacesApi.apiKey}`)
         .reply(401, mockOsPlacesInvalidApiKey)
 
       await expect(osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)).rejects.toMatchObject({
