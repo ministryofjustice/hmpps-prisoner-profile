@@ -32,6 +32,7 @@ export function editPageTests<TPage extends EditPage>(options: {
   redirectAnchor: string
   personalPageHref?: string
   submitButtonId?: string
+  isUnrestricted?: boolean
 }) {
   const {
     editUrl,
@@ -46,6 +47,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     invalidInputs,
     redirectAnchor,
     submitButtonId,
+    isUnrestricted,
   } = options
 
   let page: TPage
@@ -69,23 +71,25 @@ export function editPageTests<TPage extends EditPage>(options: {
       For now we just do permissions based on the role so this can be shared
       across multiple tests easily, it might need its own option in the future
     */
-    context('Permissions', () => {
-      if (options.personalPageHref) {
-        it('Doesnt show an edit link on the personal page if they dont have the permissions', () => {
+    if (!isUnrestricted) {
+      context('Permissions', () => {
+        if (options.personalPageHref) {
+          it('Doesnt show an edit link on the personal page if they dont have the permissions', () => {
+            cy.setupUserAuth({ roles: [Role.PrisonUser] })
+
+            cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
+            cy.get(`a[href="${options.personalPageHref}"]`).should('not.exist')
+          })
+        }
+
+        it('Doesnt let the user access if they dont have the permissions', () => {
           cy.setupUserAuth({ roles: [Role.PrisonUser] })
 
-          cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
-          cy.get(`a[href="${options.personalPageHref}"]`).should('not.exist')
+          cy.signIn({ failOnStatusCode: false, redirectPath: editUrl })
+          Page.verifyOnPage(NotFoundPage)
         })
-      }
-
-      it('Doesnt let the user access if they dont have the permissions', () => {
-        cy.setupUserAuth({ roles: [Role.PrisonUser] })
-
-        cy.signIn({ failOnStatusCode: false, redirectPath: editUrl })
-        Page.verifyOnPage(NotFoundPage)
       })
-    })
+    }
 
     context('User with permissions', () => {
       const getPage = (): TPage => {

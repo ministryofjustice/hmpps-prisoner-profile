@@ -72,12 +72,9 @@ export default function personalRouter(services: Services): Router {
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
   }
 
+  // TODO Remove this once edit religion is live (prospective date: 10th June)
   const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
     if (editReligionEnabled()) {
-      return next()
-    }
-    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
-    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
       return next()
     }
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
