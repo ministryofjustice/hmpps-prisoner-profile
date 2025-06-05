@@ -87,6 +87,7 @@ export interface IdentityNumber {
 export interface IdentityNumbers {
   justice: {
     croNumber: IdentityNumber[]
+    localInmateDataSystemNumber: IdentityNumber[]
     pncNumber: IdentityNumber[]
     prisonLegacySystemNumber: IdentityNumber[]
     prisonNumber: string

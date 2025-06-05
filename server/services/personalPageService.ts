@@ -486,6 +486,10 @@ export default class PersonalPageService {
     return {
       justice: {
         croNumber: getOffenderIdentifierValue(OffenderIdentifierType.CroNumber, identifiers),
+        localInmateDataSystemNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.LocalInmateDataSystemNumber,
+          identifiers,
+        ),
         pncNumber: getOffenderIdentifierValue(OffenderIdentifierType.PncNumber, identifiers),
         prisonNumber: prisonerData.prisonerNumber,
         prisonLegacySystemNumber: getOffenderIdentifierValue(
