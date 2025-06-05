@@ -2,12 +2,15 @@
   padding-left: 0;
   padding-right: 0;
 }
+
 .remove-column-gutter-left {
   padding-left: 0;
 }
+
 .remove-column-gutter-right {
   padding-right: 0;
 }
+
 .position-relative {
   position: relative;
 }
@@ -47,6 +50,10 @@
   display: block;
 }
 
+.hmpps-display-none {
+  display: none !important;
+}
+
 .hmpps-grey-details-card {
   border-left: 5px solid govuk-colour('mid-grey');
   margin: 0;
@@ -66,6 +73,7 @@
     display: table-row-group;
   }
 }
+
 .govuk-summary-list__row--hidden {
   display: none;
 }

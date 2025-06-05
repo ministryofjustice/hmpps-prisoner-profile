@@ -1,5 +1,3 @@
-import { Role } from '../data/enums/role'
-import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
@@ -7,6 +5,7 @@ import AddressController from './addressController'
 import AddressService from '../services/addressService'
 import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
 import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
+import { prisonUserMock } from '../data/localMockData/user'
 
 let req: any
 let res: any
@@ -26,8 +25,6 @@ describe('Address controller', () => {
     beforeEach(() => {
       req = {
         params: { prisonerNumber: '' },
-        query: { page: '0', sort: 'dateCreated,ASC', alertType: 'R', from: '01/01/2023', to: '02/02/2023' },
-        path: 'alerts/active',
         middleware: {
           clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
@@ -35,15 +32,7 @@ describe('Address controller', () => {
         },
       }
       res = {
-        locals: {
-          user: {
-            authSource: 'nomis',
-            activeCaseLoadId: 'MDI',
-            userRoles: [Role.UpdateAlert],
-            caseLoads: CaseLoadsDummyDataA,
-            token: 'TOKEN',
-          },
-        },
+        locals: { user: prisonUserMock },
         render: jest.fn(),
       }
     })
@@ -72,7 +61,8 @@ describe('Address controller', () => {
   describe('findAddressesByFreeTextQuery', () => {
     beforeEach(() => {
       req = {
-        params: { query: '1,A123BC' },
+        params: { query: '1 the road' },
+        query: {},
         middleware: {
           clientToken: 'CLIENT_TOKEN',
         },
@@ -90,7 +80,36 @@ describe('Address controller', () => {
 
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
-      expect(res.json).toHaveBeenCalledWith(mockOsAddresses)
+      expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
+    })
+
+    it('should use fuse to remove spurious results', async () => {
+      const getAddressesMatchingQuery = jest
+        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
+        .mockResolvedValue([
+          ...mockOsAddresses,
+          {
+            addressString: 'something completely random',
+            uprn: 12345,
+          },
+        ])
+
+      await controller.findAddressesByFreeTextQuery(req, res)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
+    })
+
+    it('should order by building number if query is a postcode', async () => {
+      const getAddressesMatchingQuery = jest
+        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
+        .mockResolvedValue(mockOsAddresses)
+
+      await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'SW1H9EA' } }, res)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H9EA')
+      expect(res.json).toHaveBeenCalledWith({
+        results: [expect.objectContaining({ buildingNumber: 1 }), expect.objectContaining({ buildingNumber: 2 })],
+        status: 200,
+      })
     })
 
     it('should handle errors correctly', async () => {
@@ -103,7 +122,7 @@ describe('Address controller', () => {
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
       expect(res.status).toHaveBeenCalledWith(testError().status)
-      expect(res.json).toHaveBeenCalledWith({ error: testError().message })
+      expect(res.json).toHaveBeenCalledWith({ error: testError().message, status: 500 })
     })
   })
 })

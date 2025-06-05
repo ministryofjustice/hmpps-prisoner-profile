@@ -137,6 +137,7 @@ export enum PostAction {
   AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
+  EditAddressFindUkAddress = 'EDIT_ADDRESS_FIND_UK_ADDRESS',
   EditAddressLocation = 'EDIT_ADDRESS_LOCATION',
   EditBuild = 'EDIT_BUILD',
   EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
