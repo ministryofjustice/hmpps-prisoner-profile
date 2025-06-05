@@ -534,15 +534,15 @@ describe('PersonalPageService', () => {
   describe('Identity numbers', () => {
     it('Maps the data from the API', async () => {
       const { identityNumbers } = await constructService().get('token', PrisonerMockDataA)
-      expect(identityNumbers.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
-      expect(identityNumbers.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
-      expect(identityNumbers.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
-      expect(identityNumbers.nationalInsuranceNumber).toEqual([{ value: 'QQ123456C' }])
-      expect(identityNumbers.pncNumber).toEqual([
+      expect(identityNumbers.justice.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
+      expect(identityNumbers.personal.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
+      expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
+      expect(identityNumbers.personal.nationalInsuranceNumber).toEqual([{ value: 'QQ123456C' }])
+      expect(identityNumbers.justice.pncNumber).toEqual([
         { comment: 'P/CONS', value: '08/359381C' },
         { comment: 'P/CONS - fixed', value: '8/359381C' },
       ])
-      expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
+      expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
     })
   })
 

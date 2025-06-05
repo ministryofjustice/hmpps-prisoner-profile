@@ -722,12 +722,7 @@ describe('overviewController', () => {
   })
 
   describe('External contacts', () => {
-    beforeAll(() => {
-      config.featureToggles.newOverviewPageLayoutEnabled = true
-    })
-
     afterAll(() => {
-      config.featureToggles.newOverviewPageLayoutEnabled = false
       config.featureToggles.externalContactsEnabledPrisons = []
     })
 

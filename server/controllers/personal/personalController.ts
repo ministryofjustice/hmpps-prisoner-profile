@@ -107,6 +107,8 @@ export default class PersonalController {
       })
 
       const editEnabled = profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles)
+      const hasPersonalId = Object.values(personalPageData.identityNumbers.personal).some(v => v.length > 0)
+      const hasHomeOfficeId = Object.values(personalPageData.identityNumbers.homeOffice).some(v => v.length > 0)
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
@@ -129,6 +131,8 @@ export default class PersonalController {
           prisonerData.prisonId === activeCaseLoadId,
         editReligionEnabled: editEnabled || (editReligionEnabled() && prisonerData.prisonId === activeCaseLoadId),
         personalRelationshipsApiReadEnabled,
+        hasPersonalId,
+        hasHomeOfficeId,
       })
     }
   }

@@ -85,24 +85,29 @@ export interface IdentityNumber {
 }
 
 export interface IdentityNumbers {
-  caseInformationDatabase: IdentityNumber[]
-  croNumber: IdentityNumber[]
-  didNotEnterPrisonTaggedBailRel: IdentityNumber[]
-  drivingLicenceNumber: IdentityNumber[]
-  homeOfficeReferenceNumber: IdentityNumber[]
-  localInmateDataSystemNumber: IdentityNumber[]
-  nationalInsuranceNumber: IdentityNumber[]
-  parkrunNumber: IdentityNumber[]
-  passportNumber: IdentityNumber[]
-  pncNumber: IdentityNumber[]
-  portReferenceNumber: IdentityNumber[]
-  prisonLegacySystemNumber: IdentityNumber[]
-  prisonNumber: string
-  probationLegacySystemNumber: IdentityNumber[]
-  scottishPncNumber: IdentityNumber[]
-  staffIdentityCardNumber: IdentityNumber[]
-  uniqueLearnerNumber: IdentityNumber[]
-  yjafNumber: IdentityNumber[]
+  justice: {
+    croNumber: IdentityNumber[]
+    localInmateDataSystemNumber: IdentityNumber[]
+    pncNumber: IdentityNumber[]
+    prisonLegacySystemNumber: IdentityNumber[]
+    prisonNumber: string
+    probationLegacySystemNumber: IdentityNumber[]
+    scottishPncNumber: IdentityNumber[]
+    yjafNumber: IdentityNumber[]
+  }
+  personal: {
+    drivingLicenceNumber: IdentityNumber[]
+    nationalInsuranceNumber: IdentityNumber[]
+    parkrunNumber: IdentityNumber[]
+    passportNumber: IdentityNumber[]
+    staffIdentityCardNumber: IdentityNumber[]
+    uniqueLearnerNumber: IdentityNumber[]
+  }
+  homeOffice: {
+    caseInformationDatabase: IdentityNumber[]
+    homeOfficeReferenceNumber: IdentityNumber[]
+    portReferenceNumber: IdentityNumber[]
+  }
 }
 
 export interface PropertyItem {

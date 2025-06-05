@@ -166,11 +166,11 @@ context('When signed in', () => {
           .and('include.text', 'Other nationalities')
           .and('include.text', 'multiple nationalities')
         page.personalDetails().ethnicGroup().should('have.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
-        page.personalDetails().religionOrBelief().should('contain', 'Celestial Church of God')
         page
           .personalDetails()
           .religionOrBelief()
-          .should(
+          .should('contain', 'Celestial Church of God')
+          .and(
             'contain.html',
             '<a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/G6123VU/religion-belief-history">Religion or belief history</a>',
           )
@@ -254,6 +254,14 @@ context('When signed in', () => {
         page.identityNumbers().homeOfficeReferenceNumber().should('include.text', 'A1234567')
         page.identityNumbers().nationalInsuranceNumber().should('include.text', 'QQ123456C')
         page.identityNumbers().drivingLicenceNumber().should('include.text', 'ABCD/123456/AB9DE')
+      })
+
+      it('Displays the correct section headings', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.identityNumbers().justiceNumbersHeading().should('include.text', 'Justice numbers')
+        page.identityNumbers().personalNumbersHeading().should('include.text', 'Personal numbers')
+        page.identityNumbers().homeOfficeNumbersHeading().should('include.text', 'Home office numbers')
+        page.identityNumbers().additionalNumbersHeading().should('not.exist')
       })
     })
 
