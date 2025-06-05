@@ -15,7 +15,7 @@ context('Edit religion, faith or belief', () => {
       bookingId,
       testSetup: () => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
@@ -25,6 +25,7 @@ context('Edit religion, faith or belief', () => {
       editPageWithTitle: EditPage,
       editPageTitle: 'Religion, faith or belief',
       successfulFlashMessage: 'Religion, faith or belief updated',
+      isUnrestricted: true,
       validInputs: [
         { radioInputs: { religion: 'ZORO', reasonKnown: 'NO' } },
         {
@@ -79,7 +80,7 @@ context('Edit religion, faith or belief', () => {
       bookingId,
       testSetup: () => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubInmateDetail', {
@@ -96,6 +97,7 @@ context('Edit religion, faith or belief', () => {
       editPageWithTitle: EditPage,
       editPageTitle: 'Religion, faith or belief',
       successfulFlashMessage: 'Religion, faith or belief updated',
+      isUnrestricted: true,
       validInputs: [
         {
           radioInputs: { religion: 'ZORO' },
