@@ -278,13 +278,13 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
   if ((body.appointmentType === 'VLPM' || body.appointmentType === 'VLB') && bvlsMasterPublicPrivateNotesEnabled()) {
     if (body.notesForStaff && body.notesForStaff.length > 400) {
       errors.push({
-        text: 'Enter notes for staff using 400 characters or less',
+        text: 'Notes for prison staff must be 400 characters or less',
         href: '#notesForStaff',
       })
     }
     if (body.notesForPrisoners && body.notesForPrisoners.length > 400) {
       errors.push({
-        text: 'Enter notes for prisoners using 400 characters or less',
+        text: 'Notes for prisoner must be 400 characters or less',
         href: '#notesForPrisoners',
       })
     }
