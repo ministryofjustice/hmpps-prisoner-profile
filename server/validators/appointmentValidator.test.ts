@@ -60,8 +60,8 @@ describe('Validation middleware - VLPM appointment', () => {
     const result = AppointmentValidator(appointmentForm)
 
     expect(result).toEqual([
-      { text: 'Enter notes for staff using 400 characters or less', href: '#notesForStaff' },
-      { text: 'Enter notes for prisoners using 400 characters or less', href: '#notesForPrisoners' },
+      { text: 'Notes for prison staff must be 400 characters or less', href: '#notesForStaff' },
+      { text: 'Notes for prisoner must be 400 characters or less', href: '#notesForPrisoners' },
     ])
   })
 
@@ -90,8 +90,8 @@ describe('Validation middleware - VLPM appointment', () => {
     const result = AppointmentValidator(appointmentForm)
 
     expect(result).toEqual([
-      { text: 'Enter notes for staff using 400 characters or less', href: '#notesForStaff' },
-      { text: 'Enter notes for prisoners using 400 characters or less', href: '#notesForPrisoners' },
+      { text: 'Notes for prison staff must be 400 characters or less', href: '#notesForStaff' },
+      { text: 'Notes for prisoner must be 400 characters or less', href: '#notesForPrisoners' },
     ])
   })
 
