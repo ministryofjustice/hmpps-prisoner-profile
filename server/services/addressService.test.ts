@@ -47,7 +47,7 @@ describe('addressService', () => {
 
   function validateExpectedAddressResponse(addresses: OsAddress[]) {
     expect(addresses.length).toEqual(2)
-    expect(addresses[0].addressString).toEqual('1, The Road, My Town, A123BC')
+    expect(addresses[0].addressString).toEqual('1 The Road, My Town, A123BC')
     expect(addresses[0].buildingNumber).toEqual(1)
     expect(addresses[0].subBuildingName).toEqual('')
     expect(addresses[0].thoroughfareName).toEqual('The Road')
@@ -58,7 +58,7 @@ describe('addressService', () => {
     expect(addresses[0].country).toEqual('E')
     expect(addresses[0].uprn).toEqual(12345)
 
-    expect(addresses[1].addressString).toEqual('2, The Road, My Town, A123BC')
+    expect(addresses[1].addressString).toEqual('2 The Road, My Town, A123BC')
     expect(addresses[1].buildingNumber).toEqual(2)
     expect(addresses[1].subBuildingName).toEqual('')
     expect(addresses[1].thoroughfareName).toEqual('The Road')

@@ -66,7 +66,7 @@ export default function createApp(services: Services): express.Application {
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
   app.use(apiErrorMiddleware())
-  app.use(bannerMiddleware(services))
+  app.get(standardGetPaths, bannerMiddleware(services))
 
   app.get(
     standardGetPaths,

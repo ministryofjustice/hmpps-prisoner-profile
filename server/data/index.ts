@@ -44,6 +44,7 @@ import OsPlacesApiRestClient from './osPlacesApiRestClient'
 import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApiRestClient'
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
+import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -84,6 +85,7 @@ export const dataAccess = {
   featureToggleStore: config.redis.enabled
     ? new RedisFeatureToggleStore(createRedisClient())
     : new InMemoryFeatureToggleStore(),
+  ephemeralDataStore: new EphemeralDataStore(createRedisClient()),
   personIntegrationApiClientBuilder: (token: string) => new PersonIntegrationApiRestClient(token),
   csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
   healthAndMedicationApiClientBuilder: (token: string) => new HealthAndMedicationApiRestClient(token),
