@@ -1,3 +1,5 @@
+// Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/components/address-input/autosuggest.address.js
+
 const classUPRN = 'hmpps-js-uprn'
 const classInputContainer = 'hmpps-address-autosuggest'
 const classInput = 'hmpps-js-autosuggest-input'
@@ -47,6 +49,9 @@ class AutosuggestAddress {
       this.fetch.abort()
     }
 
+    // Reset any previously selected result:
+    this.uprn.value = ''
+
     return await this.findAddress(query)
   }
 
@@ -84,9 +89,12 @@ class AutosuggestAddress {
   }
 }
 
-// Setup all address autosuggest instances:
-const addressAutosuggests = [...document.querySelectorAll('.hmpps-js-address-autosuggest')]
+document.addEventListener('DOMContentLoaded', () => {
+  // Setup all address autosuggest instances:
+  const addressAutosuggests = [...document.querySelectorAll('.hmpps-js-address-autosuggest')]
 
-if (addressAutosuggests.length) {
-  addressAutosuggests.forEach((addressAutosuggest) => new AutosuggestAddress(addressAutosuggest))
-}
+  if (addressAutosuggests.length) {
+    addressAutosuggests.forEach((addressAutosuggest) => new AutosuggestAddress(addressAutosuggest))
+  }
+})
+

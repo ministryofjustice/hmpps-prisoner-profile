@@ -63,7 +63,7 @@ context('Edit next of kin and emergency contacts', () => {
           firstName: 'Jane',
           lastName: 'Doe',
         },
-        namedAutocompleteInputs: {
+        autocompleteInputs: {
           relationshipTypeId: 'Friend',
         },
       },
@@ -74,7 +74,7 @@ context('Edit next of kin and emergency contacts', () => {
           firstName: 'John',
           lastName: 'Smith',
         },
-        namedAutocompleteInputs: {
+        autocompleteInputs: {
           relationshipTypeId: 'Brother',
         },
       },
@@ -96,7 +96,7 @@ context('Edit next of kin and emergency contacts', () => {
           street: 'Main Street',
           postcode: 'AB12 3CD',
         },
-        namedAutocompleteInputs: {
+        autocompleteInputs: {
           cityCode: 'London',
           relationshipTypeId: 'Father',
         },
@@ -111,7 +111,7 @@ context('Edit next of kin and emergency contacts', () => {
           firstName: 'Sarah',
           lastName: 'Williams',
         },
-        namedAutocompleteInputs: {
+        autocompleteInputs: {
           relationshipTypeId: 'Sister',
         },
       },
@@ -125,7 +125,7 @@ context('Edit next of kin and emergency contacts', () => {
             firstName: 'Jane',
             lastName: 'Doe',
           },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             relationshipTypeId: 'Friend',
           },
         },
@@ -139,7 +139,7 @@ context('Edit next of kin and emergency contacts', () => {
           textInputs: {
             lastName: 'Doe',
           },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             relationshipTypeId: 'Friend',
           },
         },
@@ -153,7 +153,7 @@ context('Edit next of kin and emergency contacts', () => {
           textInputs: {
             firstName: 'Jane',
           },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             relationshipTypeId: 'Friend',
           },
         },
@@ -180,7 +180,7 @@ context('Edit next of kin and emergency contacts', () => {
             firstName: 'Jane',
             lastName: 'Doe',
           },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             relationshipTypeId: 'Random',
           },
         },
@@ -198,7 +198,7 @@ context('Edit next of kin and emergency contacts', () => {
             'dateOfBirth-month': '13',
             'dateOfBirth-year': '2050',
           },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             relationshipTypeId: 'Friend',
           },
         },

@@ -6,6 +6,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
 import EphemeralDataService from '../services/EphemeralDataService'
+import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 
 // eslint-disable-next-line no-shadow
 enum AddressLocation {
@@ -93,6 +94,7 @@ export default class AddressEditController {
       const { optimisationOff } = req.query
 
       const errors = req.flash('errors')
+      const formValues = requestBodyFromFlash<{ 'address-autosuggest-input': string }>(req)
 
       this.auditService
         .sendPageView({
@@ -107,6 +109,7 @@ export default class AddressEditController {
       return res.render('pages/edit/address/findUkAddress', {
         pageTitle: 'Find a UK address - Prisoner personal details',
         formTitle: `Find a UK address for ${titlePrisonerName}`,
+        inputValue: formValues?.['address-autosuggest-input'],
         errors,
         prisonerNumber,
         optimisationOff,
@@ -119,10 +122,12 @@ export default class AddressEditController {
   public submitFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = this.getCommonRequestData(req)
-      const { uprn } = req.body
+      const { uprn, 'address-autosuggest-input': userText } = req.body
 
       if (!uprn) {
-        req.flash('errors', [{ text: 'Search for and select an address', href: '#address-autosuggest-input' }])
+        const errorMessage = userText ? 'This is not a valid address' : 'Enter a UK address'
+        req.flash('requestBody', JSON.stringify(req.body))
+        req.flash('errors', [{ text: errorMessage, href: '#address-autosuggest-input' }])
         return res.redirect(`/prisoner/${prisonerNumber}/personal/find-uk-address`)
       }
 

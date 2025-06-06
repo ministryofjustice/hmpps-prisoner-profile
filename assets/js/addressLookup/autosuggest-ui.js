@@ -1,3 +1,5 @@
+// Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/components/autosuggest/autosuggest.ui.js
+
 const jsBaseClass = 'hmpps-js-autosuggest'
 
 const classSuffixInitialised= '--initialised'

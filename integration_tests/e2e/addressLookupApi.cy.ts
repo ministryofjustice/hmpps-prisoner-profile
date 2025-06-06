@@ -14,10 +14,11 @@ context('Address Lookup API', () => {
     it('should return expected address json when matching addresses are found', () => {
       cy.signIn()
       cy.task('stubFindAddressesByFreeTextSearch')
-      cy.request('GET', '/api/addresses/find/1,A123BC').then(response => {
+      cy.request('GET', '/api/addresses/find/1%20The%20Road').then(response => {
         expect(response.status).to.eq(200)
-        expect(response.body[0].addressString).to.eq(mockOsAddresses[0].addressString)
-        expect(response.body[1].addressString).to.eq(mockOsAddresses[1].addressString)
+        // The results are sorted:
+        expect(response.body.results[0].addressString).to.eq(mockOsAddresses[1].addressString)
+        expect(response.body.results[1].addressString).to.eq(mockOsAddresses[0].addressString)
       })
     })
 
@@ -26,7 +27,7 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByFreeTextSearchNoMatch')
       cy.request('GET', '/api/addresses/find/invalid').then(response => {
         expect(response.status).to.eq(200)
-        expect(response.body.length).to.eq(0)
+        expect(response.body.results.length).to.eq(0)
       })
     })
 
@@ -35,17 +36,18 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByFreeTextSearchError')
       cy.request({ method: 'GET', url: '/api/addresses/find/error', failOnStatusCode: false }).then(response => {
         expect(response.status).to.eq(500)
+        expect(response.body.status).to.eq(500)
         expect(response.body.error).to.eq('Error calling OS Places API: Internal Server Error')
       })
     })
 
     it('should redirect to the signin page if not logged on when calling the api', () => {
       cy.task('stubFindAddressesByFreeTextSearch')
-      cy.request({ method: 'GET', url: '/api/addresses/find/1,A123BC', followRedirect: false }).then(response => {
+      cy.request({ method: 'GET', url: '/api/addresses/find/1%20The%20Road', followRedirect: false }).then(response => {
         expect(response.status).to.eq(302)
       })
 
-      cy.request({ method: 'GET', url: '/api/addresses/find/1,A123BC', followRedirect: true }).then(response => {
+      cy.request({ method: 'GET', url: '/api/addresses/find/1%20The%20Road', followRedirect: true }).then(response => {
         expect(response.status).to.eq(200)
       })
 

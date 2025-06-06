@@ -1,3 +1,5 @@
+// Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/js/abortable-fetch.js
+
 const FetchStatus = {
   unsent: 'UNSENT',
   loading: 'LOADING',

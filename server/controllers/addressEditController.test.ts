@@ -142,7 +142,7 @@ describe('Address Edit Controller', () => {
         if (!uprnResponse) {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
           expect(req.flash).toHaveBeenCalledWith('errors', [
-            { text: 'Search for and select an address', href: '#address-autosuggest-input' },
+            { text: 'Enter a UK address', href: '#address-autosuggest-input' },
           ])
         } else {
           expect(res.redirect).toHaveBeenCalledWith(
