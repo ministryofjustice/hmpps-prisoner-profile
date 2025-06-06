@@ -80,7 +80,7 @@ describe('Address controller', () => {
 
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
-      expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
+      expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
     })
 
     it('should use fuse to remove spurious results', async () => {
@@ -96,7 +96,7 @@ describe('Address controller', () => {
 
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
-      expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
+      expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
     })
 
     it('should order by building number if query is a postcode', async () => {

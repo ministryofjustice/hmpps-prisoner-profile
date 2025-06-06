@@ -14,7 +14,7 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: prisonerName,
+        text: breadcrumbPrisonerName,
         href: "/prisoner/" + prisonerNumber
     },
     {
@@ -73,6 +73,7 @@
                                     id: 'address-autosuggest-input',
                                     name: 'address-autosuggest-input',
                                     classes: 'hmpps-js-autosuggest-input',
+                                    value: inputValue,
                                     attributes: {
                                         'autocomplete': 'off',
                                         'aria-describedby': 'address-hint'
