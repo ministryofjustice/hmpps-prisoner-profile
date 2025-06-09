@@ -129,7 +129,7 @@ export default class PersonalController {
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
-        editReligionEnabled: editEnabled || (editReligionEnabled() && prisonerData.prisonId === activeCaseLoadId),
+        editReligionEnabled: editEnabled || editReligionEnabled(),
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
