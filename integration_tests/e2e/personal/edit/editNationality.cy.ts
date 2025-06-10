@@ -32,22 +32,22 @@ context('Edit nationality', () => {
       {},
       { radioInputs: { radioField: 'BRIT' } },
       { radioInputs: { radioField: 'BRIT' }, textAreaInputs: { additionalNationalities: 'Dual nationality' } },
-      { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: 'French' } },
+      { radioInputs: { radioField: 'OTHER' }, autocompleteInputs: { autocomplete: 'French' } },
       {
         radioInputs: { radioField: 'OTHER' },
-        autocompleteInput: { value: 'French' },
+        autocompleteInputs: { autocomplete: 'French' },
         textAreaInputs: { additionalNationalities: 'Dual nationality' },
       },
     ],
     invalidInputs: [
       {
         testDescription: 'Other nationality selected but not specified',
-        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: null } },
+        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInputs: { autocomplete: '' } },
         errorMessages: [`Enter nationality`],
       },
       {
         testDescription: 'Invalid nationality entered',
-        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: 'badvalue' } },
+        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInputs: { autocomplete: 'badvalue' } },
         errorMessages: [`This is not a valid nationality`],
       },
       {

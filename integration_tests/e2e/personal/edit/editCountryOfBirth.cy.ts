@@ -32,7 +32,7 @@ context('Edit city or town of birth', () => {
       { radioInputs: { radioField: 'ENG' } },
       {
         radioInputs: { radioField: 'OTHER' },
-        autocompleteInput: { value: 'France' },
+        autocompleteInputs: { autocomplete: 'France' },
       },
     ],
     invalidInputs: [
@@ -40,7 +40,7 @@ context('Edit city or town of birth', () => {
         testDescription: 'Empty autocomplete field',
         input: {
           radioInputs: { radioField: 'OTHER' },
-          autocompleteInput: { value: '' },
+          autocompleteInputs: { autocomplete: '' },
         },
         errorMessages: ['Enter country name'],
       },
@@ -48,7 +48,7 @@ context('Edit city or town of birth', () => {
         testDescription: 'Blank autocomplete field',
         input: {
           radioInputs: { radioField: 'OTHER' },
-          autocompleteInput: { value: '   ' },
+          autocompleteInputs: { autocomplete: '   ' },
         },
         errorMessages: ['Enter country name'],
       },
@@ -56,7 +56,7 @@ context('Edit city or town of birth', () => {
         testDescription: 'Invalid autocomplete field',
         input: {
           radioInputs: { radioField: 'OTHER' },
-          autocompleteInput: { value: 'invalid' },
+          autocompleteInputs: { autocomplete: 'invalid' },
         },
         errorMessages: ['This is not a valid country'],
       },

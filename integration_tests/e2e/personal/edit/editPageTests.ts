@@ -9,8 +9,8 @@ export interface EditPageInput {
   textAreaInputs?: { [key: string]: string }
   radioInputs?: { [key: string]: string }
   checkboxInputs?: { [key: string]: CheckboxValue[] }
-  autocompleteInput?: { value: string }
-  namedAutocompleteInputs?: { [key: string]: string }
+  autocompleteInputs?: { [key: string]: string }
+  addressAutoSuggestInputs?: { [key: string]: string }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
@@ -22,14 +22,15 @@ export function editPageTests<TPage extends EditPage>(options: {
   editPage?: new () => TPage
   editPageWithTitle?: new (title: string) => TPage
   editPageTitle?: string
-  successfulFlashMessage: string
+  successfulFlashMessage?: string
   validInputs: EditPageInput[]
   invalidInputs?: {
     testDescription: string
     input: EditPageInput
     errorMessages: string[]
   }[]
-  redirectAnchor: string
+  redirectUrl?: string
+  redirectAnchor?: string
   personalPageHref?: string
   submitButtonId?: string
   isUnrestricted?: boolean
@@ -45,6 +46,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     editPageTitle,
     successfulFlashMessage,
     invalidInputs,
+    redirectUrl = '/prisoner/G6123VU/personal',
     redirectAnchor,
     submitButtonId,
     isUnrestricted,
@@ -56,8 +58,8 @@ export function editPageTests<TPage extends EditPage>(options: {
     if (input.textInputs) page.fillInTextFields(input.textInputs)
     if (input.radioInputs) page.selectRadios(input.radioInputs)
     if (input.checkboxInputs) page.selectCheckboxes(input.checkboxInputs)
-    if (input.autocompleteInput) page.fillInAutocompleteField(input.autocompleteInput)
-    if (input.namedAutocompleteInputs) page.fillInNamedAutocompleteFields(input.namedAutocompleteInputs)
+    if (input.autocompleteInputs) page.fillInAutocompleteFields(input.autocompleteInputs)
+    if (input.addressAutoSuggestInputs) page.fillInAddressAutoSuggestFields(input.addressAutoSuggestInputs)
     if (input.textAreaInputs) page.fillInTextAreaFields(input.textAreaInputs)
   }
 
@@ -129,10 +131,10 @@ export function editPageTests<TPage extends EditPage>(options: {
             fillWithInputs(validInput)
             page.submit(submitButtonId)
 
-            cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
-            cy.location('hash').should('eq', `#${redirectAnchor}`)
+            cy.location('pathname').should('eq', redirectUrl)
 
-            page.flashMessage().should('include.text', successfulFlashMessage)
+            if (redirectAnchor) cy.location('hash').should('eq', `#${redirectAnchor}`)
+            if (successfulFlashMessage) page.flashMessage().should('include.text', successfulFlashMessage)
           })
         })
       })

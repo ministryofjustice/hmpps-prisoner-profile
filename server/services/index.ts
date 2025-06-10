@@ -47,6 +47,7 @@ import ContactsService from './contactsService'
 import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
 import logger from '../../logger'
+import EphemeralDataService from './EphemeralDataService'
 
 export const services = () => {
   const {
@@ -76,6 +77,7 @@ export const services = () => {
     prisonRegisterStore,
     referenceDataStore,
     featureToggleStore,
+    ephemeralDataStore,
     telemetryClient,
     osPlacesApiClient,
     curiousApiToken,
@@ -99,6 +101,7 @@ export const services = () => {
 
   const metricsService = new MetricsService(telemetryClient)
   const featureToggleService = new FeatureToggleService(featureToggleStore)
+  const ephemeralDataService = new EphemeralDataService(ephemeralDataStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
@@ -243,6 +246,7 @@ export const services = () => {
     contentfulService,
     curiousService,
     featureToggleService,
+    ephemeralDataService,
     careNeedsService,
     distinguishingMarksService,
     csipService,

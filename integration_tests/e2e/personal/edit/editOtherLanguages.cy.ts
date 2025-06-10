@@ -47,7 +47,7 @@ context('Edit other languages', () => {
       successfulFlashMessage: 'Languages updated',
       validInputs: [
         {
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             language: 'French', // Note: Using `description` for the test as entering into AutoComplete field
           },
           checkboxInputs: {
@@ -59,7 +59,7 @@ context('Edit other languages', () => {
         {
           testDescription: 'Existing language selected',
           input: {
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               language: 'English',
             },
           },
@@ -68,7 +68,7 @@ context('Edit other languages', () => {
         {
           testDescription: 'Invalid language entered',
           input: {
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               language: 'Klingon',
             },
           },
@@ -109,7 +109,7 @@ context('Edit other languages', () => {
       successfulFlashMessage: 'Languages updated',
       validInputs: [
         {
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             language: 'French',
           },
           checkboxInputs: {
@@ -121,7 +121,7 @@ context('Edit other languages', () => {
         {
           testDescription: 'Invalid language entered',
           input: {
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               language: 'Klingon',
             },
           },

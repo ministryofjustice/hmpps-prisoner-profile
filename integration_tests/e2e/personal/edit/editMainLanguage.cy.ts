@@ -54,14 +54,14 @@ context('Edit main language', () => {
         },
         {
           radioInputs: { interpreterRequired: 'false' },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             preferredSpokenLanguageCode: 'French', // Note: Using `description` for the test as entering into AutoComplete field
             preferredWrittenLanguageCode: 'English',
           },
         },
         {
           radioInputs: { interpreterRequired: 'true' },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             preferredSpokenLanguageCode: 'English',
             preferredWrittenLanguageCode: 'French',
           },
@@ -72,7 +72,7 @@ context('Edit main language', () => {
           testDescription: 'Same language as secondary language',
           input: {
             radioInputs: { interpreterRequired: 'false' },
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredSpokenLanguageCode: 'Spanish',
             },
           },
@@ -82,7 +82,7 @@ context('Edit main language', () => {
           testDescription: 'Invalid spoken language',
           input: {
             radioInputs: { interpreterRequired: 'false' },
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredSpokenLanguageCode: 'Klingon',
             },
           },
@@ -92,7 +92,7 @@ context('Edit main language', () => {
           testDescription: 'Invalid written language',
           input: {
             radioInputs: { interpreterRequired: 'false' },
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredWrittenLanguageCode: 'Klingon',
             },
           },
@@ -138,14 +138,14 @@ context('Edit main language', () => {
         },
         {
           radioInputs: { interpreterRequired: 'false' },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             preferredSpokenLanguageCode: 'French',
             preferredWrittenLanguageCode: 'English',
           },
         },
         {
           radioInputs: { interpreterRequired: 'true' },
-          namedAutocompleteInputs: {
+          autocompleteInputs: {
             preferredSpokenLanguageCode: 'English',
             preferredWrittenLanguageCode: 'French',
           },
@@ -156,7 +156,7 @@ context('Edit main language', () => {
           testDescription: 'Invalid interpreter required',
           input: {
             // Don't set interpreterRequired
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredSpokenLanguageCode: 'English',
               preferredWrittenLanguageCode: 'French',
             },
@@ -167,7 +167,7 @@ context('Edit main language', () => {
           testDescription: 'Invalid spoken language',
           input: {
             radioInputs: { interpreterRequired: 'false' },
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredSpokenLanguageCode: 'Klingon',
             },
           },
@@ -177,7 +177,7 @@ context('Edit main language', () => {
           testDescription: 'Invalid written language',
           input: {
             radioInputs: { interpreterRequired: 'false' },
-            namedAutocompleteInputs: {
+            autocompleteInputs: {
               preferredWrittenLanguageCode: 'Klingon',
             },
           },

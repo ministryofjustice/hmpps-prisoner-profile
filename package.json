@@ -122,6 +122,7 @@
     "eslint-plugin-no-only-tests": "^3.3.0",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "fuse.js": "^7.1.0",
     "govuk-frontend": "^5.10.1",
     "helmet": "^7.2.0",
     "http-errors": "^2.0.0",
