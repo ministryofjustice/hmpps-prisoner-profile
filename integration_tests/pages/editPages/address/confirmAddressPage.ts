@@ -12,7 +12,11 @@ export default class ConfirmAddressPage extends Page {
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  continueButton = (): PageElement => cy.get('button[type=submit]')
+  addressLine = index => cy.get('.address-summary > p').eq(index)
 
-  cancelButton = (): PageElement => cy.getDataQa('cancel-button')
+  backLink = (): PageElement => cy.getDataQa('back-link')
+
+  useThisAddressButton = (): PageElement => cy.getDataQa('use-this-address-button')
+
+  cancelLink = (): PageElement => cy.getDataQa('cancel-link')
 }

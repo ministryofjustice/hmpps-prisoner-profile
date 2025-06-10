@@ -29,28 +29,24 @@
 
         {{ govukBackLink({
             text: "Back",
-            href: refererUrl,
+            href: backLink,
+            attributes: { 'data-qa': 'back-link' },
             classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
         }) }}
 
         <h1 class="govuk-heading-l">{{ formTitle }}</h1>
 
         {% set addressHtml %}
-            {% if address.subBuildingName or address.buildingName  %}
-                <p class="govuk-!-static-margin-0">
-                    {% if address.subBuildingName %}{{ address.subBuildingName }}, {% endif %}{{ address.buildingName }}
-                </p>
-            {% endif %}
-
-            <p class="govuk-!-static-margin-0">
-                {% if address.buildingNumber%}{{ address.buildingNumber}} {% endif %} {{ address.thoroughfareName }}
-            </p>
-
-            {% if address.dependentLocality %}<p>{{ address.dependentLocality }}</p>{% endif %}
-            {% if address.city %}<p class="govuk-!-static-margin-0">{{ address.city }}</p>{% endif %}
-            {% if address.county %}<p class="govuk-!-static-margin-0">{{ address.county }}</p>{% endif %}
-            {% if address.postCode %}<p class="govuk-!-static-margin-0">{{ address.postCode }}</p>{% endif %}
-            {% if address.country %}<p class="govuk-!-static-margin-0">{{ address.country }}</p>{% endif %}
+            <div class="address-summary">
+                {% if address.subBuildingName %}<p class="govuk-!-static-margin-0">{{ address.subBuildingName }}</p>{% endif %}
+                {% if address.buildingName %}<p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>{% endif %}
+                {% if address.thoroughfareName %}<p class="govuk-!-static-margin-0">{% if address.buildingNumber %}{{ address.buildingNumber }}{% endif %} {{ address.thoroughfareName }}</p>{% endif %}
+                {% if address.dependantLocality %}<p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>{% endif %}
+                {% if address.city %}<p class="govuk-!-static-margin-0">{{ address.city }}</p>{% endif %}
+                {% if address.county %}<p class="govuk-!-static-margin-0">{{ address.county }}</p>{% endif %}
+                {% if address.postCode %}<p class="govuk-!-static-margin-0">{{ address.postCode }}</p>{% endif %}
+                {% if address.country %}<p class="govuk-!-static-margin-0">{{ address.country }}</p>{% endif %}
+            </div>
         {% endset %}
 
         {{ govukInsetText({
@@ -61,7 +57,7 @@
             <a href="/prisoner/{{ prisonerNumber }}/personal/primary-or-postal-address?address={{ address.cacheId }}"
                class="govuk-button" data-qa="use-this-address-button">Use this address</a>
             <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-               class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+               class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
         </div>
 
         <a href="/prisoner/{{ prisonerNumber }}/personal/where-is-address" class="govuk-link govuk-link--no-visited-state">

@@ -201,7 +201,7 @@ describe('Address Edit Controller', () => {
           prisonerNumber: 'G6123VU',
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber: 'G6123VU', prisonerName: 'Saunders, John' },
-          refererUrl: '/prisoner/G6123VU/personal/find-uk-address',
+          backLink: '/prisoner/G6123VU/personal/find-uk-address',
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({

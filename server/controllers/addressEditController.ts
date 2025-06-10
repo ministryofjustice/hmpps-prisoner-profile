@@ -162,6 +162,7 @@ export default class AddressEditController {
       }
 
       const { address, route } = addressCache.value
+
       const [cityCode, countyCode, countryCode] = await Promise.all([
         address.postTownCode && this.addressService.getCityReferenceData(address.postTownCode, clientToken),
         address.countyCode && this.addressService.getCountyReferenceData(address.countyCode, clientToken),
@@ -189,7 +190,7 @@ export default class AddressEditController {
           country: countryCode?.description,
         },
         prisonerNumber,
-        refererUrl: `/prisoner/${prisonerNumber}/personal/${route}`,
+        backLink: `/prisoner/${prisonerNumber}/personal/${route}`,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })
