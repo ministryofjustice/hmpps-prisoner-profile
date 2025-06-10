@@ -40,19 +40,19 @@ export default class EditPage extends Page {
     })
   }
 
-  fillInAutocompleteField = ({ value }: { value: string }) => {
-    cy.get('.autocomplete__input').clear()
-    if (value) {
-      // The trailing {esc} is to explicitly close the autocomplete dropdown allowing testing invalid inputs
-      cy.get('.autocomplete__input').type(`${value}{esc}`)
-    }
-  }
-
-  fillInNamedAutocompleteFields = (fields: { [key: string]: string }) => {
+  fillInAutocompleteFields = (fields: { [key: string]: string }) => {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[id=${key}]`).clear()
       // The trailing {esc} is to explicitly close the autocomplete dropdown allowing testing invalid inputs
       cy.get(`input[id=${key}]`).type(`${value}{esc}`)
+    })
+  }
+
+  fillInAddressAutoSuggestFields = (fields: { [key: string]: string }) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      cy.get(`div[id=${key}]`).find('.hmpps-js-autosuggest-input').clear()
+      cy.get(`div[id=${key}]`).find('.hmpps-js-autosuggest-input').type(`${value}`)
+      cy.get('.hmpps-address-autosuggest__option', { timeout: 1000 }).first().click()
     })
   }
 

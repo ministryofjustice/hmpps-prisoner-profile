@@ -1,4 +1,5 @@
 import { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { UUID } from 'node:crypto'
 import HmppsError from '../../interfaces/HmppsError'
 import { HmppsUser } from '../../interfaces/HmppsUser'
 import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
@@ -13,6 +14,7 @@ export declare module 'express-session' {
     userBackLink: string
     movementSlipData: object
     keyWorkerAtPrisons: Record<string, boolean>
+    temporaryDataCache: Record<UUID, unknown>
   }
 }
 
