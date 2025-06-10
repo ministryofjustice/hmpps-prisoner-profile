@@ -2,6 +2,7 @@ import RestClient from './restClient'
 import Prisoner from './interfaces/prisonerSearchApi/Prisoner'
 import { PrisonerSearchClient } from './interfaces/prisonerSearchApi/prisonerSearchClient'
 import config from '../config'
+import { PrisonerMockDataA } from './localMockData/prisoner'
 
 export default class PrisonerSearchRestClient implements PrisonerSearchClient {
   private readonly restClient: RestClient
@@ -11,6 +12,7 @@ export default class PrisonerSearchRestClient implements PrisonerSearchClient {
   }
 
   async getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
+    return PrisonerMockDataA
     try {
       const prisonerData = await this.restClient.get<Prisoner>({ path: `/prisoner/${prisonerNumber}` })
       return {

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { AuditService, Page, PostAction } from '../services/auditService'
@@ -9,8 +10,10 @@ import EphemeralDataService from '../services/EphemeralDataService'
 import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
+import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const uprn = 1234
+const addressCacheId = uuidv4()
 
 describe('Address Edit Controller', () => {
   let req: Request
@@ -135,7 +138,7 @@ describe('Address Edit Controller', () => {
       ])(`should handle uprn: '%s' and redirect to '%s' page`, async (uprnResponse: number, redirect: string) => {
         const address = { uprn } as OsAddress
         req = { ...req, body: { uprn: uprnResponse } } as unknown as Request
-        addressService.getAddressesByUprn = jest.fn().mockReturnValue([address])
+        addressService.getAddressByUprn = jest.fn().mockReturnValue([address])
 
         await controller.submitFindUkAddress()(req, res, next)
 
@@ -157,22 +160,100 @@ describe('Address Edit Controller', () => {
           })
         }
       })
+    })
+  })
 
-      it('throws NotFoundError if address not returned for uprn', async () => {
-        req = { ...req, body: { uprn } } as unknown as Request
-        addressService.getAddressesByUprn = jest.fn().mockReturnValue([])
+  describe('Confirm address page', () => {
+    describe('Rendering the page', () => {
+      it('should render the confirm address page', async () => {
+        const address: AddressRequestDto = {
+          uprn,
+          buildingNumber: '1',
+          thoroughfareName: 'The Road',
+          postTownCode: '111',
+          countyCode: '222',
+          countryCode: '333',
+          postCode: 'A12 3BC',
+          fromDate: '2025-06-09',
+          addressTypes: [],
+        }
 
-        await expect(controller.submitFindUkAddress()(req, res, next)).rejects.toThrow(
-          'Could not find unique address by UPRN',
-        )
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address, route: 'find-uk-address' } })
+        addressService.getCityReferenceData = jest.fn().mockReturnValue({ description: 'My Town' })
+        addressService.getCountyReferenceData = jest.fn().mockReturnValue({ description: 'My County' })
+        addressService.getCountryReferenceData = jest.fn().mockReturnValue({ description: 'England' })
+
+        await controller.displayConfirmAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/address/confirmAddress', {
+          pageTitle: 'Confirm address - Prisoner personal details',
+          formTitle: 'Confirm address',
+          address: {
+            ...address,
+            cacheId: addressCacheId,
+            city: 'My Town',
+            county: 'My County',
+            country: 'England',
+          },
+          prisonerNumber: 'G6123VU',
+          breadcrumbPrisonerName: 'Saunders, John',
+          miniBannerData: { prisonerNumber: 'G6123VU', prisonerName: 'Saunders, John' },
+          refererUrl: '/prisoner/G6123VU/personal/find-uk-address',
+        })
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          prisonId: PrisonerMockDataA.prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressConfirm,
+        })
       })
 
-      it('throws NotFoundError if multiple addresses returned for uprn', async () => {
-        req = { ...req, body: { uprn } } as unknown as Request
-        addressService.getAddressesByUprn = jest.fn().mockReturnValue([{ uprn: 1 }, { uprn: 2 }])
+      it('should throw not found error if address uuid not provided', async () => {
+        req = { ...req, query: {} } as unknown as Request
 
-        await expect(controller.submitFindUkAddress()(req, res, next)).rejects.toThrow(
-          'Could not find unique address by UPRN',
+        await expect(controller.displayConfirmAddress()(req, res, next)).rejects.toThrow(
+          'Could not find cached address',
+        )
+
+        expect(res.render).not.toHaveBeenCalled()
+      })
+
+      it('should throw not found error if address uuid not present in cache', async () => {
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest.fn().mockReturnValue(undefined)
+
+        await expect(controller.displayConfirmAddress()(req, res, next)).rejects.toThrow(
+          'Could not find cached address',
+        )
+
+        expect(res.render).not.toHaveBeenCalled()
+      })
+
+      it('should handle missing city, county and country codes', async () => {
+        const address: AddressRequestDto = {
+          uprn,
+          buildingNumber: '1',
+          thoroughfareName: 'The Road',
+          postCode: 'A12 3BC',
+          fromDate: '2025-06-09',
+          addressTypes: [],
+        }
+
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address, route: 'find-uk-address' } })
+
+        await controller.displayConfirmAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/address/confirmAddress',
+          expect.objectContaining({ address: { ...address, cacheId: addressCacheId } }),
         )
       })
     })

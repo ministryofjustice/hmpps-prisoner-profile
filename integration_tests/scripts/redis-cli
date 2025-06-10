@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if command -v redis-cli &> /dev/null; then
+  redis-cli $1
+else
+  # Use the redis docker instance to run the command:
+  docker ps --format '{{.Names}}' | grep "redis" | xargs -I {} docker exec {} bash -c "redis-cli $1"
+fi

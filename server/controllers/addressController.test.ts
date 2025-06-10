@@ -18,7 +18,7 @@ const testError = () => {
 describe('Address controller', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    controller = new AddressController(new AddressService(null, null), auditServiceMock())
+    controller = new AddressController(new AddressService(null, null, null), auditServiceMock())
   })
 
   describe('displayAddresses', () => {
