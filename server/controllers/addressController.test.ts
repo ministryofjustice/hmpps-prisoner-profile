@@ -105,7 +105,7 @@ describe('Address controller', () => {
         .mockResolvedValue(mockOsAddresses)
 
       await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'SW1H9EA' } }, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H9EA')
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H 9EA')
       expect(res.json).toHaveBeenCalledWith({
         results: [expect.objectContaining({ buildingNumber: 1 }), expect.objectContaining({ buildingNumber: 2 })],
         status: 200,
