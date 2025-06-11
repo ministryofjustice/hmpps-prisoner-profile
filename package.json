@@ -120,7 +120,7 @@
     "csurf": "^1.11.0",
     "date-fns": "^3.6.0",
     "eslint-plugin-no-only-tests": "^3.3.0",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "express-session": "^1.18.1",
     "fuse.js": "^7.1.0",
     "govuk-frontend": "^5.10.1",
