@@ -1,5 +1,1 @@
-#!/bin/bash
-NODE_ENV=dev \
-npm run precommit:secrets \
-&& npm run precommit:lint \
-&& npm run precommit:verify
+NODE_ENV=dev && npm run lint && npm run typecheck && npm test
