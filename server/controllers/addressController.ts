@@ -8,6 +8,7 @@ import AddressService from '../services/addressService'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 
 const simplePostCodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
+const queryContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 
 export default class AddressController {
   constructor(
@@ -56,9 +57,11 @@ export default class AddressController {
     const { optimisationOff } = req.query
 
     try {
-      const results = (await this.addressService.getAddressesMatchingQuery(query)) || []
+      const rawApiResults =
+        (await this.addressService.getAddressesMatchingQuery(optimisationOff ? query : this.sanitisePostCode(query))) ||
+        []
 
-      const bestMatchResults = new Fuse(results, {
+      const bestMatchResults = new Fuse(rawApiResults, {
         shouldSort: true,
         threshold: 0.2,
         ignoreLocation: true,
@@ -67,18 +70,25 @@ export default class AddressController {
         .search(query)
         .map(result => result.item)
 
-      const buildingNumberSort = simplePostCodeRegex.test(query)
+      const buildingNumberSort = simplePostCodeRegex.test(query.trim())
         ? (a: OsAddress, b: OsAddress) =>
             a.addressString.localeCompare(b.addressString, undefined, { numeric: true, sensitivity: 'base' })
         : (_a: OsAddress, _b: OsAddress) => 1
 
-      const displayedResults = (bestMatchResults.length ? bestMatchResults : results)
+      const optimisedResults = (bestMatchResults.length ? bestMatchResults : rawApiResults)
         .sort(buildingNumberSort)
         .slice(0, 100)
 
-      res.json({ status: 200, results: optimisationOff ? results : displayedResults })
+      res.json({ status: 200, results: optimisationOff ? rawApiResults : optimisedResults })
     } catch (error) {
       res.status(error.status).json({ status: error.status, error: error.message })
     }
+  }
+
+  private sanitisePostCode(query: string) {
+    const postCodeQuery = queryContainingPostCodeRegex.exec(query)
+    if (!postCodeQuery) return query
+
+    return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
   }
 }
