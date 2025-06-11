@@ -6,6 +6,7 @@ import AddressService from '../services/addressService'
 import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
 import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 import { prisonUserMock } from '../data/localMockData/user'
+import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 
 let req: any
 let res: any
@@ -18,7 +19,7 @@ const testError = () => {
 describe('Address controller', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    controller = new AddressController(new AddressService(null, null, null), auditServiceMock())
+    controller = new AddressController(addressServiceMock() as AddressService, auditServiceMock())
   })
 
   describe('displayAddresses', () => {
@@ -38,13 +39,16 @@ describe('Address controller', () => {
     })
 
     it('should render the addresses page', async () => {
-      const getAddresses = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddresses')
+      const getAddressesFromPrisonAPI = jest
+        .spyOn<any, string>(controller['addressService'], 'getAddressesFromPrisonAPI')
         .mockResolvedValue([...addressesPrimaryAndMailMock, ...addressesNoStartDateMock])
 
       await controller.displayAddresses(req, res)
 
-      expect(getAddresses).toHaveBeenCalledWith(req.middleware.clientToken, req.middleware.prisonerData.prisonerNumber)
+      expect(getAddressesFromPrisonAPI).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        req.middleware.prisonerData.prisonerNumber,
+      )
       expect(res.render).toHaveBeenCalledWith('pages/addresses/addresses', {
         pageTitle: 'Addresses',
         primaryAddressLabel: 'Primary and mail address',
@@ -110,6 +114,15 @@ describe('Address controller', () => {
         results: [expect.objectContaining({ buildingNumber: 1 }), expect.objectContaining({ buildingNumber: 2 })],
         status: 200,
       })
+    })
+
+    it('should sanitise post codes before querying the API', async () => {
+      const getAddressesMatchingQuery = jest
+        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
+        .mockResolvedValue(mockOsAddresses)
+
+      await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'petty france sw1H9eA 102' } }, res)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('petty france SW1H 9EA 102')
     })
 
     it('should handle errors correctly', async () => {

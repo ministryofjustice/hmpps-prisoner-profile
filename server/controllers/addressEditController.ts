@@ -2,13 +2,14 @@ import { Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { formatName } from '../utils/utils'
+import { apostrophe, formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
 import EphemeralDataService from '../services/EphemeralDataService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { FlashMessageType } from '../data/enums/flashMessageType'
 
 // eslint-disable-next-line no-shadow
 enum AddressLocation {
@@ -65,11 +66,6 @@ export default class AddressEditController {
       const { prisonerNumber } = this.getCommonRequestData(req)
       const { radioField: location } = req.body
 
-      if (!location) {
-        req.flash('errors', [{ text: 'Select where the address is', href: '#radio' }])
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/where-is-address`)
-      }
-
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -124,14 +120,7 @@ export default class AddressEditController {
   public submitFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
-      const { uprn, 'address-autosuggest-input': userText } = req.body
-
-      if (!uprn) {
-        const errorMessage = userText ? 'This is not a valid address' : 'Enter a UK address'
-        req.flash('requestBody', JSON.stringify(req.body))
-        req.flash('errors', [{ text: errorMessage, href: '#address-autosuggest-input' }])
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/find-uk-address`)
-      }
+      const { uprn } = req.body
 
       this.auditService
         .sendPostSuccess({
@@ -194,6 +183,111 @@ export default class AddressEditController {
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })
+    }
+  }
+
+  public displayPrimaryOrPostalAddress(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { address: addressCacheId } = req.query
+      const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
+        addressCacheId as UUID,
+      )
+
+      if (!addressCache?.value?.address) {
+        throw new NotFoundError('Could not find cached address')
+      }
+
+      const errors = req.flash('errors')
+      const { address } = addressCache.value
+      const [cityCode, countyCode, countryCode, existingAddresses] = await Promise.all([
+        address.postTownCode && this.addressService.getCityReferenceData(address.postTownCode, clientToken),
+        address.countyCode && this.addressService.getCountyReferenceData(address.countyCode, clientToken),
+        address.countryCode && this.addressService.getCountryReferenceData(address.countryCode, clientToken),
+        this.addressService.getAddresses(clientToken, prisonerNumber),
+      ])
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressPrimaryOrPostal,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/address/primaryOrPostalAddress', {
+        pageTitle: 'Select if primary or postal address - Prisoner personal details',
+        formTitle: `Is this ${apostrophe(titlePrisonerName)} primary or postal address?`,
+        address: {
+          ...address,
+          cacheId: addressCacheId,
+          city: cityCode?.description,
+          county: countyCode?.description,
+          country: countryCode?.description,
+        },
+        existingPrimary: !!existingAddresses.find(a => a.primaryAddress),
+        existingPostal: !!existingAddresses.find(a => a.postalAddress),
+        errors,
+        prisonerNumber,
+        backLink: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+        breadcrumbPrisonerName: prisonerName,
+        miniBannerData: { prisonerNumber, prisonerName },
+      })
+    }
+  }
+
+  public submitPrimaryOrPostalAddress(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { primaryOrPostal: primaryOrPostalResponse } = req.body
+      const { address: addressCacheId } = req.query
+
+      const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
+        addressCacheId as UUID,
+      )
+
+      if (!addressCache?.value?.address) {
+        throw new NotFoundError('Could not find cached address')
+      }
+
+      const primaryOrPostal = Array.isArray(primaryOrPostalResponse)
+        ? primaryOrPostalResponse
+        : [primaryOrPostalResponse]
+
+      const address: AddressRequestDto = {
+        ...addressCache.value.address,
+        primaryAddress: primaryOrPostal.includes('primary'),
+        postalAddress: primaryOrPostal.includes('postal'),
+      }
+
+      try {
+        await this.addressService.createAddress(clientToken, prisonerNumber, address)
+        await this.ephemeralDataService.removeData(addressCacheId as UUID)
+
+        req.flash('flashMessage', {
+          text: 'Address updated',
+          type: FlashMessageType.success,
+          fieldName: 'addresses',
+        })
+
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.EditAddressPrimaryOrPostal,
+            details: { address },
+          })
+          .catch(error => logger.error(error))
+
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
+      } catch (e) {
+        req.flash('errors', [{ text: 'There was an error please try again' }])
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/primary-or-postal-address?address=${addressCacheId}`)
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
+  AddressResponseDto,
   CorePersonPhysicalAttributesDto,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
@@ -9,7 +10,10 @@ import {
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
-import { PseudonymResponseMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import {
+  AddressResponseMock,
+  PseudonymResponseMock,
+} from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 
 const baseUrl = '/personIntegration'
@@ -264,6 +268,24 @@ export default {
   stubUpdateProfileImage: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse({
       path: `${baseUrl}/v1/core-person-record/profile-image\\?prisonerNumber=${prisonerNumber}`,
+      responseBody: {},
+    }),
+
+  stubGetAddresses: ({
+    prisonerNumber,
+    response = [AddressResponseMock],
+  }: {
+    prisonerNumber: string
+    response: AddressResponseDto[]
+  }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
+      body: response,
+    }),
+
+  stubCreateAddress: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPostWithResponse({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
       responseBody: {},
     }),
 }

@@ -148,7 +148,12 @@ export const services = () => {
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
-  const addressService = new AddressService(referenceDataService, prisonApiClientBuilder, osPlacesApiClient)
+  const addressService = new AddressService(
+    referenceDataService,
+    prisonApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    osPlacesApiClient,
+  )
   const prisonerLocationHistoryService = new PrisonerLocationHistoryService(
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
