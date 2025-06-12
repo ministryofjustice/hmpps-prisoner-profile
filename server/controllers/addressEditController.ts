@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
+import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { formatName } from '../utils/utils'
@@ -7,6 +8,7 @@ import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
 import EphemeralDataService from '../services/EphemeralDataService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 // eslint-disable-next-line no-shadow
 enum AddressLocation {
@@ -121,7 +123,7 @@ export default class AddressEditController {
 
   public submitFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
       const { uprn, 'address-autosuggest-input': userText } = req.body
 
       if (!uprn) {
@@ -141,13 +143,57 @@ export default class AddressEditController {
         })
         .catch(error => logger.error(error))
 
-      const matchingAddresses = await this.addressService.getAddressesByUprn(uprn)
-      if (!matchingAddresses || matchingAddresses.length !== 1) {
-        throw new NotFoundError('Could not find unique address by UPRN')
+      const address = await this.addressService.getAddressByUprn(uprn, clientToken)
+      const addressConfirmationUuid = await this.ephemeralDataService.cacheData({ address, route: 'find-uk-address' })
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressConfirmationUuid}`)
+    }
+  }
+
+  public displayConfirmAddress(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { address: addressCacheId } = req.query
+      const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
+        addressCacheId as UUID,
+      )
+
+      if (!addressCache?.value?.address) {
+        throw new NotFoundError('Could not find cached address')
       }
 
-      const addressConfirmationUuid = await this.ephemeralDataService.cacheData(matchingAddresses[0])
-      return res.redirect(`/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressConfirmationUuid}`)
+      const { address, route } = addressCache.value
+
+      const [cityCode, countyCode, countryCode] = await Promise.all([
+        address.postTownCode && this.addressService.getCityReferenceData(address.postTownCode, clientToken),
+        address.countyCode && this.addressService.getCountyReferenceData(address.countyCode, clientToken),
+        address.countryCode && this.addressService.getCountryReferenceData(address.countryCode, clientToken),
+      ])
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressConfirm,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/address/confirmAddress', {
+        pageTitle: 'Confirm address - Prisoner personal details',
+        formTitle: 'Confirm address',
+        address: {
+          ...address,
+          cacheId: addressCacheId,
+          city: cityCode?.description,
+          county: countyCode?.description,
+          country: countryCode?.description,
+        },
+        prisonerNumber,
+        backLink: `/prisoner/${prisonerNumber}/personal/${route}`,
+        breadcrumbPrisonerName: prisonerName,
+        miniBannerData: { prisonerNumber, prisonerName },
+      })
     }
   }
 

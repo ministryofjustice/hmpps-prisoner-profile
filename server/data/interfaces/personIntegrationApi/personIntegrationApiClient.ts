@@ -15,6 +15,8 @@ export interface CorePersonRecordReferenceDataCodeDto {
 // eslint-disable-next-line no-shadow
 export enum CorePersonRecordReferenceDataDomain {
   country = 'COUNTRY',
+  county = 'COUNTY',
+  city = 'CITY',
   nationality = 'NAT',
   religion = 'RELF',
   militaryBranch = 'MLTY_BRANCH',
@@ -192,6 +194,51 @@ export interface PseudonymResponseDto {
   isWorkingName: boolean
 }
 
+export interface AddressTypeDto {
+  addressUsageType: ReferenceDataValue
+  active?: boolean
+}
+
+export interface AddressRequestDto {
+  uprn?: number
+  noFixedAbode?: boolean
+  buildingNumber?: string
+  subBuildingName?: string
+  buildingName?: string
+  thoroughfareName?: string
+  dependantLocality?: string
+  postTownCode?: string
+  countyCode?: string
+  countryCode?: string
+  postCode?: string
+  fromDate: string
+  toDate?: string
+  addressTypes: AddressTypeDto[]
+  postalAddress?: boolean
+  primaryAddress?: boolean
+}
+
+export interface AddressResponseDto {
+  addressId: number
+  personId: string
+  uprn?: number
+  noFixedAbode?: boolean
+  buildingNumber?: string
+  subBuildingName?: string
+  buildingName?: string
+  thoroughfareName?: string
+  dependantLocality?: string
+  postTown?: ReferenceDataValue
+  county?: ReferenceDataValue
+  country?: ReferenceDataValue
+  postCode?: string
+  fromDate: string
+  toDate?: string
+  addressTypes: AddressTypeDto[]
+  postalAddress?: boolean
+  primaryAddress?: boolean
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -254,4 +301,8 @@ export interface PersonIntegrationApiClient {
     prisonerNumber: string,
     image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
   ): Promise<void>
+
+  getAddresses(prisonerNumber: string): Promise<AddressResponseDto[]>
+
+  createAddress(prisonerNumber: string, address: AddressRequestDto): Promise<AddressResponseDto>
 }

@@ -6,19 +6,27 @@ import { OsPlacesApiClient } from '../data/interfaces/osPlacesApi/osPlacesApiCli
 import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryResponse'
 import OsPlacesDeliveryPointAddress from '../data/interfaces/osPlacesApi/osPlacesDeliveryPointAddress'
 import { convertToTitleCase } from '../utils/utils'
+import ReferenceDataService from './referenceData/referenceDataService'
+import AddressMapper from './mappers/addressMapper'
+import {
+  AddressRequestDto,
+  CorePersonRecordReferenceDataDomain,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import NotFoundError from '../utils/notFoundError'
+import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
+import { PersonalRelationshipsReferenceDataDomain } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 export default class AddressService {
+  private readonly addressMapper: AddressMapper
+
   constructor(
+    private readonly referenceDataService: ReferenceDataService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly osPlacesApiClient: OsPlacesApiClient,
-  ) {}
+  ) {
+    this.addressMapper = new AddressMapper(referenceDataService)
+  }
 
-  /**
-   * Handle request for addresses
-   *
-   * @param token
-   * @param prisonerNumber
-   */
   public async getAddresses(token: string, prisonerNumber: string): Promise<Address[]> {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
   }
@@ -28,15 +36,33 @@ export default class AddressService {
     return this.handleResponse(response)
   }
 
-  public async getAddressesByUprn(uprn: string): Promise<OsAddress[]> {
+  public async getAddressByUprn(uprn: string, token: string): Promise<AddressRequestDto> {
     const response = await this.osPlacesApiClient.getAddressesByUprn(uprn)
-    return this.handleResponse(response)
+    const result = this.handleResponse(response)
+
+    if (result.length !== 1) {
+      throw new NotFoundError('Could not find unique address by UPRN')
+    }
+
+    return this.addressMapper.toAddressRequestDto(result[0], token)
   }
 
-  private async handleResponse(response: OsPlacesQueryResponse): Promise<OsAddress[]> {
-    if (response.header && response.header.totalresults === 0) {
-      return []
-    }
+  public async getCityReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+    return (
+      code && this.referenceDataService.getReferenceData(PersonalRelationshipsReferenceDataDomain.City, code, token)
+    )
+  }
+
+  public async getCountyReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+    return code && this.referenceDataService.getReferenceData(CorePersonRecordReferenceDataDomain.county, code, token)
+  }
+
+  public async getCountryReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+    return code && this.referenceDataService.getReferenceData(CorePersonRecordReferenceDataDomain.country, code, token)
+  }
+
+  private handleResponse(response: OsPlacesQueryResponse): OsAddress[] {
+    if (response.header && response.header.totalresults === 0) return []
 
     return response.results.map(result => this.toOsAddress(result.DPA))
   }

@@ -18,7 +18,7 @@ describe('addressService', () => {
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
     osPlacesApiClient = osPlacesApiClientMock()
-    addressService = new AddressService(() => prisonApiClient, osPlacesApiClient)
+    addressService = new AddressService(null, () => prisonApiClient, osPlacesApiClient)
   })
 
   describe('getAddresses', () => {
