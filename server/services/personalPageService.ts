@@ -1,6 +1,8 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   Addresses,
+  GlobalEmail,
+  GlobalNumbersAndEmails,
   IdentityNumbers,
   NextOfKin,
   PersonalDetails,
@@ -70,6 +72,7 @@ import {
 import DomesticStatusService from './domesticStatusService'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { religionFieldData } from '../controllers/personal/fieldData'
+import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 
 export default class PersonalPageService {
   constructor(
@@ -84,11 +87,30 @@ export default class PersonalPageService {
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
     private readonly nextOfKinService: NextOfKinService,
     private readonly domesticStatusService: DomesticStatusService,
+    private readonly globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
     return apiClient.getHealthAndMedication(prisonerNumber)
+  }
+
+  async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
+    return this.globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber(token, prisonerNumber)
+  }
+
+  async updateGlobalEmail(
+    token: string,
+    prisonerNumber: string,
+    emailAddressId: string,
+    value: string,
+  ): Promise<GlobalEmail> {
+    return this.globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber(
+      token,
+      prisonerNumber,
+      emailAddressId,
+      value,
+    )
   }
 
   async updateDietAndFoodAllergies(
@@ -192,6 +214,7 @@ export default class PersonalPageService {
       nextOfKinAndEmergencyContacts,
       personalRelationshipsNumberOfChildren,
       personalRelationshipsDomesticStatus,
+      globalNumbersAndEmails,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -221,6 +244,7 @@ export default class PersonalPageService {
             noCallbackOnErrorBecause('we are falling back to prison api data'),
           )
         : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
+      editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -269,6 +293,7 @@ export default class PersonalPageService {
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       distinguishingMarks,
       militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
+      globalNumbersAndEmails,
     }
   }
 

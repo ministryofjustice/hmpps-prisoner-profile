@@ -22,6 +22,7 @@ export default interface PersonalPage {
   hasCurrentBelief: boolean
   distinguishingMarks: PersonIntegrationDistinguishingMark[] | null
   militaryRecords: MilitaryRecord[] | null
+  globalNumbersAndEmails: GlobalNumbersAndEmails
 }
 
 export interface PersonalDetails {
@@ -163,4 +164,21 @@ export interface PhysicalCharacteristics {
 export interface Security {
   interestToImmigration: string
   travelRestrictions: string
+}
+
+export interface GlobalEmail {
+  id: number
+  email: string
+}
+
+export interface GlobalPhoneNumber {
+  id: number
+  type: string
+  number: string
+  extension?: string
+}
+
+export interface GlobalNumbersAndEmails {
+  phones: GlobalPhoneNumber[]
+  emails: GlobalEmail[]
 }

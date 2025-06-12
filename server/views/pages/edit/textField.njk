@@ -59,7 +59,7 @@
         <div class="govuk-button-group">
           {{
             govukButton({
-            text: "Save",
+            text: submitButtonText if submitButtonText else "Save",
             type: "submit",
             preventDoubleClick: true,
             attributes: { "data-qa": "edit-submit-button" }

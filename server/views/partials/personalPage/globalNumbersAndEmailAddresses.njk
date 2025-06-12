@@ -1,0 +1,55 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set phonesHtml %}
+<div class="hmpps-global-numbers-and-emails__phones__list">
+  {% for x in globalNumbersAndEmails.phones %}
+    <div class="hmpps-global-numbers-and-emails__phone">
+      <div class="hmpps-global-numbers-and-emails__phone__details">
+        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.type }}</p>
+        <p class="govuk-body govuk-!-margin-0">{{ x.number }}</p>
+        {% if x.extension %}
+          <p class="govuk-body govuk-!-margin-0">Ext: {{ x.extension }}</p>
+        {% endif %}
+      </div>
+      <div class="hmpps-global-numbers-and-emails__phone__change">
+        Change
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endset %}
+{% set emailsHtml %}
+<div class="hmpps-global-numbers-and-emails__phones__list">
+  {% for x in globalNumbersAndEmails.emails %}
+    <div class="hmpps-global-numbers-and-emails__email">
+      <div class="hmpps-global-numbers-and-emails__email__details">
+        <p class="govuk-body govuk-!-margin-0">{{ x.email }}</p>
+      </div>
+      <div class="hmpps-global-numbers-and-emails__email__change">
+        <a class="govuk-link govuk-link--no-visited-state" href="personal/email-addresses/{{ x.id }}">
+          Change
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endset %}
+{%- call summaryCard({title: "Phone numbers and email addresses", id: "phones-and-emails"}) -%}
+<div class="govuk-grid-row" data-qa="addresses">
+  <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
+    {{ govukSummaryList({
+        classes: 'govuk-summary-list--bottom-border',
+        rows: [
+          {
+            key: { text: 'Phone numbers' },
+            value: { html: phonesHtml }
+          },
+          {
+            key: { text: 'Email addresses' },
+            value: { html: emailsHtml }
+          }
+        ]
+    }) }}
+  </div>
+</div>
+{%- endcall -%}

@@ -1,4 +1,5 @@
 import {
+  ContactsResponseDto,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
@@ -442,3 +443,17 @@ export const PseudonymResponseMock: PseudonymResponseDto = {
   },
   isWorkingName: true,
 }
+
+export const ContactsResponseMock: ContactsResponseDto[] = [
+  {
+    contactId: 1,
+    contactType: 'BUS',
+    contactValue: '01234 567 890',
+    contactPhoneExtension: '1234',
+  },
+  {
+    contactId: 10,
+    contactType: 'EMAIL',
+    contactValue: 'foo@example.com',
+  },
+]

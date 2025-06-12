@@ -239,6 +239,19 @@ export interface AddressResponseDto {
   primaryAddress?: boolean
 }
 
+export interface ContactsResponseDto {
+  contactId: number
+  contactType: string
+  contactValue: string
+  contactPhoneExtension?: string
+}
+
+export interface ContactsRequestDto {
+  contactType: string
+  contactValue: string
+  contactPhoneExtension?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -305,4 +318,8 @@ export interface PersonIntegrationApiClient {
   getAddresses(prisonerNumber: string): Promise<AddressResponseDto[]>
 
   createAddress(prisonerNumber: string, address: AddressRequestDto): Promise<AddressResponseDto>
+
+  getContacts(prisonerNumber: string): Promise<ContactsResponseDto[]>
+
+  updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto>
 }
