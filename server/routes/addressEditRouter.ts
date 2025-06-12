@@ -19,5 +19,7 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get('/find-uk-address', editProfileChecks(), addressEditController.displayFindUkAddress())
   post('/find-uk-address', editProfileChecks(), addressEditController.submitFindUkAddress())
+
+  get('/confirm-address', editProfileChecks(), addressEditController.displayConfirmAddress())
   return router
 }

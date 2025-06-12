@@ -4,7 +4,7 @@ import { EphemeralDataStore, EphemeralDataStoreResponse } from '../data/ephemera
 export default class EphemeralDataService {
   constructor(private readonly ephemeralDataStore: EphemeralDataStore) {}
 
-  async cacheData<T>(value: T, ttlMinutes: number = 60): Promise<UUID> {
+  async cacheData<T>(value: T, ttlMinutes: number = 360): Promise<UUID> {
     return this.ephemeralDataStore.cacheData(value, ttlMinutes)
   }
 

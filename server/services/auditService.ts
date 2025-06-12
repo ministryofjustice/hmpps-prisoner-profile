@@ -26,6 +26,7 @@ export enum Page {
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
   DistinguishingMarkAllPhotos = 'DISTINGUISHING_MARK_ALL_PHOTOS',
+  EditAddressConfirm = 'EDIT_ADDRESS_CONFIRM',
   EditAddressLocation = 'EDIT_ADDRESS_LOCATION',
   EditAddressFindUkAddress = 'EDIT_ADDRESS_FIND_UK_ADDRESS',
   EditAppointment = 'EDIT_APPOINTMENT',

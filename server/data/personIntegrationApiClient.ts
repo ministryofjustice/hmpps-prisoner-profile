@@ -1,6 +1,8 @@
 import { Readable } from 'stream'
 import RestClient from './restClient'
 import {
+  AddressRequestDto,
+  AddressResponseDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
@@ -194,6 +196,17 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: `/v1/core-person-record/profile-image`,
       query: { prisonerNumber },
       files: { imageFile: image },
+    })
+  }
+
+  getAddresses(prisonerNumber: string): Promise<AddressResponseDto[]> {
+    return this.restClient.get({ path: `/v1/person/${prisonerNumber}/addresses` })
+  }
+
+  createAddress(prisonerNumber: string, address: AddressRequestDto): Promise<AddressResponseDto> {
+    return this.restClient.post({
+      path: `/v1/person/${prisonerNumber}/addresses`,
+      data: address,
     })
   }
 }
