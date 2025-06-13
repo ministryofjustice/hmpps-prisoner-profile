@@ -74,5 +74,25 @@ describe('IdentityNumbersService', () => {
         user,
       })
     })
+
+    it('transform values to uppercase', async () => {
+      const request = [
+        {
+          ...AddIdentityNumbersRequestMock[0],
+          value: AddIdentityNumbersRequestMock[0].value.toLowerCase(),
+        },
+      ]
+      await identityNumbersService.addIdentityNumbers(clientToken, user, prisonerNumber, request)
+
+      expect(personIntegrationApiClient.addIdentityNumbers).toHaveBeenCalledWith(
+        prisonerNumber,
+        AddIdentityNumbersRequestMock,
+      )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['identity-numbers'],
+        prisonerNumber,
+        user,
+      })
+    })
   })
 })

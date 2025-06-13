@@ -27,7 +27,15 @@ export default class IdentityNumbersService {
   ) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
 
-    const response = await personIntegrationApiClient.addIdentityNumbers(prisonerNumber, identifiers)
+    const response = await personIntegrationApiClient.addIdentityNumbers(
+      prisonerNumber,
+      identifiers.map(identifier => {
+        return {
+          ...identifier,
+          value: identifier.value?.toUpperCase(),
+        }
+      }),
+    )
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['identity-numbers'],

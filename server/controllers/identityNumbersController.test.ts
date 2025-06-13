@@ -11,6 +11,7 @@ import {
 } from './utils/identityNumbersController/buildIdentityNumberOptions'
 import { JusticeIdentifierMappings } from '../data/constants/identifierMappings'
 import { FlashMessageType } from '../data/enums/flashMessageType'
+import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifier'
 
 describe('IdentityNumbersController', () => {
   let req: Request
@@ -119,7 +120,7 @@ describe('IdentityNumbersController', () => {
   describe('postJusticeIdNumbers', () => {
     beforeEach(() => {
       req.body = {
-        prisonLegacySystem: {
+        probationLegacySystem: {
           selected: '',
           value: '1234',
           comment: 'Some comment',
@@ -130,13 +131,14 @@ describe('IdentityNumbersController', () => {
         },
       }
 
+      jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue(GetIdentifiersMock)
       jest.spyOn(identityNumbersService, 'addIdentityNumbers').mockResolvedValue()
     })
 
     it('should add the new id numbers and redirect', async () => {
       const expectedRequest = [
-        { comments: 'Some comment', type: 'HMPS', value: '1234' },
-        { comments: undefined, type: 'YJAF', value: '456' },
+        { comments: 'Some comment', type: OffenderIdentifierType.ProbationLegacySystemNumber, value: '1234' },
+        { comments: undefined, type: OffenderIdentifierType.YjafNumber, value: '456' },
       ]
 
       await controller.postJusticeIdNumbers()(req, res, next)
@@ -160,6 +162,30 @@ describe('IdentityNumbersController', () => {
         fieldName: 'identity-numbers',
       })
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
+    })
+
+    it('should detect duplicates of existing ids and redirect to the add justice numbers page ', async () => {
+      req.body = {
+        prisonLegacySystem: {
+          selected: '',
+          value: '1234',
+          comment: 'Some comment',
+        },
+      }
+      req.errors = []
+
+      await controller.postJusticeIdNumbers()(req, res, next)
+
+      const { errors } = req
+
+      expect(identityNumbersService.addIdentityNumbers).not.toHaveBeenCalled()
+      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal/justice-id-numbers')
+      expect(errors.length).toEqual(1)
+      expect(errors[0].text).toEqual(
+        'This Prison legacy system number already exists. Enter a different Prison legacy system number',
+      )
+      expect(errors[0].href).toEqual('#prisonLegacySystem-value-input')
     })
 
     it('should redirect to the add justice numbers page if an error is encountered', async () => {

@@ -13,6 +13,8 @@ import {
   buildIdentityNumberOptions,
 } from './utils/identityNumbersController/buildIdentityNumberOptions'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import OffenderIdentifier from '../data/interfaces/prisonApi/OffenderIdentifier'
+import HmppsError from '../interfaces/HmppsError'
 
 export default class IdentityNumbersController {
   constructor(
@@ -64,32 +66,23 @@ export default class IdentityNumbersController {
       const formValues: Record<string, AddIdentityNumberSubmission> = req.body
 
       if (!errors.length) {
-        const request = Object.entries(formValues)
-          .map(([id, value]): AddIdentifierRequestDto => {
-            const type = IdentifierMappings[id]?.type
+        const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
+        this.checkForDuplicateValues(formValues, existingIdentifiers, errors)
 
-            if (type && value.value) {
-              return {
-                type,
-                value: value.value,
-                comments: value.comment,
-              }
-            }
-            return null
-          })
-          .filter(Boolean)
-
-        try {
-          await this.identityNumbersService.addIdentityNumbers(
-            clientToken,
-            res.locals.user as PrisonUser,
-            prisonerNumber,
-            request,
-          )
-        } catch (error) {
-          if (error.status === 400) {
-            errors.push({ text: error?.data?.userMessage ?? error.message })
-          } else throw error
+        if (!errors.length) {
+          const request = this.createRequestFromFormValues(formValues)
+          try {
+            await this.identityNumbersService.addIdentityNumbers(
+              clientToken,
+              res.locals.user as PrisonUser,
+              prisonerNumber,
+              request,
+            )
+          } catch (error) {
+            if (error.status === 400) {
+              errors.push({ text: error?.data?.userMessage ?? error.message })
+            } else throw error
+          }
         }
       }
 
@@ -117,5 +110,39 @@ export default class IdentityNumbersController {
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
     }
+  }
+
+  private createRequestFromFormValues = (formValues: Record<string, AddIdentityNumberSubmission>) => {
+    return Object.entries(formValues)
+      .map(([id, value]): AddIdentifierRequestDto => {
+        const type = IdentifierMappings[id]?.type
+
+        if (type && value.value) {
+          return {
+            type,
+            value: value.value,
+            comments: value.comment,
+          }
+        }
+        return null
+      })
+      .filter(Boolean)
+  }
+
+  private checkForDuplicateValues = (
+    formValues: Record<string, AddIdentityNumberSubmission>,
+    existingIdentifiers: OffenderIdentifier[],
+    errors: HmppsError[],
+  ) => {
+    Object.entries(formValues).forEach(([key, value]) => {
+      const type = IdentifierMappings[key]?.type
+      const label = IdentifierMappings[key]?.label
+      if (existingIdentifiers.some(id => id.type === type && id.value?.toUpperCase() === value.value?.toUpperCase())) {
+        errors.push({
+          text: `This ${label} already exists. Enter a different ${label}`,
+          href: `#${key}-value-input`,
+        })
+      }
+    })
   }
 }
