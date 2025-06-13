@@ -78,7 +78,7 @@ describe('Identity Numbers Validator', () => {
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
     ])('%s', (label, id) => {
       const request = {
-        [id]: { selected: '' },
+        [id]: { selected: id },
       }
 
       const errors = identityNumbersValidator(request)

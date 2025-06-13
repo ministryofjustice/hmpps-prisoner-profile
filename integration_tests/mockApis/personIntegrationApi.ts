@@ -290,4 +290,15 @@ export default {
       path: `${baseUrl}/v1/person/${prisonerNumber}/contacts/${contactId}`,
       responseBody: response ?? ContactsResponseMock[0],
     }),
+
+  stubAddIdentifiers: ({
+    prisonerNumber = PrisonerMockDataA.prisonerNumber,
+  }: {
+    prisonerNumber: string
+    status: number
+  }) =>
+    stubPostWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      responseBody: null,
+    }),
 }

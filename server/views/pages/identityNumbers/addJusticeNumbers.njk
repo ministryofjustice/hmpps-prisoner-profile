@@ -64,6 +64,7 @@
     {% set selectItems = (selectItems.push(
         {
             name: option.id + "[selected]",
+            value: option.id,
             text: option.label,
             id: option.id,
             checked: option.selected,

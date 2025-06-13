@@ -18,7 +18,7 @@ export const identityNumbersValidator = (body: Record<string, IdentityNumberSubm
   const errors: HmppsError[] = []
 
   Object.entries(body).forEach(([key, value]) => {
-    if (value.selected === '' && !value.value) {
+    if (value.selected && !value.value) {
       errors.push({
         text: `Enter this person’s ${IdentifierMappings[key]?.label ?? 'ID number'}`,
         href: `#${key}-value-input`,
