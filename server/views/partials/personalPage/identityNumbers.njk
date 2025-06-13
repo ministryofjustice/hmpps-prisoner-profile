@@ -43,8 +43,11 @@
 {% endmacro %}
 
 {% set showAdditionalIdRow = not hasPersonalId or not hasHomeOfficeId %}
+{% set cardClasses %}
+  {{ "row-updated" if flashMessage.fieldName === 'identity-numbers' else "" }}
+{% endset %}
 
-{%- call summaryCard({title: "Identity numbers", id: "identity-numbers"}) -%}
+{%- call summaryCard({title: "Identity numbers", id: "identity-numbers", classes: cardClasses }) -%}
   <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">
       <dl class="govuk-summary-list">
@@ -52,7 +55,7 @@
         {# (the justice numbers section heading) would otherwise be a table-row #}
         <dt class="govuk-summary-list__key pseudo-row"></dt><dd class="govuk-summary-list__value pseudo-row"></dd>
 
-        {{ summaryListSectionHeading("Justice numbers", "justice-numbers", { enabled: editEnabled, href: "", text: "Add justice ID numbers" }) }}
+        {{ summaryListSectionHeading("Justice numbers", "justice-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/justice-id-numbers", text: "Add justice ID numbers" }) }}
         {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], "prison-number") }}
         {{ identityNumber("PNC number", identityNumbers.justice.pncNumber, "pnc-number") }}
         {{ identityNumber("CRO number", identityNumbers.justice.croNumber, "cro-number", { hideIfEmpty: true }) }}

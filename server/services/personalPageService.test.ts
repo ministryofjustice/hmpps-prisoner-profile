@@ -541,8 +541,11 @@ describe('PersonalPageService', () => {
   })
 
   describe('Identity numbers', () => {
-    it('Maps the data from the API', async () => {
-      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA)
+    it.each([
+      ['Profile edit enabled', true],
+      ['Profile edit disabled', false],
+    ])('Maps the data from the API - %s', async (_, profileEditEnabled: boolean) => {
+      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, false, profileEditEnabled)
       expect(identityNumbers.justice.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
       expect(identityNumbers.personal.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
       expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
@@ -552,6 +555,8 @@ describe('PersonalPageService', () => {
         { comment: 'P/CONS - fixed', value: '8/359381C' },
       ])
       expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
+
+      expect(prisonApiClient.getIdentifiers).toHaveBeenCalledWith('G6123VU', profileEditEnabled)
     })
   })
 

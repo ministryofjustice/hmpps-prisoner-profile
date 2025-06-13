@@ -5,6 +5,7 @@ import {
   AddressResponseDto,
   ContactsRequestDto,
   ContactsResponseDto,
+  AddIdentifierRequestDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
@@ -179,6 +180,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: `/v1/pseudonym`,
       query: { prisonerNumber, sourceSystem: 'NOMIS' },
       data: pseudonym,
+    })
+  }
+
+  addIdentityNumbers(prisonerNumber: string, request: AddIdentifierRequestDto[]): Promise<void> {
+    return this.restClient.post({
+      path: `/v1/core-person-record/identifiers`,
+      query: { prisonerNumber, sourceSystem: 'NOMIS' },
+      data: request,
     })
   }
 

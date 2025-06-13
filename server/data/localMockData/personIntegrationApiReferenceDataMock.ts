@@ -1,4 +1,5 @@
 import {
+  AddIdentifierRequestDto,
   ContactsResponseDto,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
@@ -8,6 +9,7 @@ import {
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 import { PrisonerMockDataA } from './prisoner'
+import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifier'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -455,5 +457,12 @@ export const ContactsResponseMock: ContactsResponseDto[] = [
     contactId: 10,
     contactType: 'EMAIL',
     contactValue: 'foo@example.com',
+  },
+]
+
+export const AddIdentityNumbersRequestMock: AddIdentifierRequestDto[] = [
+  {
+    type: OffenderIdentifierType.PncNumber,
+    value: '2017/0239598Q',
   },
 ]

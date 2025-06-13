@@ -3,9 +3,14 @@ import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
+import { IdentityNumberSubmission } from '../validators/personal/identityNumbersValidator'
 
 export type Validator = (
-  body: FileUploadRequest | Record<string, string | string[]> | BodySubmission | DietAndFoodAllergiesSubmission,
+  body:
+    | FileUploadRequest
+    | Record<string, string | string[] | IdentityNumberSubmission>
+    | BodySubmission
+    | DietAndFoodAllergiesSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
 export default function validationMiddleware(
