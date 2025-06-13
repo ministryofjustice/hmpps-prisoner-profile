@@ -101,6 +101,11 @@
       padding-bottom: 10px;
     }
 
+    .section-heading-link-container {
+      display: flex;
+      justify-content: flex-end;
+    }
+
     a {
       display: table-cell;
       text-align: right;

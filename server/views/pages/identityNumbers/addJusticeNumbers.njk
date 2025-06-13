@@ -1,0 +1,123 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+
+{% macro identifierOptionHtml(option) %}
+    {% if option.hasExistingValue %}
+        {{ govukWarningText({
+            text: "This person already has a " + option.label + ". Check their existing " + option.label + " is correct before adding a new one.",
+            iconFallbackText: "Warning",
+            attributes: { 'data-qa': 'existing-id-warning'}
+        }) }}
+    {% endif %}
+    {{ govukInput({
+        id: option.id + "-value-input",
+        name: option.id + "[value]",
+        label: {
+            text: "Number"
+        },
+        value: option.value,
+        errorMessage: errors | findError(option.id + "-value-input"),
+        classes: "govuk-!-width-one-third"
+    }) }}
+    {{ govukCharacterCount({
+        id: option.id + "-comments-input",
+        name: option.id + "[comment]",
+        label: {
+            text: "Comments (optional)"
+        },
+        value: option.comment,
+        maxlength: 240,
+        rows: 3,
+        errorMessage: errors | findError(option.id + "-comments-input"),
+        classes: "govuk-!-width-three-quarters"
+    }) }}
+{% endmacro %}
+
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{%
+  set breadCrumbs = [
+      {
+          text: 'Digital Prison Services',
+          href:  "/" | prependBaseUrl
+      },
+      {
+          text: miniBannerData.prisonerName,
+          href: "/prisoner/" + prisonerNumber
+      },
+      {
+          text: 'Personal',
+          href: "/prisoner/" + prisonerNumber + "/personal"
+      }
+  ]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% set selectItems = [] %}
+{% for option in identifierOptions %}
+    {% set selectItems = (selectItems.push(
+        {
+            name: option.id + "[selected]",
+            text: option.label,
+            id: option.id,
+            checked: option.selected,
+            hint: { text: option.hint },
+            conditional: { html: identifierOptionHtml(option) }
+        }
+    ), selectItems) %}
+{% endfor %}
+
+{% block content %}
+
+  {% block body %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    </div>
+
+    {% if errors.length > 0 %}
+      {{
+        govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
+        })
+      }}
+    {% endif %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        <h1 class="govuk-heading-l">{{ title }}</h1>
+      </div>
+    </div>
+
+      <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+              <form method="post" novalidate="novalidate" autocomplete="off">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+                  {{ govukCheckboxes({ items: selectItems }) }}
+
+                  <div class="govuk-button-group">
+                      {{ govukButton({
+                          text: "Save",
+                          type: "submit",
+                          preventDoubleClick: true,
+                          attributes: { "data-qa": "edit-save-button" }
+                      }) }}
+                      <a href="/prisoner/{{ prisonerNumber }}/personal#identity-numbers"
+                         class="govuk-link govuk-link--no-visited-state"
+                         data-qa="edit-cancel-button"
+                      >Cancel</a>
+                  </div>
+              </form>
+          </div>
+      </div>
+  {% endblock %}
+{% endblock %}
