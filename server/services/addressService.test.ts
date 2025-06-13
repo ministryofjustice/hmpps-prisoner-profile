@@ -9,22 +9,31 @@ import {
 } from '../data/localMockData/osPlacesAddressQueryResponse'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { mockAddresses } from '../data/localMockData/addresses'
+import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 
 describe('addressService', () => {
   let prisonApiClient: PrisonApiClient
+  let personIntegrationApiClient: PersonIntegrationApiClient
   let osPlacesApiClient: OsPlacesApiClient
   let addressService: AddressService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
+    personIntegrationApiClient = personIntegrationApiClientMock()
     osPlacesApiClient = osPlacesApiClientMock()
-    addressService = new AddressService(null, () => prisonApiClient, osPlacesApiClient)
+    addressService = new AddressService(
+      null,
+      () => prisonApiClient,
+      () => personIntegrationApiClient,
+      osPlacesApiClient,
+    )
   })
 
   describe('getAddresses', () => {
     it('Handles address data from prison API correctly', async () => {
       prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
-      const addresses = await addressService.getAddresses('token', 'A1234AA')
+      const addresses = await addressService.getAddressesFromPrisonAPI('token', 'A1234AA')
       expect(addresses).toEqual(mockAddresses)
     })
   })

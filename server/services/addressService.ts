@@ -10,7 +10,9 @@ import ReferenceDataService from './referenceData/referenceDataService'
 import AddressMapper from './mappers/addressMapper'
 import {
   AddressRequestDto,
+  AddressResponseDto,
   CorePersonRecordReferenceDataDomain,
+  PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../utils/notFoundError'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
@@ -22,12 +24,25 @@ export default class AddressService {
   constructor(
     private readonly referenceDataService: ReferenceDataService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly osPlacesApiClient: OsPlacesApiClient,
   ) {
     this.addressMapper = new AddressMapper(referenceDataService)
   }
 
-  public async getAddresses(token: string, prisonerNumber: string): Promise<Address[]> {
+  public async getAddresses(token: string, prisonerNumber: string): Promise<AddressResponseDto[]> {
+    return this.personIntegrationApiClientBuilder(token).getAddresses(prisonerNumber)
+  }
+
+  public async createAddress(
+    token: string,
+    prisonerNumber: string,
+    address: AddressRequestDto,
+  ): Promise<AddressResponseDto> {
+    return this.personIntegrationApiClientBuilder(token).createAddress(prisonerNumber, address)
+  }
+
+  public async getAddressesFromPrisonAPI(token: string, prisonerNumber: string): Promise<Address[]> {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
   }
 

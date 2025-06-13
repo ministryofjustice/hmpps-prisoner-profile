@@ -1,8 +1,9 @@
 import RestClient from './restClient'
 import KeyWorker from './interfaces/keyWorkerApi/KeyWorker'
 import config from '../config'
+import KeyWorkerClient from './interfaces/keyWorkerApi/keyWorkerClient'
 
-export default class KeyWorkerClient {
+export default class KeyWorkerRestClient implements KeyWorkerClient {
   private readonly restClient: RestClient
 
   constructor(token: string) {

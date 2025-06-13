@@ -20,7 +20,7 @@ export default class AddressController {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
-    const addresses = (await this.addressService.getAddresses(clientToken, prisonerNumber)) ?? []
+    const addresses = (await this.addressService.getAddressesFromPrisonAPI(clientToken, prisonerNumber)) ?? []
 
     const primaryAddress = addresses.find(address => address.primary && !address.endDate)
     const primaryAddressLabel = primaryAddress?.mail ? 'Primary and mail address' : 'Primary address'
