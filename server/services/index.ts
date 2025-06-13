@@ -48,6 +48,7 @@ import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
 import logger from '../../logger'
 import EphemeralDataService from './EphemeralDataService'
+import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 
 export const services = () => {
   const {
@@ -186,6 +187,10 @@ export const services = () => {
     referenceDataService,
     metricsService,
   )
+  const globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
+    personIntegrationApiClientBuilder,
+  )
+
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
@@ -198,6 +203,7 @@ export const services = () => {
     curiousApiToken,
     nextOfKinService,
     domesticStatusService,
+    globalPhoneNumberAndEmailAddressesService,
   )
 
   const apolloClient = new ApolloClient({
