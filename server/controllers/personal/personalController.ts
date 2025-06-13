@@ -29,6 +29,7 @@ import {
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
   domesticStatusFieldData,
+  emailAddressTextFieldData,
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
@@ -65,6 +66,7 @@ import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import config from '../../config'
 
+type TextFieldDataGetter = (req: Request) => TextFieldData
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
 
@@ -393,7 +395,7 @@ export default class PersonalController {
 
   cityOrTownOfBirthTextInput = () =>
     this.textInput(
-      cityOrTownOfBirthFieldData,
+      () => cityOrTownOfBirthFieldData,
       this.getCityOrTownOfBirth.bind(this),
       this.setCityOrTownOfBirth.bind(this),
     )
@@ -415,7 +417,11 @@ export default class PersonalController {
   }
 
   physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
-    this.textInput(fieldData, this.getPhysicalAttributesText.bind(this), this.setPhysicalAttributesText.bind(this))
+    this.textInput(
+      () => fieldData,
+      this.getPhysicalAttributesText.bind(this),
+      this.setPhysicalAttributesText.bind(this),
+    )
 
   private async getPhysicalAttributesText(
     req: Request,
@@ -444,11 +450,12 @@ export default class PersonalController {
     })
   }
 
-  private textInput(fieldData: TextFieldData, getter: TextFieldGetter, setter: TextFieldSetter) {
-    const { pageTitle, hintText, auditEditPageLoad, fieldName, inputClasses } = fieldData
-
+  private textInput(fieldDataGetter: TextFieldDataGetter, getter: TextFieldGetter, setter: TextFieldSetter) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
+        const fieldData = fieldDataGetter(req)
+        const { pageTitle, formTitle, hintText, auditEditPageLoad, fieldName, inputClasses, submitButtonText } =
+          fieldData
         const { prisonerNumber } = req.params
         const { prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
@@ -468,7 +475,7 @@ export default class PersonalController {
 
         res.render('pages/edit/textField', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: pageTitle,
+          formTitle: formTitle ?? pageTitle,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
@@ -477,10 +484,13 @@ export default class PersonalController {
           fieldValue,
           inputClasses,
           miniBannerData: miniBannerData(prisonerData),
+          submitButtonText,
         })
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
+        const fieldData = fieldDataGetter(req)
+        const { fieldName } = fieldData
         const { prisonerNumber } = req.params
         const updatedValue = req.body[fieldName] || null
         const previousValue = await getter(req, fieldData)
@@ -1567,6 +1577,41 @@ export default class PersonalController {
         })
       },
     }
+  }
+
+  globalNumbers() {
+    return {
+      edit: async (_req: Request, _res: Response, _next: NextFunction) => {},
+      submit: async (_req: Request, _res: Response, _next: NextFunction) => {},
+    }
+  }
+
+  globalEmails() {
+    const globalEmailGetter: TextFieldGetter = async (req, _fieldData) => {
+      const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
+      const { emailAddressId } = req.params
+      const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+      const emailValue = phonesAndEmails.emails.find(email => email.id.toString() === emailAddressId).email
+      return emailValue
+    }
+
+    const fieldDataGetter: TextFieldDataGetter = req => {
+      const { emailAddressId } = req.params
+      const {
+        prisonerData: { firstName, lastName },
+      } = req.middleware
+      return emailAddressTextFieldData(emailAddressId, { firstName, lastName })
+    }
+
+    const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
+      const { prisonerNumber, emailAddressId } = req.params
+      const { clientToken } = req.middleware
+
+      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, value)
+    }
+
+    return { edit: this.textInput(fieldDataGetter, globalEmailGetter, globalEmailSetter) }
   }
 
   // This will be replaced by a request to the Health and Medication API once it masters this data:

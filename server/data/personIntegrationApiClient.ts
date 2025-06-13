@@ -3,6 +3,8 @@ import RestClient from './restClient'
 import {
   AddressRequestDto,
   AddressResponseDto,
+  ContactsRequestDto,
+  ContactsResponseDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
@@ -207,6 +209,20 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.restClient.post({
       path: `/v1/person/${prisonerNumber}/addresses`,
       data: address,
+    })
+  }
+
+  // Global phones/addresses (contacts)
+  getContacts(prisonerNumber: string): Promise<ContactsResponseDto[]> {
+    return this.restClient.get<ContactsResponseDto[]>({
+      path: `/v1/person/${prisonerNumber}/contacts`,
+    })
+  }
+
+  updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
+    return this.restClient.put<ContactsResponseDto>({
+      path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,
+      data: request,
     })
   }
 }

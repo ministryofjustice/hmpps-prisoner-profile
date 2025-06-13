@@ -194,6 +194,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     resp: PersonalRelationshipsDomesticStatusMock,
   })
   cy.task('stubAllPersonalCareNeeds')
+  cy.task('stubPersonIntegrationGetContacts', { prisonerNumber })
 })
 
 Cypress.Commands.add(
