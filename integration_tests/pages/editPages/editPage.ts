@@ -18,7 +18,7 @@ export default class EditPage extends Page {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[name='${key}']`).clear()
       if (value) {
-        cy.get(`input[name='${key}']`).type(value)
+        cy.get(`input[name='${key}']`).type(value, { delay: 0 })
       }
     })
   }

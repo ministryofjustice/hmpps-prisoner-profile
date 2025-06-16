@@ -60,6 +60,8 @@ import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
+import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
+import { globalEmailsMock, globalPhonesAndEmailsMock } from '../data/localMockData/globalPhonesAndEmails'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -75,6 +77,7 @@ describe('PersonalPageService', () => {
   let metricsService: MetricsService
   let nextOfKinService: NextOfKinService
   let domesticStatusService: DomesticStatusService
+  let globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -127,6 +130,11 @@ describe('PersonalPageService', () => {
       metricsService,
     ) as jest.Mocked<DomesticStatusService>
     domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+
+    globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
+      null,
+    ) as jest.Mocked<GlobalPhoneNumberAndEmailAddressesService>
+    globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber = jest.fn(async () => globalPhonesAndEmailsMock)
   })
 
   const constructService = () =>
@@ -142,6 +150,7 @@ describe('PersonalPageService', () => {
       () => Promise.resolve({ curiousApiToken: 'token' }),
       nextOfKinService,
       domesticStatusService,
+      globalPhoneNumberAndEmailAddressesService,
     )
 
   describe('Getting information from the Prison API', () => {
@@ -532,8 +541,11 @@ describe('PersonalPageService', () => {
   })
 
   describe('Identity numbers', () => {
-    it('Maps the data from the API', async () => {
-      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA)
+    it.each([
+      ['Profile edit enabled', true],
+      ['Profile edit disabled', false],
+    ])('Maps the data from the API - %s', async (_, profileEditEnabled: boolean) => {
+      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, false, profileEditEnabled)
       expect(identityNumbers.justice.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
       expect(identityNumbers.personal.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
       expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
@@ -543,6 +555,8 @@ describe('PersonalPageService', () => {
         { comment: 'P/CONS - fixed', value: '8/359381C' },
       ])
       expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
+
+      expect(prisonApiClient.getIdentifiers).toHaveBeenCalledWith('G6123VU', profileEditEnabled)
     })
   })
 
@@ -1096,6 +1110,52 @@ describe('PersonalPageService', () => {
       const response = await constructService().updateDomesticStatus('token', user, 'A1234AA', 'M')
       expect(response).toEqual(PersonalRelationshipsDomesticStatusMock)
       expect(domesticStatusService.updateDomesticStatus).toHaveBeenCalledWith('token', user, 'A1234AA', request)
+    })
+  })
+
+  describe('Phone numbers and email addresses', () => {
+    describe('Get', () => {
+      describe('Edit profile enabled', () => {
+        it('Gets the phones and emails from the service', async () => {
+          const service = constructService()
+          const result = await service.get('token', PrisonerMockDataA, true, true)
+          expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
+        })
+      })
+      describe('Edit profile disabled', () => {
+        it('Does not get phones and emails from the service', async () => {
+          const service = constructService()
+          const result = await service.get('token', PrisonerMockDataA, true, false)
+          expect(result.globalNumbersAndEmails).toEqual(null)
+        })
+      })
+    })
+
+    describe('getGlobalPhonesAndEmails', () => {
+      it('Gets the phones and emails from the service', async () => {
+        const service = constructService()
+        const result = await service.getGlobalPhonesAndEmails('token', 'ABC123')
+        expect(result).toEqual(globalPhonesAndEmailsMock)
+      })
+    })
+
+    describe('updateEmailForPrisonerNumber', () => {
+      it('Updates the email using the service', async () => {
+        const service = constructService()
+        globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber = jest.fn(
+          async () => globalEmailsMock[0],
+        )
+
+        const result = await service.updateGlobalEmail('token', 'ABC123', '123', 'email@email.com')
+
+        expect(globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber).toHaveBeenCalledWith(
+          'token',
+          'ABC123',
+          '123',
+          'email@email.com',
+        )
+        expect(result).toEqual(globalEmailsMock[0])
+      })
     })
   })
 })

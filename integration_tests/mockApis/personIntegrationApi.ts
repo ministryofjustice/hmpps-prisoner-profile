@@ -1,6 +1,7 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
   AddressResponseDto,
+  ContactsResponseDto,
   CorePersonPhysicalAttributesDto,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
@@ -12,6 +13,7 @@ import { distinguishingMarkMock } from '../../server/data/localMockData/distingu
 import { stubFor } from './wiremock'
 import {
   AddressResponseMock,
+  ContactsResponseMock,
   PseudonymResponseMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
@@ -287,5 +289,36 @@ export default {
     stubPostWithResponse({
       path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
       responseBody: {},
+    }),
+
+  stubPersonIntegrationGetContacts: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts`,
+      body: ContactsResponseMock,
+    }),
+
+  stubPersonIntegrationUpdateContact: ({
+    prisonerNumber,
+    contactId,
+    response,
+  }: {
+    prisonerNumber: string
+    contactId: string
+    response?: ContactsResponseDto
+  }) =>
+    stubPutWithResponse({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts/${contactId}`,
+      responseBody: response ?? ContactsResponseMock[0],
+    }),
+
+  stubAddIdentifiers: ({
+    prisonerNumber = PrisonerMockDataA.prisonerNumber,
+  }: {
+    prisonerNumber: string
+    status: number
+  }) =>
+    stubPostWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      responseBody: null,
     }),
 }

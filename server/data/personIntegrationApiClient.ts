@@ -3,6 +3,9 @@ import RestClient from './restClient'
 import {
   AddressRequestDto,
   AddressResponseDto,
+  ContactsRequestDto,
+  ContactsResponseDto,
+  AddIdentifierRequestDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
@@ -180,6 +183,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
+  addIdentityNumbers(prisonerNumber: string, request: AddIdentifierRequestDto[]): Promise<void> {
+    return this.restClient.post({
+      path: `/v1/core-person-record/identifiers`,
+      query: { prisonerNumber, sourceSystem: 'NOMIS' },
+      data: request,
+    })
+  }
+
   private updateCorePersonRecord(prisonerNumber: string, fieldName: string, value: string): Promise<void> {
     return this.restClient.patch({
       path: '/v1/core-person-record',
@@ -207,6 +218,20 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.restClient.post({
       path: `/v1/person/${prisonerNumber}/addresses`,
       data: address,
+    })
+  }
+
+  // Global phones/addresses (contacts)
+  getContacts(prisonerNumber: string): Promise<ContactsResponseDto[]> {
+    return this.restClient.get<ContactsResponseDto[]>({
+      path: `/v1/person/${prisonerNumber}/contacts`,
+    })
+  }
+
+  updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
+    return this.restClient.put<ContactsResponseDto>({
+      path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,
+      data: request,
     })
   }
 }

@@ -31,10 +31,15 @@
             {{ labelAndValue('Moving to', location) }}
             {{ labelAndValue('Reason', appointmentType) }}
 
-            {# Suppress comments for VLB and VLPM appointments - can contain personal contact data #}
-            {% if (appointmentTypeCode == 'VLB') or (appointmentTypeCode == 'VLPM') %}
-                {{ labelAndValue('Comments', ' ', true) }}
-            {% else %}
+            {# BVLS appointments show the notes for prisoners if enabled, otherwise suppress the comments #}
+            {% if (appointmentTypeCode == 'VLB' or appointmentTypeCode == 'VLPM') %}
+                {% if bvlsMasterPublicPrivateNotesEnabled %}
+                    {{ labelAndValue('Comments', notesForPrisoners, true) }}
+                {% else %}
+                    {{ labelAndValue('Comments', ' ', true) }}
+                {% endif %}
+            {%  else %}
+                {# All other appointment types show the comment from the appointment #}
                 {{ labelAndValue('Comments', comment, true) }}
             {% endif %}
         </div>

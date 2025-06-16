@@ -33,6 +33,8 @@ import languagesRouter from './languagesRouter'
 import nextOfKinRouter from './nextOfKinRouter'
 import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
 import addressEditRouter from './addressEditRouter'
+import { emailValidator } from '../validators/personal/emailValidator'
+import identityNumbersRouter from './identityNumbersRouter'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -127,6 +129,14 @@ export default function personalRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     nextOfKinRouter(services, editProfileChecks),
+  )
+
+  // Identity numbers
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    identityNumbersRouter(services, editProfileChecks),
   )
 
   // Edit routes
@@ -471,6 +481,33 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditDomesticStatus,
       method: personalController.domesticStatus().submit,
+    },
+  })
+
+  // Global numbers (Not yet implemented)
+  editRoute({
+    path: 'phone-numbers/:phoneNumberId',
+    edit: {
+      audit: Page.EditDomesticStatus,
+      method: personalController.globalNumbers().edit,
+    },
+    submit: {
+      audit: Page.PostEditDomesticStatus,
+      method: personalController.globalNumbers().submit,
+    },
+  })
+
+  // Global emails
+  editRoute({
+    path: 'email-addresses/:emailAddressId',
+    edit: {
+      audit: Page.EditDomesticStatus,
+      method: personalController.globalEmails().edit.edit,
+    },
+    submit: {
+      audit: Page.PostEditDomesticStatus,
+      method: personalController.globalEmails().edit.submit,
+      validation: { validators: [emailValidator], redirectBackOnError: true },
     },
   })
 
