@@ -35,6 +35,50 @@ export const JusticeIdentifierMappings: Record<string, IdentifierMapping> = {
   },
 }
 
+export const PersonalIdentifierMappings: Record<string, IdentifierMapping> = {
+  drivingLicence: {
+    type: OffenderIdentifierType.DrivingLicenseNumber,
+    label: 'Driving licence number',
+  },
+  nationalInsurance: {
+    type: OffenderIdentifierType.NationalInsuranceNumber,
+    label: 'National Insurance number',
+  },
+  parkrun: {
+    type: OffenderIdentifierType.ParkrunNumber,
+    label: 'parkrun number',
+  },
+  passport: {
+    type: OffenderIdentifierType.PassportNumber,
+    label: 'Passport number',
+  },
+  staffId: {
+    type: OffenderIdentifierType.StaffIdentityCardNumber,
+    label: 'Staff ID card number',
+  },
+  uln: {
+    type: OffenderIdentifierType.UniqueLearnerNumber,
+    label: 'Unique learner number (ULN)',
+  },
+}
+
+export const HomeOfficeIdentifierMappings: Record<string, IdentifierMapping> = {
+  cid: {
+    type: OffenderIdentifierType.CaseInformationDatabase,
+    label: 'Case Information Database (CID)',
+  },
+  homeOfficeReference: {
+    type: OffenderIdentifierType.HomeOfficeReferenceNumber,
+    label: 'Home office reference number',
+  },
+  portReference: {
+    type: OffenderIdentifierType.PortReferenceNumber,
+    label: 'Port reference number',
+  },
+}
+
 export const IdentifierMappings: Record<string, IdentifierMapping> = {
   ...JusticeIdentifierMappings,
+  ...PersonalIdentifierMappings,
+  ...HomeOfficeIdentifierMappings,
 }

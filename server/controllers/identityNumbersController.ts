@@ -6,7 +6,13 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import IdentityNumbersService from '../services/identityNumbersService'
-import { IdentifierMappings, JusticeIdentifierMappings } from '../data/constants/identifierMappings'
+import {
+  HomeOfficeIdentifierMappings,
+  IdentifierMapping,
+  IdentifierMappings,
+  JusticeIdentifierMappings,
+  PersonalIdentifierMappings,
+} from '../data/constants/identifierMappings'
 import { AddIdentifierRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import {
   AddIdentityNumberSubmission,
@@ -22,7 +28,60 @@ export default class IdentityNumbersController {
     private readonly auditService: AuditService,
   ) {}
 
+  public addHomeOfficeIdNumbers(): RequestHandler {
+    return this.addIdentityNumbers({
+      pageTitle: `Add Home Office ID numbers - Prisoner personal details`,
+      title: `Add Home Office ID numbers`,
+      pageViewAuditEvent: Page.AddHomeOfficeIdNumbers,
+      mappings: HomeOfficeIdentifierMappings,
+    })
+  }
+
+  public postHomeOfficeIdNumbers(): RequestHandler {
+    return this.postIdentityNumbers({
+      successFlashMessage: 'Home Office identity numbers added',
+      errorRedirect: 'home-office-id-numbers',
+    })
+  }
+
   public addJusticeIdNumbers(): RequestHandler {
+    return this.addIdentityNumbers({
+      pageTitle: `Add justice ID numbers - Prisoner personal details`,
+      title: `Add justice ID numbers`,
+      pageViewAuditEvent: Page.AddJusticeIdNumbers,
+      mappings: JusticeIdentifierMappings,
+    })
+  }
+
+  public postJusticeIdNumbers(): RequestHandler {
+    return this.postIdentityNumbers({
+      successFlashMessage: 'Justice identity numbers added',
+      errorRedirect: 'justice-id-numbers',
+    })
+  }
+
+  public addPersonalIdNumbers(): RequestHandler {
+    return this.addIdentityNumbers({
+      pageTitle: `Add personal ID numbers - Prisoner personal details`,
+      title: `Add personal ID numbers`,
+      pageViewAuditEvent: Page.AddPersonalIdNumbers,
+      mappings: PersonalIdentifierMappings,
+    })
+  }
+
+  public postPersonalIdNumbers(): RequestHandler {
+    return this.postIdentityNumbers({
+      successFlashMessage: 'Personal identity numbers added',
+      errorRedirect: 'personal-id-numbers',
+    })
+  }
+
+  private addIdentityNumbers = (options: {
+    pageTitle: string
+    title: string
+    pageViewAuditEvent: Page
+    mappings: Record<string, IdentifierMapping>
+  }) => {
     return async (req: Request, res: Response) => {
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const { clientToken } = req.middleware
@@ -35,18 +94,18 @@ export default class IdentityNumbersController {
           prisonerNumber,
           prisonId,
           correlationId: req.id,
-          page: Page.AddJusticeIdNumbers,
+          page: options.pageViewAuditEvent,
         })
         .catch(error => logger.error(error))
       const identifierOptions = buildIdentityNumberOptions(
         requestBodyFromFlash<Record<string, AddIdentityNumberSubmission>>(req),
         existingIdentifiers,
-        JusticeIdentifierMappings,
+        options.mappings,
       )
 
-      return res.render('pages/identityNumbers/addJusticeNumbers', {
-        pageTitle: `Add justice ID numbers - Prisoner personal details`,
-        title: `Add justice ID numbers`,
+      return res.render('pages/identityNumbers/addIdentityNumbers', {
+        pageTitle: options.pageTitle,
+        title: options.title,
         identifierOptions,
         errors,
         miniBannerData: {
@@ -58,7 +117,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  public postJusticeIdNumbers(): RequestHandler {
+  private postIdentityNumbers = (options: { successFlashMessage: string; errorRedirect: string }) => {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
@@ -89,11 +148,11 @@ export default class IdentityNumbersController {
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(req.body))
         req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/justice-id-numbers`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${options.errorRedirect}`)
       }
 
       req.flash('flashMessage', {
-        text: 'Justice identity numbers added',
+        text: options.successFlashMessage,
         type: FlashMessageType.success,
         fieldName: 'identity-numbers',
       })

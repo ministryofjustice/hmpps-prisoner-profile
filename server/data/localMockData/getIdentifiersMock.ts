@@ -14,6 +14,18 @@ export const GetIdentifiersMock: OffenderIdentifier[] = [
     offenderNo: 'AA1234A',
     bookingId: 1,
   },
+  {
+    type: OffenderIdentifierType.ParkrunNumber,
+    value: '56',
+    offenderNo: 'AA1234A',
+    bookingId: 1,
+  },
+  {
+    type: OffenderIdentifierType.HomeOfficeReferenceNumber,
+    value: '7890',
+    offenderNo: 'AA1234A',
+    bookingId: 1,
+  },
 ]
 
 export default {

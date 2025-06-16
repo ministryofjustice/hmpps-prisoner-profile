@@ -9,7 +9,11 @@ import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,
 } from './utils/identityNumbersController/buildIdentityNumberOptions'
-import { JusticeIdentifierMappings } from '../data/constants/identifierMappings'
+import {
+  HomeOfficeIdentifierMappings,
+  JusticeIdentifierMappings,
+  PersonalIdentifierMappings,
+} from '../data/constants/identifierMappings'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifier'
 
@@ -42,19 +46,41 @@ describe('IdentityNumbersController', () => {
     controller = new IdentityNumbersController(identityNumbersService, auditService)
   })
 
-  describe('addJusticeIdNumbers', () => {
+  describe.each([
+    [
+      'Add justice ID numbers',
+      () => controller.addJusticeIdNumbers(),
+      JusticeIdentifierMappings,
+      Page.AddJusticeIdNumbers,
+      'prisonLegacySystem',
+    ],
+    [
+      'Add personal ID numbers',
+      () => controller.addPersonalIdNumbers(),
+      PersonalIdentifierMappings,
+      Page.AddPersonalIdNumbers,
+      'parkrun',
+    ],
+    [
+      'Add Home Office ID numbers',
+      () => controller.addHomeOfficeIdNumbers(),
+      HomeOfficeIdentifierMappings,
+      Page.AddHomeOfficeIdNumbers,
+      'homeOfficeReference',
+    ],
+  ])('View edit page - %s', (title, action, pageData, pageViewEvent, existingValue) => {
     beforeEach(() => {
       jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue(GetIdentifiersMock)
     })
 
     it('should render the add justice id numbers page', async () => {
-      await controller.addJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       expect(identityNumbersService.getIdentityNumbers).toHaveBeenCalledWith('CLIENT_TOKEN', 'G6123VU')
-      expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/addJusticeNumbers', {
-        pageTitle: `Add justice ID numbers - Prisoner personal details`,
-        title: `Add justice ID numbers`,
-        identifierOptions: buildIdentityNumberOptions({}, GetIdentifiersMock, JusticeIdentifierMappings),
+      expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/addIdentityNumbers', {
+        pageTitle: `${title} - Prisoner personal details`,
+        title,
+        identifierOptions: buildIdentityNumberOptions({}, GetIdentifiersMock, pageData),
         errors: [],
         miniBannerData: {
           prisonerNumber: 'G6123VU',
@@ -65,19 +91,21 @@ describe('IdentityNumbersController', () => {
     })
 
     it('should record a page view event', async () => {
-      await controller.addJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: res.locals.user,
         prisonerNumber: 'G6123VU',
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
-        page: Page.AddJusticeIdNumbers,
+        page: pageViewEvent,
       })
     })
 
     it('should populate the page data from the request flash', async () => {
-      const id = 'prisonLegacySystem'
+      const id = existingValue
+      const { label } = pageData[existingValue]
+
       const flashValues: Record<string, AddIdentityNumberSubmission> = {
         [id]: {
           selected: '',
@@ -91,13 +119,13 @@ describe('IdentityNumbersController', () => {
         return null
       })
 
-      const identifierOptions = buildIdentityNumberOptions(flashValues, GetIdentifiersMock, JusticeIdentifierMappings)
+      const identifierOptions = buildIdentityNumberOptions(flashValues, GetIdentifiersMock, pageData)
 
-      await controller.addJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
-      expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/addJusticeNumbers', {
-        pageTitle: `Add justice ID numbers - Prisoner personal details`,
-        title: `Add justice ID numbers`,
+      expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/addIdentityNumbers', {
+        pageTitle: `${title} - Prisoner personal details`,
+        title,
         identifierOptions,
         errors: [],
         miniBannerData: {
@@ -109,7 +137,7 @@ describe('IdentityNumbersController', () => {
       expect(identifierOptions.find(item => item.id === id)).toEqual({
         id,
         selected: true,
-        label: 'Prison legacy system number',
+        label,
         hasExistingValue: true,
         value: '1234',
         comment: 'Some comment',
@@ -117,7 +145,26 @@ describe('IdentityNumbersController', () => {
     })
   })
 
-  describe('postJusticeIdNumbers', () => {
+  describe.each([
+    [
+      'Justice identity numbers added',
+      () => controller.postJusticeIdNumbers(),
+      JusticeIdentifierMappings,
+      'justice-id-numbers',
+    ],
+    [
+      'Personal identity numbers added',
+      () => controller.postPersonalIdNumbers(),
+      PersonalIdentifierMappings,
+      'personal-id-numbers',
+    ],
+    [
+      'Home Office identity numbers added',
+      () => controller.postHomeOfficeIdNumbers(),
+      HomeOfficeIdentifierMappings,
+      'home-office-id-numbers',
+    ],
+  ])('Submit ID numbers - %s', (flashMessage, action, pageData, errorRedirect) => {
     beforeEach(() => {
       req.body = {
         probationLegacySystem: {
@@ -141,7 +188,7 @@ describe('IdentityNumbersController', () => {
         { comments: undefined, type: OffenderIdentifierType.YjafNumber, value: '456' },
       ]
 
-      await controller.postJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       expect(identityNumbersService.addIdentityNumbers).toHaveBeenCalledWith(
         'CLIENT_TOKEN',
@@ -157,7 +204,7 @@ describe('IdentityNumbersController', () => {
         details: { formValues: req.body },
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-        text: 'Justice identity numbers added',
+        text: flashMessage,
         type: FlashMessageType.success,
         fieldName: 'identity-numbers',
       })
@@ -174,13 +221,13 @@ describe('IdentityNumbersController', () => {
       }
       req.errors = []
 
-      await controller.postJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       const { errors } = req
 
       expect(identityNumbersService.addIdentityNumbers).not.toHaveBeenCalled()
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal/justice-id-numbers')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${errorRedirect}`)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual(
         'This Prison legacy system number already exists. Enter a different Prison legacy system number',
@@ -191,11 +238,11 @@ describe('IdentityNumbersController', () => {
     it('should redirect to the add justice numbers page if an error is encountered', async () => {
       req.errors = [{ text: 'Some error' }]
 
-      await controller.postJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       expect(identityNumbersService.addIdentityNumbers).not.toHaveBeenCalled()
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal/justice-id-numbers')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${errorRedirect}`)
     })
 
     it('should handle bad request response from client', async () => {
@@ -206,10 +253,10 @@ describe('IdentityNumbersController', () => {
       }
       jest.spyOn(identityNumbersService, 'addIdentityNumbers').mockRejectedValue(apiError)
 
-      await controller.postJusticeIdNumbers()(req, res, next)
+      await action()(req, res, next)
 
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal/justice-id-numbers')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${errorRedirect}`)
     })
   })
 })

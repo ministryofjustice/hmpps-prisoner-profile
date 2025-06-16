@@ -66,7 +66,7 @@
         {{ identityNumber("Youth Justice Application Framework (YJAF) number", identityNumbers.justice.yjafNumber, "yjaf-number", { hideIfEmpty: true }) }}
 
         {% if hasPersonalId %}
-          {{ summaryListSectionHeading("Personal numbers", "personal-numbers", { enabled: editEnabled, href: "", text: "Add personal ID numbers" }) }}
+          {{ summaryListSectionHeading("Personal numbers", "personal-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/personal-id-numbers", text: "Add personal ID numbers" }) }}
           {{ identityNumber("Driving licence number", identityNumbers.personal.drivingLicenceNumber, "driving-licence-number", { hideIfEmpty: true }) }}
           {{ identityNumber("National Insurance number", identityNumbers.personal.nationalInsuranceNumber, "national-insurance-number", { hideIfEmpty: true }) }}
           {{ identityNumber("Parkrun number", identityNumbers.personal.parkrunNumber, "parkrun-number", { hideIfEmpty: true }) }}
@@ -76,7 +76,7 @@
         {% endif %}
 
         {% if hasHomeOfficeId %}
-          {{ summaryListSectionHeading("Home office numbers", "home-office-numbers", { enabled: editEnabled, href: "", text: "Add Home Office ID numbers" }) }}
+          {{ summaryListSectionHeading("Home office numbers", "home-office-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/home-office-id-numbers", text: "Add Home Office ID numbers" }) }}
           {{ identityNumber("Case Information Database (CID) number", identityNumbers.homeOffice.caseInformationDatabase, "cid-number", { hideIfEmpty: true }) }}
           {{ identityNumber("Home Office reference number", identityNumbers.homeOffice.homeOfficeReferenceNumber, "home-office-reference-number", { hideIfEmpty: true }) }}
           {{ identityNumber("Port reference number", identityNumbers.homeOffice.portReferenceNumber, "port-reference-number", { hideIfEmpty: true }) }}
@@ -87,10 +87,10 @@
             <div>
               <h3>Additional identity numbers</h3>
               {% if not hasPersonalId %}
-                <a class="govuk-link govuk-link--no-visited-state" href="">Add personal ID numbers</a><br />
+                <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/personal-id-numbers">Add personal ID numbers</a><br />
               {% endif %}
               {% if not hasHomeOfficeId %}
-                <a class="govuk-link govuk-link--no-visited-state" href="">Add Home Office ID numbers</a><br />
+                <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/home-office-id-numbers">Add Home Office ID numbers</a><br />
               {% endif %}
             </div>
           </div>

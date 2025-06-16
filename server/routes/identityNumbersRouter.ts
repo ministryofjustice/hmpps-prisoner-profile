@@ -26,5 +26,27 @@ export default function identityNumbersRouter(services: Services, editProfileChe
     identityNumbersController.postJusticeIdNumbers(),
   )
 
+  // Add personal ID numbers
+  get('/personal-id-numbers', editProfileChecks(), identityNumbersController.addPersonalIdNumbers())
+  post(
+    '/personal-id-numbers',
+    editProfileChecks(),
+    validationMiddleware([identityNumbersValidator], {
+      redirectBackOnError: true,
+    }),
+    identityNumbersController.postPersonalIdNumbers(),
+  )
+
+  // Add personal ID numbers
+  get('/home-office-id-numbers', editProfileChecks(), identityNumbersController.addHomeOfficeIdNumbers())
+  post(
+    '/home-office-id-numbers',
+    editProfileChecks(),
+    validationMiddleware([identityNumbersValidator], {
+      redirectBackOnError: true,
+    }),
+    identityNumbersController.postHomeOfficeIdNumbers(),
+  )
+
   return router
 }
