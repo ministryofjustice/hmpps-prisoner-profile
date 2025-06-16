@@ -8,7 +8,6 @@ import AddressService from '../services/addressService'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 
 const simplePostCodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
-const queryContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 
 export default class AddressController {
   constructor(
@@ -57,9 +56,7 @@ export default class AddressController {
     const { optimisationOff } = req.query
 
     try {
-      const rawApiResults =
-        (await this.addressService.getAddressesMatchingQuery(optimisationOff ? query : this.sanitisePostCode(query))) ||
-        []
+      const rawApiResults = (await this.addressService.getAddressesMatchingQuery(query, !optimisationOff)) || []
 
       const bestMatchResults = new Fuse(rawApiResults, {
         shouldSort: true,
@@ -83,12 +80,5 @@ export default class AddressController {
     } catch (error) {
       res.status(error.status).json({ status: error.status, error: error.message })
     }
-  }
-
-  private sanitisePostCode(query: string) {
-    const postCodeQuery = queryContainingPostCodeRegex.exec(query)
-    if (!postCodeQuery) return query
-
-    return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
   }
 }

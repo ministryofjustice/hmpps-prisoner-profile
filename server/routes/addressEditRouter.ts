@@ -4,6 +4,9 @@ import { getRequest, postRequest } from './routerUtils'
 import AddressEditController from '../controllers/addressEditController'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { notEmptyValidator } from '../validators/general/notEmptyValidator'
+import { Page, PostAction } from '../services/auditService'
+import { addressValidator } from '../validators/personal/addressValidator'
+import { AddressLocation } from '../services/mappers/addressMapper'
 
 export default function addressEditRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
   const router = Router({ mergeParams: true })
@@ -62,6 +65,69 @@ export default function addressEditRouter(services: Services, editProfileChecks:
       { redirectBackOnError: true, useReq: true },
     ),
     addressEditController.submitPrimaryOrPostalAddress(),
+  )
+
+  get(
+    '/add-uk-address',
+    editProfileChecks(),
+    addressEditController.displayManualEditAddress({
+      addressLocation: AddressLocation.uk,
+      pageTitlePrefix: 'Add a UK address',
+      formTitlePrefix: 'Add a UK address',
+      auditPage: Page.EditAddressUkManual,
+    }),
+  )
+
+  post(
+    '/add-uk-address',
+    editProfileChecks(),
+    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    addressEditController.submitManualEditAddress({
+      addressLocation: AddressLocation.uk,
+      auditAction: PostAction.EditAddressUkManual,
+    }),
+  )
+
+  get(
+    '/add-overseas-address',
+    editProfileChecks(),
+    addressEditController.displayManualEditAddress({
+      addressLocation: AddressLocation.overseas,
+      pageTitlePrefix: 'Add an overseas address',
+      formTitlePrefix: 'Add an overseas address',
+      auditPage: Page.EditAddressOverseasManual,
+    }),
+  )
+
+  post(
+    '/add-overseas-address',
+    editProfileChecks(),
+    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    addressEditController.submitManualEditAddress({
+      addressLocation: AddressLocation.overseas,
+      auditAction: PostAction.EditAddressOverseasManual,
+    }),
+  )
+
+  get(
+    '/add-uk-no-fixed-address',
+    editProfileChecks(),
+    addressEditController.displayManualEditAddress({
+      addressLocation: AddressLocation.no_fixed_address,
+      pageTitlePrefix: 'Add a UK no fixed address',
+      formTitlePrefix: 'Add a UK address',
+      auditPage: Page.EditAddressNoFixedAddressManual,
+    }),
+  )
+
+  post(
+    '/add-uk-no-fixed-address',
+    editProfileChecks(),
+    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    addressEditController.submitManualEditAddress({
+      addressLocation: AddressLocation.no_fixed_address,
+      auditAction: PostAction.EditAddressNoFixedAddressManual,
+    }),
   )
 
   return router

@@ -151,6 +151,7 @@ export const services = () => {
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
   const addressService = new AddressService(
+    metricsService,
     referenceDataService,
     prisonApiClientBuilder,
     personIntegrationApiClientBuilder,
