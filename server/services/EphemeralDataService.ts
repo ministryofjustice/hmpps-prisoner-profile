@@ -11,4 +11,8 @@ export default class EphemeralDataService {
   async getData<T>(key: UUID): Promise<EphemeralDataStoreResponse<T>> {
     return this.ephemeralDataStore.getData(key)
   }
+
+  async removeData(key: UUID): Promise<void> {
+    await this.ephemeralDataStore.removeData(key)
+  }
 }

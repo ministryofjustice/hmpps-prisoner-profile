@@ -148,6 +148,10 @@ Cypress.Commands.add('setupUserAuth', (options = {}) => {
   cy.task('stubSignIn', options)
 })
 
+Cypress.Commands.add('seedRedisEntry', ({ key, value }) => {
+  cy.exec(`./integration_tests/scripts/redis-cli "SET ${key} '${JSON.stringify(value).replaceAll('"', '\\"')}'"`)
+})
+
 Cypress.Commands.add('setupComponentsData', (options = {}) => {
   cy.task('stubComponentsData', options)
   cy.task('stubUserCaseLoads', options.caseLoads)
