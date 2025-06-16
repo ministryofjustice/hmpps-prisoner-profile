@@ -3,6 +3,7 @@ import config from '../config'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import {
   ContactsResponseMock,
+  AddIdentityNumbersRequestMock,
   CountryReferenceDataCodesMock,
   DistinguishingMarksMock,
   MilitaryRecordsMock,
@@ -212,6 +213,17 @@ describe('personIntegrationApiClient', () => {
       fakePersonIntegrationApi.put('/v1/pseudonym/12345?sourceSystem=NOMIS').reply(200, PseudonymResponseMock)
       const result = await personIntegrationApiClient.updatePseudonym(12345, PseudonymRequestMock)
       expect(result).toEqual(PseudonymResponseMock)
+    })
+  })
+
+  describe('addIdentityNumbers', () => {
+    it('should add new identity numbers', async () => {
+      fakePersonIntegrationApi
+        .post('/v1/core-person-record/identifiers?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(204)
+      expect(async () =>
+        personIntegrationApiClient.addIdentityNumbers('A1234AA', AddIdentityNumbersRequestMock),
+      ).not.toThrow()
     })
   })
 

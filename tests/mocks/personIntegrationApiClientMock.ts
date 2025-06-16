@@ -29,4 +29,5 @@ export const personIntegrationApiClientMock = (): PersonIntegrationApiClient => 
   createAddress: jest.fn(),
   getContacts: jest.fn(),
   updateContact: jest.fn(),
+  addIdentityNumbers: jest.fn(),
 })

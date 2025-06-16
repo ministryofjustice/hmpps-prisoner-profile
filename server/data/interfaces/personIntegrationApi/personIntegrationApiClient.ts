@@ -252,6 +252,12 @@ export interface ContactsRequestDto {
   contactPhoneExtension?: string
 }
 
+export interface AddIdentifierRequestDto {
+  type: string
+  value: string
+  comments?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -309,6 +315,8 @@ export interface PersonIntegrationApiClient {
   updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
 
   createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
+
+  addIdentityNumbers(prisonerNumber: string, request: AddIdentifierRequestDto[]): Promise<void>
 
   updateProfileImage(
     prisonerNumber: string,

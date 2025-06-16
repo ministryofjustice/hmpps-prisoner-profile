@@ -222,7 +222,7 @@ export default class PersonalPageService {
       prisonApiClient.getProperty(bookingId),
       prisonApiClient.getAddresses(prisonerNumber),
       prisonApiClient.getOffenderContacts(prisonerNumber),
-      prisonApiClient.getIdentifiers(prisonerNumber),
+      prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
