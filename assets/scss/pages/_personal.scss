@@ -101,6 +101,11 @@
       padding-bottom: 10px;
     }
 
+    .section-heading-link-container {
+      display: flex;
+      justify-content: flex-end;
+    }
+
     a {
       display: table-cell;
       text-align: right;
@@ -271,5 +276,28 @@
 
   dl.govuk-summary-list {
     margin-bottom: 0;
+  }
+}
+
+.hmpps-global-numbers-and-emails {
+  &__phones__list, &__emails__list {
+    & > div {
+      padding: 10px 0;
+      border-bottom: 1px solid $govuk-border-colour;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  &__phone, &__email{
+    display: flex;
+    justify-content: space-between;
   }
 }

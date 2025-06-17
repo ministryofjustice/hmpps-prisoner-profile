@@ -66,6 +66,8 @@ declare global {
 
       setupUserAuth(options?: UserToken): Chainable<AUTWindow>
 
+      seedRedisEntry(options: { key: string; value: unknown }): Chainable<AUTWindow>
+
       setupComponentsData(options?: {
         header?: Component
         footer?: Component

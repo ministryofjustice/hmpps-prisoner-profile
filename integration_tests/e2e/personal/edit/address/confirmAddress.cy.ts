@@ -23,11 +23,9 @@ context('Confirm Address Page', () => {
     fromDate: '2025-06-10',
     addressTypes: [],
   }
-  const cachedAddress = JSON.stringify({ address, route: 'find-uk-address' })
 
   before(() => {
-    // Seed redis data:
-    cy.exec(`./integration_tests/scripts/redis-cli "SET ${addressKey} '${cachedAddress.replaceAll('"', '\\"')}'"`)
+    cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
   })
 
   const visitConfirmAddressPage = (): ConfirmAddressPage => {

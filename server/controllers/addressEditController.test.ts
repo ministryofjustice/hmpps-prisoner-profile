@@ -11,9 +11,23 @@ import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataService
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { FlashMessageType } from '../data/enums/flashMessageType'
 
+const clientToken = 'CLIENT_TOKEN'
+const { prisonerNumber } = PrisonerMockDataA
 const uprn = 1234
 const addressCacheId = uuidv4()
+const addressRequest: AddressRequestDto = {
+  uprn,
+  buildingNumber: '1',
+  thoroughfareName: 'The Road',
+  postTownCode: '111',
+  countyCode: '222',
+  countryCode: '333',
+  postCode: 'A12 3BC',
+  fromDate: '2025-06-09',
+  addressTypes: [],
+}
 
 describe('Address Edit Controller', () => {
   let req: Request
@@ -28,8 +42,8 @@ describe('Address Edit Controller', () => {
     req = {
       id: '123',
       query: {},
-      params: { prisonerNumber: 'G6123VU' },
-      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
+      params: { prisonerNumber },
+      middleware: { clientToken, prisonerData: PrisonerMockDataA },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -46,7 +60,12 @@ describe('Address Edit Controller', () => {
     ephemeralDataService = ephemeralDataServiceMock() as EphemeralDataService
     auditService = auditServiceMock()
 
+    ephemeralDataService.cacheData = jest.fn().mockReturnValue(addressCacheId)
     controller = new AddressEditController(addressService, ephemeralDataService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('Where is the address page', () => {
@@ -64,17 +83,17 @@ describe('Address Edit Controller', () => {
         ],
         errors: [],
         breadcrumbPrisonerName: 'Saunders, John',
-        prisonerNumber: 'G6123VU',
+        prisonerNumber,
         submitButtonText: 'Continue',
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
         },
       })
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditAddressLocation,
@@ -82,7 +101,6 @@ describe('Address Edit Controller', () => {
     })
 
     it.each([
-      [undefined, 'where-is-address'],
       ['uk', 'find-uk-address'],
       ['overseas', 'add-overseas-address'],
       ['no_fixed_address', 'add-uk-no-fixed-address'],
@@ -91,19 +109,15 @@ describe('Address Edit Controller', () => {
 
       await controller.submitWhereIsTheAddress()(req, res, next)
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/${redirect}`)
 
-      if (!location) {
-        expect(req.flash).toHaveBeenCalledWith('errors', [{ text: 'Select where the address is', href: '#radio' }])
-      } else {
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
-          user: prisonUserMock,
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-          correlationId: req.id,
-          action: PostAction.EditAddressLocation,
-          details: { location },
-        })
-      }
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditAddressLocation,
+        details: { location },
+      })
     })
   })
 
@@ -116,14 +130,14 @@ describe('Address Edit Controller', () => {
           pageTitle: 'Find a UK address - Prisoner personal details',
           formTitle: `Find a UK address for John Saunders`,
           errors: [],
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber: 'G6123VU', prisonerName: 'Saunders, John' },
+          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          prisonerNumber,
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressFindUkAddress,
@@ -132,33 +146,25 @@ describe('Address Edit Controller', () => {
     })
 
     describe('Submitting the page', () => {
-      it.each([
-        [undefined, 'find-uk-address'],
-        [uprn, 'confirm-address'],
-      ])(`should handle uprn: '%s' and redirect to '%s' page`, async (uprnResponse: number, redirect: string) => {
+      it('should submit the selected uprn', async () => {
         const address = { uprn } as OsAddress
-        req = { ...req, body: { uprn: uprnResponse } } as unknown as Request
-        addressService.getAddressByUprn = jest.fn().mockReturnValue([address])
+        req = { ...req, body: { uprn } } as unknown as Request
+        addressService.getAddressByUprn = jest.fn().mockReturnValue(address)
 
         await controller.submitFindUkAddress()(req, res, next)
 
-        if (!uprnResponse) {
-          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
-          expect(req.flash).toHaveBeenCalledWith('errors', [
-            { text: 'Enter a UK address', href: '#address-autosuggest-input' },
-          ])
-        } else {
-          expect(res.redirect).toHaveBeenCalledWith(
-            expect.stringContaining(`/prisoner/G6123VU/personal/${redirect}?address=`),
-          )
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
-            user: prisonUserMock,
-            prisonerNumber: PrisonerMockDataA.prisonerNumber,
-            correlationId: req.id,
-            action: PostAction.EditAddressFindUkAddress,
-            details: { uprn },
-          })
-        }
+        expect(ephemeralDataService.cacheData).toHaveBeenCalledWith({ address, route: 'find-uk-address' })
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+        )
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditAddressFindUkAddress,
+          details: { uprn },
+        })
       })
     })
   })
@@ -166,22 +172,10 @@ describe('Address Edit Controller', () => {
   describe('Confirm address page', () => {
     describe('Rendering the page', () => {
       it('should render the confirm address page', async () => {
-        const address: AddressRequestDto = {
-          uprn,
-          buildingNumber: '1',
-          thoroughfareName: 'The Road',
-          postTownCode: '111',
-          countyCode: '222',
-          countryCode: '333',
-          postCode: 'A12 3BC',
-          fromDate: '2025-06-09',
-          addressTypes: [],
-        }
-
         req = { ...req, query: { address: addressCacheId } } as unknown as Request
         ephemeralDataService.getData = jest
           .fn()
-          .mockReturnValue({ key: addressCacheId, value: { address, route: 'find-uk-address' } })
+          .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
         addressService.getCityReferenceData = jest.fn().mockReturnValue({ description: 'My Town' })
         addressService.getCountyReferenceData = jest.fn().mockReturnValue({ description: 'My County' })
         addressService.getCountryReferenceData = jest.fn().mockReturnValue({ description: 'England' })
@@ -192,21 +186,21 @@ describe('Address Edit Controller', () => {
           pageTitle: 'Confirm address - Prisoner personal details',
           formTitle: 'Confirm address',
           address: {
-            ...address,
+            ...addressRequest,
             cacheId: addressCacheId,
             city: 'My Town',
             county: 'My County',
             country: 'England',
           },
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber: 'G6123VU', prisonerName: 'Saunders, John' },
-          backLink: '/prisoner/G6123VU/personal/find-uk-address',
+          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          backLink: `/prisoner/${prisonerNumber}/personal/find-uk-address`,
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          prisonerNumber,
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressConfirm,
@@ -236,12 +230,10 @@ describe('Address Edit Controller', () => {
 
       it('should handle missing city, county and country codes', async () => {
         const address: AddressRequestDto = {
-          uprn,
-          buildingNumber: '1',
-          thoroughfareName: 'The Road',
-          postCode: 'A12 3BC',
-          fromDate: '2025-06-09',
-          addressTypes: [],
+          ...addressRequest,
+          postTownCode: undefined,
+          countyCode: undefined,
+          countryCode: undefined,
         }
 
         req = { ...req, query: { address: addressCacheId } } as unknown as Request
@@ -254,6 +246,184 @@ describe('Address Edit Controller', () => {
         expect(res.render).toHaveBeenCalledWith(
           'pages/edit/address/confirmAddress',
           expect.objectContaining({ address: { ...address, cacheId: addressCacheId } }),
+        )
+      })
+    })
+  })
+
+  describe('Primary or postal address page', () => {
+    describe('Rendering the page', () => {
+      beforeEach(() => {
+        addressService.getAddresses = jest.fn().mockReturnValue([])
+      })
+
+      it('Should render the primary or postal address page', async () => {
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
+        addressService.getCityReferenceData = jest.fn().mockReturnValue({ description: 'My Town' })
+        addressService.getCountyReferenceData = jest.fn().mockReturnValue({ description: 'My County' })
+        addressService.getCountryReferenceData = jest.fn().mockReturnValue({ description: 'England' })
+
+        await controller.displayPrimaryOrPostalAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/address/primaryOrPostalAddress', {
+          pageTitle: 'Select if primary or postal address - Prisoner personal details',
+          formTitle: 'Is this John Saunders’ primary or postal address?',
+          address: {
+            ...addressRequest,
+            cacheId: addressCacheId,
+            city: 'My Town',
+            county: 'My County',
+            country: 'England',
+          },
+          existingPrimary: false,
+          existingPostal: false,
+          errors: [],
+          prisonerNumber,
+          breadcrumbPrisonerName: 'Saunders, John',
+          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          backLink: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+        })
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber,
+          prisonId: PrisonerMockDataA.prisonId,
+          correlationId: req.id,
+          page: Page.EditAddressPrimaryOrPostal,
+        })
+      })
+
+      it('should throw not found error if address uuid not provided', async () => {
+        req = { ...req, query: {} } as unknown as Request
+
+        await expect(controller.displayPrimaryOrPostalAddress()(req, res, next)).rejects.toThrow(
+          'Could not find cached address',
+        )
+
+        expect(res.render).not.toHaveBeenCalled()
+      })
+
+      it('should throw not found error if address uuid not present in cache', async () => {
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest.fn().mockReturnValue(undefined)
+
+        await expect(controller.displayPrimaryOrPostalAddress()(req, res, next)).rejects.toThrow(
+          'Could not find cached address',
+        )
+
+        expect(res.render).not.toHaveBeenCalled()
+      })
+
+      it('should handle missing city, county and country codes', async () => {
+        const address: AddressRequestDto = {
+          ...addressRequest,
+          postTownCode: undefined,
+          countyCode: undefined,
+          countryCode: undefined,
+        }
+
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address, route: 'find-uk-address' } })
+
+        await controller.displayPrimaryOrPostalAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/address/primaryOrPostalAddress',
+          expect.objectContaining({ address: { ...address, cacheId: addressCacheId } }),
+        )
+      })
+
+      it('should warn of existing primary or postal addresses', async () => {
+        addressService.getAddresses = jest.fn().mockReturnValue([{ primaryAddress: true, postalAddress: true }])
+
+        req = { ...req, query: { address: addressCacheId } } as unknown as Request
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
+
+        await controller.displayPrimaryOrPostalAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/address/primaryOrPostalAddress',
+          expect.objectContaining({ existingPrimary: true, existingPostal: true }),
+        )
+      })
+    })
+
+    describe('Submitting the page', () => {
+      it.each([
+        // response, primary, postal
+        ['primary', true, false],
+        ['postal', false, true],
+        ['neither', false, false],
+        [['primary', 'postal'], true, true],
+      ])(`handles response '%s': submitting primary: %s, postal: %s`, async (primaryOrPostal, primary, postal) => {
+        const expectedAddressSubmission = {
+          ...addressRequest,
+          primaryAddress: primary,
+          postalAddress: postal,
+        }
+
+        req = { ...req, body: { primaryOrPostal }, query: { address: addressCacheId } } as unknown as Request
+
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
+
+        await controller.submitPrimaryOrPostalAddress()(req, res, next)
+
+        expect(addressService.createAddress).toHaveBeenCalledWith(
+          clientToken,
+          prisonerNumber,
+          expectedAddressSubmission,
+        )
+
+        expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Address updated',
+          type: FlashMessageType.success,
+          fieldName: 'addresses',
+        })
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditAddressPrimaryOrPostal,
+          details: { address: expectedAddressSubmission },
+        })
+
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
+      })
+
+      it('handles missing address cache id', async () => {
+        req = { ...req, body: { primaryOrPostal: 'neither' }, query: {} } as unknown as Request
+
+        await expect(controller.submitPrimaryOrPostalAddress()(req, res, next)).rejects.toThrow(
+          'Could not find cached address',
+        )
+      })
+
+      it('handles API error', async () => {
+        req = { ...req, body: { primaryOrPostal: 'neither' }, query: { address: addressCacheId } } as unknown as Request
+
+        ephemeralDataService.getData = jest
+          .fn()
+          .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
+
+        addressService.createAddress = async () => {
+          throw new Error()
+        }
+
+        await controller.submitPrimaryOrPostalAddress()(req, res, next)
+
+        expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/prisoner/${prisonerNumber}/personal/primary-or-postal-address?address=${addressCacheId}`,
         )
       })
     })

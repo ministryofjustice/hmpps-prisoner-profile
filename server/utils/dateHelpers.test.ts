@@ -215,7 +215,7 @@ describe('formatDateToPattern', () => {
 
 describe('formatDateWithAge', () => {
   it.each([
-    ['1985-06-15', 'long', '', '15 June 1985 (39 years old)'],
+    ['1985-06-15', 'long', '', '15 June 1985 (40 years old)'],
     ['1990-12-01', 'long', '', '1 December 1990 (34 years old)'],
     ['2000-05-20', 'short', '', '20/05/2000 (25 years old)'],
     ['1975-03-10', 'full', '', 'Monday 10 March 1975 (50 years old)'],

@@ -141,7 +141,7 @@ export interface PrisonApiClient {
 
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
 
-  getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]>
+  getIdentifiers(prisonerNumber: string, includeAliases: boolean): Promise<OffenderIdentifier[]>
 
   hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean>
 

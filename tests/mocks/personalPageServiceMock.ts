@@ -24,4 +24,6 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   getDomesticStatusReferenceData: jest.fn(),
   updateDomesticStatus: jest.fn(),
   getNextOfKinAndEmergencyContacts: jest.fn(),
+  getGlobalPhonesAndEmails: jest.fn(),
+  updateGlobalEmail: jest.fn(),
 })

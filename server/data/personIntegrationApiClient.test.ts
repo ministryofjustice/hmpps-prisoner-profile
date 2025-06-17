@@ -2,6 +2,8 @@ import nock from 'nock'
 import config from '../config'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import {
+  ContactsResponseMock,
+  AddIdentityNumbersRequestMock,
   CountryReferenceDataCodesMock,
   DistinguishingMarksMock,
   MilitaryRecordsMock,
@@ -214,10 +216,40 @@ describe('personIntegrationApiClient', () => {
     })
   })
 
+  describe('addIdentityNumbers', () => {
+    it('should add new identity numbers', async () => {
+      fakePersonIntegrationApi
+        .post('/v1/core-person-record/identifiers?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(204)
+      expect(async () =>
+        personIntegrationApiClient.addIdentityNumbers('A1234AA', AddIdentityNumbersRequestMock),
+      ).not.toThrow()
+    })
+  })
+
   describe('updateProfileImage', () => {
     it('Should upload the image and return the response', async () => {
       fakePersonIntegrationApi.put('/v1/core-person-record/profile-image?prisonerNumber=A1234AA').reply(200)
       expect(async () => personIntegrationApiClient.updateProfileImage('A1234AA', image)).not.toThrow()
+    })
+  })
+
+  describe('getContacts', () => {
+    it('Should return the response from the API', async () => {
+      fakePersonIntegrationApi.get('/v1/person/A1234AA/contacts').reply(200, ContactsResponseMock)
+      const result = await personIntegrationApiClient.getContacts('A1234AA')
+      expect(result).toEqual(ContactsResponseMock)
+    })
+  })
+
+  describe('updateContact', () => {
+    it('Should update the contact and return the response', async () => {
+      fakePersonIntegrationApi.put('/v1/person/A1234AA/contacts/10').reply(200, ContactsResponseMock[1])
+      const result = await personIntegrationApiClient.updateContact('A1234AA', '10', {
+        contactType: 'EMAIL',
+        contactValue: 'updated@email.com',
+      })
+      expect(result).toEqual(ContactsResponseMock[1])
     })
   })
 })

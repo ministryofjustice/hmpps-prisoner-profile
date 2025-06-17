@@ -31,6 +31,11 @@ export class EphemeralDataStore {
     return data && { key, value: JSON.parse(data) }
   }
 
+  async removeData(key: UUID): Promise<void> {
+    await this.ensureConnected()
+    this.client.del(`ephemeral:${key}`)
+  }
+
   private async ensureConnected() {
     if (!this.client.isOpen) {
       await this.client.connect()

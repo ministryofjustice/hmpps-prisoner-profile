@@ -1,5 +1,7 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
+  AddressResponseDto,
+  ContactsResponseDto,
   CorePersonPhysicalAttributesDto,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
@@ -9,7 +11,11 @@ import {
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
-import { PseudonymResponseMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import {
+  AddressResponseMock,
+  ContactsResponseMock,
+  PseudonymResponseMock,
+} from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 
 const baseUrl = '/personIntegration'
@@ -265,5 +271,54 @@ export default {
     stubPutWithResponse({
       path: `${baseUrl}/v1/core-person-record/profile-image\\?prisonerNumber=${prisonerNumber}`,
       responseBody: {},
+    }),
+
+  stubGetAddresses: ({
+    prisonerNumber,
+    response = [AddressResponseMock],
+  }: {
+    prisonerNumber: string
+    response: AddressResponseDto[]
+  }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
+      body: response,
+    }),
+
+  stubCreateAddress: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPostWithResponse({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
+      responseBody: {},
+    }),
+
+  stubPersonIntegrationGetContacts: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts`,
+      body: ContactsResponseMock,
+    }),
+
+  stubPersonIntegrationUpdateContact: ({
+    prisonerNumber,
+    contactId,
+    response,
+  }: {
+    prisonerNumber: string
+    contactId: string
+    response?: ContactsResponseDto
+  }) =>
+    stubPutWithResponse({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts/${contactId}`,
+      responseBody: response ?? ContactsResponseMock[0],
+    }),
+
+  stubAddIdentifiers: ({
+    prisonerNumber = PrisonerMockDataA.prisonerNumber,
+  }: {
+    prisonerNumber: string
+    status: number
+  }) =>
+    stubPostWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      responseBody: null,
     }),
 }

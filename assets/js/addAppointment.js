@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const probationMeetingRadios = document.querySelector('.js-meeting-type')
   const probationOfficerDetails = document.querySelector('.js-probation-officer')
   const recurringRadios = document.querySelector('.js-recurring-radios')
-  const commentsHint = document.getElementById('comments-hint')
   const appointmentRepeatsSelect = document.getElementById('repeats')
   const appointmentRepeatsTimesInput = document.getElementById('times')
   const lastAppointmentDate = document.getElementById('last-appointment-date')
@@ -15,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const appointmentId = document.getElementById('appointment-id')?.value || ''
   const publicPrivateNotes = document.querySelector('.js-public-private-notes')
   const comments = document.querySelector('.js-comments')
+  const commentsHint = document.getElementById('bvls-hint-text')
   const courtHintText = document.getElementById('court-hint-text')
   const probationHintText = document.getElementById('probation-hint-text')
 

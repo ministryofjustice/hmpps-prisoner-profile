@@ -47,6 +47,7 @@ import { mockInmateAtLocation } from './localMockData/locationsInmates'
 import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from './localMockData/visitPrisons'
 import { imageDetailListMock, imageDetailMock } from './localMockData/imageMock'
+import { GetIdentifiersMock } from './localMockData/getIdentifiersMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -604,6 +605,18 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits/prisons`, visitPrisonsMock)
       const output = await prisonApiClient.getVisitsPrisons(bookingId)
       expect(output).toEqual(visitPrisonsMock)
+    })
+  })
+
+  describe('getIdentifiers', () => {
+    it.each([true, false])('Should return data from the API', async (includeAliases: boolean) => {
+      const prisonerNumber = 'AB1234C'
+      mockSuccessfulPrisonApiCall(
+        `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=${includeAliases}`,
+        GetIdentifiersMock,
+      )
+      const output = await prisonApiClient.getIdentifiers(prisonerNumber, includeAliases)
+      expect(output).toEqual(GetIdentifiersMock)
     })
   })
 

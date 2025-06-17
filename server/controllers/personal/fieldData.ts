@@ -1,10 +1,11 @@
 import { Page, PostAction } from '../../services/auditService'
-import { formatHeight, formatWeight } from '../../utils/utils'
+import { formatHeight, formatName, formatWeight } from '../../utils/utils'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataOverride } from './referenceDataOverride'
+import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 
 export interface FieldData {
   url: string
@@ -19,6 +20,8 @@ export interface FieldData {
 
 export interface TextFieldData extends FieldData {
   inputClasses?: string
+  submitButtonText?: string
+  formTitle?: string
   formatter?: (value: number | string) => string
 }
 
@@ -279,3 +282,20 @@ export const domesticStatusFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditDomesticStatus,
   redirectAnchor: 'personal-details',
 }
+
+export const emailAddressTextFieldData = (
+  id: string,
+  name: { firstName: string; lastName: string },
+): TextFieldData => ({
+  url: `email-addresses/${id}`,
+  fieldName: 'emailAddress',
+  pageTitle: `Change this person’s email address`,
+  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  successFlashFieldName: 'Email address',
+  hintText: 'For example name@email.co.uk',
+  auditEditPageLoad: Page.EditEmailAddress,
+  auditEditPostAction: PostAction.EditEmailAddress,
+  redirectAnchor: 'phones-and-emails',
+  inputClasses: 'govuk-!-width-one-third',
+  submitButtonText: 'Save and return to profile',
+})
