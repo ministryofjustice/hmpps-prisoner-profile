@@ -1,6 +1,6 @@
 import { RestClientBuilder } from '../data'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { GlobalEmail, GlobalNumbersAndEmails } from './interfaces/personalPageService/PersonalPage'
+import { GlobalEmail, GlobalNumbersAndEmails, GlobalPhoneNumber } from './interfaces/personalPageService/PersonalPage'
 
 /*
  * Service for getting a prisoners "global" numbers and email addresess.
@@ -41,5 +41,29 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     })
 
     return { id: resp.contactId, email: resp.contactValue }
+  }
+
+  async updatePhoneNumberForPrisonerNumber(
+    token: string,
+    prisonerNumber: string,
+    phoneNumberId: string,
+    {
+      phoneNumber,
+      phoneNumberType,
+      phoneExtension,
+    }: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
+  ): Promise<GlobalPhoneNumber> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+    const { contactId, contactType, contactValue, contactPhoneExtension } = await apiClient.updateContact(
+      prisonerNumber,
+      phoneNumberId,
+      {
+        contactType: phoneNumberType,
+        contactValue: phoneNumber,
+        contactPhoneExtension: phoneExtension,
+      },
+    )
+
+    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
   }
 }

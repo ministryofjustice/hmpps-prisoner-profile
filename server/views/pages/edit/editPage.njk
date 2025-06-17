@@ -1,0 +1,31 @@
+{% extends "../index.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
+  ] %}
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{ govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
+          }) }}
+      </div>
+    </div>
+  {% endif %}
+  {% block form %}{% endblock %}
+{% endblock %}

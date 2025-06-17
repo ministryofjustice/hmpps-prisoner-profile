@@ -89,4 +89,16 @@ describe('Validation middleware', () => {
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify({ example: 'text' }))
     expect(req.flash).toHaveBeenCalledWith('errors', [error])
   })
+
+  it('Redirects with params when given the option', async () => {
+    const alwaysFailsValidator: Validator = () => Promise.resolve([error])
+
+    await validationMiddleware([alwaysFailsValidator], {
+      redirectBackOnError: true,
+      redirectWithParams: ({ id }) => `path/with/id/${id}`,
+    })({ ...req, params: { prisonerNumber: 'ABC123', id: '123' } } as any, res, next)
+    expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/path/with/id/123')
+    expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify({ example: 'text' }))
+    expect(req.flash).toHaveBeenCalledWith('errors', [error])
+  })
 })

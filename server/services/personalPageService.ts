@@ -3,6 +3,7 @@ import PersonalPage, {
   Addresses,
   GlobalEmail,
   GlobalNumbersAndEmails,
+  GlobalPhoneNumber,
   IdentityNumbers,
   NextOfKin,
   PersonalDetails,
@@ -110,6 +111,20 @@ export default class PersonalPageService {
       prisonerNumber,
       emailAddressId,
       value,
+    )
+  }
+
+  async updateGlobalPhoneNumber(
+    token: string,
+    prisonerNumber: string,
+    phoneNumberId: string,
+    values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
+  ): Promise<GlobalPhoneNumber> {
+    return this.globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber(
+      token,
+      prisonerNumber,
+      phoneNumberId,
+      values,
     )
   }
 

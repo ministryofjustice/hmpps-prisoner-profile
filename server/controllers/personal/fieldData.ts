@@ -11,6 +11,7 @@ export interface FieldData {
   url: string
   fieldName: string
   pageTitle: string
+  formTitle?: string
   auditEditPageLoad: Page
   auditEditPostAction: PostAction
   redirectAnchor: string
@@ -298,4 +299,15 @@ export const emailAddressTextFieldData = (
   redirectAnchor: 'phones-and-emails',
   inputClasses: 'govuk-!-width-one-third',
   submitButtonText: 'Save and return to profile',
+})
+
+export const changePhoneNumberFieldData = (id: string, name: { firstName: string; lastName: string }): FieldData => ({
+  auditEditPageLoad: Page.EditPhoneNumber,
+  auditEditPostAction: PostAction.EditPhoneNumber,
+  fieldName: 'phoneNumber',
+  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
+  pageTitle: `Change this person’s phone number`,
+  redirectAnchor: 'phones-and-emails',
+  successFlashFieldName: 'Phone number',
+  url: `phone-numbers/${id}`,
 })
