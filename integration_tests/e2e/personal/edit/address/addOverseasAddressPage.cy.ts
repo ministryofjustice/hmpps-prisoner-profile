@@ -2,6 +2,7 @@ import { Role } from '../../../../../server/data/enums/role'
 import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { CorePersonRecordReferenceDataDomain } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Add Overseas Address', () => {
   const prisonerNumber = 'G6123VU'
@@ -9,6 +10,8 @@ context('Add Overseas Address', () => {
   const bookingId = 1102484
 
   before(() => {
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
     cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
   })
 
@@ -22,6 +25,14 @@ context('Add Overseas Address', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonalRelationshipsGetReferenceData', {
+        domain: 'CITY',
+        referenceData: [{ code: 'CITY1', description: 'My Post Town', isActive: true }],
+      })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'COUNTY',
+        referenceData: [{ code: 'COUNTY1', description: 'My County', isActive: true }],
+      })
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'COUNTRY',
         referenceData: [{ code: 'FRA', description: 'France', isActive: true }],
