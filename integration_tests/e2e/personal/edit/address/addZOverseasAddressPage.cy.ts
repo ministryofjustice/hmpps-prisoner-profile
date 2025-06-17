@@ -3,7 +3,7 @@ import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { CorePersonRecordReferenceDataDomain } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
-context('Add Overseas Address', () => {
+context('Add ZOverseas Address', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
