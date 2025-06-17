@@ -2,6 +2,7 @@ import { Role } from '../../../../../server/data/enums/role'
 import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { CorePersonRecordReferenceDataDomain } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Add Overseas Address', () => {
   const prisonerNumber = 'G6123VU'
@@ -9,6 +10,8 @@ context('Add Overseas Address', () => {
   const bookingId = 1102484
 
   before(() => {
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
     cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
   })
 
@@ -22,18 +25,25 @@ context('Add Overseas Address', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonalRelationshipsGetReferenceData', {
+        domain: 'CITY',
+        referenceData: [{ code: 'CITY1', description: 'My Post Town', isActive: true }],
+      })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'COUNTY',
+        referenceData: [{ code: 'COUNTY1', description: 'My County', isActive: true }],
+      })
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'COUNTRY',
-        referenceData: [{ code: 'FRA', description: 'France', isActive: true }],
+        referenceData: [{ code: 'ENG', description: 'England', isActive: true }],
       })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/add-overseas-address`,
+    editUrl: `prisoner/${prisonerNumber}/personal/add-uk-address`,
     editPageWithTitle: EditPage,
-    editPageTitle: `Add an overseas address for John Saunders`,
+    editPageTitle: `Add a UK address for John Saunders`,
     validInputs: [
-      { autocompleteInputs: { country: 'France' } },
+      { autocompleteInputs: { country: 'England' } },
       {
-        checkboxInputs: { noFixedAddress: ['true'] },
         textInputs: {
           houseOrBuildingName: 'House Or Building Name',
           houseNumber: '123',
@@ -42,7 +52,9 @@ context('Add Overseas Address', () => {
           postcode: 'SW1H 9AJ',
         },
         autocompleteInputs: {
-          country: 'France',
+          'town-or-city': 'My Post Town',
+          county: 'My County',
+          country: 'England',
         },
       },
     ],
@@ -75,10 +87,12 @@ context('Add Overseas Address', () => {
         testDescription: 'Invalid selection from autocomplete',
         input: {
           autocompleteInputs: {
+            'town-or-city': 'wrong city',
+            county: 'wrong county',
             country: 'wrong country',
           },
         },
-        errorMessages: ['Enter a valid country'],
+        errorMessages: ['Enter a valid town or city', 'Enter a valid county', 'Enter a valid country'],
       },
     ],
     redirectUrl: '/prisoner/G6123VU/personal/confirm-address',
