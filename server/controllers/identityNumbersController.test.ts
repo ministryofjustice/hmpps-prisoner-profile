@@ -49,21 +49,21 @@ describe('IdentityNumbersController', () => {
   describe.each([
     [
       'Add justice ID numbers',
-      () => controller.addJusticeIdNumbers(),
+      () => controller.justiceIdNumbers().edit,
       JusticeIdentifierMappings,
       Page.AddJusticeIdNumbers,
       'prisonLegacySystem',
     ],
     [
       'Add personal ID numbers',
-      () => controller.addPersonalIdNumbers(),
+      () => controller.personalIdNumbers().edit,
       PersonalIdentifierMappings,
       Page.AddPersonalIdNumbers,
       'parkrun',
     ],
     [
       'Add Home Office ID numbers',
-      () => controller.addHomeOfficeIdNumbers(),
+      () => controller.homeOfficeIdNumbers().edit,
       HomeOfficeIdentifierMappings,
       Page.AddHomeOfficeIdNumbers,
       'homeOfficeReference',
@@ -73,7 +73,7 @@ describe('IdentityNumbersController', () => {
       jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue(GetIdentifiersMock)
     })
 
-    it('should render the add justice id numbers page', async () => {
+    it(`should render the ${title} page`, async () => {
       await action()(req, res, next)
 
       expect(identityNumbersService.getIdentityNumbers).toHaveBeenCalledWith('CLIENT_TOKEN', 'G6123VU')
@@ -146,25 +146,10 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    [
-      'Justice identity numbers added',
-      () => controller.postJusticeIdNumbers(),
-      JusticeIdentifierMappings,
-      'justice-id-numbers',
-    ],
-    [
-      'Personal identity numbers added',
-      () => controller.postPersonalIdNumbers(),
-      PersonalIdentifierMappings,
-      'personal-id-numbers',
-    ],
-    [
-      'Home Office identity numbers added',
-      () => controller.postHomeOfficeIdNumbers(),
-      HomeOfficeIdentifierMappings,
-      'home-office-id-numbers',
-    ],
-  ])('Submit ID numbers - %s', (flashMessage, action, pageData, errorRedirect) => {
+    ['Justice identity numbers added', () => controller.justiceIdNumbers().submit, 'justice-id-numbers'],
+    ['Personal identity numbers added', () => controller.personalIdNumbers().submit, 'personal-id-numbers'],
+    ['Home Office identity numbers added', () => controller.homeOfficeIdNumbers().submit, 'home-office-id-numbers'],
+  ])('Submit ID numbers - %s', (flashMessage, action, errorRedirect) => {
     beforeEach(() => {
       req.body = {
         probationLegacySystem: {

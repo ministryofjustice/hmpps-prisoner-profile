@@ -5,13 +5,22 @@ export const getOffenderIdentifierValue = (
   array: OffenderIdentifier[],
 ): IdentityNumber[] => {
   return Array.isArray(array) && array.length
-    ? array.filter(item => item.type === type).map(item => ({ value: item.value, comment: item.issuedAuthorityText }))
+    ? array
+        .filter(item => item.type === type)
+        .map(item => ({
+          offenderId: item.offenderId,
+          sequenceId: item.offenderIdSeq,
+          value: item.value,
+          comment: item.issuedAuthorityText,
+        }))
     : []
 }
 
 export default interface OffenderIdentifier {
   type: string
   value: string
+  offenderId: number
+  offenderIdSeq: number
   offenderNo?: string
   bookingId?: number
   issuedAuthorityText?: string

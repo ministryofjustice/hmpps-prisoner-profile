@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { formatLocation, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -28,52 +28,139 @@ export default class IdentityNumbersController {
     private readonly auditService: AuditService,
   ) {}
 
-  public addHomeOfficeIdNumbers(): RequestHandler {
-    return this.addIdentityNumbers({
-      pageTitle: `Add Home Office ID numbers - Prisoner personal details`,
-      title: `Add Home Office ID numbers`,
-      pageViewAuditEvent: Page.AddHomeOfficeIdNumbers,
-      mappings: HomeOfficeIdentifierMappings,
-    })
+  public homeOfficeIdNumbers() {
+    return {
+      edit: this.addIdentityNumbers({
+        pageTitle: `Add Home Office ID numbers - Prisoner personal details`,
+        title: `Add Home Office ID numbers`,
+        pageViewAuditEvent: Page.AddHomeOfficeIdNumbers,
+        mappings: HomeOfficeIdentifierMappings,
+      }),
+      submit: this.postIdentityNumbers({
+        successFlashMessage: 'Home Office identity numbers added',
+        errorRedirect: 'home-office-id-numbers',
+      }),
+    }
   }
 
-  public postHomeOfficeIdNumbers(): RequestHandler {
-    return this.postIdentityNumbers({
-      successFlashMessage: 'Home Office identity numbers added',
-      errorRedirect: 'home-office-id-numbers',
-    })
+  public justiceIdNumbers() {
+    return {
+      edit: this.addIdentityNumbers({
+        pageTitle: `Add justice ID numbers - Prisoner personal details`,
+        title: `Add justice ID numbers`,
+        pageViewAuditEvent: Page.AddJusticeIdNumbers,
+        mappings: JusticeIdentifierMappings,
+      }),
+      submit: this.postIdentityNumbers({
+        successFlashMessage: 'Justice identity numbers added',
+        errorRedirect: 'justice-id-numbers',
+      }),
+    }
   }
 
-  public addJusticeIdNumbers(): RequestHandler {
-    return this.addIdentityNumbers({
-      pageTitle: `Add justice ID numbers - Prisoner personal details`,
-      title: `Add justice ID numbers`,
-      pageViewAuditEvent: Page.AddJusticeIdNumbers,
-      mappings: JusticeIdentifierMappings,
-    })
+  public personalIdNumbers() {
+    return {
+      edit: this.addIdentityNumbers({
+        pageTitle: `Add personal ID numbers - Prisoner personal details`,
+        title: `Add personal ID numbers`,
+        pageViewAuditEvent: Page.AddPersonalIdNumbers,
+        mappings: PersonalIdentifierMappings,
+      }),
+      submit: this.postIdentityNumbers({
+        successFlashMessage: 'Personal identity numbers added',
+        errorRedirect: 'personal-id-numbers',
+      }),
+    }
   }
 
-  public postJusticeIdNumbers(): RequestHandler {
-    return this.postIdentityNumbers({
-      successFlashMessage: 'Justice identity numbers added',
-      errorRedirect: 'justice-id-numbers',
-    })
+  public idNumber() {
+    return {
+      edit: this.updateIdNumber(),
+      submit: this.postUpdateIdNumber(),
+    }
   }
 
-  public addPersonalIdNumbers(): RequestHandler {
-    return this.addIdentityNumbers({
-      pageTitle: `Add personal ID numbers - Prisoner personal details`,
-      title: `Add personal ID numbers`,
-      pageViewAuditEvent: Page.AddPersonalIdNumbers,
-      mappings: PersonalIdentifierMappings,
-    })
+  private updateIdNumber(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
+      // const { clientToken } = req.middleware
+      const errors = req.flash('errors')
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: null,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/identityNumbers/editIdentityNumber', {
+        pageTitle: 'Page title - Prisoner personal details',
+        title: 'Some title',
+        errors,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
   }
 
-  public postPersonalIdNumbers(): RequestHandler {
-    return this.postIdentityNumbers({
-      successFlashMessage: 'Personal identity numbers added',
-      errorRedirect: 'personal-id-numbers',
-    })
+  private postUpdateIdNumber(): RequestHandler {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
+      const errors = req.errors || []
+      const formValues: Record<string, AddIdentityNumberSubmission> = req.body
+
+      if (!errors.length) {
+        const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
+        this.checkForDuplicateValues(formValues, existingIdentifiers, errors)
+
+        if (!errors.length) {
+          const request = this.createRequestFromFormValues(formValues)
+          try {
+            await this.identityNumbersService.addIdentityNumbers(
+              clientToken,
+              res.locals.user as PrisonUser,
+              prisonerNumber,
+              request,
+            )
+          } catch (error) {
+            if (error.status === 400) {
+              errors.push({ text: error?.data?.userMessage ?? error.message })
+            } else throw error
+          }
+        }
+      }
+
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(req.body))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/identity-numbers`) // TODO CORRECT THIS
+      }
+
+      req.flash('flashMessage', {
+        text: 'PLACEHOLDER',
+        type: FlashMessageType.success,
+        fieldName: 'identity-numbers',
+      })
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AddIdNumbers,
+          details: { formValues },
+        })
+        .catch(error => logger.error(error))
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
+    }
   }
 
   private addIdentityNumbers = (options: {
@@ -82,7 +169,7 @@ export default class IdentityNumbersController {
     pageViewAuditEvent: Page
     mappings: Record<string, IdentifierMapping>
   }) => {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const { clientToken } = req.middleware
       const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
@@ -118,7 +205,7 @@ export default class IdentityNumbersController {
   }
 
   private postIdentityNumbers = (options: { successFlashMessage: string; errorRedirect: string }) => {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const errors = req.errors || []

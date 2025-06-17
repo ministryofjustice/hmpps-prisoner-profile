@@ -1,0 +1,50 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{%
+  set breadCrumbs = [
+      {
+          text: 'Digital Prison Services',
+          href:  "/" | prependBaseUrl
+      },
+      {
+          text: miniBannerData.prisonerName,
+          href: "/prisoner/" + prisonerNumber
+      },
+      {
+          text: 'Personal',
+          href: "/prisoner/" + prisonerNumber + "/personal"
+      }
+  ]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+  {% block body %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    </div>
+
+    {% if errors.length > 0 %}
+      {{
+        govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
+        })
+      }}
+    {% endif %}
+
+    <h1>Edit Identity Number Page (WIP)</h1>
+  {% endblock %}
+{% endblock %}

@@ -16,36 +16,47 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add justice ID numbers
-  get('/justice-id-numbers', editProfileChecks(), identityNumbersController.addJusticeIdNumbers())
+  get('/justice-id-numbers', editProfileChecks(), identityNumbersController.justiceIdNumbers().edit)
   post(
     '/justice-id-numbers',
     editProfileChecks(),
     validationMiddleware([identityNumbersValidator], {
       redirectBackOnError: true,
     }),
-    identityNumbersController.postJusticeIdNumbers(),
+    identityNumbersController.justiceIdNumbers().submit,
   )
 
   // Add personal ID numbers
-  get('/personal-id-numbers', editProfileChecks(), identityNumbersController.addPersonalIdNumbers())
+  get('/personal-id-numbers', editProfileChecks(), identityNumbersController.personalIdNumbers().edit)
   post(
     '/personal-id-numbers',
     editProfileChecks(),
     validationMiddleware([identityNumbersValidator], {
       redirectBackOnError: true,
     }),
-    identityNumbersController.postPersonalIdNumbers(),
+    identityNumbersController.personalIdNumbers().submit,
   )
 
-  // Add personal ID numbers
-  get('/home-office-id-numbers', editProfileChecks(), identityNumbersController.addHomeOfficeIdNumbers())
+  // Add Home Office ID numbers
+  get('/home-office-id-numbers', editProfileChecks(), identityNumbersController.homeOfficeIdNumbers().edit)
   post(
     '/home-office-id-numbers',
     editProfileChecks(),
     validationMiddleware([identityNumbersValidator], {
       redirectBackOnError: true,
     }),
-    identityNumbersController.postHomeOfficeIdNumbers(),
+    identityNumbersController.homeOfficeIdNumbers().submit,
+  )
+
+  // Add Home Office ID numbers
+  get('/identity-number/:seqId', editProfileChecks(), identityNumbersController.idNumber().edit)
+  post(
+    '/identity-number/:seqId',
+    editProfileChecks(),
+    validationMiddleware([identityNumbersValidator], {
+      redirectBackOnError: true,
+    }),
+    identityNumbersController.idNumber().submit,
   )
 
   return router

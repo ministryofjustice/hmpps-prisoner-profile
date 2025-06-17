@@ -34,10 +34,14 @@ describe('buildIdentityNumberOptions', () => {
       {
         type: 'ONE',
         value: '123',
+        offenderId: 1,
+        offenderIdSeq: 1,
       },
       {
         type: 'THREE',
         value: '999',
+        offenderId: 1,
+        offenderIdSeq: 2,
       },
     ]
 

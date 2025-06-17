@@ -81,6 +81,8 @@ export interface DietAndAllergyDetails {
 }
 
 export interface IdentityNumber {
+  offenderId: number
+  sequenceId: number
   value: string
   comment?: string
 }
