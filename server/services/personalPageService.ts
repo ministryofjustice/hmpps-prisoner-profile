@@ -100,6 +100,10 @@ export default class PersonalPageService {
     return this.globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber(token, prisonerNumber)
   }
 
+  async createGlobalEmail(token: string, prisonerNumber: string, value: string): Promise<GlobalEmail> {
+    return this.globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber(token, prisonerNumber, value)
+  }
+
   async updateGlobalEmail(
     token: string,
     prisonerNumber: string,

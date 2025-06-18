@@ -228,6 +228,13 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
+  createContact(prisonerNumber: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
+    return this.restClient.post<ContactsResponseDto>({
+      path: `/v1/person/${prisonerNumber}/contacts`,
+      data: request,
+    })
+  }
+
   updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
     return this.restClient.put<ContactsResponseDto>({
       path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,

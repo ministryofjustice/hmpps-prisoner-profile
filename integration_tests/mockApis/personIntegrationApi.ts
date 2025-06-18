@@ -297,6 +297,18 @@ export default {
       body: ContactsResponseMock,
     }),
 
+  stubPersonIntegrationCreateContact: ({
+    prisonerNumber,
+    response,
+  }: {
+    prisonerNumber: string
+    response?: ContactsResponseDto
+  }) =>
+    stubPostWithResponse({
+      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts`,
+      responseBody: response ?? ContactsResponseMock[0],
+    }),
+
   stubPersonIntegrationUpdateContact: ({
     prisonerNumber,
     contactId,

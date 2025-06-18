@@ -26,6 +26,7 @@ $govuk-page-width: $moj-page-width;
 @import 'server/views/components/timePicker/timePicker';
 
 @import './components/actions-block';
+@import './components/add-another-button';
 @import './components/alerts';
 @import './components/autocomplete';
 @import './components/address-autosuggest';

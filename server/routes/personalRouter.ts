@@ -516,13 +516,29 @@ export default function personalRouter(services: Services): Router {
 
   // Global emails
   editRoute({
+    path: 'add-email-address',
+    edit: {
+      audit: Page.EditEmailAddress,
+      method: personalController.globalEmails().add.edit,
+    },
+    submit: {
+      audit: Page.PostEditEmailAddress,
+      method: personalController.globalEmails().add.submit,
+      validation: {
+        validators: [emailValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
+
+  editRoute({
     path: 'email-addresses/:emailAddressId',
     edit: {
-      audit: Page.EditDomesticStatus,
+      audit: Page.EditEmailAddress,
       method: personalController.globalEmails().edit.edit,
     },
     submit: {
-      audit: Page.PostEditDomesticStatus,
+      audit: Page.PostEditEmailAddress,
       method: personalController.globalEmails().edit.submit,
       validation: {
         validators: [emailValidator],

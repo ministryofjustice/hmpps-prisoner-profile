@@ -71,6 +71,17 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     },
   )
 
+  it('Creates emails correctly', async () => {
+    personIntegrationApiClient.createContact = jest.fn(async () => ContactsResponseMock[1])
+    const result = await service.createEmailForPrisonerNumber('token', 'ABC123', 'foo@example.com')
+
+    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith('ABC123', {
+      contactType: 'EMAIL',
+      contactValue: 'foo@example.com',
+    })
+    expect(result).toEqual(email(ContactsResponseMock[1].contactId, ContactsResponseMock[1].contactValue))
+  })
+
   it('Updates emails correctly', async () => {
     personIntegrationApiClient.updateContact = jest.fn(async () => ContactsResponseMock[1])
     const result = await service.updateEmailForPrisonerNumber('token', 'ABC123', '123', 'foo@example.com')

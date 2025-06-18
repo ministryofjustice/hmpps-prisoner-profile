@@ -329,5 +329,7 @@ export interface PersonIntegrationApiClient {
 
   getContacts(prisonerNumber: string): Promise<ContactsResponseDto[]>
 
+  createContact(prisonerNumber: string, request: ContactsRequestDto): Promise<ContactsResponseDto>
+
   updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto>
 }
