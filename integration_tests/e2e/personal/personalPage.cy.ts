@@ -280,28 +280,6 @@ context('When signed in', () => {
       })
     })
 
-    context('Addresses', () => {
-      it('Displays the prisoners address', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        page.addresess().address().should('include.text', 'Flat 7, premises address, street field')
-        page.addresess().address().should('include.text', 'Leeds')
-        page.addresess().address().should('include.text', 'LS1 AAA')
-        page.addresess().address().should('include.text', 'England')
-
-        page.addresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
-        page.addresess().addressTypes().should('include.text', 'HDC Address')
-        page.addresess().addressTypes().should('include.text', 'Other')
-
-        page.addresess().phoneNumbers().should('include.text', '4444555566')
-        page.addresess().phoneNumbers().should('include.text', '0113444444')
-        page.addresess().phoneNumbers().should('include.text', '0113 333444')
-        page.addresess().phoneNumbers().should('include.text', '0800 222333')
-
-        page.addresess().comments().should('include.text', mockAddresses[0].comment)
-        page.addresess().addedOn().should('include.text', 'May 2020')
-      })
-    })
-
     context('Emergency contacts and next of kin', () => {
       it('Displays the contacts', () => {
         const page = Page.verifyOnPage(PersonalPage)
@@ -678,6 +656,24 @@ context('When signed in', () => {
     })
   })
 
+  context('Profile editing is enabled', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      visitPersonalDetailsPage()
+    })
+
+    context('Addresses', () => {
+      it('Displays a placeholder', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.addresses().placeholder().should('include.text', 'Work in progress...')
+      })
+    })
+  })
+
   context('Profile editing and diet and allergy is disabled', () => {
     beforeEach(() => {
       cy.task('reset')
@@ -728,6 +724,26 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
       page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
       page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+    })
+
+    it('Displays old addresses tile', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.oldAddresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.oldAddresess().address().should('include.text', 'Leeds')
+      page.oldAddresess().address().should('include.text', 'LS1 AAA')
+      page.oldAddresess().address().should('include.text', 'England')
+
+      page.oldAddresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
+      page.oldAddresess().addressTypes().should('include.text', 'HDC Address')
+      page.oldAddresess().addressTypes().should('include.text', 'Other')
+
+      page.oldAddresess().phoneNumbers().should('include.text', '4444555566')
+      page.oldAddresess().phoneNumbers().should('include.text', '0113444444')
+      page.oldAddresess().phoneNumbers().should('include.text', '0113 333444')
+      page.oldAddresess().phoneNumbers().should('include.text', '0800 222333')
+
+      page.oldAddresess().comments().should('include.text', mockAddresses[0].comment)
+      page.oldAddresess().addedOn().should('include.text', 'May 2020')
     })
   })
 
