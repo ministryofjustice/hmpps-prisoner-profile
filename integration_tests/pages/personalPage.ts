@@ -92,7 +92,15 @@ export default class PersonalPage extends Page {
     }
   }
 
-  addresess = () => {
+  addresses = () => {
+    const cardData = () => cy.get('[data-qa=addresses]')
+    return {
+      placeholder: () => cardData(),
+    }
+  }
+
+  // TODO: this can be removed once edit profile is rolled out
+  oldAddresess = () => {
     const cardData = () => cy.get('[data-qa=addresses]')
     const summaryListValues = () => cardData().find('.govuk-summary-list__value')
     return {

@@ -1,10 +1,10 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
-  Addresses,
   GlobalEmail,
   GlobalNumbersAndEmails,
   IdentityNumbers,
   NextOfKin,
+  OldAddresses,
   PersonalDetails,
   PhysicalCharacteristics,
   PropertyItem,
@@ -220,7 +220,7 @@ export default class PersonalPageService {
       prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
-      prisonApiClient.getAddresses(prisonerNumber),
+      !editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
@@ -247,7 +247,8 @@ export default class PersonalPageService {
       editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
     ])
 
-    const addresses: Addresses = this.addresses(addressList)
+    const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(addressList)
+
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
       (await this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode))
@@ -270,8 +271,8 @@ export default class PersonalPageService {
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
-      addresses,
-      addressSummary: this.addressSummary(addresses),
+      oldAddresses,
+      oldAddressSummary: this.addressSummary(oldAddresses),
       nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),
       nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
         contacts,
@@ -297,7 +298,7 @@ export default class PersonalPageService {
     }
   }
 
-  private addressSummary(addresses: Addresses): GovSummaryItem[] {
+  private addressSummary(addresses: OldAddresses): GovSummaryItem[] {
     const addressSummary: GovSummaryItem[] = []
 
     if (addresses) {
@@ -567,6 +568,7 @@ export default class PersonalPageService {
     }))
   }
 
+  // TODO: Remove once the new NoK/Emergency Contacts tile is released.
   private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
     const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
     let contactAddresses: { personId: number; addresses: Address[] }[] = []
@@ -581,7 +583,7 @@ export default class PersonalPageService {
       .map(contact => {
         const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
         return {
-          address: this.addresses(personAddresses?.addresses),
+          address: this.oldAddresses(personAddresses?.addresses),
           emails: contact.emails?.map(({ email }) => email) || [],
           emergencyContact: contact.emergencyContact,
           name: formatName(contact.firstName, contact.middleName, contact.lastName),
@@ -600,7 +602,8 @@ export default class PersonalPageService {
     return { personId, addresses }
   }
 
-  private addresses(addresses: Address[]): Addresses | undefined {
+  // TODO: remove once edit profile is rolled out:
+  private oldAddresses(addresses: Address[]): OldAddresses | undefined {
     if (!Array.isArray(addresses)) {
       return undefined
     }

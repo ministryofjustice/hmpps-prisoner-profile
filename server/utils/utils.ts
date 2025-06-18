@@ -13,7 +13,7 @@ import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
-import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
@@ -337,7 +337,7 @@ export const addressToLines = ({
   county,
   postalCode,
   country,
-}: Addresses['address']): string[] => {
+}: OldAddresses['address']): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
