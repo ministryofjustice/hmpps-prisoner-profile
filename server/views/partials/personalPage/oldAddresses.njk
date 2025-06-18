@@ -1,0 +1,25 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Addresses", id: "addresses"}) -%}
+  <div class="govuk-grid-row" data-qa="addresses">
+    <div class="govuk-grid-column-full">
+      {% if oldAddresses %}
+        {% if oldAddresses.noFixedAddress %}
+          <p>No fixed address.</p>
+        {% elseif oldAddresses.isPrimaryAddress %}
+        <p class="govuk-body">Primary</p>
+        {{ govukSummaryList({
+            classes: 'govuk-summary-list--bottom-border',
+            rows: oldAddressSummary
+        }) }}
+        <p class="govuk-body">From <span data-qa="address-added-on">{{ oldAddresses.addedOn | formatAddressDate }}</span></p>
+        {% elseif not oldAddresses.isPrimaryAddress %}
+          <p>No active, primary address entered.</p>
+        {% endif %}
+        <p><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses" data-qa="all-addresses-link">All addresses</a></p>
+      {% else %}
+        <p>You cannot view this prisoner’s addresses.</p>
+      {% endif %}
+    </div>
+  </div>
+{%- endcall -%}

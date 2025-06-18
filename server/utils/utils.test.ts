@@ -65,7 +65,7 @@ import {
 } from '../data/localMockData/personalCareNeedsMock'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
-import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import Address from '../data/interfaces/prisonApi/Address'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
@@ -326,7 +326,7 @@ describe('utils', () => {
 
   describe('Address to lines', () => {
     it('Maps a full address', () => {
-      const address: Addresses['address'] = {
+      const address: OldAddresses['address'] = {
         flat: '7',
         premise: 'premises address',
         street: 'street field',
@@ -346,7 +346,7 @@ describe('utils', () => {
     })
 
     it('Maps a partial address', () => {
-      const address: Addresses['address'] = {
+      const address: OldAddresses['address'] = {
         premise: 'premises address',
         street: 'street field',
         locality: 'locality field',
@@ -363,7 +363,7 @@ describe('utils', () => {
     })
 
     it('does not return a country on its own', () => {
-      const address: Addresses['address'] = {
+      const address: OldAddresses['address'] = {
         country: 'England',
       }
 
@@ -372,7 +372,7 @@ describe('utils', () => {
     })
 
     it('does return single lines that are not country', () => {
-      const address: Addresses['address'] = {
+      const address: OldAddresses['address'] = {
         premise: 'premises address',
       }
 

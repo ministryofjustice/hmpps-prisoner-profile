@@ -723,23 +723,23 @@ describe('PersonalPageService', () => {
   describe('Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
       prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)
-      const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
-      expect(addresses).toBe(undefined)
-      expect(addressSummary).toEqual([])
+      const { oldAddresses, oldAddressSummary } = await constructService().get('token', PrisonerMockDataA)
+      expect(oldAddresses).toBe(undefined)
+      expect(oldAddressSummary).toEqual([])
     })
 
     it('Maps the data from the API for the primary address', async () => {
-      const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
+      const { oldAddresses, oldAddressSummary } = await constructService().get('token', PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]
       const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
       const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
 
-      expect(addresses.addedOn).toEqual(expectedAddress.startDate)
-      expect(addresses.comment).toEqual(expectedAddress.comment)
-      expect(addresses.phones).toEqual(expectedPhones)
-      expect(addresses.addressTypes).toEqual(expectedTypes)
+      expect(oldAddresses.addedOn).toEqual(expectedAddress.startDate)
+      expect(oldAddresses.comment).toEqual(expectedAddress.comment)
+      expect(oldAddresses.phones).toEqual(expectedPhones)
+      expect(oldAddresses.addressTypes).toEqual(expectedTypes)
 
-      const { country, county, flat, locality, postalCode, premise, street, town } = addresses.address
+      const { country, county, flat, locality, postalCode, premise, street, town } = oldAddresses.address
 
       expect(country).toEqual(expectedAddress.country)
       expect(county).toEqual(expectedAddress.county)
@@ -750,7 +750,7 @@ describe('PersonalPageService', () => {
       expect(street).toEqual(expectedAddress.street)
       expect(town).toEqual(expectedAddress.town)
 
-      expect(addressSummary).toEqual(addressSummaryMock)
+      expect(oldAddressSummary).toEqual(addressSummaryMock)
     })
   })
 
@@ -808,8 +808,8 @@ describe('PersonalPageService', () => {
   describe('Addresses returns undefined', () => {
     it('Sets the address to empty', async () => {
       prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => undefined)
-      const { addresses } = await constructService().get('token', PrisonerMockDataA)
-      expect(addresses).toBeUndefined()
+      const { oldAddresses } = await constructService().get('token', PrisonerMockDataA)
+      expect(oldAddresses).toBeUndefined()
     })
   })
 

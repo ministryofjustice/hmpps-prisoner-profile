@@ -73,7 +73,11 @@
       {%- endcall -%}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/addresses.njk" %}
+          {% if editEnabled %}
+            {% include "../partials/personalPage/addresses.njk" %}
+          {% else %}
+            {% include "../partials/personalPage/oldAddresses.njk" %}
+          {% endif %}
         </div>
       </div>
       {%- call conditionallyShow({condition: editEnabled, id: 'global-numbers-and-email-addresses'}) -%}
