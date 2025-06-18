@@ -3384,4 +3384,175 @@ describe('PersonalController', () => {
       })
     })
   })
+
+  describe('Phone numbers', () => {
+    describe('Edit a phone number', () => {
+      const action = async (req: any, response: any) => controller.globalNumbers().edit(req, response, () => {})
+      const defaultReq = {
+        params: { prisonerNumber: 'ABC123', phoneNumberId: '123' },
+        flash: (): any => {
+          return []
+        },
+        middleware: defaultMiddleware,
+      }
+
+      beforeEach(() => {
+        personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+      })
+
+      it('Renders the default edit page with the correct data', async () => {
+        await action(defaultReq, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/phone', {
+          pageTitle: 'Change this person’s phone number - Prisoner personal details',
+          formTitle: `Change First Last’s phone number`,
+          phoneTypeOptions: expect.arrayContaining([{ checked: true, text: 'Business', value: 'BUS' }]),
+          phoneNumber: '12345 678 901',
+          phoneExtension: '123',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          ...defaultReq,
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          ...defaultReq,
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [JSON.stringify({ phoneNumberType: 'MOB', phoneNumber: '12345', phoneExtension: '123' })]
+              : []
+          },
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            phoneTypeOptions: expect.arrayContaining([{ checked: true, text: 'Mobile', value: 'MOB' }]),
+            phoneNumber: '12345',
+            phoneExtension: '123',
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          ...defaultReq,
+          id: 1,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditPhoneNumber,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.globalNumbers().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC', phoneNumberId: '123' },
+          body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
+          flash: jest.fn(),
+        } as any
+
+        personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+      })
+
+      it('Updates the email', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', '123', {
+          phoneNumberType: 'MOB',
+          phoneNumber: '1234',
+          phoneExtension: '4321',
+        })
+      })
+
+      it('Redirects to the personal page #phones-and-emais on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Phone number updated',
+          type: FlashMessageType.success,
+          fieldName: 'phoneNumber',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateGlobalPhoneNumber = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/phone-numbers/123')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
+        }
+
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditPhoneNumber,
+          details: {
+            fieldName: 'phoneNumber',
+            previous: {
+              phoneExtension: '123',
+              phoneNumber: '12345 678 901',
+              phoneNumberType: 'BUS',
+            },
+            updated: {
+              phoneExtension: '4321',
+              phoneNumber: '1234',
+              phoneNumberType: 'MOB',
+            },
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
 })

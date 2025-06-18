@@ -61,7 +61,11 @@ import DomesticStatusService from './domesticStatusService'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
-import { globalEmailsMock, globalPhonesAndEmailsMock } from '../data/localMockData/globalPhonesAndEmails'
+import {
+  globalEmailsMock,
+  globalPhonesAndEmailsMock,
+  globalPhonesMock,
+} from '../data/localMockData/globalPhonesAndEmails'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -1155,6 +1159,33 @@ describe('PersonalPageService', () => {
           'email@email.com',
         )
         expect(result).toEqual(globalEmailsMock[0])
+      })
+    })
+
+    describe('updatePhoneNumberForPrisonerNumber', () => {
+      it('Updates the email using the service', async () => {
+        const service = constructService()
+        globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber = jest.fn(
+          async () => globalPhonesMock[0],
+        )
+
+        const result = await service.updateGlobalPhoneNumber('token', 'ABC123', '123', {
+          phoneNumber: '123',
+          phoneNumberType: 'MOB',
+          phoneExtension: '1234',
+        })
+
+        expect(globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
+          'token',
+          'ABC123',
+          '123',
+          {
+            phoneNumber: '123',
+            phoneNumberType: 'MOB',
+            phoneExtension: '1234',
+          },
+        )
+        expect(result).toEqual(globalPhonesMock[0])
       })
     })
   })

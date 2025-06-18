@@ -18,7 +18,11 @@ import {
   hairFieldData,
   shoeSizeFieldData,
 } from '../controllers/personal/fieldData'
-import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
+import validationMiddleware, {
+  RedirectWithParams,
+  ValidationMiddlewareOptions,
+  Validator,
+} from '../middleware/validationMiddleware'
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 import { religionValidator } from '../validators/personal/religionValidator'
@@ -35,6 +39,7 @@ import { numberOfChildrenValidator } from '../validators/personal/numberOfChildr
 import addressEditRouter from './addressEditRouter'
 import { emailValidator } from '../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
+import { phoneNumberValidator } from '../validators/personal/phoneNumberValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -158,6 +163,7 @@ export default function personalRouter(services: Services): Router {
       validation?: {
         validators: Validator[]
         redirectBackOnError?: boolean
+        redirectTo?: RedirectWithParams
       }
     }
     permissionsCheck?: () => RequestHandler
@@ -174,16 +180,22 @@ export default function personalRouter(services: Services): Router {
     )
 
     if (submit.validation) {
+      const validationOptions: ValidationMiddlewareOptions = {
+        redirectBackOnError: submit.validation.redirectBackOnError || false,
+      }
+      if (submit.validation.redirectTo) {
+        validationOptions.redirectWithParams = submit.validation.redirectTo
+      } else {
+        validationOptions.redirectTo = `personal/${path}`
+      }
+
       post(
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
         permissionsCheck(),
-        validationMiddleware(submit.validation.validators, {
-          redirectBackOnError: submit.validation.redirectBackOnError || false,
-          redirectTo: `personal/${path}`,
-        }),
+        validationMiddleware(submit.validation.validators, validationOptions),
         submit.method,
       )
     } else {
@@ -494,6 +506,11 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditDomesticStatus,
       method: personalController.globalNumbers().submit,
+      validation: {
+        validators: [phoneNumberValidator],
+        redirectBackOnError: true,
+        redirectTo: ({ phoneNumberId }) => `personal/phone-numbers/${phoneNumberId}`,
+      },
     },
   })
 
@@ -507,7 +524,11 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditDomesticStatus,
       method: personalController.globalEmails().edit.submit,
-      validation: { validators: [emailValidator], redirectBackOnError: true },
+      validation: {
+        validators: [emailValidator],
+        redirectBackOnError: true,
+        redirectTo: ({ emailAddressId }) => `personal/email-addresses/${emailAddressId}`,
+      },
     },
   })
 

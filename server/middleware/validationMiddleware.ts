@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import { RequestHandler, Request } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
@@ -13,9 +13,22 @@ export type Validator = (
     | DietAndFoodAllergiesSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
+export type RedirectWithParams = (params: Request['params']) => string
+export interface ValidationMiddlewareOptions {
+  redirectBackOnError: boolean
+  redirectTo?: string
+  redirectWithParams?: RedirectWithParams
+  useReq?: boolean
+}
+
 export default function validationMiddleware(
   validators: Validator[],
-  options: { redirectBackOnError: boolean; redirectTo?: string; useReq?: boolean } = {
+  options: {
+    redirectBackOnError: boolean
+    redirectTo?: string
+    redirectWithParams?: RedirectWithParams
+    useReq?: boolean
+  } = {
     redirectBackOnError: false,
     useReq: false,
   },
@@ -46,6 +59,9 @@ export default function validationMiddleware(
       req.flash('errors', errors)
       if (options.redirectTo) {
         return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectTo}`)
+      }
+      if (options.redirectWithParams) {
+        return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectWithParams(req.params)}`)
       }
       return res.redirect(req.originalUrl)
     }

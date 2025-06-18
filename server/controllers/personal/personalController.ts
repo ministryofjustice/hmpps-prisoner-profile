@@ -25,6 +25,7 @@ import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
 import {
+  changePhoneNumberFieldData,
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
@@ -1580,9 +1581,107 @@ export default class PersonalController {
   }
 
   globalNumbers() {
+    const phoneTypeOptions = (chosenType: string = null): RadioOption[] => {
+      // TODO: Replace these with a call to the APIs for the reference data
+      const options = {
+        MOB: 'Mobile',
+        HOME: 'Home',
+        ALTH: 'Alternate Home',
+        BUS: 'Business',
+        ALTB: 'Alternate Business',
+        VISIT: 'Agency Visit Line',
+        FAX: 'Fax',
+      }
+
+      return Object.entries(options).map(([value, text]) => ({
+        text,
+        value,
+        checked: chosenType === value,
+      }))
+    }
+
     return {
-      edit: async (_req: Request, _res: Response, _next: NextFunction) => {},
-      submit: async (_req: Request, _res: Response, _next: NextFunction) => {},
+      edit: async (req: Request, res: Response, _next: NextFunction) => {
+        const { prisonerData, clientToken } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const { prisonerNumber, phoneNumberId } = req.params
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const errors = req.flash('errors')
+        const { pageTitle, formTitle } = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+        const requestBodyFlash = requestBodyFromFlash<{
+          phoneNumber: string
+          phoneNumberType: string
+          phoneExtension: string
+        }>(req)
+
+        const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+        const phoneValue = requestBodyFlash
+          ? {
+              type: requestBodyFlash.phoneNumberType,
+              number: requestBodyFlash.phoneNumber,
+              extension: requestBodyFlash.phoneExtension,
+            }
+          : phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.EditPhoneNumber,
+        })
+
+        res.render('pages/edit/phone', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          phoneTypeOptions: phoneTypeOptions(phoneValue.type),
+          phoneNumber: phoneValue.number,
+          phoneExtension: phoneValue.extension,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, _next: NextFunction) => {
+        const { prisonerNumber, phoneNumberId } = req.params
+        const {
+          prisonerData: { firstName, lastName },
+          clientToken,
+        } = req.middleware
+        const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+        const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+        const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+        const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
+              phoneNumber,
+              phoneNumberType,
+              phoneExtension,
+            })
+          },
+          fieldData,
+          auditDetails: {
+            fieldName: fieldData.fieldName,
+            previous: {
+              phoneNumber: previousValue.number,
+              phoneNumberType: previousValue.type,
+              phoneExtension: previousValue.extension,
+            },
+            updated: { phoneNumber, phoneNumberType, phoneExtension },
+          },
+        })
+      },
     }
   }
 
