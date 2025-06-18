@@ -1,10 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
 import Page from '../../../../pages/page'
 import { Role } from '../../../../../server/data/enums/role'
-import { AddressRequestDto } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  AddressRequestDto,
+  CorePersonRecordReferenceDataDomain,
+} from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundPage from '../../../../pages/notFoundPage'
 import PrimaryOrPostalAddressPage from '../../../../pages/editPages/address/primaryOrPostalAddressPage'
 import { AddressResponseMock } from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Primary or Postal Address Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -27,6 +31,10 @@ context('Primary or Postal Address Page', () => {
 
   before(() => {
     cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
   })
 
   const visitPrimaryOrPostalAddressPage = (): PrimaryOrPostalAddressPage => {

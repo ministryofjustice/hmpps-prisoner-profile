@@ -7,7 +7,11 @@ export const addressServiceMock = (): Interface<AddressService> => ({
   getAddressesFromPrisonAPI: jest.fn(),
   getAddressesMatchingQuery: jest.fn(),
   getAddressByUprn: jest.fn(),
+  getCityCode: jest.fn(),
   getCityReferenceData: jest.fn(),
+  getCountyCode: jest.fn(),
   getCountyReferenceData: jest.fn(),
+  getCountryCode: jest.fn(),
   getCountryReferenceData: jest.fn(),
+  sanitisePostcode: jest.fn(),
 })

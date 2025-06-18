@@ -12,6 +12,7 @@ import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { FlashMessageType } from '../data/enums/flashMessageType'
+import { AddressLocation } from '../services/mappers/addressMapper'
 
 const clientToken = 'CLIENT_TOKEN'
 const { prisonerNumber } = PrisonerMockDataA
@@ -176,9 +177,9 @@ describe('Address Edit Controller', () => {
         ephemeralDataService.getData = jest
           .fn()
           .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
-        addressService.getCityReferenceData = jest.fn().mockReturnValue({ description: 'My Town' })
-        addressService.getCountyReferenceData = jest.fn().mockReturnValue({ description: 'My County' })
-        addressService.getCountryReferenceData = jest.fn().mockReturnValue({ description: 'England' })
+        addressService.getCityCode = jest.fn().mockReturnValue({ description: 'My Town' })
+        addressService.getCountyCode = jest.fn().mockReturnValue({ description: 'My County' })
+        addressService.getCountryCode = jest.fn().mockReturnValue({ description: 'England' })
 
         await controller.displayConfirmAddress()(req, res, next)
 
@@ -262,9 +263,9 @@ describe('Address Edit Controller', () => {
         ephemeralDataService.getData = jest
           .fn()
           .mockReturnValue({ key: addressCacheId, value: { address: addressRequest, route: 'find-uk-address' } })
-        addressService.getCityReferenceData = jest.fn().mockReturnValue({ description: 'My Town' })
-        addressService.getCountyReferenceData = jest.fn().mockReturnValue({ description: 'My County' })
-        addressService.getCountryReferenceData = jest.fn().mockReturnValue({ description: 'England' })
+        addressService.getCityCode = jest.fn().mockReturnValue({ description: 'My Town' })
+        addressService.getCountyCode = jest.fn().mockReturnValue({ description: 'My County' })
+        addressService.getCountryCode = jest.fn().mockReturnValue({ description: 'England' })
 
         await controller.displayPrimaryOrPostalAddress()(req, res, next)
 
@@ -381,6 +382,7 @@ describe('Address Edit Controller', () => {
           clientToken,
           prisonerNumber,
           expectedAddressSubmission,
+          prisonUserMock,
         )
 
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
@@ -426,6 +428,146 @@ describe('Address Edit Controller', () => {
           `/prisoner/${prisonerNumber}/personal/primary-or-postal-address?address=${addressCacheId}`,
         )
       })
+    })
+  })
+
+  describe('Manual Address pages', () => {
+    const pageTitlePrefix = 'Page title prefix'
+    const formTitlePrefix = 'Form title prefix'
+
+    beforeEach(async () => {
+      addressService.getCityReferenceData = jest.fn().mockReturnValue([{ code: 'TOWN1', description: 'My Town' }])
+      addressService.getCountyReferenceData = jest.fn().mockReturnValue([{ code: 'COUNTY1', description: 'My County' }])
+      addressService.getCountryReferenceData = jest
+        .fn()
+        .mockReturnValue([{ code: 'COUNTRY1', description: 'My Country' }])
+    })
+
+    describe('Rendering the page', () => {
+      test.each`
+        addressLocation                     | auditPage                               | uk       | noFixedAddress | noFixedAddressOption | backLink
+        ${AddressLocation.uk}               | ${Page.EditAddressUkManual}             | ${true}  | ${false}       | ${false}             | ${'find-uk-address'}
+        ${AddressLocation.no_fixed_address} | ${Page.EditAddressNoFixedAddressManual} | ${true}  | ${true}        | ${false}             | ${'where-is-address'}
+        ${AddressLocation.overseas}         | ${Page.EditAddressOverseasManual}       | ${false} | ${false}       | ${true}              | ${'where-is-address'}
+      `(
+        `Location: '$addressLocation', audit: '$auditPage', uk: '$uk', noFixedAddress: '$noFixedAddress', noFixedAddressOption: '$noFixedAddressOption', backLink: '$backLink'`,
+        async ({ addressLocation, auditPage, uk, noFixedAddress, noFixedAddressOption, backLink }) => {
+          await controller.displayManualEditAddress({ addressLocation, auditPage, formTitlePrefix, pageTitlePrefix })(
+            req,
+            res,
+            next,
+          )
+
+          expect(res.render).toHaveBeenCalledWith('pages/edit/address/manualAddress', {
+            pageTitle: `${pageTitlePrefix} - Prisoner personal details`,
+            formTitle: `${formTitlePrefix} for John Saunders`,
+            errors: [],
+            requestBody: null,
+            townOrCityOptions: [{ value: 'TOWN1', text: 'My Town' }],
+            countyOptions: [{ value: 'COUNTY1', text: 'My County' }],
+            countryOptions: [{ value: 'COUNTRY1', text: 'My Country' }],
+            ukAddress: uk,
+            noFixedAddress,
+            noFixedAddressCheckbox: noFixedAddressOption,
+            backLink,
+            breadcrumbPrisonerName: 'Saunders, John',
+            miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          })
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
+            user: prisonUserMock,
+            prisonerNumber,
+            prisonId: PrisonerMockDataA.prisonId,
+            correlationId: req.id,
+            page: auditPage,
+          })
+        },
+      )
+
+      it('selects options from the requestBody', async () => {
+        req = {
+          ...req,
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [JSON.stringify({ townOrCity: 'TOWN1', county: 'COUNTY1', country: 'COUNTRY1' })]
+              : []
+          },
+        } as Request
+
+        await controller.displayManualEditAddress({
+          addressLocation: AddressLocation.uk,
+          auditPage: Page.EditAddressUkManual,
+          formTitlePrefix,
+          pageTitlePrefix,
+        })(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/address/manualAddress',
+          expect.objectContaining({
+            townOrCityOptions: [{ selected: true, value: 'TOWN1', text: 'My Town' }],
+            countyOptions: [{ selected: true, value: 'COUNTY1', text: 'My County' }],
+            countryOptions: [{ selected: true, value: 'COUNTRY1', text: 'My Country' }],
+          }),
+        )
+      })
+    })
+
+    describe('Submiting the page', () => {
+      test.each`
+        addressLocation                     | auditAction                                   | noFixedAddressChecked | noFixedAbode
+        ${AddressLocation.uk}               | ${PostAction.EditAddressUkManual}             | ${undefined}          | ${false}
+        ${AddressLocation.no_fixed_address} | ${PostAction.EditAddressNoFixedAddressManual} | ${undefined}          | ${true}
+        ${AddressLocation.overseas}         | ${PostAction.EditAddressOverseasManual}       | ${false}              | ${false}
+        ${AddressLocation.overseas}         | ${PostAction.EditAddressOverseasManual}       | ${true}               | ${true}
+      `(
+        `Location: '$addressLocation', audit: '$auditAction', noFixedAddressChecked: '$noFixedAddressChecked', noFixedAbode: '$noFixedAbode'`,
+        async ({ addressLocation, auditAction, noFixedAddressChecked, noFixedAbode }) => {
+          addressService.sanitisePostcode = jest.fn().mockReturnValue('SW1H 9AJ')
+          const submittedAddress = {
+            noFixedAddress: noFixedAddressChecked,
+            houseOrBuildingName: 'house or building name',
+            houseNumber: '123',
+            addressLine1: 'address line 1',
+            addressLine2: 'address line 2',
+            townOrCity: 'TOWN1',
+            county: 'COUNTY1',
+            postcode: 'sW1h9aJ',
+            country: 'COUNTRY1',
+          }
+
+          const cachedAddress = {
+            noFixedAbode,
+            buildingNumber: '123',
+            thoroughfareName: 'Address Line 1',
+            dependantLocality: 'Address Line 2',
+            postTownCode: 'TOWN1',
+            postCode: 'SW1H 9AJ',
+            countyCode: 'COUNTY1',
+            countryCode: 'COUNTRY1',
+          } as AddressRequestDto
+
+          req = { ...req, body: submittedAddress, path: '/path' } as unknown as Request
+
+          await controller.submitManualEditAddress({ addressLocation, auditAction })(req, res, next)
+
+          expect(ephemeralDataService.cacheData).toHaveBeenCalledWith({
+            address: expect.objectContaining(cachedAddress),
+            route: 'path',
+          })
+
+          expect(res.redirect).toHaveBeenCalledWith(
+            `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+          )
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+            user: prisonUserMock,
+            prisonerNumber,
+            correlationId: req.id,
+            action: auditAction,
+            details: { address: expect.objectContaining(cachedAddress) },
+          })
+        },
+      )
     })
   })
 })

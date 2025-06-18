@@ -68,6 +68,8 @@ declare global {
 
       seedRedisEntry(options: { key: string; value: unknown }): Chainable<AUTWindow>
 
+      refreshReferenceData(domain: string): Chainable<AUTWindow>
+
       setupComponentsData(options?: {
         header?: Component
         footer?: Component
