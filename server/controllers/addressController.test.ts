@@ -10,6 +10,7 @@ import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 
 let req: any
 let res: any
+let addressService: AddressService
 let controller: AddressController
 
 const testError = () => {
@@ -19,7 +20,8 @@ const testError = () => {
 describe('Address controller', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    controller = new AddressController(addressServiceMock() as AddressService, auditServiceMock())
+    addressService = addressServiceMock() as AddressService
+    controller = new AddressController(addressService, auditServiceMock())
   })
 
   describe('displayAddresses', () => {
@@ -75,6 +77,8 @@ describe('Address controller', () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       }
+
+      addressService.sanitisePostcode = jest.fn().mockResolvedValue([...addressesPrimaryAndMailMock])
     })
 
     it('should render the correct json response', async () => {
@@ -83,7 +87,7 @@ describe('Address controller', () => {
         .mockResolvedValue(mockOsAddresses)
 
       await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
       expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
     })
 
@@ -99,7 +103,7 @@ describe('Address controller', () => {
         ])
 
       await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
       expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
     })
 
@@ -109,20 +113,11 @@ describe('Address controller', () => {
         .mockResolvedValue(mockOsAddresses)
 
       await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'SW1H9EA' } }, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H 9EA')
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H9EA', true)
       expect(res.json).toHaveBeenCalledWith({
         results: [expect.objectContaining({ buildingNumber: 1 }), expect.objectContaining({ buildingNumber: 2 })],
         status: 200,
       })
-    })
-
-    it('should sanitise post codes before querying the API', async () => {
-      const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
-        .mockResolvedValue(mockOsAddresses)
-
-      await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'petty france sw1H9eA 102' } }, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('petty france SW1H 9EA 102')
     })
 
     it('should handle errors correctly', async () => {
@@ -133,7 +128,7 @@ describe('Address controller', () => {
         })
 
       await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
       expect(res.status).toHaveBeenCalledWith(testError().status)
       expect(res.json).toHaveBeenCalledWith({ error: testError().message, status: 500 })
     })

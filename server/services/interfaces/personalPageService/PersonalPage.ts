@@ -12,8 +12,8 @@ export default interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
-  addresses: Addresses
-  addressSummary: GovSummaryItem[]
+  oldAddresses: OldAddresses // TODO remove after edit profile is rolled out
+  oldAddressSummary: GovSummaryItem[] // TODO remove after edit profile is rolled out
   nextOfKin: NextOfKin[]
   nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
   physicalCharacteristics: PhysicalCharacteristics
@@ -117,7 +117,8 @@ export interface PropertyItem {
   location: string
 }
 
-export interface Addresses {
+// TODO: Remove once we've rolled out edit the profile
+export interface OldAddresses {
   isPrimaryAddress: boolean
   noFixedAddress: boolean
   address: Address
@@ -127,6 +128,7 @@ export interface Addresses {
   addedOn: string
 }
 
+// TODO: Remove once we've rolled out edit the profile
 export interface NextOfKin {
   emergencyContact: boolean
   nextOfKin: boolean
@@ -134,7 +136,7 @@ export interface NextOfKin {
   relationship: string
   emails: string[]
   phones: string[]
-  address: Addresses
+  address: OldAddresses
 }
 
 export interface DistinguishingMark {
