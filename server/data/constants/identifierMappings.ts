@@ -69,7 +69,7 @@ export const HomeOfficeIdentifierMappings: Record<string, IdentifierMapping> = {
   },
   homeOfficeReference: {
     type: OffenderIdentifierType.HomeOfficeReferenceNumber,
-    label: 'Home office reference number',
+    label: 'Home Office reference number',
   },
   portReference: {
     type: OffenderIdentifierType.PortReferenceNumber,

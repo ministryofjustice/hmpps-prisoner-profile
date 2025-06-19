@@ -36,6 +36,12 @@ export const GetIdentifiersMock: OffenderIdentifier[] = [
   },
 ]
 
-export default {
-  GetIdentifiersMock,
+export const GetIdentifierMock: OffenderIdentifier = {
+  type: OffenderIdentifierType.PncNumber,
+  value: '2017/0239598Q',
+  offenderId: 1,
+  offenderIdSeq: 1,
+  offenderNo: 'AA1234A',
+  bookingId: 1,
+  issuedAuthorityText: 'Some comment',
 }

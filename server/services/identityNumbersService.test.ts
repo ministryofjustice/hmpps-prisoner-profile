@@ -2,12 +2,15 @@ import { RestClientBuilder } from '../data'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import MetricsService from './metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { AddIdentityNumbersRequestMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
+import {
+  AddIdentityNumbersRequestMock,
+  UpdateIdentityNumberRequestMock,
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import IdentityNumbersService from './identityNumbersService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { GetIdentifiersMock } from '../data/localMockData/getIdentifiersMock'
+import { GetIdentifierMock, GetIdentifiersMock } from '../data/localMockData/getIdentifiersMock'
 
 jest.mock('../data')
 jest.mock('./metrics/metricsService')
@@ -26,6 +29,7 @@ describe('IdentityNumbersService', () => {
     personIntegrationApiClient = personIntegrationApiClientMock()
 
     prisonApiClient.getIdentifiers = jest.fn(async () => GetIdentifiersMock)
+    prisonApiClient.getIdentifier = jest.fn(async () => GetIdentifierMock)
 
     metricsService = {
       trackPersonIntegrationUpdate: jest.fn(),
@@ -60,6 +64,64 @@ describe('IdentityNumbersService', () => {
     })
   })
 
+  describe('getIdentityNumber', () => {
+    it('should return existing identity number', async () => {
+      const offenderId = 1
+      const seqId = 2
+      const result = await identityNumbersService.getIdentityNumber(clientToken, offenderId, seqId)
+
+      expect(prisonApiClient.getIdentifier).toHaveBeenCalledWith(offenderId, seqId)
+      expect(result).toEqual(GetIdentifierMock)
+    })
+  })
+
+  describe('updateIdentityNumber', () => {
+    const offenderId = 1
+    const seqId = 2
+
+    it('should update an existing identity number', async () => {
+      await identityNumbersService.updateIdentityNumber(
+        clientToken,
+        user,
+        prisonerNumber,
+        offenderId,
+        seqId,
+        UpdateIdentityNumberRequestMock,
+      )
+
+      expect(personIntegrationApiClient.updateIdentityNumber).toHaveBeenCalledWith(
+        offenderId,
+        seqId,
+        UpdateIdentityNumberRequestMock,
+      )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['identity-numbers'],
+        prisonerNumber,
+        user,
+      })
+    })
+
+    it('transforms input value to uppercase', async () => {
+      const request = {
+        ...UpdateIdentityNumberRequestMock,
+        value: UpdateIdentityNumberRequestMock.value.toLowerCase(),
+      }
+
+      await identityNumbersService.updateIdentityNumber(clientToken, user, prisonerNumber, offenderId, seqId, request)
+
+      expect(personIntegrationApiClient.updateIdentityNumber).toHaveBeenCalledWith(
+        offenderId,
+        seqId,
+        UpdateIdentityNumberRequestMock,
+      )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['identity-numbers'],
+        prisonerNumber,
+        user,
+      })
+    })
+  })
+
   describe('addIdentityNumbers', () => {
     it('should add identity numbers', async () => {
       await identityNumbersService.addIdentityNumbers(clientToken, user, prisonerNumber, AddIdentityNumbersRequestMock)
@@ -75,7 +137,7 @@ describe('IdentityNumbersService', () => {
       })
     })
 
-    it('transform values to uppercase', async () => {
+    it('transforms input values to uppercase', async () => {
       const request = [
         {
           ...AddIdentityNumbersRequestMock[0],

@@ -7,6 +7,7 @@ import {
   PersonIntegrationDistinguishingMark,
   PseudonymRequestDto,
   PseudonymResponseDto,
+  UpdateIdentifierRequestDto,
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 import { PrisonerMockDataA } from './prisoner'
@@ -474,3 +475,8 @@ export const AddIdentityNumbersRequestMock: AddIdentifierRequestDto[] = [
     value: '2017/0239598Q',
   },
 ]
+
+export const UpdateIdentityNumberRequestMock: UpdateIdentifierRequestDto = {
+  value: '2017/0239598Q',
+  comments: 'Additional info',
+}

@@ -3,7 +3,10 @@ import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
 import IdentityNumbersController from '../controllers/identityNumbersController'
-import { identityNumbersValidator } from '../validators/personal/identityNumbersValidator'
+import {
+  addIdentityNumbersValidator,
+  editIdentityNumberValidator,
+} from '../validators/personal/identityNumbersValidator'
 
 export default function identityNumbersRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
   const router = Router({ mergeParams: true })
@@ -20,7 +23,7 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   post(
     '/justice-id-numbers',
     editProfileChecks(),
-    validationMiddleware([identityNumbersValidator], {
+    validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
     identityNumbersController.justiceIdNumbers().submit,
@@ -31,7 +34,7 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   post(
     '/personal-id-numbers',
     editProfileChecks(),
-    validationMiddleware([identityNumbersValidator], {
+    validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
     identityNumbersController.personalIdNumbers().submit,
@@ -42,18 +45,18 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   post(
     '/home-office-id-numbers',
     editProfileChecks(),
-    validationMiddleware([identityNumbersValidator], {
+    validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
     identityNumbersController.homeOfficeIdNumbers().submit,
   )
 
-  // Add Home Office ID numbers
+  // Edit individual existing ID numbers
   get('/identity-number/:seqId', editProfileChecks(), identityNumbersController.idNumber().edit)
   post(
     '/identity-number/:seqId',
     editProfileChecks(),
-    validationMiddleware([identityNumbersValidator], {
+    validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,
     }),
     identityNumbersController.idNumber().submit,

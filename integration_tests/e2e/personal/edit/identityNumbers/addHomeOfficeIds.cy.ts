@@ -70,7 +70,7 @@ context('Add personal IDs', () => {
           },
         },
         errorMessages: [
-          'This Home office reference number already exists. Enter a different Home office reference number',
+          'This Home Office reference number already exists. Enter a different Home Office reference number',
         ],
       },
       {
@@ -83,7 +83,7 @@ context('Add personal IDs', () => {
           },
         },
         errorMessages: [
-          'Enter this person’s Home office reference number',
+          'Enter this person’s Home Office reference number',
           'Enter this person’s Port reference number',
           'Enter this person’s Case Information Database (CID)',
         ],

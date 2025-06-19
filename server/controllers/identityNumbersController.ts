@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { formatLocation, formatName } from '../utils/utils'
+import { apostrophe, formatLocation, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -13,7 +13,10 @@ import {
   JusticeIdentifierMappings,
   PersonalIdentifierMappings,
 } from '../data/constants/identifierMappings'
-import { AddIdentifierRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  AddIdentifierRequestDto,
+  UpdateIdentifierRequestDto,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,
@@ -21,6 +24,12 @@ import {
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import OffenderIdentifier from '../data/interfaces/prisonApi/OffenderIdentifier'
 import HmppsError from '../interfaces/HmppsError'
+
+export interface EditIdentityNumberSubmission {
+  type?: string
+  value?: string
+  comment?: string
+}
 
 export default class IdentityNumbersController {
   constructor(
@@ -83,8 +92,21 @@ export default class IdentityNumbersController {
   private updateIdNumber(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-      // const { clientToken } = req.middleware
+      const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
+      const { clientToken } = req.middleware
       const errors = req.flash('errors')
+      const [offenderId, seqId] = this.parseIdentifierIds(req.url)
+
+      const existingIdentifier = await this.identityNumbersService.getIdentityNumber(clientToken, +offenderId, +seqId)
+      const { type, label } = Object.values(IdentifierMappings).find(item => item.type === existingIdentifier.type)
+      const identifierLabel = label || 'ID number'
+
+      const requestBodyFlash = requestBodyFromFlash<EditIdentityNumberSubmission>(req)
+      const formValues = requestBodyFlash || {
+        type: existingIdentifier.type,
+        value: existingIdentifier.value,
+        comment: existingIdentifier.issuedAuthorityText,
+      }
 
       this.auditService
         .sendPageView({
@@ -92,13 +114,15 @@ export default class IdentityNumbersController {
           prisonerNumber,
           prisonId,
           correlationId: req.id,
-          page: null,
+          page: Page.EditIdNumber,
         })
         .catch(error => logger.error(error))
 
       return res.render('pages/identityNumbers/editIdentityNumber', {
-        pageTitle: 'Page title - Prisoner personal details',
-        title: 'Some title',
+        pageTitle: `${identifierLabel} - Prisoner personal details`,
+        title: `Change ${apostrophe(naturalPrisonerName)} ${identifierLabel}`,
+        formValues,
+        identifierType: type,
         errors,
         miniBannerData: {
           prisonerNumber,
@@ -113,20 +137,40 @@ export default class IdentityNumbersController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
+      const [offenderId, seqId] = this.parseIdentifierIds(req.url)
       const errors = req.errors || []
-      const formValues: Record<string, AddIdentityNumberSubmission> = req.body
+      const formValues: { type?: string; value?: string; comment?: string } = req.body
+      const { label } = Object.values(IdentifierMappings).find(item => item.type === formValues.type)
 
       if (!errors.length) {
         const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
-        this.checkForDuplicateValues(formValues, existingIdentifiers, errors)
+
+        if (
+          existingIdentifiers.some(
+            id =>
+              id.type === formValues.type &&
+              !(id.offenderId === +offenderId && id.offenderIdSeq === +seqId) &&
+              id.value?.toUpperCase() === formValues.value?.toUpperCase(),
+          )
+        ) {
+          errors.push({
+            text: `This ${label} already exists. Enter a different ${label}`,
+            href: `#identifier-value-input`,
+          })
+        }
 
         if (!errors.length) {
-          const request = this.createRequestFromFormValues(formValues)
+          const request: UpdateIdentifierRequestDto = {
+            value: formValues.value,
+            comments: formValues.comment,
+          }
           try {
-            await this.identityNumbersService.addIdentityNumbers(
+            await this.identityNumbersService.updateIdentityNumber(
               clientToken,
               res.locals.user as PrisonUser,
               prisonerNumber,
+              +offenderId,
+              +seqId,
               request,
             )
           } catch (error) {
@@ -140,11 +184,11 @@ export default class IdentityNumbersController {
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(req.body))
         req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/identity-numbers`) // TODO CORRECT THIS
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/identity-number/${offenderId}-${seqId}`)
       }
 
       req.flash('flashMessage', {
-        text: 'PLACEHOLDER',
+        text: `${label} updated`,
         type: FlashMessageType.success,
         fieldName: 'identity-numbers',
       })
@@ -154,7 +198,7 @@ export default class IdentityNumbersController {
           user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
-          action: PostAction.AddIdNumbers,
+          action: PostAction.EditIdNumber,
           details: { formValues },
         })
         .catch(error => logger.error(error))
@@ -290,5 +334,10 @@ export default class IdentityNumbersController {
         })
       }
     })
+  }
+
+  private parseIdentifierIds(url: string): (string | undefined)[] {
+    const tokens = url?.split('/')?.pop()?.split('-')
+    return [tokens?.[0], tokens?.[1]]
   }
 }
