@@ -21,7 +21,7 @@
         </div>
         {% if editable and editEnabled %}
           <div class="action-link-container">
-            <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/identity-number/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
           </div>
         {% endif %}
       </div>
@@ -33,7 +33,7 @@
       </div>
       {% if editable and editEnabled %}
         <div class="action-link-container">
-          <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/identity-number/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
         </div>
       {% endif %}
     </div>

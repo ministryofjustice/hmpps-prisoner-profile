@@ -551,20 +551,20 @@ describe('PersonalPageService', () => {
     ])('Maps the data from the API - %s', async (_, profileEditEnabled: boolean) => {
       const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, false, profileEditEnabled)
       expect(identityNumbers.justice.croNumber).toEqual([
-        { offenderId: 1, sequenceId: 1, comment: 'P/CONS', value: '400862/08W' },
+        { offenderId: 1, sequenceId: 1, comment: 'P/CONS', value: '400862/08W', editPageUrl: 'cro' },
       ])
       expect(identityNumbers.personal.drivingLicenceNumber).toEqual([
-        { offenderId: 1, sequenceId: 6, value: 'ABCD/123456/AB9DE' },
+        { offenderId: 1, sequenceId: 6, value: 'ABCD/123456/AB9DE', editPageUrl: 'driving-licence' },
       ])
       expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([
-        { offenderId: 1, sequenceId: 8, value: 'A1234567' },
+        { offenderId: 1, sequenceId: 8, value: 'A1234567', editPageUrl: 'home-office-reference' },
       ])
       expect(identityNumbers.personal.nationalInsuranceNumber).toEqual([
-        { offenderId: 1, sequenceId: 7, value: 'QQ123456C' },
+        { offenderId: 1, sequenceId: 7, value: 'QQ123456C', editPageUrl: 'national-insurance' },
       ])
       expect(identityNumbers.justice.pncNumber).toEqual([
-        { offenderId: 1, sequenceId: 2, comment: 'P/CONS', value: '08/359381C' },
-        { offenderId: 1, sequenceId: 3, comment: 'P/CONS - fixed', value: '8/359381C' },
+        { offenderId: 1, sequenceId: 2, comment: 'P/CONS', value: '08/359381C', editPageUrl: 'pnc' },
+        { offenderId: 1, sequenceId: 3, comment: 'P/CONS - fixed', value: '8/359381C', editPageUrl: 'pnc' },
       ])
       expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
 

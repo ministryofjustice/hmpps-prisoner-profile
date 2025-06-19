@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { apostrophe, formatLocation, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -84,126 +84,118 @@ export default class IdentityNumbersController {
 
   public idNumber() {
     return {
-      edit: this.updateIdNumber(),
-      submit: this.postUpdateIdNumber(),
-    }
-  }
+      edit: async (req: Request, res: Response) => {
+        const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
+        const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
+        const { clientToken } = req.middleware
+        const errors = req.flash('errors')
+        const [offenderId, seqId] = this.parseIdentifierIds(req)
 
-  private updateIdNumber(): RequestHandler {
-    return async (req: Request, res: Response) => {
-      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-      const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-      const { clientToken } = req.middleware
-      const errors = req.flash('errors')
-      const [offenderId, seqId] = this.parseIdentifierIds(req.url)
+        const existingIdentifier = await this.identityNumbersService.getIdentityNumber(clientToken, +offenderId, +seqId)
+        const { type, label } = Object.values(IdentifierMappings).find(item => item.type === existingIdentifier.type)
+        const identifierLabel = label || 'ID number'
 
-      const existingIdentifier = await this.identityNumbersService.getIdentityNumber(clientToken, +offenderId, +seqId)
-      const { type, label } = Object.values(IdentifierMappings).find(item => item.type === existingIdentifier.type)
-      const identifierLabel = label || 'ID number'
-
-      const requestBodyFlash = requestBodyFromFlash<EditIdentityNumberSubmission>(req)
-      const formValues = requestBodyFlash || {
-        type: existingIdentifier.type,
-        value: existingIdentifier.value,
-        comment: existingIdentifier.issuedAuthorityText,
-      }
-
-      this.auditService
-        .sendPageView({
-          user: res.locals.user,
-          prisonerNumber,
-          prisonId,
-          correlationId: req.id,
-          page: Page.EditIdNumber,
-        })
-        .catch(error => logger.error(error))
-
-      return res.render('pages/identityNumbers/editIdentityNumber', {
-        pageTitle: `${identifierLabel} - Prisoner personal details`,
-        title: `Change ${apostrophe(naturalPrisonerName)} ${identifierLabel}`,
-        formValues,
-        identifierType: type,
-        errors,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-          cellLocation: formatLocation(cellLocation),
-        },
-      })
-    }
-  }
-
-  private postUpdateIdNumber(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = req.params
-      const { clientToken } = req.middleware
-      const [offenderId, seqId] = this.parseIdentifierIds(req.url)
-      const errors = req.errors || []
-      const formValues: { type?: string; value?: string; comment?: string } = req.body
-      const { label } = Object.values(IdentifierMappings).find(item => item.type === formValues.type)
-
-      if (!errors.length) {
-        const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
-
-        if (
-          existingIdentifiers.some(
-            id =>
-              id.type === formValues.type &&
-              !(id.offenderId === +offenderId && id.offenderIdSeq === +seqId) &&
-              id.value?.toUpperCase() === formValues.value?.toUpperCase(),
-          )
-        ) {
-          errors.push({
-            text: `This ${label} already exists. Enter a different ${label}`,
-            href: `#identifier-value-input`,
-          })
+        const requestBodyFlash = requestBodyFromFlash<EditIdentityNumberSubmission>(req)
+        const formValues = requestBodyFlash || {
+          type: existingIdentifier.type,
+          value: existingIdentifier.value,
+          comment: existingIdentifier.issuedAuthorityText,
         }
+
+        this.auditService
+          .sendPageView({
+            user: res.locals.user,
+            prisonerNumber,
+            prisonId,
+            correlationId: req.id,
+            page: Page.EditIdNumber,
+          })
+          .catch(error => logger.error(error))
+
+        return res.render('pages/identityNumbers/editIdentityNumber', {
+          pageTitle: `${identifierLabel} - Prisoner personal details`,
+          title: `Change ${apostrophe(naturalPrisonerName)} ${identifierLabel}`,
+          formValues,
+          identifierType: type,
+          errors,
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const [offenderId, seqId] = this.parseIdentifierIds(req)
+        const errors = req.errors || []
+        const formValues: { type?: string; value?: string; comment?: string } = req.body
+        const { label, editPageUrl } = Object.values(IdentifierMappings).find(item => item.type === formValues.type)
 
         if (!errors.length) {
-          const request: UpdateIdentifierRequestDto = {
-            value: formValues.value,
-            comments: formValues.comment,
-          }
-          try {
-            await this.identityNumbersService.updateIdentityNumber(
-              clientToken,
-              res.locals.user as PrisonUser,
-              prisonerNumber,
-              +offenderId,
-              +seqId,
-              request,
+          const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
+
+          if (
+            existingIdentifiers.some(
+              id =>
+                id.type === formValues.type &&
+                !(id.offenderId === +offenderId && id.offenderIdSeq === +seqId) &&
+                id.value?.toUpperCase() === formValues.value?.toUpperCase(),
             )
-          } catch (error) {
-            if (error.status === 400) {
-              errors.push({ text: error?.data?.userMessage ?? error.message })
-            } else throw error
+          ) {
+            errors.push({
+              text: `This ${label} already exists. Enter a different ${label}`,
+              href: `#identifier-value-input`,
+            })
+          }
+
+          if (!errors.length) {
+            const request: UpdateIdentifierRequestDto = {
+              value: formValues.value,
+              comments: formValues.comment,
+            }
+            try {
+              await this.identityNumbersService.updateIdentityNumber(
+                clientToken,
+                res.locals.user as PrisonUser,
+                prisonerNumber,
+                +offenderId,
+                +seqId,
+                request,
+              )
+            } catch (error) {
+              if (error.status === 400) {
+                errors.push({ text: error?.data?.userMessage ?? error.message })
+              } else throw error
+            }
           }
         }
-      }
 
-      if (errors.length) {
-        req.flash('requestBody', JSON.stringify(req.body))
-        req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/identity-number/${offenderId}-${seqId}`)
-      }
+        if (errors.length) {
+          req.flash('requestBody', JSON.stringify(req.body))
+          req.flash('errors', errors)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/${editPageUrl}/${offenderId}-${seqId}`)
+        }
 
-      req.flash('flashMessage', {
-        text: `${label} updated`,
-        type: FlashMessageType.success,
-        fieldName: 'identity-numbers',
-      })
-
-      this.auditService
-        .sendPostSuccess({
-          user: res.locals.user,
-          prisonerNumber,
-          correlationId: req.id,
-          action: PostAction.EditIdNumber,
-          details: { formValues },
+        req.flash('flashMessage', {
+          text: `${label} updated`,
+          type: FlashMessageType.success,
+          fieldName: 'identity-numbers',
         })
-        .catch(error => logger.error(error))
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.EditIdNumber,
+            details: { formValues },
+          })
+          .catch(error => logger.error(error))
+
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
+      },
     }
   }
 
@@ -336,8 +328,8 @@ export default class IdentityNumbersController {
     })
   }
 
-  private parseIdentifierIds(url: string): (string | undefined)[] {
-    const tokens = url?.split('/')?.pop()?.split('-')
+  private parseIdentifierIds(req: Request): (string | undefined)[] {
+    const tokens = req.params?.compositeId?.split('-')
     return [tokens?.[0], tokens?.[1]]
   }
 }

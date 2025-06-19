@@ -11,7 +11,8 @@ import {
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 import { PrisonerMockDataA } from './prisoner'
-import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifier'
+
+import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',

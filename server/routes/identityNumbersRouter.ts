@@ -52,9 +52,9 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Edit individual existing ID numbers
-  get('/identity-number/:seqId', editProfileChecks(), identityNumbersController.idNumber().edit)
+  get('/:identifier/:compositeId', editProfileChecks(), identityNumbersController.idNumber().edit)
   post(
-    '/identity-number/:seqId',
+    '/:identifier/:compositeId',
     editProfileChecks(),
     validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,

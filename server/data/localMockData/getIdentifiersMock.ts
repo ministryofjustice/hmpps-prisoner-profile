@@ -1,4 +1,5 @@
-import OffenderIdentifier, { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifier'
+import OffenderIdentifier from '../interfaces/prisonApi/OffenderIdentifier'
+import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
 
 export const GetIdentifiersMock: OffenderIdentifier[] = [
   {

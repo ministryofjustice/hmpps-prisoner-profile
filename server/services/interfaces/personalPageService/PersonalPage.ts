@@ -84,6 +84,7 @@ export interface IdentityNumber {
   offenderId: number
   sequenceId: number
   value: string
+  editPageUrl: string
   comment?: string
 }
 

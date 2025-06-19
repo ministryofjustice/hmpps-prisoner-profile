@@ -21,7 +21,7 @@ context('Add personal IDs', () => {
       cy.task('stubGetIdentifier', { offenderId, seqId })
       cy.task('stubUpdateIdentifier', { offenderId, seqId })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/identity-number/${offenderId}-${seqId}`,
+    editUrl: `prisoner/${prisonerNumber}/personal/pnc/${offenderId}-${seqId}`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Change John Saunders’ PNC number',
     successfulFlashMessage: 'PNC number updated',

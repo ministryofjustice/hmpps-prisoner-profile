@@ -15,7 +15,8 @@ import {
   PersonalIdentifierMappings,
 } from '../data/constants/identifierMappings'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifier'
+
+import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 
 describe('IdentityNumbersController', () => {
   let req: Request
@@ -256,7 +257,10 @@ describe('IdentityNumbersController', () => {
     const seqId = 1
 
     beforeEach(() => {
-      req.url = `http://localhost:3000/prisoner/AA1234A/personal/identity-number/${offenderId}-${seqId}`
+      req.params = {
+        compositeId: `${offenderId}-${seqId}`,
+        prisonerNumber: 'G6123VU',
+      }
       jest.spyOn(identityNumbersService, 'getIdentityNumber').mockResolvedValue({
         ...GetIdentifierMock,
         type,
@@ -264,7 +268,7 @@ describe('IdentityNumbersController', () => {
     })
 
     it(`should render the page`, async () => {
-      await controller.idNumber().edit(req, res, next)
+      await controller.idNumber().edit(req, res)
 
       expect(identityNumbersService.getIdentityNumber).toHaveBeenCalledWith('CLIENT_TOKEN', offenderId, seqId)
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
@@ -282,7 +286,7 @@ describe('IdentityNumbersController', () => {
     })
 
     it('should record a page view event', async () => {
-      await controller.idNumber().edit(req, res, next)
+      await controller.idNumber().edit(req, res)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: res.locals.user,
@@ -305,7 +309,7 @@ describe('IdentityNumbersController', () => {
         return null
       })
 
-      await controller.idNumber().edit(req, res, next)
+      await controller.idNumber().edit(req, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
         pageTitle: `${typeLabel} - Prisoner personal details`,
@@ -323,15 +327,18 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    [OffenderIdentifierType.PncNumber, 'PNC number updated'],
-    [OffenderIdentifierType.NationalInsuranceNumber, 'National Insurance number updated'],
-    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'Home Office reference number updated'],
-  ])('Submit ID number update', (type: OffenderIdentifierType, successFlash: string) => {
+    [OffenderIdentifierType.PncNumber, 'PNC number updated', 'pnc'],
+    [OffenderIdentifierType.NationalInsuranceNumber, 'National Insurance number updated', 'national-insurance'],
+    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'Home Office reference number updated', 'home-office-reference'],
+  ])('Submit ID number update', (type: OffenderIdentifierType, successFlash: string, editPageUrl: string) => {
     const offenderId = 1
     const seqId = 1
 
     beforeEach(() => {
-      req.url = `http://localhost:3000/prisoner/AA1234A/personal/identity-number/${offenderId}-${seqId}`
+      req.params = {
+        compositeId: `${offenderId}-${seqId}`,
+        prisonerNumber: 'G6123VU',
+      }
       req.body = {
         value: '2002/0073319Z',
         comment: 'Some updated comment',
@@ -387,7 +394,7 @@ describe('IdentityNumbersController', () => {
 
       expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/identity-number/1-1`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/prison-legacy-system/1-1`)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual(
         'This Prison legacy system number already exists. Enter a different Prison legacy system number',
@@ -402,7 +409,7 @@ describe('IdentityNumbersController', () => {
 
       expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/identity-number/1-1`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
     })
 
     it('should handle bad request response from client', async () => {
@@ -416,7 +423,7 @@ describe('IdentityNumbersController', () => {
       await controller.idNumber().submit(req, res, next)
 
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/identity-number/1-1`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
     })
   })
 })

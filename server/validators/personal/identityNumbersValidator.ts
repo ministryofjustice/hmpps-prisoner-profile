@@ -1,8 +1,8 @@
 import { IdentifierMappings } from '../../data/constants/identifierMappings'
 import HmppsError from '../../interfaces/HmppsError'
 import { AddIdentityNumberSubmission } from '../../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
-import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifier'
 import { EditIdentityNumberSubmission } from '../../controllers/identityNumbersController'
+import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifierType'
 
 const MAX_LENGTH = 20
 const MAX_COMMENT_LENGTH = 240

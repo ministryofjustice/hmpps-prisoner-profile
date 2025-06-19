@@ -1,5 +1,6 @@
 import { addIdentityNumbersValidator, editIdentityNumberValidator } from './identityNumbersValidator'
-import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifier'
+
+import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifierType'
 
 describe('AddIdentityNumbersValidator', () => {
   it('Valid data', () => {
