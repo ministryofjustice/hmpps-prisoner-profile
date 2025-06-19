@@ -284,14 +284,11 @@ export const domesticStatusFieldData: RadioFieldData = {
   redirectAnchor: 'personal-details',
 }
 
-export const emailAddressTextFieldData = (
-  id: string,
-  name: { firstName: string; lastName: string },
-): TextFieldData => ({
-  url: `email-addresses/${id}`,
+export const emailAddressTextFieldData = (): TextFieldData => ({
+  url: `placeholder`,
   fieldName: 'emailAddress',
-  pageTitle: `Change this person’s email address`,
-  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  pageTitle: `placeholder`,
+  formTitle: `placeholder`,
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
   auditEditPageLoad: Page.EditEmailAddress,
@@ -299,6 +296,35 @@ export const emailAddressTextFieldData = (
   redirectAnchor: 'phones-and-emails',
   inputClasses: 'govuk-!-width-one-third',
   submitButtonText: 'Save and return to profile',
+})
+
+export const changeEmailAddressTextFieldData = (
+  id: string,
+  {
+    name,
+  }: {
+    name: { firstName: string; lastName: string }
+  },
+): TextFieldData => ({
+  ...emailAddressTextFieldData(),
+  url: `email-addresses/${id}`,
+  pageTitle: `Change this person’s email address`,
+  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  auditEditPageLoad: Page.EditEmailAddress,
+  auditEditPostAction: PostAction.EditEmailAddress,
+})
+
+export const addEmailAddressTextFieldData = ({
+  name,
+}: {
+  name: { firstName: string; lastName: string }
+}): TextFieldData => ({
+  ...emailAddressTextFieldData(),
+  url: `add-email-address`,
+  pageTitle: `Add this person’s email address`,
+  formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  auditEditPageLoad: Page.AddEmailAddress,
+  auditEditPostAction: PostAction.AddEmailAddress,
 })
 
 export const changePhoneNumberFieldData = (id: string, name: { firstName: string; lastName: string }): FieldData => ({

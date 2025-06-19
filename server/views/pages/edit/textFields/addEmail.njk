@@ -1,0 +1,15 @@
+{% extends "../textField.njk" %}
+{% block extraActions %}
+  <div class="govuk-button-group">
+    {{ govukButton({
+      text: "Add another email address",
+      id: "submit-and-add-another",
+      type: "submit",
+      preventDoubleClick: true,
+      classes: "govuk-button--secondary hmpps-button__add-another"
+    }) }}
+  </div>
+{% endblock %}
+{% block pageScripts %}
+  <script src="/assets/js/addAnotherButton.js"></script>
+{% endblock %}

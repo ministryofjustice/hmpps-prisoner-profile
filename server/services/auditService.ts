@@ -12,6 +12,7 @@ export enum Page {
   AddCaseNote = 'ADD_CASE_NOTE',
   AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
   AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
+  AddEmailAddress = 'ADD_EMAIL_ADDRESS',
   AddHomeOfficeIdNumbers = 'ADD_HOME_OFFICE_ID_NUMBERS',
   AddJusticeIdNumbers = 'ADD_JUSTICE_ID_NUMBERS',
   AddPersonalIdNumbers = 'ADD_PERSONAL_ID_NUMBERS',
@@ -141,6 +142,7 @@ export enum ApiAction {
 export enum PostAction {
   AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
   AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
+  AddEmailAddress = 'ADD_EMAIL_ADDRESS',
   AddIdNumbers = 'ADD_IDENTITY_NUMBERS',
   AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
   AddNewAlias = 'ADD_NEW_ALIAS',

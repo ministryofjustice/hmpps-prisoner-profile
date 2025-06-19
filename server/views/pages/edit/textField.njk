@@ -1,45 +1,13 @@
-{% extends "../index.njk" %}
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
-{% set hideBackLink = true %}
-{%
-  set breadCrumbs = [
-    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
-    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
-  ]
-%}
-{% block body %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-  </div>
-
-  {% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {{
-          govukErrorSummary({
-              titleText: "There is a problem",
-              errorList: errors,
-              attributes: { 'data-qa-errors': true },
-              classes: 'govuk-!-margin-bottom-6'
-          })
-        }}
-      </div>
-    </div>
-  {% endif %}
-
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% extends "./editPage.njk" %}
+{% block form %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
-        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          {{
-            govukInput({
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+          {{ govukInput({
               label: {
                 text: formTitle,
                 classes: "govuk-label--l",
@@ -53,24 +21,20 @@
               },
               classes: inputClasses if inputClasses,
               errorMessage: { text: errors[0].text } if errors.length > 0
-            })
-          }}
+            }) }}
         </div>
+        {% block extraActions %}{% endblock %}
         <div class="govuk-button-group">
-          {{
-            govukButton({
+          {{ govukButton({
             text: submitButtonText if submitButtonText else "Save",
             type: "submit",
             preventDoubleClick: true,
             attributes: { "data-qa": "edit-submit-button" }
-            })
-          }}
+            }) }}
           <a
-            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}"
             class="govuk-link govuk-link--no-visited-state"
-            data-qa="edit-cancel-button"
-            >Cancel</a
-          >
+            data-qa="edit-cancel-button">Cancel</a>
         </div>
       </form>
     </div>

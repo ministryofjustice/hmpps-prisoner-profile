@@ -1364,6 +1364,7 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
+          redirectAnchor: 'appearance',
         })
       })
 
@@ -1471,6 +1472,7 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
+          redirectAnchor: 'personal-details',
         })
       })
 
@@ -3234,153 +3236,317 @@ describe('PersonalController', () => {
   })
 
   describe('Emails', () => {
-    describe('Edit an email', () => {
-      const action = async (req: any, response: any) => controller.globalEmails().edit.edit(req, response, () => {})
+    describe('Creating an email', () => {
+      describe('edit', () => {
+        const action = async (req: any, response: any) => controller.globalEmails().add.edit(req, response, () => {})
 
-      beforeEach(() => {
-        personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
-      })
+        beforeEach(() => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+        })
 
-      it('Renders the default edit page with the correct data', async () => {
-        const req = {
-          params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
-          flash: (): any => {
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        it('Renders the default edit page with the correct data', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
 
-        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
-          pageTitle: 'Change this person’s email address - Prisoner personal details',
-          formTitle: `Change First Last’s email address`,
-          hintText: 'For example name@email.co.uk',
-          fieldName: 'emailAddress',
-          fieldValue: 'one@example.com',
-          inputClasses: 'govuk-!-width-one-third',
-          submitButtonText: 'Save and return to profile',
-          prisonerNumber: 'ABC123',
-          breadcrumbPrisonerName: 'Last, First',
-          errors: [],
-          miniBannerData: {
-            cellLocation: '2-3-001',
-            prisonerName: 'Last, First',
+          expect(res.render).toHaveBeenCalledWith('pages/edit/textFields/addEmail', {
+            pageTitle: 'Add this person’s email address - Prisoner personal details',
+            formTitle: `Add First Last’s email address`,
+            hintText: 'For example name@email.co.uk',
+            fieldName: 'emailAddress',
+            fieldValue: '',
+            inputClasses: 'govuk-!-width-one-third',
+            submitButtonText: 'Save and return to profile',
             prisonerNumber: 'ABC123',
-          },
+            breadcrumbPrisonerName: 'Last, First',
+            redirectAnchor: 'phones-and-emails',
+            errors: [],
+            miniBannerData: {
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
+            },
+          })
+        })
+
+        it('Populates the errors from the flash', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (key: string): any => {
+              if (key === 'errors') return ['error']
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+        })
+
+        it('Populates the field value from the flash', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (key: string): any => {
+              return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ fieldValue: 'foo@bar.com' }),
+          )
+        })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.AddEmailAddress,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
-      it('Populates the errors from the flash', async () => {
-        const req = {
-          params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
-          flash: (key: string): any => {
-            if (key === 'errors') return ['error']
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
-        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
-      })
+      describe('submit', () => {
+        let validRequest: any
+        const action = async (req: any, response: any) => controller.globalEmails().add.submit(req, response, () => {})
 
-      it('Populates the field value from the flash', async () => {
-        const req = {
-          params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
-          flash: (key: string): any => {
-            return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
-          },
-          middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
-        expect(res.render).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.objectContaining({ fieldValue: 'foo@bar.com' }),
-        )
-      })
+        beforeEach(() => {
+          validRequest = {
+            id: '1',
+            middleware: defaultMiddleware,
+            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            body: { emailAddress: 'foo@example.com' },
+            flash: jest.fn(),
+          } as any
 
-      it('Sends a page view audit event', async () => {
-        const req = {
-          id: 1,
-          params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
-          flash: (): any => {
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as any
-        const expectedAuditEvent = {
-          user: prisonUserMock,
-          prisonerNumber: 'ABC123',
-          prisonId: 999,
-          correlationId: req.id,
-          page: Page.EditEmailAddress,
-        }
+          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+        })
 
-        await action(req, res)
+        it('Updates the email', async () => {
+          await action(validRequest, res)
+          expect(personalPageService.createGlobalEmail).toHaveBeenCalledWith('token', 'A1234BC', 'foo@example.com')
+        })
 
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        it('Redirects to the personal page #phones-and-emais on success', async () => {
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+        })
+
+        it('Redirects back when add another is added as a query param', async () => {
+          await action({ ...validRequest, query: { addAnother: 'true' } }, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
+        })
+
+        it('Adds the success message to the flash', async () => {
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+            text: 'Email address updated',
+            type: FlashMessageType.success,
+            fieldName: 'emailAddress',
+          })
+        })
+
+        it('Handles API errors', async () => {
+          personalPageService.createGlobalEmail = async () => {
+            throw new Error()
+          }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'A1234BC',
+            correlationId: request.id,
+            action: PostAction.AddEmailAddress,
+            details: { fieldName: 'emailAddress', previous: '', updated: 'foo@bar.com' },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
     })
+    describe('Edit an email', () => {
+      describe('edit', () => {
+        const action = async (req: any, response: any) => controller.globalEmails().edit.edit(req, response, () => {})
 
-    describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.globalEmails().edit.submit(req, response, () => {})
+        beforeEach(() => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+        })
 
-      beforeEach(() => {
-        validRequest = {
-          id: '1',
-          middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-          body: { emailAddress: 'foo@example.com' },
-          flash: jest.fn(),
-        } as any
+        it('Renders the default edit page with the correct data', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
 
-        personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
-      })
+          expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
+            pageTitle: 'Change this person’s email address - Prisoner personal details',
+            formTitle: `Change First Last’s email address`,
+            hintText: 'For example name@email.co.uk',
+            fieldName: 'emailAddress',
+            fieldValue: 'one@example.com',
+            inputClasses: 'govuk-!-width-one-third',
+            submitButtonText: 'Save and return to profile',
+            prisonerNumber: 'ABC123',
+            redirectAnchor: 'phones-and-emails',
+            breadcrumbPrisonerName: 'Last, First',
+            errors: [],
+            miniBannerData: {
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
+            },
+          })
+        })
 
-      it('Updates the email', async () => {
-        await action(validRequest, res)
-        expect(personalPageService.updateGlobalEmail).toHaveBeenCalledWith('token', 'A1234BC', '234', 'foo@example.com')
-      })
+        it('Populates the errors from the flash', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (key: string): any => {
+              if (key === 'errors') return ['error']
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+        })
 
-      it('Redirects to the personal page #phones-and-emais on success', async () => {
-        await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
-      })
+        it('Populates the field value from the flash', async () => {
+          const req = {
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (key: string): any => {
+              return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ fieldValue: 'foo@bar.com' }),
+          )
+        })
 
-      it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123', emailAddressId: '234' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditEmailAddress,
+          }
 
-        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Email address updated',
-          type: FlashMessageType.success,
-          fieldName: 'emailAddress',
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
+      describe('submit', () => {
+        let validRequest: any
+        const action = async (req: any, response: any) => controller.globalEmails().edit.submit(req, response, () => {})
 
-      it('Handles API errors', async () => {
-        personalPageService.updateGlobalEmail = async () => {
-          throw new Error()
-        }
+        beforeEach(() => {
+          validRequest = {
+            id: '1',
+            middleware: defaultMiddleware,
+            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            body: { emailAddress: 'foo@example.com' },
+            flash: jest.fn(),
+          } as any
 
-        await action(validRequest, res)
+          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+        })
 
-        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/email-addresses/234')
-      })
+        it('Updates the email', async () => {
+          await action(validRequest, res)
+          expect(personalPageService.updateGlobalEmail).toHaveBeenCalledWith(
+            'token',
+            'A1234BC',
+            '234',
+            'foo@example.com',
+          )
+        })
 
-      it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } }
-        const expectedAuditEvent = {
-          user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
-          correlationId: request.id,
-          action: PostAction.EditEmailAddress,
-          details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
-        }
+        it('Redirects to the personal page #phones-and-emais on success', async () => {
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+        })
 
-        await action(request, res)
+        it('Adds the success message to the flash', async () => {
+          await action(validRequest, res)
 
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+            text: 'Email address updated',
+            type: FlashMessageType.success,
+            fieldName: 'emailAddress',
+          })
+        })
+
+        it('Handles API errors', async () => {
+          personalPageService.updateGlobalEmail = async () => {
+            throw new Error()
+          }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/email-addresses/234')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'A1234BC',
+            correlationId: request.id,
+            action: PostAction.EditEmailAddress,
+            details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
     })
   })

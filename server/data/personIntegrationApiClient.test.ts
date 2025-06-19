@@ -242,6 +242,17 @@ describe('personIntegrationApiClient', () => {
     })
   })
 
+  describe('createContact', () => {
+    it('Should create the contact and return the response', async () => {
+      fakePersonIntegrationApi.post('/v1/person/A1234AA/contacts').reply(200, ContactsResponseMock[1])
+      const result = await personIntegrationApiClient.createContact('A1234AA', {
+        contactType: 'EMAIL',
+        contactValue: 'updated@email.com',
+      })
+      expect(result).toEqual(ContactsResponseMock[1])
+    })
+  })
+
   describe('updateContact', () => {
     it('Should update the contact and return the response', async () => {
       fakePersonIntegrationApi.put('/v1/person/A1234AA/contacts/10').reply(200, ContactsResponseMock[1])

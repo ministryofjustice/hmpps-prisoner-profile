@@ -1143,6 +1143,24 @@ describe('PersonalPageService', () => {
       })
     })
 
+    describe('createaEmailForPrisonerNumber', () => {
+      it('Creates the email using the service', async () => {
+        const service = constructService()
+        globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber = jest.fn(
+          async () => globalEmailsMock[0],
+        )
+
+        const result = await service.createGlobalEmail('token', 'ABC123', 'email@email.com')
+
+        expect(globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber).toHaveBeenCalledWith(
+          'token',
+          'ABC123',
+          'email@email.com',
+        )
+        expect(result).toEqual(globalEmailsMock[0])
+      })
+    })
+
     describe('updateEmailForPrisonerNumber', () => {
       it('Updates the email using the service', async () => {
         const service = constructService()
