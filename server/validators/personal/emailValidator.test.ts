@@ -8,9 +8,13 @@ describe('Email validator', () => {
   })
 
   it.each([
-    [{ emailAddress: '' }, 'Enter an email address', '#emailAddress'],
-    [{ emailAddress: `${'1'.repeat(240)}@email.com` }, 'Email address must be 240 characters or less', '#emailAddress'],
-    [{ emailAddress: 'notanemail' }, 'Email address must include an @ symbol', '#emailAddress'],
+    [{ emailAddress: '' }, 'Enter an email address', '#email-address'],
+    [
+      { emailAddress: `${'1'.repeat(240)}@email.com` },
+      'Email address must be 240 characters or less',
+      '#email-address',
+    ],
+    [{ emailAddress: 'notanemail' }, 'Email address must include an @ symbol', '#email-address'],
   ])(
     'Validations: %s: %s',
     async ({ emailAddress }: { emailAddress: string }, errorMessage: string, errorHref: string) => {

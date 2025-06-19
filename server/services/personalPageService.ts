@@ -2,6 +2,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   GlobalEmail,
   GlobalNumbersAndEmails,
+  GlobalPhoneNumber,
   IdentityNumbers,
   NextOfKin,
   OldAddresses,
@@ -110,6 +111,20 @@ export default class PersonalPageService {
       prisonerNumber,
       emailAddressId,
       value,
+    )
+  }
+
+  async updateGlobalPhoneNumber(
+    token: string,
+    prisonerNumber: string,
+    phoneNumberId: string,
+    values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
+  ): Promise<GlobalPhoneNumber> {
+    return this.globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber(
+      token,
+      prisonerNumber,
+      phoneNumberId,
+      values,
     )
   }
 
