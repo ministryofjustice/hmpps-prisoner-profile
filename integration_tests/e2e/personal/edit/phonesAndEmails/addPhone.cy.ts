@@ -51,5 +51,6 @@ context('Change phone number', () => {
     editPageTitle: 'Add John Saunders’s phone number',
     successfulFlashMessage: 'Phone number updated',
     redirectAnchor: 'phones-and-emails',
+    submitButtonId: 'edit-submit-button',
   })
 })

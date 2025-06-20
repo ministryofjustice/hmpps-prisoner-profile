@@ -80,8 +80,8 @@
     </div>
   </div>
 {% endblock %}
-{% if addAnotherEnabled %}
-  {% block pageScripts %}
+{% block pageScripts %}
+  {% if addAnotherEnabled %}
     <script src="/assets/js/addAnotherButton.js"></script>
-  {% endblock %}
-{% endif %}
+  {% endif %}
+{% endblock %}
