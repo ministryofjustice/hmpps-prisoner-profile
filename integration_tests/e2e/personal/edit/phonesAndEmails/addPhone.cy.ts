@@ -1,5 +1,5 @@
 import { Role } from '../../../../../server/data/enums/role'
-import ChangePhoneNumber from '../../../../pages/editPages/phonesAndEmails/changePhoneNumber'
+import AddPhoneNumber from '../../../../pages/editPages/phonesAndEmails/addPhoneNumber'
 import { editPageTests } from '../editPageTests'
 
 context('Change phone number', () => {
@@ -7,7 +7,7 @@ context('Change phone number', () => {
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
-  editPageTests<ChangePhoneNumber>({
+  editPageTests<AddPhoneNumber>({
     prisonerNumber,
     prisonerName,
     bookingId,
@@ -17,9 +17,9 @@ context('Change phone number', () => {
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-      cy.task('stubPersonIntegrationUpdateContact', { prisonerNumber, contactId: '1' })
+      cy.task('stubPersonIntegrationCreateContact', { prisonerNumber })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/phone-numbers/1`,
+    editUrl: `prisoner/${prisonerNumber}/personal/add-phone-number`,
     validInputs: [
       { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '1234321', phoneExtension: '123' } },
       { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123) 123 123', phoneExtension: '123' } },
@@ -47,9 +47,10 @@ context('Change phone number', () => {
         errorMessages: ['Extension must be 7 characters or less'],
       },
     ],
-    editPageWithTitle: ChangePhoneNumber,
-    editPageTitle: 'Change John Saunders’s phone number',
+    editPageWithTitle: AddPhoneNumber,
+    editPageTitle: 'Add John Saunders’s phone number',
     successfulFlashMessage: 'Phone number updated',
     redirectAnchor: 'phones-and-emails',
+    submitButtonId: 'edit-submit-button',
   })
 })
