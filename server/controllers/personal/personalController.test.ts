@@ -3572,6 +3572,7 @@ describe('PersonalController', () => {
             phoneTypeOptions: expect.not.arrayContaining([expect.objectContaining({ checked: true })]),
             phoneExtension: undefined,
             phoneNumber: undefined,
+            addAnotherEnabled: true,
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
@@ -3662,6 +3663,11 @@ describe('PersonalController', () => {
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+        })
+
+        it('Redirects to the add phone number page on success with add another specified', async () => {
+          await action({ ...validRequest, query: { addAnother: 'true' } }, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
         })
 
         it('Adds the success message to the flash', async () => {

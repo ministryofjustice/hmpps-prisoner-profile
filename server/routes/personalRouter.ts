@@ -508,7 +508,6 @@ export default function personalRouter(services: Services): Router {
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
-        redirectTo: ({ phoneNumberId }) => `personal/phone-numbers/${phoneNumberId}`,
       },
     },
   })

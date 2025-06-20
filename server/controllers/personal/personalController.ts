@@ -1625,6 +1625,17 @@ export default class PersonalController {
       }))
     }
 
+    const onAdditionSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
+      const { prisonerNumber } = req.params
+      const addAnother = req.query?.addAnother ?? 'false'
+
+      if (addAnother === 'true') {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+      }
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${fieldData.redirectAnchor}`)
+    }
+
     return {
       add: {
         edit: async (req: Request, res: Response, _next: NextFunction) => {
@@ -1662,6 +1673,7 @@ export default class PersonalController {
             prisonerNumber,
             breadcrumbPrisonerName: prisonerBannerName,
             errors,
+            addAnotherEnabled: true,
             phoneTypeOptions: phoneTypeOptions(phoneValue?.type),
             phoneNumber: phoneValue?.number,
             phoneExtension: phoneValue?.extension,
@@ -1699,6 +1711,7 @@ export default class PersonalController {
               previous: {},
               updated: { phoneNumber, phoneNumberType, phoneExtension },
             },
+            options: { onSubmit: onAdditionSubmit },
           })
         },
       },
