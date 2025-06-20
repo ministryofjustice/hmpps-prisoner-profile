@@ -231,7 +231,8 @@ export default class PersonalPageService {
       prisonerDetail,
       secondaryLanguages,
       property,
-      addressList,
+      oldAddressList,
+      addresses,
       offenderContacts,
       identifiers,
       beliefs,
@@ -250,6 +251,7 @@ export default class PersonalPageService {
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       !editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
+      editProfileEnabled ? personIntegrationApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
@@ -276,7 +278,7 @@ export default class PersonalPageService {
       editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
     ])
 
-    const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(addressList)
+    const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(oldAddressList)
 
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
@@ -300,6 +302,16 @@ export default class PersonalPageService {
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
+      addresses: {
+        primaryOrPostal:
+          addresses?.filter(
+            address =>
+              (address.primaryAddress || address.postalAddress) &&
+              (!address.toDate || new Date(address.toDate) > new Date()),
+          ) || [],
+        totalActive:
+          addresses?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
+      },
       oldAddresses,
       oldAddressSummary: this.addressSummary(oldAddresses),
       nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),

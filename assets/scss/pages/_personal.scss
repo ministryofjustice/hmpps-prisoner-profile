@@ -217,6 +217,10 @@
   }
 }
 
+.not-entered-tag.not-entered-tag--wide {
+  max-width: 600px !important;
+}
+
 .last-updated-summary {
   font-size: 10pt;
 }
@@ -303,5 +307,27 @@
   &__phone, &__email{
     display: flex;
     justify-content: space-between;
+  }
+}
+
+.hmpps-address {
+  &__additional-details {
+    width: 95%;
+
+    .govuk-summary-list__key {
+      width: 25%;
+    }
+
+    dl.govuk-summary-list {
+      margin-bottom: 0;
+    }
+  }
+
+  &__added-date {
+    color: $govuk-secondary-text-colour;
+  }
+
+  &__break {
+    margin-bottom: 30px;
   }
 }
