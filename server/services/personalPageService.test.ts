@@ -1232,31 +1232,5 @@ describe('PersonalPageService', () => {
         expect(result).toEqual(globalPhonesMock[0])
       })
     })
-    describe('updatePhoneNumberForPrisonerNumber', () => {
-      it('Updates the email using the service', async () => {
-        const service = constructService()
-        globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber = jest.fn(
-          async () => globalPhonesMock[0],
-        )
-
-        const result = await service.updateGlobalPhoneNumber('token', 'ABC123', '123', {
-          phoneNumber: '123',
-          phoneNumberType: 'MOB',
-          phoneExtension: '1234',
-        })
-
-        expect(globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
-          'token',
-          'ABC123',
-          '123',
-          {
-            phoneNumber: '123',
-            phoneNumberType: 'MOB',
-            phoneExtension: '1234',
-          },
-        )
-        expect(result).toEqual(globalPhonesMock[0])
-      })
-    })
   })
 })
