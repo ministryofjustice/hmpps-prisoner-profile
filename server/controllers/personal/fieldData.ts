@@ -284,19 +284,14 @@ export const domesticStatusFieldData: RadioFieldData = {
   redirectAnchor: 'personal-details',
 }
 
-export const emailAddressTextFieldData = (): TextFieldData => ({
-  url: `placeholder`,
+const baseEmailAddressTextFieldData = {
   fieldName: 'emailAddress',
-  pageTitle: `placeholder`,
-  formTitle: `placeholder`,
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
-  auditEditPageLoad: Page.EditEmailAddress,
-  auditEditPostAction: PostAction.EditEmailAddress,
   redirectAnchor: 'phones-and-emails',
   inputClasses: 'govuk-!-width-one-third',
   submitButtonText: 'Save and return to profile',
-})
+}
 
 export const changeEmailAddressTextFieldData = (
   id: string,
@@ -306,7 +301,7 @@ export const changeEmailAddressTextFieldData = (
     name: { firstName: string; lastName: string }
   },
 ): TextFieldData => ({
-  ...emailAddressTextFieldData(),
+  ...baseEmailAddressTextFieldData,
   url: `email-addresses/${id}`,
   pageTitle: `Change this person’s email address`,
   formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
@@ -319,7 +314,7 @@ export const addEmailAddressTextFieldData = ({
 }: {
   name: { firstName: string; lastName: string }
 }): TextFieldData => ({
-  ...emailAddressTextFieldData(),
+  ...baseEmailAddressTextFieldData,
   url: `add-email-address`,
   pageTitle: `Add this person’s email address`,
   formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
@@ -327,13 +322,26 @@ export const addEmailAddressTextFieldData = ({
   auditEditPostAction: PostAction.AddEmailAddress,
 })
 
-export const changePhoneNumberFieldData = (id: string, name: { firstName: string; lastName: string }): FieldData => ({
-  auditEditPageLoad: Page.EditPhoneNumber,
-  auditEditPostAction: PostAction.EditPhoneNumber,
+const basePhoneNumberFieldData = {
   fieldName: 'phoneNumber',
-  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
-  pageTitle: `Change this person’s phone number`,
   redirectAnchor: 'phones-and-emails',
   successFlashFieldName: 'Phone number',
+}
+
+export const addPhoneNumberFieldData = (name: { firstName: string; lastName: string }): FieldData => ({
+  ...basePhoneNumberFieldData,
+  auditEditPageLoad: Page.AddPhoneNumber,
+  auditEditPostAction: PostAction.AddPhoneNumber,
+  formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
+  pageTitle: `Add this person’s phone number`,
+  url: `add-phone-number`,
+})
+
+export const changePhoneNumberFieldData = (id: string, name: { firstName: string; lastName: string }): FieldData => ({
+  ...basePhoneNumberFieldData,
+  auditEditPageLoad: Page.EditPhoneNumber,
+  auditEditPostAction: PostAction.EditPhoneNumber,
+  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
+  pageTitle: `Change this person’s phone number`,
   url: `phone-numbers/${id}`,
 })
