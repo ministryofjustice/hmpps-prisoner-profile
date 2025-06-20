@@ -496,16 +496,31 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
-  // Global numbers (Not yet implemented)
+  editRoute({
+    path: 'add-phone-number',
+    edit: {
+      audit: Page.AddPhoneNumber,
+      method: personalController.globalNumbers().add.edit,
+    },
+    submit: {
+      audit: Page.PostAddPhoneNumber,
+      method: personalController.globalNumbers().add.submit,
+      validation: {
+        validators: [phoneNumberValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
+
   editRoute({
     path: 'phone-numbers/:phoneNumberId',
     edit: {
-      audit: Page.EditDomesticStatus,
-      method: personalController.globalNumbers().edit,
+      audit: Page.EditPhoneNumber,
+      method: personalController.globalNumbers().edit.edit,
     },
     submit: {
-      audit: Page.PostEditDomesticStatus,
-      method: personalController.globalNumbers().submit,
+      audit: Page.PostEditPhoneNumber,
+      method: personalController.globalNumbers().edit.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
@@ -518,11 +533,11 @@ export default function personalRouter(services: Services): Router {
   editRoute({
     path: 'add-email-address',
     edit: {
-      audit: Page.EditEmailAddress,
+      audit: Page.AddEmailAddress,
       method: personalController.globalEmails().add.edit,
     },
     submit: {
-      audit: Page.PostEditEmailAddress,
+      audit: Page.AddEmailAddress,
       method: personalController.globalEmails().add.submit,
       validation: {
         validators: [emailValidator],
