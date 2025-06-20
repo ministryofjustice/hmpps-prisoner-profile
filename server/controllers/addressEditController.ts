@@ -328,6 +328,7 @@ export default class AddressEditController {
         noFixedAddressCheckbox: addressLocation === AddressLocation.overseas,
         breadcrumbPrisonerName: prisonerName,
         backLink: addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address',
+        prisonerNumber,
         miniBannerData: {
           prisonerNumber,
           prisonerName,
