@@ -1,9 +1,103 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% call summaryCard({title: "Addresses", id: "addresses"}) %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% macro addressSummary(address, primaryOrPostal) %}
+  <div class="hmpps-address" id="hmpps-address-{{ primaryOrPostal }}">
+    {{ caller() }}
+    {% if address.noFixedAbode %}<p class="govuk-body govuk-!-margin-bottom-1">No fixed address</p>{% endif %}
+    {% if address.subBuildingName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.subBuildingName }}</p>{% endif %}
+    {% if address.buildingName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.buildingName }}</p>{% endif %}
+    {% if address.thoroughfareName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{% if address.buildingNumber %}{{ address.buildingNumber }}{% endif %} {{ address.thoroughfareName }}</p>{% endif %}
+    {% if address.dependantLocality %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.dependantLocality }}</p>{% endif %}
+    {% if address.city %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.city.description }}</p>{% endif %}
+    {% if address.county %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.county.description }}</p>{% endif %}
+    {% if address.postCode %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.postCode }}</p>{% endif %}
+    {% if address.country %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.country.description }}</p>{% endif %}
+
+    {% set addressUsageTypesHtml %}
+      {% for addressType in address.addressTypes %}
+        {% if addressType.active %}
+          <p class="govuk-body">{{ addressType.addressUsageType.description }}</p>
+        {% endif %}
+      {% endfor %}
+    {% endset %}
+
+    {% set addressDatesText %}
+      From {{ address.fromDate | formatAddressDate }}{% if address.toDate %} to {{ address.toDate | formatAddressDate }}{% endif %}
+    {% endset %}
+
+    {% set additionalDetailsHtml %}
+      <div class="hmpps-address__additional-details">
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: { text: "Type" },
+              value: { html: addressUsageTypesHtml }
+            },
+            {
+              key: { text: "Dates" },
+              value: { text: addressDatesText }
+            },
+            {
+              key: { text: "Address phone numbers" },
+              value: { html: "Not entered" }
+            },
+            {
+              key: { text: "Comments" },
+              value: { text: 'Not entered' }
+            }
+          ]
+        }) }}
+      </div>
+    {% endset %}
+
+    {{ govukDetails({
+      summaryText: "Additional address details",
+      html: additionalDetailsHtml,
+      classes: 'govuk-!-margin-top-5'
+    }) }}
+
+    <p class="hmpps-address__added-date govuk-body-s">Added on {{ address.fromDate | formatDate }}</p>
+    <hr class="hmpps-address__break govuk-section-break govuk-section-break--visible">
+  </div>
+{% endmacro %}
+
+{% call summaryCard({
+  title: "Addresses",
+  id: "addresses",
+  actions: [{ text: 'Add a home address', href: 'personal/where-is-address' }] if editEnabled
+}) %}
   <div class="govuk-grid-row" data-qa="addresses">
     <div class="govuk-grid-column-full">
-        <p>Work in progress...</p>
+      {% if addresses.primaryOrPostal | length %}
+        {% for address in addresses.primaryOrPostal %}
+          {% if address.primaryAddress and address.postalAddress %}
+            {% call addressSummary(address, 'primary-and-postal') %}
+              <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary and postal address</span>
+            {% endcall %}
+          {% elseif address.primaryAddress %}
+            {% call addressSummary(address, 'primary') %}
+              <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary address</span>
+            {% endcall %}
+          {% elseif address.postalAddress %}
+            {% call addressSummary(address, 'postal') %}
+              <span class="govuk-caption-m govuk-!-margin-bottom-2">Postal address</span>
+            {% endcall %}
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p class="govuk-body govuk-!-margin-bottom-4 {% if newArrival72 %}not-entered-tag not-entered-tag--wide{% endif %}">
+          No active primary or postal addresses entered{% if not newArrival72 %}.{% endif %}
+        </p>
+      {% endif %}
+      {% if addresses.totalActive > 0 %}
+        <div class="govuk-!-padding-bottom-4">
+          <a href="/prisoner/{{ prisonerNumber }}/addresses" class="govuk-link govuk-link--no-visited-state" data-qa="all-addresses-link">
+            View all addresses ({{ addresses.totalActive }})
+          </a>
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endcall %}

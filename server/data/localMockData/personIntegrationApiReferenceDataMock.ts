@@ -1,5 +1,4 @@
 import {
-  AddressResponseDto,
   AddIdentifierRequestDto,
   ContactsResponseDto,
   CorePersonRecordReferenceDataCodeDto,
@@ -447,13 +446,6 @@ export const PseudonymResponseMock: PseudonymResponseDto = {
     description: 'White',
   },
   isWorkingName: true,
-}
-
-export const AddressResponseMock: AddressResponseDto = {
-  addressId: 1,
-  personId: PrisonerMockDataA.prisonerNumber,
-  fromDate: '2025-06-13',
-  addressTypes: [],
 }
 
 export const ContactsResponseMock: ContactsResponseDto[] = [

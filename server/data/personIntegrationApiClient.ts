@@ -1,11 +1,11 @@
 import { Readable } from 'stream'
 import RestClient from './restClient'
 import {
+  AddIdentifierRequestDto,
   AddressRequestDto,
   AddressResponseDto,
   ContactsRequestDto,
   ContactsResponseDto,
-  AddIdentifierRequestDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,

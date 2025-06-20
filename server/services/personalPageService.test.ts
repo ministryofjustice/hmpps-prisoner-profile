@@ -22,6 +22,7 @@ import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import {
+  AddressResponseDto,
   PersonIntegrationApiClient,
   PseudonymResponseDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -66,6 +67,7 @@ import {
   globalPhonesAndEmailsMock,
   globalPhonesMock,
 } from '../data/localMockData/globalPhonesAndEmails'
+import { mockAddressResponseDto } from '../data/localMockData/personIntegrationApi/addresses'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -733,6 +735,58 @@ describe('PersonalPageService', () => {
   })
 
   describe('Addresses', () => {
+    it('Handles the API returning 404 for addresses', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async (): Promise<AddressResponseDto[]> => null)
+      const { addresses } = await constructService().get('token', PrisonerMockDataA)
+      expect(addresses).toEqual({ primaryOrPostal: [], totalActive: 0 })
+    })
+
+    it('Provides primary or postal addresses and a total count', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([
+          mockAddressResponseDto,
+          { ...mockAddressResponseDto, primaryAddress: false, postalAddress: false },
+        ])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(2)
+      expect(primaryOrPostal).toHaveLength(1)
+      expect(primaryOrPostal[0]).toEqual(mockAddressResponseDto)
+    })
+
+    it('Filters out addresses that are no longer active', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([{ ...mockAddressResponseDto, toDate: '2025-01-01' }])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(0)
+      expect(primaryOrPostal).toHaveLength(0)
+    })
+
+    it('Handles addresses with no toDate', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([{ ...mockAddressResponseDto, toDate: undefined }])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(1)
+      expect(primaryOrPostal).toHaveLength(1)
+    })
+  })
+
+  // TODO: Remove this once profile edit is rolled out:
+  describe('Old Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
       prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)
       const { oldAddresses, oldAddressSummary } = await constructService().get('token', PrisonerMockDataA)

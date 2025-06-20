@@ -73,7 +73,7 @@
       {%- endcall -%}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          {% if editEnabled %}
+          {% if displayNewAddressesCard %}
             {% include "../partials/personalPage/addresses.njk" %}
           {% else %}
             {% include "../partials/personalPage/oldAddresses.njk" %}

@@ -1,5 +1,6 @@
 import { AddressRequestDto, AddressResponseDto } from '../../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PrisonerMockDataA } from '../prisoner'
+import { ReferenceDataValue } from '../../interfaces/ReferenceDataValue'
 
 export const mockAddressRequestDto: AddressRequestDto = {
   uprn: 321,
@@ -24,7 +25,7 @@ export const mockAddressResponseDto: AddressResponseDto = {
   addressId: 123,
   personId: PrisonerMockDataA.prisonerNumber,
   uprn: 321,
-  noFixedAbode: false,
+  noFixedAbode: true,
   subBuildingName: 'Flat 1',
   buildingName: 'The Flats',
   buildingNumber: '1',
@@ -47,8 +48,8 @@ export const mockAddressResponseDto: AddressResponseDto = {
   },
   postCode: 'A1 2BC',
   fromDate: '2024-06-16',
-  toDate: '2025-06-16',
-  addressTypes: [],
+  toDate: '2099-06-16',
+  addressTypes: [{ active: true, addressUsageType: { description: 'Home' } as ReferenceDataValue }],
   postalAddress: true,
   primaryAddress: true,
 }

@@ -93,9 +93,17 @@ export default class PersonalPage extends Page {
   }
 
   addresses = () => {
-    const cardData = () => cy.get('[data-qa=addresses]')
+    const primaryAndPostalAddress = () => cy.get('#hmpps-address-primary-and-postal')
+    const summaryListValues = () => primaryAndPostalAddress().find('.govuk-summary-list__value')
     return {
-      placeholder: () => cardData(),
+      addressHeading: () => primaryAndPostalAddress().get('span'),
+      address: () => primaryAndPostalAddress().get('p'),
+      addressTypes: () => summaryListValues().eq(0),
+      addressDates: () => summaryListValues().eq(1),
+      addressPhoneNumbers: () => summaryListValues().eq(2),
+      addressComments: () => summaryListValues().eq(3),
+      addressAddedDate: () => primaryAndPostalAddress().get('.hmpps-address__added-date'),
+      addressesLink: () => cy.getDataQa('all-addresses-link'),
     }
   }
 
