@@ -12,11 +12,11 @@ import {
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
 import {
-  AddressResponseMock,
   ContactsResponseMock,
   PseudonymResponseMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
+import { mockAddressResponseDto } from '../../server/data/localMockData/personIntegrationApi/addresses'
 
 const baseUrl = '/personIntegration'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -275,7 +275,7 @@ export default {
 
   stubGetAddresses: ({
     prisonerNumber,
-    response = [AddressResponseMock],
+    response = [mockAddressResponseDto],
   }: {
     prisonerNumber: string
     response: AddressResponseDto[]

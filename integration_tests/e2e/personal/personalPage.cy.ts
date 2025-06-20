@@ -457,6 +457,37 @@ context('When signed in', () => {
       })
     })
 
+    context('Addresses', () => {
+      it('Displays prisoner addresses', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.addresses().addressHeading().should('include.text', 'Primary and postal address')
+
+        page.addresses().address().should('include.text', 'No fixed address')
+        page.addresses().address().should('include.text', 'Flat 1')
+        page.addresses().address().should('include.text', 'The Flats')
+        page.addresses().address().should('include.text', '1 The Road')
+        page.addresses().address().should('include.text', 'The Area')
+        page.addresses().address().should('include.text', 'South Yorkshire')
+        page.addresses().address().should('include.text', 'A1 2BC')
+        page.addresses().address().should('include.text', 'England')
+
+        page.addresses().addressTypes().should('include.text', 'Home')
+        page.addresses().addressDates().should('include.text', 'From June 2024 to June 2099')
+        page.addresses().addressPhoneNumbers().should('include.text', 'Not entered')
+        page.addresses().addressComments().should('include.text', 'Not entered')
+
+        page.addresses().addressAddedDate().should('include.text', 'Added on 16 June 2024')
+
+        page.addresses().addressesLink().should('include.text', 'View all addresses (1)')
+        page
+          .addresses()
+          .addressesLink()
+          .get(`a[href="/prisoner/${prisonerNumber}/addresses"]`)
+          .should('exist')
+          .should('include.text', 'View all addresses (1)')
+      })
+    })
+
     context('Security', () => {
       it('Displays the security warnings', () => {
         const page = Page.verifyOnPage(PersonalPage)
@@ -652,24 +683,6 @@ context('When signed in', () => {
         page.neurodiversity().neurodiversitySelfAssessment().should('not.exist')
         page.neurodiversity().neurodiversityAssessed().should('not.exist')
         page.neurodiversity().neurodiversityTitle().should('not.exist')
-      })
-    })
-  })
-
-  context('Profile editing is enabled', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
-      cy.setupComponentsData()
-      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-      cy.task('stubPersonalCareNeeds')
-      visitPersonalDetailsPage()
-    })
-
-    context('Addresses', () => {
-      it('Displays a placeholder', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        page.addresses().placeholder().should('include.text', 'Work in progress...')
       })
     })
   })
