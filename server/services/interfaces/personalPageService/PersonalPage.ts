@@ -3,6 +3,7 @@ import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { Result } from '../../../utils/result/result'
 import {
+  AddressResponseDto,
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
 } from '../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -12,6 +13,10 @@ export default interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
+  addresses: {
+    primaryOrPostal: AddressResponseDto[]
+    totalActive: number
+  }
   oldAddresses: OldAddresses // TODO remove after edit profile is rolled out
   oldAddressSummary: GovSummaryItem[] // TODO remove after edit profile is rolled out
   nextOfKin: NextOfKin[]
@@ -81,7 +86,10 @@ export interface DietAndAllergyDetails {
 }
 
 export interface IdentityNumber {
+  offenderId: number
+  sequenceId: number
   value: string
+  editPageUrl: string
   comment?: string
 }
 

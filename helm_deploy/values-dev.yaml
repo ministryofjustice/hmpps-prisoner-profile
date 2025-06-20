@@ -90,7 +90,7 @@ generic-service:
     DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"
     DIET_AND_ALLERGY_ENABLED_FROM: "2025-04-11T13:00:00"
     EDIT_PROFILE_ENABLED: "true"
-    EDIT_PROFILE_ENABLED_PRISONS: "KMI,HEI,NMI"
+    EDIT_PROFILE_ENABLED_PRISONS: "STI,KMI,HEI,NMI"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
     EXTERNAL_CONTACTS_ENABLED_PRISONS: "KMI,SPI,GNI,LGI"
     MANAGE_ALLOCATIONS_ENABLED: "true"
@@ -102,6 +102,7 @@ generic-service:
       - moj_cloud_platform
       - prisons
       - accessibility-testing-1
+      - kilco_uat
 
   scheduledDowntime:
     enabled: true

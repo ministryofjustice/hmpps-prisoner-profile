@@ -72,11 +72,11 @@ export default class PersonalPage extends Page {
       homeOfficeNumbersHeading: () => cardData('home-office-numbers-section-heading'),
       additionalNumbersHeading: () => cardData('additional-identity-numbers-section-heading'),
       prisonNumber: () => cardData('prison-number'),
-      pncNumber: () => cardData('pnc-number'),
-      croNumber: () => cardData('cro-number'),
-      homeOfficeReferenceNumber: () => cardData('home-office-reference-number'),
-      nationalInsuranceNumber: () => cardData('national-insurance-number'),
-      drivingLicenceNumber: () => cardData('driving-licence-number'),
+      pncNumber: () => cardData('pnc'),
+      croNumber: () => cardData('cro'),
+      homeOfficeReferenceNumber: () => cardData('home-office-reference'),
+      nationalInsuranceNumber: () => cardData('national-insurance'),
+      drivingLicenceNumber: () => cardData('driving-licence'),
     }
   }
 
@@ -93,9 +93,17 @@ export default class PersonalPage extends Page {
   }
 
   addresses = () => {
-    const cardData = () => cy.get('[data-qa=addresses]')
+    const primaryAndPostalAddress = () => cy.get('#hmpps-address-primary-and-postal')
+    const summaryListValues = () => primaryAndPostalAddress().find('.govuk-summary-list__value')
     return {
-      placeholder: () => cardData(),
+      addressHeading: () => primaryAndPostalAddress().get('span'),
+      address: () => primaryAndPostalAddress().get('p'),
+      addressTypes: () => summaryListValues().eq(0),
+      addressDates: () => summaryListValues().eq(1),
+      addressPhoneNumbers: () => summaryListValues().eq(2),
+      addressComments: () => summaryListValues().eq(3),
+      addressAddedDate: () => primaryAndPostalAddress().get('.hmpps-address__added-date'),
+      addressesLink: () => cy.getDataQa('all-addresses-link'),
     }
   }
 

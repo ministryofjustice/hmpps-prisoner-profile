@@ -22,6 +22,7 @@ import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import {
+  AddressResponseDto,
   PersonIntegrationApiClient,
   PseudonymResponseDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -66,6 +67,7 @@ import {
   globalPhonesAndEmailsMock,
   globalPhonesMock,
 } from '../data/localMockData/globalPhonesAndEmails'
+import { mockAddressResponseDto } from '../data/localMockData/personIntegrationApi/addresses'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -550,13 +552,21 @@ describe('PersonalPageService', () => {
       ['Profile edit disabled', false],
     ])('Maps the data from the API - %s', async (_, profileEditEnabled: boolean) => {
       const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, false, profileEditEnabled)
-      expect(identityNumbers.justice.croNumber).toEqual([{ comment: 'P/CONS', value: '400862/08W' }])
-      expect(identityNumbers.personal.drivingLicenceNumber).toEqual([{ value: 'ABCD/123456/AB9DE' }])
-      expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([{ value: 'A1234567' }])
-      expect(identityNumbers.personal.nationalInsuranceNumber).toEqual([{ value: 'QQ123456C' }])
+      expect(identityNumbers.justice.croNumber).toEqual([
+        { offenderId: 1, sequenceId: 1, comment: 'P/CONS', value: '400862/08W', editPageUrl: 'cro' },
+      ])
+      expect(identityNumbers.personal.drivingLicenceNumber).toEqual([
+        { offenderId: 1, sequenceId: 6, value: 'ABCD/123456/AB9DE', editPageUrl: 'driving-licence' },
+      ])
+      expect(identityNumbers.homeOffice.homeOfficeReferenceNumber).toEqual([
+        { offenderId: 1, sequenceId: 8, value: 'A1234567', editPageUrl: 'home-office-reference' },
+      ])
+      expect(identityNumbers.personal.nationalInsuranceNumber).toEqual([
+        { offenderId: 1, sequenceId: 7, value: 'QQ123456C', editPageUrl: 'national-insurance' },
+      ])
       expect(identityNumbers.justice.pncNumber).toEqual([
-        { comment: 'P/CONS', value: '08/359381C' },
-        { comment: 'P/CONS - fixed', value: '8/359381C' },
+        { offenderId: 1, sequenceId: 2, comment: 'P/CONS', value: '08/359381C', editPageUrl: 'pnc' },
+        { offenderId: 1, sequenceId: 3, comment: 'P/CONS - fixed', value: '8/359381C', editPageUrl: 'pnc' },
       ])
       expect(identityNumbers.justice.prisonNumber).toEqual('G6123VU')
 
@@ -725,6 +735,58 @@ describe('PersonalPageService', () => {
   })
 
   describe('Addresses', () => {
+    it('Handles the API returning 404 for addresses', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async (): Promise<AddressResponseDto[]> => null)
+      const { addresses } = await constructService().get('token', PrisonerMockDataA)
+      expect(addresses).toEqual({ primaryOrPostal: [], totalActive: 0 })
+    })
+
+    it('Provides primary or postal addresses and a total count', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([
+          mockAddressResponseDto,
+          { ...mockAddressResponseDto, primaryAddress: false, postalAddress: false },
+        ])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(2)
+      expect(primaryOrPostal).toHaveLength(1)
+      expect(primaryOrPostal[0]).toEqual(mockAddressResponseDto)
+    })
+
+    it('Filters out addresses that are no longer active', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([{ ...mockAddressResponseDto, toDate: '2025-01-01' }])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(0)
+      expect(primaryOrPostal).toHaveLength(0)
+    })
+
+    it('Handles addresses with no toDate', async () => {
+      personIntegrationApiClient.getAddresses = jest
+        .fn()
+        .mockResolvedValue([{ ...mockAddressResponseDto, toDate: undefined }])
+
+      const {
+        addresses: { primaryOrPostal, totalActive },
+      } = await constructService().get('token', PrisonerMockDataA, false, true)
+
+      expect(totalActive).toEqual(1)
+      expect(primaryOrPostal).toHaveLength(1)
+    })
+  })
+
+  // TODO: Remove this once profile edit is rolled out:
+  describe('Old Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
       prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)
       const { oldAddresses, oldAddressSummary } = await constructService().get('token', PrisonerMockDataA)
@@ -1143,7 +1205,7 @@ describe('PersonalPageService', () => {
       })
     })
 
-    describe('createaEmailForPrisonerNumber', () => {
+    describe('createEmailForPrisonerNumber', () => {
       it('Creates the email using the service', async () => {
         const service = constructService()
         globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber = jest.fn(
@@ -1180,8 +1242,34 @@ describe('PersonalPageService', () => {
       })
     })
 
-    describe('updatePhoneNumberForPrisonerNumber', () => {
-      it('Updates the email using the service', async () => {
+    describe('createGlobalPhoneNumber', () => {
+      it('Creates the phone number using the service', async () => {
+        const service = constructService()
+        globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber = jest.fn(
+          async () => globalPhonesMock[0],
+        )
+
+        const result = await service.createGlobalPhoneNumber('token', 'ABC123', {
+          phoneNumber: '123',
+          phoneNumberType: 'MOB',
+          phoneExtension: '1234',
+        })
+
+        expect(globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
+          'token',
+          'ABC123',
+          {
+            phoneNumber: '123',
+            phoneNumberType: 'MOB',
+            phoneExtension: '1234',
+          },
+        )
+        expect(result).toEqual(globalPhonesMock[0])
+      })
+    })
+
+    describe('updateGlobalPhoneNumber', () => {
+      it('Updates the phone number using the service', async () => {
         const service = constructService()
         globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber = jest.fn(
           async () => globalPhonesMock[0],

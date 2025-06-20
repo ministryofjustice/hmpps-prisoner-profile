@@ -14,7 +14,7 @@
           }
         }) %}
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-number-type") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number-type") }}">
           {{ govukRadios({
               name: "phoneNumberType",
               id: "phone-number-type",
@@ -28,7 +28,7 @@
               errorMessage: { text: (errors | findError("phone-type")).text } if errors | findError("phone-type")
             }) }}
         </div>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-number") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number") }}">
           {{ govukInput({
               label: {
                 text: "Phone number",
@@ -40,7 +40,7 @@
               errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
             }) }}
         </div>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-extension") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-extension") }}">
           {{ govukInput({
               label: {
                 text: "Extension (optional)",
@@ -53,6 +53,17 @@
             }) }}
         </div>
         {% endcall %}
+        {% if addAnotherEnabled %}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Add another phone number",
+              id: "submit-and-add-another",
+              type: "submit",
+              preventDoubleClick: true,
+              classes: "govuk-button--secondary hmpps-button__add-another"
+            }) }}
+          </div>
+        {% endif %}
         <div class="govuk-button-group">
           {{ govukButton({
             text: submitButtonText if submitButtonText else "Save",
@@ -68,4 +79,9 @@
       </form>
     </div>
   </div>
+{% endblock %}
+{% block pageScripts %}
+  {% if addAnotherEnabled %}
+    <script src="/assets/js/addAnotherButton.js"></script>
+  {% endif %}
 {% endblock %}

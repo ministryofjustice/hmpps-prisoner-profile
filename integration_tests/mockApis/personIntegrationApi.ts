@@ -12,11 +12,11 @@ import {
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
 import {
-  AddressResponseMock,
   ContactsResponseMock,
   PseudonymResponseMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
+import { mockAddressResponseDto } from '../../server/data/localMockData/personIntegrationApi/addresses'
 
 const baseUrl = '/personIntegration'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -275,7 +275,7 @@ export default {
 
   stubGetAddresses: ({
     prisonerNumber,
-    response = [AddressResponseMock],
+    response = [mockAddressResponseDto],
   }: {
     prisonerNumber: string
     response: AddressResponseDto[]
@@ -323,14 +323,15 @@ export default {
       responseBody: response ?? ContactsResponseMock[0],
     }),
 
-  stubAddIdentifiers: ({
-    prisonerNumber = PrisonerMockDataA.prisonerNumber,
-  }: {
-    prisonerNumber: string
-    status: number
-  }) =>
+  stubAddIdentifiers: ({ prisonerNumber = PrisonerMockDataA.prisonerNumber }: { prisonerNumber: string }) =>
     stubPostWithResponse<void>({
       path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      responseBody: null,
+    }),
+
+  stubUpdateIdentifier: ({ offenderId = 1, seqId = 1 }: { offenderId: number; seqId: number }) =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/identifiers\\?offenderId=${offenderId}&seqId=${seqId}&sourceSystem=NOMIS`,
       responseBody: null,
     }),
 }

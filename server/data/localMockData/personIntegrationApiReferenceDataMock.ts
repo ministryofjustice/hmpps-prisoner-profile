@@ -1,5 +1,4 @@
 import {
-  AddressResponseDto,
   AddIdentifierRequestDto,
   ContactsResponseDto,
   CorePersonRecordReferenceDataCodeDto,
@@ -7,10 +6,12 @@ import {
   PersonIntegrationDistinguishingMark,
   PseudonymRequestDto,
   PseudonymResponseDto,
+  UpdateIdentifierRequestDto,
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 import { PrisonerMockDataA } from './prisoner'
-import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifier'
+
+import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -447,13 +448,6 @@ export const PseudonymResponseMock: PseudonymResponseDto = {
   isWorkingName: true,
 }
 
-export const AddressResponseMock: AddressResponseDto = {
-  addressId: 1,
-  personId: PrisonerMockDataA.prisonerNumber,
-  fromDate: '2025-06-13',
-  addressTypes: [],
-}
-
 export const ContactsResponseMock: ContactsResponseDto[] = [
   {
     contactId: 1,
@@ -474,3 +468,8 @@ export const AddIdentityNumbersRequestMock: AddIdentifierRequestDto[] = [
     value: '2017/0239598Q',
   },
 ]
+
+export const UpdateIdentityNumberRequestMock: UpdateIdentifierRequestDto = {
+  value: '2017/0239598Q',
+  comments: 'Additional info',
+}

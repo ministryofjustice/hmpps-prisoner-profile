@@ -755,7 +755,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offenders/${prisonerNumber}/offender-identifiers.*`,
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/offender-identifiers\\?.*`,
       },
       response: {
         status: 200,
@@ -763,6 +763,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: identifiersMock,
+      },
+    })
+  },
+
+  stubGetIdentifier: ({ offenderId, seqId }: { offenderId: number; seqId: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/aliases/${offenderId}/offender-identifiers/${seqId}.*`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: identifiersMock[2],
       },
     })
   },
