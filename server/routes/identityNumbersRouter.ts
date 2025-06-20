@@ -7,11 +7,16 @@ import {
   addIdentityNumbersValidator,
   editIdentityNumberValidator,
 } from '../validators/personal/identityNumbersValidator'
+import { IdentifierMappings } from '../data/constants/identifierMappings'
 
 export default function identityNumbersRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+
+  const identityNumberRoutes = Object.values(IdentifierMappings)
+    .map(mapping => mapping.editPageUrl)
+    .join('|')
 
   const identityNumbersController = new IdentityNumbersController(
     services.identityNumbersService,
@@ -52,9 +57,13 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Edit individual existing ID numbers
-  get('/:identifier/:compositeId', editProfileChecks(), identityNumbersController.idNumber().edit)
+  get(
+    `/:identifier(${identityNumberRoutes})/:compositeId`,
+    editProfileChecks(),
+    identityNumbersController.idNumber().edit,
+  )
   post(
-    '/:identifier/:compositeId',
+    `/:identifier(${identityNumberRoutes})/:compositeId`,
     editProfileChecks(),
     validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,

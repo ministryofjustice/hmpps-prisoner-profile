@@ -181,7 +181,7 @@ export default class IdentityNumbersController {
         req.flash('flashMessage', {
           text: `${label} updated`,
           type: FlashMessageType.success,
-          fieldName: 'identity-numbers',
+          fieldName: `${editPageUrl}-row`,
         })
 
         this.auditService
