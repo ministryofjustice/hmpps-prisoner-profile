@@ -72,11 +72,11 @@ export default class PersonalPage extends Page {
       homeOfficeNumbersHeading: () => cardData('home-office-numbers-section-heading'),
       additionalNumbersHeading: () => cardData('additional-identity-numbers-section-heading'),
       prisonNumber: () => cardData('prison-number'),
-      pncNumber: () => cardData('pnc-number'),
-      croNumber: () => cardData('cro-number'),
-      homeOfficeReferenceNumber: () => cardData('home-office-reference-number'),
-      nationalInsuranceNumber: () => cardData('national-insurance-number'),
-      drivingLicenceNumber: () => cardData('driving-licence-number'),
+      pncNumber: () => cardData('pnc'),
+      croNumber: () => cardData('cro'),
+      homeOfficeReferenceNumber: () => cardData('home-office-reference'),
+      nationalInsuranceNumber: () => cardData('national-insurance'),
+      drivingLicenceNumber: () => cardData('driving-licence'),
     }
   }
 

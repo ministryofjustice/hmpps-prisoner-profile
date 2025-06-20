@@ -8,8 +8,8 @@ import OffenderIdentifier from '../../../data/interfaces/prisonApi/OffenderIdent
 
 describe('buildIdentityNumberOptions', () => {
   const mappings: Record<string, IdentifierMapping> = {
-    one: { type: 'ONE', label: 'First identifier' },
-    two: { type: 'TWO', label: 'Second identifier', hint: 'Also contains letters' },
+    one: { type: 'ONE', label: 'First identifier', editPageUrl: 'one' },
+    two: { type: 'TWO', label: 'Second identifier', hint: 'Also contains letters', editPageUrl: 'two' },
   }
 
   it('should build options from provided mappings', () => {
@@ -34,10 +34,14 @@ describe('buildIdentityNumberOptions', () => {
       {
         type: 'ONE',
         value: '123',
+        offenderId: 1,
+        offenderIdSeq: 1,
       },
       {
         type: 'THREE',
         value: '999',
+        offenderId: 1,
+        offenderIdSeq: 2,
       },
     ]
 

@@ -3,7 +3,7 @@
   <div class="govuk-summary-list__section-heading" data-qa="{{ id }}-section-heading">
     <h3>{{ value }}</h3>
     {% if actionEnabled and action.text.length > 0 %}
-      <div class="section-heading-link-container">
+      <div class="action-link-container">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ action.href }}">{{ action.text }}</a>
       </div>
     {% endif %}
