@@ -1,6 +1,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "partials/formatCvpLink.njk" import formatCvpLink %}
 
 {% extends "../../partials/layout.njk" %}
 
@@ -195,7 +196,23 @@
                             value: {
                                 text: videoLinkUrl or "Not yet known"
                             }
-                        }
+                        } if not bvlsHmctsLinkGuestPinEnabled(),
+                        {
+                            key: {
+                                text: "Court hearing link"
+                            },
+                            value: {
+                                text: formatCvpLink(hmctsNumber, videoLinkUrl, bvlsHmctsLinkGuestPinEnabled())
+                            }
+                        } if bvlsHmctsLinkGuestPinEnabled(),
+                        {
+                            key: {
+                                text: "Guest pin"
+                            },
+                            value: {
+                                text: guestPin or "None entered"
+                            }
+                        } if bvlsHmctsLinkGuestPinEnabled()
                     ]
                 }) }}
 

@@ -20,3 +20,5 @@ export const externalContactsEnabled = (activeCaseLoadId: string) =>
   config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
 
 export const bvlsMasterPublicPrivateNotesEnabled = () => config.featureToggles.bvlsMasterPublicPrivateNotesEnabled
+
+export const bvlsHmctsLinkGuestPinEnabled = () => config.featureToggles.bvlsHmctsLinkGuestPinEnabled

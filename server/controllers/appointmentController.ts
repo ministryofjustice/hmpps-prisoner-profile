@@ -40,7 +40,7 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
-import { bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
+import { bvlsHmctsLinkGuestPinEnabled, bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -427,8 +427,11 @@ export default class AppointmentController {
               postAppointmentLocation: postLocation,
               court: vlb.courtCode,
               hearingType: vlb.courtHearingType,
-              cvpRequired: vlb.videoLinkUrl ? 'yes' : 'no',
+              cvpRequired: vlb.videoLinkUrl || vlb.hmctsNumber ? 'yes' : 'no',
               videoLinkUrl: vlb.videoLinkUrl,
+              hmctsNumber: vlb.hmctsNumber,
+              guestPinRequired: vlb.guestPin ? 'yes' : 'no',
+              guestPin: vlb.guestPin,
             }
           })
         : undefined
@@ -447,24 +450,29 @@ export default class AppointmentController {
         throw new ServerError('PrePostAppointmentDetails not found in request')
       }
 
+      // Get the list values for courts, hearings, and locations
       const { courts, hearingTypes, locations } = await this.appointmentService.getPrePostAppointmentRefData(
         clientToken,
         user.activeCaseLoadId,
       )
 
+      // Get the prisoner details in context
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
 
+      // If editing, get the existing appointment into context
       const appointment = appointmentId
         ? await this.appointmentService.getAppointment(clientToken, +appointmentId)
         : null
 
+      // Build the form details - either from flash provider for a new booking, or from APIs when editing
       const { appointmentDefaults, appointmentForm, formValues } = await buildPrePostAppointmentDetails(
         clientToken,
         appointmentFlash,
         appointment,
       )
 
+      // Map the NOMIS location ids to DPS UUID
       let location
       if (appointmentDefaults.locationId) {
         const { dpsLocationId } = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
@@ -474,6 +482,7 @@ export default class AppointmentController {
         location = locations.find(loc => loc.id === dpsLocationId)?.localName
       }
 
+      // Build up an object for the appointment
       const appointmentData = {
         miniBannerData: {
           prisonerName,
@@ -500,6 +509,7 @@ export default class AppointmentController {
       // Store the current details for use on the next page - there can be only 1 entry in this flash key
       req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
 
+      // Audit the access to the pre-post appointments form
       this.auditService
         .sendPageView({
           user: res.locals.user,
@@ -538,9 +548,12 @@ export default class AppointmentController {
         hearingType,
         cvpRequired,
         videoLinkUrl,
+        hmctsNumber,
+        guestPinRequired,
+        guestPin,
       } = req.body
 
-      // Use the values provided from the previous page - it has already ensured there will be only 1entry
+      // Use the values provided from the previous page - it has already ensured there will be only 1 entry
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
         throw new ServerError('PostVideoLinkBooking: Appointment data not found in request')
@@ -562,9 +575,13 @@ export default class AppointmentController {
           hearingType,
           cvpRequired,
           videoLinkUrl,
+          hmctsNumber,
+          guestPinRequired,
+          guestPin,
         },
       }
 
+      // If there are no form errors create or amend the booking with these values
       const errors = req.errors || []
       if (!errors.length) {
         try {
@@ -682,7 +699,18 @@ export default class AppointmentController {
             : undefined,
         court: courtDescription,
         hearingType: hearingTypes.find(ht => ht.code === formValues.hearingType)?.description,
-        videoLinkUrl: formValues.cvpRequired === 'yes' && formValues.videoLinkUrl,
+        videoLinkUrl:
+          formValues.cvpRequired === 'yes' && formValues.videoLinkUrl && formValues.videoLinkUrl.length > 0
+            ? formValues.videoLinkUrl
+            : undefined,
+        hmctsNumber:
+          formValues.cvpRequired === 'yes' && formValues.hmctsNumber && formValues.hmctsNumber.length > 0
+            ? formValues.hmctsNumber
+            : undefined,
+        guestPin:
+          formValues.guestPinRequired === 'yes' && formValues.guestPin && formValues.guestPin.length > 0
+            ? formValues.guestPin
+            : undefined,
         mustContactTheCourt: courts.find(court => court.code === formValues.court)?.enabled === false,
       }
 
@@ -984,8 +1012,25 @@ export default class AppointmentController {
       probationMeetingType: appointmentForm.meetingType,
       comments: (!bvlsMasterPublicPrivateNotesEnabled() && appointments.comment) || undefined,
       videoLinkUrl:
-        (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' && prePostAppointmentForm.formValues.videoLinkUrl) ||
-        undefined,
+        prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
+        prePostAppointmentForm.formValues?.videoLinkUrl &&
+        prePostAppointmentForm.formValues.videoLinkUrl.length > 0
+          ? prePostAppointmentForm.formValues.videoLinkUrl
+          : undefined,
+      hmctsNumber:
+        bvlsHmctsLinkGuestPinEnabled() &&
+        prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
+        prePostAppointmentForm.formValues?.hmctsNumber &&
+        prePostAppointmentForm.formValues.hmctsNumber.length > 0
+          ? prePostAppointmentForm.formValues.hmctsNumber
+          : undefined,
+      guestPin:
+        bvlsHmctsLinkGuestPinEnabled() &&
+        prePostAppointmentForm?.formValues?.guestPinRequired === 'yes' &&
+        prePostAppointmentForm.formValues.guestPin &&
+        prePostAppointmentForm.formValues.guestPin?.length > 0
+          ? prePostAppointmentForm.formValues.guestPin
+          : undefined,
       additionalBookingDetails:
         appointmentForm.appointmentType === 'VLPM' && !appointmentForm.officerDetailsNotKnown
           ? {

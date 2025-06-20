@@ -136,16 +136,16 @@
                         ]
                     }) }}
                 {% else %}
-                <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Comments
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            <pre class="govuk-body">{{ comments }}</pre>
-                        </dd>
-                    </div>
-                </dl>
+                    <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Comments
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                <pre class="govuk-body">{{ comments }}</pre>
+                            </dd>
+                        </div>
+                    </dl>
                 {% endif %}
 
                 <form method="post">
@@ -242,15 +242,51 @@
                             }) }}
 
                             {% set courtHearingLinkHtml %}
-                                {{ govukInput({
-                                    name: "videoLinkUrl",
-                                    id: "videoLinkUrl",
-                                    label: {
-                                        text: "Court hearing link"
-                                    },
-                                    value: formValues.videoLinkUrl,
-                                    errorMessage: errors | findError("videoLinkUrl")
-                                }) }}
+                                {% if bvlsHmctsLinkGuestPinEnabled() %}
+                                    {{ govukInput({
+                                        id: "hmctsNumber",
+                                        name: "hmctsNumber",
+                                        label: {
+                                            text: "Enter number from CVP address",
+                                            classes: 'govuk-label--s'
+                                        },
+                                        hint: {
+                                            text: "For example 3476"
+                                        },
+                                        prefix: {
+                                            text: "HMCTS",
+                                            classes: 'govuk-label--s'
+                                        },
+                                        inputmode: "numeric",
+                                        classes: 'govuk-input--width-5',
+                                        errorMessage: errors | findError('hmctsNumber'),
+                                        value: formValues.hmctsNumber
+                                    }) }}
+
+                                    <p>Or</p>
+
+                                    {{ govukInput({
+                                        id: "videoLinkUrl",
+                                        name: "videoLinkUrl",
+                                        label: {
+                                            text: "Enter full web address (URL)",
+                                            classes: 'govuk-label--s'
+                                        },
+                                        classes: 'govuk-!-width-three-quarters',
+                                        errorMessage: errors | findError('videoLinkUrl'),
+                                        value: formValues.videoLinkUrl
+                                    }) }}
+                                {% else %}
+                                    {{ govukInput({
+                                        name: "videoLinkUrl",
+                                        id: "videoLinkUrl",
+                                        label: {
+                                            text: "Court hearing link"
+                                        },
+                                        value: formValues.videoLinkUrl,
+                                        errorMessage: errors | findError("videoLinkUrl")
+                                    }) }}
+                                {% endif %}
                             {% endset %}
 
                             {{ govukRadios({
@@ -281,6 +317,58 @@
                             }) }}
                         </div>
                     </div>
+
+                    {% if bvlsHmctsLinkGuestPinEnabled() %}
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-full">
+
+                                {% set guestPinHtml %}
+                                    {{ govukInput({
+                                        id: "guestPin",
+                                        name: "guestPin",
+                                        label: {
+                                            text: "Enter guest pin",
+                                            classes: 'govuk-label--s'
+                                        },
+                                        hint: {
+                                            text: "Some meetings require a guest pin for security reasons"
+                                        },
+                                        inputmode: "numeric",
+                                        classes: 'govuk-input--width-10',
+                                        errorMessage: errors | findError('guestPin'),
+                                        value: formValues.guestPin
+                                    }) }}
+                                {% endset %}
+
+                                {{ govukRadios({
+                                    idPrefix: "guestPinRequired",
+                                    name: "guestPinRequired",
+                                    errorMessage: errors | findError('guestPinRequired'),
+                                    fieldset: {
+                                        legend: {
+                                            text: "Is a guest pin required?",
+                                            classes: "govuk-fieldset__legend--s"
+                                        }
+                                    },
+                                    items: [
+                                        {
+                                            value: 'yes',
+                                            text: "Yes",
+                                            checked: formValues.guestPinRequired == 'yes',
+                                            conditional: {
+                                                html: guestPinHtml
+                                            }
+                                        },
+                                        {
+                                            value: 'no',
+                                            text: "No",
+                                            checked: formValues.guestPinRequired == 'no'
+                                        }
+                                    ]
+                                }) }}
+                            </div>
+                        </div>
+                    {% endif %}
 
                     <div class="govuk-button-group">
                         {{ govukButton({ text: "Save and continue" }) }}

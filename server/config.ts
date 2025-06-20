@@ -375,5 +375,7 @@ export default {
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     bvlsMasterPublicPrivateNotesEnabled: toBoolean(get('BVLS_FEATURE_MASTER_PUBLIC_PRIVATE_NOTES', 'false')),
+    bvlsHmctsLinkGuestPinEnabled: toBoolean(get('BVLS_FEATURE_HMCTS_LINK_GUEST_PIN', 'false')),
   },
+  defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
 }
