@@ -3,14 +3,16 @@ import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
-import { IdentityNumberSubmission } from '../validators/personal/identityNumbersValidator'
+import { AddIdentityNumberSubmission } from '../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
+import { EditIdentityNumberSubmission } from '../controllers/identityNumbersController'
 
 export type Validator = (
   body:
     | FileUploadRequest
-    | Record<string, string | string[] | IdentityNumberSubmission>
+    | Record<string, string | string[] | AddIdentityNumberSubmission>
     | BodySubmission
-    | DietAndFoodAllergiesSubmission,
+    | DietAndFoodAllergiesSubmission
+    | EditIdentityNumberSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
 export type RedirectWithParams = (params: Request['params']) => string

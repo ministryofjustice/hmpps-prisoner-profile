@@ -1,0 +1,100 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{%
+  set breadCrumbs = [
+      {
+          text: 'Digital Prison Services',
+          href:  "/" | prependBaseUrl
+      },
+      {
+          text: miniBannerData.prisonerName,
+          href: "/prisoner/" + prisonerNumber
+      },
+      {
+          text: 'Personal',
+          href: "/prisoner/" + prisonerNumber + "/personal"
+      }
+  ]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+  {% block body %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    </div>
+
+    {% if errors.length > 0 %}
+      {{
+        govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true },
+            classes: 'govuk-!-margin-bottom-6'
+        })
+      }}
+    {% endif %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <form method="post" novalidate="novalidate" autocomplete="off">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                <input type="hidden" name="type" value="{{ identifierType }}" />
+
+                {{ govukInput({
+                    id: 'identifier-value-input',
+                    name: 'value',
+                    label: {
+                        text: 'Number',
+                        classes: 'govuk-label--s'
+                    },
+                    value: formValues.value,
+                    errorMessage: errors | findError('identifier-value-input'),
+                    classes: "govuk-!-width-one-third"
+                }) }}
+
+                {{ govukCharacterCount({
+                    id: "identifier-comments-input",
+                    name: "comment",
+                    label: {
+                        text: "Comments (optional)",
+                        classes: 'govuk-label--s'
+                    },
+                    value: formValues.comment,
+                    maxlength: 240,
+                    rows: 3,
+                    errorMessage: errors | findError("identifier-comments-input"),
+                    classes: "govuk-!-width-three-quarters"
+                }) }}
+
+                <div class="govuk-button-group">
+                    {{ govukButton({
+                        text: "Save",
+                        type: "submit",
+                        preventDoubleClick: true,
+                        attributes: { "data-qa": "edit-save-button" }
+                    }) }}
+                    <a href="/prisoner/{{ prisonerNumber }}/personal#identity-numbers"
+                       class="govuk-link govuk-link--no-visited-state"
+                       data-qa="edit-cancel-button"
+                    >Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+  {% endblock %}
+{% endblock %}

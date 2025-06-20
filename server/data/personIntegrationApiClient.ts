@@ -16,6 +16,7 @@ import {
   PersonIntegrationDistinguishingMark,
   PseudonymRequestDto,
   PseudonymResponseDto,
+  UpdateIdentifierRequestDto,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -180,6 +181,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: `/v1/pseudonym`,
       query: { prisonerNumber, sourceSystem: 'NOMIS' },
       data: pseudonym,
+    })
+  }
+
+  updateIdentityNumber(offenderId: number, seqId: number, request: UpdateIdentifierRequestDto): Promise<void> {
+    return this.restClient.put({
+      path: `/v1/core-person-record/identifiers`,
+      query: { offenderId, seqId, sourceSystem: 'NOMIS' },
+      data: request,
     })
   }
 
