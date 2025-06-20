@@ -27,6 +27,7 @@ import {
   sortByLatestAndUuid,
   summaryListOneHalfWidth,
   toNonAssociationRows,
+  toFullCourtLink,
   userHasRoles,
 } from './utils'
 import { checkboxFieldDataToInputs } from './checkboxUtils'
@@ -61,7 +62,12 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { externalContactsEnabled, militaryHistoryEnabled, bvlsMasterPublicPrivateNotesEnabled } from './featureToggles'
+import {
+  externalContactsEnabled,
+  militaryHistoryEnabled,
+  bvlsMasterPublicPrivateNotesEnabled,
+  bvlsHmctsLinkGuestPinEnabled,
+} from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 
@@ -118,6 +124,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
   njkEnv.addGlobal('bvlsMasterPublicPrivateNotesEnabled', bvlsMasterPublicPrivateNotesEnabled)
+  njkEnv.addGlobal('bvlsHmctsLinkGuestPinEnabled', bvlsHmctsLinkGuestPinEnabled)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
@@ -212,4 +219,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
   njkEnv.addFilter('includes', arrayIncludes)
   njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
+
+  // BVLS specific filter
+  njkEnv.addFilter('toFullCourtLink', toFullCourtLink)
 }

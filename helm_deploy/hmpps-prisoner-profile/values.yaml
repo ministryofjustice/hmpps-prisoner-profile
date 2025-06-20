@@ -38,6 +38,7 @@ generic-service:
     OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
     PERSONAL_RELATIONSHIPS_API_READ_ENABLED: "false"
     BVLS_FEATURE_MASTER_PUBLIC_PRIVATE_NOTES: "true"
+    BVLS_FEATURE_HMCTS_LINK_GUEST_PIN: "true"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

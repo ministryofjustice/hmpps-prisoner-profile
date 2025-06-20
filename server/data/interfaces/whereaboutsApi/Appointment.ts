@@ -88,6 +88,9 @@ export interface PrePostAppointmentDetails {
     hearingType?: string
     cvpRequired?: string
     videoLinkUrl?: string
+    hmctsNumber?: string
+    guestPinRequired?: string
+    guestPin?: string
   }
 }
 
