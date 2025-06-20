@@ -22,10 +22,7 @@ import {
   sortByDateTime,
 } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
-import OffenderIdentifier, {
-  getOffenderIdentifierValue,
-  OffenderIdentifierType,
-} from '../data/interfaces/prisonApi/OffenderIdentifier'
+import OffenderIdentifier, { getOffenderIdentifierValue } from '../data/interfaces/prisonApi/OffenderIdentifier'
 import Address from '../data/interfaces/prisonApi/Address'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
@@ -74,6 +71,7 @@ import DomesticStatusService from './domesticStatusService'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { religionFieldData } from '../controllers/personal/fieldData'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
+import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 
 export default class PersonalPageService {
   constructor(

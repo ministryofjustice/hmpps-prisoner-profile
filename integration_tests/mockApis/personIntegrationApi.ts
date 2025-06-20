@@ -323,14 +323,15 @@ export default {
       responseBody: response ?? ContactsResponseMock[0],
     }),
 
-  stubAddIdentifiers: ({
-    prisonerNumber = PrisonerMockDataA.prisonerNumber,
-  }: {
-    prisonerNumber: string
-    status: number
-  }) =>
+  stubAddIdentifiers: ({ prisonerNumber = PrisonerMockDataA.prisonerNumber }: { prisonerNumber: string }) =>
     stubPostWithResponse<void>({
       path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      responseBody: null,
+    }),
+
+  stubUpdateIdentifier: ({ offenderId = 1, seqId = 1 }: { offenderId: number; seqId: number }) =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/identifiers\\?offenderId=${offenderId}&seqId=${seqId}&sourceSystem=NOMIS`,
       responseBody: null,
     }),
 }

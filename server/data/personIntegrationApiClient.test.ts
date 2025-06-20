@@ -9,6 +9,7 @@ import {
   MilitaryRecordsMock,
   PseudonymRequestMock,
   PseudonymResponseMock,
+  UpdateIdentityNumberRequestMock,
 } from './localMockData/personIntegrationApiReferenceDataMock'
 import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -213,6 +214,17 @@ describe('personIntegrationApiClient', () => {
       fakePersonIntegrationApi.put('/v1/pseudonym/12345?sourceSystem=NOMIS').reply(200, PseudonymResponseMock)
       const result = await personIntegrationApiClient.updatePseudonym(12345, PseudonymRequestMock)
       expect(result).toEqual(PseudonymResponseMock)
+    })
+  })
+
+  describe('updateIdentityNumber', () => {
+    it('should up[date existing identity number', async () => {
+      fakePersonIntegrationApi
+        .put('/v1/core-person-record/identifiers?offenderId=1&seqId=2&sourceSystem=NOMIS')
+        .reply(204)
+      expect(async () =>
+        personIntegrationApiClient.updateIdentityNumber(1, 2, UpdateIdentityNumberRequestMock),
+      ).not.toThrow()
     })
   })
 
