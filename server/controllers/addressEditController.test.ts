@@ -470,6 +470,7 @@ describe('Address Edit Controller', () => {
             noFixedAddress,
             noFixedAddressCheckbox: noFixedAddressOption,
             backLink,
+            prisonerNumber,
             breadcrumbPrisonerName: 'Saunders, John',
             miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
           })
