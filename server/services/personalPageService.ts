@@ -118,6 +118,18 @@ export default class PersonalPageService {
     )
   }
 
+  async createGlobalPhoneNumber(
+    token: string,
+    prisonerNumber: string,
+    values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
+  ): Promise<GlobalPhoneNumber> {
+    return this.globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber(
+      token,
+      prisonerNumber,
+      values,
+    )
+  }
+
   async updateGlobalPhoneNumber(
     token: string,
     prisonerNumber: string,

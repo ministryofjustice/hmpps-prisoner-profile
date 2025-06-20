@@ -26,6 +26,7 @@ import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
 import {
   addEmailAddressTextFieldData,
+  addPhoneNumberFieldData,
   changeEmailAddressTextFieldData,
   changePhoneNumberFieldData,
   cityOrTownOfBirthFieldData,
@@ -1625,86 +1626,164 @@ export default class PersonalController {
     }
 
     return {
-      edit: async (req: Request, res: Response, _next: NextFunction) => {
-        const { prisonerData, clientToken } = req.middleware
-        const { firstName, lastName, cellLocation } = prisonerData
-        const { prisonerNumber, phoneNumberId } = req.params
-        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-        const errors = req.flash('errors')
-        const { pageTitle, formTitle } = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
-        const requestBodyFlash = requestBodyFromFlash<{
-          phoneNumber: string
-          phoneNumberType: string
-          phoneExtension: string
-        }>(req)
+      add: {
+        edit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerData } = req.middleware
+          const { firstName, lastName, cellLocation } = prisonerData
+          const { prisonerNumber } = req.params
+          const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+          const errors = req.flash('errors')
+          const { pageTitle, formTitle } = addPhoneNumberFieldData({ firstName, lastName })
+          const requestBodyFlash = requestBodyFromFlash<{
+            phoneNumber: string
+            phoneNumberType: string
+            phoneExtension: string
+          }>(req)
 
-        const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-        const phoneValue = requestBodyFlash
-          ? {
-              type: requestBodyFlash.phoneNumberType,
-              number: requestBodyFlash.phoneNumber,
-              extension: requestBodyFlash.phoneExtension,
-            }
-          : phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+          const phoneValue = requestBodyFlash
+            ? {
+                type: requestBodyFlash.phoneNumberType,
+                number: requestBodyFlash.phoneNumber,
+                extension: requestBodyFlash.phoneExtension,
+              }
+            : undefined
 
-        await this.auditService.sendPageView({
-          user: res.locals.user,
-          prisonerNumber: prisonerData.prisonerNumber,
-          prisonId: prisonerData.prisonId,
-          correlationId: req.id,
-          page: Page.EditPhoneNumber,
-        })
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.AddPhoneNumber,
+          })
 
-        res.render('pages/edit/phone', {
-          pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerBannerName,
-          errors,
-          phoneTypeOptions: phoneTypeOptions(phoneValue.type),
-          phoneNumber: phoneValue.number,
-          phoneExtension: phoneValue.extension,
-          miniBannerData: {
-            prisonerName: prisonerBannerName,
+          res.render('pages/edit/phone', {
+            pageTitle: `${pageTitle} - Prisoner personal details`,
+            formTitle,
             prisonerNumber,
-            cellLocation: formatLocation(cellLocation),
-          },
-        })
-      },
-
-      submit: async (req: Request, res: Response, _next: NextFunction) => {
-        const { prisonerNumber, phoneNumberId } = req.params
-        const {
-          prisonerData: { firstName, lastName },
-          clientToken,
-        } = req.middleware
-        const { phoneNumber, phoneNumberType, phoneExtension } = req.body
-        const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
-        const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-        const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
-
-        return this.submit({
-          req,
-          res,
-          prisonerNumber,
-          submit: async () => {
-            await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
-              phoneNumber,
-              phoneNumberType,
-              phoneExtension,
-            })
-          },
-          fieldData,
-          auditDetails: {
-            fieldName: fieldData.fieldName,
-            previous: {
-              phoneNumber: previousValue.number,
-              phoneNumberType: previousValue.type,
-              phoneExtension: previousValue.extension,
+            breadcrumbPrisonerName: prisonerBannerName,
+            errors,
+            phoneTypeOptions: phoneTypeOptions(phoneValue?.type),
+            phoneNumber: phoneValue?.number,
+            phoneExtension: phoneValue?.extension,
+            miniBannerData: {
+              prisonerName: prisonerBannerName,
+              prisonerNumber,
+              cellLocation: formatLocation(cellLocation),
             },
-            updated: { phoneNumber, phoneNumberType, phoneExtension },
-          },
-        })
+          })
+        },
+
+        submit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerNumber } = req.params
+          const {
+            prisonerData: { firstName, lastName },
+            clientToken,
+          } = req.middleware
+          const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const fieldData = addPhoneNumberFieldData({ firstName, lastName })
+
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.createGlobalPhoneNumber(clientToken, prisonerNumber, {
+                phoneNumber,
+                phoneNumberType,
+                phoneExtension,
+              })
+            },
+            fieldData,
+            auditDetails: {
+              fieldName: fieldData.fieldName,
+              previous: {},
+              updated: { phoneNumber, phoneNumberType, phoneExtension },
+            },
+          })
+        },
+      },
+      edit: {
+        edit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerData, clientToken } = req.middleware
+          const { firstName, lastName, cellLocation } = prisonerData
+          const { prisonerNumber, phoneNumberId } = req.params
+          const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+          const errors = req.flash('errors')
+          const { pageTitle, formTitle } = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+          const requestBodyFlash = requestBodyFromFlash<{
+            phoneNumber: string
+            phoneNumberType: string
+            phoneExtension: string
+          }>(req)
+
+          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const phoneValue = requestBodyFlash
+            ? {
+                type: requestBodyFlash.phoneNumberType,
+                number: requestBodyFlash.phoneNumber,
+                extension: requestBodyFlash.phoneExtension,
+              }
+            : phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditPhoneNumber,
+          })
+
+          res.render('pages/edit/phone', {
+            pageTitle: `${pageTitle} - Prisoner personal details`,
+            formTitle,
+            prisonerNumber,
+            breadcrumbPrisonerName: prisonerBannerName,
+            errors,
+            phoneTypeOptions: phoneTypeOptions(phoneValue.type),
+            phoneNumber: phoneValue.number,
+            phoneExtension: phoneValue.extension,
+            miniBannerData: {
+              prisonerName: prisonerBannerName,
+              prisonerNumber,
+              cellLocation: formatLocation(cellLocation),
+            },
+          })
+        },
+
+        submit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerNumber, phoneNumberId } = req.params
+          const {
+            prisonerData: { firstName, lastName },
+            clientToken,
+          } = req.middleware
+          const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
+                phoneNumber,
+                phoneNumberType,
+                phoneExtension,
+              })
+            },
+            fieldData,
+            auditDetails: {
+              fieldName: fieldData.fieldName,
+              previous: {
+                phoneNumber: previousValue.number,
+                phoneNumberType: previousValue.type,
+                phoneExtension: previousValue.extension,
+              },
+              updated: { phoneNumber, phoneNumberType, phoneExtension },
+            },
+          })
+        },
       },
     }
   }

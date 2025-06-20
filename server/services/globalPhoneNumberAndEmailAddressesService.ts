@@ -53,6 +53,28 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     return { id: resp.contactId, email: resp.contactValue }
   }
 
+  async createPhoneNumberForPrisonerNumber(
+    token: string,
+    prisonerNumber: string,
+    {
+      phoneNumber,
+      phoneNumberType,
+      phoneExtension,
+    }: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
+  ): Promise<GlobalPhoneNumber> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+    const { contactId, contactType, contactValue, contactPhoneExtension } = await apiClient.createContact(
+      prisonerNumber,
+      {
+        contactType: phoneNumberType,
+        contactValue: phoneNumber,
+        contactPhoneExtension: phoneExtension,
+      },
+    )
+
+    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
+  }
+
   async updatePhoneNumberForPrisonerNumber(
     token: string,
     prisonerNumber: string,
