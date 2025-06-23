@@ -85,9 +85,14 @@
               </div>
               {% endif %}
             </div>
+
+            <!-- Change links - add back in when external service is ready -->
+{#
             {% if editEnabled %}
             <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact's details</a></div>
             {% endif %}
+#}
+
           </div>
           <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
           <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
