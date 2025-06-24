@@ -9,6 +9,7 @@ import {
   MilitaryRecordsMock,
   PseudonymRequestMock,
   PseudonymResponseMock,
+  UpdateIdentityNumberRequestMock,
 } from './localMockData/personIntegrationApiReferenceDataMock'
 import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -216,6 +217,17 @@ describe('personIntegrationApiClient', () => {
     })
   })
 
+  describe('updateIdentityNumber', () => {
+    it('should up[date existing identity number', async () => {
+      fakePersonIntegrationApi
+        .put('/v1/core-person-record/identifiers?offenderId=1&seqId=2&sourceSystem=NOMIS')
+        .reply(204)
+      expect(async () =>
+        personIntegrationApiClient.updateIdentityNumber(1, 2, UpdateIdentityNumberRequestMock),
+      ).not.toThrow()
+    })
+  })
+
   describe('addIdentityNumbers', () => {
     it('should add new identity numbers', async () => {
       fakePersonIntegrationApi
@@ -239,6 +251,17 @@ describe('personIntegrationApiClient', () => {
       fakePersonIntegrationApi.get('/v1/person/A1234AA/contacts').reply(200, ContactsResponseMock)
       const result = await personIntegrationApiClient.getContacts('A1234AA')
       expect(result).toEqual(ContactsResponseMock)
+    })
+  })
+
+  describe('createContact', () => {
+    it('Should create the contact and return the response', async () => {
+      fakePersonIntegrationApi.post('/v1/person/A1234AA/contacts').reply(200, ContactsResponseMock[1])
+      const result = await personIntegrationApiClient.createContact('A1234AA', {
+        contactType: 'EMAIL',
+        contactValue: 'updated@email.com',
+      })
+      expect(result).toEqual(ContactsResponseMock[1])
     })
   })
 

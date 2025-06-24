@@ -152,6 +152,10 @@ Cypress.Commands.add('seedRedisEntry', ({ key, value }) => {
   cy.exec(`./integration_tests/scripts/redis-cli "SET ${key} '${JSON.stringify(value).replaceAll('"', '\\"')}'"`)
 })
 
+Cypress.Commands.add('refreshReferenceData', domain => {
+  cy.exec(`./integration_tests/scripts/redis-cli "SET reference_data_${domain} '${JSON.stringify([])}'"`)
+})
+
 Cypress.Commands.add('setupComponentsData', (options = {}) => {
   cy.task('stubComponentsData', options)
   cy.task('stubUserCaseLoads', options.caseLoads)
@@ -164,8 +168,9 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
-  cy.task('stubAddresses', { prisonerNumber })
   cy.task('stubOffenderContacts', prisonerNumber)
+  cy.task('stubAddresses', { prisonerNumber }) // TODO: Remove this after profile edit rolled out
+  cy.task('stubGetAddresses', { prisonerNumber })
   cy.task('stubPersonAddresses')
   cy.task('stubImages')
   cy.task('stubHealthReferenceDomain')

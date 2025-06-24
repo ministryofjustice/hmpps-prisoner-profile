@@ -25,11 +25,14 @@ import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
 import {
+  addEmailAddressTextFieldData,
+  addPhoneNumberFieldData,
+  changeEmailAddressTextFieldData,
+  changePhoneNumberFieldData,
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
   domesticStatusFieldData,
-  emailAddressTextFieldData,
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
@@ -125,6 +128,7 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
+        displayNewAddressesCard: profileEditEnabled,
         dietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editDietAndAllergiesEnabled:
@@ -450,12 +454,33 @@ export default class PersonalController {
     })
   }
 
-  private textInput(fieldDataGetter: TextFieldDataGetter, getter: TextFieldGetter, setter: TextFieldSetter) {
+  /**
+   *
+   * @param fieldDataGetter Returns the field data for the text input for display
+   * @param getter Returns the current value for the text input
+   * @param setter Sets the submitted value, typically on an external API
+   * @param options.template A nunjucks template that extends the text field one where additional actions are necessary
+   * @returns Edit/Submit routes for use with an edit route
+   */
+  private textInput(
+    fieldDataGetter: TextFieldDataGetter,
+    getter: TextFieldGetter,
+    setter: TextFieldSetter,
+    options?: { template?: string; onSubmit: (req: Request, res: Response, fieldData: TextFieldData) => Promise<void> },
+  ) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const fieldData = fieldDataGetter(req)
-        const { pageTitle, formTitle, hintText, auditEditPageLoad, fieldName, inputClasses, submitButtonText } =
-          fieldData
+        const {
+          pageTitle,
+          formTitle,
+          hintText,
+          auditEditPageLoad,
+          fieldName,
+          inputClasses,
+          submitButtonText,
+          redirectAnchor,
+        } = fieldData
         const { prisonerNumber } = req.params
         const { prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
@@ -473,7 +498,7 @@ export default class PersonalController {
           page: auditEditPageLoad,
         })
 
-        res.render('pages/edit/textField', {
+        res.render(options?.template ? `pages/edit/textFields/${options?.template}` : 'pages/edit/textField', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: formTitle ?? pageTitle,
           prisonerNumber,
@@ -483,6 +508,7 @@ export default class PersonalController {
           fieldName,
           fieldValue,
           inputClasses,
+          redirectAnchor,
           miniBannerData: miniBannerData(prisonerData),
           submitButtonText,
         })
@@ -503,6 +529,7 @@ export default class PersonalController {
           },
           fieldData,
           auditDetails: { fieldName, previous: previousValue, updated: updatedValue },
+          options: options?.onSubmit ? { onSubmit: options.onSubmit } : undefined,
         })
       },
     }
@@ -1580,9 +1607,198 @@ export default class PersonalController {
   }
 
   globalNumbers() {
+    const phoneTypeOptions = (chosenType: string = null): RadioOption[] => {
+      // TODO: Replace these with a call to the APIs for the reference data
+      const options = {
+        MOB: 'Mobile',
+        HOME: 'Home',
+        ALTH: 'Alternate Home',
+        BUS: 'Business',
+        ALTB: 'Alternate Business',
+        VISIT: 'Agency Visit Line',
+        FAX: 'Fax',
+      }
+
+      return Object.entries(options).map(([value, text]) => ({
+        text,
+        value,
+        checked: chosenType === value,
+      }))
+    }
+
+    const onAdditionSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
+      const { prisonerNumber } = req.params
+      const addAnother = req.query?.addAnother ?? 'false'
+
+      if (addAnother === 'true') {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+      }
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${fieldData.redirectAnchor}`)
+    }
+
     return {
-      edit: async (_req: Request, _res: Response, _next: NextFunction) => {},
-      submit: async (_req: Request, _res: Response, _next: NextFunction) => {},
+      add: {
+        edit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerData } = req.middleware
+          const { firstName, lastName, cellLocation } = prisonerData
+          const { prisonerNumber } = req.params
+          const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+          const errors = req.flash('errors')
+          const { pageTitle, formTitle } = addPhoneNumberFieldData({ firstName, lastName })
+          const requestBodyFlash = requestBodyFromFlash<{
+            phoneNumber: string
+            phoneNumberType: string
+            phoneExtension: string
+          }>(req)
+
+          const phoneValue = requestBodyFlash
+            ? {
+                type: requestBodyFlash.phoneNumberType,
+                number: requestBodyFlash.phoneNumber,
+                extension: requestBodyFlash.phoneExtension,
+              }
+            : undefined
+
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.AddPhoneNumber,
+          })
+
+          res.render('pages/edit/phone', {
+            pageTitle: `${pageTitle} - Prisoner personal details`,
+            formTitle,
+            prisonerNumber,
+            breadcrumbPrisonerName: prisonerBannerName,
+            errors,
+            addAnotherEnabled: true,
+            phoneTypeOptions: phoneTypeOptions(phoneValue?.type),
+            phoneNumber: phoneValue?.number,
+            phoneExtension: phoneValue?.extension,
+            miniBannerData: {
+              prisonerName: prisonerBannerName,
+              prisonerNumber,
+              cellLocation: formatLocation(cellLocation),
+            },
+          })
+        },
+
+        submit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerNumber } = req.params
+          const {
+            prisonerData: { firstName, lastName },
+            clientToken,
+          } = req.middleware
+          const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const fieldData = addPhoneNumberFieldData({ firstName, lastName })
+
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.createGlobalPhoneNumber(clientToken, prisonerNumber, {
+                phoneNumber,
+                phoneNumberType,
+                phoneExtension,
+              })
+            },
+            fieldData,
+            auditDetails: {
+              fieldName: fieldData.fieldName,
+              previous: {},
+              updated: { phoneNumber, phoneNumberType, phoneExtension },
+            },
+            options: { onSubmit: onAdditionSubmit },
+          })
+        },
+      },
+      edit: {
+        edit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerData, clientToken } = req.middleware
+          const { firstName, lastName, cellLocation } = prisonerData
+          const { prisonerNumber, phoneNumberId } = req.params
+          const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+          const errors = req.flash('errors')
+          const { pageTitle, formTitle } = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+          const requestBodyFlash = requestBodyFromFlash<{
+            phoneNumber: string
+            phoneNumberType: string
+            phoneExtension: string
+          }>(req)
+
+          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const phoneValue = requestBodyFlash
+            ? {
+                type: requestBodyFlash.phoneNumberType,
+                number: requestBodyFlash.phoneNumber,
+                extension: requestBodyFlash.phoneExtension,
+              }
+            : phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditPhoneNumber,
+          })
+
+          res.render('pages/edit/phone', {
+            pageTitle: `${pageTitle} - Prisoner personal details`,
+            formTitle,
+            prisonerNumber,
+            breadcrumbPrisonerName: prisonerBannerName,
+            errors,
+            phoneTypeOptions: phoneTypeOptions(phoneValue.type),
+            phoneNumber: phoneValue.number,
+            phoneExtension: phoneValue.extension,
+            miniBannerData: {
+              prisonerName: prisonerBannerName,
+              prisonerNumber,
+              cellLocation: formatLocation(cellLocation),
+            },
+          })
+        },
+
+        submit: async (req: Request, res: Response, _next: NextFunction) => {
+          const { prisonerNumber, phoneNumberId } = req.params
+          const {
+            prisonerData: { firstName, lastName },
+            clientToken,
+          } = req.middleware
+          const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
+          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
+                phoneNumber,
+                phoneNumberType,
+                phoneExtension,
+              })
+            },
+            fieldData,
+            auditDetails: {
+              fieldName: fieldData.fieldName,
+              previous: {
+                phoneNumber: previousValue.number,
+                phoneNumberType: previousValue.type,
+                phoneExtension: previousValue.extension,
+              },
+              updated: { phoneNumber, phoneNumberType, phoneExtension },
+            },
+          })
+        },
+      },
     }
   }
 
@@ -1596,13 +1812,18 @@ export default class PersonalController {
       return emailValue
     }
 
-    const fieldDataGetter: TextFieldDataGetter = req => {
-      const { emailAddressId } = req.params
-      const {
-        prisonerData: { firstName, lastName },
-      } = req.middleware
-      return emailAddressTextFieldData(emailAddressId, { firstName, lastName })
-    }
+    const fieldDataGetter =
+      (action: string): TextFieldDataGetter =>
+      req => {
+        const { emailAddressId } = req.params
+        const {
+          prisonerData: { firstName, lastName },
+        } = req.middleware
+        if (action === 'change') {
+          return changeEmailAddressTextFieldData(emailAddressId, { name: { firstName, lastName } })
+        }
+        return addEmailAddressTextFieldData({ name: { firstName, lastName } })
+      }
 
     const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
       const { prisonerNumber, emailAddressId } = req.params
@@ -1611,7 +1832,31 @@ export default class PersonalController {
       await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, value)
     }
 
-    return { edit: this.textInput(fieldDataGetter, globalEmailGetter, globalEmailSetter) }
+    const globalEmailCreator: TextFieldSetter = async (req, _res, _fieldData, value) => {
+      const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
+
+      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, value)
+    }
+
+    const globalEmailCreatorOnSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
+      const { prisonerNumber } = req.params
+      const addAnother = req.query?.addAnother ?? 'false'
+
+      if (addAnother === 'true') {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+      }
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${fieldData.redirectAnchor}`)
+    }
+
+    return {
+      add: this.textInput(fieldDataGetter('add'), async () => '', globalEmailCreator, {
+        template: 'addEmail',
+        onSubmit: globalEmailCreatorOnSubmit,
+      }),
+      edit: this.textInput(fieldDataGetter('change'), globalEmailGetter, globalEmailSetter),
+    }
   }
 
   // This will be replaced by a request to the Health and Medication API once it masters this data:
@@ -1631,6 +1876,7 @@ export default class PersonalController {
     submit,
     fieldData,
     auditDetails,
+    options,
   }: {
     req: Request
     res: Response
@@ -1638,6 +1884,7 @@ export default class PersonalController {
     submit: () => Promise<void>
     fieldData: FieldData
     auditDetails: object
+    options?: { onSubmit: (submitReq: Request, submitRes: Response, submitFieldData: FieldData) => Promise<void> }
   }) {
     const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
 
@@ -1659,6 +1906,10 @@ export default class PersonalController {
           details: auditDetails,
         })
         .catch(error => logger.error(error))
+
+      if (options?.onSubmit) {
+        return options?.onSubmit(req, res, fieldData)
+      }
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
     } catch (e) {

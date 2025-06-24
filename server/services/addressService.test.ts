@@ -11,8 +11,19 @@ import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
+import { mockAddressRequestDto, mockAddressResponseDto } from '../data/localMockData/personIntegrationApi/addresses'
+import ReferenceDataService from './referenceData/referenceDataService'
+import MetricsService from './metrics/metricsService'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { prisonUserMock } from '../data/localMockData/user'
+import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
+import { AddressLocation } from './mappers/addressMapper'
+
+const clientToken = 'CLIENT_TOKEN'
 
 describe('addressService', () => {
+  let metricsService: MetricsService
+  let referenceDataService: ReferenceDataService
   let prisonApiClient: PrisonApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
   let osPlacesApiClient: OsPlacesApiClient
@@ -22,19 +33,151 @@ describe('addressService', () => {
     prisonApiClient = prisonApiClientMock()
     personIntegrationApiClient = personIntegrationApiClientMock()
     osPlacesApiClient = osPlacesApiClientMock()
+
+    metricsService = new MetricsService() as jest.Mocked<MetricsService>
+    referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
+    referenceDataService.getReferenceData = jest.fn()
+
     addressService = new AddressService(
-      null,
+      metricsService,
+      referenceDataService,
       () => prisonApiClient,
       () => personIntegrationApiClient,
       osPlacesApiClient,
     )
   })
 
-  describe('getAddresses', () => {
+  describe('createAddress', () => {
+    it('submits request to create address to person integration API', async () => {
+      personIntegrationApiClient.createAddress = jest.fn().mockResolvedValue(mockAddressResponseDto)
+      metricsService.trackPersonIntegrationUpdate = jest.fn()
+
+      const response = await addressService.createAddress(
+        clientToken,
+        PrisonerMockDataA.prisonerNumber,
+        mockAddressRequestDto,
+        prisonUserMock,
+      )
+
+      expect(response).toEqual(mockAddressResponseDto)
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['address'],
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('getAddressesFromPrisonAPI', () => {
     it('Handles address data from prison API correctly', async () => {
       prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
       const addresses = await addressService.getAddressesFromPrisonAPI('token', 'A1234AA')
       expect(addresses).toEqual(mockAddresses)
+    })
+  })
+
+  describe('getAddresses', () => {
+    it('Handles address data from person integration API correctly', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [mockAddressResponseDto])
+      const addresses = await addressService.getAddresses('token', 'A1234AA')
+      expect(addresses).toEqual([mockAddressResponseDto])
+    })
+  })
+
+  describe('getCityCode', () => {
+    it('Returns city data from the reference data service', async () => {
+      referenceDataService.getReferenceData = jest.fn().mockResolvedValue({ code: 'CITY1' } as ReferenceDataCodeDto)
+      expect(await addressService.getCityCode('CITY1', clientToken)).toEqual({ code: 'CITY1' })
+    })
+
+    it.each([undefined, null])('Handles falsy code: %s', async code => {
+      expect(await addressService.getCityCode(code, clientToken)).toBeFalsy()
+      expect(referenceDataService.getReferenceData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCountyCode', () => {
+    it('Returns county data from the reference data service', async () => {
+      referenceDataService.getReferenceData = jest.fn().mockResolvedValue({ code: 'COUNTY1' } as ReferenceDataCodeDto)
+      expect(await addressService.getCountyCode('COUNTY1', clientToken)).toEqual({ code: 'COUNTY1' })
+    })
+
+    it.each([undefined, null])('Handles falsy code: %s', async code => {
+      expect(await addressService.getCountyCode(code, clientToken)).toBeFalsy()
+      expect(referenceDataService.getReferenceData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCountryCode', () => {
+    it('Returns country data from the reference data service', async () => {
+      referenceDataService.getReferenceData = jest.fn().mockResolvedValue({ code: 'COUNTRY1' } as ReferenceDataCodeDto)
+      expect(await addressService.getCountryCode('COUNTRY1', clientToken)).toEqual({ code: 'COUNTRY1' })
+    })
+
+    it.each([undefined, null])('Handles falsy code: %s', async code => {
+      expect(await addressService.getCountryCode(code, clientToken)).toBeFalsy()
+      expect(referenceDataService.getReferenceData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCityReferenceData', () => {
+    it('Returns city reference data from the reference data service', async () => {
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'CITY1' } as ReferenceDataCodeDto])
+
+      expect(await addressService.getCityReferenceData(clientToken)).toEqual([{ code: 'CITY1' }])
+    })
+  })
+
+  describe('getCountyReferenceData', () => {
+    it('Returns county reference data from the reference data service', async () => {
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'COUNTY1' } as ReferenceDataCodeDto])
+
+      expect(await addressService.getCountyReferenceData(clientToken)).toEqual([{ code: 'COUNTY1' }])
+    })
+  })
+
+  describe('getCountryReferenceData', () => {
+    it('Returns overseas country reference data from the reference data service', async () => {
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'COUNTRY1' }, { code: 'ENG' }])
+
+      expect(
+        await addressService.getCountryReferenceData(clientToken, { addressLocation: AddressLocation.overseas }),
+      ).toEqual([{ code: 'COUNTRY1' }])
+    })
+
+    it.each([AddressLocation.uk, AddressLocation.no_fixed_address])(
+      'Returns UK country reference data from the reference data service for location: %s',
+      async addressLocation => {
+        referenceDataService.getActiveReferenceDataCodes = jest
+          .fn()
+          .mockResolvedValue([{ code: 'COUNTRY1' }, { code: 'ENG' }])
+
+        expect(await addressService.getCountryReferenceData(clientToken, { addressLocation })).toEqual([
+          { code: 'ENG' },
+        ])
+      },
+    )
+  })
+
+  describe('sanitisePostcode', () => {
+    it.each([
+      [undefined, undefined],
+      [null, null],
+      ['', ''],
+      ['a12bc', 'A1 2BC'],
+      ['SW1H 9AJ', 'SW1H 9AJ'],
+      ['SW1H9AJ', 'SW1H 9AJ'],
+      ['sw1h9aj', 'SW1H 9AJ'],
+      ['before sw1h9aj after', 'before SW1H 9AJ after'],
+      ['not a postcode', 'not a postcode'],
+    ])(`before: '%s', after: '%s'`, (before, after) => {
+      expect(addressService.sanitisePostcode(before)).toEqual(after)
     })
   })
 
@@ -51,6 +194,12 @@ describe('addressService', () => {
       osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryResponse)
       const addresses = await addressService.getAddressesMatchingQuery(searchQuery)
       validateExpectedAddressResponse(addresses)
+    })
+
+    it('Sanitises post codes before querying the API', async () => {
+      osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryResponse)
+      await addressService.getAddressesMatchingQuery('petty france sw1H9eA 102')
+      expect(osPlacesApiClient.getAddressesByFreeTextQuery).toHaveBeenCalledWith('petty france SW1H 9EA 102')
     })
   })
 

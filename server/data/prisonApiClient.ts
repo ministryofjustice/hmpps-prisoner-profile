@@ -276,6 +276,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
+  async getIdentifier(offenderId: number, seqId: number): Promise<OffenderIdentifier> {
+    return this.restClient.get<OffenderIdentifier>({
+      path: `/api/aliases/${offenderId}/offender-identifiers/${seqId}`,
+    })
+  }
+
   async getIdentifiers(prisonerNumber: string, includeAliases: boolean = false): Promise<OffenderIdentifier[]> {
     return this.restClient.get<OffenderIdentifier[]>({
       path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=${includeAliases}`,

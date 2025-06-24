@@ -7,7 +7,7 @@ import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryR
 import OsPlacesDeliveryPointAddress from '../data/interfaces/osPlacesApi/osPlacesDeliveryPointAddress'
 import { convertToTitleCase } from '../utils/utils'
 import ReferenceDataService from './referenceData/referenceDataService'
-import AddressMapper from './mappers/addressMapper'
+import AddressMapper, { AddressLocation } from './mappers/addressMapper'
 import {
   AddressRequestDto,
   AddressResponseDto,
@@ -17,11 +17,16 @@ import {
 import NotFoundError from '../utils/notFoundError'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { PersonalRelationshipsReferenceDataDomain } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import MetricsService from './metrics/metricsService'
+import { PrisonUser } from '../interfaces/HmppsUser'
+
+const stringContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 
 export default class AddressService {
   private readonly addressMapper: AddressMapper
 
   constructor(
+    private readonly metricsService: MetricsService,
     private readonly referenceDataService: ReferenceDataService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
@@ -38,7 +43,14 @@ export default class AddressService {
     token: string,
     prisonerNumber: string,
     address: AddressRequestDto,
+    user: PrisonUser,
   ): Promise<AddressResponseDto> {
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['address'],
+      prisonerNumber,
+      user,
+    })
+
     return this.personIntegrationApiClientBuilder(token).createAddress(prisonerNumber, address)
   }
 
@@ -46,8 +58,10 @@ export default class AddressService {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
   }
 
-  public async getAddressesMatchingQuery(searchQuery: string): Promise<OsAddress[]> {
-    const response = await this.osPlacesApiClient.getAddressesByFreeTextQuery(searchQuery)
+  public async getAddressesMatchingQuery(searchQuery: string, sanitisePostcode: boolean = true): Promise<OsAddress[]> {
+    const response = await this.osPlacesApiClient.getAddressesByFreeTextQuery(
+      sanitisePostcode ? this.sanitisePostcode(searchQuery) : searchQuery,
+    )
     return this.handleResponse(response)
   }
 
@@ -62,18 +76,45 @@ export default class AddressService {
     return this.addressMapper.toAddressRequestDto(result[0], token)
   }
 
-  public async getCityReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+  public async getCityCode(code: string, token: string): Promise<ReferenceDataCodeDto> {
     return (
       code && this.referenceDataService.getReferenceData(PersonalRelationshipsReferenceDataDomain.City, code, token)
     )
   }
 
-  public async getCountyReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+  public async getCityReferenceData(token: string): Promise<ReferenceDataCodeDto[]> {
+    return this.referenceDataService.getActiveReferenceDataCodes(PersonalRelationshipsReferenceDataDomain.City, token)
+  }
+
+  public async getCountyCode(code: string, token: string): Promise<ReferenceDataCodeDto> {
     return code && this.referenceDataService.getReferenceData(CorePersonRecordReferenceDataDomain.county, code, token)
   }
 
-  public async getCountryReferenceData(code: string, token: string): Promise<ReferenceDataCodeDto> {
+  public async getCountyReferenceData(token: string): Promise<ReferenceDataCodeDto[]> {
+    return this.referenceDataService.getActiveReferenceDataCodes(CorePersonRecordReferenceDataDomain.county, token)
+  }
+
+  public async getCountryCode(code: string, token: string): Promise<ReferenceDataCodeDto> {
     return code && this.referenceDataService.getReferenceData(CorePersonRecordReferenceDataDomain.country, code, token)
+  }
+
+  public async getCountryReferenceData(
+    token: string,
+    options: { addressLocation: AddressLocation },
+  ): Promise<ReferenceDataCodeDto[]> {
+    const countryCodes = await this.referenceDataService.getActiveReferenceDataCodes(
+      CorePersonRecordReferenceDataDomain.country,
+      token,
+    )
+
+    return this.addressMapper.filterCountryCodes(countryCodes, options.addressLocation)
+  }
+
+  public sanitisePostcode(stringContainingPostcode: string) {
+    const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode)
+    if (!postCodeQuery) return stringContainingPostcode
+
+    return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
   }
 
   private handleResponse(response: OsPlacesQueryResponse): OsAddress[] {

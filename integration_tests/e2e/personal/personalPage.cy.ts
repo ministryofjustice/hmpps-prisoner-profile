@@ -280,28 +280,6 @@ context('When signed in', () => {
       })
     })
 
-    context('Addresses', () => {
-      it('Displays the prisoners address', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        page.addresess().address().should('include.text', 'Flat 7, premises address, street field')
-        page.addresess().address().should('include.text', 'Leeds')
-        page.addresess().address().should('include.text', 'LS1 AAA')
-        page.addresess().address().should('include.text', 'England')
-
-        page.addresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
-        page.addresess().addressTypes().should('include.text', 'HDC Address')
-        page.addresess().addressTypes().should('include.text', 'Other')
-
-        page.addresess().phoneNumbers().should('include.text', '4444555566')
-        page.addresess().phoneNumbers().should('include.text', '0113444444')
-        page.addresess().phoneNumbers().should('include.text', '0113 333444')
-        page.addresess().phoneNumbers().should('include.text', '0800 222333')
-
-        page.addresess().comments().should('include.text', mockAddresses[0].comment)
-        page.addresess().addedOn().should('include.text', 'May 2020')
-      })
-    })
-
     context('Emergency contacts and next of kin', () => {
       it('Displays the contacts', () => {
         const page = Page.verifyOnPage(PersonalPage)
@@ -476,6 +454,37 @@ context('When signed in', () => {
           .scars()
           .find('button.hmpps-open-close-all__button')
           .should('include.text', 'Hide all scar details')
+      })
+    })
+
+    context('Addresses', () => {
+      it('Displays prisoner addresses', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.addresses().addressHeading().should('include.text', 'Primary and postal address')
+
+        page.addresses().address().should('include.text', 'No fixed address')
+        page.addresses().address().should('include.text', 'Flat 1')
+        page.addresses().address().should('include.text', 'The Flats')
+        page.addresses().address().should('include.text', '1 The Road')
+        page.addresses().address().should('include.text', 'The Area')
+        page.addresses().address().should('include.text', 'South Yorkshire')
+        page.addresses().address().should('include.text', 'A1 2BC')
+        page.addresses().address().should('include.text', 'England')
+
+        page.addresses().addressTypes().should('include.text', 'Home')
+        page.addresses().addressDates().should('include.text', 'From June 2024 to June 2099')
+        page.addresses().addressPhoneNumbers().should('include.text', 'Not entered')
+        page.addresses().addressComments().should('include.text', 'Not entered')
+
+        page.addresses().addressAddedDate().should('include.text', 'Added on 16 June 2024')
+
+        page.addresses().addressesLink().should('include.text', 'View all addresses (1)')
+        page
+          .addresses()
+          .addressesLink()
+          .get(`a[href="/prisoner/${prisonerNumber}/addresses"]`)
+          .should('exist')
+          .should('include.text', 'View all addresses (1)')
       })
     })
 
@@ -728,6 +737,26 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
       page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
       page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+    })
+
+    it('Displays old addresses tile', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.oldAddresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.oldAddresess().address().should('include.text', 'Leeds')
+      page.oldAddresess().address().should('include.text', 'LS1 AAA')
+      page.oldAddresess().address().should('include.text', 'England')
+
+      page.oldAddresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
+      page.oldAddresess().addressTypes().should('include.text', 'HDC Address')
+      page.oldAddresess().addressTypes().should('include.text', 'Other')
+
+      page.oldAddresess().phoneNumbers().should('include.text', '4444555566')
+      page.oldAddresess().phoneNumbers().should('include.text', '0113444444')
+      page.oldAddresess().phoneNumbers().should('include.text', '0113 333444')
+      page.oldAddresess().phoneNumbers().should('include.text', '0800 222333')
+
+      page.oldAddresess().comments().should('include.text', mockAddresses[0].comment)
+      page.oldAddresess().addedOn().should('include.text', 'May 2020')
     })
   })
 

@@ -1,11 +1,11 @@
 import { Readable } from 'stream'
 import RestClient from './restClient'
 import {
+  AddIdentifierRequestDto,
   AddressRequestDto,
   AddressResponseDto,
   ContactsRequestDto,
   ContactsResponseDto,
-  AddIdentifierRequestDto,
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
@@ -16,6 +16,7 @@ import {
   PersonIntegrationDistinguishingMark,
   PseudonymRequestDto,
   PseudonymResponseDto,
+  UpdateIdentifierRequestDto,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -183,6 +184,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
+  updateIdentityNumber(offenderId: number, seqId: number, request: UpdateIdentifierRequestDto): Promise<void> {
+    return this.restClient.put({
+      path: `/v1/core-person-record/identifiers`,
+      query: { offenderId, seqId, sourceSystem: 'NOMIS' },
+      data: request,
+    })
+  }
+
   addIdentityNumbers(prisonerNumber: string, request: AddIdentifierRequestDto[]): Promise<void> {
     return this.restClient.post({
       path: `/v1/core-person-record/identifiers`,
@@ -225,6 +234,13 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   getContacts(prisonerNumber: string): Promise<ContactsResponseDto[]> {
     return this.restClient.get<ContactsResponseDto[]>({
       path: `/v1/person/${prisonerNumber}/contacts`,
+    })
+  }
+
+  createContact(prisonerNumber: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
+    return this.restClient.post<ContactsResponseDto>({
+      path: `/v1/person/${prisonerNumber}/contacts`,
+      data: request,
     })
   }
 

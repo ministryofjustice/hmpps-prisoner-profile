@@ -1,10 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
 import Page from '../../../../pages/page'
 import { Role } from '../../../../../server/data/enums/role'
-import { AddressRequestDto } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  AddressRequestDto,
+  CorePersonRecordReferenceDataDomain,
+} from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundPage from '../../../../pages/notFoundPage'
 import PrimaryOrPostalAddressPage from '../../../../pages/editPages/address/primaryOrPostalAddressPage'
-import { AddressResponseMock } from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { mockAddressResponseDto } from '../../../../../server/data/localMockData/personIntegrationApi/addresses'
 
 context('Primary or Postal Address Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -27,6 +31,10 @@ context('Primary or Postal Address Page', () => {
 
   before(() => {
     cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
   })
 
   const visitPrimaryOrPostalAddressPage = (): PrimaryOrPostalAddressPage => {
@@ -48,7 +56,10 @@ context('Primary or Postal Address Page', () => {
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubFindAddressesByFreeTextSearch')
     cy.task('stubFindAddressesByUprn')
-    cy.task('stubGetAddresses', { prisonerNumber })
+    cy.task('stubGetAddresses', {
+      prisonerNumber,
+      response: [{ ...mockAddressResponseDto, primaryAddress: false, postalAddress: false }],
+    })
     cy.task('stubCreateAddress', { prisonerNumber })
     cy.task('stubPersonalRelationshipsGetReferenceData', {
       domain: 'CITY',
@@ -126,7 +137,7 @@ context('Primary or Postal Address Page', () => {
     beforeEach(() => {
       cy.task('stubGetAddresses', {
         prisonerNumber,
-        response: [{ ...AddressResponseMock, primaryAddress: true, postalAddress: true }],
+        response: [{ ...mockAddressResponseDto, primaryAddress: true, postalAddress: true }],
       })
 
       page = visitPrimaryOrPostalAddressPage()

@@ -1,0 +1,87 @@
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% extends "./editPage.njk" %}
+{% block form %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        {% call govukFieldset({
+          legend: {
+            text: formTitle if formTitle else pageTitle,
+            classes: "govuk-fieldset__legend--l",
+            isPageHeading: true
+          }
+        }) %}
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number-type") }}">
+          {{ govukRadios({
+              name: "phoneNumberType",
+              id: "phone-number-type",
+              fieldset: {
+                legend: {
+                  text: "Phone number type",
+                  classes: "govuk-!-font-weight-bold"
+                }
+              },
+              items: phoneTypeOptions,
+              errorMessage: { text: (errors | findError("phone-type")).text } if errors | findError("phone-type")
+            }) }}
+        </div>
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number") }}">
+          {{ govukInput({
+              label: {
+                text: "Phone number",
+                classes: "govuk-!-font-weight-bold"
+              },
+              id: "phone-number",
+              name: "phoneNumber",
+              value: phoneNumber,
+              errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
+            }) }}
+        </div>
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-extension") }}">
+          {{ govukInput({
+              label: {
+                text: "Extension (optional)",
+                classes: "govuk-!-font-weight-bold"
+              },
+              id: "phone-extension",
+              name: "phoneExtension",
+              value: phoneExtension,
+              errorMessage: { text: (errors | findError("phone-extension")).text } if errors | findError("phone-extension")
+            }) }}
+        </div>
+        {% endcall %}
+        {% if addAnotherEnabled %}
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Add another phone number",
+              id: "submit-and-add-another",
+              type: "submit",
+              preventDoubleClick: true,
+              classes: "govuk-button--secondary hmpps-button__add-another"
+            }) }}
+          </div>
+        {% endif %}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: submitButtonText if submitButtonText else "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            }) }}
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% block pageScripts %}
+  {% if addAnotherEnabled %}
+    <script src="/assets/js/addAnotherButton.js"></script>
+  {% endif %}
+{% endblock %}

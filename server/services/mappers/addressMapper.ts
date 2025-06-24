@@ -5,6 +5,17 @@ import {
   CorePersonRecordReferenceDataDomain,
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { formatDateISO } from '../../utils/dateHelpers'
+import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
+
+// eslint-disable-next-line no-shadow
+export enum AddressLocation {
+  uk = 'uk',
+  overseas = 'overseas',
+  no_fixed_address = 'no_fixed_address',
+}
+
+const ukMainlandCountryCodes: string[] = ['GBR', 'ENG', 'NI', 'SCOT', 'WALES']
+const ukNomisCountryCodes: string[] = [...ukMainlandCountryCodes, 'GGY', 'IOM', 'JEY']
 
 const osPlacesCountryCodeToNomisCode: Record<string, string> = {
   E: 'ENG', // England
@@ -53,6 +64,17 @@ export default class AddressMapper {
       fromDate: formatDateISO(new Date()),
       addressTypes: [],
     }
+  }
+
+  public filterCountryCodes(
+    referenceData: ReferenceDataCodeDto[],
+    addressLocation?: AddressLocation,
+  ): ReferenceDataCodeDto[] {
+    if (addressLocation === AddressLocation.overseas) {
+      return referenceData.filter(code => !ukMainlandCountryCodes.includes(code.code))
+    }
+
+    return referenceData.filter(code => ukNomisCountryCodes.includes(code.code))
   }
 
   private async getNomisCodeFromOsPlacesPostTown(osPlacesPostTown: string, token: string): Promise<string> {

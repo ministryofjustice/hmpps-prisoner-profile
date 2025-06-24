@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { apostrophe, formatName } from '../utils/utils'
+import { apostrophe, convertToTitleCase, formatName, objectToSelectOptions } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
@@ -10,13 +10,9 @@ import EphemeralDataService from '../services/EphemeralDataService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-
-// eslint-disable-next-line no-shadow
-enum AddressLocation {
-  uk = 'uk',
-  overseas = 'overseas',
-  no_fixed_address = 'no_fixed_address',
-}
+import { formatDateISO } from '../utils/dateHelpers'
+import { AddressLocation } from '../services/mappers/addressMapper'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class AddressEditController {
   constructor(
@@ -153,9 +149,9 @@ export default class AddressEditController {
       const { address, route } = addressCache.value
 
       const [cityCode, countyCode, countryCode] = await Promise.all([
-        address.postTownCode && this.addressService.getCityReferenceData(address.postTownCode, clientToken),
-        address.countyCode && this.addressService.getCountyReferenceData(address.countyCode, clientToken),
-        address.countryCode && this.addressService.getCountryReferenceData(address.countryCode, clientToken),
+        address.postTownCode && this.addressService.getCityCode(address.postTownCode, clientToken),
+        address.countyCode && this.addressService.getCountyCode(address.countyCode, clientToken),
+        address.countryCode && this.addressService.getCountryCode(address.countryCode, clientToken),
       ])
 
       this.auditService
@@ -201,9 +197,9 @@ export default class AddressEditController {
       const errors = req.flash('errors')
       const { address } = addressCache.value
       const [cityCode, countyCode, countryCode, existingAddresses] = await Promise.all([
-        address.postTownCode && this.addressService.getCityReferenceData(address.postTownCode, clientToken),
-        address.countyCode && this.addressService.getCountyReferenceData(address.countyCode, clientToken),
-        address.countryCode && this.addressService.getCountryReferenceData(address.countryCode, clientToken),
+        this.addressService.getCityCode(address.postTownCode, clientToken),
+        this.addressService.getCountyCode(address.countyCode, clientToken),
+        this.addressService.getCountryCode(address.countryCode, clientToken),
         this.addressService.getAddresses(clientToken, prisonerNumber),
       ])
 
@@ -263,7 +259,7 @@ export default class AddressEditController {
       }
 
       try {
-        await this.addressService.createAddress(clientToken, prisonerNumber, address)
+        await this.addressService.createAddress(clientToken, prisonerNumber, address, res.locals.user as PrisonUser)
         await this.ephemeralDataService.removeData(addressCacheId as UUID)
 
         req.flash('flashMessage', {
@@ -288,6 +284,108 @@ export default class AddressEditController {
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/primary-or-postal-address?address=${addressCacheId}`)
       }
+    }
+  }
+
+  public displayManualEditAddress(options: {
+    addressLocation: AddressLocation
+    pageTitlePrefix: string
+    formTitlePrefix: string
+    auditPage: Page
+  }): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { addressLocation, pageTitlePrefix, formTitlePrefix, auditPage } = options
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const requestBody = requestBodyFromFlash<{ townOrCity: string; county: string; country: string }>(req)
+      const errors = req.flash('errors')
+
+      const [cityReferenceData, countyReferenceData, countryReferenceData] = await Promise.all([
+        this.addressService.getCityReferenceData(clientToken),
+        this.addressService.getCountyReferenceData(clientToken),
+        this.addressService.getCountryReferenceData(clientToken, { addressLocation }),
+      ])
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/address/manualAddress', {
+        pageTitle: `${pageTitlePrefix} - Prisoner personal details`,
+        formTitle: `${formTitlePrefix} for ${titlePrisonerName}`,
+        errors,
+        requestBody,
+        townOrCityOptions: objectToSelectOptions(cityReferenceData, 'code', 'description', requestBody?.townOrCity),
+        countyOptions: objectToSelectOptions(countyReferenceData, 'code', 'description', requestBody?.county),
+        countryOptions: objectToSelectOptions(countryReferenceData, 'code', 'description', requestBody?.country),
+        ukAddress: addressLocation !== AddressLocation.overseas,
+        noFixedAddress: addressLocation === AddressLocation.no_fixed_address,
+        noFixedAddressCheckbox: addressLocation === AddressLocation.overseas,
+        breadcrumbPrisonerName: prisonerName,
+        backLink: addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address',
+        prisonerNumber,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+        },
+      })
+    }
+  }
+
+  public submitManualEditAddress(options: {
+    addressLocation: AddressLocation
+    auditAction: PostAction
+  }): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { addressLocation, auditAction } = options
+      const { prisonerNumber } = this.getCommonRequestData(req)
+      const {
+        noFixedAddress,
+        houseOrBuildingName,
+        houseNumber,
+        addressLine1,
+        addressLine2,
+        townOrCity,
+        county,
+        postcode,
+        country,
+      } = req.body
+
+      const address: AddressRequestDto = {
+        noFixedAbode: addressLocation === AddressLocation.no_fixed_address || !!noFixedAddress,
+        buildingNumber: houseNumber,
+        buildingName: convertToTitleCase(houseOrBuildingName),
+        thoroughfareName: convertToTitleCase(addressLine1),
+        dependantLocality: convertToTitleCase(addressLine2),
+        postTownCode: townOrCity,
+        postCode: this.addressService.sanitisePostcode(postcode),
+        countyCode: county,
+        countryCode: country,
+        fromDate: formatDateISO(new Date()),
+        addressTypes: [],
+      }
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: auditAction,
+          details: { address },
+        })
+        .catch(error => logger.error(error))
+
+      const addressConfirmationUuid = await this.ephemeralDataService.cacheData({
+        address,
+        route: `${req.path?.replace('/', '')}`,
+      })
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressConfirmationUuid}`)
     }
   }
 

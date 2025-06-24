@@ -1,3 +1,15 @@
+.hmpps-address-field {
+  max-width: 630px;
+
+  &__house-number {
+    max-width: 85px;
+  }
+
+  &__postcode {
+    max-width: 159px;
+  }
+}
+
 .address-metadata {
   border-top: 1px solid $govuk-border-colour;
   padding-top: 15px;

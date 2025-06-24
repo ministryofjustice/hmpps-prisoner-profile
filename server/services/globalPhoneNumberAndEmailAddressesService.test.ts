@@ -71,6 +71,17 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     },
   )
 
+  it('Creates emails correctly', async () => {
+    personIntegrationApiClient.createContact = jest.fn(async () => ContactsResponseMock[1])
+    const result = await service.createEmailForPrisonerNumber('token', 'ABC123', 'foo@example.com')
+
+    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith('ABC123', {
+      contactType: 'EMAIL',
+      contactValue: 'foo@example.com',
+    })
+    expect(result).toEqual(email(ContactsResponseMock[1].contactId, ContactsResponseMock[1].contactValue))
+  })
+
   it('Updates emails correctly', async () => {
     personIntegrationApiClient.updateContact = jest.fn(async () => ContactsResponseMock[1])
     const result = await service.updateEmailForPrisonerNumber('token', 'ABC123', '123', 'foo@example.com')
@@ -80,5 +91,53 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
       contactValue: 'foo@example.com',
     })
     expect(result).toEqual(email(ContactsResponseMock[1].contactId, ContactsResponseMock[1].contactValue))
+  })
+
+  it('Creates phones correctly', async () => {
+    personIntegrationApiClient.createContact = jest.fn(async () => ContactsResponseMock[0])
+    const result = await service.createPhoneNumberForPrisonerNumber('token', 'ABC123', {
+      phoneNumber: '123',
+      phoneNumberType: 'MOB',
+      phoneExtension: '1234',
+    })
+
+    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith('ABC123', {
+      contactType: 'MOB',
+      contactValue: '123',
+      contactPhoneExtension: '1234',
+    })
+
+    expect(result).toEqual(
+      phone(
+        ContactsResponseMock[0].contactId,
+        ContactsResponseMock[0].contactType,
+        ContactsResponseMock[0].contactValue,
+        ContactsResponseMock[0].contactPhoneExtension,
+      ),
+    )
+  })
+
+  it('Updates phones correctly', async () => {
+    personIntegrationApiClient.updateContact = jest.fn(async () => ContactsResponseMock[0])
+    const result = await service.updatePhoneNumberForPrisonerNumber('token', 'ABC123', '123', {
+      phoneNumber: '123',
+      phoneNumberType: 'MOB',
+      phoneExtension: '1234',
+    })
+
+    expect(personIntegrationApiClient.updateContact).toHaveBeenCalledWith('ABC123', '123', {
+      contactType: 'MOB',
+      contactValue: '123',
+      contactPhoneExtension: '1234',
+    })
+
+    expect(result).toEqual(
+      phone(
+        ContactsResponseMock[0].contactId,
+        ContactsResponseMock[0].contactType,
+        ContactsResponseMock[0].contactValue,
+        ContactsResponseMock[0].contactPhoneExtension,
+      ),
+    )
   })
 })

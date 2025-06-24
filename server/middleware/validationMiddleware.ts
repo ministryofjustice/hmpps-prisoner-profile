@@ -1,21 +1,36 @@
-import { RequestHandler } from 'express'
+import { RequestHandler, Request } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
-import { IdentityNumberSubmission } from '../validators/personal/identityNumbersValidator'
+import { AddIdentityNumberSubmission } from '../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
+import { EditIdentityNumberSubmission } from '../controllers/identityNumbersController'
 
 export type Validator = (
   body:
     | FileUploadRequest
-    | Record<string, string | string[] | IdentityNumberSubmission>
+    | Record<string, string | string[] | AddIdentityNumberSubmission>
     | BodySubmission
-    | DietAndFoodAllergiesSubmission,
+    | DietAndFoodAllergiesSubmission
+    | EditIdentityNumberSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
+
+export type RedirectWithParams = (params: Request['params']) => string
+export interface ValidationMiddlewareOptions {
+  redirectBackOnError: boolean
+  redirectTo?: string
+  redirectWithParams?: RedirectWithParams
+  useReq?: boolean
+}
 
 export default function validationMiddleware(
   validators: Validator[],
-  options: { redirectBackOnError: boolean; redirectTo?: string; useReq?: boolean } = {
+  options: {
+    redirectBackOnError: boolean
+    redirectTo?: string
+    redirectWithParams?: RedirectWithParams
+    useReq?: boolean
+  } = {
     redirectBackOnError: false,
     useReq: false,
   },
@@ -46,6 +61,9 @@ export default function validationMiddleware(
       req.flash('errors', errors)
       if (options.redirectTo) {
         return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectTo}`)
+      }
+      if (options.redirectWithParams) {
+        return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectWithParams(req.params)}`)
       }
       return res.redirect(req.originalUrl)
     }

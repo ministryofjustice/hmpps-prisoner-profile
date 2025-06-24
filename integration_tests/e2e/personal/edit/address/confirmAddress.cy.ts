@@ -2,8 +2,12 @@ import { v4 as uuidv4 } from 'uuid'
 import Page from '../../../../pages/page'
 import { Role } from '../../../../../server/data/enums/role'
 import ConfirmAddressPage from '../../../../pages/editPages/address/confirmAddressPage'
-import { AddressRequestDto } from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  AddressRequestDto,
+  CorePersonRecordReferenceDataDomain,
+} from '../../../../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundPage from '../../../../pages/notFoundPage'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Confirm Address Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -26,6 +30,10 @@ context('Confirm Address Page', () => {
 
   before(() => {
     cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
+    cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
   })
 
   const visitConfirmAddressPage = (): ConfirmAddressPage => {
