@@ -2,6 +2,7 @@ import { Validator } from '../../middleware/validationMiddleware'
 import { validateMandatoryName, validateName } from './nameValidator'
 import HmppsError from '../../interfaces/HmppsError'
 import { validateDate } from './dateValidator'
+import { validatePhoneNumber } from './phoneNumberValidator'
 
 export const nextOfKinValidator: Validator = (body: Record<string, string>): HmppsError[] => {
   const {
@@ -35,7 +36,7 @@ export const nextOfKinValidator: Validator = (body: Record<string, string>): Hmp
       true,
       false,
     ),
-    ...validateFieldLength('#phoneNumber', 'Phone number', phoneNumber, 40, false),
+    ...validatePhoneNumber('#phoneNumber', 'Phone number', phoneNumber),
     ...validateFieldLength('#property', 'House name or number', property, 50, false),
     ...validateFieldLength('#street', 'Street', street, 160, false),
     ...validateAutocomplete('#cityCode', 'Town or city', cityCodeError),
@@ -75,7 +76,7 @@ export const validateRelationshipType = (
   if (invalidValue) {
     return [
       {
-        text: `This is not a valid relationship`,
+        text: `We could not find a matching relationship. Check the spelling or try typing something else`,
         href,
       },
     ]

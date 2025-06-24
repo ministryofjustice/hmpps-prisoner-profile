@@ -1,5 +1,7 @@
 import HmppsError from '../../interfaces/HmppsError'
 
+const phoneNumberInvalidCharacterChecker = /[^\d() ]/
+
 export const phoneNumberValidator = (body: Record<string, string>): HmppsError[] => {
   const { phoneNumberType, phoneNumber, phoneExtension } = body
   const errors: HmppsError[] = []
@@ -8,14 +10,7 @@ export const phoneNumberValidator = (body: Record<string, string>): HmppsError[]
     errors.push({ text: 'Select a phone number type', href: '#phone-number-type' })
   }
 
-  const phoneNumberInvalidCharacterChecker = /[^\d() ]/
-  if (!phoneNumber) {
-    errors.push({ text: 'Enter a phone number', href: '#phone-number' })
-  } else if (phoneNumber.match(phoneNumberInvalidCharacterChecker)) {
-    errors.push({ text: 'Phone numbers must only contain numbers or brackets', href: '#phone-number' })
-  } else if (phoneNumber.length > 40) {
-    errors.push({ text: 'Phone number must be 40 characters or less', href: '#phone-number' })
-  }
+  errors.push(...validateMandatoryPhoneNumber('#phone-number', 'Phone number', phoneNumber))
 
   if (phoneExtension) {
     const phoneExtensionInvalidCharacterChecker = /[^\d]/
@@ -27,4 +22,23 @@ export const phoneNumberValidator = (body: Record<string, string>): HmppsError[]
   }
 
   return errors
+}
+
+export const validateMandatoryPhoneNumber = (href: string, label: string, phoneNumber: string): HmppsError[] => {
+  if (!phoneNumber?.trim()) {
+    return [{ href, text: `Enter a ${label.toLowerCase()}` }]
+  }
+
+  return validatePhoneNumber(href, label, phoneNumber)
+}
+
+export const validatePhoneNumber = (href: string, label: string, phoneNumber: string): HmppsError[] => {
+  if (phoneNumber.match(phoneNumberInvalidCharacterChecker)) {
+    return [{ text: `${label}s must only contain numbers or brackets`, href }]
+  }
+  if (phoneNumber.length > 40) {
+    return [{ text: `${label} must be 40 characters or less`, href }]
+  }
+
+  return []
 }
