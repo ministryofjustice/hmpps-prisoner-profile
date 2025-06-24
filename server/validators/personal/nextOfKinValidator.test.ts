@@ -59,7 +59,12 @@ describe('Next of Kin Validator', () => {
         '#relationshipTypeId',
         undefined,
         'invalid',
-        [{ href: '#relationshipTypeId', text: 'This is not a valid relationship' }],
+        [
+          {
+            href: '#relationshipTypeId',
+            text: 'We could not find a matching relationship. Check the spelling or try typing something else',
+          },
+        ],
       ],
       // Missing value
       ['#relationshipTypeId', '', undefined, [{ href: '#relationshipTypeId', text: 'Enter relationship' }]],
@@ -150,7 +155,7 @@ describe('Next of Kin Validator', () => {
         'dateOfBirth-day': '01',
         'dateOfBirth-month': '01',
         'dateOfBirth-year': '1980',
-        phoneNumber: 'a'.repeat(41),
+        phoneNumber: '0'.repeat(41),
         property: 'a'.repeat(51),
         street: 'a'.repeat(161),
         postcode: 'a'.repeat(13),
@@ -175,6 +180,31 @@ describe('Next of Kin Validator', () => {
       expect(errors).toContainEqual({
         href: '#postcode',
         text: 'Postcode must be 12 characters or less',
+      })
+    })
+
+    it('should validate phone numbers correctly', () => {
+      const body = {
+        contactType: ['nextOfKin'],
+        firstName: 'John',
+        middleNames: '',
+        lastName: 'Doe',
+        'dateOfBirth-day': '01',
+        'dateOfBirth-month': '01',
+        'dateOfBirth-year': '1980',
+        phoneNumber: 'ABC123',
+        property: '',
+        street: '',
+        postcode: '',
+        relationshipTypeId: 'S_SIS',
+      }
+
+      const errors = nextOfKinValidator(body)
+
+      // Check specific errors
+      expect(errors).toContainEqual({
+        href: '#phoneNumber',
+        text: 'Phone numbers must only contain numbers or brackets',
       })
     })
 
@@ -204,7 +234,7 @@ describe('Next of Kin Validator', () => {
       })
       expect(errors).toContainEqual({
         href: '#relationshipTypeId',
-        text: 'This is not a valid relationship',
+        text: 'We could not find a matching relationship. Check the spelling or try typing something else',
       })
     })
   })

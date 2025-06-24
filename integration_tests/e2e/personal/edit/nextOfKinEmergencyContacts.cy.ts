@@ -173,7 +173,7 @@ context('Edit next of kin and emergency contacts', () => {
       },
       {
         // Test case 5: Invalid relationship
-        testDescription: 'INvalid relationship',
+        testDescription: 'Invalid relationship',
         input: {
           checkboxInputs: { contactType: [{ value: 'nextOfKin' }] },
           textInputs: {
@@ -184,7 +184,7 @@ context('Edit next of kin and emergency contacts', () => {
             relationshipTypeId: 'Random',
           },
         },
-        errorMessages: ['This is not a valid relationship'],
+        errorMessages: ['We could not find a matching relationship. Check the spelling or try typing something else'],
       },
       {
         // Test case 6: Invalid date of birth
@@ -203,6 +203,22 @@ context('Edit next of kin and emergency contacts', () => {
           },
         },
         errorMessages: ['Date of birth must be a real date'],
+      },
+      {
+        // Test case 7: Invalid phone number
+        testDescription: 'Invalid phone number',
+        input: {
+          checkboxInputs: { contactType: [{ value: 'nextOfKin' }] },
+          textInputs: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+            phoneNumber: 'ABC123',
+          },
+          autocompleteInputs: {
+            relationshipTypeId: 'Friend',
+          },
+        },
+        errorMessages: ['Phone numbers must only contain numbers or brackets'],
       },
     ],
     redirectAnchor: 'next-of-kin',
