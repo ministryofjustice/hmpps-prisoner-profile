@@ -32,6 +32,7 @@ export enum CorePersonRecordReferenceDataDomain {
   rightEyeColour = 'R_EYE_C',
   sexualOrientation = 'SEXO',
   ethnicity = 'ETHNICITY',
+  phoneTypes = 'PHONE_USAGE',
 }
 
 export interface MilitaryRecord {

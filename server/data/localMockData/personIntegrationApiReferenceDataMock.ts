@@ -448,6 +448,58 @@ export const PseudonymResponseMock: PseudonymResponseDto = {
   isWorkingName: true,
 }
 
+export const phoneUsageReferenceDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'PHONE_USAGE_HOME',
+    code: 'HOME',
+    description: 'Home',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_BUS',
+    code: 'BUS',
+    description: 'Business',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_FAX',
+    code: 'FAX',
+    description: 'Fax',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_ALTB',
+    code: 'ALTB',
+    description: 'Alternate Business',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_ALTH',
+    code: 'ALTH',
+    description: 'Alternate Home',
+    listSequence: 5,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_MOB',
+    code: 'MOB',
+    description: 'Mobile',
+    listSequence: 6,
+    isActive: true,
+  },
+  {
+    id: 'PHONE_USAGE_VISIT',
+    code: 'VISIT',
+    description: 'Agency Visit Line',
+    listSequence: 7,
+    isActive: true,
+  },
+]
+
 export const ContactsResponseMock: ContactsResponseDto[] = [
   {
     contactId: 1,

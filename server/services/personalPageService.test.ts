@@ -139,6 +139,7 @@ describe('PersonalPageService', () => {
 
     globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
       null,
+      null,
     ) as jest.Mocked<GlobalPhoneNumberAndEmailAddressesService>
     globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber = jest.fn(async () => globalPhonesAndEmailsMock)
   })

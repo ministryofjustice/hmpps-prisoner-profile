@@ -196,7 +196,9 @@ export const services = () => {
   )
   const globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
     personIntegrationApiClientBuilder,
+    referenceDataService,
   )
+
   const identityNumbersService = new IdentityNumbersService(
     prisonApiClientBuilder,
     personIntegrationApiClientBuilder,
