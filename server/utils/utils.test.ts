@@ -51,6 +51,7 @@ import {
   summaryListOneHalfWidth,
   SummaryListRow,
   toNonAssociationRows,
+  toFullCourtLink,
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -1270,6 +1271,18 @@ describe('utils', () => {
     it('should return false for null or undefined array', () => {
       expect(arrayIncludes(null as unknown as string[], 'banana')).toBe(false)
       expect(arrayIncludes(undefined as unknown as string[], 'banana')).toBe(false)
+    })
+  })
+
+  describe('BVLS toFullCourtLink', () => {
+    it.each([
+      ['1234', 'HMCTS1234@meet.video.justice.gov.uk'],
+      ['0878', 'HMCTS0878@meet.video.justice.gov.uk'],
+      ['12', 'HMCTS12@meet.video.justice.gov.uk'],
+      ['', undefined],
+      [undefined, undefined],
+    ])("expands court link [%s] to full link '%s'", (input, expected) => {
+      expect(toFullCourtLink(input)).toEqual(expected)
     })
   })
 })

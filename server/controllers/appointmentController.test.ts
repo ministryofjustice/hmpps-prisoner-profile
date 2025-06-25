@@ -227,6 +227,8 @@ describe('Appointment Controller', () => {
     })
   })
 
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
   it('should display add appointment with data prepopulated when editing a VLB', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
@@ -271,6 +273,8 @@ describe('Appointment Controller', () => {
       errors: undefined,
     })
   })
+
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
 
   it('should display add appointment with data prepopulated when editing a VLPM', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
@@ -359,6 +363,8 @@ describe('Appointment Controller', () => {
       )
     })
 
+    // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
     it('should create new probation video link booking for VLPM appointment', async () => {
       req.body = {
         ...formBody,
@@ -415,6 +421,8 @@ describe('Appointment Controller', () => {
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
       )
     })
+
+    // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
 
     it('should amend the existing probation video link booking for VLPM appointment', async () => {
       req.body = {
@@ -480,6 +488,8 @@ describe('Appointment Controller', () => {
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
       )
     })
+
+    // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
 
     it('should redirect to VLB page', async () => {
       req.body = {
@@ -563,6 +573,8 @@ describe('Appointment Controller', () => {
     })
   })
 
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
   it('should display prepost appointment', async () => {
     const { prisonerNumber, cellLocation } = PrisonerMockDataA
     formBody.location = locationsMock[0].locationId
@@ -622,6 +634,8 @@ describe('Appointment Controller', () => {
     })
   })
 
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
   it('should display prepost appointment with data prepopulated when editing', async () => {
     req.params.appointmentId = 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
@@ -669,6 +683,7 @@ describe('Appointment Controller', () => {
         preAppointment: 'yes',
         preAppointmentLocation: 'abc-123',
         videoLinkUrl: 'http://bvls.test.url',
+        guestPinRequired: 'no',
       },
     }
 
@@ -705,6 +720,8 @@ describe('Appointment Controller', () => {
     afterEach(() => {
       jest.resetAllMocks()
     })
+
+    // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
 
     it('should create new video link booking appointment', async () => {
       const flash = {
@@ -772,6 +789,8 @@ describe('Appointment Controller', () => {
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation`,
       )
     })
+
+    // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
 
     it('should amend the existing video link booking appointment', async () => {
       const flash = {
@@ -881,6 +900,8 @@ describe('Appointment Controller', () => {
     })
   })
 
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
   it('should display prepost appointment confirmation', async () => {
     const { prisonerNumber } = PrisonerMockDataA
     const flash = {
@@ -898,6 +919,7 @@ describe('Appointment Controller', () => {
         court: courtLocationsMock[2].code,
         cvpRequired: 'yes',
         videoLinkUrl: 'http://bvls.test.url',
+        guestPinRequired: 'no',
         preAppointment: 'no',
         postAppointment: 'no',
       },
@@ -949,6 +971,8 @@ describe('Appointment Controller', () => {
     })
   })
 
+  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+
   it('should display prepost appointment confirmation when amending', async () => {
     const { prisonerNumber } = PrisonerMockDataA
     const flash = {
@@ -967,6 +991,7 @@ describe('Appointment Controller', () => {
         court: courtLocationsMock[2].code,
         cvpRequired: 'yes',
         videoLinkUrl: 'http://bvls.test.url',
+        guestPinRequired: 'no',
         preAppointment: 'no',
         postAppointment: 'no',
       },
