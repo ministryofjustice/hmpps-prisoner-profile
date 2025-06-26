@@ -26,7 +26,7 @@ export default class NextOfKinService {
     const queryParams = {
       emergencyContactOrNextOfKin: true,
       isRelationshipActive: true,
-      size: 1000,
+      size: 50,
     }
 
     const response = await personalRelationShipsApiClient.getContacts(prisonerNumber, queryParams)
