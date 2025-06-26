@@ -837,6 +837,7 @@ export const formatPhoneNumber = (phoneNumber: string): string => {
   if (cleanedNumber.length === 11) {
     return `${cleanedNumber.slice(0, 5)} ${cleanedNumber.slice(5)}`
   }
+
   return phoneNumber.trim()
 }
 

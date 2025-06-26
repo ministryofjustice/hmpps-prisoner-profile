@@ -1,6 +1,12 @@
 import { RestClientBuilder } from '../data'
-import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  ContactsResponseDto,
+  CorePersonRecordReferenceDataDomain,
+  PersonIntegrationApiClient,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { GlobalEmail, GlobalNumbersAndEmails, GlobalPhoneNumber } from './interfaces/personalPageService/PersonalPage'
+import ReferenceDataService from './referenceData/referenceDataService'
 
 /*
  * Service for getting a prisoners "global" numbers and email addresess.
@@ -9,21 +15,32 @@ import { GlobalEmail, GlobalNumbersAndEmails, GlobalPhoneNumber } from './interf
  * rather than any specific address and is used here to maintain that distinction.
  */
 export default class GlobalPhoneNumberAndEmailAddressesService {
-  constructor(private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>) {}
+  constructor(
+    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly referenceDataService: ReferenceDataService,
+  ) {}
+
+  private transformPhones(contacts: ContactsResponseDto[], phoneTypes: ReferenceDataCodeDto[]): GlobalPhoneNumber[] {
+    return contacts
+      .filter(c => c.contactType !== 'EMAIL')
+      .map(c => ({
+        id: c.contactId,
+        type: c.contactType,
+        typeDescription: phoneTypes.find(t => t.code === c.contactType).description,
+        extension: c.contactPhoneExtension,
+        number: c.contactValue,
+      }))
+  }
 
   async getForPrisonerNumber(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
-    const contacts = await apiClient.getContacts(prisonerNumber)
+    const [contacts, phoneTypes] = await Promise.all([
+      apiClient.getContacts(prisonerNumber),
+      this.referenceDataService.getActiveReferenceDataCodes(CorePersonRecordReferenceDataDomain.phoneTypes, token),
+    ])
 
     return {
-      phones: contacts
-        .filter(c => c.contactType !== 'EMAIL')
-        .map(c => ({
-          id: c.contactId,
-          type: c.contactType,
-          extension: c.contactPhoneExtension,
-          number: c.contactValue,
-        })),
+      phones: this.transformPhones(contacts, phoneTypes),
       emails: contacts.filter(c => c.contactType === 'EMAIL').map(c => ({ id: c.contactId, email: c.contactValue })),
     }
   }
@@ -72,7 +89,13 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       },
     )
 
-    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
+    return {
+      id: contactId,
+      number: contactValue,
+      type: contactType,
+      typeDescription: '',
+      extension: contactPhoneExtension,
+    }
   }
 
   async updatePhoneNumberForPrisonerNumber(
@@ -96,6 +119,12 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       },
     )
 
-    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
+    return {
+      id: contactId,
+      number: contactValue,
+      type: contactType,
+      typeDescription: '',
+      extension: contactPhoneExtension,
+    }
   }
 }

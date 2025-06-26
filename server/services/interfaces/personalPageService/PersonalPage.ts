@@ -184,6 +184,7 @@ export interface GlobalEmail {
 export interface GlobalPhoneNumber {
   id: number
   type: string
+  typeDescription: string
   number: string
   extension?: string
 }
