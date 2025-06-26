@@ -68,6 +68,7 @@ import {
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import config from '../../config'
+import { NomisLockedError } from '../../utils/nomisLockedErrorHelpers'
 
 type TextFieldDataGetter = (req: Request) => TextFieldData
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
@@ -1910,6 +1911,7 @@ export default class PersonalController {
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
     } catch (e) {
+      if (e instanceof NomisLockedError) throw e
       req.flash('errors', [{ text: 'There was an error please try again' }])
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
