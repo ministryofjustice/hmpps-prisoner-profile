@@ -30,7 +30,7 @@
           <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
         {%- endcall -%}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        {%- call conditionallyShow({condition: editEnabled, id: 'global-numbers-and-email-addresses-nav'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) and editEnabled, id: 'global-numbers-and-email-addresses-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#phones-and-emails">Phone and email</a></li>
         {%- endcall -%}
         {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin-nav'}) -%}
