@@ -6,7 +6,7 @@ export function nomisLockedMiddleware(err: unknown, req: Request, res: Response,
   if (err instanceof NomisLockedError) {
     req.flash('isLocked', 'true')
     req.flash('requestBody', JSON.stringify(req.body))
-    return res.redirect(req.get('referer') || req.originalUrl || '/')
+    return res.redirect(req.originalUrl)
   }
   return next(err)
 }
