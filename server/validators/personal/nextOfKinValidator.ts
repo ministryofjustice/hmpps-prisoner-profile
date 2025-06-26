@@ -2,9 +2,11 @@ import { Validator } from '../../middleware/validationMiddleware'
 import { validateMandatoryName, validateName } from './nameValidator'
 import HmppsError from '../../interfaces/HmppsError'
 import { validateDate } from './dateValidator'
-import { validatePhoneNumber } from './phoneNumberValidator'
+import { validateExtensionNumber, validateMandatoryPhoneNumber } from './phoneNumberValidator'
+import { PhoneNumberTypeMappings } from '../../data/constants/phoneNumberMappings'
+import { NextOfKinPhoneNumberSubmission, NextOfKinSubmission } from '../../controllers/nextOfKinController'
 
-export const nextOfKinValidator: Validator = (body: Record<string, string>): HmppsError[] => {
+export const nextOfKinValidator: Validator = (body: NextOfKinSubmission): HmppsError[] => {
   const {
     contactType,
     firstName,
@@ -36,7 +38,7 @@ export const nextOfKinValidator: Validator = (body: Record<string, string>): Hmp
       true,
       false,
     ),
-    ...validatePhoneNumber('#phoneNumber', 'Phone number', phoneNumber),
+    ...validatePhoneNumbers(phoneNumber),
     ...validateFieldLength('#property', 'House name or number', property, 50, false),
     ...validateFieldLength('#street', 'Street', street, 160, false),
     ...validateAutocomplete('#cityCode', 'Town or city', cityCodeError),
@@ -85,6 +87,25 @@ export const validateRelationshipType = (
     return [{ href, text: 'Enter relationship' }]
   }
   return []
+}
+
+export const validatePhoneNumbers = (phoneNumber: NextOfKinPhoneNumberSubmission): HmppsError[] => {
+  if (!phoneNumber?.type || phoneNumber.type === 'NONE') {
+    return []
+  }
+
+  const { type } = phoneNumber
+  const { formValue } = PhoneNumberTypeMappings[type]
+  const numberToValidate = phoneNumber?.numbers?.[formValue]
+
+  const numberErrors =
+    validateMandatoryPhoneNumber(`#phoneNumber-${formValue}-number`, 'Phone number', numberToValidate.number) ?? []
+  const extensionErrors =
+    (numberToValidate?.extension &&
+      validateExtensionNumber(`#phoneNumber-${formValue}-extension`, 'Extension number', numberToValidate.extension)) ??
+    []
+
+  return [...numberErrors, ...extensionErrors]
 }
 
 export const validateAutocomplete = (href: string, type: string, invalidValue: string) => {

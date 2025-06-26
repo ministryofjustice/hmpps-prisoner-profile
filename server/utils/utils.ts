@@ -345,7 +345,7 @@ export const addressToLines = ({
 }
 
 export const contactAddressToHtml = (address: Partial<PersonalRelationshipsContact>): string => {
-  const { flat, property, street, cityDescription, postcode } = address || {}
+  const { flat, property, street, cityDescription, postcode, countryDescription } = address || {}
   let lineOne = [property, street]
     .filter(s => s)
     .join(' ')
@@ -353,7 +353,7 @@ export const contactAddressToHtml = (address: Partial<PersonalRelationshipsConta
   if (flat) {
     lineOne = [`Flat ${flat}`, lineOne].filter(Boolean).join(', ')
   }
-  const addressArray = [lineOne, cityDescription, postcode].filter(s => s)
+  const addressArray = [lineOne, cityDescription, postcode, countryDescription].filter(s => s)
   if (addressArray.length) return addressArray.join('<br/>')
   return 'Not entered'
 }

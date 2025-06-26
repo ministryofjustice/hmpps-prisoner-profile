@@ -6,6 +6,7 @@ import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContact,
   PersonalRelationshipsContactRequest,
+  PersonalRelationshipsContactRequestAddress,
   PersonalRelationshipsReferenceDataDomain,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
@@ -62,6 +63,26 @@ export default class NextOfKinService {
     this.metricsService.trackPersonalRelationshipsUpdate({
       fieldsUpdated: ['nextOfKin'],
       prisonerNumber: contactRequest.relationship.prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async addContactAddress(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    contactId: number,
+    request: PersonalRelationshipsContactRequestAddress,
+  ) {
+    const personalRelationShipsApiClient = this.personalRelationShipsApiClientBuilder(clientToken)
+
+    const response = await personalRelationShipsApiClient.addContactAddress(contactId, request)
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['nextOfKin'],
+      prisonerNumber,
       user,
     })
 

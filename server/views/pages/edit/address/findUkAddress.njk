@@ -33,7 +33,7 @@
 
         {{ govukBackLink({
             text: "Back",
-            href: "/prisoner/" + prisonerNumber + "/personal/where-is-address",
+            href: "/prisoner/" + prisonerNumber + "/personal/" + backLink,
             classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
         }) }}
 
@@ -111,11 +111,11 @@
                             preventDoubleClick: true,
                             attributes: { "data-qa": "edit-submit-button" }
                         }) }}
-                        <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
+                        <a href="{{ cancelLink }}"
                            class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
                     </div>
 
-                    <a href="/prisoner/{{ prisonerNumber }}/personal/add-uk-address"
+                    <a href="{{ manualEntryUrl }}"
                        class="govuk-link govuk-link--no-visited-state">Enter the address manually</a>
                 </form>
             </div>

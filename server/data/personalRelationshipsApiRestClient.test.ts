@@ -1,6 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import {
+  PersonalRelationshipsAddContactAddressRequest,
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactsDto,
@@ -268,6 +269,28 @@ describe('personalRelationshipsApiRestClient', () => {
         .reply(201)
 
       await personalRelationshipsApiClient.createContact(contactRequest)
+      expect(fakePersonalRelationshipsApi.isDone()).toBe(true)
+    })
+  })
+
+  describe('addContactAddress', () => {
+    const contactId = 1234
+    const request: PersonalRelationshipsAddContactAddressRequest = {
+      property: 'Flat 1A',
+      street: 'Test Road',
+      cityCode: 'Test',
+      postcode: 'TE1 2ST',
+      noFixedAddress: false,
+      createdBy: 'user',
+    }
+
+    it('should add a new contact address successfully', async () => {
+      fakePersonalRelationshipsApi
+        .post(`/contact/${contactId}/address`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(201)
+
+      await personalRelationshipsApiClient.addContactAddress(contactId, request)
       expect(fakePersonalRelationshipsApi.isDone()).toBe(true)
     })
   })

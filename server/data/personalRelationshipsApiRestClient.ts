@@ -3,8 +3,10 @@ import config from '../config'
 import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContactCount,
+  PersonalRelationshipsContactCreationResultDto,
   PersonalRelationshipsContactQueryParams,
   PersonalRelationshipsContactRequest,
+  PersonalRelationshipsContactRequestAddress,
   PersonalRelationshipsContactsDto,
   PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsDomesticStatusUpdateRequest,
@@ -61,7 +63,11 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     return this.restClient.get({ path: `/reference-codes/group/${domain}` })
   }
 
-  createContact(contact: PersonalRelationshipsContactRequest): Promise<void> {
+  createContact(contact: PersonalRelationshipsContactRequest): Promise<PersonalRelationshipsContactCreationResultDto> {
     return this.restClient.post({ path: '/contact', data: contact })
+  }
+
+  addContactAddress(contactId: number, address: PersonalRelationshipsContactRequestAddress): Promise<void> {
+    return this.restClient.post({ path: `/contact/${contactId}/address`, data: address })
   }
 }
