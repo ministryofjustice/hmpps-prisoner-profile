@@ -9,7 +9,7 @@
   {% for x in globalNumbersAndEmails.phones %}
     <div class="hmpps-global-numbers-and-emails__phone">
       <div class="hmpps-global-numbers-and-emails__phone__details">
-        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.type }}</p>
+        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.typeDescription }}</p>
         <p class="govuk-body govuk-!-margin-0">{{ x.number | formatPhoneNumber }}</p>
         {% if x.extension %}
           <p class="govuk-body govuk-!-margin-0">Ext: {{ x.extension }}</p>

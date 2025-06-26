@@ -25,7 +25,8 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       .filter(c => c.contactType !== 'EMAIL')
       .map(c => ({
         id: c.contactId,
-        type: phoneTypes.find(t => t.code === c.contactType).description,
+        type: c.contactType,
+        typeDescription: phoneTypes.find(t => t.code === c.contactType).description,
         extension: c.contactPhoneExtension,
         number: c.contactValue,
       }))
@@ -88,7 +89,13 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       },
     )
 
-    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
+    return {
+      id: contactId,
+      number: contactValue,
+      type: contactType,
+      typeDescription: '',
+      extension: contactPhoneExtension,
+    }
   }
 
   async updatePhoneNumberForPrisonerNumber(
@@ -112,6 +119,12 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       },
     )
 
-    return { id: contactId, number: contactValue, type: contactType, extension: contactPhoneExtension }
+    return {
+      id: contactId,
+      number: contactValue,
+      type: contactType,
+      typeDescription: '',
+      extension: contactPhoneExtension,
+    }
   }
 }

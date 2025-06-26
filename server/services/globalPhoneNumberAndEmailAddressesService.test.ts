@@ -24,9 +24,16 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     contactPhoneExtension,
   })
 
-  const phone = (id: number, type: string, number: string, extension: string = null): GlobalPhoneNumber => ({
+  const phone = (
+    id: number,
+    type: string,
+    typeDescription: string,
+    number: string,
+    extension: string = null,
+  ): GlobalPhoneNumber => ({
     id,
     type,
+    typeDescription,
     number,
     extension,
   })
@@ -46,7 +53,7 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     [
       'Only phones',
       [contact(1, 'BUS', '12345'), contact(2, 'HOME', '54321', '1')],
-      { phones: [phone(1, 'Business', '12345'), phone(2, 'Home', '54321', '1')], emails: [] },
+      { phones: [phone(1, 'BUS', 'Business', '12345'), phone(2, 'HOME', 'Home', '54321', '1')], emails: [] },
     ],
     [
       'Only Emails',
@@ -62,7 +69,7 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
         contact(4, 'EMAIL', 'bar@example.com'),
       ],
       {
-        phones: [phone(1, 'Business', '12345'), phone(3, 'Home', '54321', '1')],
+        phones: [phone(1, 'BUS', 'Business', '12345'), phone(3, 'HOME', 'Home', '54321', '1')],
         emails: [email(2, 'foo@example.com'), email(4, 'bar@example.com')],
       },
     ],
@@ -115,6 +122,7 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
       phone(
         ContactsResponseMock[0].contactId,
         ContactsResponseMock[0].contactType,
+        '',
         ContactsResponseMock[0].contactValue,
         ContactsResponseMock[0].contactPhoneExtension,
       ),
@@ -139,6 +147,7 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
       phone(
         ContactsResponseMock[0].contactId,
         ContactsResponseMock[0].contactType,
+        '',
         ContactsResponseMock[0].contactValue,
         ContactsResponseMock[0].contactPhoneExtension,
       ),

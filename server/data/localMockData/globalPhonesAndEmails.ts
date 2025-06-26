@@ -8,11 +8,13 @@ export const globalPhonesMock: GlobalPhoneNumber[] = [
   {
     id: 321,
     type: 'HOME',
+    typeDescription: 'Home',
     number: '09876 098 098',
   },
   {
     id: 123,
     type: 'BUS',
+    typeDescription: 'Business',
     number: '12345 678 901',
     extension: '123',
   },

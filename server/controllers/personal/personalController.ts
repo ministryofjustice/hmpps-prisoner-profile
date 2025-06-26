@@ -1607,22 +1607,11 @@ export default class PersonalController {
   }
 
   globalNumbers() {
-    const phoneTypeOptions = (chosenType: string = null): RadioOption[] => {
-      // TODO: Replace these with a call to the APIs for the reference data
-      const options = {
-        MOB: 'Mobile',
-        HOME: 'Home',
-        ALTH: 'Alternate Home',
-        BUS: 'Business',
-        ALTB: 'Alternate Business',
-        VISIT: 'Agency Visit Line',
-        FAX: 'Fax',
-      }
-
-      return Object.entries(options).map(([value, text]) => ({
-        text,
-        value,
-        checked: chosenType === value,
+    const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): RadioOption[] => {
+      return referenceData.map(({ code, description }) => ({
+        text: description,
+        value: code,
+        checked: chosenType === code,
       }))
     }
 
@@ -1640,12 +1629,16 @@ export default class PersonalController {
     return {
       add: {
         edit: async (req: Request, res: Response, _next: NextFunction) => {
-          const { prisonerData } = req.middleware
+          const { prisonerData, clientToken } = req.middleware
           const { firstName, lastName, cellLocation } = prisonerData
           const { prisonerNumber } = req.params
           const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
           const errors = req.flash('errors')
           const { pageTitle, formTitle } = addPhoneNumberFieldData({ firstName, lastName })
+          const [phoneTypes] = await Promise.all([
+            this.personalPageService.getReferenceDataCodes(clientToken, CorePersonRecordReferenceDataDomain.phoneTypes),
+          ])
+
           const requestBodyFlash = requestBodyFromFlash<{
             phoneNumber: string
             phoneNumberType: string
@@ -1675,7 +1668,7 @@ export default class PersonalController {
             breadcrumbPrisonerName: prisonerBannerName,
             errors,
             addAnotherEnabled: true,
-            phoneTypeOptions: phoneTypeOptions(phoneValue?.type),
+            phoneTypeOptions: phoneTypeOptions(phoneTypes, phoneValue?.type),
             phoneNumber: phoneValue?.number,
             phoneExtension: phoneValue?.extension,
             miniBannerData: {
@@ -1730,7 +1723,11 @@ export default class PersonalController {
             phoneExtension: string
           }>(req)
 
-          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const [phonesAndEmails, phoneTypes] = await Promise.all([
+            this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber),
+            this.personalPageService.getReferenceDataCodes(clientToken, CorePersonRecordReferenceDataDomain.phoneTypes),
+          ])
+
           const phoneValue = requestBodyFlash
             ? {
                 type: requestBodyFlash.phoneNumberType,
@@ -1753,7 +1750,7 @@ export default class PersonalController {
             prisonerNumber,
             breadcrumbPrisonerName: prisonerBannerName,
             errors,
-            phoneTypeOptions: phoneTypeOptions(phoneValue.type),
+            phoneTypeOptions: phoneTypeOptions(phoneTypes, phoneValue.type),
             phoneNumber: phoneValue.number,
             phoneExtension: phoneValue.extension,
             miniBannerData: {
