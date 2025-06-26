@@ -29,20 +29,26 @@ export default class PersonCommunicationNeedsApiRestClient implements PersonComm
     prisonerNumber: string,
     languagePreferencesRequest: LanguagePreferencesRequest,
   ): Promise<void> {
-    return handleNomisLockedError(() => this.restClient.put({
-      path: `/v1/prisoner/${prisonerNumber}/language-preferences`,
-      data: languagePreferencesRequest,
-    }))
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: `/v1/prisoner/${prisonerNumber}/language-preferences`,
+        data: languagePreferencesRequest,
+      }),
+    )
   }
 
   updateSecondaryLanguage(prisonerNumber: string, secondaryLanguageRequest: SecondaryLanguageRequest): Promise<void> {
-    return handleNomisLockedError(() => this.restClient.put({
-      path: `/v1/prisoner/${prisonerNumber}/secondary-language`,
-      data: secondaryLanguageRequest,
-    }))
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: `/v1/prisoner/${prisonerNumber}/secondary-language`,
+        data: secondaryLanguageRequest,
+      }),
+    )
   }
 
   deleteSecondaryLanguage(prisonerNumber: string, languageCode: string): Promise<void> {
-    return handleNomisLockedError(() =>this.restClient.delete({ path: `/v1/prisoner/${prisonerNumber}/secondary-language/${languageCode}` }))
+    return handleNomisLockedError(() =>
+      this.restClient.delete({ path: `/v1/prisoner/${prisonerNumber}/secondary-language/${languageCode}` }),
+    )
   }
 }

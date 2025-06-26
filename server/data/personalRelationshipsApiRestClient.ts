@@ -42,7 +42,9 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return handleNomisLockedError(() => this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest }))
+    return handleNomisLockedError(() =>
+      this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest }),
+    )
   }
 
   getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto> {
@@ -53,7 +55,9 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
   ): Promise<PersonalRelationshipsDomesticStatusDto> {
-    return handleNomisLockedError(() => this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest }))
+    return handleNomisLockedError(() =>
+      this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest }),
+    )
   }
 
   getReferenceDataCodes(

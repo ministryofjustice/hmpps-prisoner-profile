@@ -7,6 +7,7 @@ export class NomisLockedError extends Error {
   }
 }
 
+// Used to wrap around rest client calls in api clients. Throws the custom error.
 export async function handleNomisLockedError<T>(apiClientFunction: () => Promise<T>): Promise<T> {
   try {
     return await apiClientFunction()
