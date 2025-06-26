@@ -1,5 +1,6 @@
 import Interface from './Interface'
 import PersonalPageService from '../../server/services/personalPageService'
+import { getMockReferenceDataCodesForDomain } from './referenceDataMocks'
 
 export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   get: jest.fn(),
@@ -12,7 +13,7 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   updateCountryOfBirth: jest.fn(),
   updateReligion: jest.fn(),
   updateSexualOrientation: jest.fn(),
-  getReferenceDataCodes: jest.fn(),
+  getReferenceDataCodes: jest.fn(async (_, domain) => getMockReferenceDataCodesForDomain(domain)),
   getReferenceData: jest.fn(),
   getHealthAndMedication: jest.fn(),
   updateDietAndFoodAllergies: jest.fn(),

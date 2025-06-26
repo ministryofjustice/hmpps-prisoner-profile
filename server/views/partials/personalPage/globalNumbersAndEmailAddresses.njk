@@ -1,12 +1,16 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set notEnteredTag %}
+<p class="govuk-body not-entered-tag">Not entered</p>
+{% endset %}
 {% set phonesHtml %}
 <div class="hmpps-global-numbers-and-emails__phones__list">
   {% for x in globalNumbersAndEmails.phones %}
     <div class="hmpps-global-numbers-and-emails__phone">
       <div class="hmpps-global-numbers-and-emails__phone__details">
-        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.type }}</p>
-        <p class="govuk-body govuk-!-margin-0">{{ x.number }}</p>
+        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.typeDescription }}</p>
+        <p class="govuk-body govuk-!-margin-0">{{ x.number | formatPhoneNumber }}</p>
         {% if x.extension %}
           <p class="govuk-body govuk-!-margin-0">Ext: {{ x.extension }}</p>
         {% endif %}
@@ -36,22 +40,20 @@
   {% endfor %}
 </div>
 {% endset %}
-{%- call summaryCard({title: "Phone numbers and email addresses", id: "phones-and-emails"}) -%}
+{%- call summaryCard({
+  title: "Phone numbers and email addresses", 
+  id: "phones-and-emails", 
+  actions: [
+    { href: 'personal/add-phone-number', text: 'Add a phone number' }, 
+    { href: 'personal/add-email-address', text: 'Add an email address' }
+  ]
+}) -%}
 <div class="govuk-grid-row" data-qa="addresses">
   <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
-    {{ govukSummaryList({
-        classes: 'govuk-summary-list--bottom-border',
-        rows: [
-          {
-            key: { text: 'Phone numbers' },
-            value: { html: phonesHtml }
-          },
-          {
-            key: { text: 'Email addresses' },
-            value: { html: emailsHtml }
-          }
-        ]
-    }) }}
+    <dl class="govuk-summary-list govuk-summary-list--no-border">
+      {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true }) }}
+      {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.emails.length > 0 else notEnteredTag, "email-addresses", { html: true }) }}
+    </dl>
   </div>
 </div>
 {%- endcall -%}

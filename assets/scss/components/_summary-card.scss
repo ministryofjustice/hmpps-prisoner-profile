@@ -27,14 +27,27 @@
   }
 
   &__actions {
-    margin: 0;
+    display: flex;
     justify-content: right;
+    margin: 0;
+    padding: 0;
     text-align: right;
   }
 
   &__action {
-    margin-left: 10px;
     list-style: none;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-right: 1px solid $govuk-link-colour;
+
+    &:first-child {
+      padding-left: 0;
+    }
+
+    &:last-child {
+      padding-right: 0;
+      border: 0;
+    }
   }
 
   &__body {

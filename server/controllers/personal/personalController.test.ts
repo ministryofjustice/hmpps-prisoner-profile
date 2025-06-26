@@ -22,12 +22,6 @@ import {
 import { prisonUserMock } from '../../data/localMockData/user'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
-import {
-  ActiveCountryReferenceDataCodesMock,
-  NationalityReferenceDataCodesMock,
-  ReligionReferenceDataCodesMock,
-  SexualOrientationReferenceDataCodesMock,
-} from '../../data/localMockData/personIntegrationApiReferenceDataMock'
 import { healthAndMedicationMock } from '../../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 import {
   HealthAndMedication,
@@ -37,16 +31,9 @@ import {
   foodAllergyCodesMock,
   medicalDietCodesMock,
   personalisedDietCodesMock,
-  smokerStatusCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import {
-  buildCodesMock,
-  eyeColourCodesMock,
-  faceCodesMock,
-  facialHairCodesMock,
-  hairCodesMock,
-} from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
+import { buildCodesMock, eyeColourCodesMock } from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
@@ -102,23 +89,6 @@ describe('PersonalController', () => {
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getHealthAndMedication = jest.fn(async () => ({ ...healthAndMedicationMock }))
-    personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
-      if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
-      if (domain === 'NAT') return NationalityReferenceDataCodesMock
-      if (domain === 'RELF') return ReligionReferenceDataCodesMock
-      if (domain === 'SEXO') return SexualOrientationReferenceDataCodesMock
-      if (domain === 'MEDICAL_DIET') return medicalDietCodesMock
-      if (domain === 'FOOD_ALLERGY') return foodAllergyCodesMock
-      if (domain === 'PERSONALISED_DIET') return personalisedDietCodesMock
-      if (domain === 'SMOKER') return smokerStatusCodesMock
-      if (domain === 'HAIR') return hairCodesMock
-      if (domain === 'FACIAL_HAIR') return facialHairCodesMock
-      if (domain === 'FACE') return faceCodesMock
-      if (domain === 'BUILD') return buildCodesMock
-      if (domain === 'L_EYE_C') return eyeColourCodesMock
-      if (domain === 'R_EYE_C') return eyeColourCodesMock
-      return null
-    })
     personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
