@@ -20,6 +20,7 @@ import {
   getEthnicGroupRadioOptions,
 } from './utils/alias/ethnicityUtils'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
+import { NomisLockedError } from '../utils/nomisLockedErrorHelpers'
 
 interface DateOfBirthForm {
   'dateOfBirth-year': string
@@ -225,6 +226,7 @@ export default class AliasController {
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       } catch (e) {
+        if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/enter-alias-details`)
@@ -314,6 +316,7 @@ export default class AliasController {
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       } catch (e) {
+        if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/date-of-birth`)
@@ -474,6 +477,7 @@ export default class AliasController {
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       } catch (e) {
+        if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/${group}`)
@@ -606,6 +610,7 @@ export default class AliasController {
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       } catch (e) {
+        if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirectUrl}`)
