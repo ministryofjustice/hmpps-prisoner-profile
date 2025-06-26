@@ -862,3 +862,11 @@ export const RELATIONSHIP_DESCRIPTIONS: Record<string, string> = {
 export const mapRelationshipDescriptionByCode = (code: string, fallbackDescription: string): string => {
   return RELATIONSHIP_DESCRIPTIONS[code] || fallbackDescription
 }
+
+// BVLS convert shorthand CVP address number to full video link meeting URL
+export const toFullCourtLink = (hmctsNumber: string) => {
+  if (!hmctsNumber || hmctsNumber.length < 1) {
+    return undefined
+  }
+  return `HMCTS${hmctsNumber}@${config.defaultCourtVideoUrl}`
+}
