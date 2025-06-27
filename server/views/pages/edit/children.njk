@@ -5,8 +5,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
-
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
@@ -47,8 +45,6 @@
       {{ miniBanner(miniBannerData) }}
     </div>
   </div>
-
-  {{ nomisLockedWarning(isLocked) }}
 
   {% if errors.length > 0 %}
     {{

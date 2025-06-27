@@ -14,7 +14,6 @@ import {
   PersonalRelationshipsReferenceDataDomain,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mapToQueryString } from '../utils/utils'
-import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonalRelationshipsApiRestClient implements PersonalRelationshipsApiClient {
   private readonly restClient: RestClient
@@ -42,9 +41,7 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return handleNomisLockedError(() =>
-      this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest }),
-    )
+    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest })
   }
 
   getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto> {
@@ -55,9 +52,7 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
   ): Promise<PersonalRelationshipsDomesticStatusDto> {
-    return handleNomisLockedError(() =>
-      this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest }),
-    )
+    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest })
   }
 
   getReferenceDataCodes(
@@ -67,6 +62,6 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
   }
 
   createContact(contact: PersonalRelationshipsContactRequest): Promise<void> {
-    return handleNomisLockedError(() => this.restClient.post({ path: '/contact', data: contact }))
+    return this.restClient.post({ path: '/contact', data: contact })
   }
 }
