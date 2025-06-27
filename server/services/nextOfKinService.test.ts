@@ -104,7 +104,7 @@ describe('NextOfKinService', () => {
       expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(prisonerNumber, {
         emergencyContactOrNextOfKin: true,
         isRelationshipActive: true,
-        size: 1000,
+        size: 50,
       })
 
       expect(result).toEqual([
