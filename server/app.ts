@@ -27,6 +27,7 @@ import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 import bannerMiddleware from './middleware/bannerMiddleware'
 import logger from '../logger'
 import config from './config'
+import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './middleware/nomisLockedMiddleware'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -77,7 +78,9 @@ export default function createApp(services: Services): express.Application {
     }),
   )
   app.use(dpsComponents.retrieveCaseLoadData({ logger }))
+  app.use(nomisLockedRenderMiddleware)
   app.use(routes(services))
+  app.use(nomisLockedMiddleware)
 
   app.use(setUpPageNotFound)
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

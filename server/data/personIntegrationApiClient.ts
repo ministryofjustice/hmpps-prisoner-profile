@@ -20,6 +20,7 @@ import {
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonIntegrationApiRestClient implements PersonIntegrationApiClient {
   private readonly restClient: RestClient
@@ -29,31 +30,37 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   }
 
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void> {
-    return this.updateCorePersonRecord(prisonerNumber, 'BIRTHPLACE', birthPlace)
+    return handleNomisLockedError(() => this.updateCorePersonRecord(prisonerNumber, 'BIRTHPLACE', birthPlace))
   }
 
   updateNationality(prisonerNumber: string, nationality: string, otherNationalities: string): Promise<void> {
-    return this.restClient.put({
-      path: '/v1/core-person-record/nationality',
-      query: { prisonerNumber },
-      data: { nationality, otherNationalities },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: '/v1/core-person-record/nationality',
+        query: { prisonerNumber },
+        data: { nationality, otherNationalities },
+      }),
+    )
   }
 
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void> {
-    return this.updateCorePersonRecord(prisonerNumber, 'COUNTRY_OF_BIRTH', countryOfBirth)
+    return handleNomisLockedError(() => this.updateCorePersonRecord(prisonerNumber, 'COUNTRY_OF_BIRTH', countryOfBirth))
   }
 
   updateReligion(prisonerNumber: string, religionCode: string, reasonForChange?: string): Promise<void> {
-    return this.restClient.put({
-      path: '/v1/person-protected-characteristics/religion',
-      query: { prisonerNumber },
-      data: { religionCode, reasonForChange },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: '/v1/person-protected-characteristics/religion',
+        query: { prisonerNumber },
+        data: { religionCode, reasonForChange },
+      }),
+    )
   }
 
   updateSexualOrientation(prisonerNumber: string, sexualOrientation: string): Promise<void> {
-    return this.updateCorePersonRecord(prisonerNumber, 'SEXUAL_ORIENTATION', sexualOrientation)
+    return handleNomisLockedError(() =>
+      this.updateCorePersonRecord(prisonerNumber, 'SEXUAL_ORIENTATION', sexualOrientation),
+    )
   }
 
   getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]> {
@@ -65,19 +72,23 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   }
 
   updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void> {
-    return this.restClient.put({
-      path: '/v1/core-person-record/military-records',
-      query: { prisonerNumber, militarySeq },
-      data: militaryRecord,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: '/v1/core-person-record/military-records',
+        query: { prisonerNumber, militarySeq },
+        data: militaryRecord,
+      }),
+    )
   }
 
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void> {
-    return this.restClient.post({
-      path: '/v1/core-person-record/military-records',
-      query: { prisonerNumber },
-      data: militaryRecord,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.post({
+        path: '/v1/core-person-record/military-records',
+        query: { prisonerNumber },
+        data: militaryRecord,
+      }),
+    )
   }
 
   async getDistinguishingMark(
@@ -102,11 +113,13 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     sequenceId: string,
     distinguishingMarkRequest: DistinguishingMarkRequest,
   ): Promise<PersonIntegrationDistinguishingMark> {
-    return this.restClient.put<PersonIntegrationDistinguishingMark>({
-      path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
-      query: { sourceSystem: 'NOMIS' },
-      data: distinguishingMarkRequest,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put<PersonIntegrationDistinguishingMark>({
+        path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
+        query: { sourceSystem: 'NOMIS' },
+        data: distinguishingMarkRequest,
+      }),
+    )
   }
 
   createDistinguishingMark(
@@ -114,20 +127,24 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     distinguishingMarkRequest: DistinguishingMarkRequest,
     image?: MulterFile,
   ): Promise<PersonIntegrationDistinguishingMark> {
-    return this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
-      path: '/v1/distinguishing-mark',
-      query: { prisonerNumber, sourceSystem: 'NOMIS' },
-      data: distinguishingMarkRequest,
-      files: image ? { file: image } : null,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
+        path: '/v1/distinguishing-mark',
+        query: { prisonerNumber, sourceSystem: 'NOMIS' },
+        data: distinguishingMarkRequest,
+        files: image ? { file: image } : null,
+      }),
+    )
   }
 
   updateDistinguishingMarkImage(photoId: string, image: MulterFile): Promise<PersonIntegrationDistinguishingMark> {
-    return this.restClient.putMultipart<PersonIntegrationDistinguishingMark>({
-      path: `/v1/distinguishing-mark/image/${photoId}`,
-      query: { sourceSystem: 'NOMIS' },
-      files: { file: image },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.putMultipart<PersonIntegrationDistinguishingMark>({
+        path: `/v1/distinguishing-mark/image/${photoId}`,
+        query: { sourceSystem: 'NOMIS' },
+        files: { file: image },
+      }),
+    )
   }
 
   addDistinguishingMarkImage(
@@ -135,11 +152,13 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     sequenceId: string,
     image: MulterFile,
   ): Promise<PersonIntegrationDistinguishingMark> {
-    return this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
-      path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}/image`,
-      query: { sourceSystem: 'NOMIS' },
-      files: { file: image },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
+        path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}/image`,
+        query: { sourceSystem: 'NOMIS' },
+        files: { file: image },
+      }),
+    )
   }
 
   async getDistinguishingMarkImage(imageId: string): Promise<Readable> {
@@ -157,11 +176,13 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     prisonerNumber: string,
     physicalAttributes: CorePersonPhysicalAttributesRequest,
   ): Promise<void> {
-    return this.restClient.put({
-      path: '/v1/core-person-record/physical-attributes',
-      query: { prisonerNumber },
-      data: physicalAttributes,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: '/v1/core-person-record/physical-attributes',
+        query: { prisonerNumber },
+        data: physicalAttributes,
+      }),
+    )
   }
 
   getPseudonyms(prisonerNumber: string): Promise<PseudonymResponseDto[]> {
@@ -169,54 +190,66 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   }
 
   updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
-    return this.restClient.put({
-      path: `/v1/pseudonym/${pseudonymId}`,
-      query: { sourceSystem: 'NOMIS' },
-      data: pseudonym,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: `/v1/pseudonym/${pseudonymId}`,
+        query: { sourceSystem: 'NOMIS' },
+        data: pseudonym,
+      }),
+    )
   }
 
   createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
-    return this.restClient.post({
-      path: `/v1/pseudonym`,
-      query: { prisonerNumber, sourceSystem: 'NOMIS' },
-      data: pseudonym,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.post({
+        path: `/v1/pseudonym`,
+        query: { prisonerNumber, sourceSystem: 'NOMIS' },
+        data: pseudonym,
+      }),
+    )
   }
 
   updateIdentityNumber(offenderId: number, seqId: number, request: UpdateIdentifierRequestDto): Promise<void> {
-    return this.restClient.put({
-      path: `/v1/core-person-record/identifiers`,
-      query: { offenderId, seqId, sourceSystem: 'NOMIS' },
-      data: request,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put({
+        path: `/v1/core-person-record/identifiers`,
+        query: { offenderId, seqId, sourceSystem: 'NOMIS' },
+        data: request,
+      }),
+    )
   }
 
   addIdentityNumbers(prisonerNumber: string, request: AddIdentifierRequestDto[]): Promise<void> {
-    return this.restClient.post({
-      path: `/v1/core-person-record/identifiers`,
-      query: { prisonerNumber, sourceSystem: 'NOMIS' },
-      data: request,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.post({
+        path: `/v1/core-person-record/identifiers`,
+        query: { prisonerNumber, sourceSystem: 'NOMIS' },
+        data: request,
+      }),
+    )
   }
 
   private updateCorePersonRecord(prisonerNumber: string, fieldName: string, value: string): Promise<void> {
-    return this.restClient.patch({
-      path: '/v1/core-person-record',
-      query: { prisonerNumber },
-      data: { fieldName, value },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.patch({
+        path: '/v1/core-person-record',
+        query: { prisonerNumber },
+        data: { fieldName, value },
+      }),
+    )
   }
 
   updateProfileImage(
     prisonerNumber: string,
     image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
   ): Promise<void> {
-    return this.restClient.putMultipart<void>({
-      path: `/v1/core-person-record/profile-image`,
-      query: { prisonerNumber },
-      files: { imageFile: image },
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.putMultipart<void>({
+        path: `/v1/core-person-record/profile-image`,
+        query: { prisonerNumber },
+        files: { imageFile: image },
+      }),
+    )
   }
 
   getAddresses(prisonerNumber: string): Promise<AddressResponseDto[]> {
@@ -224,10 +257,12 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   }
 
   createAddress(prisonerNumber: string, address: AddressRequestDto): Promise<AddressResponseDto> {
-    return this.restClient.post({
-      path: `/v1/person/${prisonerNumber}/addresses`,
-      data: address,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.post({
+        path: `/v1/person/${prisonerNumber}/addresses`,
+        data: address,
+      }),
+    )
   }
 
   // Global phones/addresses (contacts)
@@ -238,16 +273,20 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
   }
 
   createContact(prisonerNumber: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
-    return this.restClient.post<ContactsResponseDto>({
-      path: `/v1/person/${prisonerNumber}/contacts`,
-      data: request,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.post<ContactsResponseDto>({
+        path: `/v1/person/${prisonerNumber}/contacts`,
+        data: request,
+      }),
+    )
   }
 
   updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
-    return this.restClient.put<ContactsResponseDto>({
-      path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,
-      data: request,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put<ContactsResponseDto>({
+        path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,
+        data: request,
+      }),
+    )
   }
 }
