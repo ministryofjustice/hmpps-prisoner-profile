@@ -14,7 +14,7 @@ import {
   PersonalRelationshipsReferenceDataDomain,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mapToQueryString } from '../utils/utils'
-import { handleNomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonalRelationshipsApiRestClient implements PersonalRelationshipsApiClient {
   private readonly restClient: RestClient

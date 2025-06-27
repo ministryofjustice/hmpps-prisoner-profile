@@ -20,7 +20,7 @@ import {
   getEthnicGroupRadioOptions,
 } from './utils/alias/ethnicityUtils'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
-import { NomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { NomisLockedError } from '../utils/nomisLockedError'
 
 interface DateOfBirthForm {
   'dateOfBirth-year': string

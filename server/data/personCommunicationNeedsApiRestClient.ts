@@ -8,7 +8,7 @@ import {
   SecondaryLanguageRequest,
 } from './interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { ReferenceDataCode } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { handleNomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonCommunicationNeedsApiRestClient implements PersonCommunicationNeedsApiClient {
   private readonly restClient: RestClient

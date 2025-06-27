@@ -20,7 +20,7 @@ import {
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
-import { handleNomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonIntegrationApiRestClient implements PersonIntegrationApiClient {
   private readonly restClient: RestClient

@@ -68,7 +68,7 @@ import {
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import config from '../../config'
-import { NomisLockedError } from '../../utils/nomisLockedErrorHelpers'
+import { NomisLockedError } from '../../utils/nomisLockedError'
 
 type TextFieldDataGetter = (req: Request) => TextFieldData
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>

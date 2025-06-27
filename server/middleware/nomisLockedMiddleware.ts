@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { NomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { NomisLockedError } from '../utils/nomisLockedError'
 
 // If there is a nomis locked error from one of the api clients, flash a locked flag and send them back.
 export function nomisLockedMiddleware(err: unknown, req: Request, res: Response, next: NextFunction) {

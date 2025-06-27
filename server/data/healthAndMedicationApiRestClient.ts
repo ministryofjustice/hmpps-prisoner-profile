@@ -10,7 +10,7 @@ import {
   SmokerStatusUpdate,
 } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { mapToQueryString } from '../utils/utils'
-import { handleNomisLockedError } from '../utils/nomisLockedErrorHelpers'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class HealthAndMedicationApiRestClient implements HealthAndMedicationApiClient {
   private readonly restClient: RestClient

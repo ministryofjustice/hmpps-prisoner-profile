@@ -3,11 +3,11 @@ export class NomisLockedError extends Error {
 
   constructor(message = 'Resource is locked') {
     super(message)
-    this.name = 'LockedError'
+    this.name = 'NomisLockedError'
   }
 }
 
-// Used to wrap around rest client calls in api clients. Throws the custom error.
+// Used to wrap around rest client calls in api clients. Throws the custom error so middleware can catch.
 export async function handleNomisLockedError<T>(apiClientFunction: () => Promise<T>): Promise<T> {
   try {
     return await apiClientFunction()
