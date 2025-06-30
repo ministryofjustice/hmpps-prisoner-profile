@@ -36,6 +36,7 @@
               },
               id: "phone-number",
               name: "phoneNumber",
+              classes: "govuk-input--width-20",
               value: phoneNumber,
               errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
             }) }}
@@ -48,6 +49,7 @@
               },
               id: "phone-extension",
               name: "phoneExtension",
+              classes: "govuk-input--width-5",
               value: phoneExtension,
               errorMessage: { text: (errors | findError("phone-extension")).text } if errors | findError("phone-extension")
             }) }}
