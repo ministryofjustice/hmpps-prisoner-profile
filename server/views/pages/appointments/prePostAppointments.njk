@@ -272,6 +272,9 @@
                                             text: "Enter full web address (URL)",
                                             classes: 'govuk-label--s'
                                         },
+                                        hint: {
+                                            text: "This should start with https://"
+                                        },
                                         classes: 'govuk-!-width-three-quarters',
                                         errorMessage: errors | findError('videoLinkUrl'),
                                         value: formValues.videoLinkUrl
