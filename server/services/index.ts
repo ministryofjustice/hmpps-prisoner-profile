@@ -47,7 +47,7 @@ import ContactsService from './contactsService'
 import NextOfKinService from './nextOfKinService'
 import DomesticStatusService from './domesticStatusService'
 import logger from '../../logger'
-import EphemeralDataService from './EphemeralDataService'
+import EphemeralDataService from './ephemeralDataService'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import IdentityNumbersService from './identityNumbersService'
 
@@ -217,6 +217,7 @@ export const services = () => {
     nextOfKinService,
     domesticStatusService,
     globalPhoneNumberAndEmailAddressesService,
+    addressService,
   )
 
   const apolloClient = new ApolloClient({
