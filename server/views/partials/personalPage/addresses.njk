@@ -16,15 +16,37 @@
     {% if address.country %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.country.description }}</p>{% endif %}
 
     {% set addressUsageTypesHtml %}
-      {% for addressType in address.addressTypes %}
-        {% if addressType.active %}
+      {% if address.addressTypes.length == 0 %}
+        <p class="govuk-body">Not entered</p>
+      {% else %}
+        {% for addressType in address.addressTypes %}
           <p class="govuk-body">{{ addressType.addressUsageType.description }}</p>
-        {% endif %}
-      {% endfor %}
+        {% endfor %}
+      {% endif %}
     {% endset %}
 
     {% set addressDatesText %}
       From {{ address.fromDate | formatAddressDate }}{% if address.toDate %} to {{ address.toDate | formatAddressDate }}{% endif %}
+    {% endset %}
+
+    {% set addressPhoneNumbersHtml %}
+      {% if address.addressPhoneNumbersForDisplay.length > 0 %}
+        <div class="hmpps-address__phones__list">
+          {% for number in address.addressPhoneNumbersForDisplay %}
+            <div class="hmpps-address__phone">
+              <div class="hmpps-address__phone__details">
+                <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
+                <p class="govuk-body govuk-!-margin-0">{{ number.number | formatPhoneNumber }}</p>
+                {% if number.extension %}
+                  <p class="govuk-body govuk-!-margin-0">Ext: {{ number.extension }}</p>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="govuk-body">Not entered</p>
+      {% endif %}
     {% endset %}
 
     {% set additionalDetailsHtml %}
@@ -41,11 +63,11 @@
             },
             {
               key: { text: "Address phone numbers" },
-              value: { html: "Not entered" }
+              value: { html: addressPhoneNumbersHtml }
             },
             {
               key: { text: "Comments" },
-              value: { text: 'Not entered' }
+              value: { text: address.comment or "Not entered" }
             }
           ]
         }) }}

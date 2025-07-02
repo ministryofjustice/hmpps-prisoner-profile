@@ -6,7 +6,7 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ContactsResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
-import { GlobalEmail, GlobalNumbersAndEmails, GlobalPhoneNumber } from './interfaces/personalPageService/PersonalPage'
+import { GlobalEmail, GlobalNumbersAndEmails, PhoneNumber } from './interfaces/personalPageService/PersonalPage'
 
 describe('GlobalPhoneNumberAndEmailAddressesService', () => {
   let personIntegrationApiClient: PersonIntegrationApiClient
@@ -30,7 +30,7 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     typeDescription: string,
     number: string,
     extension: string = null,
-  ): GlobalPhoneNumber => ({
+  ): PhoneNumber => ({
     id,
     type,
     typeDescription,

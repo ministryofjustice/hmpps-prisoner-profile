@@ -68,6 +68,7 @@ import {
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import config from '../../config'
+import { NomisLockedError } from '../../utils/nomisLockedError'
 
 type TextFieldDataGetter = (req: Request) => TextFieldData
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
@@ -1608,11 +1609,17 @@ export default class PersonalController {
 
   globalNumbers() {
     const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): RadioOption[] => {
-      return referenceData.map(({ code, description }) => ({
-        text: description,
-        value: code,
-        checked: chosenType === code,
-      }))
+      const orderedReferenceDataCodes = ['MOB', 'HOME', 'ALTH', 'BUS', 'ALTB', 'VISIT', 'FAX']
+
+      return referenceData
+        .sort((a, b) => orderedReferenceDataCodes.indexOf(a.code) - orderedReferenceDataCodes.indexOf(b.code))
+        .map(({ code, description }) => {
+          return {
+            text: description,
+            value: code,
+            checked: chosenType === code,
+          }
+        })
     }
 
     const onAdditionSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
@@ -1910,6 +1917,7 @@ export default class PersonalController {
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
     } catch (e) {
+      if (e instanceof NomisLockedError) throw e
       req.flash('errors', [{ text: 'There was an error please try again' }])
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)

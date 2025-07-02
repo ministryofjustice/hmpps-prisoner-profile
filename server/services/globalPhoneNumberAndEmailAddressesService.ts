@@ -1,12 +1,11 @@
 import { RestClientBuilder } from '../data'
 import {
-  ContactsResponseDto,
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
-import { GlobalEmail, GlobalNumbersAndEmails, GlobalPhoneNumber } from './interfaces/personalPageService/PersonalPage'
+import { GlobalEmail, GlobalNumbersAndEmails, PhoneNumber } from './interfaces/personalPageService/PersonalPage'
 import ReferenceDataService from './referenceData/referenceDataService'
+import { transformPhones } from '../utils/transformPhones'
 
 /*
  * Service for getting a prisoners "global" numbers and email addresess.
@@ -20,18 +19,6 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     private readonly referenceDataService: ReferenceDataService,
   ) {}
 
-  private transformPhones(contacts: ContactsResponseDto[], phoneTypes: ReferenceDataCodeDto[]): GlobalPhoneNumber[] {
-    return contacts
-      .filter(c => c.contactType !== 'EMAIL')
-      .map(c => ({
-        id: c.contactId,
-        type: c.contactType,
-        typeDescription: phoneTypes.find(t => t.code === c.contactType).description,
-        extension: c.contactPhoneExtension,
-        number: c.contactValue,
-      }))
-  }
-
   async getForPrisonerNumber(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const [contacts, phoneTypes] = await Promise.all([
@@ -40,7 +27,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     ])
 
     return {
-      phones: this.transformPhones(contacts, phoneTypes),
+      phones: transformPhones(contacts, phoneTypes),
       emails: contacts.filter(c => c.contactType === 'EMAIL').map(c => ({ id: c.contactId, email: c.contactValue })),
     }
   }
@@ -78,7 +65,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       phoneNumberType,
       phoneExtension,
     }: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
-  ): Promise<GlobalPhoneNumber> {
+  ): Promise<PhoneNumber> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const { contactId, contactType, contactValue, contactPhoneExtension } = await apiClient.createContact(
       prisonerNumber,
@@ -107,7 +94,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       phoneNumberType,
       phoneExtension,
     }: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
-  ): Promise<GlobalPhoneNumber> {
+  ): Promise<PhoneNumber> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const { contactId, contactType, contactValue, contactPhoneExtension } = await apiClient.updateContact(
       prisonerNumber,

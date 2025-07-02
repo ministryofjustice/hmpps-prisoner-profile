@@ -1,10 +1,10 @@
 import {
   GlobalEmail,
   GlobalNumbersAndEmails,
-  GlobalPhoneNumber,
+  PhoneNumber,
 } from '../../services/interfaces/personalPageService/PersonalPage'
 
-export const globalPhonesMock: GlobalPhoneNumber[] = [
+export const globalPhonesMock: PhoneNumber[] = [
   {
     id: 321,
     type: 'HOME',

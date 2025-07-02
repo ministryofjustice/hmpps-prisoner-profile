@@ -10,6 +10,7 @@ import {
   SmokerStatusUpdate,
 } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { mapToQueryString } from '../utils/utils'
+import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class HealthAndMedicationApiRestClient implements HealthAndMedicationApiClient {
   private readonly restClient: RestClient
@@ -36,16 +37,20 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
     prisonerNumber: string,
     dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy> {
-    return this.restClient.put<DietAndAllergy>({
-      path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
-      data: dietAndAllergyUpdate,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put<DietAndAllergy>({
+        path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
+        data: dietAndAllergyUpdate,
+      }),
+    )
   }
 
   updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void> {
-    return this.restClient.put<void>({
-      path: `/prisoners/${prisonerNumber}/smoker`,
-      data: smokerStatusUpdate,
-    })
+    return handleNomisLockedError(() =>
+      this.restClient.put<void>({
+        path: `/prisoners/${prisonerNumber}/smoker`,
+        data: smokerStatusUpdate,
+      }),
+    )
   }
 }

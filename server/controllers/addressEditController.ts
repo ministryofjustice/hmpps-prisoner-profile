@@ -6,7 +6,7 @@ import { apostrophe, convertToTitleCase, formatName, objectToSelectOptions } fro
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
-import EphemeralDataService from '../services/EphemeralDataService'
+import EphemeralDataService from '../services/ephemeralDataService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { FlashMessageType } from '../data/enums/flashMessageType'
@@ -256,6 +256,7 @@ export default class AddressEditController {
         ...addressCache.value.address,
         primaryAddress: primaryOrPostal.includes('primary'),
         postalAddress: primaryOrPostal.includes('postal'),
+        addressTypes: ['HOME'],
       }
 
       try {

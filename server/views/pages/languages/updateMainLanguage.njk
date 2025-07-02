@@ -6,6 +6,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% from "../../macros/otherLanguagesText.njk" import otherLanguagesText %}
+{% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
 
 
 {% set hideBackLink = true %}
@@ -34,6 +35,8 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
         </div>
+
+        {{ nomisLockedWarning(isLocked) }}
 
         {% if errors.length > 0 %}
             {{
