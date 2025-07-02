@@ -14,7 +14,7 @@
           }
         }) %}
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number-type") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-number-type") }}">
           {{ govukRadios({
               name: "phoneNumberType",
               id: "phone-number-type",
@@ -25,10 +25,10 @@
                 }
               },
               items: phoneTypeOptions,
-              errorMessage: { text: (errors | findError("phone-type")).text } if errors | findError("phone-type")
+              errorMessage: { text: (errors | findError("phone-number-type")).text } if errors | findError("phone-number-type")
             }) }}
         </div>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-number") }}">
           {{ govukInput({
               label: {
                 text: "Phone number",
@@ -36,11 +36,12 @@
               },
               id: "phone-number",
               name: "phoneNumber",
+              classes: "govuk-input--width-20",
               value: phoneNumber,
               errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
             }) }}
         </div>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-extension") }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError("phone-extension") }}">
           {{ govukInput({
               label: {
                 text: "Extension (optional)",
@@ -48,6 +49,7 @@
               },
               id: "phone-extension",
               name: "phoneExtension",
+              classes: "govuk-input--width-5",
               value: phoneExtension,
               errorMessage: { text: (errors | findError("phone-extension")).text } if errors | findError("phone-extension")
             }) }}
@@ -72,7 +74,7 @@
             attributes: { "data-qa": "edit-submit-button" }
             }) }}
           <a
-            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            href="/prisoner/{{ prisonerNumber }}/personal#phones-and-emails"
             class="govuk-link govuk-link--no-visited-state"
             data-qa="edit-cancel-button">Cancel</a>
         </div>

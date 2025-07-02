@@ -1609,11 +1609,17 @@ export default class PersonalController {
 
   globalNumbers() {
     const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): RadioOption[] => {
-      return referenceData.map(({ code, description }) => ({
-        text: description,
-        value: code,
-        checked: chosenType === code,
-      }))
+      const orderedReferenceDataCodes = ['MOB', 'HOME', 'ALTH', 'BUS', 'ALTB', 'VISIT', 'FAX']
+
+      return referenceData
+        .sort((a, b) => orderedReferenceDataCodes.indexOf(a.code) - orderedReferenceDataCodes.indexOf(b.code))
+        .map(({ code, description }) => {
+          return {
+            text: description,
+            value: code,
+            checked: chosenType === code,
+          }
+        })
     }
 
     const onAdditionSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {

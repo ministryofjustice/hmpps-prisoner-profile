@@ -27,23 +27,28 @@ context('Change phone number', () => {
     ],
     invalidInputs: [
       {
+        testDescription: 'No phone number type',
+        input: {},
+        errorMessages: ['Select a phone number type'],
+      },
+      {
         testDescription: 'Empty phone number',
-        input: { textInputs: { phoneNumber: '', phoneExtension: '' } },
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '', phoneExtension: '' } },
         errorMessages: ['Enter a phone number'],
       },
       {
         testDescription: 'Phone number too long',
-        input: { textInputs: { phoneNumber: `${'1'.repeat(40)}1` } },
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: `${'1'.repeat(40)}1` } },
         errorMessages: ['Phone number must be 40 characters or less'],
       },
       {
         testDescription: 'Invalid phone number',
-        input: { textInputs: { phoneNumber: `123 abc 123` } },
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: `123 abc 123` } },
         errorMessages: ['Phone numbers must only contain numbers or brackets'],
       },
       {
         testDescription: 'Phone extension too long',
-        input: { textInputs: { phoneExtension: `${'1'.repeat(7)}1` } },
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneExtension: `${'1'.repeat(7)}1` } },
         errorMessages: ['Extension must be 7 characters or less'],
       },
     ],
