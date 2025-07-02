@@ -53,7 +53,7 @@ export default class AddressMapper {
 
     return {
       uprn: address.uprn,
-      buildingNumber: `${address.buildingNumber}`,
+      buildingNumber: address.buildingNumber ? `${address.buildingNumber}` : null,
       subBuildingName: address.subBuildingName,
       buildingName: address.buildingName,
       thoroughfareName: address.thoroughfareName,

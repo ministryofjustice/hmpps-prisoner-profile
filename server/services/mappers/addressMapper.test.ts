@@ -84,6 +84,26 @@ describe('addressService', () => {
         }),
       )
     })
+
+    it('handles undefined buildingNumber', async () => {
+      const result = await addressMapper.toAddressRequestDto(
+        {
+          addressString: 'some string',
+          buildingNumber: undefined,
+          buildingName: 'Building Name',
+          subBuildingName: 'Sub Building Name',
+          thoroughfareName: 'Thoroughfare Name',
+          dependentLocality: 'Dependent Locality',
+          postTown: 'Y Felinheli',
+          postcode: 'A1 2BC',
+          country: 'W',
+          uprn: 321,
+        } as OsAddress,
+        clientToken,
+      )
+
+      expect(result).toEqual(expect.objectContaining({ buildingNumber: null }))
+    })
   })
 
   describe('filterCountryCodes', () => {
