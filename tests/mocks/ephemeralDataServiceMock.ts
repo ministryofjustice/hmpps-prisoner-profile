@@ -1,4 +1,4 @@
-import EphemeralDataService from '../../server/services/EphemeralDataService'
+import EphemeralDataService from '../../server/services/ephemeralDataService'
 import Interface from './Interface'
 
 export const ephemeralDataServiceMock = (): Interface<EphemeralDataService> => ({

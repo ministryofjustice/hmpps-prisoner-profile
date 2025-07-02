@@ -322,6 +322,26 @@
     }
   }
 
+  &__phones__list {
+    & > div {
+      padding: 5px 0;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  &__phone {
+    display: flex;
+    justify-content: space-between;
+  }
+
   &__added-date {
     color: $govuk-secondary-text-colour;
   }

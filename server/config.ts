@@ -277,10 +277,10 @@ export default {
     personIntegrationApi: {
       url: get('PERSON_INTEGRATION_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('PERSON_INTEGRATION_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('PRISON_INTEGRATION_TIMEOUT_DEADLINE', 3000)),
+        response: Number(get('PERSON_INTEGRATION_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PRISON_INTEGRATION_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(Number(get('PERSON_INTEGRATION_TIMEOUT_DEADLINE', 3000))),
+      agent: new AgentConfig(Number(get('PERSON_INTEGRATION_TIMEOUT_DEADLINE', 10000))),
     },
     csipApi: {
       url: get('CSIP_API_URL', 'http://localhost:8082', requiredInProduction),

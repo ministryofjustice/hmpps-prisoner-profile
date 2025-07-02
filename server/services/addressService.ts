@@ -19,6 +19,8 @@ import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { PersonalRelationshipsReferenceDataDomain } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import MetricsService from './metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
+import { transformPhones } from '../utils/transformPhones'
 
 const stringContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 
@@ -37,6 +39,27 @@ export default class AddressService {
 
   public async getAddresses(token: string, prisonerNumber: string): Promise<AddressResponseDto[]> {
     return this.personIntegrationApiClientBuilder(token).getAddresses(prisonerNumber)
+  }
+
+  async getAddressesForDisplay(token: string, prisonerNumber: string): Promise<AddressForDisplay[]> {
+    const [addresses, phoneTypes] = await Promise.all([
+      this.getAddresses(token, prisonerNumber),
+      this.referenceDataService.getActiveReferenceDataCodes(CorePersonRecordReferenceDataDomain.phoneTypes, token),
+    ])
+
+    return (
+      addresses
+        ?.map(
+          address =>
+            ({
+              ...address,
+              addressTypes: address.addressTypes.filter(type => type.active),
+              addressPhoneNumbersForDisplay: transformPhones(address.addressPhoneNumbers, phoneTypes),
+            }) as AddressForDisplay,
+        )
+        ?.filter(address => !address.toDate || new Date(address.toDate) > new Date())
+        .sort(a => (a.primaryAddress ? -1 : 1)) || []
+    )
   }
 
   public async createAddress(

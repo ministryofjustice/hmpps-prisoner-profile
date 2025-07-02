@@ -52,4 +52,13 @@ export const mockAddressResponseDto: AddressResponseDto = {
   addressTypes: [{ active: true, addressUsageType: { description: 'Home' } as ReferenceDataValue }],
   postalAddress: true,
   primaryAddress: true,
+  comment: 'Some comment',
+  addressPhoneNumbers: [
+    {
+      contactId: 123,
+      contactType: 'HOME',
+      contactValue: '012345678',
+      contactPhoneExtension: '567',
+    },
+  ],
 }
