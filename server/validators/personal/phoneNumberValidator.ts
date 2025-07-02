@@ -7,7 +7,7 @@ export const phoneNumberValidator = (body: Record<string, string>): HmppsError[]
   const errors: HmppsError[] = []
 
   if (!phoneNumberType) {
-    errors.push({ text: 'Select a phone number type', href: '#phone-number-type' })
+    return [{ text: 'Select a phone number type', href: '#phone-number-type' }]
   }
 
   errors.push(...validateMandatoryPhoneNumber('#phone-number', 'Phone number', phoneNumber))

@@ -6,7 +6,7 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import { prisonUserMock } from '../data/localMockData/user'
 import AddressEditController from './addressEditController'
 import AddressService from '../services/addressService'
-import EphemeralDataService from '../services/EphemeralDataService'
+import EphemeralDataService from '../services/ephemeralDataService'
 import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
@@ -27,7 +27,7 @@ const addressRequest: AddressRequestDto = {
   countryCode: '333',
   postCode: 'A12 3BC',
   fromDate: '2025-06-09',
-  addressTypes: [],
+  addressTypes: ['HOME'],
 }
 
 describe('Address Edit Controller', () => {

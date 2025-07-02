@@ -2,11 +2,11 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   GlobalEmail,
   GlobalNumbersAndEmails,
-  GlobalPhoneNumber,
   IdentityNumbers,
   NextOfKin,
   OldAddresses,
   PersonalDetails,
+  PhoneNumber,
   PhysicalCharacteristics,
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
@@ -72,6 +72,7 @@ import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { religionFieldData } from '../controllers/personal/fieldData'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
+import AddressService from './addressService'
 
 export default class PersonalPageService {
   constructor(
@@ -87,6 +88,7 @@ export default class PersonalPageService {
     private readonly nextOfKinService: NextOfKinService,
     private readonly domesticStatusService: DomesticStatusService,
     private readonly globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService,
+    private readonly addressService: AddressService,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -120,7 +122,7 @@ export default class PersonalPageService {
     token: string,
     prisonerNumber: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
-  ): Promise<GlobalPhoneNumber> {
+  ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber(
       token,
       prisonerNumber,
@@ -133,7 +135,7 @@ export default class PersonalPageService {
     prisonerNumber: string,
     phoneNumberId: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
-  ): Promise<GlobalPhoneNumber> {
+  ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber(
       token,
       prisonerNumber,
@@ -251,7 +253,7 @@ export default class PersonalPageService {
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       !editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
-      editProfileEnabled ? personIntegrationApiClient.getAddresses(prisonerNumber) : null,
+      editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
@@ -279,6 +281,7 @@ export default class PersonalPageService {
     ])
 
     const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(oldAddressList)
+    const primaryOrPostalAddresses = addresses?.filter(address => address.primaryAddress || address.postalAddress)
 
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
@@ -303,12 +306,7 @@ export default class PersonalPageService {
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses: {
-        primaryOrPostal:
-          addresses?.filter(
-            address =>
-              (address.primaryAddress || address.postalAddress) &&
-              (!address.toDate || new Date(address.toDate) > new Date()),
-          ) || [],
+        primaryOrPostal: primaryOrPostalAddresses,
         totalActive:
           addresses?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
       },
@@ -339,6 +337,7 @@ export default class PersonalPageService {
     }
   }
 
+  // TODO: Remove this once edit profile is live
   private addressSummary(addresses: OldAddresses): GovSummaryItem[] {
     const addressSummary: GovSummaryItem[] = []
 
