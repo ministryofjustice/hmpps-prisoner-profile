@@ -36,7 +36,6 @@ generic-service:
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
     OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
-    BVLS_FEATURE_MASTER_PUBLIC_PRIVATE_NOTES: "true"
     BVLS_FEATURE_HMCTS_LINK_GUEST_PIN: "true"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.

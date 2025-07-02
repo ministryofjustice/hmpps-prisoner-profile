@@ -33,12 +33,8 @@
 
             {# BVLS appointments show the notes for prisoners if enabled, otherwise suppress the comments #}
             {% if (appointmentTypeCode == 'VLB' or appointmentTypeCode == 'VLPM') %}
-                {% if bvlsMasterPublicPrivateNotesEnabled %}
-                    {{ labelAndValue('Comments', notesForPrisoners, true) }}
-                {% else %}
-                    {{ labelAndValue('Comments', ' ', true) }}
-                {% endif %}
-            {%  else %}
+                {{ labelAndValue('Comments', notesForPrisoners, true) }}
+            {% else %}
                 {# All other appointment types show the comment from the appointment #}
                 {{ labelAndValue('Comments', comment, true) }}
             {% endif %}

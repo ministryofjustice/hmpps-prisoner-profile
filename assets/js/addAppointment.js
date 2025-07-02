@@ -113,24 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function showHideCommentsHint() {
-    if (!comments) {
-      return
-    }
-
-    const appointmentType = appointmentTypeSelect.value
-
-    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
-      commentsHint.removeAttribute("style");
-    } else {
-      commentsHint.style.display = 'none'
-    }
-  }
-
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
     showHideProbationFields()
-    showHideCommentsHint()
     showHidePublicPrivateNotes()
   })
 

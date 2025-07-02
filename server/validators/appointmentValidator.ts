@@ -4,7 +4,6 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
-import { bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
@@ -275,7 +274,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     }
   }
 
-  if ((body.appointmentType === 'VLPM' || body.appointmentType === 'VLB') && bvlsMasterPublicPrivateNotesEnabled()) {
+  if (body.appointmentType === 'VLPM' || body.appointmentType === 'VLB') {
     if (body.notesForStaff && body.notesForStaff.length > 400) {
       errors.push({
         text: 'Notes for prison staff must be 400 characters or less',

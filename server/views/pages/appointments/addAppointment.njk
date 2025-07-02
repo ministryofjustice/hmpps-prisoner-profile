@@ -319,14 +319,10 @@
                         classes: 'govuk-!-width-one-half',
                         label: {
                             text: "Comments (optional)"
-                        },
-                        hint: {
-                            html: "<p id='bvls-hint-text' class='govuk-hint'>For confidentiality reasons, comments for Video Link - Court Hearing and Video Link - Probation Meeting appointments will not appear on movement slips.</p>"
                         }
                     }) }}
                     </div>
 
-                    {% if bvlsMasterPublicPrivateNotesEnabled() %}
                     <div class="js-public-private-notes">
                         {{ govukCharacterCount({
                             id: "notesForStaff",
@@ -355,7 +351,6 @@
                             maxlength: "400"
                         }) }}
                     </div>
-                    {% endif %}
 
                     <div class="govuk-button-group">
                         {{ govukButton({ text: "Save and continue", type: "submit", preventDoubleClick: true }) }}

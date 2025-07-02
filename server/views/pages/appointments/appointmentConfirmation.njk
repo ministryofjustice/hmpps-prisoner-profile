@@ -157,7 +157,7 @@
                 }) }}
                 {% endif %}
 
-                {% if bvlsMasterPublicPrivateNotesEnabled() and appointmentTypeCode == 'VLPM' %}
+                {% if appointmentTypeCode == 'VLPM' %}
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border appointment-details-list',
                     rows: [
