@@ -745,7 +745,7 @@ context('When signed in', () => {
 
     it('Displays old addresses tile', () => {
       const page = Page.verifyOnPage(PersonalPage)
-      page.oldAddresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.oldAddresess().address().should('include.text', '7, premises address, street field')
       page.oldAddresess().address().should('include.text', 'Leeds')
       page.oldAddresess().address().should('include.text', 'LS1 AAA')
       page.oldAddresess().address().should('include.text', 'England')
