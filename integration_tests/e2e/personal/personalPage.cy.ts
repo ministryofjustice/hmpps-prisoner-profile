@@ -473,8 +473,12 @@ context('When signed in', () => {
 
         page.addresses().addressTypes().should('include.text', 'Home')
         page.addresses().addressDates().should('include.text', 'From June 2024 to June 2099')
-        page.addresses().addressPhoneNumbers().should('include.text', 'Not entered')
-        page.addresses().addressComments().should('include.text', 'Not entered')
+
+        page.addresses().addressPhoneNumbers().should('include.text', 'Home')
+        page.addresses().addressPhoneNumbers().should('include.text', '012345678')
+        page.addresses().addressPhoneNumbers().should('include.text', 'Ext: 567')
+
+        page.addresses().addressComments().should('include.text', 'Some comment')
 
         page.addresses().addressAddedDate().should('include.text', 'Added on 16 June 2024')
 
@@ -741,7 +745,7 @@ context('When signed in', () => {
 
     it('Displays old addresses tile', () => {
       const page = Page.verifyOnPage(PersonalPage)
-      page.oldAddresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.oldAddresess().address().should('include.text', '7, premises address, street field')
       page.oldAddresess().address().should('include.text', 'Leeds')
       page.oldAddresess().address().should('include.text', 'LS1 AAA')
       page.oldAddresess().address().should('include.text', 'England')

@@ -40,7 +40,7 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
-import { bvlsHmctsLinkGuestPinEnabled, bvlsMasterPublicPrivateNotesEnabled } from '../utils/featureToggles'
+import { bvlsHmctsLinkGuestPinEnabled } from '../utils/featureToggles'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -1010,7 +1010,6 @@ export default class AppointmentController {
       probationTeamCode: appointmentForm.probationTeam,
       courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
       probationMeetingType: appointmentForm.meetingType,
-      comments: (!bvlsMasterPublicPrivateNotesEnabled() && appointments.comment) || undefined,
       videoLinkUrl:
         prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
         prePostAppointmentForm.formValues?.videoLinkUrl &&
@@ -1039,8 +1038,8 @@ export default class AppointmentController {
               contactNumber: appointmentForm.officerTelephone,
             }
           : undefined,
-      notesForStaff: (bvlsMasterPublicPrivateNotesEnabled() && appointmentForm.notesForStaff) || undefined,
-      notesForPrisoners: (bvlsMasterPublicPrivateNotesEnabled() && appointmentForm.notesForPrisoners) || undefined,
+      notesForStaff: appointmentForm.notesForStaff || undefined,
+      notesForPrisoners: appointmentForm.notesForPrisoners || undefined,
     } as CreateVideoBookingRequest
 
     if (appointmentForm.appointmentId) {

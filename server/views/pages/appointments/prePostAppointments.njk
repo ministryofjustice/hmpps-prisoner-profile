@@ -113,40 +113,27 @@
                     ]
                 }) }}
 
-                {% if bvlsMasterPublicPrivateNotesEnabled() %}
-                    {{ govukSummaryList({
-                        classes: 'govuk-summary-list--no-border appointment-details-list',
-                        rows: [
-                            {
-                                key: {
-                                    text: "Notes for prison staff"
-                                },
-                                value: {
-                                    text: notesForStaff or 'None entered'
-                                }
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                                text: "Notes for prison staff"
                             },
-                            {
-                                key: {
-                                    text: "Notes for prisoner"
-                                },
-                                value: {
-                                    text: notesForPrisoners or 'None entered'
-                                }
+                            value: {
+                                text: notesForStaff or 'None entered'
                             }
-                        ]
-                    }) }}
-                {% else %}
-                    <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Comments
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <pre class="govuk-body">{{ comments }}</pre>
-                            </dd>
-                        </div>
-                    </dl>
-                {% endif %}
+                        },
+                        {
+                            key: {
+                                text: "Notes for prisoner"
+                            },
+                            value: {
+                                text: notesForPrisoners or 'None entered'
+                            }
+                        }
+                    ]
+                }) }}
 
                 <form method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
@@ -271,6 +258,9 @@
                                         label: {
                                             text: "Enter full web address (URL)",
                                             classes: 'govuk-label--s'
+                                        },
+                                        hint: {
+                                            text: "This should start with https://"
                                         },
                                         classes: 'govuk-!-width-three-quarters',
                                         errorMessage: errors | findError('videoLinkUrl'),

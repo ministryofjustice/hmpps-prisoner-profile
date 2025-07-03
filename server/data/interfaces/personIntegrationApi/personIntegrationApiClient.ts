@@ -214,7 +214,7 @@ export interface AddressRequestDto {
   postCode?: string
   fromDate: string
   toDate?: string
-  addressTypes: AddressTypeDto[]
+  addressTypes: string[]
   postalAddress?: boolean
   primaryAddress?: boolean
 }
@@ -238,6 +238,8 @@ export interface AddressResponseDto {
   addressTypes: AddressTypeDto[]
   postalAddress?: boolean
   primaryAddress?: boolean
+  comment?: string
+  addressPhoneNumbers?: ContactsResponseDto[]
 }
 
 export interface ContactsResponseDto {

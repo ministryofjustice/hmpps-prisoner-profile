@@ -6,7 +6,7 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import { prisonUserMock } from '../data/localMockData/user'
 import AddressEditController from './addressEditController'
 import AddressService from '../services/addressService'
-import EphemeralDataService from '../services/EphemeralDataService'
+import EphemeralDataService from '../services/ephemeralDataService'
 import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
@@ -27,7 +27,7 @@ const addressRequest: AddressRequestDto = {
   countryCode: '333',
   postCode: 'A12 3BC',
   fromDate: '2025-06-09',
-  addressTypes: [],
+  addressTypes: ['HOME'],
 }
 
 describe('Address Edit Controller', () => {
@@ -400,6 +400,24 @@ describe('Address Edit Controller', () => {
         })
 
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
+      })
+
+      it('handles empty address strings', async () => {
+        req = { ...req, body: { primaryOrPostal: 'primary' }, query: { address: addressCacheId } } as unknown as Request
+
+        ephemeralDataService.getData = jest.fn().mockReturnValue({
+          key: addressCacheId,
+          value: { address: { ...addressRequest, thoroughfareName: '' }, route: 'find-uk-address' },
+        })
+
+        await controller.submitPrimaryOrPostalAddress()(req, res, next)
+
+        expect(addressService.createAddress).toHaveBeenCalledWith(
+          clientToken,
+          prisonerNumber,
+          expect.objectContaining({ thoroughfareName: null }),
+          prisonUserMock,
+        )
       })
 
       it('handles missing address cache id', async () => {

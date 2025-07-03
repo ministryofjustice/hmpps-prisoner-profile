@@ -1,3 +1,4 @@
+import { subDays } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { OsPlacesApiClient } from '../data/interfaces/osPlacesApi/osPlacesApiClient'
@@ -9,7 +10,10 @@ import {
 } from '../data/localMockData/osPlacesAddressQueryResponse'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { mockAddresses } from '../data/localMockData/addresses'
-import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  AddressResponseDto,
+  PersonIntegrationApiClient,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import { mockAddressRequestDto, mockAddressResponseDto } from '../data/localMockData/personIntegrationApi/addresses'
 import ReferenceDataService from './referenceData/referenceDataService'
@@ -18,6 +22,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { AddressLocation } from './mappers/addressMapper'
+import { formatDateISO } from '../utils/dateHelpers'
 
 const clientToken = 'CLIENT_TOKEN'
 
@@ -37,6 +42,7 @@ describe('addressService', () => {
     metricsService = new MetricsService() as jest.Mocked<MetricsService>
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     referenceDataService.getReferenceData = jest.fn()
+    referenceDataService.getActiveReferenceDataCodes = jest.fn()
 
     addressService = new AddressService(
       metricsService,
@@ -81,6 +87,58 @@ describe('addressService', () => {
       personIntegrationApiClient.getAddresses = jest.fn(async () => [mockAddressResponseDto])
       const addresses = await addressService.getAddresses('token', 'A1234AA')
       expect(addresses).toEqual([mockAddressResponseDto])
+    })
+  })
+
+  describe('getAddressesForDisplay', () => {
+    it('Handles the API returning 404 for addresses', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async (): Promise<AddressResponseDto[]> => null)
+
+      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+      expect(addresses).toEqual([])
+    })
+
+    it('Adds phone type reference data to the result', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [mockAddressResponseDto])
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
+
+      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+      expect(addresses).toEqual([
+        {
+          ...mockAddressResponseDto,
+          addressPhoneNumbersForDisplay: [
+            {
+              id: 123,
+              type: 'HOME',
+              typeDescription: 'Home',
+              number: '012345678',
+              extension: '567',
+            },
+          ],
+        },
+      ])
+    })
+
+    it('Filters out expired addresses', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [
+        { ...mockAddressResponseDto, toDate: formatDateISO(subDays(new Date(), 1)) },
+      ])
+
+      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+      expect(addresses).toEqual([])
+    })
+
+    it('Handles null toDate when filtering', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [
+        { ...mockAddressResponseDto, addressPhoneNumbers: [], toDate: null } as AddressResponseDto,
+      ])
+
+      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+      expect(addresses).toEqual([
+        { ...mockAddressResponseDto, addressPhoneNumbers: [], addressPhoneNumbersForDisplay: [], toDate: null },
+      ])
     })
   })
 

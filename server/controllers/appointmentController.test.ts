@@ -372,6 +372,8 @@ describe('Appointment Controller', () => {
         probationTeam: 'BLACKPP',
         officerDetailsNotKnown: 'true',
         meetingType: 'PSR',
+        notesForPrisoners: 'prisoner notes',
+        notesForStaff: 'staff notes',
       }
 
       locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
@@ -407,7 +409,8 @@ describe('Appointment Controller', () => {
         ],
         probationTeamCode: 'BLACKPP',
         probationMeetingType: 'PSR',
-        comments: 'Comment',
+        notesForPrisoners: 'prisoner notes',
+        notesForStaff: 'staff notes',
       })
 
       expect(req.flash).toHaveBeenCalledWith('appointmentForm', req.body)
@@ -432,6 +435,8 @@ describe('Appointment Controller', () => {
         probationTeam: 'BLACKPP',
         officerDetailsNotKnown: 'true',
         meetingType: 'PSR',
+        notesForPrisoners: 'amended prisoner notes',
+        notesForStaff: 'amended staff notes',
       }
 
       appointmentService.getAppointment = jest.fn().mockResolvedValue(vlpmAppointmentMock)
@@ -473,7 +478,8 @@ describe('Appointment Controller', () => {
           ],
           probationTeamCode: 'BLACKPP',
           probationMeetingType: 'PSR',
-          comments: 'Comment',
+          notesForPrisoners: 'amended prisoner notes',
+          notesForStaff: 'amended staff notes',
         },
       )
 
@@ -729,9 +735,13 @@ describe('Appointment Controller', () => {
           startTime: appointmentsToCreate.startTime,
           endTime: appointmentsToCreate.endTime,
           locationId: appointmentsToCreate.locationId,
-          comment: appointmentsToCreate.comment,
         },
-        appointmentForm: { ...formBody, appointmentType: 'VLB' },
+        appointmentForm: {
+          ...formBody,
+          appointmentType: 'VLB',
+          notesForPrisoners: 'prisoner notes',
+          notesForStaff: 'staff notes',
+        },
       }
       req.flash = (key: string) => {
         if (key === 'postVLBDetails') {
@@ -781,8 +791,9 @@ describe('Appointment Controller', () => {
         ],
         courtCode: 'ABC',
         courtHearingType: 'APPEAL',
-        comments: 'Comment',
         videoLinkUrl: 'http://test.url',
+        notesForPrisoners: 'prisoner notes',
+        notesForStaff: 'staff notes',
       })
 
       expect(res.redirect).toHaveBeenCalledWith(
@@ -798,9 +809,14 @@ describe('Appointment Controller', () => {
           startTime: appointmentsToCreate.startTime,
           endTime: appointmentsToCreate.endTime,
           locationId: appointmentsToCreate.locationId,
-          comment: appointmentsToCreate.comment,
         },
-        appointmentForm: { ...formBody, appointmentId: 1, appointmentType: 'VLB' },
+        appointmentForm: {
+          ...formBody,
+          appointmentId: 1,
+          appointmentType: 'VLB',
+          notesForPrisoners: 'amended prisoner notes',
+          notesForStaff: 'ameneded staff notes',
+        },
       }
       req.flash = (key: string) => {
         if (key === 'postVLBDetails') {
@@ -856,8 +872,9 @@ describe('Appointment Controller', () => {
           ],
           courtCode: 'ABC',
           courtHearingType: 'APPEAL',
-          comments: 'Comment',
           videoLinkUrl: 'http://test.url',
+          notesForPrisoners: 'amended prisoner notes',
+          notesForStaff: 'ameneded staff notes',
         },
       )
 

@@ -181,7 +181,7 @@ export interface GlobalEmail {
   email: string
 }
 
-export interface GlobalPhoneNumber {
+export interface PhoneNumber {
   id: number
   type: string
   typeDescription: string
@@ -190,6 +190,10 @@ export interface GlobalPhoneNumber {
 }
 
 export interface GlobalNumbersAndEmails {
-  phones: GlobalPhoneNumber[]
+  phones: PhoneNumber[]
   emails: GlobalEmail[]
+}
+
+export interface AddressForDisplay extends AddressResponseDto {
+  addressPhoneNumbersForDisplay?: PhoneNumber[]
 }

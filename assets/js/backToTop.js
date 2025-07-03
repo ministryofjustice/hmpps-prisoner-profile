@@ -17,15 +17,17 @@ BackToTop.prototype.init = function () {
   var $h1 = document.querySelector('h1')
   var $footer = document.querySelector('.connect-dps-common-footer') ?? document.querySelector('.govuk-footer')
   var $sidebar = document.querySelector('.app-sidebar')
+  var $header = document.querySelector('.connect-dps-common-header')
 
   // Check if there is anything to observe
-  if (!$h1 || !$footer || !$sidebar) {
+  if (!$h1 || !$footer || !$sidebar || !$header) {
     return
   }
 
   var h1IsIntersecting = false
   var footerIsIntersecting = false
   var sidebarIsIntersecting = false
+  var headerIsIntersecting = false
 
   var observer = new window.IntersectionObserver(
     function (entries) {
@@ -39,6 +41,9 @@ BackToTop.prototype.init = function () {
       var sidebarEntry = entries.find(function (entry) {
         return entry.target === $sidebar
       })
+      var headerEntry = entries.find(function (entry) {
+        return entry.target === $header
+      })
 
       // If there is an entry this means the element has changed so lets check if it's intersecting.
       if (h1Entry) {
@@ -50,9 +55,12 @@ BackToTop.prototype.init = function () {
       if (sidebarEntry) {
         sidebarIsIntersecting = sidebarEntry.isIntersecting
       }
+      if (headerEntry) {
+        headerIsIntersecting = headerEntry.isIntersecting
+      }
 
-      // If the sidebar or h1 is visible then hide the back to top link as it's not required
-      if (sidebarIsIntersecting || h1IsIntersecting) {
+      // If the sidebar, h1, or header is visible then hide the back to top link as it's not required
+      if (sidebarIsIntersecting || h1IsIntersecting || headerIsIntersecting) {
         this.$module.classList.remove('hmpps-back-to-top--fixed')
         this.$module.classList.add('hmpps-back-to-top--hidden')
         // If the footer is visible then set the back to top link at the bottom
@@ -70,6 +78,7 @@ BackToTop.prototype.init = function () {
   observer.observe($h1)
   observer.observe($footer)
   observer.observe($sidebar)
+  observer.observe($header)
 }
 
 // Initialise back to top
