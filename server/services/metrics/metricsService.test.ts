@@ -100,8 +100,8 @@ describe('Metrics Service', () => {
   describe('trackNomisLockedWarning', () => {
     it('should send correct telemetry event', () => {
       const prisonerNumber = 'A1234BC'
-      const pageUrl = '/prisoner/A1234BC/profile'
-      const apiUrlCalled = '/api/prisoner/A1234BC/lock-status'
+      const pageUrl = '/somePage'
+      const apiUrlCalled = '/someApiUrl'
       const user = { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser
 
       metricsService.trackNomisLockedWarning(prisonerNumber, pageUrl, apiUrlCalled, user)
