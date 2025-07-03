@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { apostrophe, convertToTitleCase, formatName, objectToSelectOptions } from '../utils/utils'
+import { apostrophe, blankStringsToNull, convertToTitleCase, formatName, objectToSelectOptions } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
@@ -252,12 +252,12 @@ export default class AddressEditController {
         ? primaryOrPostalResponse
         : [primaryOrPostalResponse]
 
-      const address: AddressRequestDto = {
+      const address = blankStringsToNull<AddressRequestDto>({
         ...addressCache.value.address,
         primaryAddress: primaryOrPostal.includes('primary'),
         postalAddress: primaryOrPostal.includes('postal'),
         addressTypes: ['HOME'],
-      }
+      })
 
       try {
         await this.addressService.createAddress(clientToken, prisonerNumber, address, res.locals.user as PrisonUser)
