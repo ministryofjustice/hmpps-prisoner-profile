@@ -1,15 +1,10 @@
 import { addDays, addYears, subDays } from 'date-fns'
 import { AppointmentValidator } from './appointmentValidator'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
-import config from '../config'
 
 const todayStr = formatDate(formatDateISO(new Date()), 'short')
 const futureDate = formatDateISO(addDays(new Date(), 7))
 const futureDateYear = formatDateISO(addYears(new Date(), 1))
-
-beforeEach(() => {
-  config.featureToggles.bvlsMasterPublicPrivateNotesEnabled = false
-})
 
 describe('Validation middleware - VLPM appointment', () => {
   it('should pass validation with good data', async () => {
@@ -35,9 +30,7 @@ describe('Validation middleware - VLPM appointment', () => {
     expect(result).toEqual([])
   })
 
-  it('should fail validation for notes and not comments when max characters exceeded for BVLS VLPM appointment', async () => {
-    config.featureToggles.bvlsMasterPublicPrivateNotesEnabled = true
-
+  it('should fail validation for notes when max characters exceeded for BVLS VLPM appointment', async () => {
     const appointmentForm = {
       appointmentType: 'VLPM',
       probationTeam: 'TEAM_CODE',
@@ -65,9 +58,7 @@ describe('Validation middleware - VLPM appointment', () => {
     ])
   })
 
-  it('should fail validation for notes and not comments when max characters exceeded for BVLS VLB appointment', async () => {
-    config.featureToggles.bvlsMasterPublicPrivateNotesEnabled = true
-
+  it('should fail validation for notes when max characters exceeded for BVLS VLB appointment', async () => {
     const appointmentForm = {
       appointmentType: 'VLB',
       probationTeam: 'TEAM_CODE',
@@ -265,8 +256,6 @@ describe('Validation middleware - VLPM appointment', () => {
       recurring: 'yes',
       repeats: '',
       times: 'aa',
-      comments: 'a'.repeat(3601),
-      // should be ignored, for BVLS appointments and when toggle is off.
       notesForStaff: 'a'.repeat(401),
       notesForPrisoners: 'a'.repeat(401),
     }
@@ -281,7 +270,8 @@ describe('Validation middleware - VLPM appointment', () => {
       { text: 'Enter the minutes using numbers only', href: '#endTime' },
       { text: 'Select the repeat period for this appointment', href: '#repeats' },
       { text: 'Enter the number of appointments using numbers only', href: '#times' },
-      { text: 'Enter comments using 3,600 characters or less', href: '#comments' },
+      { text: 'Notes for prison staff must be 400 characters or less', href: '#notesForStaff' },
+      { text: 'Notes for prisoner must be 400 characters or less', href: '#notesForPrisoners' },
     ])
   })
 

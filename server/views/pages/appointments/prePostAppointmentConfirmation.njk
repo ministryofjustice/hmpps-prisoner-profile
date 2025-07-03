@@ -98,7 +98,7 @@
                     ]
                 }) }}
 
-                {% if bvlsMasterPublicPrivateNotesEnabled() and appointmentTypeCode == 'VLB' %}
+                {% if appointmentTypeCode == 'VLB' %}
                     {{ govukSummaryList({
                         classes: 'govuk-summary-list--no-border appointment-details-list',
                         rows: [
@@ -116,20 +116,6 @@
                                 },
                                 value: {
                                     text: notesForPrisoners or 'None entered'
-                                }
-                            }
-                        ]
-                    }) }}
-                {% else %}
-                    {{ govukSummaryList({
-                        classes: 'govuk-summary-list--no-border appointment-details-list',
-                        rows: [
-                            {
-                                key: {
-                                    text: "Comment"
-                                },
-                                value: {
-                                    text: comments
                                 }
                             }
                         ]
