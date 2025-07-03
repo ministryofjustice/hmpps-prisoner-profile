@@ -175,7 +175,7 @@ export default class AddressEditController {
           country: countryCode?.description,
         },
         prisonerNumber,
-        backLink: `/prisoner/${prisonerNumber}/personal/${route}`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/${route}`,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })
@@ -227,7 +227,7 @@ export default class AddressEditController {
         existingPostal: !!existingAddresses.find(a => a.postalAddress),
         errors,
         prisonerNumber,
-        backLink: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })
@@ -328,7 +328,7 @@ export default class AddressEditController {
         noFixedAddress: addressLocation === AddressLocation.no_fixed_address,
         noFixedAddressCheckbox: addressLocation === AddressLocation.overseas,
         breadcrumbPrisonerName: prisonerName,
-        backLink: addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address',
+        backLinkUrl: addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address',
         prisonerNumber,
         miniBannerData: {
           prisonerNumber,

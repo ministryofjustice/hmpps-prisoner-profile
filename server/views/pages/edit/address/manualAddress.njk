@@ -1,185 +1,126 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% extends "../editPage.njk" %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + prisonerNumber + "/personal"
-    }
-] %}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-    {% block body %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-        </div>
-
-        {{ govukBackLink({
-            text: "Back",
-            href: backLink,
-            attributes: { 'data-qa': 'back-link' },
-            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
-        }) }}
-
-        {% if errors.length > 0 %}
-            {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            }) }}
-        {% endif %}
-
-        {%  if noFixedAddress %}
-            <span class="govuk-caption-l">No fixed address</span>
-        {% endif %}
-
-        <h1 class="govuk-heading-l">{{ formTitle }}</h1>
-
-        <div class="hmpps-find-uk-address govuk-grid-row">
-            <div class="govuk-grid-column-three-quarters">
-                <form method="post" novalidate="novalidate" autocomplete="off">
-                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-                    <input type="hidden" id="town-or-city-error" name="townOrCityError" value="{{ requestBody.townOrCityError }}" />
-                    <input type="hidden" id="county-error" name="countyError" value="{{ requestBody.countyError }}" />
-                    <input type="hidden" id="country-error" name="countryError" value="{{ requestBody.countryError }}" />
-
-                    <div id="hmpps-autocomplete-options"
-                         data-input-classes="govuk-input hmpps-address-field"
-                          data-menu-classes="hmpps-address-field"></div>
-
-                    {% if noFixedAddressCheckbox %}
-                        {{ govukCheckboxes({
-                            name: "noFixedAddress",
-                            classes: "govuk-checkboxes--small",
-                            items: [ { value: "true", text: "No fixed address" } ]
-                        }) }}
-                    {% endif %}
-
-                    {{ govukInput({
-                        label: { text: "House or building name (optional)" },
-                        id: "house-or-building-name",
-                        name: "houseOrBuildingName",
-                        value: requestBody.houseOrBuildingName,
-                        errorMessage: errors | findError("house-or-building-name"),
-                        classes: "hmpps-address-field"
-                    }) }}
-
-                    {{ govukInput({
-                        label: { text: "House number (optional)" },
-                        id: "house-number",
-                        name: "houseNumber",
-                        value: requestBody.houseNumber,
-                        errorMessage: errors | findError("house-number"),
-                        classes: "hmpps-address-field__house-number"
-                    }) }}
-
-                    {{ govukInput({
-                        label: { text: "Address line 1 (optional)" },
-                        id: "address-line-1",
-                        name: "addressLine1",
-                        value: requestBody.addressLine1,
-                        errorMessage: errors | findError("address-line-1"),
-                        classes: "hmpps-address-field"
-                    }) }}
-
-                    {{ govukInput({
-                        label: { text: "Address line 2 (optional)" },
-                        id: "address-line-2",
-                        name: "addressLine2",
-                        value: requestBody.addressLine2,
-                        errorMessage: errors | findError("address-line-2"),
-                        classes: "hmpps-address-field"
-                    }) }}
-
-                    {% if ukAddress %}
-                        {{ govukSelect({
-                            id: "town-or-city",
-                            name: "townOrCity",
-                            label: { text: "Town or city (optional)" },
-                            items: [{ value: '', text: 'Please select a town or city' }].concat(townOrCityOptions),
-                            errorMessage: errors | findError("town-or-city"),
-                            classes: "hmpps-address-field js-autocomplete-select",
-                            attributes: {
-                                "data-test": "select-autocomplete-input",
-                                "data-input-classes": "govuk-input hmpps-address-field",
-                                "data-menu-classes": "hmpps-address-field"
-                            }
-                        }) }}
-
-                        {{ govukSelect({
-                            id: "county",
-                            name: "county",
-                            label: { text: "County (optional)" },
-                            items: [{ value: '', text: 'Please select a county' }].concat(countyOptions),
-                            errorMessage: errors | findError("county"),
-                            classes: "hmpps-address-field js-autocomplete-select",
-                            attributes: {
-                                "data-test": "select-autocomplete-input",
-                                "data-input-classes": "govuk-input hmpps-address-field",
-                                "data-menu-classes": "hmpps-address-field"
-                            }
-                        }) }}
-                    {% endif %}
-
-                    {{ govukInput({
-                        label: { text: "Postcode (optional)" },
-                        id: "postcode",
-                        name: "postcode",
-                        value: requestBody.postcode,
-                        errorMessage: errors | findError("postcode"),
-                        classes: "hmpps-address-field__postcode"
-                    }) }}
-
-                    {{ govukSelect({
-                        id: "country",
-                        name: "country",
-                        label: { text: "Country" },
-                        items: [{ value: '', text: 'Please select a country' }].concat(countryOptions),
-                        errorMessage: errors | findError("country"),
-                        classes: "hmpps-address-field js-autocomplete-select",
-                        attributes: {
-                            "data-test": "select-autocomplete-input",
-                            "data-input-classes": "govuk-input hmpps-address-field",
-                            "data-menu-classes": "hmpps-address-field"
-                        }
-                    }) }}
-
-                    <div class="govuk-button-group">
-                        {{ govukButton({
-                            text: "Continue",
-                            type: "submit",
-                            classes: "js-autocomplete-submit",
-                            preventDoubleClick: true,
-                            attributes: { "data-qa": "submit-button" }
-                        }) }}
-                        <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-                           class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    {% endblock %}
+{% block form %}
+  {% if noFixedAddress %}
+    <span class="govuk-caption-l">No fixed address</span>
+  {% endif %}
+  <h1 class="govuk-heading-l">{{ formTitle }}</h1>
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <input type="hidden" id="town-or-city-error" name="townOrCityError" value="{{ requestBody.townOrCityError }}"/>
+    <input type="hidden" id="county-error" name="countyError" value="{{ requestBody.countyError }}"/>
+    <input type="hidden" id="country-error" name="countryError" value="{{ requestBody.countryError }}"/>
+    <div
+      id="hmpps-autocomplete-options"
+      data-input-classes="govuk-input hmpps-address-field"
+      data-menu-classes="hmpps-address-field"></div>
+    {% if noFixedAddressCheckbox %}
+      {{ govukCheckboxes({
+        name: "noFixedAddress",
+        classes: "govuk-checkboxes--small",
+        items: [ { value: "true", text: "No fixed address" } ]
+      }) }}
+    {% endif %}
+    {{ govukInput({
+      label: { text: "House or building name (optional)" },
+      id: "house-or-building-name",
+      name: "houseOrBuildingName",
+      value: requestBody.houseOrBuildingName,
+      errorMessage: errors | findError("house-or-building-name"),
+      classes: "hmpps-address-field"
+    }) }}
+    {{ govukInput({
+      label: { text: "House number (optional)" },
+      id: "house-number",
+      name: "houseNumber",
+      value: requestBody.houseNumber,
+      errorMessage: errors | findError("house-number"),
+      classes: "hmpps-address-field__house-number"
+    }) }}
+    {{ govukInput({
+      label: { text: "Address line 1 (optional)" },
+      id: "address-line-1",
+      name: "addressLine1",
+      value: requestBody.addressLine1,
+      errorMessage: errors | findError("address-line-1"),
+      classes: "hmpps-address-field"
+    }) }}
+    {{ govukInput({
+      label: { text: "Address line 2 (optional)" },
+      id: "address-line-2",
+      name: "addressLine2",
+      value: requestBody.addressLine2,
+      errorMessage: errors | findError("address-line-2"),
+      classes: "hmpps-address-field"
+    }) }}
+    {% if ukAddress %}
+      {{ govukSelect({
+        id: "town-or-city",
+        name: "townOrCity",
+        label: { text: "Town or city (optional)" },
+        items: [{ value: '', text: 'Please select a town or city' }].concat(townOrCityOptions),
+        errorMessage: errors | findError("town-or-city"),
+        classes: "hmpps-address-field js-autocomplete-select",
+        attributes: {
+          "data-test": "select-autocomplete-input",
+          "data-input-classes": "govuk-input hmpps-address-field",
+          "data-menu-classes": "hmpps-address-field"
+        }
+      }) }}
+      {{ govukSelect({
+        id: "county",
+        name: "county",
+        label: { text: "County (optional)" },
+        items: [{ value: '', text: 'Please select a county' }].concat(countyOptions),
+        errorMessage: errors | findError("county"),
+        classes: "hmpps-address-field js-autocomplete-select",
+        attributes: {
+          "data-test": "select-autocomplete-input",
+          "data-input-classes": "govuk-input hmpps-address-field",
+          "data-menu-classes": "hmpps-address-field"
+        }
+      }) }}
+    {% endif %}
+    {{ govukInput({
+      label: { text: "Postcode (optional)" },
+      id: "postcode",
+      name: "postcode",
+      value: requestBody.postcode,
+      errorMessage: errors | findError("postcode"),
+      classes: "hmpps-address-field__postcode"
+    }) }}
+    {{ govukSelect({
+      id: "country",
+      name: "country",
+      label: { text: "Country" },
+      items: [{ value: '', text: 'Please select a country' }].concat(countryOptions),
+      errorMessage: errors | findError("country"),
+      classes: "hmpps-address-field js-autocomplete-select",
+      attributes: {
+        "data-test": "select-autocomplete-input",
+        "data-input-classes": "govuk-input hmpps-address-field",
+        "data-menu-classes": "hmpps-address-field"
+      }
+    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Continue",
+        type: "submit",
+        classes: "js-autocomplete-submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#addresses"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="cancel-link">Cancel</a>
+    </div>
+  </form>
 {% endblock %}
-
 {% block pageScripts %}
-    <script src="/assets/js/accessible-autocomplete.min.js"></script>
-    <script src="/assets/js/autocomplete.js"></script>
+  <script src="/assets/js/accessible-autocomplete.min.js"></script>
+  <script src="/assets/js/autocomplete.js"></script>
 {% endblock %}

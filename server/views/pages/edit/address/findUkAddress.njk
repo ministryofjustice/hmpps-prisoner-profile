@@ -1,4 +1,4 @@
-{% extends "../../../partials/layout.njk" %}
+{% extends "../editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
@@ -6,125 +6,78 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + prisonerNumber + "/personal"
-    }
-] %}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-    {% block body %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-        </div>
-
-        {{ govukBackLink({
-            text: "Back",
-            href: "/prisoner/" + prisonerNumber + "/personal/where-is-address",
-            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
-        }) }}
-
-        {% if errors.length > 0 %}
-            {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            }) }}
-        {% endif %}
-
-        <div class="hmpps-find-uk-address govuk-grid-row">
-            <div class="govuk-grid-column-three-quarters">
-                <form method="post" novalidate="novalidate" autocomplete="off">
-                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-
-                    <div class="govuk-form-group">
-                        <h1 class="govuk-label-wrapper">
-                            <label class="govuk-label govuk-label--l" for="address-autosuggest-input">{{ formTitle }}</label>
-                        </h1>
-                        <div id="address-hint" class="govuk-hint">Start typing a postcode or address</div>
-                        <div id="address" class="hmpps-js-address-autosuggest">
-                            <input type="hidden" id="uprn" class="hmpps-js-uprn hmpps-display-none" name="uprn" />
-                            <div class="hmpps-address-autosuggest"
-                                 data-optimisation-off="{{ optimisationOff }}"
-                                 data-aria-you-have-selected="You have selected"
-                                 data-aria-min-chars="Enter 3 or more characters for suggestions."
-                                 data-aria-one-result="There is one suggestion available."
-                                 data-aria-n-results="There are {n} suggestions available."
-                                 data-no-results="No results found. Try entering a different part of the address"
-                                 data-type-more="Enter more of the address to get results"
-                                 data-error-api="The address search is not working right now. Enter the address manually to continue."
-                                 data-styling-base-class="hmpps-address-autosuggest">
-
-                                {{ govukInput({
-                                    id: 'address-autosuggest-input',
-                                    name: 'address-autosuggest-input',
-                                    classes: 'hmpps-js-autosuggest-input',
-                                    value: inputValue,
-                                    attributes: {
-                                        'autocomplete': 'off',
-                                        'aria-describedby': 'address-hint'
-                                    },
-                                    errorMessage: errors | findError('address-autosuggest-input')
-                                }) }}
-
-                                <div class="hmpps-address-autosuggest__results hmpps-js-autosuggest-results">
-                                    <div id="address-results" class="hmpps-address-autosuggest__results-title hmpps-js-autosuggest-results-title">
-                                        Select an address
-                                    </div>
-                                    <ul class="hmpps-address-autosuggest__listbox hmpps-js-autosuggest-listbox" title="Select an address"
-                                        role="listbox" id="address-autosuggest-listbox" tabindex="-1"></ul>
-                                </div>
-                                <div class="hmpps-address-autosuggest__instructions hmpps-js-autosuggest-instructions govuk-visually-hidden"
-                                     id="address-autosuggest-instructions" tabindex="-1"> Use up and down
-                                    keys to navigate suggestions once you have typed more than two characters. Use the enter
-                                    key to select a suggestion. Touch device users, explore by touch or with swipe gestures.
-                                </div>
-                                <div class="hmpps-address-autosuggest__status hmpps-js-autosuggest-aria-status govuk-visually-hidden "
-                                     aria-live="assertive" aria-atomic="true" role="status" tabindex="-1"></div>
-
-                                {{ mojAlert({
-                                    variant: "warning",
-                                    classes: 'hmpps-address-autosuggest__error hmpps-js-autosuggest-error hmpps-display-none'
-                                }) }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="govuk-button-group">
-                        {{ govukButton({
-                            text: "Continue",
-                            type: "submit",
-                            preventDoubleClick: true,
-                            attributes: { "data-qa": "edit-submit-button" }
-                        }) }}
-                        <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-                           class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
-                    </div>
-
-                    <a href="/prisoner/{{ prisonerNumber }}/personal/add-uk-address"
-                       class="govuk-link govuk-link--no-visited-state">Enter the address manually</a>
-                </form>
+{% set backLinkUrl = "/prisoner/" + prisonerNumber + "/personal/where-is-address" %}
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <div class="govuk-form-group">
+      <h1 class="govuk-label-wrapper">
+        <label class="govuk-label govuk-label--l" for="address-autosuggest-input">{{ formTitle }}</label>
+      </h1>
+      <div id="address-hint" class="govuk-hint">Start typing a postcode or address</div>
+      <div id="address" class="hmpps-js-address-autosuggest">
+        <input type="hidden" id="uprn" class="hmpps-js-uprn hmpps-display-none" name="uprn"/>
+        <div class="hmpps-address-autosuggest" data-optimisation-off="{{ optimisationOff }}" data-aria-you-have-selected="You have selected" data-aria-min-chars="Enter 3 or more characters for suggestions." data-aria-one-result="There is one suggestion available." data-aria-n-results="There are {n} suggestions available." data-no-results="No results found. Try entering a different part of the address" data-type-more="Enter more of the address to get results" data-error-api="The address search is not working right now. Enter the address manually to continue." data-styling-base-class="hmpps-address-autosuggest">
+          {{ govukInput({
+            id: 'address-autosuggest-input',
+            name: 'address-autosuggest-input',
+            classes: 'hmpps-js-autosuggest-input',
+            value: inputValue,
+            attributes: {
+              'autocomplete': 'off',
+              'aria-describedby': 'address-hint'
+            },
+            errorMessage: errors | findError('address-autosuggest-input')
+          }) }}
+          <div class="hmpps-address-autosuggest__results hmpps-js-autosuggest-results">
+            <div id="address-results" class="hmpps-address-autosuggest__results-title hmpps-js-autosuggest-results-title">
+              Select an address
             </div>
+            <ul
+              class="hmpps-address-autosuggest__listbox hmpps-js-autosuggest-listbox"
+              title="Select an address"
+              role="listbox"
+              id="address-autosuggest-listbox"
+              tabindex="-1"></ul>
+          </div>
+          <div
+            class="hmpps-address-autosuggest__instructions hmpps-js-autosuggest-instructions govuk-visually-hidden"
+            id="address-autosuggest-instructions"
+            tabindex="-1">
+            Use up and down keys to navigate suggestions once you have typed more than two characters. Use the enter key to select a
+            suggestion. Touch device users, explore by touch or with swipe gestures.
+          </div>
+          <div
+            class="hmpps-address-autosuggest__status hmpps-js-autosuggest-aria-status govuk-visually-hidden "
+            aria-live="assertive"
+            aria-atomic="true"
+            role="status"
+            tabindex="-1"></div>
+          {{ mojAlert({
+            variant: "warning",
+            classes: 'hmpps-address-autosuggest__error hmpps-js-autosuggest-error hmpps-display-none'
+          }) }}
         </div>
-    {% endblock %}
+      </div>
+    </div>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Continue",
+        type: "submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#addresses"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
+    </div>
+    <a href="/prisoner/{{ prisonerNumber }}/personal/add-uk-address" class="govuk-link govuk-link--no-visited-state">Enter
+      the address manually</a>
+  </form>
 {% endblock %}
-
 {% block pageScripts %}
-    <script src="/assets/js/addressLookup/abortable-fetch.js"></script>
-    <script src="/assets/js/addressLookup/autosuggest-ui.js"></script>
-    <script src="/assets/js/addressLookup/autosuggest-address.js"></script>
+  <script src="/assets/js/addressLookup/abortable-fetch.js"></script>
+  <script src="/assets/js/addressLookup/autosuggest-ui.js"></script>
+  <script src="/assets/js/addressLookup/autosuggest-address.js"></script>
 {% endblock %}
