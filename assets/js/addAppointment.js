@@ -150,5 +150,4 @@ document.addEventListener('DOMContentLoaded', () => {
   showHideRecurring()
   showHideProbationFields()
   showHidePublicPrivateNotes()
-  showHideCommentsHint()
 })
