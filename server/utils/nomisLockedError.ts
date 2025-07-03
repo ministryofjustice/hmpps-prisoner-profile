@@ -3,9 +3,12 @@ import logger from '../../logger'
 export class NomisLockedError extends Error {
   status = 423
 
-  constructor(message = 'Resource is locked') {
+  endpoint: string
+
+  constructor(message: string, endpoint: string) {
     super(message)
     this.name = 'NomisLockedError'
+    this.endpoint = endpoint
   }
 }
 
@@ -15,7 +18,7 @@ export async function handleNomisLockedError<T>(apiClientFunction: () => Promise
   } catch (e) {
     if (e.status === 423) {
       logger.warn(`NomisLockedError: 423 status occurred when calling ${e.endpoint}`)
-      throw new NomisLockedError(e.message)
+      throw new NomisLockedError(e.message, e.endpoint)
     }
     throw e
   }

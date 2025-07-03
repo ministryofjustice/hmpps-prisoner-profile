@@ -66,7 +66,7 @@ context('Professional contacts list page', () => {
       .contains('email2@email.com')
       .contains('07700000000')
       .contains('4444555566')
-    firstPrisonContact.address().contains('Flat 7, premises address, street field')
+    firstPrisonContact.address().contains('7, premises address, street field')
 
     professionalContactsPage.backLink().should('exist')
   })

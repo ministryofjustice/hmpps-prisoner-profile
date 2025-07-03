@@ -402,6 +402,24 @@ describe('Address Edit Controller', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
       })
 
+      it('handles empty address strings', async () => {
+        req = { ...req, body: { primaryOrPostal: 'primary' }, query: { address: addressCacheId } } as unknown as Request
+
+        ephemeralDataService.getData = jest.fn().mockReturnValue({
+          key: addressCacheId,
+          value: { address: { ...addressRequest, thoroughfareName: '' }, route: 'find-uk-address' },
+        })
+
+        await controller.submitPrimaryOrPostalAddress()(req, res, next)
+
+        expect(addressService.createAddress).toHaveBeenCalledWith(
+          clientToken,
+          prisonerNumber,
+          expect.objectContaining({ thoroughfareName: null }),
+          prisonUserMock,
+        )
+      })
+
       it('handles missing address cache id', async () => {
         req = { ...req, body: { primaryOrPostal: 'neither' }, query: {} } as unknown as Request
 
