@@ -10,7 +10,7 @@
     {% if address.buildingName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.buildingName }}</p>{% endif %}
     {% if address.thoroughfareName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{% if address.buildingNumber %}{{ address.buildingNumber }}{% endif %} {{ address.thoroughfareName }}</p>{% endif %}
     {% if address.dependantLocality %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.dependantLocality }}</p>{% endif %}
-    {% if address.city %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.city.description }}</p>{% endif %}
+    {% if address.postTown %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.postTown.description }}</p>{% endif %}
     {% if address.county %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.county.description }}</p>{% endif %}
     {% if address.postCode %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.postCode }}</p>{% endif %}
     {% if address.country %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.country.description }}</p>{% endif %}
