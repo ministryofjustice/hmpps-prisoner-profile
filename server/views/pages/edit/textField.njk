@@ -2,41 +2,37 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% extends "./editPage.njk" %}
 {% block form %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
-      <form method="post" novalidate="novalidate" autocomplete="off">
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-          {{ govukInput({
-              label: {
-                text: formTitle,
-                classes: "govuk-label--l",
-                isPageHeading: true
-              },
-              id: fieldName,
-              name: fieldName,
-              value: fieldValue,
-              hint: {
-                text: hintText if hintText
-              },
-              classes: inputClasses if inputClasses,
-              errorMessage: { text: errors[0].text } if errors.length > 0
-            }) }}
-        </div>
-        {% block extraActions %}{% endblock %}
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: submitButtonText if submitButtonText else "Save",
-            type: "submit",
-            preventDoubleClick: true,
-            attributes: { "data-qa": "edit-submit-button" }
-            }) }}
-          <a
-            href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}"
-            class="govuk-link govuk-link--no-visited-state"
-            data-qa="edit-cancel-button">Cancel</a>
-        </div>
-      </form>
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+      {{ govukInput({
+        label: {
+          text: formTitle,
+          classes: "govuk-label--l",
+          isPageHeading: true
+        },
+        id: fieldName,
+        name: fieldName,
+        value: fieldValue,
+        hint: {
+          text: hintText if hintText
+        },
+        classes: inputClasses if inputClasses,
+        errorMessage: { text: errors[0].text } if errors.length > 0
+      }) }}
     </div>
-  </div>
+    {% block extraActions %}{% endblock %}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: submitButtonText if submitButtonText else "Save",
+        type: "submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
+    </div>
+  </form>
 {% endblock %}

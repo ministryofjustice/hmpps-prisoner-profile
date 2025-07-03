@@ -36,13 +36,6 @@ export interface RadioFieldData extends FieldData {
   referenceDataOverrides?: ReferenceDataOverride[]
 }
 
-export interface CheckboxFieldData extends FieldData {
-  options?: {
-    showDontKnow?: boolean
-    showNo?: boolean
-  }
-}
-
 export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
   url: 'shoe-size',
   fieldName: 'shoeSize',

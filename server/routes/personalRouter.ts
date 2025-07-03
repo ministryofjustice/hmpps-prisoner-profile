@@ -40,6 +40,7 @@ import addressEditRouter from './addressEditRouter'
 import { emailValidator } from '../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
 import { phoneNumberValidator } from '../validators/personal/phoneNumberValidator'
+import { populateEditPageData } from '../middleware/populateEditPageData'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -91,6 +92,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}/:markType(tattoo|scar|mark)`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     editProfileChecks(),
     distinguishingMarksRouter(services),
@@ -100,6 +102,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     militaryRecordsRouter(services),
   )
@@ -108,6 +111,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     addressEditRouter(services, editProfileChecks),
   )
@@ -116,6 +120,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     aliasRouter(services, editProfileChecks),
   )
@@ -124,6 +129,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     languagesRouter(services, editProfileChecks),
   )
@@ -132,6 +138,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     nextOfKinRouter(services, editProfileChecks),
   )
@@ -140,6 +147,7 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    populateEditPageData(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     identityNumbersRouter(services, editProfileChecks),
   )
@@ -176,6 +184,7 @@ export default function personalRouter(services: Services): Router {
       getPrisonerData(services),
       prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
       permissionsCheck(),
+      populateEditPageData(),
       edit.method,
     )
 

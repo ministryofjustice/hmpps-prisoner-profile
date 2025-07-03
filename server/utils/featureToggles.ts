@@ -13,8 +13,7 @@ export const militaryHistoryEnabled = () =>
   config.featureToggles.militaryHistoryEnabledFrom &&
   isAfter(Date.now(), config.featureToggles.militaryHistoryEnabledFrom)
 
-export const editReligionEnabled = () =>
-  config.featureToggles.editReligionEnabledFrom && isAfter(Date.now(), config.featureToggles.editReligionEnabledFrom)
+export const editReligionEnabled = () => true
 
 export const externalContactsEnabled = (activeCaseLoadId: string) =>
   config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)

@@ -1,12 +1,12 @@
 {% extends "../index.njk" %}
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
 {% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
-
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% set hideBackLink = true %}
 {% set breadCrumbs = [
     { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
@@ -17,9 +17,18 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
   </div>
-
+  {% if backLinkUrl %}
+    <div class="govuk-grid-row govuk-!-margin-bottom-6">
+      <div class="govuk-grid-column-full">
+        {{ govukBackLink({
+        text: "Back",
+        classes: "govuk-!-margin-0",
+        href: backLinkUrl
+      }) }}
+      </div>
+    </div>
+  {% endif %}
   {{ nomisLockedWarning(isLocked) }}
-
   {% if errors.length > 0 %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
@@ -32,5 +41,9 @@
       </div>
     </div>
   {% endif %}
-  {% block form %}{% endblock %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% block form %}{% endblock %}
+    </div>
+  </div>
 {% endblock %}
