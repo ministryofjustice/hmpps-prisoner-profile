@@ -103,4 +103,17 @@ export default class MetricsService {
       },
     })
   }
+
+  trackNomisLockedWarning(prisonerNumber: string, pageUrl: string, apiUrlCalled: string, user: PrisonUser) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-nomis-locked-warning-shown',
+      properties: {
+        prisonerNumber,
+        pageUrl,
+        apiUrlCalled,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+      },
+    })
+  }
 }

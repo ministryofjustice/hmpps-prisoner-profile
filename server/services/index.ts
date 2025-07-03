@@ -279,6 +279,7 @@ export const services = () => {
     nextOfKinService,
     prisonPermissionsService,
     identityNumbersService,
+    metricsService,
   }
 }
 
