@@ -96,4 +96,26 @@ describe('Metrics Service', () => {
       })
     })
   })
+
+  describe('trackNomisLockedWarning', () => {
+    it('should send correct telemetry event', () => {
+      const prisonerNumber = 'A1234BC'
+      const pageUrl = '/prisoner/A1234BC/profile'
+      const apiUrlCalled = '/api/prisoner/A1234BC/lock-status'
+      const user = { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser
+
+      metricsService.trackNomisLockedWarning(prisonerNumber, pageUrl, apiUrlCalled, user)
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-nomis-locked-warning-shown',
+        properties: {
+          prisonerNumber,
+          pageUrl,
+          apiUrlCalled,
+          username: user.username,
+          activeCaseLoad: user.activeCaseLoadId,
+        },
+      })
+    })
+  })
 })
