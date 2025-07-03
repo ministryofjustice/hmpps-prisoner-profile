@@ -2,9 +2,8 @@ import { Request, RequestHandler, Response } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
-import { formatName } from '../../utils/utils'
+import { getCommonRequestData, mapToQueryString } from '../../utils/utils'
 import EphemeralDataService from '../../services/ephemeralDataService'
-import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import AddressService from '../../services/addressService'
 
 export interface DisplayFindUkAddressOptions {
@@ -46,7 +45,7 @@ export function displayFindUkAddressHandler(
       })
       .catch(error => logger.error(error))
 
-    const query = queryString(options.queryParams)
+    const query = options.queryParams ? `?${mapToQueryString(options.queryParams)}` : ''
 
     return res.render('pages/edit/address/findUkAddress', {
       pageTitle,
@@ -87,27 +86,7 @@ export function submitFindUkAddressHandler(
 
     const address = await addressService.getAddressByUprn(uprn, clientToken)
     const addressConfirmationUuid = await ephemeralDataService.cacheData({ address, route })
-    const query = queryString({ address: addressConfirmationUuid, ...(queryParams ?? {}) })
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${confirmRedirectUrl}${query}`)
+    const query = mapToQueryString({ address: addressConfirmationUuid, ...(queryParams ?? {}) })
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${confirmRedirectUrl}?${query}`)
   }
-}
-
-function getCommonRequestData(req: Request) {
-  const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-  const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-  const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-  const { clientToken } = req.middleware
-  return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
-}
-
-function queryString(values: Record<string, string | number> | undefined): string {
-  if (!values) {
-    return ''
-  }
-
-  const joinedString = Object.entries(values)
-    ?.map(([k, v]) => `${k}=${v}`)
-    ?.join('&')
-
-  return joinedString ? `?${joinedString}` : ''
 }

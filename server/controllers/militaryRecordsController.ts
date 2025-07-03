@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatLocation, formatName, objectToRadioOptions } from '../utils/utils'
+import { apostrophe, formatLocation, getCommonRequestData, objectToRadioOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import MilitaryRecordsService from '../services/militaryRecordsService'
@@ -10,7 +10,6 @@ import {
   DisciplinaryAction,
   MilitaryServiceInformation,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
@@ -25,8 +24,8 @@ export default class MilitaryRecordsController {
 
   public displayMilitaryServiceInformation(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        getCommonRequestData(req)
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<MilitaryServiceInformation>(req)
       const errors = req.flash('errors')
@@ -135,7 +134,7 @@ export default class MilitaryRecordsController {
 
       return res.render('pages/militaryRecords/militaryServiceInformation', {
         pageTitle: `UK military service information - Prisoner personal details`,
-        title: `${apostrophe(titlePrisonerName)} UK military service information`,
+        title: `${apostrophe(naturalPrisonerName)} UK military service information`,
         militarySeq,
         formValues,
         errors,
@@ -225,8 +224,8 @@ export default class MilitaryRecordsController {
 
   public displayConflicts(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        getCommonRequestData(req)
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<Conflicts>(req)
       const errors = req.flash('errors')
@@ -265,7 +264,7 @@ export default class MilitaryRecordsController {
 
       return res.render('pages/militaryRecords/conflicts', {
         pageTitle: `Most recent conflict - Prisoner personal details`,
-        title: `What was the most recent conflict ${titlePrisonerName} served in?`,
+        title: `What was the most recent conflict ${naturalPrisonerName} served in?`,
         militarySeq,
         formValues,
         errors,
@@ -335,8 +334,8 @@ export default class MilitaryRecordsController {
 
   public displayDisciplinaryAction(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        getCommonRequestData(req)
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<DisciplinaryAction>(req)
       const errors = req.flash('errors')
@@ -383,7 +382,7 @@ export default class MilitaryRecordsController {
 
       return res.render('pages/militaryRecords/disciplinaryAction', {
         pageTitle: `Disciplinary action - Prisoner personal details`,
-        title: `Was ${titlePrisonerName} subject to any of the following disciplinary action?`,
+        title: `Was ${naturalPrisonerName} subject to any of the following disciplinary action?`,
         militarySeq,
         formValues,
         errors,
@@ -453,8 +452,8 @@ export default class MilitaryRecordsController {
 
   public displayDischargeDetails(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        getCommonRequestData(req)
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<DischargeDetails>(req)
       const errors = req.flash('errors')
@@ -508,7 +507,7 @@ export default class MilitaryRecordsController {
 
       return res.render('pages/militaryRecords/dischargeDetails', {
         pageTitle: `Discharge details - Prisoner personal details`,
-        title: `${apostrophe(titlePrisonerName)} discharge details`,
+        title: `${apostrophe(naturalPrisonerName)} discharge details`,
         militarySeq,
         formValues,
         errors,
@@ -573,13 +572,5 @@ export default class MilitaryRecordsController {
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
     }
-  }
-
-  private getCommonRequestData(req: Request) {
-    const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-    const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-    const { clientToken } = req.middleware
-    return { prisonerNumber, prisonId, cellLocation, prisonerName, titlePrisonerName, clientToken }
   }
 }

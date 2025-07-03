@@ -3,11 +3,10 @@ import { AddressLocation } from '../../services/mappers/addressMapper'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
-import { convertToTitleCase, formatName, objectToSelectOptions } from '../../utils/utils'
+import { convertToTitleCase, getCommonRequestData, mapToQueryString, objectToSelectOptions } from '../../utils/utils'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { formatDateISO } from '../../utils/dateHelpers'
 import EphemeralDataService from '../../services/ephemeralDataService'
-import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import AddressService from '../../services/addressService'
 
 export interface DisplayManualEditAddressOptions {
@@ -54,7 +53,7 @@ export function displayManualEditAddressHandler(
       })
       .catch(error => logger.error(error))
 
-    const query = queryString(options.queryParams)
+    const query = options.queryParams ? `?${mapToQueryString(options.queryParams)}` : ''
 
     return res.render('pages/edit/address/manualAddress', {
       pageTitle,
@@ -124,33 +123,13 @@ export function submitManualEditAddressHandler(
       })
       .catch(error => logger.error(error))
 
-    const currentQuery = queryString(queryParams)
+    const currentQuery = queryParams ? `?${mapToQueryString(queryParams)}` : ''
     const addressConfirmationUuid = await ephemeralDataService.cacheData({
       address,
       route: `${req.path?.replace('/', '')}${currentQuery}`,
     })
-    const query = queryString({ address: addressConfirmationUuid, ...(queryParams ?? {}) })
+    const query = mapToQueryString({ address: addressConfirmationUuid, ...(queryParams ?? {}) })
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${confirmRedirectUrl}${query}`)
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${confirmRedirectUrl}?${query}`)
   }
-}
-
-function getCommonRequestData(req: Request) {
-  const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-  const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-  const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-  const { clientToken } = req.middleware
-  return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
-}
-
-function queryString(values: Record<string, string | number> | undefined): string {
-  if (!values) {
-    return ''
-  }
-
-  const joinedString = Object.entries(values)
-    ?.map(([k, v]) => `${k}=${v}`)
-    ?.join('&')
-
-  return joinedString ? `?${joinedString}` : ''
 }

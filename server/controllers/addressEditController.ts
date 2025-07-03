@@ -2,9 +2,8 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { apostrophe, blankStringsToNull, formatName } from '../utils/utils'
+import { apostrophe, blankStringsToNull, getCommonRequestData } from '../utils/utils'
 import EphemeralDataService from '../services/ephemeralDataService'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -45,10 +44,10 @@ export default class AddressEditController {
 
   public displayFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { titlePrisonerName } = this.getCommonRequestData(req)
+      const { naturalPrisonerName } = getCommonRequestData(req)
       return displayFindUkAddressHandler(this.auditService, {
         pageTitle: 'Find a UK address - Prisoner personal details',
-        formTitle: `Find a UK address for ${titlePrisonerName}`,
+        formTitle: `Find a UK address for ${naturalPrisonerName}`,
         auditPage: Page.EditAddressFindUkAddress,
         manualEntryAnchor: 'add-uk-address',
         backLink: 'where-is-address',
@@ -78,7 +77,7 @@ export default class AddressEditController {
 
   public displayPrimaryOrPostalAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const { address: addressCacheId } = req.query
       const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
         addressCacheId as UUID,
@@ -109,7 +108,7 @@ export default class AddressEditController {
 
       return res.render('pages/edit/address/primaryOrPostalAddress', {
         pageTitle: 'Select if primary or postal address - Prisoner personal details',
-        formTitle: `Is this ${apostrophe(titlePrisonerName)} primary or postal address?`,
+        formTitle: `Is this ${apostrophe(naturalPrisonerName)} primary or postal address?`,
         address: {
           ...address,
           cacheId: addressCacheId,
@@ -130,7 +129,7 @@ export default class AddressEditController {
 
   public submitPrimaryOrPostalAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req)
       const { primaryOrPostal: primaryOrPostalResponse } = req.body
       const { address: addressCacheId } = req.query
 
@@ -190,13 +189,13 @@ export default class AddressEditController {
   }): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { addressLocation, pageTitlePrefix, formTitlePrefix, auditPage } = options
-      const { titlePrisonerName } = this.getCommonRequestData(req)
+      const { naturalPrisonerName } = getCommonRequestData(req)
       const backLink = addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address'
 
       return displayManualEditAddressHandler(this.addressService, this.auditService, {
         addressLocation,
         pageTitle: `${pageTitlePrefix} - Prisoner personal details`,
-        formTitle: `${formTitlePrefix} for ${titlePrisonerName}`,
+        formTitle: `${formTitlePrefix} for ${naturalPrisonerName}`,
         auditPage,
         backLink,
         cancelAnchor: 'addresses',
@@ -213,13 +212,5 @@ export default class AddressEditController {
       auditAction: options.auditAction,
       confirmRedirectUrl: 'confirm-address',
     })
-  }
-
-  private getCommonRequestData(req: Request) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-    const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-    const { clientToken } = req.middleware
-    return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
   }
 }

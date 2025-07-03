@@ -4,6 +4,7 @@ import {
   apostrophe,
   formatLocation,
   formatName,
+  getCommonRequestData,
   mapRelationshipDescriptionByCode,
   objectToSelectOptions,
 } from '../utils/utils'
@@ -93,8 +94,8 @@ export default class NextOfKinController {
 
   public displayNextOfKinEmergencyContact(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        getCommonRequestData(req)
       const requestBodyFlash = requestBodyFromFlash<PersonalRelationshipsContactForm>(req)
       const errors = req.flash('errors')
 
@@ -146,11 +147,11 @@ export default class NextOfKinController {
 
       return res.render('pages/nextOfKin/nextOfKinEmergencyContacts', {
         pageTitle: `Next of kin and emergency contacts - Prisoner personal details`,
-        title: `Add a next of kin or emergency contact for ${titlePrisonerName}`,
+        title: `Add a next of kin or emergency contact for ${naturalPrisonerName}`,
         formValues,
         errors,
         titleOptions,
-        titlePrisonerName,
+        naturalPrisonerName,
         relationshipOptions,
         cityOptions,
         miniBannerData: {
@@ -358,7 +359,7 @@ export default class NextOfKinController {
 
   public submitConfirmAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req)
 
       const { address: addressCacheId, contact: contactCacheId } = req.query
 
@@ -494,14 +495,6 @@ export default class NextOfKinController {
       phoneNumber: formValues.numbers?.[PhoneNumberTypeMappings[formValues.type].formValue]?.number || undefined,
       extNumber: formValues.numbers?.[PhoneNumberTypeMappings[formValues.type].formValue]?.extension || undefined,
     }
-  }
-
-  private getCommonRequestData(req: Request) {
-    const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-    const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-    const { clientToken } = req.middleware
-    return { prisonerNumber, prisonId, cellLocation, prisonerName, titlePrisonerName, clientToken }
   }
 
   private async getContactNameFromCache(req: Request) {

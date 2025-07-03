@@ -6,8 +6,7 @@ import { AuditService, Page } from '../../services/auditService'
 import logger from '../../../logger'
 import AddressService from '../../services/addressService'
 import EphemeralDataService from '../../services/ephemeralDataService'
-import { formatName } from '../../utils/utils'
-import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
+import { getCommonRequestData } from '../../utils/utils'
 
 export interface ConfirmAddressOptions {
   pageTitle: string
@@ -80,12 +79,4 @@ export function displayConfirmAddressHandler(
       miniBannerData: { prisonerNumber, prisonerName },
     })
   }
-}
-
-function getCommonRequestData(req: Request) {
-  const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-  const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-  const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-  const { clientToken } = req.middleware
-  return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
 }

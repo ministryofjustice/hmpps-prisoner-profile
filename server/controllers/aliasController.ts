@@ -1,8 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatName, formatNamePart } from '../utils/utils'
+import { apostrophe, formatNamePart, getCommonRequestData } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import AliasService, { Name } from '../services/aliasService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
@@ -37,7 +36,7 @@ export default class AliasController {
 
   public displayChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const errors = req.flash('errors')
 
       this.auditService
@@ -52,7 +51,7 @@ export default class AliasController {
 
       return res.render('pages/edit/radioField', {
         pageTitle: `Why are you changing this person’s name? - Prisoner personal details`,
-        formTitle: `Why are you changing ${apostrophe(titlePrisonerName)} name?`,
+        formTitle: `Why are you changing ${apostrophe(naturalPrisonerName)} name?`,
         submitButtonText: 'Continue',
         options: [
           {
@@ -79,12 +78,12 @@ export default class AliasController {
 
   public submitChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { titlePrisonerName, prisonerNumber } = this.getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber } = getCommonRequestData(req)
       const { radioField: purpose } = req.body
 
       if (!purpose) {
         req.flash('errors', [
-          { text: `Select why you’re changing ${apostrophe(titlePrisonerName)} name`, href: '#radio' },
+          { text: `Select why you’re changing ${apostrophe(naturalPrisonerName)} name`, href: '#radio' },
         ])
         return res.redirect(`/prisoner/${prisonerNumber}/personal/change-name`)
       }
@@ -142,7 +141,7 @@ export default class AliasController {
 
   public displayAddNewAlias(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
@@ -236,7 +235,7 @@ export default class AliasController {
 
   public displayChangeDateOfBirth(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
@@ -326,7 +325,7 @@ export default class AliasController {
 
   public displayChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const errors = req.flash('errors')
       const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
         this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
@@ -348,7 +347,7 @@ export default class AliasController {
 
       return res.render('pages/edit/radioField', {
         pageTitle: `Ethnic group - Prisoner personal details`,
-        formTitle: `What is ${apostrophe(titlePrisonerName)} ethnic group?`,
+        formTitle: `What is ${apostrophe(naturalPrisonerName)} ethnic group?`,
         hintText: `Choose the group which best describes this person’s ethnic group. You'll need to select a more detailed ethnic group on the next page.`,
         submitButtonText: 'Continue',
         options: getEthnicGroupRadioOptions(ethnicityReferenceDataCodes, currentWorkingName.ethnicity?.code),
@@ -365,7 +364,7 @@ export default class AliasController {
 
   public submitChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = this.getCommonRequestData(req)
+      const { prisonerNumber } = getCommonRequestData(req)
       const { radioField: ethnicGroup } = req.body
 
       if (!ethnicGroup) {
@@ -393,7 +392,7 @@ export default class AliasController {
 
   public displayChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const { group } = req.params
       const errors = req.flash('errors')
 
@@ -417,7 +416,7 @@ export default class AliasController {
 
       return res.render('pages/edit/radioField', {
         pageTitle: `${getEthnicGroupDescription(group)} - Prisoner personal details`,
-        formTitle: `Which of the following best describes ${apostrophe(titlePrisonerName)} ${getEthnicGroupDescriptionForHeading(group)} background?`,
+        formTitle: `Which of the following best describes ${apostrophe(naturalPrisonerName)} ${getEthnicGroupDescriptionForHeading(group)} background?`,
         backLink: `/prisoner/${prisonerNumber}/personal/ethnic-group`,
         options: getEthnicBackgroundRadioOptions(
           group,
@@ -437,7 +436,7 @@ export default class AliasController {
 
   public submitChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req)
       const { group } = req.params
       const { radioField: ethnicBackground } = req.body
 
@@ -499,7 +498,7 @@ export default class AliasController {
     prepopulateFields: boolean
   }): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const { firstName, middleName1, middleName2, lastName } = await this.aliasService.getWorkingNameAlias(
         clientToken,
         prisonerNumber,
@@ -530,7 +529,7 @@ export default class AliasController {
 
       return res.render('pages/edit/alias/changeName', {
         pageTitle,
-        formTitle: formTitle(titlePrisonerName),
+        formTitle: formTitle(naturalPrisonerName),
         warningText,
         errors,
         formValues,
@@ -616,13 +615,5 @@ export default class AliasController {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirectUrl}`)
       }
     }
-  }
-
-  private getCommonRequestData(req: Request) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-    const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-    const { clientToken } = req.middleware
-    return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
   }
 }

@@ -139,7 +139,7 @@ describe('NextOfKinController', () => {
         formValues: requestBodyFlash,
         errors: [],
         titleOptions: expect.arrayContaining([{ value: '', text: 'Select title' }]),
-        titlePrisonerName: 'John Saunders',
+        naturalPrisonerName: 'John Saunders',
         relationshipOptions: expect.arrayContaining([{ value: 'S_SIS', text: 'Sister', selected: false }]),
         cityOptions: expect.arrayContaining([{ value: '', text: '' }]),
         miniBannerData: {
@@ -162,7 +162,7 @@ describe('NextOfKinController', () => {
         formValues: {},
         errors: [],
         titleOptions: expect.arrayContaining([{ value: '', text: 'Select title' }]),
-        titlePrisonerName: 'John Saunders',
+        naturalPrisonerName: 'John Saunders',
         relationshipOptions: expect.arrayContaining([{ value: 'S_SIS', text: 'Sister', selected: false }]),
         cityOptions: expect.arrayContaining([{ value: '', text: '' }]),
         miniBannerData: {

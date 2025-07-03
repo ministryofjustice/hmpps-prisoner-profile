@@ -2,8 +2,7 @@ import { Request, RequestHandler, Response } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import logger from '../../../logger'
 import { AddressLocation } from '../../services/mappers/addressMapper'
-import { formatName } from '../../utils/utils'
-import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
+import { getCommonRequestData, mapToQueryString } from '../../utils/utils'
 
 export interface AddressRedirects {
   [AddressLocation.uk]: string
@@ -73,6 +72,7 @@ export function submitWhereIsTheAddressHandler(
     const { prisonerNumber } = getCommonRequestData(req)
     const { radioField: location } = req.body
     const { redirectOptions, action } = options
+    const query = options.queryParams ? `?${mapToQueryString(options.queryParams)}` : ''
 
     auditService
       .sendPostSuccess({
@@ -84,28 +84,6 @@ export function submitWhereIsTheAddressHandler(
       })
       .catch(error => logger.error(error))
 
-    return res.redirect(
-      `/prisoner/${prisonerNumber}/personal/${redirectOptions[location as AddressLocation]}${queryString(options.queryParams)}`,
-    )
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirectOptions[location as AddressLocation]}${query}`)
   }
-}
-
-function getCommonRequestData(req: Request) {
-  const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-  const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-  const titlePrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-  const { clientToken } = req.middleware
-  return { prisonerNumber, prisonId, prisonerName, titlePrisonerName, clientToken }
-}
-
-function queryString(values: Record<string, string | number> | undefined): string {
-  if (!values) {
-    return ''
-  }
-
-  const joinedString = Object.entries(values)
-    ?.map(([k, v]) => `${k}=${v}`)
-    ?.join('&')
-
-  return joinedString ? `?${joinedString}` : ''
 }
