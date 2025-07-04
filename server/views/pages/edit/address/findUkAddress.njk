@@ -6,7 +6,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% set backLinkUrl = "/prisoner/" + prisonerNumber + "/personal/where-is-address" %}
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
@@ -67,13 +66,9 @@
         preventDoubleClick: true,
         attributes: { "data-qa": "edit-submit-button" }
       }) }}
-      <a
-        href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-        class="govuk-link govuk-link--no-visited-state"
-        data-qa="edit-cancel-button">Cancel</a>
+      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
     </div>
-    <a href="/prisoner/{{ prisonerNumber }}/personal/add-uk-address" class="govuk-link govuk-link--no-visited-state">Enter
-      the address manually</a>
+    <a href="{{ manualEntryUrl }}" class="govuk-link govuk-link--no-visited-state">Enter the address manually</a>
   </form>
 {% endblock %}
 {% block pageScripts %}

@@ -1,8 +1,11 @@
 {% extends "../editPage.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% block form %}
   {% if noFixedAddress %}
     <span class="govuk-caption-l">No fixed address</span>
@@ -113,10 +116,7 @@
         preventDoubleClick: true,
         attributes: { "data-qa": "submit-button" }
       }) }}
-      <a
-        href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-        class="govuk-link govuk-link--no-visited-state"
-        data-qa="cancel-link">Cancel</a>
+      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
     </div>
   </form>
 {% endblock %}

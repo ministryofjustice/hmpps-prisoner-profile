@@ -68,6 +68,16 @@ export interface PersonalRelationshipsContact {
   restrictionSummary: PersonalRelationshipsRestrictionSummary
 }
 
+export interface PersonalRelationshipsContactCreationResultDto {
+  createdContact: PersonalRelationshipContactDetails
+}
+
+export interface PersonalRelationshipContactDetails {
+  id: number
+  firstName: string
+  lastName: string
+}
+
 export interface PersonalRelationshipsRestrictionSummary {
   active: PersonalRelationshipsRestriction[]
   totalActive: number
@@ -149,16 +159,30 @@ export interface PersonalRelationshipsContactRequestRelationship {
 }
 
 export interface PersonalRelationshipsContactRequestAddress {
+  flat?: string
   property?: string
   street?: string
+  area?: string
   cityCode?: string
+  countyCode?: string
   postcode?: string
+  countryCode?: string
   noFixedAddress: boolean
 }
 
 export interface PersonalRelationshipsContactRequestPhoneNumber {
   phoneType?: string
   phoneNumber?: string
+  extNumber?: string
+}
+
+export interface PersonalRelationshipsAddContactAddressRequest {
+  property?: string
+  street?: string
+  cityCode?: string
+  postcode?: string
+  noFixedAddress: boolean
+  createdBy: string
 }
 
 export interface PersonalRelationshipsApiClient {
@@ -169,7 +193,9 @@ export interface PersonalRelationshipsApiClient {
 
   getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount>
 
-  createContact(contact: PersonalRelationshipsContactRequest): Promise<void>
+  createContact(contact: PersonalRelationshipsContactRequest): Promise<PersonalRelationshipsContactCreationResultDto>
+
+  addContactAddress(contactId: number, address: PersonalRelationshipsContactRequestAddress): Promise<void>
 
   getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto>
 

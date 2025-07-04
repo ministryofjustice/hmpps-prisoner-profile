@@ -127,6 +127,7 @@ describe('PersonalPageService', () => {
       updateDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
       createContact: jest.fn(),
       getReferenceDataCodes: jest.fn(),
+      addContactAddress: jest.fn(),
     }
 
     nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>

@@ -121,6 +121,19 @@ describe('addressService', () => {
       ])
     })
 
+    it('Handles building number returned as building name', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [
+        { ...mockAddressResponseDto, buildingNumber: null, buildingName: '1' } as AddressResponseDto,
+      ])
+
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
+
+      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+      expect(addresses).toEqual([expect.objectContaining({ buildingName: null, buildingNumber: '1' })])
+    })
+
     it('Filters out expired addresses', async () => {
       personIntegrationApiClient.getAddresses = jest.fn(async () => [
         { ...mockAddressResponseDto, toDate: formatDateISO(subDays(new Date(), 1)) },

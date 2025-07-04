@@ -6,6 +6,7 @@ import {
   validateRelationshipType,
 } from './nextOfKinValidator'
 import HmppsError from '../../interfaces/HmppsError'
+import { NextOfKinSubmission } from '../../controllers/nextOfKinController'
 
 describe('Next of Kin Validator', () => {
   describe('validateContactType', () => {
@@ -147,15 +148,23 @@ describe('Next of Kin Validator', () => {
     })
 
     it('should validate field lengths correctly', () => {
-      const body = {
-        contactType: ['nextOfKin'],
+      const body: NextOfKinSubmission = {
+        contactType: 'nextOfKin',
         firstName: 'John',
         middleNames: '',
         lastName: 'Doe',
         'dateOfBirth-day': '01',
         'dateOfBirth-month': '01',
         'dateOfBirth-year': '1980',
-        phoneNumber: '0'.repeat(41),
+        phoneNumber: {
+          type: 'BUS',
+          numbers: {
+            business: {
+              number: '0'.repeat(41),
+              extension: '0'.repeat(8),
+            },
+          },
+        },
         property: 'a'.repeat(51),
         street: 'a'.repeat(161),
         postcode: 'a'.repeat(13),
@@ -166,8 +175,12 @@ describe('Next of Kin Validator', () => {
 
       // Check specific errors
       expect(errors).toContainEqual({
-        href: '#phoneNumber',
+        href: '#phoneNumber-business-number',
         text: 'Phone number must be 40 characters or less',
+      })
+      expect(errors).toContainEqual({
+        href: '#phoneNumber-business-extension',
+        text: 'Extension number must be 7 characters or less',
       })
       expect(errors).toContainEqual({
         href: '#property',
@@ -183,16 +196,28 @@ describe('Next of Kin Validator', () => {
       })
     })
 
-    it('should validate phone numbers correctly', () => {
-      const body = {
-        contactType: ['nextOfKin'],
+    it.each([
+      ['BUS', 'business'],
+      ['HOME', 'home'],
+      ['MOB', 'mobile'],
+    ])('should validate phone numbers correctly', (type: string, formvalue: string) => {
+      const body: NextOfKinSubmission = {
+        contactType: 'nextOfKin',
         firstName: 'John',
         middleNames: '',
         lastName: 'Doe',
         'dateOfBirth-day': '01',
         'dateOfBirth-month': '01',
         'dateOfBirth-year': '1980',
-        phoneNumber: 'ABC123',
+        phoneNumber: {
+          type,
+          numbers: {
+            [formvalue]: {
+              number: 'ABC123',
+              extension: 'ABC123',
+            },
+          },
+        },
         property: '',
         street: '',
         postcode: '',
@@ -203,8 +228,42 @@ describe('Next of Kin Validator', () => {
 
       // Check specific errors
       expect(errors).toContainEqual({
-        href: '#phoneNumber',
+        href: `#phoneNumber-${formvalue}-number`,
         text: 'Phone numbers must only contain numbers or brackets',
+      })
+      expect(errors).toContainEqual({
+        href: `#phoneNumber-${formvalue}-extension`,
+        text: 'Extension numbers must only contain numbers',
+      })
+    })
+
+    it('should require a phone number if a phone number type is selected', () => {
+      const body: NextOfKinSubmission = {
+        contactType: 'nextOfKin',
+        firstName: 'John',
+        middleNames: '',
+        lastName: 'Doe',
+        'dateOfBirth-day': '01',
+        'dateOfBirth-month': '01',
+        'dateOfBirth-year': '1980',
+        phoneNumber: {
+          type: 'BUS',
+          numbers: {
+            business: {},
+          },
+        },
+        property: '',
+        street: '',
+        postcode: '',
+        relationshipTypeId: 'S_SIS',
+      }
+
+      const errors = nextOfKinValidator(body)
+
+      // Check specific errors
+      expect(errors).toContainEqual({
+        href: '#phoneNumber-business-number',
+        text: 'Enter a phone number',
       })
     })
 

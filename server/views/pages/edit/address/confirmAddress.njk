@@ -1,5 +1,6 @@
 {% extends "../editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set addressHtml %}
@@ -11,7 +12,11 @@
     <p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>
   {% endif %}
   {% if address.thoroughfareName %}
-    <p class="govuk-!-static-margin-0">{% if address.buildingNumber %}{{ address.buildingNumber }} {% endif %}{{ address.thoroughfareName }}</p>
+    <p class="govuk-!-static-margin-0">
+      {% if address.buildingNumber %}
+        {{ address.buildingNumber }}
+      {% endif %}
+      {{ address.thoroughfareName }}</p>
   {% endif %}
   {% if address.dependantLocality %}
     <p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>
@@ -35,17 +40,26 @@
   {{ govukInsetText({
             html: addressHtml
         }) }}
-  <div class="govuk-button-group">
-    <a
-      href="/prisoner/{{ prisonerNumber }}/personal/primary-or-postal-address?address={{ address.cacheId }}"
-      class="govuk-button"
-      data-qa="use-this-address-button">Use this address</a>
-    <a
-      href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-      class="govuk-link govuk-link--no-visited-state"
-      data-qa="cancel-link">Cancel</a>
-  </div>
-  <a href="/prisoner/{{ prisonerNumber }}/personal/where-is-address" class="govuk-link govuk-link--no-visited-state">
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <div class="govuk-button-group">
+      {% if confirmPrimaryOrPostalAddress %}
+        <a
+          href="/prisoner/{{ prisonerNumber }}/personal/primary-or-postal-address?address={{ address.cacheId }}"
+          class="govuk-button"
+          data-qa="use-this-address-button">Use this address</a>
+      {% else %}
+        {{ govukButton({
+          text: "Save and return to the profile",
+          type: "submit",
+          preventDoubleClick: true,
+          attributes: { "data-qa": "submit-button" }
+        }) }}
+      {% endif %}
+      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
+    </div>
+  </form>
+  <a href="{{ enterDifferentAddressLink }}" class="govuk-link govuk-link--no-visited-state">
     Enter a different address
   </a>
 {% endblock %}

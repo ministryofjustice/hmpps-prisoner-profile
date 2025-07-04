@@ -49,7 +49,9 @@ context('Edit next of kin and emergency contacts', () => {
       })
 
       // Stub the create contact endpoint
-      cy.task('stubPersonalRelationshipsCreateContact', { prisonerNumber })
+      cy.task('stubPersonalRelationshipsCreateContact', {
+        resp: { createdContact: { id: 1234, firstName: 'Albert', lastName: 'Wesker' } },
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/next-of-kin-emergency-contacts`,
     editPageWithTitle: EditPage,
@@ -82,7 +84,6 @@ context('Edit next of kin and emergency contacts', () => {
         // Test case 3: Both next of kin and emergency contact with all fields
         checkboxInputs: {
           contactType: [{ value: 'nextOfKin' }, { value: 'emergencyContact' }],
-          noFixedAddress: [{ value: 'true' }],
         },
         textInputs: {
           firstName: 'Robert',
@@ -91,28 +92,20 @@ context('Edit next of kin and emergency contacts', () => {
           'dateOfBirth-day': '15',
           'dateOfBirth-month': '06',
           'dateOfBirth-year': '1980',
-          phoneNumber: '07123456789',
-          property: '123',
-          street: 'Main Street',
-          postcode: 'AB12 3CD',
         },
         autocompleteInputs: {
-          cityCode: 'London',
           relationshipTypeId: 'Father',
         },
-      },
-      {
-        // Test case 4: No fixed address
-        checkboxInputs: {
-          contactType: [{ value: 'nextOfKin' }],
-          noFixedAddress: [{ value: 'true' }],
-        },
-        textInputs: {
-          firstName: 'Sarah',
-          lastName: 'Williams',
-        },
-        autocompleteInputs: {
-          relationshipTypeId: 'Sister',
+        radioInputs: {
+          '"phoneNumber[type]"': {
+            value: 'BUS',
+            conditionals: {
+              textInputs: {
+                'phoneNumber[numbers][business][number]': '07123456789',
+                'phoneNumber[numbers][business][extension]': '103',
+              },
+            },
+          },
         },
       },
     ],
@@ -205,20 +198,71 @@ context('Edit next of kin and emergency contacts', () => {
         errorMessages: ['Date of birth must be a real date'],
       },
       {
-        // Test case 7: Invalid phone number
+        // Test case 7: Phone number type selected but no number entered
+        testDescription: 'No phone number entered but type selected',
+        input: {
+          checkboxInputs: { contactType: [{ value: 'nextOfKin' }] },
+          textInputs: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          autocompleteInputs: {
+            relationshipTypeId: 'Friend',
+          },
+          radioInputs: { '"phoneNumber[type]"': 'HOME' },
+        },
+        errorMessages: ['Enter a phone number'],
+      },
+      {
+        // Test case 8: Invalid phone number
         testDescription: 'Invalid phone number',
         input: {
           checkboxInputs: { contactType: [{ value: 'nextOfKin' }] },
           textInputs: {
             firstName: 'Jane',
             lastName: 'Doe',
-            phoneNumber: 'ABC123',
           },
           autocompleteInputs: {
             relationshipTypeId: 'Friend',
           },
+          radioInputs: {
+            '"phoneNumber[type]"': {
+              value: 'HOME',
+              conditionals: {
+                textInputs: {
+                  'phoneNumber[numbers][home][number]': 'ABC123',
+                },
+              },
+            },
+          },
         },
         errorMessages: ['Phone numbers must only contain numbers or brackets'],
+      },
+      {
+        // Test case 9: Invalid extension number
+        testDescription: 'Invalid extension number',
+        input: {
+          checkboxInputs: { contactType: [{ value: 'nextOfKin' }] },
+          textInputs: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+          autocompleteInputs: {
+            relationshipTypeId: 'Friend',
+          },
+          radioInputs: {
+            '"phoneNumber[type]"': {
+              value: 'BUS',
+              conditionals: {
+                textInputs: {
+                  'phoneNumber[numbers][business][number]': '07123456789',
+                  'phoneNumber[numbers][business][extension]': 'ABC123',
+                },
+              },
+            },
+          },
+        },
+        errorMessages: ['Extension numbers must only contain numbers'],
       },
     ],
     redirectAnchor: 'next-of-kin',

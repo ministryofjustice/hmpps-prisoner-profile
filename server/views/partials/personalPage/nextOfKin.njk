@@ -89,14 +89,15 @@
             <!-- Change links - add back in when external service is ready -->
 {#
             {% if editEnabled %}
-            <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact's details</a></div>
+            <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact’s details</a></div>
             {% endif %}
 #}
 
           </div>
           <h3 class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
           <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
-          <p class="govuk-!-font-size-24 govuk-!-margin-top-0 govuk-!-margin-bottom-1 {{ 'hmpps-red-text' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
+          <p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-{{ "1" if not contact.extNumber else "0"}} {{ 'contact-phone-number__missing' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
+          {% if contact.extNumber %}<p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-phone-extension">{{ "Ext. " + contact.extNumber }}</p>{% endif %}
           {{ govukDetails({
             summaryText: "Additional details",
             html: additionalDetails(contact)

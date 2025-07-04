@@ -31,6 +31,30 @@
 %}
 {% set mainClasses = 'govuk-body' %}
 
+{% macro phoneNumberHtml(id, formValues, acceptExtension) %}
+    {{ govukInput({
+        id: "phoneNumber-" + id + "-number",
+        name: "phoneNumber[numbers][" + id + "][number]",
+        label: { text: "Phone number" },
+        value: formValues.phoneNumber.numbers[id].number,
+        errorMessage: errors | findError("phoneNumber-" + id + "-number"),
+        classes: "govuk-input--width-20",
+        attributes: { autocomplete: "off" }
+    }) }}
+
+    {% if acceptExtension == true %}
+        {{ govukInput({
+            id: "phoneNumber-" + id + "-extension",
+            name: "phoneNumber[numbers][" + id + "][extension]",
+            label: { text: "Extension (optional)" },
+            value: formValues.phoneNumber.numbers[id].extension,
+            errorMessage: errors | findError('phoneNumber-' + id + "-extension"),
+            classes: "govuk-input--width-10",
+            attributes: { autocomplete: "off" }
+        }) }}
+    {% endif %}
+{% endmacro %}
+
 {% block content %}
 
     {% block body %}
@@ -59,7 +83,7 @@
                     {{ govukCheckboxes({
                         idPrefix: "contactType",
                         name: "contactType",
-                        hint: { text: 'Select at least one.' },
+                        hint: { text: 'Select at least one contact type.' },
                         fieldset: {
                             legend: {
                                 text: "Contact type",
@@ -81,7 +105,7 @@
                         ]
                     }) }}
 
-                    <h2 class="govuk-!-font-size-24">Contact's details</h2>
+                    <h2 class="govuk-!-font-size-24">Contact’s details</h2>
 
                     {% call govukFieldset({
                         legend: {
@@ -183,93 +207,12 @@
                         or (errors | findError('dateOfBirth-year'))
                     }) }}
 
-                    {{ govukInput({
-                        id: "phoneNumber",
-                        name: "phoneNumber",
-                        label: {
-                            text: "Phone number (optional)",
-                            classes: "govuk-label--s"
-                        },
-                        value: formValues.phoneNumber,
-                        errorMessage: errors | findError('phoneNumber'),
-                        classes: "govuk-input--width-20",
-                        attributes: { autocomplete: "off" }
-                    }) }}
-
-                    {% call govukFieldset({
-                        legend: {
-                            text: "Address (optional)",
-                            classes: "govuk-fieldset__legend--s govuk-!-margin-bottom-3"
-                        }
-                    }) %}
-
-                        {{ govukCheckboxes({
-                            id: "noFixedAddress",
-                            name: "noFixedAddress",
-                            classes: "govuk-checkboxes--small",
-                            items: [
-                                { value: "true", text: "No fixed address", checked: formValues.noFixedAddress === 'true' }
-                            ]
-                        }) }}
-
-                        {{ govukInput({
-                            id: "property",
-                            name: "property",
-                            label: {
-                                text: "House name or number"
-                            },
-                            value: formValues.property,
-                            errorMessage: errors | findError('property'),
-                            classes: "govuk-input--width-20",
-                            attributes: { autocomplete: "off" }
-                        }) }}
-
-                        {{ govukInput({
-                            id: "street",
-                            name: "street",
-                            label: {
-                                text: "Street"
-                            },
-                            value: formValues.street,
-                            errorMessage: errors | findError('street'),
-                            classes: "govuk-input--width-20",
-                            attributes: { autocomplete: "off" }
-                        }) }}
-
-                        <input type="hidden" id="cityCodeError" name="cityCodeError" value="{{ cityCodeError }}" />
-                        {{ govukSelect({
-                            id: "cityCode",
-                            name: "cityCode",
-                            label: {
-                                text: "Town or city"
-                            },
-                            value: formValues.cityCode,
-                            errorMessage: errors | findError('cityCode'),
-                            classes: "govuk-input--width-20 js-autocomplete-select",
-                            items: cityOptions,
-                            attributes: { autocomplete: "off" }
-                        }) }}
-
-                        {{ govukInput({
-                            id: "postcode",
-                            name: "postcode",
-                            label: {
-                                text: "Postcode"
-                            },
-                            value: formValues.postcode,
-                            errorMessage: errors | findError('postcode'),
-                            classes: "govuk-input--width-5",
-                            attributes: { autocomplete: "off" }
-                        }) }}
-
-                    {% endcall %}
-
                     <input type="hidden" id="relationshipTypeIdError" name="relationshipTypeIdError" value="{{ relationshipTypeIdError }}" />
                     {{ govukSelect({
                         id: "relationshipTypeId",
                         name: "relationshipTypeId",
                         label: {
-                            text: "Contact's relationship to " + titlePrisonerName,
+                            text: "Contact’s relationship to " + naturalPrisonerName,
                             classes: "govuk-label--s"
                         },
                         hint: {
@@ -281,6 +224,59 @@
                         attributes: { autocomplete: "off" }
                     }) }}
 
+                    {{ govukRadios({
+                        idPrefix: "radio",
+                        name: "phoneNumber[type]",
+                        errorMessage: errors | findError("phoneNumberType"),
+                        fieldset: {
+                            classes: "phone-number-type-radio-fieldset",
+                            legend: {
+                                text: "Phone number type",
+                                classes: "govuk-fieldset__legend--m"
+                            }
+                        },
+                        items: [
+                            {
+                                value: "MOB",
+                                text: "Mobile",
+                                checked: formValues.phoneNumber.type === 'MOB',
+                                conditional: {
+                                    html: phoneNumberHtml("mobile", formValues, false)
+                                }
+                            },
+                            {
+                                value: "HOME",
+                                text: "Home",
+                                checked: formValues.phoneNumber.type === 'HOME',
+                                conditional: {
+                                    html: phoneNumberHtml("home", formValues, false)
+                                }
+                            },
+                            {
+                                value: "BUS",
+                                text: "Business",
+                                checked: formValues.phoneNumber.type === 'BUS',
+                                conditional: {
+                                    html: phoneNumberHtml("business", formValues, true)
+                                }
+                            },
+                            { divider: "or" },
+                            {
+                                value: "NONE",
+                                text: "No phone number",
+                                checked: formValues.phoneNumberType === 'NO'
+                            }
+                        ]
+                    }) }}
+
+                    {{ govukButton({
+                        text: "Add an address",
+                        type: "submit",
+                        preventDoubleClick: true,
+                        classes: "js-autocomplete-submit govuk-button--secondary",
+                        attributes: { name: "action", value: "add-address", "data-qa": "add-address-button" }
+                    }) }}
+
                     <div class="govuk-button-group govuk-!-margin-top-8">
                         {{ govukButton({
                             text: "Save and return to profile",
@@ -288,13 +284,6 @@
                             preventDoubleClick: true,
                             classes: "js-autocomplete-submit",
                             attributes: { "data-qa": "save-button" }
-                        }) }}
-                        {{ govukButton({
-                            text: "Add another contact",
-                            type: "submit",
-                            preventDoubleClick: true,
-                            classes: "js-autocomplete-submit govuk-button--secondary",
-                            attributes: { name: "action", value: "another", "data-qa": "save-and-add-another-button" }
                         }) }}
                         <a href="/prisoner/{{ prisonerNumber }}/personal#next-of-kin"
                            class="govuk-link govuk-link--no-visited-state"

@@ -1,6 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
+  PersonalRelationshipsContactCreationResultDto,
   PersonalRelationshipsContactsDto,
   PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsNumberOfChildrenDto,
@@ -160,7 +161,9 @@ const stubPersonalRelationshipsGetReferenceData = (params: {
     },
   })
 
-const stubPersonalRelationshipsCreateContact = (): SuperAgentRequest =>
+const stubPersonalRelationshipsCreateContact = (params: {
+  resp: PersonalRelationshipsContactCreationResultDto
+}): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'POST',
@@ -171,6 +174,7 @@ const stubPersonalRelationshipsCreateContact = (): SuperAgentRequest =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
+      jsonBody: params.resp,
     },
   })
 
