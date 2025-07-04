@@ -13,11 +13,6 @@
 {% macro description() %}
   {% if not photoStatus.placeholder %}
     <div class="hmpps-profile-photo__description">
-      <div class="photo-feedback-banner">This is a
-        <span class="govuk-!-font-weight-bold">new page in DPS</span>.
-        <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
-        (opens in a new tab)
-      </div>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
       {{ govukSummaryList({
         rows: [
@@ -41,11 +36,6 @@
     </div>
   {% else %}
     <div class="hmpps-profile-photo__description">
-      <div class="photo-feedback-banner">This is a
-        <span class="govuk-!-font-weight-bold">new page in DPS</span>.
-        <a href="https://www.smartsurvey.co.uk/s/DPSPrisonerPhotos/" class="govuk-link" target="_blank">Give feedback</a>
-        (opens in a new tab)
-      </div>
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
       <p class="govuk-body">This prisoner does not have any facial images.</p>
     </div>
