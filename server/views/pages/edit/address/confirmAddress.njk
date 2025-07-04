@@ -13,10 +13,8 @@
   {% endif %}
   {% if address.thoroughfareName %}
     <p class="govuk-!-static-margin-0">
-      {% if address.buildingNumber %}
-        {{ address.buildingNumber }}
-      {% endif %}
-      {{ address.thoroughfareName }}</p>
+      {% if address.buildingNumber %}{{ address.buildingNumber }} {% endif %}{{ address.thoroughfareName }}
+    </p>
   {% endif %}
   {% if address.dependantLocality %}
     <p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>
