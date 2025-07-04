@@ -102,7 +102,7 @@ export const validatePhoneNumbers = (phoneNumber: NextOfKinPhoneNumberSubmission
     validateMandatoryPhoneNumber(`#phoneNumber-${formValue}-number`, 'Phone number', numberToValidate.number) ?? []
   const extensionErrors =
     (numberToValidate?.extension &&
-      validateExtensionNumber(`#phoneNumber-${formValue}-extension`, 'Extension number', numberToValidate.extension)) ??
+      validateExtensionNumber(`#phoneNumber-${formValue}-extension`, 'Extension', numberToValidate.extension)) ??
     []
 
   return [...numberErrors, ...extensionErrors]

@@ -45,7 +45,7 @@ export const validatePhoneNumber = (href: string, label: string, phoneNumber: st
 
 export const validateExtensionNumber = (href: string, label: string, extensionNumber: string): HmppsError[] => {
   if (extensionNumber.match(phoneExtensionInvalidCharacterChecker)) {
-    return [{ text: `${label}s must only contain numbers`, href }]
+    return [{ text: `${label} must only contain numbers`, href }]
   }
   if (extensionNumber.length > 7) {
     return [{ text: `${label} must be 7 characters or less`, href }]

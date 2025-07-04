@@ -180,7 +180,7 @@ describe('Next of Kin Validator', () => {
       })
       expect(errors).toContainEqual({
         href: '#phoneNumber-business-extension',
-        text: 'Extension number must be 7 characters or less',
+        text: 'Extension must be 7 characters or less',
       })
       expect(errors).toContainEqual({
         href: '#property',
@@ -233,7 +233,7 @@ describe('Next of Kin Validator', () => {
       })
       expect(errors).toContainEqual({
         href: `#phoneNumber-${formvalue}-extension`,
-        text: 'Extension numbers must only contain numbers',
+        text: 'Extension must only contain numbers',
       })
     })
 
