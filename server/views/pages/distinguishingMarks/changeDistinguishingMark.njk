@@ -1,69 +1,59 @@
-{% extends "../index.njk" %}
+{% extends "../edit/editPage.njk" %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
-{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
 {% set heading =  "Change " + markType + " details" %}
 {% set pageTitle =  heading + " - Prisoner personal details" %}
 {% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
-
-{% block body %}
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
-        </div>
-    </div>
-
+{% block form %}
     <span class="govuk-caption-l">Distinguishing marks</span>
     <h1 class='govuk-!-margin-top-0 govuk-!-font-size-36'>{{ heading }}</h1>
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <table class="mark-edit-details-table govuk-!-margin-bottom-6">
-                <tr data-qa="body-part">
-                    <th>Body part</th>
-                    <td>{{ mark | toBodyPartDescription }}</td>
-                    <td><a href="{{ basePath }}/body-part" class="govuk-link govuk-link--no-visited-state">Change</a></td>
-                </tr>
-                {% if mark | toBodyPartDescription !== 'Neck' and mark | toBodyPartDescription !== 'Back' %}
-                    <tr data-qa="location">
-                        <th>Location</th>
-                        <td>{{ mark | toMarkLocationDescription }}</td>
-                        <td><a href="{{ basePath }}/location?bodyPart={{ mark | toBodyPartToken }}" class="govuk-link govuk-link--no-visited-state">Change</a></td>
-                    </tr>
-                {% endif %}
-                <tr data-qa="description">
-                    <th>Description</th>
-                    <td>{{ mark.comment | default("Not entered", true) }}</td>
-                    <td><a href="{{ basePath }}/description" class="govuk-link govuk-link--no-visited-state">Change</a></td>
-                </tr>
-                <tr data-qa="photos">
-                    <th>Photos</th>
-                    <td colspan="2">
-                        <div class="mark-changeable-image__container">
-                            {% for photoDetails in mark.photographUuids | sortByLatestAndUuid %}
-                                <div class="mark-changeable-image">
-                                    <img src="/api/distinguishing-mark-image/{{ photoDetails.id }}?nocache={{ currentTimeMillis() }}"
-                                         alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}" />
-                                    <div class="mark-changeable-image__overlay">
-                                        <a href="{{ basePath }}/photo/{{ photoDetails.id }}" class="govuk-link govuk-link--no-visited-state">Change</a>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                            <div class="mark-new-image-placeholder">
-                                <a href="{{ basePath }}/photo" class="govuk-link govuk-link--no-visited-state">Add photo</a>
+    <table class="mark-edit-details-table govuk-!-margin-bottom-6">
+        <tr data-qa="body-part">
+            <th>Body part</th>
+            <td>{{ mark | toBodyPartDescription }}</td>
+            <td>
+                <a href="{{ basePath }}/body-part" class="govuk-link govuk-link--no-visited-state">Change</a>
+            </td>
+        </tr>
+        {% if mark | toBodyPartDescription !== 'Neck' and mark | toBodyPartDescription !== 'Back' %}
+            <tr data-qa="location">
+                <th>Location</th>
+                <td>{{ mark | toMarkLocationDescription }}</td>
+                <td>
+                    <a href="{{ basePath }}/location?bodyPart={{ mark | toBodyPartToken }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+                </td>
+            </tr>
+        {% endif %}
+        <tr data-qa="description">
+            <th>Description</th>
+            <td>{{ mark.comment | default("Not entered", true) }}</td>
+            <td>
+                <a href="{{ basePath }}/description" class="govuk-link govuk-link--no-visited-state">Change</a>
+            </td>
+        </tr>
+        <tr data-qa="photos">
+            <th>Photos</th>
+            <td colspan="2">
+                <div class="mark-changeable-image__container">
+                    {% for photoDetails in mark.photographUuids | sortByLatestAndUuid %}
+                        <div class="mark-changeable-image">
+                            <img
+                                src="/api/distinguishing-mark-image/{{ photoDetails.id }}?nocache={{ currentTimeMillis() }}"
+                                alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}"/>
+                            <div class="mark-changeable-image__overlay">
+                                <a href="{{ basePath }}/photo/{{ photoDetails.id }}" class="govuk-link govuk-link--no-visited-state">Change</a>
                             </div>
                         </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
+                    {% endfor %}
+                    <div class="mark-new-image-placeholder">
+                        <a href="{{ basePath }}/photo" class="govuk-link govuk-link--no-visited-state">Add photo</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
     <div class="govuk-button-group">
-        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Return to the prisoner's profile</a>
+        <a href={{ "/prisoner/" + prisonerNumber + "/personal#marks" }} class="govuk-button">Return to the prisoner's profile</a>
     </div>
-
 {% endblock %}

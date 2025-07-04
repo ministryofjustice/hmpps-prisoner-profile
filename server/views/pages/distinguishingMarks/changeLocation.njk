@@ -1,4 +1,4 @@
-{% extends "../index.njk" %}
+{% extends "../edit/editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -8,92 +8,66 @@
 {% set formConfig = bodyPart | toBodyPartSpecificFormData(markType) %}
 {% set heading = "Change the location of the " + markType %}
 
-{% block body %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
-    </div>
-</div>
-
-{% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-            govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            })
-            }}
-        </div>
-    </div>
-{% endif %}
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <form id="mark-detail-form" method="post" autocomplete="off">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <input type="hidden" name="bodyPart" value="{{ bodyPart }}">
-            {% if formConfig.specificParts.length === 1 %}
+{% block form %}
+<form id="mark-detail-form" method="post" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    <input type="hidden" name="bodyPart" value="{{ bodyPart }}">
+    {% if formConfig.specificParts.length === 1 %}
 {#              Don't show the radio buttons if there is only one option #}
-                <input type="hidden" name="specificBodyPart" value="{{ formConfig.specificParts[0].name }}">
-                <span class="govuk-caption-l">Distinguishing marks</span>
-                <h1 class="govuk-heading-l">
-                    {{ heading }}
-                </h1>
-                <div>
-                    <p>There are no specific locations to choose.</p>
-                </div>
-            {% else %}
+        <input type="hidden" name="specificBodyPart" value="{{ formConfig.specificParts[0].name }}">
+        <span class="govuk-caption-l">Distinguishing marks</span>
+        <h1 class="govuk-heading-l">
+            {{ heading }}
+        </h1>
+        <div>
+            <p>There are no specific locations to choose.</p>
+        </div>
+    {% else %}
 {#              Show the radio buttons #}
-                <div id="specific-body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                            <span class="govuk-caption-l">Distinguishing marks</span>
-                            <h1 class="govuk-fieldset__heading">
-                                {{ heading }}
-                            </h1>
-                        </legend>
-                        {% if errors.length > 0 %}
-                            <p id="whereDoYouLive-error" class="govuk-error-message">
-                                <span class="govuk-visually-hidden">Error:</span> Select a body part.
-                            </p>
-                        {% endif %}
-                            <div class="govuk-radios" data-module="govuk-radios">
-                                {% for part in formConfig.specificParts %}
-                                    {% set errorOnDesc = errors.length > 0 and errors[0].href === "#description-"+part.name %}
+        <div id="specific-body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <span class="govuk-caption-l">Distinguishing marks</span>
+                    <h1 class="govuk-fieldset__heading">
+                        {{ heading }}
+                    </h1>
+                </legend>
+                {% if errors.length > 0 %}
+                    <p id="whereDoYouLive-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> Select a body part.
+                    </p>
+                {% endif %}
+                    <div class="govuk-radios" data-module="govuk-radios">
+                        {% for part in formConfig.specificParts %}
+                            {% set errorOnDesc = errors.length > 0 and errors[0].href === "#description-"+part.name %}
 
-                                    <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="{{ part.name }}"
-                                               name="specificBodyPart"
-                                               type="radio"
-                                               value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint"{% endif %}
-                                               data-aria-controls="conditional-details-form-{{ part.name }}"
-                                                {% if part.name === specificBodyPart %} checked {% endif %}
-                                                {% if errorOnDesc %} checked aria-expanded="true" {% endif %}
-                                        >
-                                        <label class="govuk-label govuk-radios__label" for="{{ part.name }}">
-                                            {{ part.desc }}
-                                        </label>
-                                        {% if part.hint %}
-                                            <div id="{{ part.name }}-hint" class="govuk-hint govuk-radios__hint">
-                                                {{ part.hint }}
-                                            </div>
-                                        {% endif %}
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="{{ part.name }}"
+                                        name="specificBodyPart"
+                                        type="radio"
+                                        value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint"{% endif %}
+                                        data-aria-controls="conditional-details-form-{{ part.name }}"
+                                        {% if part.name === specificBodyPart %} checked {% endif %}
+                                        {% if errorOnDesc %} checked aria-expanded="true" {% endif %}
+                                >
+                                <label class="govuk-label govuk-radios__label" for="{{ part.name }}">
+                                    {{ part.desc }}
+                                </label>
+                                {% if part.hint %}
+                                    <div id="{{ part.name }}-hint" class="govuk-hint govuk-radios__hint">
+                                        {{ part.hint }}
                                     </div>
-                                {% endfor %}
+                                {% endif %}
                             </div>
-                    </fieldset>
-                </div>
-            {% endif %}
+                        {% endfor %}
+                    </div>
+            </fieldset>
+        </div>
+    {% endif %}
 
-            <div class="govuk-button-group">
-                {{ govukButton({ text: "Save", type: "submit" }) }}
-                <a href="{{ cancelUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
-            </div>
-        </form>
+    <div class="govuk-button-group">
+        {{ govukButton({ text: "Save", type: "submit" }) }}
+        <a href="{{ cancelUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
     </div>
-</div>
-
+</form>
 {% endblock %}

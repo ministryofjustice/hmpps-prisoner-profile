@@ -1,52 +1,26 @@
-{% extends "../index.njk" %}
+{% extends "../edit/editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-
 {% set pageTitle = "Change " + markType + " photo - Prisoner personal details" %}
 {% set heading = "Change the photo of the " + markType %}
-
-{% block body %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
-    </div>
-</div>
-
-{% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-            govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            })
-            }}
-        </div>
-    </div>
-{% endif %}
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds {{ "upload-visible" if upload or errors.length > 0 or not photoHtml }}">
+{% block form %}
+    <div class="{{ "upload-visible" if upload or errors.length > 0 or not photoHtml }}">
         <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
             <span class="govuk-caption-l">Distinguishing marks</span>
             <h1 class="govuk-heading-l">
                 {{ heading }}
             </h1>
-
             <div class="mark-photo-container">
                 {{ photoHtml | safe }}
                 <div>
                     <a href="?upload" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
                 </div>
             </div>
-
             <div class="mark-upload-control">
                 {{ govukFileUpload({
                     id: "file",
@@ -57,13 +31,10 @@
                     errorMessage: errors | findError("file")
                 }) }}
             </div>
-
             <div class="govuk-button-group">
                 {{ govukButton({ text: "Save", type: "submit" }) }}
                 <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
 {% endblock %}
