@@ -72,7 +72,7 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     editProfileChecks(),
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.uk,
-      pageTitlePrefix: 'Add a UK address',
+      pageTitlePrefix: 'Add a UK address - Prisoner personal details',
       formTitlePrefix: 'Add a UK address',
       auditPage: Page.EditAddressUkManual,
     }),

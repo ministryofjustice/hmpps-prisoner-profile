@@ -1,6 +1,7 @@
 import HmppsError from '../../interfaces/HmppsError'
 
 const phoneNumberInvalidCharacterChecker = /[^\d() ]/
+const phoneExtensionInvalidCharacterChecker = /[^\d]/
 
 export const phoneNumberValidator = (body: Record<string, string>): HmppsError[] => {
   const { phoneNumberType, phoneNumber, phoneExtension } = body
@@ -13,7 +14,6 @@ export const phoneNumberValidator = (body: Record<string, string>): HmppsError[]
   errors.push(...validateMandatoryPhoneNumber('#phone-number', 'Phone number', phoneNumber))
 
   if (phoneExtension) {
-    const phoneExtensionInvalidCharacterChecker = /[^\d]/
     if (phoneExtension.match(phoneExtensionInvalidCharacterChecker)) {
       errors.push({ text: 'Extension must only contain numbers', href: '#phone-extension' })
     } else if (phoneExtension.length > 7) {
@@ -38,6 +38,17 @@ export const validatePhoneNumber = (href: string, label: string, phoneNumber: st
   }
   if (phoneNumber.length > 40) {
     return [{ text: `${label} must be 40 characters or less`, href }]
+  }
+
+  return []
+}
+
+export const validateExtensionNumber = (href: string, label: string, extensionNumber: string): HmppsError[] => {
+  if (extensionNumber.match(phoneExtensionInvalidCharacterChecker)) {
+    return [{ text: `${label}s must only contain numbers`, href }]
+  }
+  if (extensionNumber.length > 7) {
+    return [{ text: `${label} must be 7 characters or less`, href }]
   }
 
   return []

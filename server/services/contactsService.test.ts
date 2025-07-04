@@ -29,6 +29,7 @@ describe('ContactsService', () => {
       updateDomesticStatus: jest.fn(async () => PersonalRelationshipsDomesticStatusMock),
       getReferenceDataCodes: jest.fn(),
       createContact: jest.fn(),
+      addContactAddress: jest.fn(),
     }
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest

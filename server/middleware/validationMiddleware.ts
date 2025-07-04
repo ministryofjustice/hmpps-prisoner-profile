@@ -5,6 +5,7 @@ import { BodySubmission, FileUploadRequest } from '../validators/personal/distin
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
 import { AddIdentityNumberSubmission } from '../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
 import { EditIdentityNumberSubmission } from '../controllers/identityNumbersController'
+import { NextOfKinSubmission } from '../controllers/nextOfKinController'
 
 export type Validator = (
   body:
@@ -12,7 +13,8 @@ export type Validator = (
     | Record<string, string | string[] | AddIdentityNumberSubmission>
     | BodySubmission
     | DietAndFoodAllergiesSubmission
-    | EditIdentityNumberSubmission,
+    | EditIdentityNumberSubmission
+    | NextOfKinSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
 export type RedirectWithParams = (params: Request['params']) => string

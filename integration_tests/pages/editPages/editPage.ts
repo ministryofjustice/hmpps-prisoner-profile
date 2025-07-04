@@ -4,6 +4,8 @@ export type CheckboxValue =
   | string
   | { value: string; subValues?: string[]; conditionals?: { textInputs: { [key: string]: string } } }
 
+export type RadioValue = string | { value: string; conditionals?: { textInputs: { [key: string]: string } } }
+
 export default class EditPage extends Page {
   constructor(pageTitle: string) {
     super(pageTitle)
@@ -34,9 +36,16 @@ export default class EditPage extends Page {
     })
   }
 
-  selectRadios = (fields: { [key: string]: string }) => {
+  selectRadios = (fields: { [key: string]: RadioValue }) => {
     Object.entries(fields).forEach(([key, value]) => {
-      cy.get(`input[name=${key}][value=${value}]`).click()
+      if (typeof value === 'string') {
+        cy.get(`input[name=${key}][value=${value}]`).click()
+      } else {
+        cy.get(`input[name=${key}][value=${value.value}]`).click()
+        if (value.conditionals) {
+          if (value.conditionals.textInputs) this.fillInTextFields(value.conditionals.textInputs)
+        }
+      }
     })
   }
 

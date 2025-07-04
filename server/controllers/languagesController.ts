@@ -1,8 +1,7 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatName, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
+import { apostrophe, getCommonRequestData, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import LanguagesService from '../services/languagesService'
 import {
   LanguagePreferencesRequest,
@@ -22,8 +21,7 @@ export default class LanguagesController {
 
   public displayUpdateMainLanguage(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } = getCommonRequestData(req)
       const errors = req.flash('errors')
       const spokenInvalidInput = req.flash('spokenInvalidInput')
       const writtenInvalidInput = req.flash('writtenInvalidInput')
@@ -94,7 +92,7 @@ export default class LanguagesController {
 
   public submitUpdateMainLanguage(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req)
       const {
         preferredSpokenLanguageCode,
         preferredWrittenLanguageCode,
@@ -162,8 +160,7 @@ export default class LanguagesController {
 
   public displayUpdateOtherLanguages(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } =
-        this.getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } = getCommonRequestData(req)
       const { languageCode } = req.params
       const errors = req.flash('errors')
       const invalidInput = req.flash('invalidInput')
@@ -227,7 +224,7 @@ export default class LanguagesController {
 
   public submitUpdateOtherLanguages(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req)
       const { languageCode } = req.params
       const { language, languageSkills, languageError, action } = req.body
       const formValues: SecondaryLanguageRequest & {
@@ -376,13 +373,5 @@ export default class LanguagesController {
       })
     }
     return invalidInput
-  }
-
-  private getCommonRequestData(req: Request) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-    const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-    const { clientToken } = req.middleware
-    return { prisonerNumber, prisonId, prisonerName, naturalPrisonerName, clientToken }
   }
 }

@@ -85,6 +85,7 @@ describe('Address Edit Controller', () => {
         errors: [],
         breadcrumbPrisonerName: 'Saunders, John',
         prisonerNumber,
+        redirectAnchor: 'addresses',
         submitButtonText: 'Continue',
         miniBannerData: {
           prisonerNumber,
@@ -132,6 +133,9 @@ describe('Address Edit Controller', () => {
           formTitle: `Find a UK address for John Saunders`,
           errors: [],
           prisonerNumber,
+          manualEntryUrl: '/prisoner/G6123VU/personal/add-uk-address',
+          cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
+          backLink: 'where-is-address',
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
         })
@@ -197,6 +201,9 @@ describe('Address Edit Controller', () => {
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
           backLink: `/prisoner/${prisonerNumber}/personal/find-uk-address`,
+          cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
+          enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/where-is-address`,
+          confirmPrimaryOrPostalAddress: true,
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
@@ -246,7 +253,9 @@ describe('Address Edit Controller', () => {
 
         expect(res.render).toHaveBeenCalledWith(
           'pages/edit/address/confirmAddress',
-          expect.objectContaining({ address: { ...address, cacheId: addressCacheId } }),
+          expect.objectContaining({
+            address: { ...address, cacheId: addressCacheId },
+          }),
         )
       })
     })
@@ -488,6 +497,7 @@ describe('Address Edit Controller', () => {
             noFixedAddress,
             noFixedAddressCheckbox: noFixedAddressOption,
             backLink,
+            cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
             prisonerNumber,
             breadcrumbPrisonerName: 'Saunders, John',
             miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
@@ -531,7 +541,7 @@ describe('Address Edit Controller', () => {
       })
     })
 
-    describe('Submiting the page', () => {
+    describe('Submitting the page', () => {
       test.each`
         addressLocation                     | auditAction                                   | noFixedAddressChecked | noFixedAbode
         ${AddressLocation.uk}               | ${PostAction.EditAddressUkManual}             | ${undefined}          | ${false}
