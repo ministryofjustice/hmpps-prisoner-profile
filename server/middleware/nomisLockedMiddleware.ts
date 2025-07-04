@@ -1,13 +1,24 @@
 import { Request, Response, NextFunction } from 'express'
 import { NomisLockedError } from '../utils/nomisLockedError'
+import MetricsService from '../services/metrics/metricsService'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
-export function nomisLockedMiddleware(err: unknown, req: Request, res: Response, next: NextFunction) {
-  if (err instanceof NomisLockedError) {
-    req.flash('isLocked', 'true')
-    req.flash('requestBody', JSON.stringify(req.body))
-    return res.redirect(req.originalUrl)
+export function nomisLockedMiddleware(metricsService: MetricsService) {
+  return (err: unknown, req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof NomisLockedError) {
+      const { prisonerNumber } = req.middleware.prisonerData
+      metricsService.trackNomisLockedWarning(
+        prisonerNumber,
+        req.originalUrl,
+        err.endpoint,
+        res.locals.user as PrisonUser,
+      )
+      req.flash('isLocked', 'true')
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(req.originalUrl)
+    }
+    return next(err)
   }
-  return next(err)
 }
 
 export function nomisLockedRenderMiddleware(req: Request, res: Response, next: NextFunction) {

@@ -5,6 +5,7 @@ import {
   apostrophe,
   arrayIncludes,
   arrayToQueryString,
+  blankStringsToNull,
   calculateAge,
   camelToSnakeCase,
   contactAddressToHtml,
@@ -50,8 +51,8 @@ import {
   SortType,
   summaryListOneHalfWidth,
   SummaryListRow,
-  toNonAssociationRows,
   toFullCourtLink,
+  toNonAssociationRows,
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -329,7 +330,7 @@ describe('utils', () => {
     it('Maps a full address', () => {
       const address: OldAddresses['address'] = {
         flat: '7',
-        premise: 'premises address',
+        premise: 'some premise',
         street: 'street field',
         locality: 'locality field',
         town: 'Leeds',
@@ -339,7 +340,7 @@ describe('utils', () => {
       }
 
       const lines = addressToLines(address)
-      expect(lines[0]).toEqual('Flat 7, premises address, street field')
+      expect(lines[0]).toEqual('7, some premise, street field')
       expect(lines[1]).toEqual('Leeds')
       expect(lines[2]).toEqual('West Yorkshire')
       expect(lines[3]).toEqual('LS1 AAA')
@@ -1283,6 +1284,30 @@ describe('utils', () => {
       [undefined, undefined],
     ])("expands court link [%s] to full link '%s'", (input, expected) => {
       expect(toFullCourtLink(input)).toEqual(expected)
+    })
+  })
+
+  describe('blankStringsToNull', () => {
+    it.each([
+      [undefined, undefined],
+      [null, null],
+      ['string', 'string'],
+      [1, 1],
+      [{}, {}],
+      [
+        { a: 'a', b: 1, c: { d: 'd' } },
+        { a: 'a', b: 1, c: { d: 'd' } },
+      ],
+      [
+        { a: '', b: '  ', c: { d: '   ' } },
+        { a: null, b: null, c: { d: null } },
+      ],
+      [{ a: { b: { c: '' } } }, { a: { b: { c: null } } }],
+      [[], []],
+      [[[]], [[]]],
+      [{ a: { b: [{ c: ' ' }] } }, { a: { b: [{ c: null }] } }],
+    ])('converts blank strings to null for %s', async (input: unknown, output: unknown) => {
+      expect(blankStringsToNull(input)).toEqual(output)
     })
   })
 })

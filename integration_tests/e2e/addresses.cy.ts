@@ -23,7 +23,7 @@ context('Addresses page', () => {
 
     const primaryAddress = addressesPage.primaryAddress()
     primaryAddress.header().should('have.text', 'Primary address')
-    primaryAddress.address().should('contain.text', 'Flat 7, premises address, street field')
+    primaryAddress.address().should('contain.text', '7, premises address, street field')
     primaryAddress.address().should('contain.text', 'Leeds')
     primaryAddress.address().should('contain.text', 'West Yorkshire')
     primaryAddress.address().should('contain.text', 'LS1 AAA')

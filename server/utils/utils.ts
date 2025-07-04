@@ -338,10 +338,7 @@ export const addressToLines = ({
   postalCode,
   country,
 }: OldAddresses['address']): string[] => {
-  let lineOne = [premise, street].filter(s => s).join(', ')
-  if (flat) {
-    lineOne = `Flat ${flat}, ${lineOne}`
-  }
+  const lineOne = [flat, premise, street].filter(s => s).join(', ')
   const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
   if (addressArray.length !== 1 || !country) return addressArray
   return []
@@ -869,4 +866,20 @@ export const toFullCourtLink = (hmctsNumber: string) => {
     return undefined
   }
   return `HMCTS${hmctsNumber}@${config.defaultCourtVideoUrl}`
+}
+
+export const blankStringsToNull = <T>(object: T): T => {
+  if (object === null || object === undefined) return object
+  if (typeof object === 'string') return object?.trim() ? (object.trim() as T) : null
+  if (Array.isArray(object)) return object.map(v => blankStringsToNull(v)) as T
+  if (typeof object === 'object') {
+    return Object.fromEntries(
+      Object.entries(object).map(entry => {
+        const key = entry[0]
+        const value = entry[1]
+        return [key, blankStringsToNull(value)]
+      }),
+    ) as T
+  }
+  return object
 }

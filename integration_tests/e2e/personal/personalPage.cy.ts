@@ -467,6 +467,7 @@ context('When signed in', () => {
         page.addresses().address().should('include.text', 'The Flats')
         page.addresses().address().should('include.text', '1 The Road')
         page.addresses().address().should('include.text', 'The Area')
+        page.addresses().address().should('include.text', 'Sheffield')
         page.addresses().address().should('include.text', 'South Yorkshire')
         page.addresses().address().should('include.text', 'A1 2BC')
         page.addresses().address().should('include.text', 'England')
@@ -745,7 +746,7 @@ context('When signed in', () => {
 
     it('Displays old addresses tile', () => {
       const page = Page.verifyOnPage(PersonalPage)
-      page.oldAddresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.oldAddresess().address().should('include.text', '7, premises address, street field')
       page.oldAddresess().address().should('include.text', 'Leeds')
       page.oldAddresess().address().should('include.text', 'LS1 AAA')
       page.oldAddresess().address().should('include.text', 'England')
