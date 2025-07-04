@@ -1,4 +1,4 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -9,7 +9,7 @@ import {
 } from '../validators/personal/identityNumbersValidator'
 import { IdentifierMappings } from '../data/constants/identifierMappings'
 
-export default function identityNumbersRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
@@ -24,10 +24,9 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add justice ID numbers
-  get('/justice-id-numbers', editProfileChecks(), identityNumbersController.justiceIdNumbers().edit)
+  get('/justice-id-numbers', identityNumbersController.justiceIdNumbers().edit)
   post(
     '/justice-id-numbers',
-    editProfileChecks(),
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -35,10 +34,9 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add personal ID numbers
-  get('/personal-id-numbers', editProfileChecks(), identityNumbersController.personalIdNumbers().edit)
+  get('/personal-id-numbers', identityNumbersController.personalIdNumbers().edit)
   post(
     '/personal-id-numbers',
-    editProfileChecks(),
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -46,10 +44,9 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add Home Office ID numbers
-  get('/home-office-id-numbers', editProfileChecks(), identityNumbersController.homeOfficeIdNumbers().edit)
+  get('/home-office-id-numbers', identityNumbersController.homeOfficeIdNumbers().edit)
   post(
     '/home-office-id-numbers',
-    editProfileChecks(),
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -57,14 +54,9 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Edit individual existing ID numbers
-  get(
-    `/:identifier(${identityNumberRoutes})/:compositeId`,
-    editProfileChecks(),
-    identityNumbersController.idNumber().edit,
-  )
+  get(`/:identifier(${identityNumberRoutes})/:compositeId`, identityNumbersController.idNumber().edit)
   post(
     `/:identifier(${identityNumberRoutes})/:compositeId`,
-    editProfileChecks(),
     validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,
     }),
