@@ -1,4 +1,4 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { Services } from '../services'
 import { getRequest, postRequest } from './routerUtils'
 import AddressEditController from '../controllers/addressEditController'
@@ -8,7 +8,7 @@ import { Page, PostAction } from '../services/auditService'
 import { addressValidator } from '../validators/personal/addressValidator'
 import { AddressLocation } from '../services/mappers/addressMapper'
 
-export default function addressEditRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function addressEditRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
@@ -19,10 +19,9 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     services.auditService,
   )
 
-  get('/where-is-address', editProfileChecks(), addressEditController.displayWhereIsTheAddress())
+  get('/where-is-address', addressEditController.displayWhereIsTheAddress())
   post(
     '/where-is-address',
-    editProfileChecks(),
     validationMiddleware(
       [notEmptyValidator({ fieldName: 'radioField', href: '#radio', errorText: 'Select where the address is' })],
       { redirectBackOnError: true, useReq: true },
@@ -30,10 +29,9 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     addressEditController.submitWhereIsTheAddress(),
   )
 
-  get('/find-uk-address', editProfileChecks(), addressEditController.displayFindUkAddress())
+  get('/find-uk-address', addressEditController.displayFindUkAddress())
   post(
     '/find-uk-address',
-    editProfileChecks(),
     validationMiddleware(
       [
         notEmptyValidator({
@@ -48,12 +46,11 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     addressEditController.submitFindUkAddress(),
   )
 
-  get('/confirm-address', editProfileChecks(), addressEditController.displayConfirmAddress())
+  get('/confirm-address', addressEditController.displayConfirmAddress())
 
-  get('/primary-or-postal-address', editProfileChecks(), addressEditController.displayPrimaryOrPostalAddress())
+  get('/primary-or-postal-address', addressEditController.displayPrimaryOrPostalAddress())
   post(
     '/primary-or-postal-address',
-    editProfileChecks(),
     validationMiddleware(
       [
         notEmptyValidator({
@@ -69,7 +66,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-uk-address',
-    editProfileChecks(),
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.uk,
       pageTitlePrefix: 'Add a UK address - Prisoner personal details',
@@ -80,7 +76,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   post(
     '/add-uk-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.uk,
@@ -90,7 +85,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-overseas-address',
-    editProfileChecks(),
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.overseas,
       pageTitlePrefix: 'Add an overseas address',
@@ -101,7 +95,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   post(
     '/add-overseas-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.overseas,
@@ -111,7 +104,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-uk-no-fixed-address',
-    editProfileChecks(),
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
       pageTitlePrefix: 'Add a UK no fixed address',
@@ -122,7 +114,6 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   post(
     '/add-uk-no-fixed-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
