@@ -21,10 +21,11 @@
     <div class="govuk-grid-row govuk-!-margin-bottom-6">
       <div class="govuk-grid-column-full">
         {{ govukBackLink({
-        text: "Back",
-        classes: "govuk-!-margin-0",
-        href: backLinkUrl
-      }) }}
+          text: "Back",
+          classes: "govuk-!-margin-0",
+          attributes: { 'data-qa': 'back-link' },
+          href: backLinkUrl
+        }) }}
       </div>
     </div>
   {% endif %}
