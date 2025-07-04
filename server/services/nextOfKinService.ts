@@ -81,7 +81,7 @@ export default class NextOfKinService {
     const response = await personalRelationShipsApiClient.addContactAddress(contactId, request)
 
     this.metricsService.trackPersonalRelationshipsUpdate({
-      fieldsUpdated: ['nextOfKin'],
+      fieldsUpdated: ['nextOfKinAddress'],
       prisonerNumber,
       user,
     })

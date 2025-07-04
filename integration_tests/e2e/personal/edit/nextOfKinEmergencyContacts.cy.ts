@@ -262,7 +262,7 @@ context('Edit next of kin and emergency contacts', () => {
             },
           },
         },
-        errorMessages: ['Extension numbers must only contain numbers'],
+        errorMessages: ['Extension must only contain numbers'],
       },
     ],
     redirectAnchor: 'next-of-kin',

@@ -523,8 +523,13 @@ export default class NextOfKinController {
       noFixedAbode,
     } = cachedAddress
 
+    const buildingNameIsTheBuildingNumber = !buildingNumber && /^[0-9]+$/.test(buildingName?.trim())
+
+    const parsedBuildingNumber = buildingNameIsTheBuildingNumber ? buildingName : buildingNumber
+    const parsedBuildingName = buildingNameIsTheBuildingNumber ? null : buildingName
+
     return {
-      property: buildingNumber && buildingName ? `${buildingNumber} ${buildingName}` : buildingNumber,
+      property: parsedBuildingName ? `${parsedBuildingNumber} ${parsedBuildingName}` : `${parsedBuildingNumber}`,
       ...(thoroughfareName && { street: thoroughfareName }),
       ...(dependantLocality && { area: dependantLocality }),
       ...(postTownCode && { cityCode: postTownCode }),
