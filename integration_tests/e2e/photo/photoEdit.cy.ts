@@ -33,7 +33,7 @@ context('Editing the photo', () => {
         prisonerNumber,
         visitPage,
         pageToDisplay: EditPhotoPage,
-        options: { additionalRoles: [Role.DpsApplicationDeveloper], preventGlobalAccess: true },
+        options: { additionalRoles: [Role.PrisonerProfileSensitiveEdit], preventGlobalAccess: true },
       })
     })
 

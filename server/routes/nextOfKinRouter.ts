@@ -1,4 +1,4 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import NextOfKinController from '../controllers/nextOfKinController'
@@ -9,7 +9,7 @@ import { AddressLocation } from '../services/mappers/addressMapper'
 import { Page, PostAction } from '../services/auditService'
 import { addressValidator } from '../validators/personal/addressValidator'
 
-export default function nextOfKinRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function nextOfKinRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
@@ -21,20 +21,18 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
     services.auditService,
   )
 
-  get('/next-of-kin-emergency-contacts', editProfileChecks(), nextOfKinController.displayNextOfKinEmergencyContact())
+  get('/next-of-kin-emergency-contacts', nextOfKinController.displayNextOfKinEmergencyContact())
   post(
     '/next-of-kin-emergency-contacts',
-    editProfileChecks(),
     validationMiddleware([nextOfKinValidator], {
       redirectBackOnError: true,
     }),
     nextOfKinController.submitNextOfKinEmergencyContact(),
   )
 
-  get('/where-is-next-of-kin-address', editProfileChecks(), nextOfKinController.displayWhereIsTheAddress())
+  get('/where-is-next-of-kin-address', nextOfKinController.displayWhereIsTheAddress())
   post(
     '/where-is-next-of-kin-address',
-    editProfileChecks(),
     validationMiddleware(
       [notEmptyValidator({ fieldName: 'radioField', href: '#radio', errorText: 'Select where the address is' })],
       { redirectBackOnError: true, useReq: true },
@@ -42,10 +40,9 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
     nextOfKinController.submitWhereIsTheAddress(),
   )
 
-  get('/find-uk-next-of-kin-address', editProfileChecks(), nextOfKinController.displayFindUkAddress())
+  get('/find-uk-next-of-kin-address', nextOfKinController.displayFindUkAddress())
   post(
     '/find-uk-next-of-kin-address',
-    editProfileChecks(),
     validationMiddleware(
       [
         notEmptyValidator({
@@ -62,7 +59,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
 
   get(
     '/add-uk-next-of-kin-no-fixed-address',
-    editProfileChecks(),
     nextOfKinController.displayManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
       pageTitlePrefix: 'Add UK no fixed address for contact',
@@ -72,7 +68,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
   )
   post(
     '/add-uk-next-of-kin-no-fixed-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
@@ -82,7 +77,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
 
   get(
     '/add-uk-next-of-kin-address',
-    editProfileChecks(),
     nextOfKinController.displayManualEditAddress({
       addressLocation: AddressLocation.uk,
       pageTitlePrefix: 'Add UK address for contact',
@@ -92,7 +86,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
   )
   post(
     '/add-uk-next-of-kin-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.uk,
@@ -102,7 +95,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
 
   get(
     '/add-next-of-kin-overseas-address',
-    editProfileChecks(),
     nextOfKinController.displayManualEditAddress({
       addressLocation: AddressLocation.overseas,
       pageTitlePrefix: 'Add overseas address for contact',
@@ -112,7 +104,6 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
   )
   post(
     '/add-next-of-kin-overseas-address',
-    editProfileChecks(),
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.overseas,
@@ -120,8 +111,8 @@ export default function nextOfKinRouter(services: Services, editProfileChecks: (
     }),
   )
 
-  get('/confirm-next-of-kin-address', editProfileChecks(), nextOfKinController.displayConfirmAddress())
-  post('/confirm-next-of-kin-address', editProfileChecks(), nextOfKinController.submitConfirmAddress())
+  get('/confirm-next-of-kin-address', nextOfKinController.displayConfirmAddress())
+  post('/confirm-next-of-kin-address', nextOfKinController.submitConfirmAddress())
 
   return router
 }

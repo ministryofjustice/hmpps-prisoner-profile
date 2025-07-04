@@ -14,7 +14,7 @@ context('Edit build', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -30,5 +30,6 @@ context('Edit build', () => {
     successfulFlashMessage: 'Build updated',
     validInputs: [{ radioInputs: { radioField: 'MEDIUM' } }],
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })

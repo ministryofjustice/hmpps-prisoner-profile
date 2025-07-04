@@ -19,7 +19,7 @@
             </p>
           {% endif %}
         </div>
-        {% if editable and editEnabled %}
+        {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
           <div class="action-link-container">
             <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
           </div>
@@ -31,7 +31,7 @@
       <div>
         <p class="govuk-body not-entered-tag">Not entered</p>
       </div>
-      {% if editable and editEnabled %}
+      {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
         <div class="action-link-container">
           <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
         </div>
@@ -63,7 +63,9 @@
         {# (the justice numbers section heading) would otherwise be a table-row #}
         <dt class="govuk-summary-list__key pseudo-row"></dt><dd class="govuk-summary-list__value pseudo-row"></dd>
 
-        {{ summaryListSectionHeading("Justice numbers", "justice-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/justice-id-numbers", text: "Add justice ID numbers" }) }}
+        {% set identityNumberEditEnabled = editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
+
+        {{ summaryListSectionHeading("Justice numbers", "justice-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/justice-id-numbers", text: "Add justice ID numbers" }) }}
         {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], { editable: false }) }}
         {{ identityNumber("PNC number", identityNumbers.justice.pncNumber) }}
         {{ identityNumber("CRO number", identityNumbers.justice.croNumber, { hideIfEmpty: true }) }}
@@ -74,7 +76,7 @@
         {{ identityNumber("Youth Justice Application Framework (YJAF) number", identityNumbers.justice.yjafNumber, { hideIfEmpty: true }) }}
 
         {% if hasPersonalId %}
-          {{ summaryListSectionHeading("Personal numbers", "personal-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/personal-id-numbers", text: "Add personal ID numbers" }) }}
+          {{ summaryListSectionHeading("Personal numbers", "personal-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/personal-id-numbers", text: "Add personal ID numbers" }) }}
           {{ identityNumber("Driving licence number", identityNumbers.personal.drivingLicenceNumber, { hideIfEmpty: true }) }}
           {{ identityNumber("National Insurance number", identityNumbers.personal.nationalInsuranceNumber, { hideIfEmpty: true }) }}
           {{ identityNumber("Parkrun number", identityNumbers.personal.parkrunNumber, { hideIfEmpty: true }) }}
@@ -84,13 +86,13 @@
         {% endif %}
 
         {% if hasHomeOfficeId %}
-          {{ summaryListSectionHeading("Home office numbers", "home-office-numbers", { enabled: editEnabled, href: "/prisoner/" + prisonerNumber + "/personal/home-office-id-numbers", text: "Add Home Office ID numbers" }) }}
+          {{ summaryListSectionHeading("Home office numbers", "home-office-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/home-office-id-numbers", text: "Add Home Office ID numbers" }) }}
           {{ identityNumber("Case Information Database (CID) number", identityNumbers.homeOffice.caseInformationDatabase, { hideIfEmpty: true }) }}
           {{ identityNumber("Home Office reference number", identityNumbers.homeOffice.homeOfficeReferenceNumber, { hideIfEmpty: true }) }}
           {{ identityNumber("Port reference number", identityNumbers.homeOffice.portReferenceNumber, { hideIfEmpty: true }) }}
         {% endif %}
 
-        {% if showAdditionalIdRow and editEnabled %}
+        {% if showAdditionalIdRow and identityNumberEditEnabled %}
           <div class="govuk-summary-list__row additional-identity-numbers-row" data-qa="additional-identity-numbers-section-heading">
             <div>
               <h3>Additional identity numbers</h3>

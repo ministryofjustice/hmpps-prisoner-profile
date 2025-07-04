@@ -1,4 +1,4 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import AliasController from '../controllers/aliasController'
@@ -6,7 +6,7 @@ import validationMiddleware from '../middleware/validationMiddleware'
 import { nameValidator } from '../validators/personal/nameValidator'
 import { dateValidator } from '../validators/personal/dateValidator'
 
-export default function aliasRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
@@ -19,13 +19,12 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     services.auditService,
   )
 
-  get('/change-name', editProfileChecks(), aliasController.displayChangeNamePurpose())
-  post('/change-name', editProfileChecks(), aliasController.submitChangeNamePurpose())
+  get('/change-name', aliasController.displayChangeNamePurpose())
+  post('/change-name', aliasController.submitChangeNamePurpose())
 
-  get('/date-of-birth', editProfileChecks(), aliasController.displayChangeDateOfBirth())
+  get('/date-of-birth', aliasController.displayChangeDateOfBirth())
   post(
     '/date-of-birth',
-    editProfileChecks(),
     validationMiddleware(
       [
         dateValidator({
@@ -41,31 +40,28 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     aliasController.submitChangeDateOfBirth(),
   )
 
-  get('/ethnic-group', editProfileChecks(), aliasController.displayChangeEthnicGroup())
-  post('/ethnic-group', editProfileChecks(), aliasController.submitChangeEthnicGroup())
-  get(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.displayChangeEthnicBackground())
-  post(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.submitChangeEthnicBackground())
+  get('/ethnic-group', aliasController.displayChangeEthnicGroup())
+  post('/ethnic-group', aliasController.submitChangeEthnicGroup())
+  get(`/:group(${ethnicGroups})`, aliasController.displayChangeEthnicBackground())
+  post(`/:group(${ethnicGroups})`, aliasController.submitChangeEthnicBackground())
 
-  get('/enter-corrected-name', editProfileChecks(), aliasController.displayChangeNameCorrection())
+  get('/enter-corrected-name', aliasController.displayChangeNameCorrection())
   post(
     '/enter-corrected-name',
-    editProfileChecks(),
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameCorrection(),
   )
 
-  get('/enter-new-name', editProfileChecks(), aliasController.displayChangeNameLegal())
+  get('/enter-new-name', aliasController.displayChangeNameLegal())
   post(
     '/enter-new-name',
-    editProfileChecks(),
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameLegal(),
   )
 
-  get('/enter-alias-details', editProfileChecks(), aliasController.displayAddNewAlias())
+  get('/enter-alias-details', aliasController.displayAddNewAlias())
   post(
     '/enter-alias-details',
-    editProfileChecks(),
     validationMiddleware(
       [
         nameValidator,

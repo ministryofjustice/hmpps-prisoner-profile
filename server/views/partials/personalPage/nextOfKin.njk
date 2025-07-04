@@ -35,7 +35,13 @@
 {% endmacro %}
 
 
-{%- call summaryCard({title: "Next of kin and emergency contacts", id: "next-of-kin", actions: [{text: 'Add a new contact', href: 'personal/next-of-kin-emergency-contacts' }] if editEnabled }) -%}
+{%- call summaryCard({
+  title: "Next of kin and emergency contacts",
+  id: "next-of-kin",
+  actions: [
+    {text: 'Add a new contact', href: 'personal/next-of-kin-emergency-contacts' }
+  ] if editEnabled and isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions)
+}) -%}
   {% if nextOfKinAndEmergencyContacts.status === 'fulfilled'  %}
     {% set hasNextOfKin = nextOfKinAndEmergencyContacts.value.hasNextOfKin %}
     {% set hasEmergencyContact = nextOfKinAndEmergencyContacts.value.hasEmergencyContact %}
@@ -88,7 +94,7 @@
 
             <!-- Change links - add back in when external service is ready -->
 {#
-            {% if editEnabled %}
+            {% if editEnabled and isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions) %}
             <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact’s details</a></div>
             {% endif %}
 #}

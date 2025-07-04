@@ -2,6 +2,7 @@
 import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import { setupNunjucksPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import {
   addDefaultSelectedValue,
   addressToLines,
@@ -26,8 +27,8 @@ import {
   prisonerIsTRN,
   sortByLatestAndUuid,
   summaryListOneHalfWidth,
-  toNonAssociationRows,
   toFullCourtLink,
+  toNonAssociationRows,
   userHasRoles,
 } from './utils'
 import { pluralise } from './pluralise'
@@ -61,7 +62,7 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { externalContactsEnabled, militaryHistoryEnabled, bvlsHmctsLinkGuestPinEnabled } from './featureToggles'
+import { bvlsHmctsLinkGuestPinEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 
@@ -106,6 +107,10 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   const {
     analytics: { tagManagerContainerId },
   } = config
+
+  // Enable permissions checking in templates:
+  setupNunjucksPermissions(njkEnv)
+
   njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
   njkEnv.addGlobal('isInUsersCaseLoad', isInUsersCaseLoad)
   njkEnv.addGlobal('userHasRoles', userHasRoles)

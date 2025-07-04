@@ -19,7 +19,7 @@ context('Edit next of kin and emergency contacts', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -267,5 +267,6 @@ context('Edit next of kin and emergency contacts', () => {
     ],
     redirectAnchor: 'next-of-kin',
     submitButtonId: 'save-button',
+    isUnrestricted: true,
   })
 })

@@ -21,11 +21,11 @@
           <li class="moj-sub-navigation__item">
             <a class="moj-sub-navigation__link" aria-current="page">All facial images</a>
           </li>
-          {% if editEnabled %}
+          {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
             <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
               {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
-            {% endif %}
-          </li>
+            </li>
+          {% endif %}
         </ul>
       </nav>
     </div>

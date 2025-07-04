@@ -29,7 +29,7 @@
         {% endif %}
       </dd>
       <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list">
-        {% if editEnabled %}
+        {% if editEnabled and isGranted(PersonCommunicationNeedsPermission.edit_language, prisonerPermissions) %}
           <a
             class="govuk-link govuk-link--no-visited-state"
             href="/prisoner/{{ prisonerNumber }}/personal/main-language"
@@ -55,7 +55,7 @@
       <dd
         class="govuk-summary-list__actions govuk-!-padding-right-0 govuk-!-padding-bottom-0 hmpps-width-4 govuk-summary-list--sub-list"
       >
-        {% if editEnabled %}
+        {% if editEnabled and isGranted(PersonCommunicationNeedsPermission.edit_language, prisonerPermissions) %}
           <a
             class="govuk-link govuk-link--no-visited-state"
             href="/prisoner/{{ prisonerNumber }}/personal/other-languages"
@@ -80,7 +80,7 @@
         <dd
           class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list {{ 'hmpps-border-bottom govuk-!-padding-bottom-0' if not loop.last }}"
         >
-          {% if editEnabled %}
+          {% if editEnabled and isGranted(PersonCommunicationNeedsPermission.edit_language, prisonerPermissions) %}
             <a
               class="govuk-link govuk-link--no-visited-state"
               href="/prisoner/{{ prisonerNumber }}/personal/other-languages/{{ language.code }}"

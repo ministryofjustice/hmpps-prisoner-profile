@@ -25,6 +25,7 @@ export enum Role {
   PathfinderStdProbation = 'ROLE_PF_STD_PROBATION',
   PathfinderUser = 'ROLE_PF_USER',
   PomUser = 'ROLE_POM',
+  PrisonerProfileSensitiveEdit = 'ROLE_PRISONER_PROFILE_SENSITIVE_RW',
   PrisonUser = 'ROLE_PRISON',
   ReceptionUser = 'ROLE_PRISON_RECEPTION',
   ReleaseDatesCalculator = 'ROLE_RELEASE_DATES_CALCULATOR',

@@ -1,15 +1,20 @@
-import { NextFunction, Request, RequestHandler, Response, Router } from 'express'
-import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { RequestHandler, Router } from 'express'
+import {
+  CorePersonRecordPermission,
+  PersonalRelationshipsPermission,
+  PersonCommunicationNeedsPermission,
+  PersonHealthAndMedicationPermission,
+  PersonProtectedCharacteristicsPermission,
+  PrisonerBasePermission,
+  PrisonerPermission,
+  prisonerPermissionsGuard,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { Services } from '../services'
-import { userHasRoles } from '../utils/utils'
-import NotFoundError from '../utils/notFoundError'
-import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../utils/featureToggles'
-import { PrisonUser } from '../interfaces/HmppsUser'
+import { dietAndAllergyEnabled, editProfileEnabled, militaryHistoryEnabled } from '../utils/featureToggles'
 import PersonalController from '../controllers/personal/personalController'
 import {
   buildFieldData,
@@ -30,7 +35,6 @@ import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 import militaryRecordsRouter from './militaryRecordsRouter'
-import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
@@ -41,6 +45,7 @@ import { emailValidator } from '../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
 import { phoneNumberValidator } from '../validators/personal/phoneNumberValidator'
 import { populateEditPageData } from '../middleware/populateEditPageData'
+import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGuard'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -63,38 +68,15 @@ export default function personalRouter(services: Services): Router {
     personalController.displayPersonalPage(),
   )
 
-  const dietAndAllergiesEditCheck = () => (req: Request, res: Response, next: NextFunction) => {
-    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
-    if (dietAndAllergyEnabled(activeCaseLoadId) && userHasRoles([Role.DietAndAllergiesEdit], userRoles)) {
-      return next()
-    }
-    return next(new NotFoundError('User cannot access diet and food allergies edit route', HmppsStatusCode.NOT_FOUND))
-  }
-
-  // Temporary edit check for now
-  const editProfileChecks = () => (req: Request, res: Response, next: NextFunction) => {
-    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
-    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
-      return next()
-    }
-    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
-  }
-
-  // TODO Remove this once edit religion is live (prospective date: 10th June)
-  const editReligionCheck = () => (req: Request, res: Response, next: NextFunction) => {
-    if (editReligionEnabled()) {
-      return next()
-    }
-    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
-  }
-
   // Distinguishing marks
   router.use(
     `${basePath}/:markType(tattoo|scar|mark)`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    editProfileChecks(),
     distinguishingMarksRouter(services),
   )
 
@@ -102,8 +84,11 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Military History', militaryHistoryEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_military_history],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     militaryRecordsRouter(services),
   )
 
@@ -111,45 +96,60 @@ export default function personalRouter(services: Services): Router {
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_address],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    addressEditRouter(services, editProfileChecks),
+    addressEditRouter(services),
   )
 
   // Aliases
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_name_and_aliases],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    aliasRouter(services, editProfileChecks),
+    aliasRouter(services),
   )
 
   // Languages
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PersonCommunicationNeedsPermission.edit_language],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    languagesRouter(services, editProfileChecks),
+    languagesRouter(services),
   )
 
   // Next of kin and emergency contacts
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PersonalRelationshipsPermission.edit_emergency_contacts],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    nextOfKinRouter(services, editProfileChecks),
+    nextOfKinRouter(services),
   )
 
   // Identity numbers
   router.use(
     `${basePath}`,
     getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_identifiers],
+    }),
     populateEditPageData(),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    identityNumbersRouter(services, editProfileChecks),
+    identityNumbersRouter(services),
   )
 
   // Edit routes
@@ -157,7 +157,8 @@ export default function personalRouter(services: Services): Router {
     path,
     edit,
     submit,
-    permissionsCheck = editProfileChecks,
+    requiredPermission,
+    featureFlag = { featureName: 'Profile Edit', method: editProfileEnabled },
   }: {
     requiredRoles?: string[]
     path: string
@@ -174,7 +175,8 @@ export default function personalRouter(services: Services): Router {
         redirectTo?: RedirectWithParams
       }
     }
-    permissionsCheck?: () => RequestHandler
+    requiredPermission: PrisonerPermission
+    featureFlag?: { featureName: string; method: FeatureFlagMethod }
   }) => {
     const routePath = `${basePath}/${path}`
 
@@ -182,8 +184,8 @@ export default function personalRouter(services: Services): Router {
       routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
-      prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-      permissionsCheck(),
+      featureFlagGuard(featureFlag.featureName, featureFlag.method),
+      prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
       populateEditPageData(),
       edit.method,
     )
@@ -202,8 +204,8 @@ export default function personalRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-        permissionsCheck(),
+        featureFlagGuard(featureFlag.featureName, featureFlag.method),
+        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
         validationMiddleware(submit.validation.validators, validationOptions),
         submit.method,
       )
@@ -212,8 +214,8 @@ export default function personalRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-        permissionsCheck(),
+        featureFlagGuard(featureFlag.featureName, featureFlag.method),
+        prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
         submit.method,
       )
     }
@@ -234,6 +236,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   editRoute({
@@ -250,6 +253,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Weight
@@ -267,6 +271,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   editRoute({
@@ -283,6 +288,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   editRoute({
@@ -299,6 +305,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Hair type or colour
@@ -312,6 +319,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditHairTypeOrColour,
       method: personalController.physicalCharacteristicRadioField(hairFieldData).submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Facial hair
@@ -325,6 +333,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditFacialHair,
       method: personalController.physicalCharacteristicRadioField(facialHairFieldData).submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Face shape
@@ -338,6 +347,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditFaceShape,
       method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Build
@@ -351,19 +361,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditBuild,
       method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
     },
-  })
-
-  // Smoker/Vaper
-  editRoute({
-    path: 'smoker-or-vaper',
-    edit: {
-      audit: Page.EditSmokerOrVaper,
-      method: personalController.smokerOrVaper().edit,
-    },
-    submit: {
-      audit: Page.PostEditSmokerOrVaper,
-      method: personalController.smokerOrVaper().submit,
-    },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   // Eye colour
@@ -377,6 +375,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditEyeColour,
       method: personalController.eyeColour().submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
 
   editRoute({
@@ -389,6 +388,21 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditEyeColour,
       method: personalController.eyeColourIndividual().submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
+  })
+
+  // Smoker/Vaper
+  editRoute({
+    path: 'smoker-or-vaper',
+    edit: {
+      audit: Page.EditSmokerOrVaper,
+      method: personalController.smokerOrVaper().edit,
+    },
+    submit: {
+      audit: Page.PostEditSmokerOrVaper,
+      method: personalController.smokerOrVaper().submit,
+    },
+    requiredPermission: PersonHealthAndMedicationPermission.edit_smoker,
   })
 
   editRoute({
@@ -405,7 +419,8 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
-    permissionsCheck: dietAndAllergiesEditCheck,
+    requiredPermission: PersonHealthAndMedicationPermission.edit_diet,
+    featureFlag: { featureName: 'Diet and Allergy', method: dietAndAllergyEnabled },
   })
 
   editRoute({
@@ -418,6 +433,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditCityOrTownOfBirth,
       method: personalController.cityOrTownOfBirthTextInput().submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })
 
   editRoute({
@@ -430,6 +446,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditCountryOfBirth,
       method: personalController.countryOfBirth().submit,
     },
+    requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })
 
   editRoute({
@@ -446,6 +463,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_nationality,
   })
 
   editRoute({
@@ -462,7 +480,8 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
-    permissionsCheck: editReligionCheck,
+    requiredPermission: PersonProtectedCharacteristicsPermission.edit_religion_and_belief,
+    featureFlag: { featureName: 'Religion Edit', method: () => true },
   })
 
   editRoute({
@@ -475,6 +494,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditSexualOrientation,
       method: personalController.sexualOrientation().submit,
     },
+    requiredPermission: PersonProtectedCharacteristicsPermission.edit_sexual_orientation,
   })
 
   editRoute({
@@ -491,6 +511,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: PersonalRelationshipsPermission.edit_number_of_children,
   })
 
   editRoute({
@@ -503,6 +524,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditDomesticStatus,
       method: personalController.domesticStatus().submit,
     },
+    requiredPermission: PersonalRelationshipsPermission.edit_domestic_status,
   })
 
   editRoute({
@@ -519,6 +541,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_phone_numbers,
   })
 
   editRoute({
@@ -536,6 +559,7 @@ export default function personalRouter(services: Services): Router {
         redirectTo: ({ phoneNumberId }) => `personal/change-phone-number/${phoneNumberId}`,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_phone_numbers,
   })
 
   // Global emails
@@ -553,6 +577,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_email_addresses,
   })
 
   editRoute({
@@ -570,6 +595,7 @@ export default function personalRouter(services: Services): Router {
         redirectTo: ({ emailAddressId }) => `personal/change-email-address/${emailAddressId}`,
       },
     },
+    requiredPermission: CorePersonRecordPermission.edit_email_addresses,
   })
 
   return router

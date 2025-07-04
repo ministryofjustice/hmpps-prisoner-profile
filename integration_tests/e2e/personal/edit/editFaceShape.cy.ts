@@ -14,7 +14,7 @@ context('Edit face shape', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -30,5 +30,6 @@ context('Edit face shape', () => {
     successfulFlashMessage: 'Face shape updated',
     validInputs: [{ radioInputs: { radioField: 'OVAL' } }],
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })
