@@ -30,7 +30,6 @@ import {
   toFullCourtLink,
   userHasRoles,
 } from './utils'
-import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
 import {
   formatAddressDate,
@@ -198,7 +197,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
-  njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
   njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)

@@ -1,96 +1,39 @@
-{% extends "../../partials/layout.njk" %}
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% extends "./editPage.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
-
-{% set hideBackLink = true %}
-{%
-  set breadCrumbs = [
-  {
-  text: 'Digital Prison Services',
-  href:  "/" | prependBaseUrl
-  },
-  {
-  text: breadcrumbPrisonerName,
-  href: "/prisoner/" + prisonerNumber
-  },
-  {
-  text: 'Personal',
-  href: "/prisoner/" + prisonerNumber + "/personal"
-  }
-  ]
-%}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-{% block body %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-  </div>
-
-  {{ nomisLockedWarning(isLocked) }}
-  
-  {% if backLink %}
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink,
-      classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
-    }) }}
-  {% endif %}
-
-  {% if errors.length > 0 %}
-    {{
-      govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: errors,
-          attributes: { 'data-qa-errors': true },
-          classes: 'govuk-!-margin-bottom-6'
-      })
-    }}
-  {% endif %}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
-      <form method="post" novalidate="novalidate" autocomplete="off">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
-          {{ govukRadios({
-            idPrefix: "radio",
-            name: "radioField",
-            errorMessage: errors | findError("radioField"),
-            fieldset: {
-              id: "radioFieldset",
-              legend: {
-                text: formTitle,
-                isPageHeading: true,
-                classes: "govuk-fieldset__legend--l"
-              }
-            },
-            hint: {
-              text: hintText
-            },
-            items: options
-          }) }}
-        </div>
-        <div class="govuk-button-group">
-          {{
-          govukButton({
-            text: submitButtonText or "Save",
-            type: "submit",
-            preventDoubleClick: true,
-            attributes: { "data-qa": "edit-submit-button" }
-            })
-          }}
-          <a href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
-        </div>
-      </form>
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+      {{ govukRadios({
+        idPrefix: "radio",
+        name: "radioField",
+        errorMessage: errors | findError("radioField"),
+        fieldset: {
+          id: "radioFieldset",
+          legend: {
+            text: formTitle,
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        hint: {
+          text: hintText
+        },
+        items: options
+      }) }}
     </div>
-  </div>
-{% endblock %}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: submitButtonText or "Save",
+        type: "submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
+    </div>
+  </form>
 {% endblock %}

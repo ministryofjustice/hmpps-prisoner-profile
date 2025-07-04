@@ -417,7 +417,7 @@ export default class AliasController {
       return res.render('pages/edit/radioField', {
         pageTitle: `${getEthnicGroupDescription(group)} - Prisoner personal details`,
         formTitle: `Which of the following best describes ${apostrophe(naturalPrisonerName)} ${getEthnicGroupDescriptionForHeading(group)} background?`,
-        backLink: `/prisoner/${prisonerNumber}/personal/ethnic-group`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/ethnic-group`,
         options: getEthnicBackgroundRadioOptions(
           group,
           ethnicityReferenceDataCodes,

@@ -1,156 +1,118 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% extends "../editPage.njk" %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + prisonerNumber + "/personal"
-    }
-] %}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-    {% block body %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-        </div>
-
-        {{ govukBackLink({
-            text: "Back",
-            href: backLink,
-            attributes: { 'data-qa': 'back-link' },
-            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
-        }) }}
-
-        {% if errors.length > 0 %}
-            {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            }) }}
-        {% endif %}
-
-        <div class="hmpps-find-uk-address govuk-grid-row">
-            <div class="govuk-grid-column-three-quarters">
-                <form method="post" novalidate="novalidate" autocomplete="off">
-                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-
-                    {% set insetAddressHtml %}
-                        <div class="address-summary">
-                            {% if address.subBuildingName %}<p class="govuk-!-static-margin-0">{{ address.subBuildingName }}</p>{% endif %}
-                            {% if address.buildingName %}<p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>{% endif %}
-                            {% if address.thoroughfareName %}<p class="govuk-!-static-margin-0">{% if address.buildingNumber %}{{ address.buildingNumber }}{% endif %} {{ address.thoroughfareName }}</p>{% endif %}
-                            {% if address.dependantLocality %}<p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>{% endif %}
-                            {% if address.city %}<p class="govuk-!-static-margin-0">{{ address.city }}</p>{% endif %}
-                            {% if address.county %}<p class="govuk-!-static-margin-0">{{ address.county }}</p>{% endif %}
-                            {% if address.postCode %}<p class="govuk-!-static-margin-0">{{ address.postCode }}</p>{% endif %}
-                            {% if address.country %}<p class="govuk-!-static-margin-0">{{ address.country }}</p>{% endif %}
-                        </div>
-                    {% endset %}
-
-                    {% set addressHtml %}
-                        <h1 class="govuk-heading-l">{{ formTitle }}</h1>
-                        {{ govukInsetText({
-                            html: insetAddressHtml,
-                            classes: 'govuk-!-static-margin-2'
-                        }) }}
-                    {% endset %}
-
-                    {% set existingPrimaryHtml %}
-                        {{ govukWarningText({
-                            text: "This person already has a primary address. Saving this will replace the existing one.",
-                            iconFallbackText: "Warning",
-                            attributes: { 'data-qa': 'existing-primary-warning' }
-                        }) }}
-                    {% endset %}
-
-                    {% set existingPostalHtml %}
-                        {{ govukWarningText({
-                            text: "This person already has a postal address. Saving this will replace the existing one.",
-                            iconFallbackText: "Warning",
-                            attributes: { 'data-qa': 'existing-postal-warning' }
-                        }) }}
-                    {% endset %}
-
-                    {% set neitherHtml %}
-                        {{ govukWarningText({
-                            text: "Addresses not marked as primary or postal will not show on the personal page.",
-                            iconFallbackText: "Warning"
-                        }) }}
-                    {% endset %}
-
-                    {{ govukCheckboxes({
-                        name: "primaryOrPostal",
-                        fieldset: {
-                            id: "primaryOrPostal",
-                            legend: {
-                                html: addressHtml,
-                                isPageHeading: true,
-                                classes: "govuk-fieldset__legend--l"
-                            }
-                        },
-                        hint: {
-                            text: "Select all that apply"
-                        },
-                        items: [
-                            {
-                                value: "primary",
-                                text: "Primary address",
-                                conditional: {
-                                    html: existingPrimaryHtml
-                                } if existingPrimary
-                            },
-                            {
-                                value: "postal",
-                                text: "Postal address",
-                                conditional: {
-                                    html: existingPostalHtml
-                                }  if existingPostal
-                            },
-                            {
-                                divider: "or"
-                            },
-                            {
-                                value: "neither",
-                                text: "Neither primary or postal address",
-                                behaviour: "exclusive",
-                                conditional: {
-                                    html: neitherHtml
-                                }
-                            }
-                        ],
-                        errorMessage: errors | findError('primaryOrPostal')
-                    }) }}
-
-                    <div class="govuk-button-group">
-                        {{ govukButton({
-                            text: "Save",
-                            type: "submit",
-                            preventDoubleClick: true,
-                            attributes: { "data-qa": "submit-button" }
-                        }) }}
-                        <a href="/prisoner/{{ prisonerNumber }}/personal#addresses"
-                           class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    {% endblock %}
+{% set insetAddressHtml %}
+<div class="address-summary">
+  {% if address.subBuildingName %}
+    <p class="govuk-!-static-margin-0">{{ address.subBuildingName }}</p>
+  {% endif %}
+  {% if address.buildingName %}
+    <p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>
+  {% endif %}
+  {% if address.thoroughfareName %}
+    <p class="govuk-!-static-margin-0">{% if address.buildingNumber %}{{ address.buildingNumber }} {% endif %}{{ address.thoroughfareName }}</p>
+  {% endif %}
+  {% if address.dependantLocality %}
+    <p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>
+  {% endif %}
+  {% if address.city %}
+    <p class="govuk-!-static-margin-0">{{ address.city }}</p>
+  {% endif %}
+  {% if address.county %}
+    <p class="govuk-!-static-margin-0">{{ address.county }}</p>
+  {% endif %}
+  {% if address.postCode %}
+    <p class="govuk-!-static-margin-0">{{ address.postCode }}</p>
+  {% endif %}
+  {% if address.country %}
+    <p class="govuk-!-static-margin-0">{{ address.country }}</p>
+  {% endif %}
+</div>
+{% endset %}
+{% set addressHtml %}
+<h1 class="govuk-heading-l">{{ formTitle }}</h1>
+{{ govukInsetText({
+  html: insetAddressHtml,
+  classes: 'govuk-!-static-margin-2'
+}) }}
+{% endset %}
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {% set existingPrimaryHtml %}
+    {{ govukWarningText({
+      text: "This person already has a primary address. Saving this will replace the existing one.",
+      iconFallbackText: "Warning",
+      attributes: { 'data-qa': 'existing-primary-warning' }
+    }) }}
+    {% endset %}
+    {% set existingPostalHtml %}
+    {{ govukWarningText({
+      text: "This person already has a postal address. Saving this will replace the existing one.",
+      iconFallbackText: "Warning",
+      attributes: { 'data-qa': 'existing-postal-warning' }
+    }) }}
+    {% endset %}
+    {% set neitherHtml %}
+    {{ govukWarningText({
+      text: "Addresses not marked as primary or postal will not show on the personal page.",
+      iconFallbackText: "Warning"
+    }) }}
+    {% endset %}
+    {{ govukCheckboxes({
+      name: "primaryOrPostal",
+      fieldset: {
+        id: "primaryOrPostal",
+        legend: {
+          html: addressHtml,
+          isPageHeading: true,
+          classes: "govuk-fieldset__legend--l"
+        }
+      },
+      hint: {
+        text: "Select all that apply"
+      },
+      items: [
+        {
+          value: "primary",
+          text: "Primary address",
+          conditional: {
+            html: existingPrimaryHtml
+          } if existingPrimary
+        },
+        {
+          value: "postal",
+          text: "Postal address",
+          conditional: {
+            html: existingPostalHtml
+          }  if existingPostal
+        },
+        {
+          divider: "or"
+        },
+        {
+          value: "neither",
+          text: "Neither primary or postal address",
+          behaviour: "exclusive",
+          conditional: {
+            html: neitherHtml
+          }
+        }
+      ],
+      errorMessage: errors | findError('primaryOrPostal')
+    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Save",
+        type: "submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#addresses"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="cancel-link">Cancel</a>
+    </div>
+  </form>
 {% endblock %}

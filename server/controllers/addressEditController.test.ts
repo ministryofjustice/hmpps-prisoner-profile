@@ -135,7 +135,7 @@ describe('Address Edit Controller', () => {
           prisonerNumber,
           manualEntryUrl: '/prisoner/G6123VU/personal/add-uk-address',
           cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
-          backLink: 'where-is-address',
+          backLinkUrl: 'where-is-address',
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
         })
@@ -200,7 +200,7 @@ describe('Address Edit Controller', () => {
           prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
-          backLink: `/prisoner/${prisonerNumber}/personal/find-uk-address`,
+          backLinkUrl: `/prisoner/${prisonerNumber}/personal/find-uk-address`,
           cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
           enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/where-is-address`,
           confirmPrimaryOrPostalAddress: true,
@@ -294,7 +294,7 @@ describe('Address Edit Controller', () => {
           prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
           miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
-          backLink: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+          backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
@@ -472,13 +472,13 @@ describe('Address Edit Controller', () => {
 
     describe('Rendering the page', () => {
       test.each`
-        addressLocation                     | auditPage                               | uk       | noFixedAddress | noFixedAddressOption | backLink
+        addressLocation                     | auditPage                               | uk       | noFixedAddress | noFixedAddressOption | backLinkUrl
         ${AddressLocation.uk}               | ${Page.EditAddressUkManual}             | ${true}  | ${false}       | ${false}             | ${'find-uk-address'}
         ${AddressLocation.no_fixed_address} | ${Page.EditAddressNoFixedAddressManual} | ${true}  | ${true}        | ${false}             | ${'where-is-address'}
         ${AddressLocation.overseas}         | ${Page.EditAddressOverseasManual}       | ${false} | ${false}       | ${true}              | ${'where-is-address'}
       `(
-        `Location: '$addressLocation', audit: '$auditPage', uk: '$uk', noFixedAddress: '$noFixedAddress', noFixedAddressOption: '$noFixedAddressOption', backLink: '$backLink'`,
-        async ({ addressLocation, auditPage, uk, noFixedAddress, noFixedAddressOption, backLink }) => {
+        `Location: '$addressLocation', audit: '$auditPage', uk: '$uk', noFixedAddress: '$noFixedAddress', noFixedAddressOption: '$noFixedAddressOption', backLinkUrl: '$backLink'`,
+        async ({ addressLocation, auditPage, uk, noFixedAddress, noFixedAddressOption, backLinkUrl }) => {
           await controller.displayManualEditAddress({ addressLocation, auditPage, formTitlePrefix, pageTitlePrefix })(
             req,
             res,
@@ -496,7 +496,7 @@ describe('Address Edit Controller', () => {
             ukAddress: uk,
             noFixedAddress,
             noFixedAddressCheckbox: noFixedAddressOption,
-            backLink,
+            backLinkUrl,
             cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
             prisonerNumber,
             breadcrumbPrisonerName: 'Saunders, John',

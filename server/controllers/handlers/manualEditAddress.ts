@@ -67,7 +67,7 @@ export function displayManualEditAddressHandler(
       noFixedAddress: addressLocation === AddressLocation.no_fixed_address,
       noFixedAddressCheckbox: addressLocation === AddressLocation.overseas,
       breadcrumbPrisonerName: prisonerName,
-      backLink: `${backLink}${query}`,
+      backLinkUrl: `${backLink}${query}`,
       cancelLink: `/prisoner/${prisonerNumber}/personal#${cancelAnchor}`,
       prisonerNumber,
       miniBannerData: {

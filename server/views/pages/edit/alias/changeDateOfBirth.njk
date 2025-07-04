@@ -1,112 +1,67 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
-
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: miniBannerData.prisonerName,
-        href: "/prisoner/" + miniBannerData.prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + miniBannerData.prisonerNumber + "/personal"
-    }
-] %}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-    {% block body %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-        </div>
-
-        {{ nomisLockedWarning(isLocked) }}
-
-        {% if errors.length > 0 %}
-            {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            }) }}
-        {% endif %}
-
-        <div class="hmpps-name-change govuk-grid-row">
-            <div class="govuk-grid-column-three-quarters">
-                <form method="post" novalidate="novalidate" autocomplete="off">
-                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-                    {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else '' %}
-                    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else '' %}
-                    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else '' %}
-
-                    {{ govukDateInput({
-                        id: "dateOfBirth",
-                        namePrefix: "dateOfBirth",
-                        fieldset: {
-                            legend: {
-                                text: "Date of birth",
-                                isPageHeading: true,
-                                classes: "govuk-fieldset__legend--l"
-                            }
-                        },
-                        hint: {
-                            text: "For example, 31 8 1980"
-                        },
-                        items: [
-                            {
-                                name: "day",
-                                attributes: { maxlength: 2 },
-                                classes: "govuk-input--width-2" + dayErrorClass,
-                                value: formValues['dateOfBirth-day']
-                            },
-                            {
-                                name: "month",
-                                attributes: { maxlength: 2 },
-                                classes: "govuk-input--width-2" + monthErrorClass,
-                                value: formValues['dateOfBirth-month']
-                            },
-                            {
-                                name: "year",
-                                attributes: { maxlength: 4 },
-                                classes: "govuk-input--width-4" + yearErrorClass,
-                                value: formValues['dateOfBirth-year']
-                            }
-                        ],
-                        value: formValues.dateOfBirth,
-                        errorMessage: (errors | findError('dateOfBirth'))
-                            or (errors | findError('dateOfBirth-day'))
-                            or (errors | findError('dateOfBirth-month'))
-                            or (errors | findError('dateOfBirth-year'))
-                    }) }}
-
-                    {{ govukWarningText({
-                        text: warningText,
-                        iconFallbackText: "Warning",
-                        classes: "govuk-body-s"
-                    }) }}
-
-                    <div class="govuk-button-group">
-                        {{ govukButton({
-                            text: "Save",
-                            type: "submit",
-                            preventDoubleClick: true,
-                            attributes: { "data-qa": "edit-submit-button" }
-                        }) }}
-                        <a href="/prisoner/{{ miniBannerData.prisonerNumber }}/personal#personal-details"
-                           class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    {% endblock %}
+{% extends "../editPage.njk" %}
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else '' %}
+    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else '' %}
+    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else '' %}
+    {{ govukDateInput({
+      id: "dateOfBirth",
+      namePrefix: "dateOfBirth",
+      fieldset: {
+        legend: {
+          text: "Date of birth",
+          isPageHeading: true,
+          classes: "govuk-fieldset__legend--l"
+        }
+      },
+      hint: {
+        text: "For example, 31 8 1980"
+      },
+      items: [
+        {
+          name: "day",
+          attributes: { maxlength: 2 },
+          classes: "govuk-input--width-2" + dayErrorClass,
+          value: formValues['dateOfBirth-day']
+        },
+        {
+          name: "month",
+          attributes: { maxlength: 2 },
+          classes: "govuk-input--width-2" + monthErrorClass,
+          value: formValues['dateOfBirth-month']
+        },
+        {
+          name: "year",
+          attributes: { maxlength: 4 },
+          classes: "govuk-input--width-4" + yearErrorClass,
+          value: formValues['dateOfBirth-year']
+        }
+      ],
+      value: formValues.dateOfBirth,
+      errorMessage: (errors | findError('dateOfBirth'))
+        or (errors | findError('dateOfBirth-day'))
+        or (errors | findError('dateOfBirth-month'))
+        or (errors | findError('dateOfBirth-year'))
+    }) }}
+    {{ govukWarningText({
+      text: warningText,
+      iconFallbackText: "Warning",
+      classes: "govuk-body-s"
+    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({
+          text: "Save",
+          type: "submit",
+          preventDoubleClick: true,
+          attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ miniBannerData.prisonerNumber }}/personal#personal-details"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
+    </div>
+  </form>
 {% endblock %}

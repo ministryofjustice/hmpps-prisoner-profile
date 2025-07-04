@@ -120,7 +120,7 @@ export default class AddressEditController {
         existingPostal: !!existingAddresses.find(a => a.postalAddress),
         errors,
         prisonerNumber,
-        backLink: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData: { prisonerNumber, prisonerName },
       })

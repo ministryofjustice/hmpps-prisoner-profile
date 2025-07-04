@@ -808,7 +808,7 @@ describe('Alias Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
         pageTitle: `${description} - Prisoner personal details`,
-        backLink: '/prisoner/G6123VU/personal/ethnic-group',
+        backLinkUrl: '/prisoner/G6123VU/personal/ethnic-group',
         formTitle: `Which of the following best describes John Saunders’ ${headingDescription} background?`,
         breadcrumbPrisonerName: 'Saunders, John',
         prisonerNumber: 'G6123VU',

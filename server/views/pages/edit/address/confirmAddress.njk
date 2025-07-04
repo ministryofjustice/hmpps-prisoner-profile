@@ -1,81 +1,63 @@
-{% extends "../../../partials/layout.njk" %}
+{% extends "../editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + prisonerNumber + "/personal"
-    }
-] %}
-{% set mainClasses = 'govuk-body' %}
-
-{% block content %}
-
-    {% block body %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-        </div>
-
-        {{ govukBackLink({
-            text: "Back",
-            href: backLink,
-            attributes: { 'data-qa': 'back-link' },
-            classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
-        }) }}
-
-        <h1 class="govuk-heading-l">{{ formTitle }}</h1>
-
-        {% set addressHtml %}
-            <div class="address-summary">
-                {% if address.subBuildingName %}<p class="govuk-!-static-margin-0">{{ address.subBuildingName }}</p>{% endif %}
-                {% if address.buildingName %}<p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>{% endif %}
-                {% if address.thoroughfareName %}<p class="govuk-!-static-margin-0">{% if address.buildingNumber %}{{ address.buildingNumber }}{% endif %} {{ address.thoroughfareName }}</p>{% endif %}
-                {% if address.dependantLocality %}<p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>{% endif %}
-                {% if address.city %}<p class="govuk-!-static-margin-0">{{ address.city }}</p>{% endif %}
-                {% if address.county %}<p class="govuk-!-static-margin-0">{{ address.county }}</p>{% endif %}
-                {% if address.postCode %}<p class="govuk-!-static-margin-0">{{ address.postCode }}</p>{% endif %}
-                {% if address.country %}<p class="govuk-!-static-margin-0">{{ address.country }}</p>{% endif %}
-            </div>
-        {% endset %}
-
-        {{ govukInsetText({
+{% set addressHtml %}
+<div class="address-summary">
+  {% if address.subBuildingName %}
+    <p class="govuk-!-static-margin-0">{{ address.subBuildingName }}</p>
+  {% endif %}
+  {% if address.buildingName %}
+    <p class="govuk-!-static-margin-0">{{ address.buildingName }}</p>
+  {% endif %}
+  {% if address.thoroughfareName %}
+    <p class="govuk-!-static-margin-0">
+      {% if address.buildingNumber %}{{ address.buildingNumber }} {% endif %}{{ address.thoroughfareName }}
+    </p>
+  {% endif %}
+  {% if address.dependantLocality %}
+    <p class="govuk-!-static-margin-0">{{ address.dependantLocality }}</p>
+  {% endif %}
+  {% if address.city %}
+    <p class="govuk-!-static-margin-0">{{ address.city }}</p>
+  {% endif %}
+  {% if address.county %}
+    <p class="govuk-!-static-margin-0">{{ address.county }}</p>
+  {% endif %}
+  {% if address.postCode %}
+    <p class="govuk-!-static-margin-0">{{ address.postCode }}</p>
+  {% endif %}
+  {% if address.country %}
+    <p class="govuk-!-static-margin-0">{{ address.country }}</p>
+  {% endif %}
+</div>
+{% endset %}
+{% block form %}
+  <h1 class="govuk-heading-l">{{ formTitle }}</h1>
+  {{ govukInsetText({
             html: addressHtml
         }) }}
-
-        <form method="post" novalidate="novalidate" autocomplete="off">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-
-            <div class="govuk-button-group">
-                {% if confirmPrimaryOrPostalAddress %}
-                    <a href="/prisoner/{{ prisonerNumber }}/personal/primary-or-postal-address?address={{ address.cacheId }}"
-                       class="govuk-button" data-qa="use-this-address-button">Use this address</a>
-                {% else %}
-                    {{ govukButton({
-                        text: "Save and return to the profile",
-                        type: "submit",
-                        preventDoubleClick: true,
-                        attributes: { "data-qa": "submit-button" }
-                    }) }}
-                {% endif %}
-                <a href="{{ cancelLink }}"
-                   class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
-            </div>
-        </form>
-
-        <a href="{{ enterDifferentAddressLink }}" class="govuk-link govuk-link--no-visited-state">
-            Enter a different address
-        </a>
-    {% endblock %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <div class="govuk-button-group">
+      {% if confirmPrimaryOrPostalAddress %}
+        <a
+          href="/prisoner/{{ prisonerNumber }}/personal/primary-or-postal-address?address={{ address.cacheId }}"
+          class="govuk-button"
+          data-qa="use-this-address-button">Use this address</a>
+      {% else %}
+        {{ govukButton({
+          text: "Save and return to the profile",
+          type: "submit",
+          preventDoubleClick: true,
+          attributes: { "data-qa": "submit-button" }
+        }) }}
+      {% endif %}
+      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
+    </div>
+  </form>
+  <a href="{{ enterDifferentAddressLink }}" class="govuk-link govuk-link--no-visited-state">
+    Enter a different address
+  </a>
 {% endblock %}

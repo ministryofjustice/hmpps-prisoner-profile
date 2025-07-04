@@ -1,98 +1,45 @@
-{% extends "../index.njk" %}
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% extends "./editPage.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
-{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
-
-{% set hideBackLink = true %}
-{%
-  set breadCrumbs = [
-    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
-    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
-  ]
-%}
-{% block body %}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-  </div>
-
-  {{ nomisLockedWarning(isLocked) }}
-
-  {% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {{
-          govukErrorSummary({
-              titleText: "There is a problem",
-              errorList: errors,
-              attributes: { 'data-qa-errors': true },
-              classes: 'govuk-!-margin-bottom-6'
-          })
-        }}
-      </div>
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {% call govukFieldset({
+          legend: {
+            text: "Height",
+            classes: "govuk-fieldset__legend--l",
+            isPageHeading: true
+          }
+        }) %}
+      {{ govukInput({
+        label: {
+          text: "Centimetres"
+        },
+        id: "height",
+        name: "editField",
+        value: fieldValue,
+        classes: "govuk-input--width-3",
+        errorMessage: { text: errors[0].text } if errors.length > 0
+      }) }}
+      {% endcall %}
     </div>
-  {% endif %}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
-      <form method="post" novalidate="novalidate" autocomplete="off">
-        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          {%
-            call govukFieldset({
-              legend: {
-                text: "Height",
-                classes: "govuk-fieldset__legend--l",
-                isPageHeading: true
-              }
-            })
-          %}
-            {{
-              govukInput({
-                label: {
-                  text: "Centimetres"
-                },
-                id: "height",
-                name: "editField",
-                value: fieldValue,
-                classes: "govuk-input--width-3",
-                errorMessage: { text: errors[0].text } if errors.length > 0
-              })
-            }}
-          {% endcall %}
-        </div>
-        <p class="govuk-body">
-          <a
-            class="govuk-link"
-            data-qa="switch-units"
-            href="/prisoner/{{ prisonerNumber }}/personal/height/imperial"
-          >
-            Switch to feet and inches
-          </a>
-        </p>
-        <div class="govuk-button-group">
-          {{
-            govukButton({
-            text: "Save",
-            type: "submit",
-            preventDoubleClick: true,
-            attributes: { "data-qa": "edit-submit-button" }
-            })
-          }}
-          <a
-            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
-            class="govuk-link govuk-link--no-visited-state"
-            data-qa="edit-cancel-button"
-            >Cancel</a
-          >
-        </div>
-      </form>
+    <p class="govuk-body">
+      <a class="govuk-link" data-qa="switch-units" href="/prisoner/{{ prisonerNumber }}/personal/height/imperial">
+        Switch to feet and inches
+      </a>
+    </p>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Save",
+        type: "submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
     </div>
-  </div>
+  </form>
 {% endblock %}

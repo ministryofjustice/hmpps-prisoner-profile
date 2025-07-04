@@ -72,7 +72,7 @@ export function displayConfirmAddressHandler(
       },
       prisonerNumber,
       confirmPrimaryOrPostalAddress,
-      backLink: `/prisoner/${prisonerNumber}/personal/${route}`,
+      backLinkUrl: `/prisoner/${prisonerNumber}/personal/${route}`,
       cancelLink: `/prisoner/${prisonerNumber}/personal#${cancelAnchor}`,
       enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/${enterDifferentAddressAnchor}`,
       breadcrumbPrisonerName: prisonerName,
