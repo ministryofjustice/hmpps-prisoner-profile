@@ -49,14 +49,21 @@ export default class AddressService {
 
     return (
       addresses
-        ?.map(
-          address =>
-            ({
-              ...address,
-              addressTypes: address.addressTypes.filter(type => type.active),
-              addressPhoneNumbersForDisplay: transformPhones(address.addressPhoneNumbers, phoneTypes),
-            }) as AddressForDisplay,
-        )
+        ?.map(address => {
+          const buildingNameIsTheBuildingNumber =
+            !address.buildingNumber && /^[0-9]+$/.test(address.buildingName?.trim())
+
+          const buildingNumber = buildingNameIsTheBuildingNumber ? address.buildingName : address.buildingNumber
+          const buildingName = buildingNameIsTheBuildingNumber ? null : address.buildingName
+
+          return {
+            ...address,
+            buildingNumber,
+            buildingName,
+            addressTypes: address.addressTypes.filter(type => type.active),
+            addressPhoneNumbersForDisplay: transformPhones(address.addressPhoneNumbers, phoneTypes),
+          } as AddressForDisplay
+        })
         ?.filter(address => !address.toDate || new Date(address.toDate) > new Date())
         .sort(a => (a.primaryAddress ? -1 : 1)) || []
     )
