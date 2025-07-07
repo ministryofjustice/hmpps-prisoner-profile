@@ -140,6 +140,7 @@ export default class PersonalController {
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
+        prisonerIsInCaseload: prisonerData.prisonId === activeCaseLoadId,
       })
     }
   }
