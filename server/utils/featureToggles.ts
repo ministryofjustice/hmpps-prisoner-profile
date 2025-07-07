@@ -9,9 +9,7 @@ export const dietAndAllergyEnabled = (activeCaseLoadId: string) =>
   (isAfter(Date.now(), config.featureToggles.dietAndAllergyEnabledPrisonsFrom) &&
     config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes(activeCaseLoadId))
 
-export const militaryHistoryEnabled = () =>
-  config.featureToggles.militaryHistoryEnabledFrom &&
-  isAfter(Date.now(), config.featureToggles.militaryHistoryEnabledFrom)
+export const militaryHistoryEnabled = () => true
 
 export const editReligionEnabled = () => true
 
