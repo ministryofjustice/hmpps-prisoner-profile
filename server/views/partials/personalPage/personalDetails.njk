@@ -245,7 +245,7 @@
           </dl>
       {% endif %}
 
-      {% if militaryHistoryEnabled and militaryRecords.length === 0 %}
+      {% if militaryHistoryEnabled and militaryRecords.length === 0 and prisonerIsInCaseload %}
         <h3 class="govuk-!-font-size-24 govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
         <div class="govuk-!-margin-bottom-4">
           <a href="/prisoner/{{ prisonerNumber }}/personal/military-service-information" class="govuk-link govuk-link--no-visited-state"
