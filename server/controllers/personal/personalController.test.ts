@@ -3500,7 +3500,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/email-addresses/234')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
         })
 
         it('Sends a post success audit event', async () => {
@@ -3826,7 +3826,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/phone-numbers/123')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
         })
 
         it('Sends a post success audit event', async () => {
