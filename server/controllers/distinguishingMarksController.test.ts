@@ -384,7 +384,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType,
-        refererUrl: `/prisoner/A12345/personal/${markType}/100`,
+        backLinkUrl: `/prisoner/A12345/personal/${markType}/100`,
         selected: 'left-leg',
         verifiedSelection: 'leftLeg',
       })
@@ -403,7 +403,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType: 'tattoo',
-        refererUrl: '/prisoner/A12345/personal/tattoo/100',
+        backLinkUrl: '/prisoner/A12345/personal/tattoo/100',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
       })
@@ -545,7 +545,7 @@ describe('Distinguishing Marks Controller', () => {
         markType,
         bodyPart: 'leftLeg',
         specificBodyPart: 'leftLeg',
-        refererUrl: `/prisoner/A12345/personal/${markType}/100/body-part?selected=left-leg`,
+        backLinkUrl: `/prisoner/A12345/personal/${markType}/100/body-part?selected=left-leg`,
         cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
       })
     })
@@ -565,7 +565,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
-        refererUrl: `/prisoner/A12345/personal/tattoo/100`,
+        backLinkUrl: `/prisoner/A12345/personal/tattoo/100`,
         cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
       })
     })
@@ -676,7 +676,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType,
         formValues: { description: 'Comment' },
-        refererUrl: `/prisoner/A12345/personal/${markType}/100`,
+        backLinkUrl: `/prisoner/A12345/personal/${markType}/100`,
       })
     })
 
@@ -695,7 +695,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         formValues: { description: 'Horrible arm scar' },
-        refererUrl: `/prisoner/A12345/personal/tattoo/100`,
+        backLinkUrl: `/prisoner/A12345/personal/tattoo/100`,
       })
     })
 
@@ -799,7 +799,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType,
         photoHtml,
-        refererUrl: `/prisoner/A12345/personal/${markType}/100`,
+        backLinkUrl: `/prisoner/A12345/personal/${markType}/100`,
         upload: false,
       })
     })
@@ -827,7 +827,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         photoHtml,
-        refererUrl: `/prisoner/A12345/personal/tattoo/100`,
+        backLinkUrl: `/prisoner/A12345/personal/tattoo/100`,
         upload: false,
       })
     })
@@ -932,7 +932,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType,
-        refererUrl: `/prisoner/A12345/personal/${markType}/100`,
+        backLinkUrl: `/prisoner/A12345/personal/${markType}/100`,
         upload: false,
       })
     })
@@ -954,7 +954,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType: 'tattoo',
-        refererUrl: `/prisoner/A12345/personal/tattoo/100`,
+        backLinkUrl: `/prisoner/A12345/personal/tattoo/100`,
         upload: false,
       })
     })

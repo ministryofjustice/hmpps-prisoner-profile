@@ -198,13 +198,13 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const backLinkUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     return res.render('pages/distinguishingMarks/changeBodyPart', {
       markType,
       selected,
       verifiedSelection,
-      refererUrl,
+      backLinkUrl,
     })
   }
 
@@ -278,14 +278,14 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
-    const refererUrl = `${cancelUrl}${referer === 'body-part' ? `/body-part?selected=${bodyPart}` : ''}`
+    const backLinkUrl = `${cancelUrl}${referer === 'body-part' ? `/body-part?selected=${bodyPart}` : ''}`
 
     return res.render('pages/distinguishingMarks/changeLocation', {
       markId,
       markType,
       bodyPart: verifiedBodyPart,
       ...(bodyPartChanged ? {} : { specificBodyPart }),
-      refererUrl,
+      backLinkUrl,
       cancelUrl,
     })
   }
@@ -341,7 +341,7 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const backLinkUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     const formValues = res.locals.formValues ?? {
       description: mark.comment,
@@ -351,7 +351,7 @@ export default class DistinguishingMarksController {
       markId,
       markType,
       formValues,
-      refererUrl,
+      backLinkUrl,
     })
   }
 
@@ -407,7 +407,7 @@ export default class DistinguishingMarksController {
       ? `<img src="/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
       : null
 
-    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const backLinkUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     await this.auditService.sendPageView({
       user: res.locals.user,
@@ -421,7 +421,7 @@ export default class DistinguishingMarksController {
       markId,
       markType,
       photoHtml,
-      refererUrl,
+      backLinkUrl,
       upload,
     })
   }
@@ -434,7 +434,7 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
-    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const backLinkUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     await this.auditService.sendPageView({
       user: res.locals.user,
@@ -447,7 +447,7 @@ export default class DistinguishingMarksController {
     return res.render('pages/distinguishingMarks/addPhoto', {
       markId,
       markType,
-      refererUrl,
+      backLinkUrl,
       upload,
     })
   }

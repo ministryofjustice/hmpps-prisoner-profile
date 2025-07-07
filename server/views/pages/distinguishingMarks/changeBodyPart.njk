@@ -1,4 +1,4 @@
-{% extends "../index.njk" %}
+{% extends "../edit/editPage.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -6,29 +6,11 @@
 
 {% set pageTitle =  "Change body part - Prisoner personal details" %}
 
-{% block body %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
-    </div>
-</div>
-
 {% if errors.length > 0 %}
     {%  set selected = "" %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-            govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true },
-                classes: 'govuk-!-margin-bottom-6'
-            })
-            }}
-        </div>
-    </div>
 {% endif %}
 
+{% block form %}
 <span class="govuk-caption-l">Distinguishing marks</span>
 <h1 class='govuk-!-margin-top-0'>Change where the {{ markType }} is</h1>
 
@@ -72,7 +54,7 @@
 
     <div class="govuk-button-group">
         {{ govukButton({ text: "Save and continue", type: "submit" }) }}
-        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+        <a href="{{ backLinkUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
     </div>
 </form>
 
