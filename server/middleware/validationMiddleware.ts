@@ -1,4 +1,4 @@
-import { RequestHandler, Request } from 'express'
+import { Request, RequestHandler } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'

@@ -38,6 +38,7 @@ import personalRouter from './personalRouter'
 import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import checkIfKeyWorkerAtPrison from '../middleware/checkIfKeyWorkerAtPrison'
+import editRouter from './editRouter'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -225,6 +226,7 @@ export default function routes(services: Services): Router {
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
   router.use(personalRouter(services))
+  router.use(editRouter(services))
   router.use(imageRouter(services))
 
   get(

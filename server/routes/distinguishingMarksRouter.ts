@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -13,11 +14,22 @@ import {
   updatePhotoValidator,
 } from '../validators/personal/distinguishingMarksValidator'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../utils/featureToggles'
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
+
+  // Common feature flag and permission guard:
+  router.use(
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
+    }),
+  )
 
   // Define valid body parts
   const validBodyParts =
