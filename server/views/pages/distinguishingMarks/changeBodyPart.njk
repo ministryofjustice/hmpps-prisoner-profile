@@ -21,7 +21,7 @@
 
     <div id="body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
 
-        <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
+        <p data-qa='explanation-text'>You can only select one body part at a time.</p>
 
         {% if errors.length > 0 %}
             <p id="body-part-selection-error" class="govuk-error-message">
@@ -54,7 +54,7 @@
 
     <div class="govuk-button-group">
         {{ govukButton({ text: "Save and continue", type: "submit" }) }}
-        <a href="{{ backLinkUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+        <a href="{{ cancelUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
     </div>
 </form>
 

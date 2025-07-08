@@ -117,8 +117,8 @@ const bodyPartConfig: Record<BodyPartSelection, BodyPartConfig> = {
     title: 'Add front and side %s details',
     specificParts: [
       { name: 'frontTorso', desc: 'Front', hint: 'The abdomen, chest or pelvis.' },
-      { name: 'rightTorso', desc: 'Right side', hint: 'The left side of the abdomen, chest or pelvis.' },
-      { name: 'leftTorso', desc: 'Left side', hint: 'The right side of the abdomen, chest or pelvis.' },
+      { name: 'rightTorso', desc: 'Right side', hint: 'The right side of the abdomen, chest or pelvis.' },
+      { name: 'leftTorso', desc: 'Left side', hint: 'The left side of the abdomen, chest or pelvis.' },
     ],
   },
 }
