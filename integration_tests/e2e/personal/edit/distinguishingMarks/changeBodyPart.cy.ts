@@ -53,12 +53,7 @@ context('Change body part', () => {
       page.miniBanner().name().should('contain.text', prisonerNumber)
 
       page.h1().should('contain.text', 'Change where the tattoo is')
-      page
-        .explanationText()
-        .should(
-          'contain.text',
-          'You can only select one body part at a time. You can add more tattoos for this person later.',
-        )
+      page.explanationText().should('contain.text', 'You can only select one body part at a time.')
 
       page.selectionDescription().should('contain.text', 'Front and sides selected')
     })
@@ -69,12 +64,7 @@ context('Change body part', () => {
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the scar is')
 
       page.h1().should('contain.text', 'Change where the scar is')
-      page
-        .explanationText()
-        .should(
-          'contain.text',
-          'You can only select one body part at a time. You can add more scars for this person later.',
-        )
+      page.explanationText().should('contain.text', 'You can only select one body part at a time.')
 
       page.selectionDescription().should('contain.text', 'Left arm selected')
     })
@@ -85,12 +75,7 @@ context('Change body part', () => {
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
       page.h1().should('contain.text', 'Change where the mark is')
-      page
-        .explanationText()
-        .should(
-          'contain.text',
-          'You can only select one body part at a time. You can add more marks for this person later.',
-        )
+      page.explanationText().should('contain.text', 'You can only select one body part at a time.')
 
       page.selectionDescription().should('contain.text', 'Left leg selected')
     })
