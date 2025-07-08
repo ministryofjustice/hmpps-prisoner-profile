@@ -19,7 +19,7 @@ context('Change phone number', () => {
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonIntegrationUpdateContact', { prisonerNumber, contactId: '1' })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/phone-numbers/1`,
+    editUrl: `prisoner/${prisonerNumber}/personal/change-phone-number/1`,
     validInputs: [
       { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '1234321', phoneExtension: '123' } },
       { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123) 123 123', phoneExtension: '123' } },

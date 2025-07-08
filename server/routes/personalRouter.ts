@@ -522,7 +522,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'phone-numbers/:phoneNumberId',
+    path: 'change-phone-number/:phoneNumberId',
     edit: {
       audit: Page.EditPhoneNumber,
       method: personalController.globalNumbers().edit.edit,
@@ -533,7 +533,7 @@ export default function personalRouter(services: Services): Router {
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
-        redirectTo: ({ phoneNumberId }) => `personal/phone-numbers/${phoneNumberId}`,
+        redirectTo: ({ phoneNumberId }) => `personal/change-phone-number/${phoneNumberId}`,
       },
     },
   })
@@ -556,7 +556,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'email-addresses/:emailAddressId',
+    path: 'change-email-address/:emailAddressId',
     edit: {
       audit: Page.EditEmailAddress,
       method: personalController.globalEmails().edit.edit,
@@ -567,7 +567,7 @@ export default function personalRouter(services: Services): Router {
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
-        redirectTo: ({ emailAddressId }) => `personal/email-addresses/${emailAddressId}`,
+        redirectTo: ({ emailAddressId }) => `personal/change-email-address/${emailAddressId}`,
       },
     },
   })

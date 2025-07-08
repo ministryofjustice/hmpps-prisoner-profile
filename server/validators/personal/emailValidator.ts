@@ -7,13 +7,15 @@ export const emailValidator = (body: Record<string, string>): HmppsError[] => {
     return [{ text: 'Enter an email address', href: '#emailAddress' }]
   }
 
+  const errors = []
+
   if (!(emailAddress.length <= 240)) {
-    return [{ text: 'Email address must be 240 characters or less', href: '#emailAddress' }]
+    errors.push({ text: 'Email address must be 240 characters or less', href: '#emailAddress' })
   }
 
   if (!emailAddress.includes('@')) {
-    return [{ text: 'Email address must include an @ symbol', href: '#emailAddress' }]
+    errors.push({ text: 'Email address must include an @ symbol', href: '#emailAddress' })
   }
 
-  return []
+  return errors
 }

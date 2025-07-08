@@ -295,7 +295,7 @@ export const changeEmailAddressTextFieldData = (
   },
 ): TextFieldData => ({
   ...baseEmailAddressTextFieldData,
-  url: `email-addresses/${id}`,
+  url: `change-email-address/${id}`,
   pageTitle: `Change this person’s email address`,
   formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
   auditEditPageLoad: Page.EditEmailAddress,
@@ -336,5 +336,5 @@ export const changePhoneNumberFieldData = (id: string, name: { firstName: string
   auditEditPostAction: PostAction.EditPhoneNumber,
   formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
   pageTitle: `Change this person’s phone number`,
-  url: `phone-numbers/${id}`,
+  url: `change-phone-number/${id}`,
 })

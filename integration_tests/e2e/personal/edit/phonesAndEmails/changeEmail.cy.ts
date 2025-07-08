@@ -19,7 +19,7 @@ context('Change email address', () => {
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonIntegrationUpdateContact', { prisonerNumber, contactId: '10' })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/email-addresses/10`,
+    editUrl: `prisoner/${prisonerNumber}/personal/change-email-address/10`,
     validInputs: [{ textInputs: { emailAddress: 'foo@example.com' } }],
     invalidInputs: [
       {
