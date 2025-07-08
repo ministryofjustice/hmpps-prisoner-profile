@@ -1,11 +1,16 @@
 import { Role } from '../../../../../server/data/enums/role'
 import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 context('Find UK Address', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
+
+  before(() => {
+    cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
+  })
 
   editPageTests<EditPage>({
     prisonerNumber,
@@ -19,6 +24,10 @@ context('Find UK Address', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubFindAddressesByFreeTextSearch')
       cy.task('stubFindAddressesByUprn')
+      cy.task('stubPersonalRelationshipsGetReferenceData', {
+        domain: 'CITY',
+        referenceData: [{ code: 'CITY1', description: 'My Post Town', isActive: true }],
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/find-uk-address`,
     editPageWithTitle: EditPage,

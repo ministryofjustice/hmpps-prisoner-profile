@@ -84,7 +84,7 @@ context('Confirm Address Page', () => {
 
   context('Can check and confirm and address', () => {
     beforeEach(() => {
-      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
       page = visitConfirmAddressPage()
     })
 
