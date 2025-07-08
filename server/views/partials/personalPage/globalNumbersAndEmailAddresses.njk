@@ -51,8 +51,8 @@
 <div class="govuk-grid-row" data-qa="addresses">
   <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
     <dl class="govuk-summary-list govuk-summary-list--no-border">
-      {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true }) }}
-      {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.emails.length > 0 else notEnteredTag, "email-addresses", { html: true }) }}
+      {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true, classes: "row-updated" if flashMessage.fieldName === "phoneNumber" else "" }) }}
+      {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.emails.length > 0 else notEnteredTag, "email-addresses", { html: true, classes: "row-updated" if flashMessage.fieldName === "emailAddress" else "" }) }}
     </dl>
   </div>
 </div>
