@@ -285,7 +285,7 @@
                                 errorMessage: errors | findError('cvpRequired'),
                                 fieldset: {
                                     legend: {
-                                        text: "Do you know the link for this video link hearing?",
+                                        text: "Do you know the video link for this hearing?",
                                         classes: "govuk-fieldset__legend--s"
                                     }
                                 },
@@ -320,9 +320,6 @@
                                             text: "Enter guest pin",
                                             classes: 'govuk-label--s'
                                         },
-                                        hint: {
-                                            text: "Some meetings require a guest pin for security reasons"
-                                        },
                                         inputmode: "numeric",
                                         classes: 'govuk-input--width-10',
                                         errorMessage: errors | findError('guestPin'),
@@ -339,6 +336,9 @@
                                             text: "Is a guest pin required?",
                                             classes: "govuk-fieldset__legend--s"
                                         }
+                                    },
+                                    hint: {
+                                        text: "Some meetings require a guest pin for security reasons"
                                     },
                                     items: [
                                         {
