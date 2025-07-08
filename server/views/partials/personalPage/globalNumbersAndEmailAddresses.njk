@@ -15,11 +15,13 @@
           <p class="govuk-body govuk-!-margin-0">Ext: {{ x.extension }}</p>
         {% endif %}
       </div>
-      <div class="hmpps-global-numbers-and-emails__phone__change">
-        <a class="govuk-link govuk-link--no-visited-state" href="personal/change-phone-number/{{ x.id }}">
-          Change
-        </a>
-      </div>
+      {% if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions) %}
+        <div class="hmpps-global-numbers-and-emails__phone__change">
+          <a class="govuk-link govuk-link--no-visited-state" href="personal/change-phone-number/{{ x.id }}">
+            Change
+          </a>
+        </div>
+      {% endif %}
     </div>
   {% endfor %}
 </div>
@@ -31,11 +33,13 @@
       <div class="hmpps-global-numbers-and-emails__email__details">
         <p class="govuk-body govuk-!-margin-0">{{ x.email }}</p>
       </div>
-      <div class="hmpps-global-numbers-and-emails__email__change">
-        <a class="govuk-link govuk-link--no-visited-state" href="personal/change-email-address/{{ x.id }}">
-          Change
-        </a>
-      </div>
+      {% if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions) %}
+        <div class="hmpps-global-numbers-and-emails__email__change">
+          <a class="govuk-link govuk-link--no-visited-state" href="personal/change-email-address/{{ x.id }}">
+            Change
+          </a>
+        </div>
+      {% endif %}
     </div>
   {% endfor %}
 </div>
@@ -44,8 +48,8 @@
   title: "Phone numbers and email addresses", 
   id: "phones-and-emails", 
   actions: [
-    { href: 'personal/add-phone-number', text: 'Add a phone number' }, 
-    { href: 'personal/add-email-address', text: 'Add an email address' }
+    { href: 'personal/add-phone-number', text: 'Add a phone number' } if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions),
+    { href: 'personal/add-email-address', text: 'Add an email address' } if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions)
   ]
 }) -%}
 <div class="govuk-grid-row" data-qa="addresses">
