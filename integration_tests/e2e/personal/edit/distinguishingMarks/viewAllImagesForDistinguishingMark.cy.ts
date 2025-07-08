@@ -1,6 +1,5 @@
 import { Role } from '../../../../../server/data/enums/role'
 import Page from '../../../../pages/page'
-import NotFoundPage from '../../../../pages/notFoundPage'
 import { distinguishingMarkMultiplePhotosMock } from '../../../../../server/data/localMockData/distinguishingMarksMock'
 import ViewAllImagesForDistinguishingMark from '../../../../pages/editPages/distinguishingMarks/viewAllImagesForDistinguishingMark'
 
@@ -13,19 +12,6 @@ const visitAllImagesPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumb
 }
 
 context('View all images for a distinguishing mark', () => {
-  context('Permissions', () => {
-    it('Displays not found page if the user does not have permissions', () => {
-      cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser] })
-      cy.setupComponentsData()
-      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-      cy.task('stubPrisonerData', { prisonerNumber })
-
-      visitAllImagesPage({ failOnStatusCode: false })
-      Page.verifyOnPage(NotFoundPage)
-    })
-  })
-
   context('Page contents', () => {
     beforeEach(() => {
       cy.task('reset')

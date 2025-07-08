@@ -185,7 +185,7 @@
                     dataQa: "nationality",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/nationality",
-                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality),
+                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'nationality'
                   }
                 },
