@@ -23,12 +23,16 @@ export default class AddressEditController {
   ) {}
 
   public displayWhereIsTheAddress(): RequestHandler {
-    return displayWhereIsTheAddressHandler(this.auditService, {
-      pageTitle: 'Where is this person’s address? - Prisoner personal details',
-      formTitle: 'Where is the address?',
-      page: Page.EditAddressLocation,
-      cancelAnchor: 'addresses',
-    })
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { naturalPrisonerName } = getCommonRequestData(req)
+
+      return displayWhereIsTheAddressHandler(this.auditService, {
+        pageTitle: 'Where is this person’s address? - Prisoner personal details',
+        formTitle: `Where is ${apostrophe(naturalPrisonerName)} address?`,
+        page: Page.EditAddressLocation,
+        cancelAnchor: 'addresses',
+      })(req, res, next)
+    }
   }
 
   public submitWhereIsTheAddress(): RequestHandler {

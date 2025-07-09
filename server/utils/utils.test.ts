@@ -340,11 +340,21 @@ describe('utils', () => {
       }
 
       const lines = addressToLines(address)
-      expect(lines[0]).toEqual('7, some premise, street field')
+      expect(lines[0]).toEqual('Flat 7, some premise, street field')
       expect(lines[1]).toEqual('Leeds')
       expect(lines[2]).toEqual('West Yorkshire')
       expect(lines[3]).toEqual('LS1 AAA')
       expect(lines[4]).toEqual('England')
+    })
+
+    it('Does not add Flat prefix if it already exists', () => {
+      const address: OldAddresses['address'] = {
+        flat: 'flat 7',
+        premise: 'some premise',
+        street: 'street field',
+      }
+
+      expect(addressToLines(address)[0]).toEqual('flat 7, some premise, street field')
     })
 
     it('Maps a partial address', () => {
@@ -1155,6 +1165,17 @@ describe('utils', () => {
           postcode: 'AB1 2CD',
         } as PersonalRelationshipsContact,
         'Flat 7, Building Name Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Flat with word flat already present',
+        {
+          flat: 'flat 7',
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'flat 7, Building Name Street Name<br/>City<br/>AB1 2CD',
       ],
       [
         'Full address without flat',

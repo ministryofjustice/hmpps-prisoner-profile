@@ -1,15 +1,18 @@
 {# When including this, ensure you also include the script "fileUploadWithPreview.js" to enable the preview #}
-
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% macro fileUploadWithPreview(fileUploadName) %}
-  <div class="hmpps-file-upload-with-preview">
-    <div id="file-upload" class="hmpps-file-upload-with-preview__upload">
+{% macro fileUploadWithPreview(fileUploadName, options = {}) %}
+  <div data-component="file-upload-with-preview-component" class="hmpps-file-upload-with-preview">
+    <div
+      id="file-upload"
+      class="hmpps-file-upload-with-preview__upload {{ "
+      hmpps-file-upload-with-preview__upload__hidden" if options.initialPhotoUrl else "
+      hmpps-file-upload-with-preview__upload__visible" }}">
       {{ govukFileUpload({
         id: "file",
         name: fileUploadName,
         label: {
           classes: "govuk-!-font-weight-bold",
-          text: "Select an image"
+          text: options.label if options.label else "Select an image"
         },
         hint: {
           text: "The photo must be a JPEG or GIF."
@@ -19,11 +22,15 @@
         }
       }) }}
     </div>
-    <div id="preview-container" class="hmpps-file-upload-with-preview__preview">
+    <div
+      id="preview-container"
+      class="hmpps-file-upload-with-preview__preview {{ "
+      hmpps-file-upload-with-preview__preview__visible" if options.initialPhotoUrl else "
+      hmpps-file-upload-with-preview__preview__hidden" }}">
       <div class="image-preview">
-        <img class="hmpps-file-upload-with-preview__photo" id="preview-image"/>
+        <img class="hmpps-file-upload-with-preview__photo" id="preview-image" src="{{ options.initialPhotoUrl }}" alt="{{ options.initialPhotoAlt }}"/>
         <div class="hmpps-file-upload-with-preview__file-name">
-          <p id="preview-filename" class="govuk-body">File name</p>
+          <p id="preview-filename" class="govuk-body"></p>
         </div>
       </div>
       <div class="hmpps-file-upload-with-preview__change">

@@ -23,6 +23,8 @@ import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage
 import { transformPhones } from '../utils/transformPhones'
 
 const stringContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
+const numericStringRegex = /^[0-9]+$/i
+const buildingNumberAtEndOfStringRegex = /^(.*?),? ([0-9]+)$/i
 
 export default class AddressService {
   private readonly addressMapper: AddressMapper
@@ -50,16 +52,15 @@ export default class AddressService {
     return (
       addresses
         ?.map(address => {
-          const buildingNameIsTheBuildingNumber =
-            !address.buildingNumber && /^[0-9]+$/.test(address.buildingName?.trim())
-
-          const buildingNumber = buildingNameIsTheBuildingNumber ? address.buildingName : address.buildingNumber
-          const buildingName = buildingNameIsTheBuildingNumber ? null : address.buildingName
+          const buildingNumber = this.getBuildingNumberForDisplay(address.buildingNumber, address.buildingName)?.trim()
+          const buildingName = this.getBuildingNameForDisplay(address.buildingNumber, address.buildingName)?.trim()
+          const buildingParts = !address.subBuildingName && buildingName?.split(',')
 
           return {
             ...address,
             buildingNumber,
-            buildingName,
+            subBuildingName: address.subBuildingName || (buildingParts?.length > 1 ? buildingParts[0]?.trim() : null),
+            buildingName: buildingParts?.length > 1 ? buildingParts.slice(1)?.join(',')?.trim() : buildingName,
             addressTypes: address.addressTypes.filter(type => type.active),
             addressPhoneNumbersForDisplay: transformPhones(address.addressPhoneNumbers, phoneTypes),
           } as AddressForDisplay
@@ -67,6 +68,38 @@ export default class AddressService {
         ?.filter(address => !address.toDate || new Date(address.toDate) > new Date())
         .sort(a => (a.primaryAddress ? -1 : 1)) || []
     )
+  }
+
+  private getBuildingNumberForDisplay(buildingNumber: string, buildingName: string) {
+    const buildingNameIsTheBuildingNumber = !buildingNumber && numericStringRegex.test(buildingName?.trim())
+    const buildingNameContainsTheBuildingNumber =
+      !buildingNumber && buildingNumberAtEndOfStringRegex.exec(buildingName?.trim())
+
+    if (buildingNameIsTheBuildingNumber) {
+      return buildingName
+    }
+
+    if (buildingNameContainsTheBuildingNumber) {
+      return buildingNameContainsTheBuildingNumber[2]
+    }
+
+    return buildingNumber
+  }
+
+  private getBuildingNameForDisplay(buildingNumber: string, buildingName: string) {
+    const buildingNameIsTheBuildingNumber = !buildingNumber && numericStringRegex.test(buildingName?.trim())
+    const buildingNameContainsTheBuildingNumber =
+      !buildingNumber && buildingNumberAtEndOfStringRegex.exec(buildingName?.trim())
+
+    if (buildingNameIsTheBuildingNumber) {
+      return null
+    }
+
+    if (buildingNameContainsTheBuildingNumber) {
+      return buildingNameContainsTheBuildingNumber[1]
+    }
+
+    return buildingName
   }
 
   public async createAddress(

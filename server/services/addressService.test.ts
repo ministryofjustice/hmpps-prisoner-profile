@@ -23,6 +23,7 @@ import { prisonUserMock } from '../data/localMockData/user'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { AddressLocation } from './mappers/addressMapper'
 import { formatDateISO } from '../utils/dateHelpers'
+import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
 
 const clientToken = 'CLIENT_TOKEN'
 
@@ -98,16 +99,20 @@ describe('addressService', () => {
       expect(addresses).toEqual([])
     })
 
-    it('Adds phone type reference data to the result', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async () => [mockAddressResponseDto])
-      referenceDataService.getActiveReferenceDataCodes = jest
-        .fn()
-        .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
+    it('Filters out expired addresses', async () => {
+      personIntegrationApiClient.getAddresses = jest.fn(async () => [
+        { ...mockAddressResponseDto, toDate: formatDateISO(subDays(new Date(), 1)) },
+      ])
 
       const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
-      expect(addresses).toEqual([
+      expect(addresses).toEqual([])
+    })
+
+    it.each([
+      [
+        'Adds phone type reference data to the result',
+        mockAddressResponseDto,
         {
-          ...mockAddressResponseDto,
           addressPhoneNumbersForDisplay: [
             {
               id: 123,
@@ -118,41 +123,61 @@ describe('addressService', () => {
             },
           ],
         },
-      ])
-    })
+      ],
+      [
+        'Handles null toDate when filtering',
+        { addressPhoneNumbers: [], toDate: null },
+        { addressPhoneNumbers: [], addressPhoneNumbersForDisplay: [], toDate: null },
+      ],
+      [
+        'Handles building number returned as building name',
+        { buildingNumber: null, buildingName: '1' },
+        { buildingName: undefined, buildingNumber: '1' },
+      ],
+      [
+        'Handles building number as part of building name',
+        { buildingNumber: null, buildingName: 'The Place, 1' },
+        { buildingName: 'The Place', buildingNumber: '1' },
+      ],
+      [
+        'Handles subBuildingName if present',
+        { buildingNumber: '1', subBuildingName: 'Flat 2', buildingName: 'The Place' },
+        { subBuildingName: 'Flat 2', buildingName: 'The Place', buildingNumber: '1' },
+      ],
+      [
+        'Splits comma separated buildingName and populates subBuildingName',
+        { buildingNumber: null, subBuildingName: null, buildingName: 'The Flat, The Place, 1' },
+        { subBuildingName: 'The Flat', buildingName: 'The Place', buildingNumber: '1' },
+      ],
+      [
+        'Handles multiple commas separating buildingName',
+        { buildingNumber: null, subBuildingName: null, buildingName: 'Thing 1, Thing 2, Thing 3, The Place, 1' },
+        { subBuildingName: 'Thing 1', buildingName: 'Thing 2, Thing 3, The Place', buildingNumber: '1' },
+      ],
+      [
+        'Handles building number and building name',
+        { buildingNumber: '1', buildingName: 'The Place' },
+        { buildingNumber: '1', buildingName: 'The Place' },
+      ],
+    ])(
+      '%s',
+      async (
+        _: string,
+        addressOverride: Partial<AddressResponseDto>,
+        addressForDisplay: Partial<AddressForDisplay>,
+      ) => {
+        personIntegrationApiClient.getAddresses = jest.fn(async () => [
+          { ...mockAddressResponseDto, ...addressOverride } as AddressResponseDto,
+        ])
 
-    it('Handles building number returned as building name', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async () => [
-        { ...mockAddressResponseDto, buildingNumber: null, buildingName: '1' } as AddressResponseDto,
-      ])
+        referenceDataService.getActiveReferenceDataCodes = jest
+          .fn()
+          .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
 
-      referenceDataService.getActiveReferenceDataCodes = jest
-        .fn()
-        .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
-
-      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
-      expect(addresses).toEqual([expect.objectContaining({ buildingName: null, buildingNumber: '1' })])
-    })
-
-    it('Filters out expired addresses', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async () => [
-        { ...mockAddressResponseDto, toDate: formatDateISO(subDays(new Date(), 1)) },
-      ])
-
-      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
-      expect(addresses).toEqual([])
-    })
-
-    it('Handles null toDate when filtering', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async () => [
-        { ...mockAddressResponseDto, addressPhoneNumbers: [], toDate: null } as AddressResponseDto,
-      ])
-
-      const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
-      expect(addresses).toEqual([
-        { ...mockAddressResponseDto, addressPhoneNumbers: [], addressPhoneNumbersForDisplay: [], toDate: null },
-      ])
-    })
+        const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+        expect(addresses).toEqual([expect.objectContaining(addressForDisplay)])
+      },
+    )
   })
 
   describe('getCityCode', () => {
