@@ -12,9 +12,9 @@ export default class ChangePhoto extends Page {
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  changeLink = (): PageElement => cy.get('[data-qa="change-photo-link"]')
+  changeLink = (): PageElement => cy.get('#change-photo-link')
 
-  fileUploadButton = (): PageElement => cy.get('.mark-upload-control input')
+  fileUploadButton = (): PageElement => cy.get('#file-upload input')
 
   photoField = (): PageElement => cy.get('input[type=file]')
 
