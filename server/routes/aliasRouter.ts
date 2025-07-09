@@ -8,6 +8,7 @@ import { nameValidator } from '../validators/personal/nameValidator'
 import { dateValidator } from '../validators/personal/dateValidator'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
+import { radioFieldValidator } from '../validators/personal/radioFieldValidator'
 
 export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -53,7 +54,14 @@ export default function aliasRouter(services: Services): Router {
   )
 
   get('/ethnic-group', ...commonMiddleware, aliasController.displayChangeEthnicGroup())
-  post('/ethnic-group', ...commonMiddleware, aliasController.submitChangeEthnicGroup())
+  post(
+    '/ethnic-group',
+    ...commonMiddleware,
+    validationMiddleware([radioFieldValidator({ fieldName: 'radioField', fieldDisplayName: 'an ethnic group' })], {
+      redirectBackOnError: true,
+    }),
+    aliasController.submitChangeEthnicGroup(),
+  )
   get(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.displayChangeEthnicBackground())
   post(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.submitChangeEthnicBackground())
 
