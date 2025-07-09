@@ -338,7 +338,10 @@ export const addressToLines = ({
   postalCode,
   country,
 }: OldAddresses['address']): string[] => {
-  const lineOne = [flat, premise, street].filter(s => s).join(', ')
+  let lineOne = [premise, street].filter(s => s).join(', ')
+  if (flat) {
+    lineOne = `${/flat/i.test(flat) ? '' : 'Flat '}${flat}, ${lineOne}`
+  }
   const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
   if (addressArray.length !== 1 || !country) return addressArray
   return []
@@ -351,7 +354,7 @@ export const contactAddressToHtml = (address: Partial<PersonalRelationshipsConta
     .join(' ')
     .trim()
   if (flat) {
-    lineOne = [`Flat ${flat}`, lineOne].filter(Boolean).join(', ')
+    lineOne = [`${/flat/i.test(flat) ? '' : 'Flat '}${flat}`, lineOne].filter(Boolean).join(', ')
   }
   const addressArray = [lineOne, cityDescription, postcode, countryDescription].filter(s => s)
   if (addressArray.length) return addressArray.join('<br/>')
