@@ -297,13 +297,15 @@ export default class IdentityNumbersController {
   private createRequestFromFormValues = (formValues: Record<string, AddIdentityNumberSubmission>) => {
     return Object.entries(formValues)
       .map(([id, value]): AddIdentifierRequestDto => {
-        const type = IdentifierMappings[id]?.type
+        if (value.selected) {
+          const type = IdentifierMappings[id]?.type
 
-        if (type && value.value) {
-          return {
-            type,
-            value: value.value,
-            comments: value.comment,
+          if (type && value.value) {
+            return {
+              type,
+              value: value.value,
+              comments: value.comment,
+            }
           }
         }
         return null
@@ -317,13 +319,17 @@ export default class IdentityNumbersController {
     errors: HmppsError[],
   ) => {
     Object.entries(formValues).forEach(([key, value]) => {
-      const type = IdentifierMappings[key]?.type
-      const label = IdentifierMappings[key]?.label
-      if (existingIdentifiers.some(id => id.type === type && id.value?.toUpperCase() === value.value?.toUpperCase())) {
-        errors.push({
-          text: `This ${label} already exists. Enter a different ${label}`,
-          href: `#${key}-value-input`,
-        })
+      if (value?.selected) {
+        const type = IdentifierMappings[key]?.type
+        const label = IdentifierMappings[key]?.label
+        if (
+          existingIdentifiers.some(id => id.type === type && id.value?.toUpperCase() === value.value?.toUpperCase())
+        ) {
+          errors.push({
+            text: `This ${label} already exists. Enter a different ${label}`,
+            href: `#${key}-value-input`,
+          })
+        }
       }
     })
   }
