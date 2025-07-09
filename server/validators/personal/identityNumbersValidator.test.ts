@@ -27,10 +27,10 @@ describe('AddIdentityNumbersValidator', () => {
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
     ])('%s', (_, id, validValue = '1'.repeat(20)) => {
       const validRequest = {
-        [id]: { value: validValue },
+        [id]: { selected: id, value: validValue },
       }
       const invalidRequest = {
-        [id]: { value: '1'.repeat(21) },
+        [id]: { selected: id, value: '1'.repeat(21) },
       }
 
       const validErrors = addIdentityNumbersValidator(validRequest)
@@ -53,10 +53,10 @@ describe('AddIdentityNumbersValidator', () => {
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
     ])('%s', (_, id, value = '123') => {
       const validRequest = {
-        [id]: { value, comment: 'a'.repeat(240) },
+        [id]: { selected: id, value, comment: 'a'.repeat(240) },
       }
       const invalidRequest = {
-        [id]: { value, comment: 'a'.repeat(241) },
+        [id]: { selected: id, value, comment: 'a'.repeat(241) },
       }
 
       const validErrors = addIdentityNumbersValidator(validRequest)
@@ -104,7 +104,7 @@ describe('AddIdentityNumbersValidator', () => {
       ['2024/0070623D', true],
     ])('%s', (pnc, isValid) => {
       const request = {
-        pnc: { value: pnc },
+        pnc: { selected: 'pnc', value: pnc },
       }
 
       const errors = addIdentityNumbersValidator(request)
@@ -135,7 +135,7 @@ describe('AddIdentityNumbersValidator', () => {
       ['99166G', false],
     ])('%s', (cro, isValid) => {
       const request = {
-        cro: { value: cro },
+        cro: { selected: 'cro', value: cro },
       }
 
       const errors = addIdentityNumbersValidator(request)
@@ -150,6 +150,20 @@ describe('AddIdentityNumbersValidator', () => {
         expect(errors[0].href).toEqual(`#cro-value-input`)
       }
     })
+  })
+
+  it('Does not validate unselected data', () => {
+    const request = {
+      pnc: { selected: 'pnc', value: 'BADVALUE' },
+      cro: { value: 'BADVALUE', comment: 'a'.repeat(241) },
+      prisonLegacySystem: { value: 'BADVALUE', comment: 'a'.repeat(241) },
+    }
+
+    const errors = addIdentityNumbersValidator(request)
+
+    expect(errors.length).toEqual(1)
+    expect(errors[0].text).toEqual('Enter a PNC number in the correct format, exactly as it appears on the document')
+    expect(errors[0].href).toEqual(`#pnc-value-input`)
   })
 })
 
