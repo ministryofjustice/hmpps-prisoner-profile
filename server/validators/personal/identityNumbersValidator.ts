@@ -15,28 +15,34 @@ export const addIdentityNumbersValidator = (body: Record<string, AddIdentityNumb
   const errors: HmppsError[] = []
 
   Object.entries(body).forEach(([key, value]) => {
-    if (value.selected && !value.value) {
-      errors.push({
-        text: `Enter this person’s ${IdentifierMappings[key]?.label ?? 'ID number'}`,
-        href: `#${key}-value-input`,
-      })
-    }
+    if (value.selected) {
+      if (!value.value) {
+        errors.push({
+          text: `Enter this person’s ${IdentifierMappings[key]?.label ?? 'ID number'}`,
+          href: `#${key}-value-input`,
+        })
+      }
 
-    if (value.value && value.value.length > MAX_LENGTH) {
-      errors.push({ text: `Enter the ID number using ${MAX_LENGTH} characters or less`, href: `#${key}-value-input` })
-    }
+      if (value.value && value.value.length > MAX_LENGTH) {
+        errors.push({ text: `Enter the ID number using ${MAX_LENGTH} characters or less`, href: `#${key}-value-input` })
+      }
 
-    if (value.comment && value.comment.length > MAX_COMMENT_LENGTH) {
-      errors.push({
-        text: `Enter your comment using ${MAX_COMMENT_LENGTH} characters or less`,
-        href: `#${key}-comments-input`,
-      })
+      if (value.comment && value.comment.length > MAX_COMMENT_LENGTH) {
+        errors.push({
+          text: `Enter your comment using ${MAX_COMMENT_LENGTH} characters or less`,
+          href: `#${key}-comments-input`,
+        })
+      }
     }
   })
 
   const { pnc, cro } = body
-  validatePnc(pnc?.value, '#pnc-value-input', errors)
-  validateCro(cro?.value, '#cro-value-input', errors)
+  if (pnc?.selected) {
+    validatePnc(pnc?.value, '#pnc-value-input', errors)
+  }
+  if (cro?.selected) {
+    validateCro(cro?.value, '#cro-value-input', errors)
+  }
 
   return errors
 }

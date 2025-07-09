@@ -156,13 +156,16 @@ describe('IdentityNumbersController', () => {
     beforeEach(() => {
       req.body = {
         probationLegacySystem: {
-          selected: '',
+          selected: 'probationLegacySystem',
           value: '1234',
           comment: 'Some comment',
         },
         yjaf: {
-          selected: '',
+          selected: 'yjaf',
           value: '456',
+        },
+        portReference: {
+          value: '789',
         },
       }
 
@@ -170,7 +173,7 @@ describe('IdentityNumbersController', () => {
       jest.spyOn(identityNumbersService, 'addIdentityNumbers').mockResolvedValue()
     })
 
-    it('should add the new id numbers and redirect', async () => {
+    it('should add all currently selected id numbers and redirect', async () => {
       const expectedRequest = [
         { comments: 'Some comment', type: OffenderIdentifierType.ProbationLegacySystemNumber, value: '1234' },
         { comments: undefined, type: OffenderIdentifierType.YjafNumber, value: '456' },
@@ -199,12 +202,15 @@ describe('IdentityNumbersController', () => {
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
     })
 
-    it('should detect duplicates of existing ids and redirect to the add justice numbers page ', async () => {
+    it('should detect duplicates of selected ids and redirect to the add justice numbers page ', async () => {
       req.body = {
         prisonLegacySystem: {
-          selected: '',
+          selected: 'prisonLegacySystem',
           value: '1234',
           comment: 'Some comment',
+        },
+        yjaf: {
+          value: '456',
         },
       }
       req.errors = []
