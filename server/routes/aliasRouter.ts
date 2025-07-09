@@ -1,15 +1,19 @@
 import { RequestHandler, Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import AliasController from '../controllers/aliasController'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { nameValidator } from '../validators/personal/nameValidator'
 import { dateValidator } from '../validators/personal/dateValidator'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../utils/featureToggles'
 
-export default function aliasRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
 
   const ethnicGroups = ['white', 'mixed', 'asian', 'black', 'other'].join('|')
 
@@ -19,13 +23,20 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     services.auditService,
   )
 
-  get('/change-name', editProfileChecks(), aliasController.displayChangeNamePurpose())
-  post('/change-name', editProfileChecks(), aliasController.submitChangeNamePurpose())
+  const commonMiddleware: RequestHandler[] = [
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_name_and_aliases],
+    }),
+  ]
 
-  get('/date-of-birth', editProfileChecks(), aliasController.displayChangeDateOfBirth())
+  get('/change-name', ...commonMiddleware, aliasController.displayChangeNamePurpose())
+  post('/change-name', ...commonMiddleware, aliasController.submitChangeNamePurpose())
+
+  get('/date-of-birth', ...commonMiddleware, aliasController.displayChangeDateOfBirth())
   post(
     '/date-of-birth',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware(
       [
         dateValidator({
@@ -41,31 +52,31 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     aliasController.submitChangeDateOfBirth(),
   )
 
-  get('/ethnic-group', editProfileChecks(), aliasController.displayChangeEthnicGroup())
-  post('/ethnic-group', editProfileChecks(), aliasController.submitChangeEthnicGroup())
-  get(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.displayChangeEthnicBackground())
-  post(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.submitChangeEthnicBackground())
+  get('/ethnic-group', ...commonMiddleware, aliasController.displayChangeEthnicGroup())
+  post('/ethnic-group', ...commonMiddleware, aliasController.submitChangeEthnicGroup())
+  get(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.displayChangeEthnicBackground())
+  post(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.submitChangeEthnicBackground())
 
-  get('/enter-corrected-name', editProfileChecks(), aliasController.displayChangeNameCorrection())
+  get('/enter-corrected-name', ...commonMiddleware, aliasController.displayChangeNameCorrection())
   post(
     '/enter-corrected-name',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameCorrection(),
   )
 
-  get('/enter-new-name', editProfileChecks(), aliasController.displayChangeNameLegal())
+  get('/enter-new-name', ...commonMiddleware, aliasController.displayChangeNameLegal())
   post(
     '/enter-new-name',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameLegal(),
   )
 
-  get('/enter-alias-details', editProfileChecks(), aliasController.displayAddNewAlias())
+  get('/enter-alias-details', ...commonMiddleware, aliasController.displayAddNewAlias())
   post(
     '/enter-alias-details',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware(
       [
         nameValidator,

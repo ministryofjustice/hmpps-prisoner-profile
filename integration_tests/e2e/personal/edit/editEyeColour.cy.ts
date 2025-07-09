@@ -15,7 +15,7 @@ context('Edit eye colour - both eyes the same colour', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -35,6 +35,7 @@ context('Edit eye colour - both eyes the same colour', () => {
     successfulFlashMessage: 'Eye colour updated',
     validInputs: [{ radioInputs: { eyeColour: 'BLUE' } }],
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })
 
@@ -49,7 +50,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -69,6 +70,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
     successfulFlashMessage: 'Left and right eye colours updated',
     validInputs: [{ radioInputs: { leftEyeColour: 'BROWN', rightEyeColour: 'HAZEL' } }],
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })
 
@@ -79,7 +81,7 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
 
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+    cy.setupUserAuth({ roles: [Role.PrisonUser] })
     cy.setupComponentsData()
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubPersonalCareNeeds')

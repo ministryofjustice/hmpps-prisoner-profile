@@ -19,7 +19,6 @@ import {
   objectToSelectOptions,
   RadioOption,
   SelectOption,
-  userHasRoles,
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
@@ -60,7 +59,6 @@ import {
   HealthAndMedicationReferenceDataDomain,
   ReferenceDataIdSelection,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { Role } from '../../data/enums/role'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
@@ -86,8 +84,8 @@ export default class PersonalController {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
       const { user, flashMessage, apiErrorCallback } = res.locals
-      const { activeCaseLoadId, userRoles } = user as PrisonUser
-      const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
+      const { activeCaseLoadId } = user as PrisonUser
+      const editEnabled = editProfileEnabled(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled } = config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
@@ -95,7 +93,7 @@ export default class PersonalController {
           clientToken,
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),
-          profileEditEnabled,
+          editEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           flashMessage,
@@ -112,7 +110,6 @@ export default class PersonalController {
         page: Page.Personal,
       })
 
-      const editEnabled = profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles)
       const hasPersonalId = Object.values(personalPageData.identityNumbers.personal).some(v => v.length > 0)
       const hasHomeOfficeId = Object.values(personalPageData.identityNumbers.homeOffice).some(v => v.length > 0)
 
@@ -129,18 +126,13 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
-        displayNewAddressesCard: profileEditEnabled,
+        displayNewAddressesCard: editEnabled,
         dietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
-        editDietAndAllergiesEnabled:
-          dietAndAllergyEnabled(activeCaseLoadId) &&
-          userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
-          prisonerData.prisonId === activeCaseLoadId,
         editReligionEnabled: editEnabled || editReligionEnabled(),
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
-        prisonerIsInCaseload: prisonerData.prisonId === activeCaseLoadId,
       })
     }
   }

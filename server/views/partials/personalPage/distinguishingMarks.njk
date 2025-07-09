@@ -46,7 +46,7 @@
                                         {% endif %}
                                     {% endif %}
                                 </dl>
-                                {% if mark.markType.code != 'OTH' %}
+                                {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                                     <div>
                                         <a href="/prisoner/{{ prisonerNumber }}/personal/{{ mark.markType.description | lower }}/{{ mark.id }}"
                                            class="govuk-link govuk-link--no-visited-state">Change</a>
@@ -78,28 +78,34 @@
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Tattoos</dt>
                 <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMarks('tattoo', groupedDistinguishingMarks.tattoos) }}</dd>
-                <dd class='personal-distinguishing-marks__row__actions'>
-                    <a class='govuk-link govuk-link--no-visited-state'
-                       href='/prisoner/{{ prisonerNumber }}/personal/tattoo'>Add tattoo</a>
-                </dd>
+                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+                  <dd class='personal-distinguishing-marks__row__actions'>
+                      <a class='govuk-link govuk-link--no-visited-state'
+                         href='/prisoner/{{ prisonerNumber }}/personal/tattoo'>Add tattoo</a>
+                  </dd>
+                {% endif %}
             </div>
 
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Scars</dt>
                 <dd data-qa="distinguishing-marks-scars">{{ distinguishingMarks('scar', groupedDistinguishingMarks.scars) }}</dd>
-                <dd class='personal-distinguishing-marks__row__actions'>
-                    <a class='govuk-link govuk-link--no-visited-state'
-                       href='/prisoner/{{ prisonerNumber }}/personal/scar'>Add scar</a>
-                </dd>
+                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+                  <dd class='personal-distinguishing-marks__row__actions'>
+                      <a class='govuk-link govuk-link--no-visited-state'
+                         href='/prisoner/{{ prisonerNumber }}/personal/scar'>Add scar</a>
+                  </dd>
+                {% endif %}
             </div>
 
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Other marks</dt>
                 <dd data-qa="distinguishing-marks-others">{{ distinguishingMarks('other mark', groupedDistinguishingMarks.others) }}</dd>
-                <dd class='personal-distinguishing-marks__row__actions'>
-                    <a class='govuk-link govuk-link--no-visited-state'
-                       href='/prisoner/{{ prisonerNumber }}/personal/mark'>Add mark</a>
-                </dd>
+                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+                  <dd class='personal-distinguishing-marks__row__actions'>
+                      <a class='govuk-link govuk-link--no-visited-state'
+                         href='/prisoner/{{ prisonerNumber }}/personal/mark'>Add mark</a>
+                  </dd>
+                {% endif %}
             </div>
         </dl>
     </div>

@@ -18,7 +18,7 @@ context('Edit domestic status', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -41,5 +41,6 @@ context('Edit domestic status', () => {
     successfulFlashMessage: 'Marital or civil partnership status updated',
     validInputs: [{ radioInputs: { radioField: 'M' } }],
     redirectAnchor: 'personal-details',
+    isUnrestricted: true,
   })
 })

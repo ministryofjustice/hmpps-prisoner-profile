@@ -14,7 +14,7 @@ context('Edit smoker or vaper', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -28,5 +28,6 @@ context('Edit smoker or vaper', () => {
     successfulFlashMessage: 'Smoker or vaper updated',
     validInputs: [{ radioInputs: { radioField: 'SMOKER_YES ' } }],
     redirectAnchor: 'personal-details',
+    isUnrestricted: true,
   })
 })

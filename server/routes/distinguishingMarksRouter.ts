@@ -1,4 +1,5 @@
-import { Router } from 'express'
+import { RequestHandler, Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -13,11 +14,21 @@ import {
   updatePhotoValidator,
 } from '../validators/personal/distinguishingMarksValidator'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../utils/featureToggles'
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
+
+  const commonMiddleware: RequestHandler[] = [
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
+    }),
+  ]
 
   // Define valid body parts
   const validBodyParts =
@@ -45,9 +56,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add distinguishing mark
-  get('/', distinguishingMarksController.newDistinguishingMark)
+  get('/', ...commonMiddleware, distinguishingMarksController.newDistinguishingMark)
   post(
     '/',
+    ...commonMiddleware,
     validationMiddleware([newDistinguishingMarkValidator], {
       redirectBackOnError: true,
     }),
@@ -55,9 +67,14 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add distinguishing mark with detail
-  get(`/:bodyPart(${validBodyParts})`, distinguishingMarksController.newDistinguishingMarkWithDetail)
+  get(
+    `/:bodyPart(${validBodyParts})`,
+    ...commonMiddleware,
+    distinguishingMarksController.newDistinguishingMarkWithDetail,
+  )
   post(
     `/:bodyPart(${validBodyParts})`,
+    ...commonMiddleware,
     validationMiddleware([newDetailedDistinguishingMarkValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -66,12 +83,13 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Edit distinguishing mark
-  get('/:markId', distinguishingMarksController.changeDistinguishingMark)
+  get('/:markId', ...commonMiddleware, distinguishingMarksController.changeDistinguishingMark)
 
   // Change body part
-  get('/:markId/body-part', distinguishingMarksController.changeBodyPart)
+  get('/:markId/body-part', ...commonMiddleware, distinguishingMarksController.changeBodyPart)
   post(
     '/:markId/body-part',
+    ...commonMiddleware,
     validationMiddleware([newDistinguishingMarkValidator], {
       redirectBackOnError: true,
     }),
@@ -79,9 +97,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change location
-  get('/:markId/location', distinguishingMarksController.changeLocation)
+  get('/:markId/location', ...commonMiddleware, distinguishingMarksController.changeLocation)
   post(
     '/:markId/location',
+    ...commonMiddleware,
     validationMiddleware([updateLocationValidator], {
       redirectBackOnError: true,
     }),
@@ -89,9 +108,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change description
-  get('/:markId/description', distinguishingMarksController.changeDescription)
+  get('/:markId/description', ...commonMiddleware, distinguishingMarksController.changeDescription)
   post(
     '/:markId/description',
+    ...commonMiddleware,
     validationMiddleware([updateDescriptionValidator], {
       redirectBackOnError: true,
     }),
@@ -99,9 +119,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change photo
-  get('/:markId/photo/:photoId', distinguishingMarksController.changePhoto)
+  get('/:markId/photo/:photoId', ...commonMiddleware, distinguishingMarksController.changePhoto)
   post(
     '/:markId/photo/:photoId',
+    ...commonMiddleware,
     validationMiddleware([updatePhotoValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -110,9 +131,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add photo
-  get('/:markId/photo', distinguishingMarksController.addNewPhoto)
+  get('/:markId/photo', ...commonMiddleware, distinguishingMarksController.addNewPhoto)
   post(
     '/:markId/photo',
+    ...commonMiddleware,
     validationMiddleware([updatePhotoValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -121,7 +143,14 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // View all images for a mark
-  get('/:markId/all-photos', distinguishingMarksController.viewAllImages)
+  get(
+    '/:markId/all-photos',
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.read_distinguishing_marks],
+    }),
+    distinguishingMarksController.viewAllImages,
+  )
 
   return router
 }
