@@ -103,7 +103,7 @@ describe('Alias Controller', () => {
 
       if (!purpose) {
         expect(req.flash).toHaveBeenCalledWith('errors', [
-          { text: `Select why you’re changing John Saunders’ name`, href: '#radio' },
+          { text: `Select why you’re changing John Saunders’ name`, href: '#radioField' },
         ])
       } else {
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
