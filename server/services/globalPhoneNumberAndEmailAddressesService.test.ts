@@ -53,12 +53,15 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     [
       'Only phones',
       [contact(1, 'BUS', '12345'), contact(2, 'HOME', '54321', '1')],
-      { phones: [phone(1, 'BUS', 'Business', '12345'), phone(2, 'HOME', 'Home', '54321', '1')], emails: [] },
+      {
+        phones: [phone(2, 'HOME', 'Home', '54321', '1'), phone(1, 'BUS', 'Business', '12345')],
+        emails: [],
+      },
     ],
     [
       'Only Emails',
       [contact(1, 'EMAIL', 'foo@example.com'), contact(2, 'EMAIL', 'bar@example.com')],
-      { phones: [], emails: [email(1, 'foo@example.com'), email(2, 'bar@example.com')] },
+      { phones: [], emails: [email(2, 'bar@example.com'), email(1, 'foo@example.com')] },
     ],
     [
       'Both phones and emails',
@@ -69,8 +72,8 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
         contact(4, 'EMAIL', 'bar@example.com'),
       ],
       {
-        phones: [phone(1, 'BUS', 'Business', '12345'), phone(3, 'HOME', 'Home', '54321', '1')],
-        emails: [email(2, 'foo@example.com'), email(4, 'bar@example.com')],
+        phones: [phone(3, 'HOME', 'Home', '54321', '1'), phone(1, 'BUS', 'Business', '12345')],
+        emails: [email(4, 'bar@example.com'), email(2, 'foo@example.com')],
       },
     ],
   ])(

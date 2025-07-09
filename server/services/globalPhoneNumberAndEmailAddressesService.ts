@@ -27,8 +27,11 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     ])
 
     return {
-      phones: transformPhones(contacts, phoneTypes),
-      emails: contacts.filter(c => c.contactType === 'EMAIL').map(c => ({ id: c.contactId, email: c.contactValue })),
+      phones: transformPhones(contacts, phoneTypes).sort((a, b) => b.id - a.id),
+      emails: contacts
+        .filter(c => c.contactType === 'EMAIL')
+        .map(c => ({ id: c.contactId, email: c.contactValue }))
+        .sort((a, b) => b.id - a.id),
     }
   }
 
