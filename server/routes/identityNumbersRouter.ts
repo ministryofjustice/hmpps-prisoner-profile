@@ -1,4 +1,5 @@
 import { RequestHandler, Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -8,11 +9,14 @@ import {
   editIdentityNumberValidator,
 } from '../validators/personal/identityNumbersValidator'
 import { IdentifierMappings } from '../data/constants/identifierMappings'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../utils/featureToggles'
 
-export default function identityNumbersRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
 
   const identityNumberRoutes = Object.values(IdentifierMappings)
     .map(mapping => mapping.editPageUrl)
@@ -23,11 +27,18 @@ export default function identityNumbersRouter(services: Services, editProfileChe
     services.auditService,
   )
 
+  const commonMiddleware: RequestHandler[] = [
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_identifiers],
+    }),
+  ]
+
   // Add justice ID numbers
-  get('/justice-id-numbers', editProfileChecks(), identityNumbersController.justiceIdNumbers().edit)
+  get('/justice-id-numbers', ...commonMiddleware, identityNumbersController.justiceIdNumbers().edit)
   post(
     '/justice-id-numbers',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -35,10 +46,10 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add personal ID numbers
-  get('/personal-id-numbers', editProfileChecks(), identityNumbersController.personalIdNumbers().edit)
+  get('/personal-id-numbers', ...commonMiddleware, identityNumbersController.personalIdNumbers().edit)
   post(
     '/personal-id-numbers',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -46,10 +57,10 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   )
 
   // Add Home Office ID numbers
-  get('/home-office-id-numbers', editProfileChecks(), identityNumbersController.homeOfficeIdNumbers().edit)
+  get('/home-office-id-numbers', ...commonMiddleware, identityNumbersController.homeOfficeIdNumbers().edit)
   post(
     '/home-office-id-numbers',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
       redirectBackOnError: true,
     }),
@@ -59,12 +70,12 @@ export default function identityNumbersRouter(services: Services, editProfileChe
   // Edit individual existing ID numbers
   get(
     `/:identifier(${identityNumberRoutes})/:compositeId`,
-    editProfileChecks(),
+    ...commonMiddleware,
     identityNumbersController.idNumber().edit,
   )
   post(
     `/:identifier(${identityNumberRoutes})/:compositeId`,
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,
     }),

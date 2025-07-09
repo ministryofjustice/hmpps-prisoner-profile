@@ -13,7 +13,7 @@ context('Edit height (metric)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
@@ -53,6 +53,7 @@ context('Edit height (metric)', () => {
     editPageTitle: 'Height',
     successfulFlashMessage: 'Height updated',
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })
 
@@ -67,7 +68,7 @@ context('Edit height (Imperial)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
@@ -92,5 +93,6 @@ context('Edit height (Imperial)', () => {
     editPageTitle: 'Height',
     successfulFlashMessage: 'Height updated',
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })

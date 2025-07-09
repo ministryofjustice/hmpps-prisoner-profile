@@ -3,7 +3,8 @@ import Page from '../../pages/page'
 import ConfirmFacialImagePage from '../../pages/photoPages/confirmFacialImagePage'
 import EditPhotoPage from '../../pages/photoPages/editPhotoPage'
 import PrisonerPhotoPage from '../../pages/photoPages/photoPage'
-import { permissionsTests } from '../permissionsTests'
+import NotFoundPage from '../../pages/notFoundPage'
+import CaseLoad from '../../../server/data/interfaces/prisonApi/CaseLoad'
 
 context('Editing the photo', () => {
   const prisonerNumber = 'G6123VU'
@@ -12,28 +13,28 @@ context('Editing the photo', () => {
 
   context('New image page', () => {
     beforeEach(() => {
-      cy.setupBannerStubs({
-        prisonerNumber,
-        bookingId,
-      })
+      cy.task('reset')
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubImageDetails')
       cy.task('stubUpdateProfileImage', { prisonerNumber })
     })
 
     context('Permissions', () => {
-      const visitPage = prisonerDataOverrides => {
-        cy.setupBannerStubs({
-          prisonerNumber,
-          bookingId,
-          prisonerDataOverrides: { ...prisonerDataOverrides, category: 'B' },
+      context('Prisoner is not in active caseload', () => {
+        it('Displays Page Not Found', () => {
+          cy.setupComponentsData({
+            caseLoads: [
+              { caseLoadId: 'ZZZ', currentlyActive: true } as CaseLoad,
+              { caseLoadId: 'ABC', currentlyActive: false } as CaseLoad,
+            ],
+          })
+          cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'ABC' } })
+
+          cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/new' })
+          new NotFoundPage().shouldBeDisplayed()
         })
-        cy.task('stubImageDetails')
-        cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/new' })
-      }
-      permissionsTests({
-        prisonerNumber,
-        visitPage,
-        pageToDisplay: EditPhotoPage,
-        options: { additionalRoles: [Role.DpsApplicationDeveloper], preventGlobalAccess: true },
       })
     })
 

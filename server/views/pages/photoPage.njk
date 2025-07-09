@@ -58,7 +58,9 @@
             <li class="moj-sub-navigation__item">
               <a class="moj-sub-navigation__link" href="{{ photoAllHref }}">All facial images</a>
             </li>
-            {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
+            {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+              {{ newFacialImageButton(prisonerNumber, referer) }}
+            {% endif %}
           </ul>
         </nav>
       </div>
@@ -96,10 +98,11 @@
         {{ description() }}
       </div>
     </div>
-    {% if (photoStatus.withheld or photoStatus.placeholder) and editEnabled %}
+    {% if (photoStatus.withheld or photoStatus.placeholder)
+      and editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
       <div class="govuk-grid-column-one-quarter">
         <div class="hmpps-!-float-right">
-          {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
+          {{ newFacialImageButton(prisonerNumber, referer) }}
         </div>
       </div>
     {% endif %}

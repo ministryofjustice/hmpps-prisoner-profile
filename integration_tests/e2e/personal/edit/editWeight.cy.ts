@@ -13,7 +13,7 @@ context('Edit Weight (metric)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
@@ -43,6 +43,7 @@ context('Edit Weight (metric)', () => {
     editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight updated',
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })
 
@@ -57,7 +58,7 @@ context('Edit weight (Imperial)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
@@ -82,5 +83,6 @@ context('Edit weight (Imperial)', () => {
     editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight updated',
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })

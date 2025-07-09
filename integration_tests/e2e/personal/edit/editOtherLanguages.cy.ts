@@ -15,7 +15,7 @@ context('Edit other languages', () => {
       bookingId,
       testSetup: () => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
@@ -77,6 +77,7 @@ context('Edit other languages', () => {
       ],
       redirectAnchor: 'personal-details',
       submitButtonId: 'save-button',
+      isUnrestricted: true,
     })
   })
 
@@ -87,7 +88,7 @@ context('Edit other languages', () => {
       bookingId,
       testSetup: () => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
@@ -130,6 +131,7 @@ context('Edit other languages', () => {
       ],
       redirectAnchor: 'personal-details',
       submitButtonId: 'save-button',
+      isUnrestricted: true,
     })
   })
 })

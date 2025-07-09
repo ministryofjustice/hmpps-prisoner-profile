@@ -14,7 +14,7 @@ context('Edit hair', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -30,5 +30,6 @@ context('Edit hair', () => {
     successfulFlashMessage: 'Hair type or colour updated',
     validInputs: [{ radioInputs: { radioField: 'GREY' } }],
     redirectAnchor: 'appearance',
+    isUnrestricted: true,
   })
 })

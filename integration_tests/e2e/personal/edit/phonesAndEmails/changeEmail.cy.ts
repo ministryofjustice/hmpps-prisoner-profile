@@ -13,7 +13,7 @@ context('Change email address', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })

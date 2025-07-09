@@ -14,7 +14,7 @@ context('Edit number of children', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
@@ -60,5 +60,6 @@ context('Edit number of children', () => {
       },
     ],
     redirectAnchor: 'personal-details',
+    isUnrestricted: true,
   })
 })

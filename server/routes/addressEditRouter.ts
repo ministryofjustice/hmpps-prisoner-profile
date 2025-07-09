@@ -1,4 +1,5 @@
 import { RequestHandler, Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
 import { getRequest, postRequest } from './routerUtils'
 import AddressEditController from '../controllers/addressEditController'
@@ -7,11 +8,14 @@ import { notEmptyValidator } from '../validators/general/notEmptyValidator'
 import { Page, PostAction } from '../services/auditService'
 import { addressValidator } from '../validators/personal/addressValidator'
 import { AddressLocation } from '../services/mappers/addressMapper'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../utils/featureToggles'
 
-export default function addressEditRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
+export default function addressEditRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
 
   const addressEditController = new AddressEditController(
     services.addressService,
@@ -19,10 +23,17 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     services.auditService,
   )
 
-  get('/where-is-address', editProfileChecks(), addressEditController.displayWhereIsTheAddress())
+  const commonMiddleware: RequestHandler[] = [
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_address],
+    }),
+  ]
+
+  get('/where-is-address', ...commonMiddleware, addressEditController.displayWhereIsTheAddress())
   post(
     '/where-is-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware(
       [notEmptyValidator({ fieldName: 'radioField', href: '#radio', errorText: 'Select where the address is' })],
       { redirectBackOnError: true, useReq: true },
@@ -30,10 +41,10 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     addressEditController.submitWhereIsTheAddress(),
   )
 
-  get('/find-uk-address', editProfileChecks(), addressEditController.displayFindUkAddress())
+  get('/find-uk-address', ...commonMiddleware, addressEditController.displayFindUkAddress())
   post(
     '/find-uk-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware(
       [
         notEmptyValidator({
@@ -48,12 +59,12 @@ export default function addressEditRouter(services: Services, editProfileChecks:
     addressEditController.submitFindUkAddress(),
   )
 
-  get('/confirm-address', editProfileChecks(), addressEditController.displayConfirmAddress())
+  get('/confirm-address', ...commonMiddleware, addressEditController.displayConfirmAddress())
 
-  get('/primary-or-postal-address', editProfileChecks(), addressEditController.displayPrimaryOrPostalAddress())
+  get('/primary-or-postal-address', ...commonMiddleware, addressEditController.displayPrimaryOrPostalAddress())
   post(
     '/primary-or-postal-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware(
       [
         notEmptyValidator({
@@ -69,7 +80,7 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-uk-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.uk,
       pageTitlePrefix: 'Add a UK address - Prisoner personal details',
@@ -77,10 +88,9 @@ export default function addressEditRouter(services: Services, editProfileChecks:
       auditPage: Page.EditAddressUkManual,
     }),
   )
-
   post(
     '/add-uk-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.uk,
@@ -90,7 +100,7 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-overseas-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.overseas,
       pageTitlePrefix: 'Add an overseas address',
@@ -98,10 +108,9 @@ export default function addressEditRouter(services: Services, editProfileChecks:
       auditPage: Page.EditAddressOverseasManual,
     }),
   )
-
   post(
     '/add-overseas-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.overseas,
@@ -111,7 +120,7 @@ export default function addressEditRouter(services: Services, editProfileChecks:
 
   get(
     '/add-uk-no-fixed-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     addressEditController.displayManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
       pageTitlePrefix: 'Add a UK no fixed address',
@@ -119,10 +128,9 @@ export default function addressEditRouter(services: Services, editProfileChecks:
       auditPage: Page.EditAddressNoFixedAddressManual,
     }),
   )
-
   post(
     '/add-uk-no-fixed-address',
-    editProfileChecks(),
+    ...commonMiddleware,
     validationMiddleware([addressValidator], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,

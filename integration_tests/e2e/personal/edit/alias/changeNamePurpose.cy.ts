@@ -16,7 +16,7 @@ context('Change Name Purpose Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+    cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })

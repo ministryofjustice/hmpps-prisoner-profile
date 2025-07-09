@@ -1,12 +1,10 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% macro newFacialImageButton(prisonerNumber, referer, editEnabled) %}
-  {% if editEnabled %}
-    <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
-      {{ govukButton({
-        text: "Add a new facial image",
-        href: "/prisoner/" + prisonerNumber + "/image/new" | appendRefererToUrl(referer),
-        classes: "govuk-!-margin-bottom-0"
-      }) }}
-    </li>
-  {% endif %}
+{% macro newFacialImageButton(prisonerNumber, referer) %}
+  <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
+    {{ govukButton({
+      text: "Add a new facial image",
+      href: "/prisoner/" + prisonerNumber + "/image/new" | appendRefererToUrl(referer),
+      classes: "govuk-!-margin-bottom-0"
+    }) }}
+  </li>
 {% endmacro %}

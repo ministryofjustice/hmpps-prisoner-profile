@@ -1,41 +1,41 @@
-import { NextFunction, Request, Response, Router } from 'express'
+import { RequestHandler, Router } from 'express'
+import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import MilitaryRecordsController from '../controllers/militaryRecordsController'
 import { militaryServiceInformationValidator } from '../validators/personal/militaryServiceInformationValidator'
 import validationMiddleware from '../middleware/validationMiddleware'
-import { militaryHistoryEnabled } from '../utils/featureToggles'
-import NotFoundError from '../utils/notFoundError'
-import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import { dischargeDetailsValidator } from '../validators/personal/dischargeDetailsValidator'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { militaryHistoryEnabled } from '../utils/featureToggles'
 
 export default function militaryRecordsRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
   const get = getRequest(router)
   const post = postRequest(router)
+  const { prisonPermissionsService } = services
 
   const militaryRecordsController = new MilitaryRecordsController(
     services.militaryRecordsService,
     services.auditService,
   )
 
-  // Feature flag check
-  const militaryHistoryEnabledCheck = () => (req: Request, res: Response, next: NextFunction) => {
-    if (militaryHistoryEnabled()) {
-      return next()
-    }
-    return next(new NotFoundError('User cannot access military history routes', HmppsStatusCode.NOT_FOUND))
-  }
+  const commonMiddleware: RequestHandler[] = [
+    featureFlagGuard('Military History', militaryHistoryEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [CorePersonRecordPermission.edit_military_history],
+    }),
+  ]
 
   // Create Military Service Information
   get(
     '/military-service-information',
-    militaryHistoryEnabledCheck(),
+    ...commonMiddleware,
     militaryRecordsController.displayMilitaryServiceInformation(),
   )
   post(
     '/military-service-information',
-    militaryHistoryEnabledCheck(),
+    ...commonMiddleware,
     validationMiddleware([militaryServiceInformationValidator], {
       redirectBackOnError: true,
     }),
@@ -45,12 +45,12 @@ export default function militaryRecordsRouter(services: Services): Router {
   // Update Military Service Information
   get(
     '/military-service-information/:militarySeq',
-    militaryHistoryEnabledCheck(),
+    ...commonMiddleware,
     militaryRecordsController.displayMilitaryServiceInformation(),
   )
   post(
     '/military-service-information/:militarySeq',
-    militaryHistoryEnabledCheck(),
+    ...commonMiddleware,
     validationMiddleware([militaryServiceInformationValidator], {
       redirectBackOnError: true,
     }),
@@ -58,30 +58,18 @@ export default function militaryRecordsRouter(services: Services): Router {
   )
 
   // Update Conflicts
-  get('/conflicts/:militarySeq', militaryHistoryEnabledCheck(), militaryRecordsController.displayConflicts())
-  post('/conflicts/:militarySeq', militaryHistoryEnabledCheck(), militaryRecordsController.postConflicts())
+  get('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.displayConflicts())
+  post('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.postConflicts())
 
   // Update Disciplinary Action
-  get(
-    '/disciplinary-action/:militarySeq',
-    militaryHistoryEnabledCheck(),
-    militaryRecordsController.displayDisciplinaryAction(),
-  )
-  post(
-    '/disciplinary-action/:militarySeq',
-    militaryHistoryEnabledCheck(),
-    militaryRecordsController.postDisciplinaryAction(),
-  )
+  get('/disciplinary-action/:militarySeq', ...commonMiddleware, militaryRecordsController.displayDisciplinaryAction())
+  post('/disciplinary-action/:militarySeq', ...commonMiddleware, militaryRecordsController.postDisciplinaryAction())
 
   // Update Discharge Details
-  get(
-    '/discharge-details/:militarySeq',
-    militaryHistoryEnabledCheck(),
-    militaryRecordsController.displayDischargeDetails(),
-  )
+  get('/discharge-details/:militarySeq', ...commonMiddleware, militaryRecordsController.displayDischargeDetails())
   post(
     '/discharge-details/:militarySeq',
-    militaryHistoryEnabledCheck(),
+    ...commonMiddleware,
     validationMiddleware([dischargeDetailsValidator], {
       redirectBackOnError: true,
     }),
