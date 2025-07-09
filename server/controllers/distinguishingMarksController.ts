@@ -403,10 +403,6 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
-    const photoHtml = mark.photographUuids?.length
-      ? `<img src="/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
-      : null
-
     const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     await this.auditService.sendPageView({
@@ -420,7 +416,10 @@ export default class DistinguishingMarksController {
     return res.render('pages/distinguishingMarks/changePhoto', {
       markId,
       markType,
-      photoHtml,
+      photo: {
+        url: `/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}`,
+        alt: `Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}`,
+      },
       cancelUrl,
       upload,
     })
