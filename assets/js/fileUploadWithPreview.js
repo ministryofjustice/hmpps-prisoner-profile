@@ -1,3 +1,4 @@
+const component = document.getElementById('file-upload-with-preview-component')
 const imageInput = document.getElementById('file')
 const inputContainer = document.getElementById('file-upload')
 const previewImage = document.getElementById('preview-image')
@@ -21,14 +22,29 @@ function previewSelectedImage() {
   }
 }
 
-imageInput.addEventListener('change', previewSelectedImage)
+// When an initial image URL has been provided we want to start by displaying the image
+function displayInitialImage() {
+  const imageUrl = component.dataset.initialPhotoUrl
+  previewImage.src = imageUrl
+  previewImage.alt = 'Preview of uploaded image'
+  previewContainer.style.display = 'flex'
+  inputContainer.style.display = 'none'
+}
 
 // Hide the photo preview and show upload controls when 'change' link is clicked
 function showUploadControls() {
   imageInput.value = null
   previewFilename.innerText = ''
   previewContainer.style.display = 'none'
-  inputContainer.style.display = 'block'
+  inputContainer.style.display = 'flex'
 }
 
-changeLink.addEventListener('click', showUploadControls)
+window.onload = () => {
+  imageInput.addEventListener('change', previewSelectedImage)
+  changeLink.addEventListener('click', showUploadControls)
+
+  const initialImageUrl = component.dataset.initialPhotoUrl
+  // if (initialImageUrl?.length > 0) {
+  //   displayInitialImage()
+  // }
+}

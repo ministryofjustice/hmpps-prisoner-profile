@@ -792,12 +792,10 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
-
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
         markType,
-        photoHtml,
+        photoUrl: `/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345`,
         cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
         upload: false,
       })
@@ -820,12 +818,10 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
-
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
         markType: 'tattoo',
-        photoHtml,
+        photoUrl: `/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345`,
         cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
         upload: false,
       })

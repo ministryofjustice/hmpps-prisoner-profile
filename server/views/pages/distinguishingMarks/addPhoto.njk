@@ -5,6 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from '../../components/fileUploadWithPreview/macro.njk' import fileUploadWithPreview %}
 {% set pageTitle = "Add " + markType + " photo - Prisoner personal details" %}
 {% set heading = "Add the photo of the " + markType %}
 {% block form %}
@@ -14,24 +15,8 @@
     <h1 class="govuk-heading-l">
       {{ heading }}
     </h1>
-    <div id="mark-preview-image-container">
-      <div class="image-preview">
-        <img id="mark-image-preview" width="150px"/>
-        <p id="mark-image-filename"></p>
-      </div>
-      <div>
-        <a id="change-photo-link" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
-      </div>
-    </div>
-    <div id="mark-add-photo-upload-control">
-      {{ govukFileUpload({
-        id: "file",
-        name: "file",
-        hint: {
-          text: "Photos can be JPG or GIF files."
-        },
-        errorMessage: errors | findError("file")
-      }) }}
+    <div class="govuk-form-group">
+      {{ fileUploadWithPreview("file") }}
     </div>
     <div class="govuk-button-group">
       {{ govukButton({
@@ -50,5 +35,5 @@
   </form>
 {% endblock %}
 {% block pageScripts %}
-  <script src="/assets/js/distinguishingMarkAddImage.js"></script>
+  <script src="/assets/js/fileUploadWithPreview.js" nonce="{{ cspNonce }}"></script>
 {% endblock %}

@@ -1,10 +1,23 @@
 .hmpps-file-upload-with-preview {
   &__upload {
-    display: block;
+    &__visible {
+      display: block;
+    }
+
+    &__hidden {
+      display: none;
+    }
   }
 
   &__preview {
-    display: none;
+    &__visible {
+      display: flex;
+    }
+
+    &__hidden {
+      display: none;
+    }
+
     flex-direction: row;
     flex-wrap: nowrap;
     column-gap: 20px;
