@@ -416,7 +416,10 @@ export default class DistinguishingMarksController {
     return res.render('pages/distinguishingMarks/changePhoto', {
       markId,
       markType,
-      photoUrl: `/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}`,
+      photo: {
+        url: `/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}`,
+        alt: `Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}`,
+      },
       cancelUrl,
       upload,
     })

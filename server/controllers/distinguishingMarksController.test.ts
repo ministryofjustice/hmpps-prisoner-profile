@@ -795,7 +795,10 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
         markType,
-        photoUrl: `/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345`,
+        photo: {
+          url: `/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345`,
+          alt: `Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}`,
+        },
         cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
         upload: false,
       })
@@ -821,7 +824,10 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
         markType: 'tattoo',
-        photoUrl: `/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345`,
+        photo: {
+          url: `/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345`,
+          alt: `Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}`,
+        },
         cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
         upload: false,
       })

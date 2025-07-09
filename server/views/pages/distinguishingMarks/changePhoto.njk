@@ -16,7 +16,7 @@
         {{ heading }}
       </h1>
       <div class="govuk-form-group">
-        {{ fileUploadWithPreview("file", { initialPhotoUrl: photoUrl }) }}
+        {{ fileUploadWithPreview("file", { initialPhotoUrl: photo.url, initialPhotoAlt: photo.alt }) }}
       </div>
       <div class="govuk-button-group">
         {{ govukButton({ text: "Save", type: "submit" }) }}
