@@ -45,6 +45,7 @@ import { populateEditPageData } from '../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGuard'
 import { personalPageBasePath } from './personalRouter'
 import PersonalController from '../controllers/personal/personalController'
+import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
@@ -348,6 +349,16 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
       method: personalController.cityOrTownOfBirthTextInput().submit,
+      validation: {
+        validators: [
+          textFieldLengthValidator({
+            fieldName: 'cityOrTownOfBirth',
+            displayName: 'City or town of birth',
+            maxLength: 25,
+          }),
+        ],
+        redirectBackOnError: true,
+      },
     },
     requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })
