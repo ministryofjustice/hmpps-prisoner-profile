@@ -1,12 +1,11 @@
-const imageInput = document.getElementById('file')
-const inputContainer = document.getElementById('file-upload')
-const previewImage = document.getElementById('preview-image')
-const previewFilename = document.getElementById('preview-filename')
-const previewContainer = document.getElementById('preview-container')
-const changeLink = document.getElementById('change-photo-link')
-
 // Show the image preview and hide upload controls when adding a new photo
-function previewSelectedImage() {
+function previewSelectedImage(component) {
+  const imageInput = component.querySelector('#file')
+  const inputContainer = component.querySelector('#file-upload')
+  const previewImage = component.querySelector('#preview-image')
+  const previewFilename = component.querySelector('#preview-filename')
+  const previewContainer = component.querySelector('#preview-container')
+
   const file = imageInput.files[0]
   if (file) {
     const reader = new FileReader()
@@ -21,14 +20,25 @@ function previewSelectedImage() {
   }
 }
 
-imageInput.addEventListener('change', previewSelectedImage)
-
 // Hide the photo preview and show upload controls when 'change' link is clicked
-function showUploadControls() {
+function showUploadControls(component) {
+  const imageInput = component.querySelector('#file')
+  const inputContainer = component.querySelector('#file-upload')
+  const previewFilename = component.querySelector('#preview-filename')
+  const previewContainer = component.querySelector('#preview-container')
+
   imageInput.value = null
   previewFilename.innerText = ''
   previewContainer.style.display = 'none'
-  inputContainer.style.display = 'block'
+  inputContainer.style.display = 'flex'
 }
 
-changeLink.addEventListener('click', showUploadControls)
+window.onload = () => {
+  const components = document.querySelectorAll('[data-component="file-upload-with-preview-component"]')
+  components.forEach(component => {
+    const imageInput = component.querySelector('#file')
+    const changeLink = component.querySelector('#change-photo-link')
+    imageInput.addEventListener('change', () => previewSelectedImage(component))
+    changeLink.addEventListener('click', () => showUploadControls(component))
+  })
+}

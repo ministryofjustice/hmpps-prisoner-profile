@@ -62,7 +62,6 @@ context('Change distinguishing mark photo', () => {
       page.fileUploadButton().should('not.be.visible')
       page.changeLink().click()
       page.fileUploadButton().should('be.visible')
-      cy.location('search').should('eq', '?upload')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
@@ -79,7 +78,6 @@ context('Change distinguishing mark photo', () => {
       page.fileUploadButton().should('not.be.visible')
       page.changeLink().click()
       page.fileUploadButton().should('be.visible')
-      cy.location('search').should('eq', '?upload')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
@@ -96,7 +94,6 @@ context('Change distinguishing mark photo', () => {
       page.fileUploadButton().should('not.be.visible')
       page.changeLink().click()
       page.fileUploadButton().should('be.visible')
-      cy.location('search').should('eq', '?upload')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
