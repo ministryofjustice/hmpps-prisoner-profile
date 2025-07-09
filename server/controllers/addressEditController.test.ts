@@ -75,7 +75,7 @@ describe('Address Edit Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
         pageTitle: `Where is this person’s address? - Prisoner personal details`,
-        formTitle: 'Where is the address?',
+        formTitle: 'Where is John Saunders’ address?',
         options: [
           { value: 'uk', text: 'United Kingdom' },
           { value: 'overseas', text: 'Overseas' },

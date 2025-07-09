@@ -5,7 +5,7 @@ import WhereIsAddressPage from '../../../../pages/editPages/address/whereIsAddre
 
 const visitWhereIsAddressPage = (): WhereIsAddressPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/personal/where-is-address' })
-  return Page.verifyOnPageWithTitle(WhereIsAddressPage, `Where is the address?`)
+  return Page.verifyOnPageWithTitle(WhereIsAddressPage, `Where is John Saunders’ address?`)
 }
 
 context('Where is Address Page', () => {
