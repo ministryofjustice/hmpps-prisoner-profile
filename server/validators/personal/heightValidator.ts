@@ -1,17 +1,19 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
+const containsOnlyNumbers = (str: string) => str.match(/[^\d-]/) === null
+
 export const heightMetricValidator: Validator = (body: Record<string, string>) => {
   const { editField } = body
+
+  if (!containsOnlyNumbers(editField)) {
+    return [{ text: 'Enter this person’s height', href: '#height' }]
+  }
 
   const height = editField ? parseInt(editField, 10) : 0
 
   // Empty input is allowed
   if (editField === '') {
     return []
-  }
-
-  if (Number.isNaN(height)) {
-    return [{ text: 'Enter this person’s height', href: '#height' }]
   }
 
   if (height < 50 || height > 280) {
@@ -24,6 +26,10 @@ export const heightMetricValidator: Validator = (body: Record<string, string>) =
 export const heightImperialValidator: Validator = (body: Record<string, string>) => {
   const { feet: feetString, inches: inchesString } = body
 
+  if ((feetString && !containsOnlyNumbers(feetString)) || (inchesString && !containsOnlyNumbers(inchesString))) {
+    return [{ text: 'Enter this person’s height', href: '#feet' }]
+  }
+
   const feet = feetString ? parseInt(feetString, 10) : 0
   const inches = inchesString ? parseInt(inchesString, 10) : 0
 
@@ -32,11 +38,7 @@ export const heightImperialValidator: Validator = (body: Record<string, string>)
     return []
   }
 
-  if (Number.isNaN(feet) || Number.isNaN(inches)) {
-    return [{ text: 'Enter this person’s height', href: '#feet' }]
-  }
-
-  if (!feetString || (feet >= 1 && feet <= 9 && inches < 0)) {
+  if (!feetString || (feet >= 1 && feet <= 9 && (inches < 0 || inches > 11))) {
     return [{ text: 'Feet must be between 1 and 9. Inches must be between 0 and 11', href: '#feet' }]
   }
 
