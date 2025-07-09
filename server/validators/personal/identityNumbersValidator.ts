@@ -3,13 +3,11 @@ import HmppsError from '../../interfaces/HmppsError'
 import { AddIdentityNumberSubmission } from '../../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
 import { EditIdentityNumberSubmission } from '../../controllers/identityNumbersController'
 import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifierType'
+import { pncFormatValidator } from './identity-numbers/pncFormatValidator'
+import { croFormatValidator } from './identity-numbers/croFormatValidator'
 
 const MAX_LENGTH = 20
 const MAX_COMMENT_LENGTH = 240
-
-const pncRegex = /^\d{2,4}\/?\d{1,7}[A-Z]$/
-const croRegex = /^\d{1,6}\/\d{2}[A-Z]$/
-const croSfRegex = /^SF\d{2}\/\d{1,6}[A-Z]$/
 
 export const addIdentityNumbersValidator = (body: Record<string, AddIdentityNumberSubmission>) => {
   const errors: HmppsError[] = []
@@ -83,13 +81,7 @@ const validatePnc = (input: string, href: string, errors: HmppsError[]) => {
     return
   }
 
-  const sanitized = input?.toUpperCase() || ''
-  if (!pncRegex.test(sanitized)) {
-    errors.push({
-      text: 'Enter a PNC number in the correct format, exactly as it appears on the document',
-      href,
-    })
-  }
+  errors.push(...pncFormatValidator(input, href))
 }
 
 const validateCro = (input: string, href: string, errors: HmppsError[]) => {
@@ -97,11 +89,5 @@ const validateCro = (input: string, href: string, errors: HmppsError[]) => {
     return
   }
 
-  const sanitized = input?.toUpperCase() || ''
-  if (!croRegex.test(sanitized) && !croSfRegex.test(sanitized)) {
-    errors.push({
-      text: 'Enter a CRO number in the correct format, exactly as it appears on the document',
-      href,
-    })
-  }
+  errors.push(...croFormatValidator(input, href))
 }
