@@ -7,6 +7,7 @@ import { osPlacesApiClientMock } from '../../tests/mocks/osPlacesApiClientMock'
 import {
   mockOsPlacesAddressQueryEmptyResponse,
   mockOsPlacesAddressQueryResponse,
+  mockOsPlacesAddressQuerySingleResponse,
 } from '../data/localMockData/osPlacesAddressQueryResponse'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { mockAddresses } from '../data/localMockData/addresses'
@@ -24,6 +25,8 @@ import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { AddressLocation } from './mappers/addressMapper'
 import { formatDateISO } from '../utils/dateHelpers'
 import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
+import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryResponse'
+import NotFoundError from '../utils/notFoundError'
 
 const clientToken = 'CLIENT_TOKEN'
 
@@ -296,6 +299,56 @@ describe('addressService', () => {
       osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryResponse)
       await addressService.getAddressesMatchingQuery('petty france sw1H9eA 102')
       expect(osPlacesApiClient.getAddressesByFreeTextQuery).toHaveBeenCalledWith('petty france SW1H 9EA 102')
+    })
+  })
+
+  describe('getAddressesByUprn', () => {
+    it('Throws NotFoundException if empty result returned', async () => {
+      osPlacesApiClient.getAddressesByUprn = jest.fn(async () => mockOsPlacesAddressQueryEmptyResponse)
+      await expect(addressService.getAddressByUprn('123', clientToken)).rejects.toThrow(
+        new NotFoundError('Could not find address by UPRN'),
+      )
+    })
+
+    it('Picks the last result if multiple are returned', async () => {
+      osPlacesApiClient.getAddressesByUprn = jest.fn(
+        async () =>
+          ({
+            header: { ...mockOsPlacesAddressQueryEmptyResponse.header, totalresults: 2 },
+            results: [
+              { DPA: { UPRN: 12345, ADDRESS: '', BUILDING_NUMBER: 1 } },
+              { DPA: { UPRN: 12345, ADDRESS: '', BUILDING_NUMBER: 2 } },
+            ],
+          }) as OsPlacesQueryResponse,
+      )
+
+      const address = await addressService.getAddressByUprn('12345', clientToken)
+
+      expect(address.buildingNumber).toEqual('2')
+    })
+
+    it('Maps the returned address correctly', async () => {
+      osPlacesApiClient.getAddressesByUprn = jest.fn(async () => mockOsPlacesAddressQuerySingleResponse)
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ description: 'My Post Town', code: 'CITY1' } as ReferenceDataCodeDto])
+
+      const address = await addressService.getAddressByUprn('12345', clientToken)
+
+      expect(address).toEqual(
+        expect.objectContaining({
+          uprn: 12345,
+          buildingNumber: '1',
+          subBuildingName: '',
+          buildingName: '',
+          thoroughfareName: 'The Road',
+          dependantLocality: 'My Town',
+          postTownCode: 'CITY1',
+          countryCode: 'ENG',
+          postCode: 'A123BC',
+          addressTypes: [],
+        }),
+      )
     })
   })
 

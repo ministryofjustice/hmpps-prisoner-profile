@@ -49,7 +49,8 @@ export default class AddressMapper {
   constructor(private readonly referenceDataService: ReferenceDataService) {}
 
   public async toAddressRequestDto(address: OsAddress, token: string): Promise<AddressRequestDto> {
-    const postTownCode = await this.getNomisCodeFromOsPlacesPostTown(address.postTown, token)
+    const postTownCode =
+      (address.postTown && (await this.getNomisCodeFromOsPlacesPostTown(address.postTown, token))) || null
 
     return {
       uprn: address.uprn,
@@ -86,7 +87,7 @@ export default class AddressMapper {
       token,
     )
 
-    return cityCodes.find(code => code.description?.toUpperCase()?.trim() === osPlacesPostTown?.toUpperCase()?.trim())
+    return cityCodes?.find(code => code.description?.toUpperCase()?.trim() === osPlacesPostTown?.toUpperCase()?.trim())
       ?.code
   }
 }

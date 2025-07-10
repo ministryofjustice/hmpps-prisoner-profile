@@ -21,6 +21,7 @@ import MetricsService from './metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
 import { transformPhones } from '../utils/transformPhones'
+import logger from '../../logger'
 
 const stringContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 const numericStringRegex = /^[0-9]+$/i
@@ -132,11 +133,10 @@ export default class AddressService {
     const response = await this.osPlacesApiClient.getAddressesByUprn(uprn)
     const result = this.handleResponse(response)
 
-    if (result.length !== 1) {
-      throw new NotFoundError('Could not find unique address by UPRN')
-    }
+    if (result.length === 0) throw new NotFoundError('Could not find address by UPRN')
+    if (result.length > 1) logger.info(`Multiple results returned for UPRN`)
 
-    return this.addressMapper.toAddressRequestDto(result[0], token)
+    return this.addressMapper.toAddressRequestDto(result[result.length - 1], token)
   }
 
   public async getCityCode(code: string, token: string): Promise<ReferenceDataCodeDto> {
