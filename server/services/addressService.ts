@@ -123,7 +123,7 @@ export default class AddressService {
 
   public async getAddressesMatchingQuery(searchQuery: string, sanitisePostcode: boolean = true): Promise<OsAddress[]> {
     const response = await this.osPlacesApiClient.getAddressesByFreeTextQuery(
-      sanitisePostcode ? this.sanitisePostcode(searchQuery) : searchQuery,
+      sanitisePostcode ? this.sanitisePostcode(searchQuery, AddressLocation.uk) : searchQuery,
     )
     return this.handleResponse(response)
   }
@@ -173,11 +173,14 @@ export default class AddressService {
     return this.addressMapper.filterCountryCodes(countryCodes, options.addressLocation)
   }
 
-  public sanitisePostcode(stringContainingPostcode: string) {
-    const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode)
-    if (!postCodeQuery) return stringContainingPostcode
+  public sanitisePostcode(stringContainingPostcode: string, addressLocation: AddressLocation) {
+    if (addressLocation !== AddressLocation.overseas) {
+      const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode)
+      if (!postCodeQuery) return stringContainingPostcode
 
-    return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
+      return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
+    }
+    return stringContainingPostcode?.trim()?.toUpperCase() ?? stringContainingPostcode
   }
 
   private handleResponse(response: OsPlacesQueryResponse): OsAddress[] {

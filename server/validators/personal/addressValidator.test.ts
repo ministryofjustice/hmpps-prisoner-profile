@@ -13,7 +13,7 @@ const submittedAddress = {
 
 describe('Address Validator', () => {
   it('Valid data', async () => {
-    const errors = await addressValidator(submittedAddress)
+    const errors = await addressValidator({ ukAddress: true })(submittedAddress)
     expect(errors.length).toEqual(0)
   })
 
@@ -23,7 +23,7 @@ describe('Address Validator', () => {
       houseOrBuildingName: 'a'.repeat(51),
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('House or building name must be 50 characters or less')
     expect(errors[0].href).toEqual('#house-or-building-name')
@@ -35,7 +35,7 @@ describe('Address Validator', () => {
       houseNumber: '1'.repeat(5),
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('House number must be 4 characters or less')
     expect(errors[0].href).toEqual('#house-number')
@@ -47,7 +47,7 @@ describe('Address Validator', () => {
       addressLine1: 'a'.repeat(61),
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Address line 1 must be 60 characters or less')
     expect(errors[0].href).toEqual('#address-line-1')
@@ -59,21 +59,44 @@ describe('Address Validator', () => {
       addressLine2: 'a'.repeat(36),
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Address line 2 must be 35 characters or less')
     expect(errors[0].href).toEqual('#address-line-2')
   })
 
-  it('Field postcode exceeds 8 chars', async () => {
+  it.each([
+    ['ABC', false],
+    ['123', false],
+    ['ABC 123', false],
+    ['S8 0AD', true],
+    ['S80AD', true],
+    ['GU16 7HF', true],
+    ['  GU16 7HF   ', true],
+    ['GU167HF', true],
+  ])('Postcode: %s is valid: %s', async (postcode, expectValid) => {
+    const body = { ...submittedAddress, postcode }
+
+    const errors = await addressValidator({ ukAddress: true })(body)
+
+    if (expectValid) {
+      expect(errors.length).toEqual(0)
+    } else {
+      expect(errors.length).toEqual(1)
+      expect(errors[0].text).toEqual('Enter a full UK postcode')
+      expect(errors[0].href).toEqual('#postcode')
+    }
+  })
+
+  it('Overseas postcode exceeds 10 chars', async () => {
     const body = {
       ...submittedAddress,
-      postcode: 'a'.repeat(9),
+      postcode: 'a'.repeat(11),
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: false })(body)
     expect(errors.length).toEqual(1)
-    expect(errors[0].text).toEqual('Postcode must be 8 characters or less')
+    expect(errors[0].text).toEqual('Postcode must be 10 characters or less')
     expect(errors[0].href).toEqual('#postcode')
   })
 
@@ -83,7 +106,7 @@ describe('Address Validator', () => {
       townOrCityError: 'error',
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Enter a valid town or city')
     expect(errors[0].href).toEqual('#town-or-city')
@@ -95,7 +118,7 @@ describe('Address Validator', () => {
       countyError: 'error',
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Enter a valid county')
     expect(errors[0].href).toEqual('#county')
@@ -107,7 +130,7 @@ describe('Address Validator', () => {
       country: undefined as string,
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Enter a country')
     expect(errors[0].href).toEqual('#country')
@@ -119,7 +142,7 @@ describe('Address Validator', () => {
       countryError: 'error',
     }
 
-    const errors = await addressValidator(body)
+    const errors = await addressValidator({ ukAddress: true })(body)
     expect(errors.length).toEqual(1)
     expect(errors[0].text).toEqual('Enter a valid country')
     expect(errors[0].href).toEqual('#country')
