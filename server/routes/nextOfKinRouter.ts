@@ -87,7 +87,7 @@ export default function nextOfKinRouter(services: Services): Router {
   post(
     '/add-uk-next-of-kin-no-fixed-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
       auditAction: PostAction.EditNextOfKinAddressNoFixedAddressManual,
@@ -107,7 +107,7 @@ export default function nextOfKinRouter(services: Services): Router {
   post(
     '/add-uk-next-of-kin-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.uk,
       auditAction: PostAction.EditNextOfKinAddressUkManual,
@@ -127,7 +127,7 @@ export default function nextOfKinRouter(services: Services): Router {
   post(
     '/add-next-of-kin-overseas-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: false })], { redirectBackOnError: true }),
     nextOfKinController.submitManualEditAddress({
       addressLocation: AddressLocation.overseas,
       auditAction: PostAction.EditNextOfKinAddressOverseasManual,

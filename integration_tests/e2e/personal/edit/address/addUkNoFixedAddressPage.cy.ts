@@ -70,7 +70,7 @@ context('Add UK No Fixed Address', () => {
             houseNumber: '1'.repeat(5),
             addressLine1: 'a'.repeat(61),
             addressLine2: 'a'.repeat(36),
-            postcode: 'a'.repeat(9),
+            postcode: 'abc',
           },
         },
         errorMessages: [
@@ -78,7 +78,7 @@ context('Add UK No Fixed Address', () => {
           'House number must be 4 characters or less',
           'Address line 1 must be 60 characters or less',
           'Address line 2 must be 35 characters or less',
-          'Postcode must be 8 characters or less',
+          'Enter a full UK postcode',
         ],
       },
       {

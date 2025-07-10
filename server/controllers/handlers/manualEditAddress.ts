@@ -106,7 +106,7 @@ export function submitManualEditAddressHandler(
       thoroughfareName: convertToTitleCase(addressLine1),
       dependantLocality: convertToTitleCase(addressLine2),
       postTownCode: townOrCity,
-      postCode: addressService.sanitisePostcode(postcode),
+      postCode: addressService.sanitisePostcode(postcode, addressLocation),
       countyCode: county,
       countryCode: country,
       fromDate: formatDateISO(new Date()),

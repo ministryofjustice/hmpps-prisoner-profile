@@ -264,7 +264,7 @@ describe('addressService', () => {
     )
   })
 
-  describe('sanitisePostcode', () => {
+  describe('sanitisePostcode - UK', () => {
     it.each([
       [undefined, undefined],
       [null, null],
@@ -276,7 +276,18 @@ describe('addressService', () => {
       ['before sw1h9aj after', 'before SW1H 9AJ after'],
       ['not a postcode', 'not a postcode'],
     ])(`before: '%s', after: '%s'`, (before, after) => {
-      expect(addressService.sanitisePostcode(before)).toEqual(after)
+      expect(addressService.sanitisePostcode(before, AddressLocation.uk)).toEqual(after)
+    })
+  })
+
+  describe('sanitisePostcode - Overseas', () => {
+    it.each([
+      [undefined, undefined],
+      [null, null],
+      ['', ''],
+      ['abc', 'ABC'],
+    ])(`before: '%s', after: '%s'`, (before, after) => {
+      expect(addressService.sanitisePostcode(before, AddressLocation.overseas)).toEqual(after)
     })
   })
 
