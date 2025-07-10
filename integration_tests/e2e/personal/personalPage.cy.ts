@@ -189,7 +189,7 @@ context('When signed in', () => {
           .and('include.text', 'Nutrient deficiency')
           .and('include.text', 'Vegan')
           .and('include.text', 'Arrange the food like a smiley face.')
-        page.personalDetails().smokeOrVaper().should('have.text', 'No')
+        page.personalDetails().smokeOrVaper().should('have.text', 'Does not smoke or vape')
         page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
         page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')
         page.personalDetails().socialCareNeeded().should('have.text', 'No')
