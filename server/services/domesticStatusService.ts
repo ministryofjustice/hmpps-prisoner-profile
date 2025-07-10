@@ -18,7 +18,7 @@ const domesticStatusMapping: Record<string, string> = {
   D: 'Divorced or dissolved',
   P: 'Separated – married or in a civil partnership but living apart',
   W: 'Widowed or surviving civil partner',
-  N: 'Prefer not to say',
+  N: 'They prefer not to say',
 }
 
 export default class DomesticStatusService {

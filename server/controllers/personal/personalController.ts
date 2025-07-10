@@ -1394,7 +1394,7 @@ export default class PersonalController {
     const descriptionLookup: Record<string, string> = {
       HET: 'Heterosexual or straight',
       HOM: 'Gay or lesbian',
-      ND: 'Not answered',
+      ND: 'They prefer not to say',
     }
 
     const currentOrientationCode = async (req: Request, referenceData?: ReferenceDataCodeDto[]) => {
@@ -1568,7 +1568,12 @@ export default class PersonalController {
         const radioOptions = [
           ...objectToRadioOptions(options, 'code', 'description', fieldValue),
           { divider: 'Or' },
-          ...objectToRadioOptions([preferNotToSayOption], 'code', 'description', fieldValue),
+          ...objectToRadioOptions(
+            [{ ...preferNotToSayOption, description: 'They prefer not to say' }],
+            'code',
+            'description',
+            fieldValue,
+          ),
         ]
 
         return this.editRadioFields(
