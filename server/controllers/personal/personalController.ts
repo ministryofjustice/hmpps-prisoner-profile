@@ -1198,8 +1198,9 @@ export default class PersonalController {
         const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
         const previousValue = inmateDetail.birthCountryCode
 
-        if (!autocompleteField && ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(radioField)) {
-          const validationText = radioField === 'OTHER' ? 'Enter country name' : 'This is not a valid country'
+        if (radioField === 'OTHER__VALIDATION_ERROR' || (radioField === 'OTHER' && !autocompleteField)) {
+          const validationText =
+            radioField === 'OTHER__VALIDATION_ERROR' ? 'This is not a valid country' : 'Enter country name'
           req.flash('errors', [{ href: '#autocomplete', text: validationText }])
           req.flash('requestBody', JSON.stringify(req.body))
           return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
