@@ -453,7 +453,8 @@ export default class PersonalPageService {
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
       smokerOrVaper:
-        getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
+        this.mapSmokerVaper(getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation)) ||
+        'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
@@ -527,6 +528,13 @@ export default class PersonalPageService {
       []
     )
   }
+
+  private mapSmokerVaper = (smokerVaperStatus: string) =>
+    ({
+      No: 'Does not smoke or vape',
+      Yes: 'Smoker',
+      'Vaper/NRT Only': 'Vaper or uses nicotine replacement therapy (NRT)',
+    })[smokerVaperStatus] ?? smokerVaperStatus
 
   private latestModificationDetails = (healthAndMedication: HealthAndMedication) => {
     const dietAndAllergy = healthAndMedication?.dietAndAllergy

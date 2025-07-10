@@ -69,6 +69,7 @@ import {
 import { mockAddressResponseDto } from '../data/localMockData/personIntegrationApi/addresses'
 import AddressService from './addressService'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
+import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -349,9 +350,21 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
-      it('Maps the smoker or vaper field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.smokerOrVaper).toEqual('No')
+      describe('Smoker or vaper', () => {
+        it.each([
+          ['No', 'Does not smoke or vape'],
+          ['Yes', 'Smoker'],
+          ['Vaper/NRT Only', 'Vaper or uses nicotine replacement therapy (NRT)'],
+          ['Some unmapped other option', 'Some unmapped other option'],
+        ])(`Maps the smoker or vaper field: '%s' to '%s'`, async (input, output) => {
+          prisonApiClient.getInmateDetail = jest.fn(async () => ({
+            ...inmateDetailMock,
+            profileInformation: [{ type: 'SMOKE', resultValue: input } as ProfileInformation],
+          }))
+
+          const response = await constructService().get('token', PrisonerMockDataA)
+          expect(response.personalDetails.smokerOrVaper).toEqual(output)
+        })
       })
 
       describe('Food allergies', () => {
