@@ -2715,7 +2715,7 @@ describe('PersonalController', () => {
         { text: 'Bisexual', value: 'BIS' },
         { text: 'Other', value: 'OTH' },
         { divider: 'Or' },
-        { text: 'Not answered', value: 'ND' },
+        { text: 'They prefer not to say', value: 'ND' },
       ]
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
@@ -3046,7 +3046,7 @@ describe('PersonalController', () => {
         {
           id: '3',
           code: 'N',
-          description: 'Prefer not to say',
+          description: 'The prefer not to say',
           listSequence: 99,
           isActive: true,
         },
@@ -3061,7 +3061,7 @@ describe('PersonalController', () => {
           { text: 'Single', value: 'S', checked: true },
           { text: 'Married', value: 'M' },
           { divider: 'Or' },
-          { text: 'Prefer not to say', value: 'N' },
+          { text: 'They prefer not to say', value: 'N' },
         ]
 
         const req = {
