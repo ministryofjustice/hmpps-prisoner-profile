@@ -101,7 +101,7 @@
         classes: 'govuk-!-margin-bottom-0',
         rows: toSummaryListRows([
             {
-              key: "Full name",
+              key: "Name",
               value: personalDetails.fullName,
               options: {
                 dataQa: "full-name",
@@ -112,7 +112,7 @@
             },
             {
               key: "Aliases",
-              value: "No aliases have been entered." if aliases.length == 0,
+              value: "Not entered" if aliases.length == 0,
               options: {
                 dataQa: "aliases",
                 changeText: 'Add an alias',
