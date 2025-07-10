@@ -91,7 +91,7 @@ export default function addressEditRouter(services: Services): Router {
   post(
     '/add-uk-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.uk,
       auditAction: PostAction.EditAddressUkManual,
@@ -111,7 +111,7 @@ export default function addressEditRouter(services: Services): Router {
   post(
     '/add-overseas-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: false })], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.overseas,
       auditAction: PostAction.EditAddressOverseasManual,
@@ -131,7 +131,7 @@ export default function addressEditRouter(services: Services): Router {
   post(
     '/add-uk-no-fixed-address',
     ...commonMiddleware,
-    validationMiddleware([addressValidator], { redirectBackOnError: true }),
+    validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
     addressEditController.submitManualEditAddress({
       addressLocation: AddressLocation.no_fixed_address,
       auditAction: PostAction.EditAddressNoFixedAddressManual,
