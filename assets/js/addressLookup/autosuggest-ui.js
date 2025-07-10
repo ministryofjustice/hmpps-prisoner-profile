@@ -2,16 +2,16 @@
 
 const jsBaseClass = 'hmpps-js-autosuggest'
 
-const classSuffixInitialised= '--initialised'
+const classSuffixInitialised = '--initialised'
 const classSuffixOption = '__option'
 const classSuffixOptionFocused = `${classSuffixOption}--focused`
 const classSuffixOptionNoResults = `${classSuffixOption}--no-results`
 const classSuffixHasResults = '--has-results'
 
-const NoResults= {
+const NoResults = {
   type_more: 'TYPE_MORE',
   no_match: 'NO_MATCH',
-  server_error: 'SERVER_ERROR'
+  server_error: 'SERVER_ERROR',
 }
 
 class AutosuggestUi {
@@ -32,7 +32,7 @@ class AutosuggestUi {
     this.ariaYouHaveSelected = context.getAttribute('data-aria-you-have-selected')
     this.ariaMinChars = context.getAttribute('data-aria-min-chars')
     this.ariaOneResult = context.getAttribute('data-aria-one-result')
-    this.ariaNResults =context.getAttribute('data-aria-n-results')
+    this.ariaNResults = context.getAttribute('data-aria-n-results')
     this.noResults = context.getAttribute('data-no-results')
     this.typeMore = context.getAttribute('data-type-more')
     this.listboxId = this.listbox.getAttribute('id')
@@ -83,17 +83,20 @@ class AutosuggestUi {
 
   handleKeydown(event) {
     switch (event.keyCode) {
-      case 38: { // Up
+      case 38: {
+        // Up
         event.preventDefault()
         this.navigateResults(-1)
         break
       }
-      case 40: { // Down
+      case 40: {
+        // Down
         event.preventDefault()
         this.navigateResults(1)
         break
       }
-      case 13: { // Enter
+      case 13: {
+        // Enter
         if (this.highlightedResultIndex !== null) {
           event.preventDefault()
         }
@@ -110,7 +113,8 @@ class AutosuggestUi {
         event.preventDefault()
         break
       }
-      case 13: { // Enter
+      case 13: {
+        // Enter
         if (this.highlightedResultIndex !== null) {
           this.selectResult()
         }
@@ -199,7 +203,7 @@ class AutosuggestUi {
       if (this.sanitisedQuery.length >= this.minChars) {
         this.fetchSuggestions(this.sanitisedQuery, this.data)
           .then(this.handleResults.bind(this))
-          .catch((error) => {
+          .catch(error => {
             if (error.name !== abortError && error.reason !== abortTimeout) {
               console.log('error:', error)
               this.handleNoResults(NoResults.server_error)
@@ -230,14 +234,15 @@ class AutosuggestUi {
     this.setAriaStatus()
     this.listbox.innerHTML = ''
 
-    this.resultOptions = this.results?.map((result, index) => {
-      this.resultsTitleContainer?.classList?.remove('hmpps-display-none')
-      const listElement = this.createListElement(result, index)
-      this.listbox.appendChild(listElement)
-      return listElement
-    }) ?? []
+    this.resultOptions =
+      this.results?.map((result, index) => {
+        this.resultsTitleContainer?.classList?.remove('hmpps-display-none')
+        const listElement = this.createListElement(result, index)
+        this.listbox.appendChild(listElement)
+        return listElement
+      }) ?? []
 
-    this.setHighlightedResult(null)
+    this.setHighlightedResult(0)
     this.input.setAttribute('aria-expanded', this.numberOfResults ? 'true' : 'false')
 
     if (!!this.numberOfResults && this.sanitisedQuery.length >= this.minChars) {
@@ -259,8 +264,10 @@ class AutosuggestUi {
     listElement.setAttribute('id', `${this.listboxId}__option--${index}`)
     listElement.setAttribute('role', 'option')
     listElement.innerHTML = innerHTML
-    listElement.addEventListener('click', () => { this.selectResult(index) })
-    listElement.addEventListener('mouseenter', (() => !this.scrolling && this.setHighlightedResult(index)))
+    listElement.addEventListener('click', () => {
+      this.selectResult(index)
+    })
+    listElement.addEventListener('mouseenter', () => !this.scrolling && this.setHighlightedResult(index))
     return listElement
   }
 
@@ -270,7 +277,7 @@ class AutosuggestUi {
       this.resultsTitleContainer?.classList?.add('hmpps-display-none')
       this.input.setAttribute('aria-expanded', true)
 
-      const message = (reason === NoResults.type_more) ? this.typeMore : this.noResults
+      const message = reason === NoResults.type_more ? this.typeMore : this.noResults
       this.setAriaStatus(message)
       this.listbox.innerHTML = `<li class="${this.stylingBaseClass}${classSuffixOption} ${this.stylingBaseClass}${classSuffixOptionNoResults}">${message}</li>`
     } else {
@@ -280,7 +287,7 @@ class AutosuggestUi {
 
   displayAPIError() {
     this.input.value = ''
-    this.input.setAttribute('disabled', true);
+    this.input.setAttribute('disabled', true)
     this.clearListbox()
     this.errorContainer.classList.remove('hmpps-display-none')
     this.errorTextContainer.innerHTML = this.errorMessage
@@ -308,10 +315,10 @@ class AutosuggestUi {
           const optionText = option.innerHTML.replace('<strong>', '').replace('</strong>', '')
           this.setAriaStatus(optionText)
         } else {
-          option.classList.remove(`${this.stylingBaseClass}${classSuffixOptionFocused}`);
-          option.removeAttribute('aria-selected');
+          option.classList.remove(`${this.stylingBaseClass}${classSuffixOptionFocused}`)
+          option.removeAttribute('aria-selected')
         }
-      });
+      })
     }
   }
 
@@ -321,34 +328,34 @@ class AutosuggestUi {
     const result = this.results[index || this.highlightedResultIndex || 0]
     this.onSelect(result)
     this.clearListbox()
-    this.setAriaStatus(`${this.ariaYouHaveSelected}: ${result.displayText}.`);
+    this.setAriaStatus(`${this.ariaYouHaveSelected}: ${result.displayText}.`)
   }
 
   setAriaStatus(content) {
     if (!content) {
-      const queryTooShort = this.sanitisedQuery.length < this.minChars;
-      const noResults = this.numberOfResults === 0;
+      const queryTooShort = this.sanitisedQuery.length < this.minChars
+      const noResults = this.numberOfResults === 0
       if (queryTooShort) {
-        content = this.ariaMinChars;
+        content = this.ariaMinChars
       } else if (noResults) {
-        content = `${this.noResults}: "${this.query}"`;
+        content = `${this.noResults}: "${this.query}"`
       } else if (this.numberOfResults === 1) {
-        content = this.ariaOneResult;
+        content = this.ariaOneResult
       } else {
-        content = this.ariaNResults.replace('{n}', this.numberOfResults);
+        content = this.ariaNResults.replace('{n}', this.numberOfResults)
       }
     }
-    this.ariaStatus.innerHTML = content;
+    this.ariaStatus.innerHTML = content
   }
 
   emboldenMatch(string, query) {
-    let reg = new RegExp(this.escapeRegExp(query).split(' ').join('[\\s,]*'), 'gi');
+    let reg = new RegExp(this.escapeRegExp(query).split(' ').join('[\\s,]*'), 'gi')
 
-    return string.replace(reg, '<strong>$&</strong>');
+    return string.replace(reg, '<strong>$&</strong>')
   }
 
   escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
 
   isAboveViewport(element) {
