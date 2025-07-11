@@ -7,6 +7,7 @@ import {
   bodyPartMap,
   BodyPartSelection,
   bodyPartSelections,
+  MarkTypeSelection,
   markTypeSelections,
 } from './interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from './interfaces/MulterFile'
@@ -156,7 +157,7 @@ export default class DistinguishingMarksController {
     req.flash('flashMessage', {
       text: `${convertToTitleCase(verifiedMarkType)} added`,
       type: FlashMessageType.success,
-      fieldName: 'distinguishing-mark',
+      fieldName: `distinguishing-marks-${verifiedMarkType}`,
     })
 
     return action === 'returnToProfile'
@@ -167,6 +168,7 @@ export default class DistinguishingMarksController {
   public async changeDistinguishingMark(req: Request, res: Response) {
     const { clientToken, prisonerData } = req.middleware
     const { prisonerNumber, markId, markType } = req.params
+    const updated = (req.query.updated as string) === 'true'
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
 
@@ -182,7 +184,25 @@ export default class DistinguishingMarksController {
       prisonerNumber,
       mark,
       markType,
+      updated,
     })
+  }
+
+  public async returnToPrisonerProfileAfterUpdate(req: Request, res: Response) {
+    const { prisonerNumber, markType } = req.params
+    const updateMessages: Record<MarkTypeSelection, string> = {
+      tattoo: 'Tattoos updated',
+      scar: 'Scars updated',
+      mark: 'Other marks updated',
+    }
+
+    req.flash('flashMessage', {
+      text: updateMessages[markType as MarkTypeSelection] ?? 'Distinguishing marks updated',
+      type: FlashMessageType.success,
+      fieldName: `distinguishing-marks-${markType}`,
+    })
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
   }
 
   public async changeBodyPart(req: Request, res: Response) {
@@ -328,7 +348,7 @@ export default class DistinguishingMarksController {
       })
       .catch(error => logger.error(error))
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}?updated=true`)
   }
 
   public async changeDescription(req: Request, res: Response) {
@@ -389,7 +409,7 @@ export default class DistinguishingMarksController {
       })
       .catch(error => logger.error(error))
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}?updated=true`)
   }
 
   public async changePhoto(req: Request, res: Response) {
@@ -429,11 +449,12 @@ export default class DistinguishingMarksController {
     const { markId, markType, prisonerNumber } = req.params
     const { prisonerData } = req.middleware
     const upload = req.query.upload !== undefined
+    const updated = (req.query.updated as string) === 'true'
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
-    const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}${updated ? '?updated=true' : ''}`
 
     await this.auditService.sendPageView({
       user: res.locals.user,
@@ -474,7 +495,7 @@ export default class DistinguishingMarksController {
       })
       .catch(error => logger.error(error))
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}?updated=true`)
   }
 
   public async addPhoto(req: Request, res: Response) {
@@ -508,8 +529,8 @@ export default class DistinguishingMarksController {
       .catch(error => logger.error(error))
 
     return action === 'addAnotherPhoto'
-      ? res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}/photo`)
-      : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+      ? res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}/photo?updated=true`)
+      : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}?updated=true`)
   }
 
   public async viewAllImages(req: Request, res: Response) {
