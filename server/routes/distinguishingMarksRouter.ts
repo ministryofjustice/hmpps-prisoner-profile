@@ -83,6 +83,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Edit distinguishing mark
+  get('/profile-redirect', ...commonMiddleware, distinguishingMarksController.returnToPrisonerProfileAfterUpdate)
   get('/:markId', ...commonMiddleware, distinguishingMarksController.changeDistinguishingMark)
 
   // Change body part

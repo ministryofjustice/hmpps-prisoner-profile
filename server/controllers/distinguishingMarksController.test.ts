@@ -8,6 +8,7 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
+import { FlashMessageType } from '../data/enums/flashMessageType'
 
 const getResLocals = () => ({
   user: prisonUserMock,
@@ -26,6 +27,7 @@ describe('Distinguishing Marks Controller', () => {
         clientToken: 'token',
         prisonerData: PrisonerMockDataA,
       },
+      flash: jest.fn(),
     }
     res = {
       locals: getResLocals(),
@@ -342,7 +344,26 @@ describe('Distinguishing Marks Controller', () => {
         prisonerNumber: 'A12345',
         markType,
         mark: distinguishingMarkMock,
+        updated: false,
       })
+    })
+
+    it('should flag to the template when an update has happened', async () => {
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+      const typeReq = {
+        ...req,
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: distinguishingMarkMock.id },
+        query: { updated: 'true' },
+      } as Request
+
+      await controller.changeDistinguishingMark(typeReq, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/distinguishingMarks/changeDistinguishingMark',
+        expect.objectContaining({
+          updated: true,
+        }),
+      )
     })
 
     it('sends a page view audit event', async () => {
@@ -363,6 +384,26 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeDistinguishingMark(typeReq, res)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+  })
+
+  describe('returnToPrisonerProfileAfterUpdate', () => {
+    it.each([
+      ['tattoo', 'Tattoos updated'],
+      ['scar', 'Scars updated'],
+      ['mark', 'Other marks updated'],
+    ])('creates a flashMessage and redirects to the profile for type: %s', async (markType, flashMessage) => {
+      const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as Request
+
+      await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
+
+      expect(typeReq.flash).toHaveBeenCalledWith('flashMessage', {
+        text: flashMessage,
+        type: FlashMessageType.success,
+        fieldName: `distinguishing-marks-${markType}`,
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -995,9 +1036,9 @@ describe('Distinguishing Marks Controller', () => {
 
   describe('addPhoto', () => {
     it.each([
-      [undefined, '/prisoner/A12345/personal/tattoo/100'],
-      ['returnToMarkSummary', '/prisoner/A12345/personal/tattoo/100'],
-      ['addAnotherPhoto', '/prisoner/A12345/personal/tattoo/100/photo'],
+      [undefined, '/prisoner/A12345/personal/tattoo/100?updated=true'],
+      ['returnToMarkSummary', '/prisoner/A12345/personal/tattoo/100?updated=true'],
+      ['addAnotherPhoto', '/prisoner/A12345/personal/tattoo/100/photo?updated=true'],
     ])(
       'should add a new distinguishing mark photo and redirect correctly',
       async (action: string | undefined, redirectUrl: string) => {
