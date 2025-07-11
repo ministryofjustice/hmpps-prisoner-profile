@@ -25,7 +25,7 @@ context('Edit smoker or vaper', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/smoker-or-vaper`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders smoke or vape?',
-    successfulFlashMessage: 'Smoker or vaper updated',
+    successfulFlashMessage: 'Smoking and vaping updated',
     validInputs: [{ radioInputs: { radioField: 'SMOKER_YES ' } }],
     redirectAnchor: 'personal-details',
     isUnrestricted: true,
