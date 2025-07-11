@@ -193,7 +193,7 @@ export const SexualOrientationReferenceDataCodesMock: CorePersonRecordReferenceD
   {
     id: 'SEXO_ND',
     code: 'ND',
-    description: 'Not Disclosed',
+    description: 'Not Answered',
     listSequence: 5,
     isActive: true,
   },
