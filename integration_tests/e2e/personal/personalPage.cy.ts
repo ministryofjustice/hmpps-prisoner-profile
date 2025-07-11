@@ -172,7 +172,7 @@ context('When signed in', () => {
           .should('contain', 'Celestial Church of God')
           .and(
             'contain.html',
-            '<a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/G6123VU/religion-belief-history">Religion or belief history</a>',
+            '<a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/G6123VU/religion-belief-history">Religion, faith or belief history</a>',
           )
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual or straight')
