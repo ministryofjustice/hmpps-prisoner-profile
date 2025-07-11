@@ -111,6 +111,7 @@ export const eyeColourIndividualFieldData: FieldData = {
 export const smokerOrVaperFieldData: RadioFieldData = {
   url: 'smoker-or-vaper',
   fieldName: 'smokerOrVaper',
+  successFlashFieldName: 'Smoking and vaping',
   pageTitle: 'Smoker or vaper',
   auditEditPageLoad: Page.EditSmokerOrVaper,
   auditEditPostAction: PostAction.EditSmokerOrVaper,
