@@ -43,6 +43,9 @@ export const properCaseName = (name: string): string => (isBlank(name) ? '' : na
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
 
+export const capitaliseFirstLetter = (sentence: string): string =>
+  isBlank(sentence) ? '' : sentence[0].toUpperCase() + sentence.slice(1)
+
 export const initialiseName = (fullName?: string): string | null => {
   // this check is for the autherror page
   if (!fullName) return null
