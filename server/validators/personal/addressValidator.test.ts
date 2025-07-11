@@ -74,6 +74,8 @@ describe('Address Validator', () => {
     ['GU16 7HF', true],
     ['  GU16 7HF   ', true],
     ['GU167HF', true],
+    ['GU.&16_-=!7HF', true],
+    [' *S^//80a£D', true],
   ])('Postcode: %s is valid: %s', async (postcode, expectValid) => {
     const body = { ...submittedAddress, postcode }
 
