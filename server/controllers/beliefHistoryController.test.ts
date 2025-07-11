@@ -3,8 +3,6 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import BeliefHistoryController from './beliefHistoryController'
 import BeliefService from '../services/beliefService'
 import { beliefHistoryMock, beliefHistoryOverrideMock } from '../data/localMockData/beliefHistoryMock'
-import { formatName } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -55,11 +53,11 @@ describe('Prisoner belief history', () => {
 
       await controller.displayBeliefHistory(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
-        pageTitle: 'Religion or belief history',
+        pageTitle: 'Religion, faith or belief history',
+        pageHeading: `John Saunders’ religion, faith or belief history`,
         beliefs: beliefHistoryMock,
         prisonerNumber,
-        breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
-        prisonerName: formatName('John', '', 'Saunders'),
+        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
 
@@ -70,14 +68,14 @@ describe('Prisoner belief history', () => {
 
       await controller.displayBeliefHistory(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
-        pageTitle: 'Religion or belief history',
+        pageTitle: 'Religion, faith or belief history',
+        pageHeading: `John Saunders’ religion, faith or belief history`,
         beliefs: [
           { ...beliefHistoryOverrideMock[0], beliefDescription: 'Other religion, faith or belief' },
           beliefHistoryOverrideMock[1],
         ],
         prisonerNumber,
-        breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
-        prisonerName: formatName('John', '', 'Saunders'),
+        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
   })
