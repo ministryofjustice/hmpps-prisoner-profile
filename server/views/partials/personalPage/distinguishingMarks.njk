@@ -75,7 +75,7 @@
     </div>
     <div class='personal-distinguishing-marks__info'>
         <dl>
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }}">
+            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-tattoo' }}">
                 <dt class="personal-distinguishing-marks__row__key">Tattoos</dt>
                 <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMarks('tattoo', groupedDistinguishingMarks.tattoos) }}</dd>
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
@@ -86,7 +86,7 @@
                 {% endif %}
             </div>
 
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }}">
+            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-scar' }}">
                 <dt class="personal-distinguishing-marks__row__key">Scars</dt>
                 <dd data-qa="distinguishing-marks-scars">{{ distinguishingMarks('scar', groupedDistinguishingMarks.scars) }}</dd>
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
@@ -97,7 +97,7 @@
                 {% endif %}
             </div>
 
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }}">
+            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-mark' }}">
                 <dt class="personal-distinguishing-marks__row__key">Other marks</dt>
                 <dd data-qa="distinguishing-marks-others">{{ distinguishingMarks('other mark', groupedDistinguishingMarks.others) }}</dd>
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}

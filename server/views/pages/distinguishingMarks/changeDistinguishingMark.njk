@@ -4,7 +4,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set heading =  "Change " + markType + " details" %}
 {% set pageTitle =  heading + " - Prisoner personal details" %}
-{% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
+{% set personalPath = '/prisoner/' + prisonerNumber + '/personal' %}
+{% set basePath = personalPath + '/' + markType + '/' + mark.id %}
 {% block form %}
     <span class="govuk-caption-l">Distinguishing marks</span>
     <h1 class='govuk-!-margin-top-0 govuk-!-font-size-36'>{{ heading }}</h1>
@@ -54,6 +55,7 @@
         </tr>
     </table>
     <div class="govuk-button-group">
-        <a href={{ "/prisoner/" + prisonerNumber + "/personal#marks" }} class="govuk-link govuk-link--no-visited-state">Return to the prisoner's profile</a>
+        {% set returnUrl = (personalPath + '#marks') if not updated else (personalPath + '/' + markType + '/profile-redirect')%}
+        <a href={{ returnUrl }} class="govuk-link govuk-link--no-visited-state">Return to the prisoner's profile</a>
     </div>
 {% endblock %}
