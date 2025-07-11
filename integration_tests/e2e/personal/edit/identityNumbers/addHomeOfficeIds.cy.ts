@@ -21,7 +21,7 @@ context('Add personal IDs', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/home-office-id-numbers`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Add Home Office ID numbers',
-    successfulFlashMessage: 'Home Office identity numbers added',
+    successfulFlashMessage: 'Identity numbers added',
     validInputs: [
       {
         checkboxInputs: {
@@ -84,8 +84,8 @@ context('Add personal IDs', () => {
         },
         errorMessages: [
           'Enter this person’s Home Office reference number',
-          'Enter this person’s Port reference number',
-          'Enter this person’s Case Information Database (CID)',
+          'Enter this person’s port reference number',
+          'Enter this person’s Case Information Database (CID) number',
         ],
       },
       {
@@ -113,12 +113,9 @@ context('Add personal IDs', () => {
           },
         },
         errorMessages: [
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
+          'Enter the Home Office reference number using 20 characters or less',
+          'Enter the port reference number using 20 characters or less',
+          'Enter the Case Information Database (CID) number using 20 characters or less',
         ],
       },
       {

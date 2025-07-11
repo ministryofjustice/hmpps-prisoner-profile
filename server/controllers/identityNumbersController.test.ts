@@ -17,6 +17,7 @@ import {
 import { FlashMessageType } from '../data/enums/flashMessageType'
 
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
+import { capitaliseFirstLetter } from '../utils/utils'
 
 describe('IdentityNumbersController', () => {
   let req: Request
@@ -107,7 +108,7 @@ describe('IdentityNumbersController', () => {
 
     it('should populate the page data from the request flash', async () => {
       const id = existingValue
-      const { label } = pageData[existingValue]
+      const { description } = pageData[existingValue]
 
       const flashValues: Record<string, AddIdentityNumberSubmission> = {
         [id]: {
@@ -140,8 +141,9 @@ describe('IdentityNumbersController', () => {
       expect(identifierOptions.find(item => item.id === id)).toEqual({
         id,
         selected: true,
-        label,
-        hasExistingValue: true,
+        label: capitaliseFirstLetter(description),
+        description,
+        mostRecentExistingValue: expect.any(String),
         value: '1234',
         comment: 'Some comment',
       })
@@ -149,10 +151,10 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    ['Justice identity numbers added', () => controller.justiceIdNumbers().submit, 'justice-id-numbers'],
-    ['Personal identity numbers added', () => controller.personalIdNumbers().submit, 'personal-id-numbers'],
-    ['Home Office identity numbers added', () => controller.homeOfficeIdNumbers().submit, 'home-office-id-numbers'],
-  ])('Submit ID numbers - %s', (flashMessage, action, errorRedirect) => {
+    [() => controller.justiceIdNumbers().submit, 'justice-id-numbers'],
+    [() => controller.personalIdNumbers().submit, 'personal-id-numbers'],
+    [() => controller.homeOfficeIdNumbers().submit, 'home-office-id-numbers'],
+  ])('Submit ID numbers - %s', (action, errorRedirect) => {
     beforeEach(() => {
       req.body = {
         probationLegacySystem: {
@@ -195,9 +197,9 @@ describe('IdentityNumbersController', () => {
         details: { formValues: req.body },
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-        text: flashMessage,
+        text: 'Identity numbers added',
         type: FlashMessageType.success,
-        fieldName: 'identity-numbers',
+        fieldName: expect.stringContaining('probation-legacy-system-row,yjaf-row'),
       })
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
     })
@@ -224,7 +226,7 @@ describe('IdentityNumbersController', () => {
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${errorRedirect}`)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual(
-        'This Prison legacy system number already exists. Enter a different Prison legacy system number',
+        'This prison legacy system number already exists. Enter a different prison legacy system number',
       )
       expect(errors[0].href).toEqual('#prisonLegacySystem-value-input')
     })
@@ -333,10 +335,10 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    [OffenderIdentifierType.PncNumber, 'PNC number updated', 'pnc'],
-    [OffenderIdentifierType.NationalInsuranceNumber, 'National Insurance number updated', 'national-insurance'],
-    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'Home Office reference number updated', 'home-office-reference'],
-  ])('Submit ID number update', (type: OffenderIdentifierType, successFlash: string, editPageUrl: string) => {
+    [OffenderIdentifierType.PncNumber, 'pnc'],
+    [OffenderIdentifierType.NationalInsuranceNumber, 'national-insurance'],
+    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'home-office-reference'],
+  ])('Submit ID number update', (type: OffenderIdentifierType, editPageUrl: string) => {
     const offenderId = 1
     const seqId = 1
 
@@ -379,7 +381,7 @@ describe('IdentityNumbersController', () => {
         details: { formValues: req.body },
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-        text: successFlash,
+        text: 'Identity numbers updated',
         type: FlashMessageType.success,
         fieldName: `${editPageUrl}-row`,
       })
@@ -403,7 +405,7 @@ describe('IdentityNumbersController', () => {
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/prison-legacy-system/1-1`)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual(
-        'This Prison legacy system number already exists. Enter a different Prison legacy system number',
+        'This prison legacy system number already exists. Enter a different prison legacy system number',
       )
       expect(errors[0].href).toEqual('#identifier-value-input')
     })

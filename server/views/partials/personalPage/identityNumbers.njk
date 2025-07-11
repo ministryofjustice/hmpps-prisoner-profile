@@ -42,8 +42,9 @@
 
 {% macro identityNumber(name, identityNumbers, options) %}
   {% set id = identityNumbers[0].editPageUrl | d("prison-number") %}
+  {% set updatedFields = flashMessage.fieldName | d("") %}
   {% set rowClasses %}
-    {{ "row-updated" if flashMessage.fieldName === id + "-row" else "" }}
+    {{ "row-updated" if (id + "-row") in updatedFields else "" }}
   {% endset %}
   {% if identityNumbers.length > 0 or not options.hideIfEmpty %}
     {{ summaryListRow(name, identityNumbersWithComment(identityNumbers, options), id, {html: true, classes: rowClasses}) }}
@@ -51,11 +52,8 @@
 {% endmacro %}
 
 {% set showAdditionalIdRow = not hasPersonalId or not hasHomeOfficeId %}
-{% set cardClasses %}
-  {{ "row-updated" if flashMessage.fieldName === 'identity-numbers' else "" }}
-{% endset %}
 
-{%- call summaryCard({title: "Identity numbers", id: "identity-numbers", classes: cardClasses }) -%}
+{%- call summaryCard({title: "Identity numbers", id: "identity-numbers" }) -%}
   <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">
       <dl class="govuk-summary-list">
@@ -69,9 +67,9 @@
         {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], { editable: false }) }}
         {{ identityNumber("PNC number", identityNumbers.justice.pncNumber) }}
         {{ identityNumber("CRO number", identityNumbers.justice.croNumber, { hideIfEmpty: true }) }}
-        {{ identityNumber("Prison Legacy System number", identityNumbers.justice.prisonLegacySystemNumber, { hideIfEmpty: true }) }}
+        {{ identityNumber("Prison legacy system number", identityNumbers.justice.prisonLegacySystemNumber, { hideIfEmpty: true }) }}
         {{ identityNumber("Local Inmate Data System (LIDS) number", identityNumbers.justice.localInmateDataSystemNumber, { hideIfEmpty: true, editable: false }) }}
-        {{ identityNumber("Probation Legacy System number", identityNumbers.justice.probationLegacySystemNumber, { hideIfEmpty: true }) }}
+        {{ identityNumber("Probation legacy system number", identityNumbers.justice.probationLegacySystemNumber, { hideIfEmpty: true }) }}
         {{ identityNumber("Scottish PNC number", identityNumbers.justice.scottishPncNumber, { hideIfEmpty: true }) }}
         {{ identityNumber("Youth Justice Application Framework (YJAF) number", identityNumbers.justice.yjafNumber, { hideIfEmpty: true }) }}
 
@@ -81,8 +79,8 @@
           {{ identityNumber("National Insurance number", identityNumbers.personal.nationalInsuranceNumber, { hideIfEmpty: true }) }}
           {{ identityNumber("Parkrun number", identityNumbers.personal.parkrunNumber, { hideIfEmpty: true }) }}
           {{ identityNumber("Passport number", identityNumbers.personal.passportNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Staff identity card number", identityNumbers.personal.staffIdentityCardNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Unique learner number", identityNumbers.personal.uniqueLearnerNumber, { hideIfEmpty: true }) }}
+          {{ identityNumber("Staff ID card number", identityNumbers.personal.staffIdentityCardNumber, { hideIfEmpty: true }) }}
+          {{ identityNumber("Unique Learner Number (ULN)", identityNumbers.personal.uniqueLearnerNumber, { hideIfEmpty: true }) }}
         {% endif %}
 
         {% if hasHomeOfficeId %}

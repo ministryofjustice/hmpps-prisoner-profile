@@ -1,6 +1,7 @@
 import { IdentityNumber } from '../../../services/interfaces/personalPageService/PersonalPage'
 import { IdentifierMappings } from '../../constants/identifierMappings'
 import { OffenderIdentifierType } from './OffenderIdentifierType'
+import { sortByDateTime } from '../../../utils/utils'
 
 export const getOffenderIdentifierValue = (
   type: OffenderIdentifierType,
@@ -9,6 +10,8 @@ export const getOffenderIdentifierValue = (
   return Array.isArray(array) && array.length
     ? array
         .filter(item => item.type === type)
+        // Sort by created date DESC
+        .sort((a, b) => sortByDateTime(b.whenCreated, a.whenCreated))
         .map(item => ({
           offenderId: item.offenderId,
           sequenceId: item.offenderIdSeq,
