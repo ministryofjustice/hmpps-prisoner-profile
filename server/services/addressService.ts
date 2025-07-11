@@ -175,7 +175,7 @@ export default class AddressService {
 
   public sanitisePostcode(stringContainingPostcode: string, addressLocation: AddressLocation) {
     if (addressLocation !== AddressLocation.overseas) {
-      const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode)
+      const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode?.replace(/[^A-Z0-9 ]/gi, ''))
       if (!postCodeQuery) return stringContainingPostcode
 
       return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`

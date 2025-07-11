@@ -35,7 +35,7 @@ export const addressValidator =
       errors.push({ text: 'Address line 2 must be 35 characters or less', href: '#address-line-2' })
     }
 
-    if (postcode && ukAddress && !basicPostCodeRegex.test(postcode.trim())) {
+    if (postcode && ukAddress && !basicPostCodeRegex.test(postcode.trim().replaceAll(/[^A-Z0-9]/gi, ''))) {
       errors.push({ text: 'Enter a full UK postcode', href: '#postcode' })
     }
 

@@ -274,6 +274,7 @@ describe('addressService', () => {
       ['SW1H9AJ', 'SW1H 9AJ'],
       ['sw1h9aj', 'SW1H 9AJ'],
       ['before sw1h9aj after', 'before SW1H 9AJ after'],
+      ['b.&e?for"e sw1+-//h#9a...j af,_ter', 'before SW1H 9AJ after'],
       ['not a postcode', 'not a postcode'],
     ])(`before: '%s', after: '%s'`, (before, after) => {
       expect(addressService.sanitisePostcode(before, AddressLocation.uk)).toEqual(after)

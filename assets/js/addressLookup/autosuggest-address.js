@@ -52,7 +52,7 @@ class AutosuggestAddress {
     // Reset any previously selected result:
     this.uprn.value = ''
 
-    return await this.findAddress(query)
+    return await this.findAddress(query?.replace(/[^A-Z0-9 ]/gi, ''))
   }
 
   async findAddress(query) {
@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const addressAutosuggests = [...document.querySelectorAll('.hmpps-js-address-autosuggest')]
 
   if (addressAutosuggests.length) {
-    addressAutosuggests.forEach((addressAutosuggest) => new AutosuggestAddress(addressAutosuggest))
+    addressAutosuggests.forEach(addressAutosuggest => new AutosuggestAddress(addressAutosuggest))
   }
 })
-
