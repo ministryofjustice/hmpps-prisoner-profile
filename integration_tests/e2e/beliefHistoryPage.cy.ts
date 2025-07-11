@@ -3,7 +3,7 @@ import BeliefHistoryPage from '../pages/beliefHistoryPage'
 
 const visitBeliefHistoryPage = (): BeliefHistoryPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/religion-belief-history' })
-  return Page.verifyOnPageWithTitle(BeliefHistoryPage, 'John Saunders’ religion or belief history')
+  return Page.verifyOnPageWithTitle(BeliefHistoryPage, 'John Saunders’ religion, faith or belief history')
 }
 
 context('Belief history page', () => {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { formatName } from '../utils/utils'
+import { apostrophe, formatName } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
 import BeliefService from '../services/beliefService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -35,11 +35,11 @@ export default class BeliefHistoryController {
       .catch(error => logger.error(error))
 
     return res.render('pages/beliefHistory', {
-      pageTitle: 'Religion or belief history',
+      pageTitle: 'Religion, faith or belief history',
+      pageHeading: `${apostrophe(formatName(firstName, '', lastName))} religion, faith or belief history`,
       beliefs,
       prisonerNumber,
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-      prisonerName: formatName(firstName, '', lastName),
     })
   }
 }
