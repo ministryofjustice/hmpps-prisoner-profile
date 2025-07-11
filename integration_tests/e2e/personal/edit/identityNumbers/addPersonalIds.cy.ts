@@ -21,7 +21,7 @@ context('Add personal IDs', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/personal-id-numbers`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Add personal ID numbers',
-    successfulFlashMessage: 'Personal identity numbers added',
+    successfulFlashMessage: 'Identity numbers added',
     validInputs: [
       {
         checkboxInputs: {
@@ -83,7 +83,7 @@ context('Add personal IDs', () => {
             ],
           },
         },
-        errorMessages: ['This Driving licence number already exists. Enter a different Driving licence number'],
+        errorMessages: ['This driving licence number already exists. Enter a different driving licence number'],
       },
       {
         testDescription: `Checkboxes selected but no values provided`,
@@ -98,12 +98,12 @@ context('Add personal IDs', () => {
           },
         },
         errorMessages: [
-          'Enter this person’s Driving licence number',
+          'Enter this person’s driving licence number',
           'Enter this person’s National Insurance number',
           'Enter this person’s parkrun number',
-          'Enter this person’s Passport number',
-          'Enter this person’s Staff ID card number',
-          'Enter this person’s Unique learner number (ULN)',
+          'Enter this person’s passport number',
+          'Enter this person’s staff ID card number',
+          'Enter this person’s unique learner number (ULN)',
         ],
       },
       {
@@ -138,12 +138,12 @@ context('Add personal IDs', () => {
           },
         },
         errorMessages: [
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
+          'Enter the driving licence number using 20 characters or less',
+          'Enter the National Insurance number using 20 characters or less',
+          'Enter the parkrun number using 20 characters or less',
+          'Enter the passport number using 20 characters or less',
+          'Enter the staff ID card number using 20 characters or less',
+          'Enter the unique learner number (ULN) using 20 characters or less',
         ],
       },
       {

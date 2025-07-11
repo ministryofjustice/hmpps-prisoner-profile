@@ -24,7 +24,7 @@ context('Add personal IDs', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/pnc/${offenderId}-${seqId}`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Change John Saunders’ PNC number',
-    successfulFlashMessage: 'PNC number updated',
+    successfulFlashMessage: 'Identity numbers updated',
     validInputs: [
       {
         textInputs: {

@@ -21,7 +21,7 @@ context('Add justice IDs', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/justice-id-numbers`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Add justice ID numbers',
-    successfulFlashMessage: 'Justice identity numbers added',
+    successfulFlashMessage: 'Identity numbers added',
     validInputs: [
       {
         checkboxInputs: {
@@ -98,8 +98,8 @@ context('Add justice IDs', () => {
         errorMessages: [
           'Enter this person’s PNC number',
           'Enter this person’s CRO number',
-          'Enter this person’s Prison legacy system number',
-          'Enter this person’s Probation legacy system number',
+          'Enter this person’s prison legacy system number',
+          'Enter this person’s probation legacy system number',
           'Enter this person’s Scottish PNC number',
           'Enter this person’s Youth Justice Application Framework (YJAF) number',
         ],
@@ -129,12 +129,12 @@ context('Add justice IDs', () => {
           },
         },
         errorMessages: [
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
-          'Enter the ID number using 20 characters or less',
+          'Enter the CRO number using 20 characters or less',
+          'Enter the PNC number using 20 characters or less',
+          'Enter the prison legacy system number using 20 characters or less',
+          'Enter the probation legacy system number using 20 characters or less',
+          'Enter the Scottish PNC number using 20 characters or less',
+          'Enter the Youth Justice Application Framework (YJAF) number using 20 characters or less',
         ],
       },
       {

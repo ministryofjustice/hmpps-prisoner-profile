@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { apostrophe, formatLocation, formatName } from '../utils/utils'
+import { apostrophe, capitaliseFirstLetter, formatLocation, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -46,7 +46,7 @@ export default class IdentityNumbersController {
         mappings: HomeOfficeIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Home Office identity numbers added',
+        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'home-office-id-numbers',
       }),
     }
@@ -61,7 +61,7 @@ export default class IdentityNumbersController {
         mappings: JusticeIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Justice identity numbers added',
+        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'justice-id-numbers',
       }),
     }
@@ -76,7 +76,7 @@ export default class IdentityNumbersController {
         mappings: PersonalIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Personal identity numbers added',
+        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'personal-id-numbers',
       }),
     }
@@ -92,8 +92,10 @@ export default class IdentityNumbersController {
         const [offenderId, seqId] = this.parseIdentifierIds(req)
 
         const existingIdentifier = await this.identityNumbersService.getIdentityNumber(clientToken, +offenderId, +seqId)
-        const { type, label } = Object.values(IdentifierMappings).find(item => item.type === existingIdentifier.type)
-        const identifierLabel = label || 'ID number'
+        const { type, description } = Object.values(IdentifierMappings).find(
+          item => item.type === existingIdentifier.type,
+        )
+        const identifierLabel = description || 'ID number'
 
         const requestBodyFlash = requestBodyFromFlash<EditIdentityNumberSubmission>(req)
         const formValues = requestBodyFlash || {
@@ -113,7 +115,7 @@ export default class IdentityNumbersController {
           .catch(error => logger.error(error))
 
         return res.render('pages/identityNumbers/editIdentityNumber', {
-          pageTitle: `${identifierLabel} - Prisoner personal details`,
+          pageTitle: `${capitaliseFirstLetter(identifierLabel)} - Prisoner personal details`,
           title: `Change ${apostrophe(naturalPrisonerName)} ${identifierLabel}`,
           formValues,
           identifierType: type,
@@ -131,7 +133,9 @@ export default class IdentityNumbersController {
         const [offenderId, seqId] = this.parseIdentifierIds(req)
         const errors = req.errors || []
         const formValues: { type?: string; value?: string; comment?: string } = req.body
-        const { label, editPageUrl } = Object.values(IdentifierMappings).find(item => item.type === formValues.type)
+        const { description, editPageUrl } = Object.values(IdentifierMappings).find(
+          item => item.type === formValues.type,
+        )
 
         if (!errors.length) {
           const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
@@ -145,7 +149,7 @@ export default class IdentityNumbersController {
             )
           ) {
             errors.push({
-              text: `This ${label} already exists. Enter a different ${label}`,
+              text: `This ${description} already exists. Enter a different ${description}`,
               href: `#identifier-value-input`,
             })
           }
@@ -179,7 +183,7 @@ export default class IdentityNumbersController {
         }
 
         req.flash('flashMessage', {
-          text: `${label} updated`,
+          text: `Identity numbers updated`,
           type: FlashMessageType.success,
           fieldName: `${editPageUrl}-row`,
         })
@@ -277,7 +281,7 @@ export default class IdentityNumbersController {
       req.flash('flashMessage', {
         text: options.successFlashMessage,
         type: FlashMessageType.success,
-        fieldName: 'identity-numbers',
+        fieldName: this.getUpdatedFieldsFromFormValues(formValues),
       })
 
       this.auditService
@@ -313,6 +317,14 @@ export default class IdentityNumbersController {
       .filter(Boolean)
   }
 
+  private getUpdatedFieldsFromFormValues = (formValues: Record<string, AddIdentityNumberSubmission>) =>
+    Object.entries(formValues)
+      .map(([id, value]): string =>
+        value.selected && value.value ? `${IdentifierMappings[id]?.editPageUrl}-row` : null,
+      )
+      .filter(Boolean)
+      .join(',')
+
   private checkForDuplicateValues = (
     formValues: Record<string, AddIdentityNumberSubmission>,
     existingIdentifiers: OffenderIdentifier[],
@@ -321,12 +333,12 @@ export default class IdentityNumbersController {
     Object.entries(formValues).forEach(([key, value]) => {
       if (value?.selected) {
         const type = IdentifierMappings[key]?.type
-        const label = IdentifierMappings[key]?.label
+        const description = IdentifierMappings[key]?.description
         if (
           existingIdentifiers.some(id => id.type === type && id.value?.toUpperCase() === value.value?.toUpperCase())
         ) {
           errors.push({
-            text: `This ${label} already exists. Enter a different ${label}`,
+            text: `This ${description} already exists. Enter a different ${description}`,
             href: `#${key}-value-input`,
           })
         }

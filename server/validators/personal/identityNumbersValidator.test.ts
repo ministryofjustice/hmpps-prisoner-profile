@@ -19,13 +19,13 @@ describe('AddIdentityNumbersValidator', () => {
 
   describe('Maximum value length exceeded', () => {
     it.each([
-      ['CRO Number', 'cro', '097501/98T'],
-      ['PNC Number', 'pnc', '2002/0073319Z'],
-      ['Prison legacy system number', 'prisonLegacySystem'],
-      ['Probation legacy system number', 'probationLegacySystem'],
+      ['CRO number', 'cro', '097501/98T'],
+      ['PNC number', 'pnc', '2002/0073319Z'],
+      ['prison legacy system number', 'prisonLegacySystem'],
+      ['probation legacy system number', 'probationLegacySystem'],
       ['Scottish PNC number', 'scottishPnc'],
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
-    ])('%s', (_, id, validValue = '1'.repeat(20)) => {
+    ])('%s', (description, id, validValue = '1'.repeat(20)) => {
       const validRequest = {
         [id]: { selected: id, value: validValue },
       }
@@ -38,7 +38,7 @@ describe('AddIdentityNumbersValidator', () => {
 
       const errors = addIdentityNumbersValidator(invalidRequest)
       expect(errors.length).toEqual(1)
-      expect(errors[0].text).toEqual('Enter the ID number using 20 characters or less')
+      expect(errors[0].text).toEqual(`Enter the ${description} using 20 characters or less`)
       expect(errors[0].href).toEqual(`#${id}-value-input`)
     })
   })
@@ -73,18 +73,18 @@ describe('AddIdentityNumbersValidator', () => {
     it.each([
       ['CRO number', 'cro'],
       ['PNC number', 'pnc'],
-      ['Prison legacy system number', 'prisonLegacySystem'],
-      ['Probation legacy system number', 'probationLegacySystem'],
+      ['prison legacy system number', 'prisonLegacySystem'],
+      ['probation legacy system number', 'probationLegacySystem'],
       ['Scottish PNC number', 'scottishPnc'],
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
-    ])('%s', (label, id) => {
+    ])('%s', (description, id) => {
       const request = {
         [id]: { selected: id },
       }
 
       const errors = addIdentityNumbersValidator(request)
       expect(errors.length).toEqual(1)
-      expect(errors[0].text).toEqual(`Enter this person’s ${label}`)
+      expect(errors[0].text).toEqual(`Enter this person’s ${description}`)
       expect(errors[0].href).toEqual(`#${id}-value-input`)
     })
   })

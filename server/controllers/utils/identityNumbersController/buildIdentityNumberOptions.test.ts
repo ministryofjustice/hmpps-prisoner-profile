@@ -8,19 +8,24 @@ import OffenderIdentifier from '../../../data/interfaces/prisonApi/OffenderIdent
 
 describe('buildIdentityNumberOptions', () => {
   const mappings: Record<string, IdentifierMapping> = {
-    one: { type: 'ONE', label: 'First identifier', editPageUrl: 'one' },
-    two: { type: 'TWO', label: 'Second identifier', hint: 'Also contains letters', editPageUrl: 'two' },
+    one: { type: 'ONE', description: 'first identifier', editPageUrl: 'one' },
+    two: { type: 'TWO', description: 'second identifier', hint: 'Also contains letters', editPageUrl: 'two' },
   }
 
   it('should build options from provided mappings', () => {
     const expected: AddIdentityNumberOption[] = [
-      { id: 'one', label: 'First identifier', selected: false, hasExistingValue: false },
+      {
+        id: 'one',
+        label: 'First identifier',
+        description: 'first identifier',
+        selected: false,
+      },
       {
         id: 'two',
         label: 'Second identifier',
+        description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
-        hasExistingValue: false,
       },
     ]
 
@@ -46,13 +51,19 @@ describe('buildIdentityNumberOptions', () => {
     ]
 
     const expected: AddIdentityNumberOption[] = [
-      { id: 'one', label: 'First identifier', selected: false, hasExistingValue: true },
+      {
+        id: 'one',
+        label: 'First identifier',
+        description: 'first identifier',
+        selected: false,
+        mostRecentExistingValue: '123',
+      },
       {
         id: 'two',
         label: 'Second identifier',
+        description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
-        hasExistingValue: false,
       },
     ]
 
@@ -77,17 +88,17 @@ describe('buildIdentityNumberOptions', () => {
       {
         id: 'one',
         label: 'First identifier',
+        description: 'first identifier',
         selected: true,
-        hasExistingValue: false,
         value: '123',
         comment: 'Comment one',
       },
       {
         id: 'two',
         label: 'Second identifier',
+        description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
-        hasExistingValue: false,
       },
     ]
 
