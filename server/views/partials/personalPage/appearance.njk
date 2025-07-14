@@ -40,6 +40,25 @@
     {% endif %}
 {% endmacro %}
 
+{% macro eyeColourHtml(leftEyeColour, rightEyeColour) %}
+    {% if leftEyeColour === rightEyeColour %}
+        {{ leftEyeColour }}
+    {% else %}
+        {% if leftEyeColour === 'Not entered' %}
+            {{ rightEyeColour }}
+        {% elseif rightEyeColour === 'Not entered' %}
+            {{ leftEyeColour }}
+        {% else %}
+            <div>
+                <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Left eye</span>
+                {{ leftEyeColour }}
+                <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Right eye</span>
+                {{ rightEyeColour }}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
     {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length or distinguishingMarks %}
     <div class="govuk-grid-row" data-qa="appearance">
@@ -52,8 +71,7 @@
                     { key: "Height", value: physicalCharacteristics.height, options: { dataQa: "height", changeHref: "personal/height", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'height' } },
                     { key: "Weight", value: physicalCharacteristics.weight, options: { dataQa: "weight", changeHref: "personal/weight", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'weight' } },
                     { key: "Hair type or colour", value: physicalCharacteristics.hairColour, options: { dataQa: "hair-type-or-colour", changeHref: "personal/hair", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'hair' } },
-                    { key: "Left eye colour", value: physicalCharacteristics.leftEyeColour, options: { dataQa: "left-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
-                    { key: "Right eye colour", value: physicalCharacteristics.rightEyeColour, options: { dataQa: "right-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
+                    { key: "Eye colour", value: eyeColourHtml(physicalCharacteristics.leftEyeColour, physicalCharacteristics.rightEyeColour), options: { dataQa: "eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
                     { key: "Facial hair", value: physicalCharacteristics.facialHair, options: { dataQa: "facial-hair", changeHref: "personal/facial-hair", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: "facial hair type" } },
                     { key: "Shape of face", value: physicalCharacteristics.shapeOfFace, options: { dataQa: "face-shape", changeHref: "personal/face-shape", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: "face shape" } },
                     { key: "Build", value: physicalCharacteristics.build, options: { dataQa: "build", changeHref: "personal/build", changeLinkEnabled: physicalCharacteristicsEditEnabled, rowUpdated: flashMessage.fieldName === 'build' } },
