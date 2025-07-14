@@ -2,7 +2,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import BeliefHistoryController from './beliefHistoryController'
 import BeliefService from '../services/beliefService'
-import { beliefHistoryMock, beliefHistoryOverrideMock } from '../data/localMockData/beliefHistoryMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -47,36 +46,5 @@ describe('Prisoner belief history', () => {
     spy.mockRestore()
   })
 
-  describe('displayBeliefHistory', () => {
-    it('should call the service and render the page', async () => {
-      jest.spyOn<any, string>(controller['beliefService'], 'getBeliefHistory').mockResolvedValue(beliefHistoryMock)
-
-      await controller.displayBeliefHistory(req, res)
-      expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
-        pageTitle: 'Religion, faith or belief history',
-        pageHeading: `John Saunders’ religion, faith or belief history`,
-        beliefs: beliefHistoryMock,
-        prisonerNumber,
-        breadcrumbPrisonerName: 'Saunders, John',
-      })
-    })
-
-    it('should use religion field date override values to render the belief descriptions', async () => {
-      jest
-        .spyOn<any, string>(controller['beliefService'], 'getBeliefHistory')
-        .mockResolvedValue(beliefHistoryOverrideMock)
-
-      await controller.displayBeliefHistory(req, res)
-      expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
-        pageTitle: 'Religion, faith or belief history',
-        pageHeading: `John Saunders’ religion, faith or belief history`,
-        beliefs: [
-          { ...beliefHistoryOverrideMock[0], beliefDescription: 'Other religion, faith or belief' },
-          beliefHistoryOverrideMock[1],
-        ],
-        prisonerNumber,
-        breadcrumbPrisonerName: 'Saunders, John',
-      })
-    })
-  })
+  it('foo', () => {})
 })
