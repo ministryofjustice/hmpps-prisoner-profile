@@ -256,7 +256,7 @@ export default class PersonalPageService {
       editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
-      prisonApiClient.getBeliefHistory(prisonerNumber),
+      null,
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
