@@ -256,7 +256,7 @@ export default class PersonalPageService {
       editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
-      null,
+      prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
@@ -330,7 +330,7 @@ export default class PersonalPageService {
         ),
       },
       learnerNeurodivergence,
-      hasCurrentBelief: false,
+      hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       distinguishingMarks,
       militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
