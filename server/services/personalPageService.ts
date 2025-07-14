@@ -330,7 +330,7 @@ export default class PersonalPageService {
         ),
       },
       learnerNeurodivergence,
-      hasCurrentBelief: false,
+      hasCurrentBelief: beliefs != null,
       distinguishingMarks,
       militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
