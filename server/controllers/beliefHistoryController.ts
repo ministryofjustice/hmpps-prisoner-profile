@@ -5,6 +5,7 @@ import BeliefService from '../services/beliefService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import { religionFieldData } from './personal/fieldData'
+import NotFoundError from '../utils/notFoundError'
 
 export default class BeliefHistoryController {
   constructor(
@@ -16,6 +17,7 @@ export default class BeliefHistoryController {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
+    throw new NotFoundError('emergency')
     const beliefs = (await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)).map(belief => {
       const override = religionFieldData.referenceDataOverrides.find(o => o.id === belief.beliefCode)
       return {
