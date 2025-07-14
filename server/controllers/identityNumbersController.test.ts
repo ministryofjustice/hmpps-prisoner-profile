@@ -197,7 +197,7 @@ describe('IdentityNumbersController', () => {
         details: { formValues: req.body },
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-        text: 'Identity numbers added',
+        text: 'Identity numbers updated',
         type: FlashMessageType.success,
         fieldName: expect.stringContaining('probation-legacy-system-row,yjaf-row'),
       })
