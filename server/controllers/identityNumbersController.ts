@@ -46,7 +46,6 @@ export default class IdentityNumbersController {
         mappings: HomeOfficeIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'home-office-id-numbers',
       }),
     }
@@ -61,7 +60,6 @@ export default class IdentityNumbersController {
         mappings: JusticeIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'justice-id-numbers',
       }),
     }
@@ -76,7 +74,6 @@ export default class IdentityNumbersController {
         mappings: PersonalIdentifierMappings,
       }),
       submit: this.postIdentityNumbers({
-        successFlashMessage: 'Identity numbers added',
         errorRedirect: 'personal-id-numbers',
       }),
     }
@@ -244,7 +241,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  private postIdentityNumbers = (options: { successFlashMessage: string; errorRedirect: string }) => {
+  private postIdentityNumbers = (options: { errorRedirect: string }) => {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
@@ -279,7 +276,7 @@ export default class IdentityNumbersController {
       }
 
       req.flash('flashMessage', {
-        text: options.successFlashMessage,
+        text: 'Identity numbers updated',
         type: FlashMessageType.success,
         fieldName: this.getUpdatedFieldsFromFormValues(formValues),
       })
