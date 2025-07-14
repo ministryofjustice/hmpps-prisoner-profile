@@ -150,14 +150,13 @@ export default class PersonalPage extends Page {
       height: () => physicalCharacteristic(0),
       weight: () => physicalCharacteristic(1),
       hairColour: () => physicalCharacteristic(2),
-      leftEyeColour: () => physicalCharacteristic(3),
-      rightEyeColour: () => physicalCharacteristic(4),
-      facialHair: () => physicalCharacteristic(5),
-      shapeOfFace: () => physicalCharacteristic(6),
-      build: () => physicalCharacteristic(7),
-      shoeSize: () => physicalCharacteristic(8),
-      warnedAboutTattooing: () => physicalCharacteristic(9),
-      warnedNotTochangeAppearance: () => physicalCharacteristic(10),
+      eyeColour: () => physicalCharacteristic(3),
+      facialHair: () => physicalCharacteristic(4),
+      shapeOfFace: () => physicalCharacteristic(5),
+      build: () => physicalCharacteristic(6),
+      shoeSize: () => physicalCharacteristic(7),
+      warnedAboutTattooing: () => physicalCharacteristic(8),
+      warnedNotTochangeAppearance: () => physicalCharacteristic(9),
       distinguishingMarks: (row: number) => {
         const mark = () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-row').eq(row)
         return {
