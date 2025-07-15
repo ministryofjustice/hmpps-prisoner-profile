@@ -28,7 +28,7 @@ context('Edit city or town of birth', () => {
       {
         testDescription: 'Input too long',
         input: { textInputs: { cityOrTownOfBirth: '1234567890 1234567890 1234567890' } },
-        errorMessages: ['City of birth must be 25 characters or less.'],
+        errorMessages: ['City or town of birth must be 25 characters or less.'],
       },
     ],
     redirectAnchor: 'personal-details',
