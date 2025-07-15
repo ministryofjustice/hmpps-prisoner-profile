@@ -64,7 +64,7 @@
         <div class="hmpps-cropper-photo-container" id="photo-preview-container">
           <div class="hmpps-cropper-photo-container__content">
             <div class="hmpps-cropper-photo-container__photo-preview">
-              <img src='{{ imgSrc }}' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id='photo-preview' class="govuk-!-margin-bottom-2"/>
+              <img src='{{ imgSrc }}' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id='photo-preview'/>
               <div class="hmpps-cropper-photo-container__controls govuk-!-margin-bottom-0">
                 {{ govukButton({
                   html: cropHtml,
@@ -84,7 +84,7 @@
           <div class="hmpps-cropper-photo-container__content">
             <div class='hmpps-cropper-container'>
               <div class="hmpps-cropper-photo-container__photo">
-                <cropper-canvas background class="govuk-!-margin-bottom-2">
+                <cropper-canvas background>
                   <cropper-image src='{{ imgSrc }}' alt="Picture" initial-center-size="contain" rotatable="false" skewable="false" scalable="false" translatable="false"></cropper-image>
                   <cropper-shade hidden></cropper-shade>
                   <cropper-selection id="cropperSelection" aspect-ratio="0.8" movable resizable outlined keyboard>

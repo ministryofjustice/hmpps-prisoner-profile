@@ -1,3 +1,29 @@
 .hmpps-withheld-photo {
   width: 170px;
 }
+
+.hmpps-image-cropper-button-text {
+  font-size: 16px;
+}
+
+.hmpps-image-cropper-button-text > img {
+  margin-right: 8px;
+}
+
+.hmpps-cropper-photo-container__photo > cropper-canvas {
+  margin-bottom: 3px;
+}
+
+.hmpps-cropper-photo-container__controls__half-width {
+  border: 0;
+  width: 109px !important;
+}
+
+.hmpps-cropper-photo-container__controls__full-width {
+  border: 0px;
+  height: 38px;
+}
+
+#photo-preview {
+  margin-bottom: 0;
+}
