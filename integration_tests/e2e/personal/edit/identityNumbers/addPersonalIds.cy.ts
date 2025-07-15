@@ -21,7 +21,7 @@ context('Add personal IDs', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/personal-id-numbers`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Add personal ID numbers',
-    successfulFlashMessage: 'Identity numbers added',
+    successfulFlashMessage: 'Identity numbers updated',
     validInputs: [
       {
         checkboxInputs: {
