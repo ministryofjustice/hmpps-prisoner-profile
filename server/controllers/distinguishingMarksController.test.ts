@@ -283,7 +283,7 @@ describe('Distinguishing Marks Controller', () => {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
         },
-        file: { originalname: 'file.jpg' },
+        files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
         query: {},
         flash: jest.fn(),
       } as Request
@@ -311,7 +311,7 @@ describe('Distinguishing Marks Controller', () => {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
         },
-        file: { originalname: 'file.jpg' },
+        files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
         query: {},
         flash: jest.fn(),
       } as Request

@@ -23,6 +23,10 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 
+interface MulterFiles {
+  [fieldname: string]: MulterFile[]
+}
+
 export default class DistinguishingMarksController {
   constructor(
     private readonly distinguishingMarksService: DistinguishingMarksService,
@@ -128,6 +132,7 @@ export default class DistinguishingMarksController {
     const { markType, prisonerNumber } = req.params
     const { specificBodyPart, action } = req.body
     const { clientToken } = req.middleware
+    const files = req.files as MulterFiles
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -138,7 +143,7 @@ export default class DistinguishingMarksController {
       verifiedMarkType,
       specificBodyPart as AllBodyPartSelection,
       req.body[`description-${specificBodyPart}`],
-      req.file,
+      files?.[`file-${specificBodyPart}`]?.[0],
     )
 
     this.auditService

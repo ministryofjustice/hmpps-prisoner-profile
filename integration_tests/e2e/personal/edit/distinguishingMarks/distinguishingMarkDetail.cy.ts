@@ -57,7 +57,7 @@ context('New distinguishing mark on face', () => {
 
           page.bodyPartRadios().filter(`[value="${bodyPart}"]`).check()
           page.descriptionFields().filter(`[name="description-${bodyPart}"]`).type('Description')
-          page.imageFields().filter(`[name="file"]`).attachFile('tat.jpeg')
+          page.imageFields().filter(`[name="file-${bodyPart}"]`).attachFile('tat.jpeg')
 
           page.saveAndExitBtn().click()
           Page.verifyOnPage(PersonalPage)
@@ -77,7 +77,7 @@ context('New distinguishing mark on face', () => {
         const page = Page.verifyOnPageWithTitle(DistinguishingMarkDetail, title)
 
         page.descriptionFields().filter(`[name="description-${bodyPart}"]`).type('Description')
-        page.imageFields().filter(`[name="file"]`).attachFile('tat.jpeg')
+        page.imageFields().filter(`[name="file-${bodyPart}"]`).attachFile('tat.jpeg')
 
         page.saveAndExitBtn().click()
         Page.verifyOnPage(PersonalPage)

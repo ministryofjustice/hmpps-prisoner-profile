@@ -56,6 +56,6 @@
     </table>
     <div class="govuk-button-group">
         {% set returnUrl = (personalPath + '#marks') if not updated else (personalPath + '/' + markType + '/profile-redirect')%}
-        <a href={{ returnUrl }} class="govuk-link govuk-link--no-visited-state">Return to the prisoner's profile</a>
+        <a href={{ returnUrl }} class="govuk-link govuk-link--no-visited-state">Return to prisoner's profile</a>
     </div>
 {% endblock %}

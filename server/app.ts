@@ -28,6 +28,8 @@ import bannerMiddleware from './middleware/bannerMiddleware'
 import logger from '../logger'
 import config from './config'
 import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './middleware/nomisLockedMiddleware'
+import { distinguishingMarksMulterExceptions } from './routes/distinguishingMarksRouter'
+import unless from './utils/unless'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -54,14 +56,19 @@ export default function createApp(services: Services): express.Application {
 
     If multipart forms are needed in other cases, more specific rules based on path will be required, e.g.
     update the app.use(csrf stuff) to only run for routes which don't contain distinguishing-marks, then set
-    up the Multer and CSRF middleware separately within the distinguishing marks router.
+    up the Multer and CSRF middleware separately within the distinguishing marks router using the unless 
+    middleware to skip it here as required.
    */
   app.use(
-    multer({
-      storage: multer.memoryStorage(),
-    }).single('file'),
+    unless(
+      [distinguishingMarksMulterExceptions],
+      multer({
+        storage: multer.memoryStorage(),
+      }).single('file'),
+    ),
   )
-  app.use(setUpCsrf())
+
+  app.use(unless([distinguishingMarksMulterExceptions], setUpCsrf()))
 
   app.use(setUpCurrentUser())
   app.use(populateClientToken())

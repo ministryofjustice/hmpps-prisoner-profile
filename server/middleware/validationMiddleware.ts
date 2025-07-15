@@ -1,7 +1,11 @@
 import { Request, RequestHandler } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
-import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
+import {
+  BodySubmission,
+  FileUploadRequest,
+  MultiFileUploadRequest,
+} from '../validators/personal/distinguishingMarksValidator'
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
 import { AddIdentityNumberSubmission } from '../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
 import { EditIdentityNumberSubmission } from '../controllers/identityNumbersController'
@@ -10,8 +14,8 @@ import { NextOfKinSubmission } from '../controllers/nextOfKinController'
 export type Validator = (
   body:
     | FileUploadRequest
-    | Record<string, string | string[] | AddIdentityNumberSubmission>
-    | BodySubmission
+    | MultiFileUploadRequest
+    | Record<string, string | string[] | AddIdentityNumberSubmission | BodySubmission>
     | DietAndFoodAllergiesSubmission
     | EditIdentityNumberSubmission
     | NextOfKinSubmission,
