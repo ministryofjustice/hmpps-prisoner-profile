@@ -8,7 +8,7 @@
       hmpps-file-upload-with-preview__upload__hidden" if options.initialPhotoUrl else "
       hmpps-file-upload-with-preview__upload__visible" }}">
       {{ govukFileUpload({
-        id: "file",
+        id: options.id if options.id else "file",
         name: fileUploadName,
         label: {
           classes: "govuk-!-font-weight-bold",
@@ -17,6 +17,7 @@
         hint: {
           text: "The photo must be a JPEG or GIF."
         },
+        errorMessage: { text: options.errorMessage } if options.errorMessage,
         attributes: {
           accept: "image/jpeg, image/gif"
         }

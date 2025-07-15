@@ -29,7 +29,7 @@ import { heightImperialValidator, heightMetricValidator } from '../validators/pe
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
-import distinguishingMarksRouter from './distinguishingMarksRouter'
+import distinguishingMarksRouter, { markTypes } from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 import militaryRecordsRouter from './militaryRecordsRouter'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
@@ -62,7 +62,7 @@ export default function editRouter(services: Services): Router {
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
   router.use(
-    `${personalPageBasePath}/:markType(tattoo|scar|mark)`,
+    `${personalPageBasePath}/:markType(${markTypes})`,
     ...commonMiddleware,
     distinguishingMarksRouter(services),
   )

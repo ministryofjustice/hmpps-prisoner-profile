@@ -58,23 +58,23 @@ describe('Distinguishing Marks Validators', () => {
     it('File size too large', () => {
       const req = {
         body: { specificBodyPart: 'face' },
-        file: { size: 201 * 1024 * 1024 } as MulterFile,
+        files: { 'file-face': [{ size: 201 * 1024 * 1024 }] as MulterFile[] },
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual('The photo file size must be less than 200MB')
-      expect(errors[0].href).toEqual('#file')
+      expect(errors[0].href).toEqual('#file-face')
     })
 
     it('Invalid MIME type', () => {
       const req = {
         body: { specificBodyPart: 'face' },
-        file: { size: 100, mimetype: 'image/png' } as MulterFile,
+        files: { 'file-face': [{ size: 100, mimetype: 'image/png' } as MulterFile] },
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual('The photo must be a JPG or GIF')
-      expect(errors[0].href).toEqual('#file')
+      expect(errors[0].href).toEqual('#file-face')
     })
   })
 

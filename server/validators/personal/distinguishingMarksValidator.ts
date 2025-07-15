@@ -3,9 +3,14 @@ import {
   bodyPartMap,
   bodyPartSelections,
 } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import MulterFile from '../../controllers/interfaces/MulterFile'
 
+interface MulterFiles {
+  [fieldname: string]: MulterFile[]
+}
 export interface BodySubmission {
   bodyPart?: string
+  [key: string]: string
 }
 
 interface BodySpecificSubmission {
@@ -15,6 +20,10 @@ interface BodySpecificSubmission {
 
 export interface FileUploadRequest {
   file?: Express.Multer.File
+  body?: BodySpecificSubmission
+}
+export interface MultiFileUploadRequest {
+  files?: MulterFiles
   body?: BodySpecificSubmission
 }
 
@@ -34,7 +43,7 @@ export function newDistinguishingMarkValidator({ bodyPart }: BodySubmission) {
   return []
 }
 
-export function newDetailedDistinguishingMarkValidator(req: FileUploadRequest) {
+export function newDetailedDistinguishingMarkValidator(req: MultiFileUploadRequest) {
   const verifiedBodyPart = allBodyParts.find(selection => selection === req.body.specificBodyPart)
 
   if (!verifiedBodyPart) {
@@ -50,11 +59,14 @@ export function newDetailedDistinguishingMarkValidator(req: FileUploadRequest) {
     })
   }
 
-  const fileName = `file`
+  const fileName = `file-${verifiedBodyPart}`
 
-  if (req.file?.size > maxSize) {
-    errors.push({ text: `The photo file size must be less than ${maxSizeMB}MB`, href: `#${fileName}` })
-  } else if (req.file && !allowedMimeTypes.includes(req.file.mimetype)) {
+  if (req.files?.[fileName]?.[0].size > maxSize) {
+    errors.push({
+      text: `The photo file size must be less than ${maxSizeMB}MB`,
+      href: `#${fileName}`,
+    })
+  } else if (req.files?.[fileName]?.[0] && !allowedMimeTypes.includes(req.files[fileName][0].mimetype)) {
     const allowedTypes = allowedMimeTypes.map(type => type.split('/')[1].toUpperCase().replace('JPEG', 'JPG'))
     errors.push({
       text: `The photo must be a ${allowedTypes.slice(0, -1).join(', ')} or ${allowedTypes.slice(-1)}`,
