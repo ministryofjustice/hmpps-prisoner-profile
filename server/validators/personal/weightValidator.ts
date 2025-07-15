@@ -1,16 +1,19 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
+const containsOnlyNumbers = (str: string) => str.match(/[^\d-]/) === null
+
 export const weightMetricValidator: Validator = (body: Record<string, string>) => {
   const { kilograms } = body
+
+  if (!containsOnlyNumbers(kilograms)) {
+    return [{ text: 'Enter this person’s weight', href: '#kilograms' }]
+  }
+
   const weight = parseInt(kilograms, 10)
 
   // Empty input is allowed
   if (kilograms === '') {
     return []
-  }
-
-  if (Number.isNaN(weight)) {
-    return [{ text: 'Enter this person’s weight', href: '#kilograms' }]
   }
 
   if (weight < 12 || weight > 640) {
@@ -23,16 +26,16 @@ export const weightMetricValidator: Validator = (body: Record<string, string>) =
 export const weightImperialValidator: Validator = (body: Record<string, string>) => {
   const { stone: stoneString, pounds: poundsString } = body
 
+  if ((stoneString && !containsOnlyNumbers(stoneString)) || (poundsString && !containsOnlyNumbers(poundsString))) {
+    return [{ text: 'Enter this person’s weight', href: '#stone' }]
+  }
+
   const stone = stoneString ? parseInt(stoneString, 10) : 0
   const pounds = poundsString ? parseInt(poundsString, 10) : 0
 
   // Empty input is allowed for both or pounds only
   if ((!stoneString && !poundsString) || (stoneString && !poundsString)) {
     return []
-  }
-
-  if (Number.isNaN(stone) || Number.isNaN(pounds)) {
-    return [{ text: 'Enter this person’s weight', href: '#stone' }]
   }
 
   if (!stoneString || (stone >= 2 && stone <= 100 && (pounds < 0 || pounds > 13))) {

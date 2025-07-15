@@ -83,7 +83,7 @@ export default class AliasController {
 
       if (!purpose) {
         req.flash('errors', [
-          { text: `Select why you’re changing ${apostrophe(naturalPrisonerName)} name`, href: '#radio' },
+          { text: `Select why you’re changing ${apostrophe(naturalPrisonerName)} name`, href: '#radioField' },
         ])
         return res.redirect(`/prisoner/${prisonerNumber}/personal/change-name`)
       }

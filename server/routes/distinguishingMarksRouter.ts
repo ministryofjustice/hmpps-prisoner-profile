@@ -1,3 +1,4 @@
+import multer from 'multer'
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
@@ -16,6 +17,19 @@ import {
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
+import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
+import setUpCsrf from '../middleware/setUpCsrf'
+
+// Define valid mark types
+export const markTypes = 'tattoo|scar|mark'
+
+// Define valid body parts
+const validBodyParts =
+  'face|front-and-sides|right-arm|right-leg|right-hand|right-foot|left-arm|left-leg|left-hand|left-foot|back|neck'
+
+export function distinguishingMarksMulterExceptions(path: string): boolean {
+  return path.match(`\\/personal\\/(${markTypes})\\/(${validBodyParts})`) != null
+}
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -29,10 +43,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
       requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
     }),
   ]
-
-  // Define valid body parts
-  const validBodyParts =
-    'face|front-and-sides|right-arm|right-leg|right-hand|right-foot|left-arm|left-leg|left-hand|left-foot|back|neck'
 
   router.use((req, res, next) => {
     // set some prisoner data to use in the views
@@ -70,11 +80,14 @@ export default function distinguishingMarksRouter(services: Services): Router {
   get(
     `/:bodyPart(${validBodyParts})`,
     ...commonMiddleware,
+    setUpCsrf(),
     distinguishingMarksController.newDistinguishingMarkWithDetail,
   )
   post(
     `/:bodyPart(${validBodyParts})`,
     ...commonMiddleware,
+    multer().fields(allBodyParts.map(part => ({ name: `file-${part}`, maxCount: 1 }))),
+    setUpCsrf(),
     validationMiddleware([newDetailedDistinguishingMarkValidator], {
       redirectBackOnError: true,
       useReq: true,

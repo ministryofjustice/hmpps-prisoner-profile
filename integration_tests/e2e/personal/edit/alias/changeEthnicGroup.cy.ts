@@ -73,15 +73,14 @@ context('Change ethnic group', () => {
     })
   })
 
-  context('Allows no ethnic group to be selected', () => {
-    it('redirects back to personal page if nothing selected', () => {
+  context('Does not allow no ethnic group to be selected', () => {
+    it('displays an error message if no ethnic group is selected', () => {
       // Prepopulates with existing ethnicity:
       cy.task('stubGetPseudonyms', { prisonerNumber, response: [{ ...PseudonymResponseMock, ethnicity: undefined }] })
 
       page = visitChangeEthnicGroupPage()
       page.continueButton().click()
-
-      cy.location('pathname').should('eq', `/prisoner/G6123VU/personal`)
+      page.errorSummary().should('contain.text', 'Select an ethnic group.')
     })
   })
 })

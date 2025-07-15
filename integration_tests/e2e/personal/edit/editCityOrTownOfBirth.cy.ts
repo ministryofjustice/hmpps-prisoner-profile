@@ -24,7 +24,13 @@ context('Edit city or town of birth', () => {
     editPageTitle: 'City or town of birth',
     successfulFlashMessage: 'City or town of birth updated',
     validInputs: [{ textInputs: { cityOrTownOfBirth: 'SHEFFIELD' } }],
-    invalidInputs: [],
+    invalidInputs: [
+      {
+        testDescription: 'Input too long',
+        input: { textInputs: { cityOrTownOfBirth: '1234567890 1234567890 1234567890' } },
+        errorMessages: ['City or town of birth must be 25 characters or less.'],
+      },
+    ],
     redirectAnchor: 'personal-details',
   })
 })
