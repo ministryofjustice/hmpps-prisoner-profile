@@ -15,6 +15,7 @@ export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 export const editReligionEnabled: FeatureFlagMethod = () => true
 
 export const externalContactsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  config.featureToggles.externalContactsEnabledPrisons.includes('***') ||
   config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
 
 export const bvlsHmctsLinkGuestPinEnabled: FeatureFlagMethod = () => config.featureToggles.bvlsHmctsLinkGuestPinEnabled
