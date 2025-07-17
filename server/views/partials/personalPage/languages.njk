@@ -12,7 +12,7 @@
       <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-2">
         <span class="govuk-!-font-weight-bold govuk-!-display-block">Main language</span>
         {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
-          <div data-qa="no-language-entered">Not entered</div>
+          <div data-qa="no-language-entered" class="not-entered-tag">Not entered</div>
         {% else %}
           <div data-qa="spoken-language">
             {% if personalDetails.languages.spoken %}
@@ -47,9 +47,7 @@
           >Other languages</span
         >
         {% if personalDetails.otherLanguages.length == 0 %}
-          <span class="govuk-!-display-block govuk-!-margin-bottom-2" data-qa="no-other-languages-entered"
-            >Not entered</span
-          >
+          <div class="govuk-!-margin-bottom-2 not-entered-tag" data-qa="no-other-languages-entered">Not entered</div>
         {% endif %}
       </dd>
       <dd

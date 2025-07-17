@@ -39,7 +39,9 @@
         </dl>
       {% endif %}
       {% if not careNeeds.length and not hasPastCareNeeds %}
-        <p data-qa="no-care-needs-message">No care needs have been entered.</p>
+        <p data-qa="no-care-needs-message" class="govuk-!-margin-bottom-4 not-entered-tag not-entered-tag--wide">
+          No care needs have been entered{% if not newArrival72 %}.{% endif %}
+        </p>
       {% elseif not careNeeds.length and hasPastCareNeeds %}
         <p data-qa="no-care-needs-message">This person does not have any current care needs.</p>
       {% endif %}
