@@ -65,6 +65,7 @@ import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDe
 import { bvlsHmctsLinkGuestPinEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
+import { mapSexualOrientationText } from './referenceDataMapping'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -216,6 +217,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
   njkEnv.addFilter('includes', arrayIncludes)
   njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
+  njkEnv.addFilter('sexualOrientationText', mapSexualOrientationText)
 
   // BVLS specific filter
   njkEnv.addFilter('toFullCourtLink', toFullCourtLink)

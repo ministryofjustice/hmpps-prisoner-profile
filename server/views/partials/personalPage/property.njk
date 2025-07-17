@@ -15,7 +15,9 @@
   <div class="govuk-grid-row" data-qa="property">
     <div class="govuk-grid-column-full">
       {% if not property.length %}
-        <p>No property entered.</p>
+        <p data-qa="no-property-entered" class="govuk-!-margin-bottom-4 not-entered-tag not-entered-tag--wide">
+            No property entered{% if not newArrival72 %}.{% endif %}
+        </p>
       {% endif %}
       {% for item in property %}
         {{ propertyItem({containerType: item.containerType, sealMark: item.sealMark, location: item.location}) }}
