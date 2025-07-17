@@ -42,7 +42,7 @@
 
 {% macro eyeColourHtml(leftEyeColour, rightEyeColour) %}
     {% if leftEyeColour === rightEyeColour %}
-        {{ leftEyeColour }}
+        <span data-qa="eye-colour" class="{% if leftEyeColour === 'Not entered' %}not-entered-tag{% endif %}">{{ leftEyeColour }}</span>
     {% else %}
         {% if leftEyeColour === 'Not entered' %}
             {{ rightEyeColour }}

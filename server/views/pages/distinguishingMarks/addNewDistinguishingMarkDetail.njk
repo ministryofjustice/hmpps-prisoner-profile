@@ -10,7 +10,8 @@
 {% set formConfig = bodyPart | toBodyPartSpecificFormData(markType) %}
 {% set pageTitle = formConfig.tab + " - Prisoner personal details" %}
 {% macro formSet(postfix) %}
-  {{ govukCharacterCount({
+  <div class="govuk-form-group">
+    {{ govukCharacterCount({
         name: "description-"+postfix,
         id: "description-"+postfix,
         maxlength: 240,
@@ -23,7 +24,10 @@
         attributes: { "data-qa": "description-field-"+postfix },
         value: formValues["description-"+postfix]
     }) }}
-  {{ fileUploadWithPreview("file", { label: "Add a photo (optional)" }) }}
+  </div>
+  <div class="govuk-form-group">
+    {{ fileUploadWithPreview("file-" + postfix, { label: "Add a photo (optional)", id: "file-" + postfix, errorMessage: (errors | findError("file-"+postfix)).text }) }}
+  </div>
 {% endmacro %}
 {% block form %}
   <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -39,7 +43,7 @@
         {{ formSet(formConfig.specificParts[0].name) }}
       {% else %}
         {#              Show the radio buttons #}
-        <div id="specific-body-part-selection" class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+        <div id="specific-body-part-selection" class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 and errors[0].href === "#specific-body-part-selection" }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               <span class="govuk-caption-l">Distinguishing marks</span>

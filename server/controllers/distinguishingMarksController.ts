@@ -13,7 +13,7 @@ import {
 import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { convertToTitleCase, formatName } from '../utils/utils'
+import { formatName } from '../utils/utils'
 import {
   BodyPartId,
   BodyPartSideId,
@@ -22,6 +22,16 @@ import {
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
+
+interface MulterFiles {
+  [fieldname: string]: MulterFile[]
+}
+
+const updateMessages: Record<MarkTypeSelection, string> = {
+  tattoo: 'Tattoos updated',
+  scar: 'Scars updated',
+  mark: 'Other marks updated',
+}
 
 export default class DistinguishingMarksController {
   constructor(
@@ -102,9 +112,9 @@ export default class DistinguishingMarksController {
       .catch(error => logger.error(error))
 
     req.flash('flashMessage', {
-      text: `${convertToTitleCase(verifiedMarkType)} added`,
+      text: updateMessages[verifiedMarkType],
       type: FlashMessageType.success,
-      fieldName: 'distinguishing-mark',
+      fieldName: `distinguishing-marks-${verifiedMarkType}`,
     })
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -128,6 +138,7 @@ export default class DistinguishingMarksController {
     const { markType, prisonerNumber } = req.params
     const { specificBodyPart, action } = req.body
     const { clientToken } = req.middleware
+    const files = req.files as MulterFiles
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -138,7 +149,7 @@ export default class DistinguishingMarksController {
       verifiedMarkType,
       specificBodyPart as AllBodyPartSelection,
       req.body[`description-${specificBodyPart}`],
-      req.file,
+      files?.[`file-${specificBodyPart}`]?.[0],
     )
 
     this.auditService
@@ -155,7 +166,7 @@ export default class DistinguishingMarksController {
       .catch(error => logger.error(error))
 
     req.flash('flashMessage', {
-      text: `${convertToTitleCase(verifiedMarkType)} added`,
+      text: updateMessages[verifiedMarkType],
       type: FlashMessageType.success,
       fieldName: `distinguishing-marks-${verifiedMarkType}`,
     })
@@ -190,17 +201,15 @@ export default class DistinguishingMarksController {
 
   public async returnToPrisonerProfileAfterUpdate(req: Request, res: Response) {
     const { prisonerNumber, markType } = req.params
-    const updateMessages: Record<MarkTypeSelection, string> = {
-      tattoo: 'Tattoos updated',
-      scar: 'Scars updated',
-      mark: 'Other marks updated',
-    }
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
 
-    req.flash('flashMessage', {
-      text: updateMessages[markType as MarkTypeSelection] ?? 'Distinguishing marks updated',
-      type: FlashMessageType.success,
-      fieldName: `distinguishing-marks-${markType}`,
-    })
+    if (verifiedMarkType) {
+      req.flash('flashMessage', {
+        text: updateMessages[verifiedMarkType],
+        type: FlashMessageType.success,
+        fieldName: `distinguishing-marks-${verifiedMarkType}`,
+      })
+    }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
   }

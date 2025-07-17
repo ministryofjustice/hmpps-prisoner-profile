@@ -40,9 +40,12 @@ describe('Height validators', () => {
       [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
       [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
       [{ feet: 'example', inches: '1' }, 'Enter this person’s height'],
+      [{ feet: '12example', inches: '1' }, 'Enter this person’s height'],
+      [{ feet: '1', inches: '12example' }, 'Enter this person’s height'],
       [{ feet: '5', inches: 'example' }, 'Enter this person’s height'],
       [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
       [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+      [{ feet: '1', inches: '13' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
     ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
       const body = { feet, inches }
       const errors = await heightImperialValidator(body)

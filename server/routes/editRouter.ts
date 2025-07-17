@@ -29,7 +29,7 @@ import { heightImperialValidator, heightMetricValidator } from '../validators/pe
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
-import distinguishingMarksRouter from './distinguishingMarksRouter'
+import distinguishingMarksRouter, { markTypes } from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 import militaryRecordsRouter from './militaryRecordsRouter'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
@@ -45,6 +45,7 @@ import { populateEditPageData } from '../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGuard'
 import { personalPageBasePath } from './personalRouter'
 import PersonalController from '../controllers/personal/personalController'
+import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
@@ -61,7 +62,7 @@ export default function editRouter(services: Services): Router {
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
   router.use(
-    `${personalPageBasePath}/:markType(tattoo|scar|mark)`,
+    `${personalPageBasePath}/:markType(${markTypes})`,
     ...commonMiddleware,
     distinguishingMarksRouter(services),
   )
@@ -348,6 +349,16 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
       method: personalController.cityOrTownOfBirthTextInput().submit,
+      validation: {
+        validators: [
+          textFieldLengthValidator({
+            fieldName: 'cityOrTownOfBirth',
+            displayName: 'City or town of birth',
+            maxLength: 25,
+          }),
+        ],
+        redirectBackOnError: true,
+      },
     },
     requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })
