@@ -57,9 +57,12 @@ export default function aliasRouter(services: Services): Router {
   post(
     '/ethnic-group',
     ...commonMiddleware,
-    validationMiddleware([radioFieldValidator({ fieldName: 'radioField', fieldDisplayName: 'an ethnic group' })], {
-      redirectBackOnError: true,
-    }),
+    validationMiddleware(
+      [radioFieldValidator({ fieldName: 'radioField', href: 'radio', fieldDisplayName: 'an ethnic group' })],
+      {
+        redirectBackOnError: true,
+      },
+    ),
     aliasController.submitChangeEthnicGroup(),
   )
   get(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.displayChangeEthnicBackground())
