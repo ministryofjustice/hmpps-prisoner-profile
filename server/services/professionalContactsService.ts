@@ -11,11 +11,7 @@ import {
   SortType,
 } from '../utils/utils'
 import Address from '../data/interfaces/prisonApi/Address'
-import StaffContacts, {
-  Contact,
-  KeyWorkerSummary,
-  YouthStaffContacts,
-} from '../data/interfaces/prisonApi/StaffContacts'
+import StaffContacts, { Contact, YouthStaffContacts } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
@@ -268,29 +264,29 @@ export default class ProfessionalContactsService {
       const [communityManager, allocationManager, currentAllocatedStaff, bookingContacts] = await Promise.all([
         Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
         Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
-        keyWorkerClient.getCurrentAllocations(prisonerNumber),
+        Result.wrap(keyWorkerClient.getCurrentAllocations(prisonerNumber), apiErrorCallback),
         prisonApi.getBookingContacts(bookingId),
       ])
 
-      const allocatedKeyWorker = currentAllocatedStaff.allocations.find(
-        itm => itm.policy.code === 'KEY_WORKER',
-      )?.staffMember
-      const lastKeyWorkerSession = currentAllocatedStaff.latestRecordedEvents.find(itm => itm.type === 'SESSION')
-      const keyWorker: PromiseSettledResult<KeyWorkerSummary> = allocatedKeyWorker
-        ? {
-            status: 'fulfilled',
-            value: {
-              name: `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`,
-              lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
-            },
-          }
-        : {
-            status: 'rejected',
-            reason: 'No currently allocated key worker for this prisoner',
-          }
-
       return {
-        keyWorker,
+        keyWorker: currentAllocatedStaff
+          .map(({ allocations, latestRecordedEvents, hasHighComplexityOfNeeds }) => {
+            const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
+            const lastKeyWorkerSession = latestRecordedEvents.find(itm => itm.type === 'SESSION')
+            let name: string
+            if (hasHighComplexityOfNeeds) {
+              name = 'None - high complexity of need'
+            } else if (allocatedKeyWorker) {
+              name = `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
+            } else {
+              name = 'Not allocated'
+            }
+            return {
+              name,
+              lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
+            }
+          })
+          .toPromiseSettledResult(),
         prisonOffenderManager: allocationManager
           .map(pom => formatPomName(pom?.primary_pom?.name))
           .toPromiseSettledResult(),
