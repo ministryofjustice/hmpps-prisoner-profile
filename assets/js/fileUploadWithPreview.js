@@ -13,7 +13,7 @@ function previewSelectedImage(component) {
     reader.onload = function (e) {
       previewImage.src = e.target.result
       previewImage.alt = 'Preview of uploaded image'
-      previewFilename.innerText = imageInput.files[0].name
+      previewFilename.innerText = file.name
       previewContainer.style.display = 'flex'
       inputContainer.style.display = 'none'
     }
