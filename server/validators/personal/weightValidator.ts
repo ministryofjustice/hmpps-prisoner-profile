@@ -6,7 +6,7 @@ export const weightMetricValidator: Validator = (body: Record<string, string>) =
   const { kilograms } = body
 
   if (!containsOnlyNumbers(kilograms)) {
-    return [{ text: 'Enter this person’s weight', href: '#kilograms' }]
+    return [{ text: 'Weight must only contain numbers', href: '#kilograms' }]
   }
 
   const weight = parseInt(kilograms, 10)
@@ -27,7 +27,7 @@ export const weightImperialValidator: Validator = (body: Record<string, string>)
   const { stone: stoneString, pounds: poundsString } = body
 
   if ((stoneString && !containsOnlyNumbers(stoneString)) || (poundsString && !containsOnlyNumbers(poundsString))) {
-    return [{ text: 'Enter this person’s weight', href: '#stone' }]
+    return [{ text: 'Weight must only contain numbers', href: '#stone' }]
   }
 
   const stone = stoneString ? parseInt(stoneString, 10) : 0

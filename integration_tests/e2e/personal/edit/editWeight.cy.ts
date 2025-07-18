@@ -36,7 +36,7 @@ context('Edit Weight (metric)', () => {
       {
         testDescription: 'Invalid',
         input: { textInputs: { kilograms: 'Example' } },
-        errorMessages: ['Enter this person’s weight'],
+        errorMessages: ['Weight must only contain numbers'],
       },
     ],
     editPageWithTitle: EditWeight,
@@ -71,12 +71,12 @@ context('Edit weight (Imperial)', () => {
       {
         testDescription: 'Invalid',
         input: { textInputs: { stone: 'Example', pounds: '5' } },
-        errorMessages: ['Enter this person’s weight'],
+        errorMessages: ['Weight must only contain numbers'],
       },
       {
         testDescription: 'Invalid',
         input: { textInputs: { stone: '5', pounds: 'Example' } },
-        errorMessages: ['Enter this person’s weight'],
+        errorMessages: ['Weight must only contain numbers'],
       },
     ],
     editPageWithTitle: EditWeight,
