@@ -22,12 +22,21 @@ export const StaffAllocationMock: StaffAllocation = {
       },
       staffMember: {
         staffId: 3532453,
-        firstName: 'Dave',
-        lastName: 'Stevens',
+        firstName: 'NEW',
+        lastName: 'KEY-WORKER',
       },
     },
   ],
-  latestRecordedEvents: [],
+  latestRecordedEvents: [
+    {
+      prison: {
+        code: 'CODE',
+        description: 'Description',
+      },
+      type: 'SESSION',
+      occurredAt: '2025-06-24T12:00:00',
+    },
+  ],
 }
 
 export default {

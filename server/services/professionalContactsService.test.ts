@@ -618,6 +618,26 @@ describe('professionalContactsService', () => {
       })
     })
 
+    it('should use new key worker endpoint to get key worker details for prisons onboard the new version of key worker service', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
+
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA, true)
+
+      expect(result).toEqual({
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'New Key-Worker',
+            lastSession: '24/06/2025',
+          },
+        },
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+        resettlementWorker: 'Ivan Smirnov',
+      })
+    })
+
     it('should handle error getting keyworkers name', async () => {
       prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
       keyWorkerApiClient.getOffendersKeyWorker = jest.fn().mockRejectedValue('Some error')
