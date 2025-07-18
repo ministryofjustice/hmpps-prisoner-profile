@@ -80,7 +80,7 @@ context('Change ethnic group', () => {
 
       page = visitChangeEthnicGroupPage()
       page.continueButton().click()
-      page.errorSummary().should('contain.text', 'Select an ethnic group.')
+      page.errorSummary().should('contain.text', 'Select an ethnic group')
     })
   })
 })

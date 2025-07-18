@@ -1,6 +1,6 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import { dietAndAllergyEnabled } from './featureToggles'
+import { dietAndAllergyEnabled, externalContactsEnabled } from './featureToggles'
 
 describe('featureToggles', () => {
   describe('dietAndAllergyEnabled', () => {
@@ -38,14 +38,43 @@ describe('featureToggles', () => {
     it('enabled if active case load is listed as permanently enabled', () => {
       config.featureToggles.dietAndAllergyEnabledPrisons = ['MDI']
 
-      dietAndAllergyEnabled('MDI')
+      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
     })
 
     it('enabled if active case load is listed as enabled after date', () => {
       config.featureToggles.dietAndAllergyEnabledPrisonsByDate = ['MDI']
       config.featureToggles.dietAndAllergyEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
 
-      dietAndAllergyEnabled('MDI')
+      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
+    })
+  })
+
+  describe('externalContactsEnabled', () => {
+    afterEach(() => {
+      // reset to defaults:
+      config.featureToggles.externalContactsEnabledPrisons = []
+    })
+
+    it('is not enabled by default', () => {
+      expect(externalContactsEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if active case load is not listed as enabled', () => {
+      config.featureToggles.externalContactsEnabledPrisons = ['LEI']
+
+      expect(externalContactsEnabled('MDI')).toBeFalsy()
+    })
+
+    it('enabled if active case load is listed as enabled', () => {
+      config.featureToggles.externalContactsEnabledPrisons = ['MDI']
+
+      expect(externalContactsEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if wildcard is listed as enabled', () => {
+      config.featureToggles.externalContactsEnabledPrisons = ['***']
+
+      expect(externalContactsEnabled('MDI')).toBeTruthy()
     })
   })
 })

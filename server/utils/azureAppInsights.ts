@@ -10,8 +10,8 @@ import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contract
 import { RequestHandler } from 'express'
 import { ApplicationInfo } from '../applicationInfo'
 
-const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info']
-const dependencyPrefixesToIgnore = ['sqs']
+const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info', 'GET /api/addresses/find']
+const dependencyPrefixesToIgnore = ['sqs', 'api.os.uk']
 
 export type ContextObject = {
   /* eslint-disable  @typescript-eslint/no-explicit-any */

@@ -6,7 +6,7 @@ export const heightMetricValidator: Validator = (body: Record<string, string>) =
   const { editField } = body
 
   if (!containsOnlyNumbers(editField)) {
-    return [{ text: 'Enter this person’s height', href: '#height' }]
+    return [{ text: 'Height must only contain numbers', href: '#height' }]
   }
 
   const height = editField ? parseInt(editField, 10) : 0
@@ -27,7 +27,7 @@ export const heightImperialValidator: Validator = (body: Record<string, string>)
   const { feet: feetString, inches: inchesString } = body
 
   if ((feetString && !containsOnlyNumbers(feetString)) || (inchesString && !containsOnlyNumbers(inchesString))) {
-    return [{ text: 'Enter this person’s height', href: '#feet' }]
+    return [{ text: 'Height must only contain numbers', href: '#feet' }]
   }
 
   const feet = feetString ? parseInt(feetString, 10) : 0
