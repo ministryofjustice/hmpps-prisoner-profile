@@ -1693,9 +1693,11 @@ export default class PersonalController {
           } = req.middleware
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
           const fieldData = addPhoneNumberFieldData({ firstName, lastName })
-
           const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-          const isDuplicate = phones.some(phone => phone.number === phoneNumber && phone.type === phoneNumberType)
+          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
+          const isDuplicate = phones.some(
+            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension,
+          )
 
           if (isDuplicate) {
             req.flash('errors', [{ text: 'This phone number has already been added', href: '#phone-number' }])
@@ -1784,12 +1786,14 @@ export default class PersonalController {
           } = req.middleware
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
           const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
-          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-          const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
-
-          const valueHasChanged = phoneNumber !== previousValue.number || phoneNumberType !== previousValue.type
           const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-          const isDuplicate = phones.some(phone => phone.number === phoneNumber && phone.type === phoneNumberType)
+          const previousValue = phones.find(phone => phone.id.toString() === phoneNumberId)
+          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
+          const valueHasChanged =
+            sanitisedNumber !== previousValue.number.replace(/\D/g, '') || phoneNumberType !== previousValue.type
+          const isDuplicate = phones.some(
+            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension,
+          )
 
           if (isDuplicate && valueHasChanged) {
             req.flash('errors', [{ text: 'This phone number has already been added', href: '#phone-number' }])
@@ -1852,16 +1856,17 @@ export default class PersonalController {
       const { clientToken } = req.middleware
 
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-      const previousValue = emails.find(email => email.id.toString() === emailAddressId)
-      const valueHasChanged = value !== previousValue.email
-      const isDuplicate = emails.some(email => email.email === value)
+      const previousEmail = emails.find(email => email.id.toString() === emailAddressId).email
+      const emailEntered = value.replaceAll(' ', '').toLowerCase()
+      const valueHasChanged = emailEntered !== previousEmail
+      const isDuplicate = emails.some(email => email.email === emailEntered)
 
       if (isDuplicate && valueHasChanged) {
         req.flash('errors', [{ text: 'This email address has already been added', href: '#email' }])
         req.flash('requestBody', JSON.stringify(req.body))
         throw Error('Duplicate Email')
       } else {
-        await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, value)
+        await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailEntered)
       }
     }
 
@@ -1870,14 +1875,15 @@ export default class PersonalController {
       const { clientToken } = req.middleware
 
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-      const isDuplicate = emails.some(email => email.email === value)
+      const emailEntered = value.replaceAll(' ', '').toLowerCase()
+      const isDuplicate = emails.some(email => email.email === emailEntered)
 
       if (isDuplicate) {
         req.flash('errors', [{ text: 'This email address has already been added', href: '#email' }])
         req.flash('requestBody', JSON.stringify(req.body))
         throw Error('Duplicate Email')
       } else {
-        await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, value)
+        await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailEntered)
       }
     }
 

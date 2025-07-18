@@ -3304,7 +3304,7 @@ describe('PersonalController', () => {
             id: '1',
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            body: { emailAddress: 'foo@example.com' },
+            body: { emailAddress: 'fOO@exaMple.com' },
             flash: jest.fn(),
           } as any
 
@@ -3334,6 +3334,26 @@ describe('PersonalController', () => {
             type: FlashMessageType.success,
             fieldName: 'emailAddress',
           })
+        })
+
+        it('Handles duplicate emails', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            emails: [{ email: 'foo@example.com' }],
+            phones: [],
+          })
+
+          validRequest.body = { emailAddress: ' Foo@ eXAMplE.com' }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
+            {
+              href: '#email',
+              text: 'This email address has already been added',
+            },
+          ])
+
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
         })
 
         it('Handles API errors', async () => {
@@ -3621,7 +3641,7 @@ describe('PersonalController', () => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
-        it('Updates the email', async () => {
+        it('Updates the phone number', async () => {
           await action(validRequest, res)
           expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', {
             phoneNumberType: 'MOB',
@@ -3641,6 +3661,54 @@ describe('PersonalController', () => {
         })
 
         it('Adds the success message to the flash', async () => {
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+            text: 'Phone number updated',
+            type: FlashMessageType.success,
+            fieldName: 'phoneNumber',
+          })
+        })
+
+        it('Handles duplicate phone numbers', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            phones: [
+              {
+                number: '(12)34',
+                type: 'MOB',
+                extension: '4321',
+              },
+            ],
+            emails: [],
+          })
+
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
+            {
+              href: '#phone-number',
+              text: 'This phone number has already been added',
+            },
+          ])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+        })
+
+        it('Allows duplicate phone number if the extention differs', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            phones: [
+              {
+                number: '(12)34',
+                type: 'MOB',
+                extension: '4321',
+              },
+            ],
+            emails: [],
+          })
+
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4322' }
+
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
@@ -3809,6 +3877,68 @@ describe('PersonalController', () => {
         })
 
         it('Adds the success message to the flash', async () => {
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+            text: 'Phone number updated',
+            type: FlashMessageType.success,
+            fieldName: 'phoneNumber',
+          })
+        })
+
+        it('Handles duplicate phone numbers', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            phones: [
+              {
+                id: '123',
+                number: '(12)34',
+                type: 'MOB',
+                extension: '1111',
+              },
+              {
+                id: '1234',
+                number: '(12)34',
+                type: 'MOB',
+                extension: '4321',
+              },
+            ],
+            emails: [],
+          })
+
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
+            {
+              href: '#phone-number',
+              text: 'This phone number has already been added',
+            },
+          ])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
+        })
+
+        it('Allows duplicate phone number if the extention differs', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            phones: [
+              {
+                id: '123',
+                number: '(12)34',
+                type: 'MOB',
+                extension: '1111',
+              },
+              {
+                id: '1234',
+                number: '(12)34',
+                type: 'MOB',
+                extension: '4321',
+              },
+            ],
+            emails: [],
+          })
+
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '5555' }
+
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
