@@ -1,6 +1,11 @@
 {% macro religionHistoryHtml(religion, hasCurrentBelief, prisonerNumber) %}
-    <div>{{ religion }}</div>
-    {% if religion !== 'Not entered' and hasCurrentBelief %}
-    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/religion-belief-history">Religion, faith or belief history</a>
+    {% if religion === 'Not entered' %}
+        <span class="not-entered-tag">{{ religion }}</span>
+    {% else %}
+        <div>{{ religion }}</div>
+        {% if religion !== 'Not entered' and hasCurrentBelief %}
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
+               href="/prisoner/{{ prisonerNumber }}/religion-belief-history">Religion, faith or belief history</a>
+        {% endif %}
     {% endif %}
 {% endmacro %}
