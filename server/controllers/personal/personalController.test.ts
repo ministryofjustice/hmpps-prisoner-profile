@@ -3349,7 +3349,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
               href: '#email',
-              text: 'This email address has already been added',
+              text: 'This email address already exists for this person. Add a new email or edit the saved one',
             },
           ])
 
@@ -3689,7 +3689,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
               href: '#phone-number',
-              text: 'This phone number has already been added',
+              text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
@@ -3912,7 +3912,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
               href: '#phone-number',
-              text: 'This phone number has already been added',
+              text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')

@@ -1700,7 +1700,12 @@ export default class PersonalController {
           )
 
           if (isDuplicate) {
-            req.flash('errors', [{ text: 'This phone number has already been added', href: '#phone-number' }])
+            req.flash('errors', [
+              {
+                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
+                href: '#phone-number',
+              },
+            ])
             req.flash('requestBody', JSON.stringify(req.body))
             return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
           }
@@ -1796,7 +1801,12 @@ export default class PersonalController {
           )
 
           if (isDuplicate && valueHasChanged) {
-            req.flash('errors', [{ text: 'This phone number has already been added', href: '#phone-number' }])
+            req.flash('errors', [
+              {
+                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
+                href: '#phone-number',
+              },
+            ])
             req.flash('requestBody', JSON.stringify(req.body))
             return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
           }
@@ -1862,7 +1872,12 @@ export default class PersonalController {
       const isDuplicate = emails.some(email => email.email === emailEntered)
 
       if (isDuplicate && valueHasChanged) {
-        req.flash('errors', [{ text: 'This email address has already been added', href: '#email' }])
+        req.flash('errors', [
+          {
+            text: 'This email address already exists for this person. Add a new email or edit the saved one',
+            href: '#email',
+          },
+        ])
         req.flash('requestBody', JSON.stringify(req.body))
         throw Error('Duplicate Email')
       } else {
@@ -1879,7 +1894,12 @@ export default class PersonalController {
       const isDuplicate = emails.some(email => email.email === emailEntered)
 
       if (isDuplicate) {
-        req.flash('errors', [{ text: 'This email address has already been added', href: '#email' }])
+        req.flash('errors', [
+          {
+            text: 'This email address already exists for this person. Add a new email or edit the saved one',
+            href: '#email',
+          },
+        ])
         req.flash('requestBody', JSON.stringify(req.body))
         throw Error('Duplicate Email')
       } else {
