@@ -3353,6 +3353,12 @@ describe('PersonalController', () => {
             },
           ])
 
+          expect(validRequest.flash).not.toHaveBeenCalledWith('errors', [
+            {
+              text: 'There was an error please try again',
+            },
+          ])
+
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
         })
 
@@ -3520,6 +3526,35 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
+        })
+
+        it('Handles duplicate emails', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            emails: [
+              { id: '234', email: 'foo@example.com' },
+              { id: '555', email: 'something@example.com' },
+            ],
+            phones: [],
+          })
+
+          validRequest.body = { emailAddress: 'someThinG@exaM ple.com' }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
+            {
+              href: '#email',
+              text: 'This email address already exists for this person. Add a new email or edit the saved one',
+            },
+          ])
+
+          expect(validRequest.flash).not.toHaveBeenCalledWith('errors', [
+            {
+              text: 'There was an error please try again',
+            },
+          ])
+
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
         })
 
@@ -3915,6 +3950,14 @@ describe('PersonalController', () => {
               text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
+
+          expect(validRequest.flash).not.toHaveBeenCalledWith('errors', [
+            {
+              text: 'There was an error please try again',
+            },
+          ])
+          expect(validRequest.flash).not.toHaveBeenCalledTimes(3)
+
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
         })
 

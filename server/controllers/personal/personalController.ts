@@ -1861,7 +1861,7 @@ export default class PersonalController {
         return addEmailAddressTextFieldData({ name: { firstName, lastName } })
       }
 
-    const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
+    const globalEmailSetter: TextFieldSetter = async (req, res, fieldData, value) => {
       const { prisonerNumber, emailAddressId } = req.params
       const { clientToken } = req.middleware
 
@@ -1879,10 +1879,9 @@ export default class PersonalController {
           },
         ])
         req.flash('requestBody', JSON.stringify(req.body))
-        throw Error('Duplicate Email')
-      } else {
-        await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailEntered)
+        res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
       }
+      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailEntered)
     }
 
     const globalEmailCreator: TextFieldSetter = async (req, res, fieldData, value) => {
@@ -1901,21 +1900,22 @@ export default class PersonalController {
           },
         ])
         req.flash('requestBody', JSON.stringify(req.body))
-        throw Error('Duplicate Email')
-      } else {
-        await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailEntered)
+        res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
       }
+      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailEntered)
     }
 
     const globalEmailCreatorOnSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
       const { prisonerNumber } = req.params
       const addAnother = req.query?.addAnother ?? 'false'
+      if (!res.headersSent) {
+        if (addAnother === 'true') {
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+        }
 
-      if (addAnother === 'true') {
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#${fieldData.redirectAnchor}`)
       }
-
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#${fieldData.redirectAnchor}`)
+      return null
     }
 
     return {
