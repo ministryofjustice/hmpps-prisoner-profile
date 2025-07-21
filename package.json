@@ -138,7 +138,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "^4.7.1",
-    "superagent": "^9.0.2",
+    "superagent": "^10.2.2",
     "url-value-parser": "^2.2.0",
     "uuid": "^11.1.0"
   },
