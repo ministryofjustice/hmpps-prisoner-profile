@@ -19,26 +19,37 @@ describe('AddIdentityNumbersValidator', () => {
 
   describe('Maximum value length exceeded', () => {
     it.each([
-      ['CRO number', 'cro', '097501/98T'],
-      ['PNC number', 'pnc', '2002/0073319Z'],
+      [
+        'CRO number',
+        'cro',
+        '097501/98T',
+        'Enter a CRO number in the correct format, exactly as it appears on the document',
+      ],
+      [
+        'PNC number',
+        'pnc',
+        '2002/0073319Z',
+        'Enter a PNC number in the correct format, exactly as it appears on the document',
+      ],
       ['prison legacy system number', 'prisonLegacySystem'],
       ['probation legacy system number', 'probationLegacySystem'],
       ['Scottish PNC number', 'scottishPnc'],
       ['Youth Justice Application Framework (YJAF) number', 'yjaf'],
-    ])('%s', (description, id, validValue = '1'.repeat(20)) => {
+    ])('%s', (description, id, validValue = '1'.repeat(20), errorOverride = undefined) => {
       const validRequest = {
         [id]: { selected: id, value: validValue },
       }
       const invalidRequest = {
         [id]: { selected: id, value: '1'.repeat(21) },
       }
+      const expectedError = errorOverride ?? `Enter the ${description} using 20 characters or less`
 
       const validErrors = addIdentityNumbersValidator(validRequest)
       expect(validErrors.length).toEqual(0)
 
       const errors = addIdentityNumbersValidator(invalidRequest)
       expect(errors.length).toEqual(1)
-      expect(errors[0].text).toEqual(`Enter the ${description} using 20 characters or less`)
+      expect(errors[0].text).toEqual(expectedError)
       expect(errors[0].href).toEqual(`#${id}-value-input`)
     })
   })

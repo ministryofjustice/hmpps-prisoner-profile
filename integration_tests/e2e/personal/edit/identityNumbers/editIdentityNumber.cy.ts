@@ -66,7 +66,7 @@ context('Add personal IDs', () => {
             value: '1'.repeat(21),
           },
         },
-        errorMessages: ['Enter the ID number using 20 characters or less'],
+        errorMessages: ['Enter a PNC number in the correct format, exactly as it appears on the document'],
       },
       {
         testDescription: `comment field too long`,

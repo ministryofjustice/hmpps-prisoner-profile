@@ -521,7 +521,7 @@ describe('Distinguishing Marks Controller', () => {
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/tattoo/100`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/tattoo/100?updated=true`)
       },
     )
 
