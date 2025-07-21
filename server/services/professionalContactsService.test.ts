@@ -7,7 +7,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { Contact, ContactDetail } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
-import { keyWorkerMock } from '../data/localMockData/keyWorker'
+import { keyWorkerMock, staffAllocationMock } from '../data/localMockData/keyWorker'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
@@ -143,6 +143,7 @@ describe('professionalContactsService', () => {
 
     keyWorkerApiClient = {
       getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
+      getCurrentAllocations: jest.fn(async () => staffAllocationMock),
     }
 
     complexityApiClient = {
@@ -614,6 +615,26 @@ describe('professionalContactsService', () => {
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+      })
+    })
+
+    it('should use new key worker endpoint to get key worker details for prisons onboard the new version of key worker service', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
+
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA, true)
+
+      expect(result).toEqual({
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'New Key-Worker',
+            lastSession: '24/06/2025',
+          },
+        },
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+        resettlementWorker: 'Ivan Smirnov',
       })
     })
 
