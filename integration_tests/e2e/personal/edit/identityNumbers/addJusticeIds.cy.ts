@@ -129,8 +129,8 @@ context('Add justice IDs', () => {
           },
         },
         errorMessages: [
-          'Enter the CRO number using 20 characters or less',
-          'Enter the PNC number using 20 characters or less',
+          'Enter a CRO number in the correct format, exactly as it appears on the document',
+          'Enter a PNC number in the correct format, exactly as it appears on the document',
           'Enter the prison legacy system number using 20 characters or less',
           'Enter the probation legacy system number using 20 characters or less',
           'Enter the Scottish PNC number using 20 characters or less',
