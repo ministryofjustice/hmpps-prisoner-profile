@@ -8,7 +8,7 @@ export const keyWorkerMock: KeyWorker = {
   email: '1@1.com',
 }
 
-export const StaffAllocationMock: StaffAllocation = {
+export const staffAllocationMock: StaffAllocation = {
   hasHighComplexityOfNeeds: false,
   allocations: [
     {
@@ -41,5 +41,5 @@ export const StaffAllocationMock: StaffAllocation = {
 
 export default {
   keyWorkerMock,
-  StaffAllocationMock,
+  StaffAllocationMock: staffAllocationMock,
 }

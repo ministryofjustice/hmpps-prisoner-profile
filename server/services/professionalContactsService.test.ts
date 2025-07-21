@@ -7,7 +7,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { Contact, ContactDetail } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
-import { keyWorkerMock, StaffAllocationMock } from '../data/localMockData/keyWorker'
+import { keyWorkerMock, staffAllocationMock } from '../data/localMockData/keyWorker'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
@@ -143,7 +143,7 @@ describe('professionalContactsService', () => {
 
     keyWorkerApiClient = {
       getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
-      getCurrentAllocations: jest.fn(async () => StaffAllocationMock),
+      getCurrentAllocations: jest.fn(async () => staffAllocationMock),
     }
 
     complexityApiClient = {
