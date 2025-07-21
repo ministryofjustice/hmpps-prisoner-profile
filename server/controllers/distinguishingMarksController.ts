@@ -281,7 +281,7 @@ export default class DistinguishingMarksController {
 
     // Neck and back have no specific locations to choose from, so return to the change summary screen
     if (bodyPart === 'neck' || bodyPart === 'back') {
-      return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}?updated=true`)
     }
 
     return res.redirect(
