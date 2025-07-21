@@ -296,8 +296,8 @@ export default class ProfessionalContactsService {
         communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
         resettlementWorker: bookingContacts.otherContacts
           ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
-          .sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
-          .map(contact =>
+          ?.sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
+          ?.map(contact =>
             formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
           )?.[0],
       }
@@ -328,8 +328,8 @@ export default class ProfessionalContactsService {
       communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
       resettlementWorker: bookingContacts.otherContacts
         ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
-        .sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
-        .map(contact =>
+        ?.sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
+        ?.map(contact =>
           formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
         )?.[0],
     }
