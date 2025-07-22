@@ -2,7 +2,7 @@ import { stubFor } from './wiremock'
 import { incentiveReviewsMock } from '../../server/data/localMockData/incentiveReviewsMock'
 
 export default {
-  stubGetReviews: (prisonerNumber: string) => {
+  stubGetReviews: ({ prisonerNumber, bookingId }: { prisonerNumber: string; bookingId: number }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -13,7 +13,10 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: incentiveReviewsMock,
+        jsonBody: {
+          ...incentiveReviewsMock,
+          bookingId,
+        },
       },
     })
   },
