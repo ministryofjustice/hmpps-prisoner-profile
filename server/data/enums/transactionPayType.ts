@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow
 export enum TransactionPayType {
   Unemployed = 'UNEMPLOYED',
   Session = 'SESSION',

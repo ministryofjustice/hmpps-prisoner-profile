@@ -1,7 +1,6 @@
 import { ReferenceDataValue } from '../ReferenceDataValue'
 import { ReferenceDataCode } from '../healthAndMedicationApi/healthAndMedicationApiClient'
 
-// eslint-disable-next-line no-shadow
 export enum PersonCommunicationNeedsReferenceDataDomain {
   language = 'LANG',
 }

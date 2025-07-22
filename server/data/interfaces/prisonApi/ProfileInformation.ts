@@ -10,7 +10,6 @@ export const getProfileInformationValue = (type: ProfileInformationType, array: 
   return value && value.resultValue
 }
 
-// eslint-disable-next-line no-shadow
 export enum ProfileInformationType {
   RecognisedListener = 'LIST_REC',
   SuitableListener = 'LIST_SUIT',

@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow
 export enum ChargeResultCode {
   imprisonment = '1002',
   recall_to_prison = '1501',

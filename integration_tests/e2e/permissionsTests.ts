@@ -3,7 +3,6 @@ import { Role } from '../../server/data/enums/role'
 import NotFoundPage from '../pages/notFoundPage'
 import Page from '../pages/page'
 
-// eslint-disable-next-line import/prefer-default-export
 export function permissionsTests<TPage extends Page>({
   prisonerNumber,
   visitPage,

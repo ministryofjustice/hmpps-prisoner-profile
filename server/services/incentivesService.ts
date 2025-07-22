@@ -48,7 +48,7 @@ export default class IncentivesService {
           ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
           : undefined,
       }
-    } catch (e) {
+    } catch (_error) {
       return { error: true }
     }
   }
