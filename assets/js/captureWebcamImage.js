@@ -12,6 +12,9 @@ const mimetype = 'image/jpeg'
 let stream = null
 
 async function getWebcamList() {
+  // get camera permissions
+  await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+
   navigator.mediaDevices.enumerateDevices().then(devices => {
     const videoDevices = devices.filter(device => device.kind === 'videoinput')
 
