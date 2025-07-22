@@ -922,7 +922,7 @@ describe('PersonalController', () => {
             expect.objectContaining({ value: 'SMOKER_VAPER' }),
             expect.objectContaining({ value: 'SMOKER_NO' }),
           ]),
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'smoking-and-vaping',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -1008,9 +1008,9 @@ describe('PersonalController', () => {
         )
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #smoking-and-vaping on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#smoking-and-vaping')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1253,9 +1253,9 @@ describe('PersonalController', () => {
         )
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #nationality on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#nationality')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1442,7 +1442,7 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'city-or-town-of-birth',
         })
       })
 
@@ -1498,7 +1498,7 @@ describe('PersonalController', () => {
           expect.anything(),
           updateRequest,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#city-or-town-of-birth')
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'City or town of birth updated',
           type: FlashMessageType.success,
@@ -1549,7 +1549,7 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'country-of-birth',
         })
       })
 
@@ -1657,7 +1657,7 @@ describe('PersonalController', () => {
           expect.anything(),
           updateRequest,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#country-of-birth')
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Country of birth updated',
           type: FlashMessageType.success,
@@ -2256,9 +2256,9 @@ describe('PersonalController', () => {
         } as any
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #diet-and-food-allergies on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#diet-and-food-allergies')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -2408,7 +2408,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
           formTitle: `Select First Last’s religion, faith or belief`,
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'religion-faith-or-belief',
           prisonerNumber: 'ABC123',
           currentReasonForChange: undefined,
           currentReasonForChangeUnknown: undefined,
@@ -2601,7 +2601,7 @@ describe('PersonalController', () => {
           updatedReligion,
           reason,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#religion-faith-or-belief')
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
           type: FlashMessageType.success,
@@ -2649,7 +2649,7 @@ describe('PersonalController', () => {
           updatedReligion,
           reason,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#religion-faith-or-belief')
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
           type: FlashMessageType.success,
@@ -2736,7 +2736,7 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expectedOptions,
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'sexual-orientation',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -2822,9 +2822,9 @@ describe('PersonalController', () => {
         )
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #sexual-orientation on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#sexual-orientation')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -2885,7 +2885,7 @@ describe('PersonalController', () => {
           prisonerNumber: 'ABC123',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'number-of-children',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -2982,9 +2982,9 @@ describe('PersonalController', () => {
         expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #number-of-children on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#number-of-children')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -3081,7 +3081,7 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expectedOptions,
-          redirectAnchor: 'personal-details',
+          redirectAnchor: 'marriage-or-civil-partnership-status',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -3162,9 +3162,9 @@ describe('PersonalController', () => {
         expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'M')
       })
 
-      it('Redirects to the personal page #personal-details on success', async () => {
+      it('Redirects to the personal page #marriage-or-civil-partnership-status on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#marriage-or-civil-partnership-status')
       })
 
       it('Adds the success message to the flash', async () => {

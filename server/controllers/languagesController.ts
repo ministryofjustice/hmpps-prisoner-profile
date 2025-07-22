@@ -154,7 +154,7 @@ export default class LanguagesController {
         })
         .catch(error => logger.error(error))
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#main-language`)
     }
   }
 
@@ -301,7 +301,7 @@ export default class LanguagesController {
       return res.redirect(
         action === 'another'
           ? `/prisoner/${prisonerNumber}/personal/other-languages`
-          : `/prisoner/${prisonerNumber}/personal#personal-details`,
+          : `/prisoner/${prisonerNumber}/personal#other-languages`,
       )
     }
   }

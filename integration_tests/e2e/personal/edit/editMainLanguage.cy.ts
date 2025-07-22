@@ -99,7 +99,7 @@ context('Edit main language', () => {
           errorMessages: ['This is not a valid language'],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'main-language',
       isUnrestricted: true,
     })
   })
@@ -185,7 +185,7 @@ context('Edit main language', () => {
           errorMessages: ['This is not a valid language'],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'main-language',
       isUnrestricted: true,
     })
   })

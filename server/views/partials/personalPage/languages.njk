@@ -3,13 +3,13 @@
 
 {% if inUsersCaseLoad %}
   <dl
-    id="languages"
     class="govuk-summary-list govuk-summary-list--bottom-border govuk-!-margin-bottom-0 {{ 'row-updated' if flashMessage.fieldName === 'languages' }}"
     data-qa="languages"
   >
     <div class="govuk-summary-list__row govuk-!-border-none">
       <dt class="govuk-summary-list__key govuk-!-padding-top-2">Languages</dt>
       <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-2">
+        <span class="anchor-center" id="main-language"></span>
         <span class="govuk-!-font-weight-bold govuk-!-display-block">Main language</span>
         {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
           <div data-qa="no-language-entered" class="not-entered-tag">Not entered</div>
@@ -42,6 +42,7 @@
     <div class="govuk-summary-list__row {{ 'govuk-!-border-none' if personalDetails.otherLanguages.length > 0 }}">
       <dt class="govuk-summary-list__key govuk-!-padding-top-2"></dt>
       <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-0">
+        <span class="anchor-center" id="other-languages"></span>
         <span
           class="govuk-!-font-weight-bold govuk-!-display-block {{ 'other-languages-header--list' if personalDetails.otherLanguages.length > 0 }}"
           >Other languages</span

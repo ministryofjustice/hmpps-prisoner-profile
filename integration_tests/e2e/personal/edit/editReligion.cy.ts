@@ -69,7 +69,7 @@ context('Edit religion, faith or belief', () => {
           errorMessages: [`The details about this change must be 4,000 characters or less`],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'religion-faith-or-belief',
     })
   })
 
@@ -103,7 +103,7 @@ context('Edit religion, faith or belief', () => {
           radioInputs: { religion: 'ZORO' },
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'religion-faith-or-belief',
     })
   })
 })

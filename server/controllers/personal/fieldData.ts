@@ -115,7 +115,7 @@ export const smokerOrVaperFieldData: RadioFieldData = {
   pageTitle: 'Smoker or vaper',
   auditEditPageLoad: Page.EditSmokerOrVaper,
   auditEditPostAction: PostAction.EditSmokerOrVaper,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'smoking-and-vaping',
 }
 
 export const heightFieldData: PhysicalAttributesTextFieldData = {
@@ -154,7 +154,7 @@ export const cityOrTownOfBirthFieldData: TextFieldData = {
   pageTitle: 'City or town of birth',
   auditEditPageLoad: Page.EditCityOrTownOfBirth,
   auditEditPostAction: PostAction.EditCityOrTownOfBirth,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'city-or-town-of-birth',
   inputClasses: 'govuk-!-width-one-third',
 }
 
@@ -164,7 +164,7 @@ export const countryOfBirthFieldData: RadioFieldData = {
   pageTitle: 'Country of birth',
   auditEditPageLoad: Page.EditCountryOfBirth,
   auditEditPostAction: PostAction.EditCountryOfBirth,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'country-of-birth',
 }
 
 export const nationalityFieldData: RadioFieldData = {
@@ -173,7 +173,7 @@ export const nationalityFieldData: RadioFieldData = {
   pageTitle: 'Nationality',
   auditEditPageLoad: Page.EditNationality,
   auditEditPostAction: PostAction.EditNationality,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'nationality',
 }
 
 export const dietAndFoodAllergiesFieldData: FieldData = {
@@ -182,7 +182,7 @@ export const dietAndFoodAllergiesFieldData: FieldData = {
   pageTitle: 'Diet and food allergies',
   auditEditPageLoad: Page.EditDietAndFoodAllergies,
   auditEditPostAction: PostAction.EditDietAndFoodAllergies,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'diet-and-food-allergies',
 }
 
 export const religionFieldData: RadioFieldData = {
@@ -191,7 +191,7 @@ export const religionFieldData: RadioFieldData = {
   pageTitle: 'Religion, faith or belief',
   auditEditPageLoad: Page.EditReligion,
   auditEditPostAction: PostAction.EditReligion,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'religion-faith-or-belief',
   referenceDataOverrides: [
     {
       id: 'BAHA',
@@ -256,7 +256,7 @@ export const sexualOrientationFieldData: RadioFieldData = {
   pageTitle: 'Sexual orientation',
   auditEditPageLoad: Page.EditSexualOrientation,
   auditEditPostAction: PostAction.EditSexualOrientation,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'sexual-orientation',
 }
 
 export const numberOfChildrenFieldData: RadioFieldData = {
@@ -265,7 +265,7 @@ export const numberOfChildrenFieldData: RadioFieldData = {
   pageTitle: 'Children',
   auditEditPageLoad: Page.EditNumberOfChildren,
   auditEditPostAction: PostAction.EditNumberOfChildren,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'number-of-children',
   successFlashFieldName: 'Number of children',
 }
 
@@ -275,7 +275,7 @@ export const domesticStatusFieldData: RadioFieldData = {
   pageTitle: 'Marital or civil partnership status',
   auditEditPageLoad: Page.EditDomesticStatus,
   auditEditPostAction: PostAction.EditDomesticStatus,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'marriage-or-civil-partnership-status',
 }
 
 const baseEmailAddressTextFieldData = {

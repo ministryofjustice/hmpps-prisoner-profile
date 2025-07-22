@@ -61,6 +61,6 @@ context('Edit city or town of birth', () => {
         errorMessages: ['This is not a valid country'],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'country-of-birth',
   })
 })
