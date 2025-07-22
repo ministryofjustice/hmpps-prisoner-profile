@@ -18,6 +18,30 @@ export default class ImageController {
 
   public updateProfileImage() {
     return {
+      captureImage: {
+        get: async (req: Request, res: Response, next: NextFunction) => {
+          const { prisonerData } = req.middleware
+          res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
+
+          return res.render('pages/edit/photo/captureImage', {
+            pageTitle: 'Capture a new facial image',
+            miniBannerData: miniBannerData(prisonerData),
+            prisonerNumber: prisonerData.prisonerNumber,
+          })
+        },
+        post: async (req: Request, res: Response, next: NextFunction) => {
+          const { prisonerData } = req.middleware
+
+          const file = req.file as MulterFile
+          return res.render('pages/edit/photo/editPhoto', {
+            miniBannerData: miniBannerData(prisonerData),
+            imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+            prisonerNumber: prisonerData.prisonerNumber,
+            fileName: file.originalname,
+            fileType: file.mimetype,
+          })
+        },
+      },
       newImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerData } = req.middleware
@@ -36,6 +60,12 @@ export default class ImageController {
           if (req.body.photoType === 'withheld') {
             return res.redirect(
               `/prisoner/${prisonerData.prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+            )
+          }
+
+          if (req.body.photoType === 'webcam') {
+            return res.redirect(
+              `/prisoner/${prisonerData.prisonerNumber}/image/capture${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
             )
           }
 

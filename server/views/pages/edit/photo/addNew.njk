@@ -62,6 +62,14 @@
                   text: 'This should be used for all Category A prisoners.'
                 },
                 checked: formValues['photoType'] == 'withheld'
+              },
+              {
+                value: "webcam",
+                text: "Capture image via webcam.",
+                hint: {
+                  text: 'Capture an image via webcam - requires permissions for browser to access the webcam.'
+                },
+                checked: formValues['photoType'] == 'webcam'
               }
             ]
           }) }}

@@ -212,5 +212,29 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().newWithheldImage.post,
   )
 
+  get(
+    `${basePath}/image/capture`,
+    auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
+    getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
+    buildBreadcrumbsAndReferer(true),
+    imageController.updateProfileImage().captureImage.get,
+  )
+
+  post(
+    `${basePath}/image/capture`,
+    auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
+    getPrisonerData(services),
+    featureFlagGuard('Profile Edit', editProfileEnabled),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
+    dpsComponents.getPageComponents({
+      logger,
+      includeSharedData: true,
+      dpsUrl: config.serviceUrls.digitalPrison,
+    }),
+    imageController.updateProfileImage().captureImage.post,
+  )
+
   return router
 }

@@ -1,0 +1,98 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row govuk-!-margin-bottom-4">
+    <div class="govuk-grid-column-full">
+      {{ govukBackLink({
+        text: "Back",
+        classes: "govuk-!-margin-0",
+        href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
+      }) }}
+    </div>
+  </div>
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{ govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
+          }) }}
+      </div>
+    </div>
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form id="image-capture-form" method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/capture" | appendRefererToUrl(referer) }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+        <input type="file" id="webcam-image-input" name="file" hidden/>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Capture image from webcam</h1>
+        {{ govukSelect({
+            id: "select-webcam",
+            name: "select-webcam",
+            label: {
+              text: "Select webcam"
+            },
+            items: []
+        }) }}
+        <div class="hmpps-webcam-container" id="webcam-preview-container">
+          <div class="hmpps-webcam-video-container">
+            <video id="webcam" autoplay playsinline></video>
+          </div>
+          <div class="hmpps-webcam-image-container">
+            <img id="snapshot" src="/assets/images/placeholder.svg" alt="Captured frame will appear here">
+          </div>
+        </div>
+          <div class="govuk-button-group">
+            {{ govukButton({
+              id: "captureImageButton",
+              type: "button",
+              text: "Capture image",
+              classes: "webcam-control-buttons govuk-button--secondary",
+              preventDoubleClick: true
+            }) }}
+            {{ govukButton({
+              id: "clearImageButton",
+              type: "button",
+              text: "Clear image",
+              classes: "webcam-control-buttons govuk-button--secondary",
+              preventDoubleClick: true
+            }) }}
+
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({
+            id: "submitImageButton",
+            text: "Select Image and continue",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "submit-button" }
+          }) }}
+          <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+            Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% block pageScripts %}
+  <script type="module" src="/assets/js/captureWebcamImage.js" nonce="{{ cspNonce }}"></script>
+{% endblock %}
