@@ -10,9 +10,9 @@ export default class IncentivesApiRestClient implements IncentivesApiClient {
     this.restClient = new RestClient('Incentives API', config.apis.incentivesApi, token)
   }
 
-  async getReviews(bookingId: number): Promise<IncentiveReviews> {
+  async getReviews(prisonerNumber: string): Promise<IncentiveReviews> {
     return this.restClient.get<IncentiveReviews>({
-      path: `/incentive-reviews/booking/${bookingId}`,
+      path: `/incentive-reviews/prisoner/${prisonerNumber}`,
       ignore404: true,
     })
   }

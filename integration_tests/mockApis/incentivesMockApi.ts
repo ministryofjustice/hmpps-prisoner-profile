@@ -2,11 +2,11 @@ import { stubFor } from './wiremock'
 import { incentiveReviewsMock } from '../../server/data/localMockData/incentiveReviewsMock'
 
 export default {
-  stubGetReviews: (bookingId: number) => {
+  stubGetReviews: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/incentives/incentive-reviews/booking/${bookingId}`,
+        urlPattern: `/incentives/incentive-reviews/prisoner/${prisonerNumber}`,
       },
       response: {
         status: 200,

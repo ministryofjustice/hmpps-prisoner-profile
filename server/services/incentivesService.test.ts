@@ -31,7 +31,7 @@ describe('prisonerScheduleService', () => {
 
     it('should get data and map incentive summary data', async () => {
       incentivesApiClient.getReviews = jest.fn().mockResolvedValue(incentiveReviewsMock)
-      const result = await service.getIncentiveOverview('token', 1)
+      const result = await service.getIncentiveOverview('token', 'A1234AB')
 
       expect(result).toEqual({
         daysOverdue: 2,
@@ -44,7 +44,7 @@ describe('prisonerScheduleService', () => {
     it('should return null if no data', async () => {
       incentivesApiClient.getReviews = jest.fn().mockResolvedValue(null)
 
-      const result = await service.getIncentiveOverview('token', 1)
+      const result = await service.getIncentiveOverview('token', 'A1234AB')
       expect(result).toEqual({
         daysOverdue: null,
         negativeBehaviourCount: null,
@@ -56,7 +56,7 @@ describe('prisonerScheduleService', () => {
     it('should return error object if api errors', async () => {
       incentivesApiClient.getReviews = jest.fn().mockRejectedValue('error')
 
-      const result = await service.getIncentiveOverview('token', 1)
+      const result = await service.getIncentiveOverview('token', 'A1234AB')
       expect(result).toEqual({ error: true })
     })
   })
