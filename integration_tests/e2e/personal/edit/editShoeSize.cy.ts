@@ -46,7 +46,7 @@ context('Edit shoe size', () => {
         testDescription: 'Input with letters',
       },
     ],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'shoe-size',
     isUnrestricted: true,
   })
 })
