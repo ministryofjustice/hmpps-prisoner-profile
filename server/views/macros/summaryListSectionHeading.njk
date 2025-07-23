@@ -1,6 +1,6 @@
 {% macro summaryListSectionHeading(value, id, action) %}
   {% set actionEnabled = action.enabled | default(true) %}
-  <div class="govuk-summary-list__section-heading" data-qa="{{ id }}-section-heading">
+  <div class="govuk-summary-list__section-heading" id="{{ id }}" data-qa="{{ id }}-section-heading">
     <h3>{{ value }}</h3>
     {% if actionEnabled and action.text.length > 0 %}
       <div class="action-link-container">

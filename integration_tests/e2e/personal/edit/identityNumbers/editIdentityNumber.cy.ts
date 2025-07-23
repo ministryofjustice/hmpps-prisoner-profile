@@ -81,6 +81,6 @@ context('Add personal IDs', () => {
         errorMessages: ['Enter your comment using 240 characters or less'],
       },
     ],
-    redirectAnchor: 'identity-numbers',
+    redirectAnchor: 'pnc-number',
   })
 })
