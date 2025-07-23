@@ -43,7 +43,7 @@ export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
   auditEditPageLoad: Page.EditShoeSize,
   auditEditPostAction: PostAction.EditShoeSize,
   hintText: 'Enter a UK shoe size, for example 7.5 or 11.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'shoe-size',
   inputClasses: 'govuk-input--width-5',
 }
 
@@ -56,7 +56,7 @@ export const hairFieldData: RadioFieldData = {
   code: 'hairCode',
   domain: CorePersonRecordReferenceDataDomain.hair,
   hintText: 'Select the most prominent hair type or colour.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'hair-type-or-colour',
 }
 
 export const facialHairFieldData: RadioFieldData = {
@@ -68,7 +68,7 @@ export const facialHairFieldData: RadioFieldData = {
   code: 'facialHairCode',
   domain: CorePersonRecordReferenceDataDomain.facialHair,
   hintText: 'Select the most prominent type of facial hair.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'facial-hair',
 }
 
 export const faceShapeFieldData: RadioFieldData = {
@@ -79,7 +79,7 @@ export const faceShapeFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditFaceShape,
   code: 'faceCode',
   domain: CorePersonRecordReferenceDataDomain.face,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'face-shape',
 }
 
 export const buildFieldData: RadioFieldData = {
@@ -90,7 +90,7 @@ export const buildFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditBuild,
   code: 'buildCode',
   domain: CorePersonRecordReferenceDataDomain.build,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'build',
 }
 
 export const eyeColourFieldData: FieldData = {
@@ -99,7 +99,7 @@ export const eyeColourFieldData: FieldData = {
   pageTitle: 'Eye colour',
   auditEditPageLoad: Page.EditEyeColour,
   auditEditPostAction: PostAction.EditEyeColour,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'eye-colour',
 }
 
 export const eyeColourIndividualFieldData: FieldData = {
@@ -124,7 +124,7 @@ export const heightFieldData: PhysicalAttributesTextFieldData = {
   pageTitle: 'Height',
   auditEditPageLoad: Page.EditHeight,
   auditEditPostAction: PostAction.EditHeight,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'height',
   formatter: formatHeight,
 }
 
@@ -139,7 +139,7 @@ export const weightFieldData: PhysicalAttributesTextFieldData = {
   pageTitle: 'Weight',
   auditEditPageLoad: Page.EditWeight,
   auditEditPostAction: PostAction.EditWeight,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'weight',
   formatter: formatWeight,
 }
 

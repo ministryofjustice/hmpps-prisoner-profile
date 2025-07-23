@@ -208,7 +208,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#height')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
             type: FlashMessageType.success,
@@ -372,7 +372,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#height')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
             type: FlashMessageType.success,
@@ -515,7 +515,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#weight')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
             type: FlashMessageType.success,
@@ -680,7 +680,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#weight')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
             type: FlashMessageType.success,
@@ -1334,7 +1334,7 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
-          redirectAnchor: 'appearance',
+          redirectAnchor: shoeSizeFieldData.redirectAnchor,
         })
       })
 
@@ -1391,7 +1391,7 @@ describe('PersonalController', () => {
           expect.anything(),
           expect.objectContaining(updateRequest),
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#shoe-size')
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Shoe size updated',
           type: FlashMessageType.success,
@@ -1800,9 +1800,9 @@ describe('PersonalController', () => {
         })
       })
 
-      it('Redirects to the personal page #appearance on success', async () => {
+      it('Redirects to the personal page #eye-colour on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1979,9 +1979,9 @@ describe('PersonalController', () => {
         })
       })
 
-      it('Redirects to the personal page #appearance on success', async () => {
+      it('Redirects to the personal page #eye-colour on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
       })
 
       it('Adds the success message to the flash', async () => {
