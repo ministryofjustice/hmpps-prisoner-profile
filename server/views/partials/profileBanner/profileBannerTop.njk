@@ -44,17 +44,21 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
         <div class="hmpps-profile-banner-photo">
-          <a
-            href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}"
-            class="hmpps-clickable-image {{ prisonerUrlPath }}"
-            data-qa="prisoner-photo-link">
-            <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber }}/image?imageId={{ prisonerPhotoId }}" alt="{{ prisonerName }}"/>
-            <div class="hmpps-clickable-image__overlay">
-              <p class="govuk-body govuk-!-text-align-centre">
-                Facial<br/> images
-              </p>
-            </div>
-          </a>
+          {% if isGranted(CorePersonRecordPermission.read_photo, prisonerPermissions) %}
+            <a
+              href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}"
+              class="hmpps-clickable-image {{ prisonerUrlPath }}"
+              data-qa="prisoner-photo-link">
+              <img class="hmpps-profile-photo" src="{{ prisonerImageUrl }}" alt="{{ prisonerName }}"/>
+              <div class="hmpps-clickable-image__overlay">
+                <p class="govuk-body govuk-!-text-align-centre">
+                  Facial<br/> images
+                </p>
+              </div>
+            </a>
+          {% else %}
+            <img class="hmpps-profile-photo" src="/assets/images/prisoner-profile-image.png" alt="Photo of {{ prisonerName }} not available"/>
+          {% endif %}
         </div>
         <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
         <div class="info">

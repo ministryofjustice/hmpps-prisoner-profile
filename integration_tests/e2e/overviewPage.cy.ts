@@ -57,6 +57,11 @@ context('Overview Page', () => {
         })
       })
 
+      it('Does not display the facial images link', () => {
+        visitOverviewPage()
+        cy.get('[data-qa=prisoner-photo-link]').should('not.exist')
+      })
+
       it('Does not display the sidebar', () => {
         visitOverviewPage()
         cy.getDataQa('hidden-overview-side-bar').should('exist')

@@ -18,7 +18,16 @@ context('Photo Page', () => {
       cy.task('stubImagesForOffender', prisonerNumber)
       cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image' })
     }
-    permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoPage })
+    permissionsTests({
+      prisonerNumber,
+      visitPage,
+      pageToDisplay: PrisonerPhotoPage,
+      options: {
+        additionalRoles: [],
+        preventGlobalSearchAccessOfOtherCaseloads: true,
+        preventGlobalSearchAccessOfTransferringPrisoners: true,
+      },
+    })
   })
 
   beforeEach(() => {

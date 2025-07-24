@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
+import { CorePersonRecordPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import OffenderService from '../../services/offenderService'
 import { ApiAction, AuditService, SubjectType } from '../../services/auditService'
 import logger from '../../../logger'
@@ -23,6 +24,7 @@ export default class CommonApiRoutes {
     const { prisonerNumber } = req.params
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
+    const { prisonerPermissions } = res.locals
 
     this.auditService
       .sendEvent({
@@ -34,10 +36,10 @@ export default class CommonApiRoutes {
       })
       .catch(error => logger.error(error))
 
+    // If there's no photo ID then we don't need to call the API and can prevent the extra call
     const { placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-    // If there's no photo ID then we dont need to call the API and can prevent the extra call
-    if (placeholder) {
+    if (placeholder || !isGranted(CorePersonRecordPermission.read_photo, prisonerPermissions)) {
       res.redirect(placeHolderImage)
     } else {
       this.offenderService
