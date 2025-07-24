@@ -45,7 +45,7 @@
   {% set id = identityNumbers[0].editPageUrl | d("prison-number") %}
   {% set updatedFields = flashMessage.fieldName | d("") %}
   {% set rowClasses %}
-    {{ "row-updated" if (id + "-row") in updatedFields else "" }}
+    {{ "row-updated" if ("'" + id + "-row'") in updatedFields else "" }}
   {% endset %}
   {% if identityNumbers.length > 0 or not options.hideIfEmpty %}
     {{ summaryListRow(name, identityNumbersWithComment(identityNumbers, options), id, {html: true, classes: rowClasses}) }}

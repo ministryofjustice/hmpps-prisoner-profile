@@ -320,7 +320,7 @@ export default class IdentityNumbersController {
   private getUpdatedFieldsFromFormValues = (formValues: Record<string, AddIdentityNumberSubmission>) =>
     Object.entries(formValues)
       .map(([id, value]): string =>
-        value.selected && value.value ? `${IdentifierMappings[id]?.editPageUrl}-row` : null,
+        value.selected && value.value ? `'${IdentifierMappings[id]?.editPageUrl}-row'` : null,
       )
       .filter(Boolean)
       .join(',')
