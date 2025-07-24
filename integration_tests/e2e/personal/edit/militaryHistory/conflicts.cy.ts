@@ -43,11 +43,11 @@ describe('Military Records - Conflicts Page', () => {
   it('should submit the form and redirect to personal page on "Save and return to profile"', () => {
     conflictsPage.warZoneRadio().click()
     conflictsPage.saveAndReturnButton().click()
-    cy.url().should('include', `/prisoner/G6123VU/personal#military-service-information`)
+    cy.url().should('include', `/prisoner/G6123VU/personal#military-conflict`)
   })
 
   it('should navigate back to personal page on cancel', () => {
     cy.get('a[data-qa="cancel-button"]').click()
-    cy.url().should('include', `/prisoner/G6123VU/personal#military-service-information`)
+    cy.url().should('include', `/prisoner/G6123VU/personal#military-conflict`)
   })
 })

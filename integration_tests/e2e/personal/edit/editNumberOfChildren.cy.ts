@@ -59,7 +59,7 @@ context('Edit number of children', () => {
         errorMessages: [`Enter the number of children.`],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'number-of-children',
     isUnrestricted: true,
   })
 })

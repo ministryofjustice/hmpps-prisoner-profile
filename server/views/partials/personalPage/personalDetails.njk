@@ -107,6 +107,7 @@
               key: "Name",
               value: personalDetails.fullName,
               options: {
+                anchor: "name",
                 dataQa: "full-name",
                 changeHref: "personal/change-name",
                 changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
@@ -117,6 +118,7 @@
               key: "Aliases",
               value: "Not entered" if aliases.length == 0,
               options: {
+                anchor: "aliases",
                 dataQa: "aliases",
                 changeText: 'Add an alias',
                 changeHref: "personal/enter-alias-details",
@@ -153,6 +155,7 @@
                   key: "Date of birth",
                   value: dateOfBirthText,
                   options: {
+                    anchor: "date-of-birth",
                     dataQa: "date-of-birth",
                     changeHref: "personal/date-of-birth",
                     changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
@@ -163,6 +166,7 @@
                   key: "City or town of birth",
                   value: personalDetails.cityOrTownOfBirth,
                   options: {
+                    anchor: "city-or-town-of-birth",
                     dataQa: "city-or-town-of-birth",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/city-or-town-of-birth",
@@ -174,6 +178,7 @@
                   key: "Country of birth",
                   value: personalDetails.countryOfBirth,
                   options: {
+                    anchor: "country-of-birth",
                     dataQa: "country-of-birth",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/country-of-birth",
@@ -185,6 +190,7 @@
                   key: "Nationality",
                   value: nationalitiesHtml(personalDetails),
                   options: {
+                    anchor: "nationality",
                     dataQa: "nationality",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/nationality",
@@ -196,6 +202,7 @@
                   key: "Ethnic group",
                   value: personalDetails.ethnicGroup,
                   options: {
+                    anchor: "ethnic-group",
                     dataQa: "ethnic-group",
                     changeHref: "personal/ethnic-group",
                     changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
@@ -206,6 +213,7 @@
                   key: "Religion, faith or belief",
                   value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.justice.prisonNumber),
                   options: {
+                    anchor: "religion-faith-or-belief",
                     dataQa: "religion-or-belief",
                     html: true,
                     visible: inUsersCaseLoad,
@@ -219,6 +227,7 @@
                   key: "Sexual orientation",
                   value: personalDetails.sexualOrientation | sexualOrientationText,
                   options: {
+                    anchor: "sexual-orientation",
                     dataQa: "sexual-orientation",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/sexual-orientation",
@@ -230,6 +239,7 @@
                   key: "Marriage or civil partnership status",
                   value: personalDetails.marriageOrCivilPartnership,
                   options: {
+                    anchor: "marriage-or-civil-partnership-status",
                     dataQa: "marriage-or-civil-partnership",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/marital-status",
@@ -241,6 +251,7 @@
                   key: "Number of children",
                   value: personalDetails.numberOfChildren,
                   options: {
+                    anchor: "number-of-children",
                     dataQa: "number-of-children",
                     visible: inUsersCaseLoad,
                     changeHref: "personal/children",
@@ -260,6 +271,7 @@
                   key: "Type of diet",
                   value: personalDetails.typeOfDiet,
                   options: {
+                    anchor: "type-of-diet",
                     dataQa: "type-of-diet",
                     visible: inUsersCaseLoad and not dietAndAllergiesEnabled
                   }
@@ -269,6 +281,7 @@
                   value:
                   dietAndFoodAllergiesHtml(personalDetails),
                   options: {
+                    anchor: "diet-and-food-allergies",
                     dataQa: "diet-and-food-allergies",
                     visible: dietAndAllergiesEnabled,
                     changeLinkEnabled: dietAndAllergiesEnabled and isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
@@ -280,6 +293,7 @@
                   key: "Smoking and vaping",
                   value: personalDetails.smokerOrVaper,
                   options: {
+                    anchor: "smoking-and-vaping",
                     dataQa: "smoker-or-vaper",
                     visible: inUsersCaseLoad,
                     changeLinkEnabled: editEnabled and isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
@@ -287,21 +301,56 @@
                     rowUpdated: flashMessage.fieldName === 'smokerOrVaper'
                   }
                 },
-                { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
-                { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
-                { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },
-                { key: "Social care needed", value: personalDetails.socialCareNeeded, options: { dataQa: "social-care-needed", hideIfEmpty: true, visible: inUsersCaseLoad } }
+                {
+                  key: "Youth offender",
+                  value: personalDetails.youthOffender,
+                  options: {
+                    anchor: "youth-offender",
+                    dataQa: "youth-offender",
+                    visible: inUsersCaseLoad
+                  }
+                },
+                {
+                  key: "Domestic abuse perpetrator",
+                  value: personalDetails.domesticAbusePerpetrator,
+                  options: {
+                    anchor: "domestic-abuse-perpetrator",
+                    dataQa: "domestic-abuse-perpetrator",
+                    hideIfEmpty: true,
+                    visible: inUsersCaseLoad
+                  }
+                },
+                {
+                  key: "Domestic abuse victim",
+                  value: personalDetails.domesticAbuseVictim,
+                  options: {
+                    anchor: "domestic-abuse-victim",
+                    dataQa: "domestic-abuse-victim",
+                    hideIfEmpty: true,
+                    visible: inUsersCaseLoad
+                  }
+                },
+                {
+                  key: "Social care needed",
+                  value: personalDetails.socialCareNeeded,
+                  options: {
+                    anchor: "social-care-needed",
+                    dataQa: "social-care-needed",
+                    hideIfEmpty: true,
+                    visible: inUsersCaseLoad
+                  }
+                }
             ])
         })
       }}
 
       {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
-          <dl id="military-service-information"
-              class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
+          <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
               data-qa="military-records">
               <div class="govuk-summary-list__row govuk-!-border-none">
                   <dt class="govuk-summary-list__key">UK military service record</dt>
                   <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border govuk-!-padding-bottom-0">
+                      <span class="anchor-center" id="military-service-information"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
                       <div class="govuk-!-margin-bottom-2">
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
@@ -312,6 +361,7 @@
                               {{ summaryListRow("Comments", militaryRecords[0].description | d('Not entered'), "comments") }}
                           </dl>
                       </div>
+                      <span class="anchor-center" id="military-enlistment"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list">
@@ -331,6 +381,7 @@
               <div class="govuk-summary-list__row govuk-!-border-none">
                   <dt class="govuk-summary-list__key"></dt>
                   <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                      <span class="anchor-center" id="military-conflict"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
@@ -348,6 +399,7 @@
               <div class="govuk-summary-list__row  govuk-!-border-none">
                   <dt class="govuk-summary-list__key"></dt>
                   <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                      <span class="anchor-center" id="military-disciplinary-action"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
@@ -365,6 +417,7 @@
               <div class="govuk-summary-list__row govuk-!-border-none">
                   <dt class="govuk-summary-list__key"></dt>
                   <dd class="govuk-summary-list__value">
+                      <span class="anchor-center" id="military-discharge"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list">

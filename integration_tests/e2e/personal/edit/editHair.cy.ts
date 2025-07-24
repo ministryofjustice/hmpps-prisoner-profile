@@ -29,7 +29,7 @@ context('Edit hair', () => {
     editPageTitle: 'Hair type or colour',
     successfulFlashMessage: 'Hair type or colour updated',
     validInputs: [{ radioInputs: { radioField: 'GREY' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'hair-type-or-colour',
     isUnrestricted: true,
   })
 })

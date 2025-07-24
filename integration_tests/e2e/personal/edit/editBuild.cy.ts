@@ -29,7 +29,7 @@ context('Edit build', () => {
     editPageTitle: 'Build',
     successfulFlashMessage: 'Build updated',
     validInputs: [{ radioInputs: { radioField: 'MEDIUM' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'build',
     isUnrestricted: true,
   })
 })

@@ -209,3 +209,9 @@ div.hmpps-merged-key-summary-list-row {
 .hmpps-\!-float-right {
   float: right;
 }
+
+.anchor-center {
+  position: absolute;
+  transform: translateY(-50vh);
+  visibility: hidden;
+}

@@ -71,7 +71,7 @@ export function changeEthnicBackground(options: { group: string; pageTitle: stri
           errorMessages: [`Select an ethnic group`],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'ethnic-group',
     })
   })
 }

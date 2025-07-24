@@ -82,6 +82,6 @@ context('Change date of birth', () => {
         errorMessages: ['Date of birth must include a day'],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'date-of-birth',
   })
 })

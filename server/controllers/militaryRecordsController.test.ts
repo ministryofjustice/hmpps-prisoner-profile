@@ -207,7 +207,7 @@ describe('MilitaryRecordsController', () => {
       await controller.postConflicts()(req, res, next)
 
       expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', 1, conflicts)
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-conflict')
     })
   })
 
@@ -270,7 +270,7 @@ describe('MilitaryRecordsController', () => {
         1,
         disciplinaryAction,
       )
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-disciplinary-action')
     })
   })
 
@@ -340,7 +340,7 @@ describe('MilitaryRecordsController', () => {
         1,
         dischargeDetails,
       )
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-discharge')
     })
   })
 })

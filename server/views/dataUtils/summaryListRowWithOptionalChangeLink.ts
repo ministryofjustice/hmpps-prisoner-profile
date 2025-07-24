@@ -10,6 +10,7 @@ interface Options {
   html?: boolean
   mergeKeyDown?: boolean
   classes?: string[]
+  anchor?: string
 }
 
 const defaultOptions: Options = {
@@ -75,8 +76,11 @@ const summaryListRowWithOptionalChangeLink = (
     ...options.classes,
   ].join(' ')
 
+  const anchorSpan = options.anchor ? `<span class="anchor-center" id="${options.anchor}"></span>` : ''
   const keyResult = options.dataQa
-    ? { html: `<span data-qa="${rowHidden ? 'hidden-' : ''}${options.dataQa}-key">${key}</span>` }
+    ? {
+        html: `<div>${anchorSpan}<span data-qa="${rowHidden ? 'hidden-' : ''}${options.dataQa}-key">${key}</span></div>`,
+      }
     : { text: key }
 
   return {

@@ -33,6 +33,12 @@ const updateMessages: Record<MarkTypeSelection, string> = {
   mark: 'Other marks updated',
 }
 
+const redirectAnchors: Record<MarkTypeSelection, string> = {
+  tattoo: 'tattoos',
+  scar: 'scars',
+  mark: 'other-marks',
+}
+
 export default class DistinguishingMarksController {
   constructor(
     private readonly distinguishingMarksService: DistinguishingMarksService,
@@ -117,7 +123,7 @@ export default class DistinguishingMarksController {
       fieldName: `distinguishing-marks-${verifiedMarkType}`,
     })
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
+    return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
   }
 
   public async newDistinguishingMarkWithDetail(req: Request, res: Response) {
@@ -172,7 +178,7 @@ export default class DistinguishingMarksController {
     })
 
     return action === 'returnToProfile'
-      ? res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
+      ? res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
       : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}`)
   }
 
@@ -209,6 +215,8 @@ export default class DistinguishingMarksController {
         type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
     }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -430,7 +438,7 @@ export default class DistinguishingMarksController {
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
 
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
@@ -461,7 +469,7 @@ export default class DistinguishingMarksController {
     const updated = (req.query.updated as string) === 'true'
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}${updated ? '?updated=true' : ''}`
 
@@ -487,7 +495,7 @@ export default class DistinguishingMarksController {
     const file = req.file as MulterFile
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
 
@@ -514,7 +522,7 @@ export default class DistinguishingMarksController {
     const file = req.file as MulterFile
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const updatedMark = await this.distinguishingMarksService.addDistinguishingMarkPhoto(
       clientToken,

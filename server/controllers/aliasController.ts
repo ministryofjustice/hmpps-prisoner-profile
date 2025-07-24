@@ -223,7 +223,7 @@ export default class AliasController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#aliases`)
       } catch (e) {
         if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -313,7 +313,7 @@ export default class AliasController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#date-of-birth`)
       } catch (e) {
         if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -368,7 +368,7 @@ export default class AliasController {
       const { radioField: ethnicGroup } = req.body
 
       if (!ethnicGroup) {
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#ethnic-group`)
       }
 
       this.auditService
@@ -474,7 +474,7 @@ export default class AliasController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#ethnic-group`)
       } catch (e) {
         if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -607,7 +607,7 @@ export default class AliasController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#name`)
       } catch (e) {
         if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])

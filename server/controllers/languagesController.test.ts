@@ -175,7 +175,7 @@ describe('LanguagesController', () => {
         },
       })
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#main-language`)
     })
 
     it('should validate that interpreter required is selected', async () => {
@@ -435,7 +435,7 @@ describe('LanguagesController', () => {
         },
       })
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })
 
     it('should validate that language is not in main or secondary languages', async () => {
@@ -500,7 +500,7 @@ describe('LanguagesController', () => {
         },
       })
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })
 
     it('should validate that language is a valid language', async () => {
@@ -572,7 +572,7 @@ describe('LanguagesController', () => {
         fieldName: 'languages',
       })
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })
   })
 })

@@ -133,7 +133,7 @@ describe('Distinguishing Marks Controller', () => {
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#marks`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#tattoos`)
       },
     )
 
@@ -155,7 +155,7 @@ describe('Distinguishing Marks Controller', () => {
         markType,
         'leftLeg',
       )
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#marks`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#${getRedirectAnchor(markType)}`)
     })
 
     it('redirects back if the mark type is invalid', async () => {
@@ -192,6 +192,19 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
+
+    const getRedirectAnchor = (markType: string): string => {
+      switch (markType) {
+        case 'tattoo':
+          return 'tattoos'
+        case 'scar':
+          return 'scars'
+        case 'mark':
+          return 'other-marks'
+        default:
+          return 'marks'
+      }
+    }
   })
 
   describe('newDistinguishingMarkWithDetail', () => {
@@ -389,22 +402,25 @@ describe('Distinguishing Marks Controller', () => {
 
   describe('returnToPrisonerProfileAfterUpdate', () => {
     it.each([
-      ['tattoo', 'Tattoos updated'],
-      ['scar', 'Scars updated'],
-      ['mark', 'Other marks updated'],
-    ])('creates a flashMessage and redirects to the profile for type: %s', async (markType, flashMessage) => {
-      const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as Request
+      ['tattoo', 'Tattoos updated', 'tattoos'],
+      ['scar', 'Scars updated', 'scars'],
+      ['mark', 'Other marks updated', 'other-marks'],
+    ])(
+      'creates a flashMessage and redirects to the profile for type: %s',
+      async (markType, flashMessage, redirectAnchor) => {
+        const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as Request
 
-      await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
+        await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
 
-      expect(typeReq.flash).toHaveBeenCalledWith('flashMessage', {
-        text: flashMessage,
-        type: FlashMessageType.success,
-        fieldName: `distinguishing-marks-${markType}`,
-      })
+        expect(typeReq.flash).toHaveBeenCalledWith('flashMessage', {
+          text: flashMessage,
+          type: FlashMessageType.success,
+          fieldName: `distinguishing-marks-${markType}`,
+        })
 
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
-    })
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#${redirectAnchor}`)
+      },
+    )
   })
 
   describe('changeBodyPart', () => {
@@ -886,7 +902,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changePhoto(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
 
     it('sends a page view audit event', async () => {
@@ -1011,7 +1027,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.addNewPhoto(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
 
     it('sends a page view audit event', async () => {

@@ -43,7 +43,7 @@ export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
   auditEditPageLoad: Page.EditShoeSize,
   auditEditPostAction: PostAction.EditShoeSize,
   hintText: 'Enter a UK shoe size, for example 7.5 or 11.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'shoe-size',
   inputClasses: 'govuk-input--width-5',
 }
 
@@ -56,7 +56,7 @@ export const hairFieldData: RadioFieldData = {
   code: 'hairCode',
   domain: CorePersonRecordReferenceDataDomain.hair,
   hintText: 'Select the most prominent hair type or colour.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'hair-type-or-colour',
 }
 
 export const facialHairFieldData: RadioFieldData = {
@@ -68,7 +68,7 @@ export const facialHairFieldData: RadioFieldData = {
   code: 'facialHairCode',
   domain: CorePersonRecordReferenceDataDomain.facialHair,
   hintText: 'Select the most prominent type of facial hair.',
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'facial-hair',
 }
 
 export const faceShapeFieldData: RadioFieldData = {
@@ -79,7 +79,7 @@ export const faceShapeFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditFaceShape,
   code: 'faceCode',
   domain: CorePersonRecordReferenceDataDomain.face,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'face-shape',
 }
 
 export const buildFieldData: RadioFieldData = {
@@ -90,7 +90,7 @@ export const buildFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditBuild,
   code: 'buildCode',
   domain: CorePersonRecordReferenceDataDomain.build,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'build',
 }
 
 export const eyeColourFieldData: FieldData = {
@@ -99,7 +99,7 @@ export const eyeColourFieldData: FieldData = {
   pageTitle: 'Eye colour',
   auditEditPageLoad: Page.EditEyeColour,
   auditEditPostAction: PostAction.EditEyeColour,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'eye-colour',
 }
 
 export const eyeColourIndividualFieldData: FieldData = {
@@ -115,7 +115,7 @@ export const smokerOrVaperFieldData: RadioFieldData = {
   pageTitle: 'Smoker or vaper',
   auditEditPageLoad: Page.EditSmokerOrVaper,
   auditEditPostAction: PostAction.EditSmokerOrVaper,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'smoking-and-vaping',
 }
 
 export const heightFieldData: PhysicalAttributesTextFieldData = {
@@ -124,7 +124,7 @@ export const heightFieldData: PhysicalAttributesTextFieldData = {
   pageTitle: 'Height',
   auditEditPageLoad: Page.EditHeight,
   auditEditPostAction: PostAction.EditHeight,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'height',
   formatter: formatHeight,
 }
 
@@ -139,7 +139,7 @@ export const weightFieldData: PhysicalAttributesTextFieldData = {
   pageTitle: 'Weight',
   auditEditPageLoad: Page.EditWeight,
   auditEditPostAction: PostAction.EditWeight,
-  redirectAnchor: 'appearance',
+  redirectAnchor: 'weight',
   formatter: formatWeight,
 }
 
@@ -154,7 +154,7 @@ export const cityOrTownOfBirthFieldData: TextFieldData = {
   pageTitle: 'City or town of birth',
   auditEditPageLoad: Page.EditCityOrTownOfBirth,
   auditEditPostAction: PostAction.EditCityOrTownOfBirth,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'city-or-town-of-birth',
   inputClasses: 'govuk-!-width-one-third',
 }
 
@@ -164,7 +164,7 @@ export const countryOfBirthFieldData: RadioFieldData = {
   pageTitle: 'Country of birth',
   auditEditPageLoad: Page.EditCountryOfBirth,
   auditEditPostAction: PostAction.EditCountryOfBirth,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'country-of-birth',
 }
 
 export const nationalityFieldData: RadioFieldData = {
@@ -173,7 +173,7 @@ export const nationalityFieldData: RadioFieldData = {
   pageTitle: 'Nationality',
   auditEditPageLoad: Page.EditNationality,
   auditEditPostAction: PostAction.EditNationality,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'nationality',
 }
 
 export const dietAndFoodAllergiesFieldData: FieldData = {
@@ -182,7 +182,7 @@ export const dietAndFoodAllergiesFieldData: FieldData = {
   pageTitle: 'Diet and food allergies',
   auditEditPageLoad: Page.EditDietAndFoodAllergies,
   auditEditPostAction: PostAction.EditDietAndFoodAllergies,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'diet-and-food-allergies',
 }
 
 export const religionFieldData: RadioFieldData = {
@@ -191,7 +191,7 @@ export const religionFieldData: RadioFieldData = {
   pageTitle: 'Religion, faith or belief',
   auditEditPageLoad: Page.EditReligion,
   auditEditPostAction: PostAction.EditReligion,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'religion-faith-or-belief',
   referenceDataOverrides: [
     {
       id: 'BAHA',
@@ -256,7 +256,7 @@ export const sexualOrientationFieldData: RadioFieldData = {
   pageTitle: 'Sexual orientation',
   auditEditPageLoad: Page.EditSexualOrientation,
   auditEditPostAction: PostAction.EditSexualOrientation,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'sexual-orientation',
 }
 
 export const numberOfChildrenFieldData: RadioFieldData = {
@@ -265,7 +265,7 @@ export const numberOfChildrenFieldData: RadioFieldData = {
   pageTitle: 'Children',
   auditEditPageLoad: Page.EditNumberOfChildren,
   auditEditPostAction: PostAction.EditNumberOfChildren,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'number-of-children',
   successFlashFieldName: 'Number of children',
 }
 
@@ -275,7 +275,7 @@ export const domesticStatusFieldData: RadioFieldData = {
   pageTitle: 'Marital or civil partnership status',
   auditEditPageLoad: Page.EditDomesticStatus,
   auditEditPostAction: PostAction.EditDomesticStatus,
-  redirectAnchor: 'personal-details',
+  redirectAnchor: 'marriage-or-civil-partnership-status',
 }
 
 const baseEmailAddressTextFieldData = {

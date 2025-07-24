@@ -151,10 +151,10 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    [() => controller.justiceIdNumbers().submit, 'justice-id-numbers'],
-    [() => controller.personalIdNumbers().submit, 'personal-id-numbers'],
-    [() => controller.homeOfficeIdNumbers().submit, 'home-office-id-numbers'],
-  ])('Submit ID numbers - %s', (action, errorRedirect) => {
+    [() => controller.justiceIdNumbers().submit, 'justice-id-numbers', 'justice-numbers'],
+    [() => controller.personalIdNumbers().submit, 'personal-id-numbers', 'personal-numbers'],
+    [() => controller.homeOfficeIdNumbers().submit, 'home-office-id-numbers', 'home-office-numbers'],
+  ])('Submit ID numbers - %s', (action, errorRedirect, successRedirect) => {
     beforeEach(() => {
       req.body = {
         probationLegacySystem: {
@@ -201,7 +201,7 @@ describe('IdentityNumbersController', () => {
         type: FlashMessageType.success,
         fieldName: expect.stringContaining(`'probation-legacy-system-row','yjaf-row'`),
       })
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirect}`)
     })
 
     it('should detect duplicates of selected ids and redirect to the add justice numbers page ', async () => {
@@ -335,103 +335,106 @@ describe('IdentityNumbersController', () => {
   })
 
   describe.each([
-    [OffenderIdentifierType.PncNumber, 'pnc'],
-    [OffenderIdentifierType.NationalInsuranceNumber, 'national-insurance'],
-    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'home-office-reference'],
-  ])('Submit ID number update', (type: OffenderIdentifierType, editPageUrl: string) => {
-    const offenderId = 1
-    const seqId = 1
+    [OffenderIdentifierType.PncNumber, 'pnc', 'pnc-number'],
+    [OffenderIdentifierType.NationalInsuranceNumber, 'national-insurance', 'national-insurance-number'],
+    [OffenderIdentifierType.HomeOfficeReferenceNumber, 'home-office-reference', 'home-office-reference-number'],
+  ])(
+    'Submit ID number update - %s',
+    (type: OffenderIdentifierType, editPageUrl: string, successRedirectAnchor: string) => {
+      const offenderId = 1
+      const seqId = 1
 
-    beforeEach(() => {
-      req.params = {
-        compositeId: `${offenderId}-${seqId}`,
-        prisonerNumber: 'G6123VU',
-      }
-      req.body = {
-        value: '2002/0073319Z',
-        comment: 'Some updated comment',
-        type,
-      }
+      beforeEach(() => {
+        req.params = {
+          compositeId: `${offenderId}-${seqId}`,
+          prisonerNumber: 'G6123VU',
+        }
+        req.body = {
+          value: '2002/0073319Z',
+          comment: 'Some updated comment',
+          type,
+        }
 
-      jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue(GetIdentifiersMock)
-      jest.spyOn(identityNumbersService, 'updateIdentityNumber').mockResolvedValue()
-    })
-
-    it('should update the existing id number and redirect', async () => {
-      const expectedRequest = {
-        comments: 'Some updated comment',
-        value: '2002/0073319Z',
-      }
-
-      await controller.idNumber().submit(req, res, next)
-
-      expect(identityNumbersService.updateIdentityNumber).toHaveBeenCalledWith(
-        'CLIENT_TOKEN',
-        res.locals.user,
-        'G6123VU',
-        offenderId,
-        seqId,
-        expectedRequest,
-      )
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
-        user: res.locals.user,
-        prisonerNumber: 'G6123VU',
-        correlationId: req.id,
-        action: PostAction.EditIdNumber,
-        details: { formValues: req.body },
+        jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue(GetIdentifiersMock)
+        jest.spyOn(identityNumbersService, 'updateIdentityNumber').mockResolvedValue()
       })
-      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-        text: 'Identity numbers updated',
-        type: FlashMessageType.success,
-        fieldName: `${editPageUrl}-row`,
+
+      it('should update the existing id number and redirect', async () => {
+        const expectedRequest = {
+          comments: 'Some updated comment',
+          value: '2002/0073319Z',
+        }
+
+        await controller.idNumber().submit(req, res, next)
+
+        expect(identityNumbersService.updateIdentityNumber).toHaveBeenCalledWith(
+          'CLIENT_TOKEN',
+          res.locals.user,
+          'G6123VU',
+          offenderId,
+          seqId,
+          expectedRequest,
+        )
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+          user: res.locals.user,
+          prisonerNumber: 'G6123VU',
+          correlationId: req.id,
+          action: PostAction.EditIdNumber,
+          details: { formValues: req.body },
+        })
+        expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Identity numbers updated',
+          type: FlashMessageType.success,
+          fieldName: `${editPageUrl}-row`,
+        })
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirectAnchor}`)
       })
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
-    })
 
-    it('should detect duplicates of existing ids and redirect to the edit identity number page ', async () => {
-      req.body = {
-        type: OffenderIdentifierType.PrisonLegacySystemNumber,
-        value: '1234',
-        comment: 'Some comment',
-      }
-      req.errors = []
+      it('should detect duplicates of existing ids and redirect to the edit identity number page ', async () => {
+        req.body = {
+          type: OffenderIdentifierType.PrisonLegacySystemNumber,
+          value: '1234',
+          comment: 'Some comment',
+        }
+        req.errors = []
 
-      await controller.idNumber().submit(req, res, next)
+        await controller.idNumber().submit(req, res, next)
 
-      const { errors } = req
+        const { errors } = req
 
-      expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
-      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/prison-legacy-system/1-1`)
-      expect(errors.length).toEqual(1)
-      expect(errors[0].text).toEqual(
-        'This prison legacy system number already exists. Enter a different prison legacy system number',
-      )
-      expect(errors[0].href).toEqual('#identifier-value-input')
-    })
+        expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
+        expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/prison-legacy-system/1-1`)
+        expect(errors.length).toEqual(1)
+        expect(errors[0].text).toEqual(
+          'This prison legacy system number already exists. Enter a different prison legacy system number',
+        )
+        expect(errors[0].href).toEqual('#identifier-value-input')
+      })
 
-    it('should redirect to the edit identity number page if an error is encountered', async () => {
-      req.errors = [{ text: 'Some error' }]
+      it('should redirect to the edit identity number page if an error is encountered', async () => {
+        req.errors = [{ text: 'Some error' }]
 
-      await controller.idNumber().submit(req, res, next)
+        await controller.idNumber().submit(req, res, next)
 
-      expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
-      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
-    })
+        expect(identityNumbersService.updateIdentityNumber).not.toHaveBeenCalled()
+        expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
+      })
 
-    it('should handle bad request response from client', async () => {
-      const apiError = {
-        message: 'Bad request',
-        status: 400,
-        text: { errorMessage: 'Bad request', httpStatusCode: 400 },
-      }
-      jest.spyOn(identityNumbersService, 'updateIdentityNumber').mockRejectedValue(apiError)
+      it('should handle bad request response from client', async () => {
+        const apiError = {
+          message: 'Bad request',
+          status: 400,
+          text: { errorMessage: 'Bad request', httpStatusCode: 400 },
+        }
+        jest.spyOn(identityNumbersService, 'updateIdentityNumber').mockRejectedValue(apiError)
 
-      await controller.idNumber().submit(req, res, next)
+        await controller.idNumber().submit(req, res, next)
 
-      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
-    })
-  })
+        expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${editPageUrl}/1-1`)
+      })
+    },
+  )
 })

@@ -29,7 +29,7 @@ context('Edit face shape', () => {
     editPageTitle: 'Face shape',
     successfulFlashMessage: 'Face shape updated',
     validInputs: [{ radioInputs: { radioField: 'OVAL' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'face-shape',
     isUnrestricted: true,
   })
 })

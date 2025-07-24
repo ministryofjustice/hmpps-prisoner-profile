@@ -2,7 +2,7 @@ import { Role } from '../../../../../server/data/enums/role'
 import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 
-context('Add personal IDs', () => {
+context('Add Home Office IDs', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
@@ -154,6 +154,6 @@ context('Add personal IDs', () => {
         ],
       },
     ],
-    redirectAnchor: 'identity-numbers',
+    redirectAnchor: 'home-office-numbers',
   })
 })

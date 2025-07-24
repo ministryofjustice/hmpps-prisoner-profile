@@ -56,6 +56,6 @@ context('Edit nationality', () => {
         errorMessages: [`Additional nationalities must be 40 characters or less`],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'nationality',
   })
 })

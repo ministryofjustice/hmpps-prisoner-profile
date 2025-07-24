@@ -179,6 +179,6 @@ context('Add justice IDs', () => {
         ],
       },
     ],
-    redirectAnchor: 'identity-numbers',
+    redirectAnchor: 'justice-numbers',
   })
 })
