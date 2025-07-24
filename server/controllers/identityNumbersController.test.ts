@@ -199,7 +199,7 @@ describe('IdentityNumbersController', () => {
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Identity numbers updated',
         type: FlashMessageType.success,
-        fieldName: expect.stringContaining('probation-legacy-system-row,yjaf-row'),
+        fieldName: expect.stringContaining(`'probation-legacy-system-row','yjaf-row'`),
       })
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#identity-numbers')
     })
