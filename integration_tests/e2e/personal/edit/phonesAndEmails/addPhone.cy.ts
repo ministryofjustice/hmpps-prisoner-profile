@@ -51,6 +51,14 @@ context('Change phone number', () => {
         input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneExtension: `${'1'.repeat(7)}1` } },
         errorMessages: ['Extension must be 7 characters or less'],
       },
+      {
+        testDescription: 'Duplicate phone number',
+        input: {
+          radioInputs: { phoneNumberType: 'HOME' },
+          textInputs: { phoneNumber: '01234567890', phoneExtension: '1234' },
+        },
+        errorMessages: ['This phone number already exists for this person. Add a new number or edit the saved one'],
+      },
     ],
     editPageWithTitle: AddPhoneNumber,
     editPageTitle: 'Add John Saunders’s phone number',
