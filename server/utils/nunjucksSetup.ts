@@ -132,7 +132,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)

@@ -162,7 +162,6 @@ export default class AlertsService {
     }
   }
 
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   public async createAlert(
     clientToken: string,
     { prisonerNumber, alertForm }: { prisonerNumber: string; alertForm: AlertForm },

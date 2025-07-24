@@ -42,7 +42,7 @@ export default function validationMiddleware(
   },
 ): RequestHandler {
   // Recursively iterate into an object and trim any strings inside
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const deepTrim = (object: any): object => {
     const o = object
     if (o) {

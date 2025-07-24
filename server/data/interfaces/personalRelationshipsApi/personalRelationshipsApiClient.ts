@@ -1,12 +1,10 @@
 import { QueryParams } from '../../../interfaces/QueryParams'
 
-// eslint-disable-next-line no-shadow
 export enum PersonalRelationshipType {
   Official = 'O',
   Social = 'S',
 }
 
-// eslint-disable-next-line no-shadow
 export enum PersonalRelationshipsReferenceDataDomain {
   Title = 'TITLE',
   OfficialRelationship = 'OFFICIAL_RELATIONSHIP',

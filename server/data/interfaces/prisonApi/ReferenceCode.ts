@@ -11,7 +11,6 @@ export default interface ReferenceCode {
   subCodes?: ReferenceCode[]
 }
 
-// eslint-disable-next-line no-shadow
 export enum ReferenceCodeDomain {
   Health = 'HEALTH',
   HealthTreatments = 'HEALTH_TREAT',

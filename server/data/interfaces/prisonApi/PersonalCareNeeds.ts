@@ -14,7 +14,6 @@ export interface PersonalCareNeed {
   endDate?: string
 }
 
-// eslint-disable-next-line no-shadow
 export enum HealthDomainReferenceCode {
   XRayBodyScan = 'BSCAN',
 }

@@ -4,7 +4,7 @@ import { HmppsUser } from '../interfaces/HmppsUser'
 import { isInUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information
-// eslint-disable-next-line no-shadow
+
 export enum Page {
   ActiveAlerts = 'ACTIVE_ALERTS',
   AddAlert = 'ADD_ALERT',
@@ -138,7 +138,6 @@ export enum Page {
   XRayBodyScans = 'XRAY_BODY_SCANS',
 }
 
-// eslint-disable-next-line no-shadow
 export enum ApiAction {
   AddressLookup = 'ADDRESS_LOOKUP',
   Image = 'IMAGE',
@@ -147,7 +146,6 @@ export enum ApiAction {
   PrisonerImage = 'PRISONER_IMAGE',
 }
 
-// eslint-disable-next-line no-shadow
 export enum PostAction {
   AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
   AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
@@ -213,18 +211,15 @@ export enum PostAction {
   EditWeight = 'EDIT_WEIGHT',
 }
 
-// eslint-disable-next-line no-shadow
 export enum PutAction {
   CaseNote = 'UPDATE_CASE_NOTE',
 }
 
-// eslint-disable-next-line no-shadow
 export enum SearchAction {
   Alerts = 'ALERTS',
   CaseNotes = 'CASE_NOTES',
 }
 
-// eslint-disable-next-line no-shadow
 export enum SubjectType {
   PrisonerId = 'PRISONER_ID',
   SearchTerm = 'SEARCH_TERM',
