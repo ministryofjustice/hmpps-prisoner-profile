@@ -12,6 +12,10 @@
     {
         text: breadcrumbPrisonerName,
         href: "/prisoner/" + prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + prisonerNumber + "/personal"
     }
 ] %}
 
@@ -75,6 +79,12 @@
     {% endif %}
 
     </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/personal#addresses" data-qa="addresses-back-link">Return to prisoner’s profile</a>
+  </div>
 </div>
 
 {% endblock %}
