@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow
 export enum Role {
   ActivityHub = 'ROLE_ACTIVITY_HUB',
   AddSensitiveCaseNotes = 'ROLE_ADD_SENSITIVE_CASE_NOTES',

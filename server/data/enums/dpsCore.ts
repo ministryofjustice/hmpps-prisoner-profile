@@ -1,18 +1,15 @@
-// eslint-disable-next-line no-shadow
 export enum AssessmentQualificationType {
   English = 'English',
   Maths = 'Maths',
   DigitalLiteracy = 'Digital Literacy',
 }
 
-// eslint-disable-next-line no-shadow
 export enum LearnerEducationDeliveryMethodType {
   BlendedLearning = 'Blended Learning',
   ClassroomOnlyLearning = 'Classroom Only Learning',
   PackOnlyLearning = 'Pack Only Learning',
 }
 
-// eslint-disable-next-line no-shadow
 export enum DeliveryMethodType {
   FaceToFace = 'Face to Face',
   BlendedLearning = 'Blended Learning',
@@ -20,7 +17,6 @@ export enum DeliveryMethodType {
   PackOnlyLearning = 'Pack Only Learning',
 }
 
-// eslint-disable-next-line no-shadow
 export enum EmployabilitySkill {
   FaceToFace = 'Adaptability',
   AttitudesAndBehaviour = 'Attitudes and Behaviour',
@@ -34,7 +30,6 @@ export enum EmployabilitySkill {
   Timekeeping = 'Timekeeping',
 }
 
-// eslint-disable-next-line no-shadow
 export enum NeurodivergenceSelfDeclared {
   ADHD = 'ADHD',
   Dyslexia = 'Dyslexia',
@@ -42,7 +37,6 @@ export enum NeurodivergenceSelfDeclared {
   Dyscalculia = 'Dyscalculia',
 }
 
-// eslint-disable-next-line no-shadow
 export enum NeurodivergenceAssessed {
   AcquiredBrainInjury = 'Acquired Brain Injury',
   AttentionDeficitHyperactivityDisorder = 'Attention Deficit Hyperactivity Disorder',
@@ -73,7 +67,6 @@ export enum NeurodivergenceAssessed {
   TraumaticBrainInjury = 'Traumatic Brain Injury',
 }
 
-// eslint-disable-next-line no-shadow
 export enum NeurodivergenceSupport {
   Reading = 'Reading Support',
   WritingSupport = 'Writing Support',

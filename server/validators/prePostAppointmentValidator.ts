@@ -2,7 +2,6 @@ import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { bvlsHmctsLinkGuestPinEnabled } from '../utils/featureToggles'
 
-// eslint-disable-next-line import/prefer-default-export
 export const PrePostAppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
 

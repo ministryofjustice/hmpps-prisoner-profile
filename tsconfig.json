@@ -14,10 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": [
-      "./server/@types",
-      "./node_modules/@types"
-    ],
+    "typeRoots": ["./server/@types", "./node_modules/@types", "eslint.config.mjs"],
     "ignoreDeprecations": "5.0"
   },
   "exclude": [
@@ -29,8 +26,5 @@
     "coverage",
     "server/views/components"
   ],
-  "include": [
-    "**/*.js",
-    "**/*.ts"
-  ]
+  "include": ["**/*.js", "**/*.ts"]
 }

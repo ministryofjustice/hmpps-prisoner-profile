@@ -1,6 +1,5 @@
 import { ReferenceDataValue } from '../ReferenceDataValue'
 
-// eslint-disable-next-line no-shadow
 export enum HealthAndMedicationReferenceDataDomain {
   foodAllergy = 'FOOD_ALLERGY',
   medicalDiet = 'MEDICAL_DIET',

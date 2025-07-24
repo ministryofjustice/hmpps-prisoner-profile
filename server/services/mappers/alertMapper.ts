@@ -51,8 +51,8 @@ export const toAlertTypesFilters = (alerts: Alert[]) => {
   )
 }
 
-/* eslint-disable no-shadow, no-plusplus */
-export const toAlertSummaryData = (alerts: Result<PagedList<Alert>>): AlertSummaryData => {
+/* eslint-disable no-plusplus */
+export const toAlertSummaryData = (pagedAlerts: Result<PagedList<Alert>>): AlertSummaryData => {
   const toAlertCounts = (alerts: Alert[]) => {
     return alerts.reduce(
       (acc, alert) => {
@@ -67,9 +67,9 @@ export const toAlertSummaryData = (alerts: Result<PagedList<Alert>>): AlertSumma
     )
   }
 
-  if (!alerts.isFulfilled()) return { apiUnavailable: true }
+  if (!pagedAlerts.isFulfilled()) return { apiUnavailable: true }
 
-  const alertsContent = alerts.getOrThrow().content
+  const alertsContent = pagedAlerts.getOrThrow().content
 
   return {
     ...toAlertCounts(alertsContent),
