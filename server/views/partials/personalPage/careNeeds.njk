@@ -39,7 +39,7 @@
         </dl>
       {% endif %}
       {% if not careNeeds.length and not hasPastCareNeeds %}
-        <p data-qa="no-care-needs-message" class="govuk-!-margin-bottom-4 not-entered-tag not-entered-tag--wide">
+        <p data-qa="no-care-needs-message" class="govuk-!-margin-bottom-4">
           No care needs have been entered{% if not newArrival72 %}.{% endif %}
         </p>
       {% elseif not careNeeds.length and hasPastCareNeeds %}
