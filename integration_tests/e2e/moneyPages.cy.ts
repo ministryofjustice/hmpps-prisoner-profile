@@ -211,7 +211,7 @@ context('Money Pages', () => {
     })
 
     it('Displays back link', () => {
-      spendsPage.backLink().contains("Return to prisoner's profile")
+      spendsPage.backLink().contains('Return to prisoner’s profile')
     })
   })
 
@@ -294,7 +294,7 @@ context('Money Pages', () => {
     })
 
     it('Displays back link', () => {
-      privateCashPage.backLink().contains("Return to prisoner's profile")
+      privateCashPage.backLink().contains('Return to prisoner’s profile')
     })
   })
 
@@ -348,7 +348,7 @@ context('Money Pages', () => {
     })
 
     it('Displays back link', () => {
-      savingsPage.backLink().contains("Return to prisoner's profile")
+      savingsPage.backLink().contains('Return to prisoner’s profile')
     })
   })
 
@@ -412,7 +412,7 @@ context('Money Pages', () => {
     })
 
     it('Displays back link', () => {
-      damageObligationsPage.backLink().contains("Return to prisoner's profile")
+      damageObligationsPage.backLink().contains('Return to prisoner’s profile')
     })
   })
 })
