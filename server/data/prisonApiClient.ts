@@ -13,7 +13,7 @@ import VisitBalances from './interfaces/prisonApi/VisitBalances'
 import Assessment from './interfaces/prisonApi/Assessment'
 import { ContactDetail } from './interfaces/prisonApi/StaffContacts'
 import { mapToQueryString } from '../utils/utils'
-import CaseNote, { CaseNoteCount, CaseNoteUsage } from './interfaces/prisonApi/CaseNote'
+import CaseNote, { CaseNoteCount } from './interfaces/prisonApi/CaseNote'
 import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
 import PrisonerDetail from './interfaces/prisonApi/PrisonerDetail'
 import InmateDetail from './interfaces/prisonApi/InmateDetail'
@@ -29,7 +29,6 @@ import PrisonerSentenceDetails from './interfaces/prisonApi/PrisonerSentenceDeta
 import Address from './interfaces/prisonApi/Address'
 import ReferenceCode, { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
 import { ReasonableAdjustments } from './interfaces/prisonApi/ReasonableAdjustment'
-import { formatDateISO } from '../utils/dateHelpers'
 import CourtDateResults from './interfaces/prisonApi/CourtDateResults'
 import MainOffence from './interfaces/prisonApi/MainOffence'
 import FullStatus from './interfaces/prisonApi/FullStatus'
@@ -238,14 +237,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments> {
     return this.restClient.get<ReasonableAdjustments>({
       path: `/api/bookings/${bookingId}/reasonable-adjustments/all`,
-    })
-  }
-
-  async getCaseNotesUsage(prisonerNumber: string): Promise<CaseNoteUsage[]> {
-    const today = formatDateISO(new Date())
-    return this.restClient.get({
-      path: `/api/case-notes/usage`,
-      query: `offenderNo=${prisonerNumber}&toDate=${today}&numMonths=1200`,
     })
   }
 

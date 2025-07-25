@@ -1,12 +1,11 @@
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import CaseNotesService from './caseNotesService'
-import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
-import PagedList from '../data/interfaces/prisonApi/PagedList'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
-import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
+import FindCaseNotesResponse from '../data/interfaces/caseNotesApi/FindCaseNotesResponse'
 
 jest.mock('../data/caseNotesApiClient')
 
@@ -19,10 +18,10 @@ describe('Case Notes Page', () => {
     prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH', prisonId: 'MDI' } as Prisoner
     caseNotesApiClientSpy = {
       getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
-      getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
-      addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
-      addCaseNoteAmendment: jest.fn(async () => pagedCaseNotesMock.content[0]),
-      getCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
+      getCaseNotes: jest.fn(async () => findCaseNotesMock),
+      addCaseNote: jest.fn(async () => findCaseNotesMock.content[0]),
+      addCaseNoteAmendment: jest.fn(async () => findCaseNotesMock.content[0]),
+      getCaseNote: jest.fn(async () => findCaseNotesMock.content[0]),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
   })
@@ -44,13 +43,9 @@ describe('Case Notes Page', () => {
 
       expect(caseNotesPageData.fullName).toEqual('John Smith')
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
-        prisonerData.prisonerNumber,
-        prisonerData.prisonId,
-        {
-          includeSensitive: 'false',
-        },
-      )
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
+        includeSensitive: 'false',
+      })
     })
 
     it('should allow inclusion of sensitive case notes', async () => {
@@ -64,13 +59,38 @@ describe('Case Notes Page', () => {
         canViewSensitiveCaseNotes: true,
       })
 
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
-        prisonerData.prisonerNumber,
-        prisonerData.prisonId,
-        {
-          includeSensitive: 'true',
-        },
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
+        includeSensitive: 'true',
+      })
+    })
+
+    it('should correctly calculate pagination metadata', async () => {
+      const caseNotesPageData = await caseNotesService.get({
+        token: '',
+        prisonerData,
+        currentUserDetails: {
+          displayName: 'A Name',
+          name: 'Name',
+        } as HmppsUser,
+      })
+
+      expect(caseNotesPageData.fullName).toEqual('John Smith')
+      expect(caseNotesPageData.pagedCaseNotes).toEqual(
+        expect.objectContaining({
+          numberOfElements: 20,
+          totalElements: 80,
+          totalPages: 4,
+          empty: false,
+          first: true,
+          last: false,
+          number: 1,
+          size: 20,
+        }),
       )
+      expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
+        includeSensitive: 'false',
+      })
     })
   })
 
@@ -123,7 +143,7 @@ describe('Case Notes Page', () => {
   describe('Case note incentive links', () => {
     describe('Given an incentive warning', () => {
       it('Returns an incentive warning link', async () => {
-        const foundCaseNotes: PagedList<CaseNote> = { ...pagedCaseNotesMock }
+        const foundCaseNotes: FindCaseNotesResponse = { ...findCaseNotesMock }
         foundCaseNotes.content = foundCaseNotes.content.slice(0, 3)
         foundCaseNotes.content[0].subType = 'IEP_WARN'
         foundCaseNotes.content[1].subType = 'IEP_ENC'
