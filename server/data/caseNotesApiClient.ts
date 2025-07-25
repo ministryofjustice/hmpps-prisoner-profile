@@ -3,9 +3,10 @@ import { mapToQueryString } from '../utils/utils'
 
 import config from '../config'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
-import PagedList, { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
+import { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
+import FindCaseNotesResponse from './interfaces/caseNotesApi/FindCaseNotesResponse'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   private readonly restClient: RestClient
@@ -26,21 +27,20 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.restClient.put(args)
   }
 
-  async getCaseNotes(
-    offenderNumber: string,
-    caseloadId: string,
-    queryParams?: CaseNotesListQueryParams,
-  ): Promise<PagedList<CaseNote>> {
-    // Set defaults then apply queryParams
-    const params: CaseNotesListQueryParams = {
-      size: queryParams?.showAll ? 9999 : 20,
-      ...queryParams,
+  async getCaseNotes(prisonerNumber: string, queryParams?: CaseNotesListQueryParams): Promise<FindCaseNotesResponse> {
+    const request = {
+      occurredFrom: queryParams?.startDate,
+      occurredTo: queryParams?.endDate,
+      includeSensitive: queryParams?.includeSensitive === 'true',
+      typeSubTypes: this.mapTypeAndSubType(queryParams?.type, queryParams?.subType),
+      page: queryParams?.page ?? 1,
+      size: queryParams?.showAll ? 9999 : (queryParams?.size ?? 20),
+      sort: queryParams?.sort,
     }
-    return this.get<PagedList<CaseNote>>({
-      path: `/case-notes/${offenderNumber}`,
-      query: mapToQueryString(params),
-      headers: { caseloadId },
-    })
+    return (await this.post({
+      path: `/search/case-notes/${prisonerNumber}`,
+      data: request,
+    })) as Promise<FindCaseNotesResponse>
   }
 
   async getCaseNoteTypes(queryParams: CaseNotesTypeParams): Promise<CaseNoteType[]> {
@@ -87,5 +87,18 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
       headers: { caseloadId },
       ignore404,
     })
+  }
+
+  private mapTypeAndSubType(type?: string, subtype?: string): { type: string; subTypes: string[] }[] | undefined {
+    if (!type) {
+      return undefined
+    }
+
+    return [
+      {
+        type,
+        subTypes: subtype ? [subtype] : [],
+      },
+    ]
   }
 }

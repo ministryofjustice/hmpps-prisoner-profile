@@ -19,6 +19,7 @@ export interface CaseNotePageData extends CaseNote {
 export default interface CaseNotesPageData {
   pagedCaseNotes: PagedList<CaseNotePageData>
   listMetadata: ListMetadata<CaseNotesListQueryParams>
+  hasCaseNotes: boolean
   caseNoteTypes: CaseNoteType[]
   fullName: string
   errors: HmppsError[]

@@ -38,7 +38,7 @@ export default class CaseNotesController {
       const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { prisonerPermissions } = res.locals
 
-      queryParams.sort = (req.query.sort as string) || 'creationDateTime,DESC'
+      queryParams.sort = (req.query.sort as string) || 'createdAt,DESC'
       if (req.query.page) queryParams.page = +req.query.page
       if (req.query.type) queryParams.type = req.query.type as string
       if (req.query.subType) queryParams.subType = req.query.subType as string
@@ -50,23 +50,16 @@ export default class CaseNotesController {
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
         : undefined
 
-      // Get total count of case notes ignoring filters
-      // Get case notes based on given query params
-      // Get inmate detail for header
-      const prisonApiClient = this.prisonApiClientBuilder(clientToken)
-      const [caseNotesUsage, caseNotesPageData] = await Promise.all([
-        prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber),
-        Result.wrap(
-          this.caseNotesService.get({
-            token: clientToken,
-            prisonerData,
-            queryParams,
-            canViewSensitiveCaseNotes: isGranted(CaseNotesPermission.read_sensitive, prisonerPermissions),
-            canDeleteSensitiveCaseNotes: isGranted(CaseNotesPermission.delete_sensitive, prisonerPermissions),
-            currentUserDetails: res.locals.user,
-          }),
-        ),
-      ])
+      const caseNotesPageData = await Result.wrap(
+        this.caseNotesService.get({
+          token: clientToken,
+          prisonerData,
+          queryParams,
+          canViewSensitiveCaseNotes: isGranted(CaseNotesPermission.read_sensitive, prisonerPermissions),
+          canDeleteSensitiveCaseNotes: isGranted(CaseNotesPermission.delete_sensitive, prisonerPermissions),
+          currentUserDetails: res.locals.user,
+        }),
+      )
 
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
@@ -76,7 +69,6 @@ export default class CaseNotesController {
         })
       }
 
-      const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(
         caseNotesPageData.getOrThrow().caseNoteTypes,
         queryParams.type,
@@ -103,7 +95,6 @@ export default class CaseNotesController {
         subTypes,
         typeSubTypeMap,
         showingAll,
-        hasCaseNotes,
         addCaseNoteLinkUrl,
         canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponents?.sharedData),
       })

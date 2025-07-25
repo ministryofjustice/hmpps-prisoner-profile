@@ -12,7 +12,7 @@ import validateDateRange from '../utils/validateDateRange'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
-import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import PagedList, { CaseNotesListQueryParams, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class CaseNotesService {
@@ -32,7 +32,6 @@ export default class CaseNotesService {
         apiParams.startDate && formatDateTimeISO(parseDate(apiParams.startDate), { startOfDay: true })
     if (apiParams.endDate)
       apiParams.endDate = apiParams.endDate && formatDateTimeISO(parseDate(apiParams.endDate), { endOfDay: true })
-    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
 
     return apiParams
   }
@@ -53,16 +52,17 @@ export default class CaseNotesService {
     currentUserDetails: HmppsUser
   }): Promise<CaseNotesPageData> {
     const sortOptions: SortOption[] = [
-      { value: 'creationDateTime,DESC', description: 'Created (most recent)' },
-      { value: 'creationDateTime,ASC', description: 'Created (oldest)' },
-      { value: 'occurrenceDateTime,DESC', description: 'Happened (most recent)' },
-      { value: 'occurrenceDateTime,ASC', description: 'Happened (oldest)' },
+      { value: 'createdAt,DESC', description: 'Created (most recent)' },
+      { value: 'createdAt,ASC', description: 'Created (oldest)' },
+      { value: 'occurredAt,DESC', description: 'Happened (most recent)' },
+      { value: 'occurredAt,ASC', description: 'Happened (oldest)' },
     ]
 
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const errors: HmppsError[] = validateDateRange(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList<CaseNotePageData>
+    let hasCaseNotes: boolean
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
       dpsUserSelectableOnly: false,
       includeInactive: true,
@@ -71,14 +71,14 @@ export default class CaseNotesService {
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
-      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(
-        prisonerData.prisonerNumber,
-        prisonerData.prisonId,
-        {
-          ...this.mapToApiParams(queryParams),
-          includeSensitive: String(canViewSensitiveCaseNotes),
-        },
-      )
+      const {
+        content,
+        metadata,
+        hasCaseNotes: hasNotes,
+      } = await caseNotesApiClient.getCaseNotes(prisonerData.prisonerNumber, {
+        ...this.mapToApiParams(queryParams),
+        includeSensitive: String(canViewSensitiveCaseNotes),
+      })
 
       const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {
         return {
@@ -110,7 +110,8 @@ export default class CaseNotesService {
         }
       })
 
-      pagedCaseNotes = { ...rest, content: pagedCaseNotesContent }
+      pagedCaseNotes = this.mapMetadata(pagedCaseNotesContent, metadata, queryParams)
+      hasCaseNotes = hasNotes
     }
 
     return {
@@ -123,6 +124,7 @@ export default class CaseNotesService {
         'Sort by',
         true,
       ),
+      hasCaseNotes,
       caseNoteTypes,
       fullName: prisonerFullName,
       errors,
@@ -176,5 +178,39 @@ export default class CaseNotesService {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
 
     return caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, caseloadId, caseNoteId, text)
+  }
+
+  private mapMetadata<T>(
+    content: T[],
+    metadata: { totalElements: number; page: number; size: number },
+    queryParams: PagedListQueryParams,
+  ): PagedList<T> {
+    const totalElements = metadata?.totalElements ?? 0
+    const page = metadata?.page ?? 1
+    const pageSize = metadata?.size ?? 1
+    const totalPages = Math.floor(totalElements / pageSize) + Math.min(totalElements % pageSize, 1)
+    const sorted = !!queryParams?.sort
+    const sort = { empty: false, sorted, unsorted: !sorted }
+
+    return {
+      content,
+      empty: totalElements === 0,
+      first: metadata?.page === 1,
+      last: page === totalPages,
+      number: page,
+      numberOfElements: content?.length ?? 0,
+      size: pageSize,
+      sort,
+      totalElements,
+      totalPages,
+      pageable: {
+        sort,
+        offset: (page - 1) * pageSize,
+        pageSize,
+        pageNumber: page - 1, // This API uses a 1-indexed page number, but the common pagination component uses 0-indexed
+        paged: true,
+        unpaged: false,
+      },
+    }
   }
 }

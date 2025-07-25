@@ -8,7 +8,6 @@ import {
 import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
-import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -84,7 +83,6 @@ describe('Case Notes Controller', () => {
     next = jest.fn()
 
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getCaseNotesUsage = jest.fn(async () => caseNoteUsageMock)
     controller = new CaseNotesController(() => prisonApiClient, new CaseNotesService(null), auditServiceMock())
     mockPermissionCheck(CaseNotesPermission.read_sensitive, false)
     mockPermissionCheck(CaseNotesPermission.edit_sensitive, false)
@@ -103,7 +101,6 @@ describe('Case Notes Controller', () => {
 
       await controller.displayCaseNotes()(req, res)
 
-      expect(prisonApiClient.getCaseNotesUsage).toHaveBeenCalledWith(req.params.prisonerNumber)
       expect(getCaseNotesSpy).toHaveBeenCalledWith({
         token: req.middleware.clientToken,
         prisonerData: PrisonerMockDataA,

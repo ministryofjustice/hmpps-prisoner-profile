@@ -1,33 +1,32 @@
 import { stubFor } from './wiremock'
-import {
-  emptyCaseNotesMock,
-  pagedCaseNotesMock,
-  pagedCaseNotesMockFiltered,
-  pagedCaseNotesMockPage2,
-  pagedCaseNotesMockSorted,
-  pomCaseNotesMock,
-  singleCaseNoteWithTypes,
-} from '../../server/data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../../server/data/localMockData/caseNoteTypesMock'
+import {
+  emptyFindCaseNotesMock,
+  findCaseNotesMock,
+  findCaseNotesMockFiltered,
+  findCaseNotesMockPage2,
+  findCaseNotesMockSorted,
+  findPomCaseNotesMock,
+  findSingleCaseNoteWithTypes,
+} from '../../server/data/localMockData/findCaseNotesMock'
 
 export default {
-  stubGetCaseNotes: ({
-    prisonerNumber,
-    includeSensitive = false,
-  }: {
-    prisonerNumber: string
-    includeSensitive?: boolean
-  }) => {
+  stubGetCaseNotes: ({ prisonerNumber }: { prisonerNumber: string }) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedCaseNotesMock
+      jsonResp = findCaseNotesMock
     } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyCaseNotesMock
+      jsonResp = emptyFindCaseNotesMock
     }
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC(&page=0)?${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: '"page":1',
+          },
+        ],
       },
       response: {
         status: 200,
@@ -42,14 +41,19 @@ export default {
   stubGetCaseNotesPage2: (prisonerNumber: string) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedCaseNotesMockPage2
+      jsonResp = findCaseNotesMockPage2
     } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyCaseNotesMock
+      jsonResp = emptyFindCaseNotesMock
     }
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&page=1&includeSensitive=false`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: '"page":2',
+          },
+        ],
       },
       response: {
         status: 200,
@@ -64,14 +68,19 @@ export default {
   stubGetCaseNotesSorted: (prisonerNumber: string) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedCaseNotesMockSorted
+      jsonResp = findCaseNotesMockSorted
     } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyCaseNotesMock
+      jsonResp = emptyFindCaseNotesMock
     }
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CASC&includeSensitive=false`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: '"sort":"createdAt,ASC"',
+          },
+        ],
       },
       response: {
         status: 200,
@@ -86,14 +95,19 @@ export default {
   stubGetCaseNotesFiltered: (prisonerNumber: string) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedCaseNotesMockFiltered
+      jsonResp = findCaseNotesMockFiltered
     } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyCaseNotesMock
+      jsonResp = emptyFindCaseNotesMock
     }
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=ACP&includeSensitive=false`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: '"type":"ACP"',
+          },
+        ],
       },
       response: {
         status: 200,
@@ -124,14 +138,22 @@ export default {
   stubGetSensitiveCaseNotesPage: (prisonerNumber: string) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
-      jsonResp = pomCaseNotesMock
+      jsonResp = findPomCaseNotesMock
     } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyCaseNotesMock
+      jsonResp = emptyFindCaseNotesMock
     }
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=OMIC&includeSensitive=true`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: '"type":"OMIC"',
+          },
+          {
+            contains: '"includeSensitive":true',
+          },
+        ],
       },
       response: {
         status: 200,
@@ -152,12 +174,17 @@ export default {
     type: string
     subType: string
   }) => {
-    const jsonResp = singleCaseNoteWithTypes(prisonerNumber, type, subType)
+    const jsonResp = findSingleCaseNoteWithTypes(prisonerNumber, type, subType)
 
     return stubFor({
       request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=${type}&includeSensitive=false`,
+        method: 'POST',
+        urlPattern: `/casenotes/search/case-notes/${prisonerNumber}`,
+        bodyPatterns: [
+          {
+            contains: `"type":"${type}"`,
+          },
+        ],
       },
       response: {
         status: 200,
@@ -180,7 +207,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedCaseNotesMock.content[0],
+        jsonBody: findCaseNotesMock.content[0],
       },
     })
   },
@@ -198,10 +225,10 @@ export default {
   }) => {
     // eslint-disable-next-line no-nested-ternary
     const jsonBody = longText
-      ? pagedCaseNotesMock.content[3]
+      ? findCaseNotesMock.content[3]
       : isOmic
-        ? pomCaseNotesMock.content[0]
-        : pagedCaseNotesMock.content[0]
+        ? findPomCaseNotesMock.content[0]
+        : findCaseNotesMock.content[0]
     return stubFor({
       request: {
         method: 'GET',
@@ -228,7 +255,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedCaseNotesMock.content[0],
+        jsonBody: findCaseNotesMock.content[0],
       },
     })
   },

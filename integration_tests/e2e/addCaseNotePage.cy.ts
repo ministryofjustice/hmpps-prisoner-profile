@@ -16,7 +16,6 @@ context('Add Case Note Page', () => {
     cy.setupUserAuth()
     cy.setupComponentsData()
     cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
-    cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNoteTypes')
     cy.task('stubAddCaseNote')
   })
@@ -171,7 +170,6 @@ context('Add Case Note Page', () => {
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
         cy.task('stubInmateDetail', { bookingId: 1102484 })
         cy.task('stubPrisonerDetail', 'G6123VU')
-        cy.task('stubGetCaseNotesUsage', 'G6123VU')
         cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       })
 

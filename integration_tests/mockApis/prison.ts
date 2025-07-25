@@ -31,7 +31,6 @@ import {
   CourtDateResultsUnsentencedMockA,
 } from '../../server/data/localMockData/courtDateResultsMock'
 import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
-import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import CaseLoad from '../../server/data/interfaces/prisonApi/CaseLoad'
@@ -80,7 +79,6 @@ import { OffenderCellHistoryMock } from '../../server/data/localMockData/offende
 import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
 import OffenderCellHistory from '../../server/data/interfaces/prisonApi/OffenderCellHistoryInterface'
 import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
-import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
 import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
@@ -623,28 +621,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: CourtDateResultsUnsentencedMockA,
-      },
-    })
-  },
-
-  stubGetCaseNotesUsage: (prisonerNumber: string) => {
-    let jsonResp: CaseNoteUsage[]
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = caseNoteUsageMock
-    } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = []
-    }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/case-notes/usage\\?offenderNo=${prisonerNumber}&(.*)`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
       },
     })
   },

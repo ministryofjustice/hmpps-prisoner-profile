@@ -11,7 +11,6 @@ import { agencyDetailsMock } from '../data/localMockData/agency'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { inmateDetailMock, inmateDetailMockOverride } from '../data/localMockData/inmateDetailMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
-import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CellMoveReason from '../data/interfaces/whereaboutsApi/CellMoveReason'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
@@ -19,6 +18,7 @@ import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsi
 import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
 import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
 import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
+import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
@@ -57,7 +57,7 @@ describe('prisonerLocationHistoryService', () => {
     prisonApiClient.getCellMoveReasonTypes = jest.fn().mockResolvedValue(getCellMoveReasonTypesMock)
     prisonApiClient.getInmateDetail = jest.fn().mockResolvedValue(inmateDetailMock)
     whereaboutsApiClient.getCellMoveReason = jest.fn().mockResolvedValue(CellMoveReasonMock)
-    caseNotesApiClient.getCaseNote = jest.fn().mockResolvedValue(pagedCaseNotesMock.content[0])
+    caseNotesApiClient.getCaseNote = jest.fn().mockResolvedValue(findCaseNotesMock.content[0])
 
     const prisonApiClientBuilder = () => prisonApiClient
     const caseNotesApiClientBuilder = () => caseNotesApiClient
@@ -308,7 +308,7 @@ describe('prisonerLocationHistoryService', () => {
             CellMoveReasonMock.cellMoveReason.caseNoteId.toString(),
             true,
           )
-          expect(res.whatHappenedDetails).toEqual(pagedCaseNotesMock.content[0].text)
+          expect(res.whatHappenedDetails).toEqual(findCaseNotesMock.content[0].text)
         })
       })
     })
