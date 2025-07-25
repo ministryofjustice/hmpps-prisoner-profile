@@ -17,7 +17,7 @@ context('Probation documents page', () => {
       prisonerNumber,
       visitPage,
       pageToDisplay: ProbationDocumentsPage,
-      options: { additionalRoles: [Role.ViewProbationDocuments], preventGlobalAccess: true },
+      options: { additionalRoles: [Role.ViewProbationDocuments], preventGlobalSearchAccessOfOtherCaseloads: true },
     })
   })
 

@@ -16,7 +16,7 @@
                             - No previous session
                         {% endif %}
                     {% else %}
-                        {{ standardApiErrorText() }}
+                        {{ standardApiErrorText }}
                     {% endif %}
                 </p>
             {% endset %}
@@ -24,19 +24,19 @@
             {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
                 {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
             {% else %}
-                {% set communityOffenderManager = standardApiErrorText() %}
+                {% set communityOffenderManager = standardApiErrorText %}
             {% endif %}
 
             {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
                 {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
             {% else %}
-                {% set prisonOffenderManager = standardApiErrorText() %}
+                {% set prisonOffenderManager = standardApiErrorText %}
             {% endif %}
 
             {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
                 {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
             {% else %}
-                {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
+                {% set coworkingPrisonOffenderManager = standardApiErrorText %}
             {% endif %}
 
             {% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}

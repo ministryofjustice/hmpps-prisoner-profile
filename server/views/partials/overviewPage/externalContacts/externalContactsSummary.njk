@@ -21,7 +21,7 @@
         </dl>
     {% else %}
         <div class="hmpps-summary-card__unavailable-body" data-qa="external-contacts-summary-unavailable">
-            <div class="hmpps-summary-card__unavailable-message">{{ standardApiErrorText() }}</div>
+            <div class="hmpps-summary-card__unavailable-message">{{ standardApiErrorText }}</div>
             <div><a href="{{ config.serviceUrls.contacts }}/prisoner/{{ prisonerNumber }}/contacts/list" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Social and official contacts</a></div>
         </div>
     {% endif %}
