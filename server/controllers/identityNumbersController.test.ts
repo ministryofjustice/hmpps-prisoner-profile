@@ -385,7 +385,7 @@ describe('IdentityNumbersController', () => {
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Identity numbers updated',
           type: FlashMessageType.success,
-          fieldName: `${editPageUrl}-row`,
+          fieldName: `'${editPageUrl}-row'`,
         })
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirectAnchor}`)
       })
