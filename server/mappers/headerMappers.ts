@@ -63,7 +63,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     )
       ? 'Manage category'
       : 'View category',
-    // eslint-disable-next-line no-nested-ternary
+
     info: formatCategoryCodeDescription(prisonerData.category, inmateDetail.category),
     classes: '',
     url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
@@ -104,7 +104,6 @@ export function mapHeaderData(
     prisonerName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName, {
       style: NameFormatStyle.lastCommaFirst,
     }),
-    prisonerPhotoId: inmateDetail.facialImageId,
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alertSummaryData,

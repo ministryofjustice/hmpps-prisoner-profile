@@ -189,12 +189,20 @@ export default class ProfessionalContactsService {
   getProfessionalContactsOverview(
     clientToken: string,
     { prisonId, bookingId, prisonerNumber }: Prisoner,
+    isNewKeyWorkerServiceEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<YouthStaffContacts | StaffContacts> {
     const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
     return isYouthPrisoner
       ? this.getYouthStaffContactsOverview(clientToken, bookingId)
-      : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, prisonId, apiErrorCallback)
+      : this.getStaffContactsOverview(
+          clientToken,
+          bookingId,
+          prisonerNumber,
+          prisonId,
+          isNewKeyWorkerServiceEnabled,
+          apiErrorCallback,
+        )
   }
 
   private async getYouthStaffContactsOverview(clientToken: string, bookingId: number) {
@@ -243,11 +251,57 @@ export default class ProfessionalContactsService {
     bookingId: number,
     prisonerNumber: string,
     prisonId: string,
+    isNewKeyWorkerServiceEnabled: boolean,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<StaffContacts> {
     const prisonApi = this.prisonApiClientBuilder(clientToken)
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
     const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
+
+    if (isNewKeyWorkerServiceEnabled) {
+      const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+
+      const [communityManager, allocationManager, currentAllocatedStaff, bookingContacts] = await Promise.all([
+        Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
+        Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
+        Result.wrap(keyWorkerClient.getCurrentAllocations(prisonerNumber), apiErrorCallback),
+        prisonApi.getBookingContacts(bookingId),
+      ])
+
+      return {
+        keyWorker: currentAllocatedStaff
+          .map(({ allocations, latestRecordedEvents, hasHighComplexityOfNeeds }) => {
+            const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
+            const lastKeyWorkerSession = latestRecordedEvents.find(itm => itm.type === 'SESSION')
+            let name: string
+            if (hasHighComplexityOfNeeds) {
+              name = 'None - high complexity of need'
+            } else if (allocatedKeyWorker) {
+              name = `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
+            } else {
+              name = 'Not allocated'
+            }
+            return {
+              name,
+              lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
+            }
+          })
+          .toPromiseSettledResult(),
+        prisonOffenderManager: allocationManager
+          .map(pom => formatPomName(pom?.primary_pom?.name))
+          .toPromiseSettledResult(),
+        coworkingPrisonOffenderManager: allocationManager
+          .map(pom => formatPomName(pom?.secondary_pom?.name))
+          .toPromiseSettledResult(),
+        communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
+        resettlementWorker: bookingContacts.otherContacts
+          ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
+          ?.sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
+          ?.map(contact =>
+            formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
+          )?.[0],
+      }
+    }
 
     const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions, bookingContacts] = await Promise.all([
       Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
@@ -274,8 +328,8 @@ export default class ProfessionalContactsService {
       communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
       resettlementWorker: bookingContacts.otherContacts
         ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
-        .sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
-        .map(contact =>
+        ?.sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
+        ?.map(contact =>
           formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
         )?.[0],
     }

@@ -52,7 +52,7 @@ context('Edit height (metric)', () => {
     editPageWithTitle: EditHeight,
     editPageTitle: 'Height',
     successfulFlashMessage: 'Height updated',
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'height',
     isUnrestricted: true,
   })
 })
@@ -92,7 +92,7 @@ context('Edit height (Imperial)', () => {
     editPageWithTitle: EditHeight,
     editPageTitle: 'Height',
     successfulFlashMessage: 'Height updated',
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'height',
     isUnrestricted: true,
   })
 })

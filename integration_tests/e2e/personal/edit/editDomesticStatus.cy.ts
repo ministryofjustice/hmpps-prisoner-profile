@@ -40,7 +40,7 @@ context('Edit domestic status', () => {
     editPageTitle: 'What is John Saunders’ marital or civil partnership status?',
     successfulFlashMessage: 'Marital or civil partnership status updated',
     validInputs: [{ radioInputs: { radioField: 'M' } }],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'marriage-or-civil-partnership-status',
     isUnrestricted: true,
   })
 })

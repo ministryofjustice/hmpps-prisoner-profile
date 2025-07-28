@@ -12,7 +12,6 @@ export interface CorePersonRecordReferenceDataCodeDto {
   parentDomain?: string
 }
 
-// eslint-disable-next-line no-shadow
 export enum CorePersonRecordReferenceDataDomain {
   country = 'COUNTRY',
   county = 'COUNTY',

@@ -29,7 +29,7 @@ context('Edit facial hair', () => {
     editPageTitle: 'Facial hair',
     successfulFlashMessage: 'Facial hair updated',
     validInputs: [{ radioInputs: { radioField: 'BEARDED' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'facial-hair',
     isUnrestricted: true,
   })
 })

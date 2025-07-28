@@ -34,7 +34,7 @@ context('Edit eye colour - both eyes the same colour', () => {
     editPageTitle: 'Eye colour',
     successfulFlashMessage: 'Eye colour updated',
     validInputs: [{ radioInputs: { eyeColour: 'BLUE' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'eye-colour',
     isUnrestricted: true,
   })
 })
@@ -69,7 +69,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
     editPageTitle: 'Left and right eye colours',
     successfulFlashMessage: 'Left and right eye colours updated',
     validInputs: [{ radioInputs: { leftEyeColour: 'BROWN', rightEyeColour: 'HAZEL' } }],
-    redirectAnchor: 'appearance',
+    redirectAnchor: 'eye-colour',
     isUnrestricted: true,
   })
 })

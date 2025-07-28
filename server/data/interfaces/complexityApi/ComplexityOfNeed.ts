@@ -8,7 +8,6 @@ export default interface ComplexityOfNeed {
   active: boolean
 }
 
-// eslint-disable-next-line no-shadow
 export enum ComplexityLevel {
   Low = 'low',
   Medium = 'medium',

@@ -93,6 +93,6 @@ context('Change name - correction', () => {
         ],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'name',
   })
 })

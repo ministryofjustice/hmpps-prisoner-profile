@@ -145,6 +145,15 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(next).toHaveBeenCalledWith()
   })
 
+  it('should populate commonly used data in res.locals for use in template', async () => {
+    await getPrisonerData(services)(req, res, next)
+
+    expect(res.locals.prisonerImageUrl).toEqual('/api/prisoner/G6123VU/image?imageId=1413311')
+    expect(res.locals.prisonerThumbnailImageUrl).toEqual(
+      '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
+    )
+  })
+
   it('should set the newArrival24 flag if latest arrival date is today', async () => {
     const arrivalDate = new Date()
     const arrivalDateString = formatDateISO(arrivalDate)

@@ -29,6 +29,6 @@ context('Edit sexual orientation', () => {
     editPageTitle: 'Which of the following best describes John Saunders’ sexual orientation?',
     successfulFlashMessage: 'Sexual orientation updated',
     validInputs: [{ radioInputs: { radioField: 'ND' } }],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'sexual-orientation',
   })
 })

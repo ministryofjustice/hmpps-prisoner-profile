@@ -12,27 +12,27 @@ export default class IncentivesService {
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
   ) {}
 
-  async getIncentiveOverview(clientToken: string, bookingId: number): Promise<IncentiveSummary | { error: true }> {
+  async getIncentiveOverview(clientToken: string, prisonerNumber: string): Promise<IncentiveSummary | { error: true }> {
     const incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     // TODO use the RESULT type for this
     try {
-      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+      const incentiveReviews = await incentivesApiClient.getReviews(prisonerNumber)
 
       if (!incentiveReviews)
         return { positiveBehaviourCount: null, negativeBehaviourCount: null, nextReviewDate: null, daysOverdue: null }
 
       const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
         prisonApiClient.getCaseNoteCount(
-          bookingId,
+          incentiveReviews.bookingId,
           CaseNoteType.PositiveBehaviour,
           CaseNoteSubType.IncentiveEncouragement,
           incentiveReviews?.iepDate,
           formatDateISO(new Date()),
         ),
         prisonApiClient.getCaseNoteCount(
-          bookingId,
+          incentiveReviews.bookingId,
           CaseNoteType.NegativeBehaviour,
           CaseNoteSubType.IncentiveWarning,
           incentiveReviews?.iepDate,
@@ -48,7 +48,7 @@ export default class IncentivesService {
           ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
           : undefined,
       }
-    } catch (e) {
+    } catch (_error) {
       return { error: true }
     }
   }

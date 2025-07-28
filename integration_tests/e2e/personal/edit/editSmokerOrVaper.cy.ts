@@ -27,7 +27,7 @@ context('Edit smoker or vaper', () => {
     editPageTitle: 'Does John Saunders smoke or vape?',
     successfulFlashMessage: 'Smoking and vaping updated',
     validInputs: [{ radioInputs: { radioField: 'SMOKER_YES ' } }],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'smoking-and-vaping',
     isUnrestricted: true,
   })
 })

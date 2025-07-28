@@ -136,6 +136,6 @@ context('Add new alias', () => {
         errorMessages: ['Date of birth must include a day'],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'aliases',
   })
 })

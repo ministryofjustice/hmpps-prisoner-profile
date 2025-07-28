@@ -75,7 +75,7 @@ context('Edit other languages', () => {
           errorMessages: ['This is not a valid language'],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'other-languages',
       submitButtonId: 'save-button',
       isUnrestricted: true,
     })
@@ -129,7 +129,7 @@ context('Edit other languages', () => {
           errorMessages: ['This is not a valid language'],
         },
       ],
-      redirectAnchor: 'personal-details',
+      redirectAnchor: 'other-languages',
       submitButtonId: 'save-button',
       isUnrestricted: true,
     })

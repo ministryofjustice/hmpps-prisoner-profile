@@ -90,7 +90,7 @@
             {% call summaryCard({title: contactApiError.relationshipDescription}) %}
                 <dl class="govuk-summary-list" >
                     <div class="govuk-summary-list__row" data-qa="contact-api-error">
-                        {{ standardApiErrorText() }}
+                        {{ standardApiErrorText }}
                     </div>
                 </dl>
             {% endcall %}
@@ -101,7 +101,7 @@
             <p data-qa="no-contacts-message">No professional contacts have been entered.</p>
         {% endif %}
 
-        <a href="/prisoner/{{ prisonerNumber }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">Return to prisoner's profile</a>
+        <a href="/prisoner/{{ prisonerNumber }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">Return to prisoner’s profile</a>
     </div>
 </div>
 

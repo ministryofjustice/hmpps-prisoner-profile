@@ -196,6 +196,6 @@ context('Add personal IDs', () => {
         ],
       },
     ],
-    redirectAnchor: 'identity-numbers',
+    redirectAnchor: 'personal-numbers',
   })
 })

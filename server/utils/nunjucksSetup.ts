@@ -118,7 +118,8 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
-  njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
+  njkEnv.addGlobal('standardApiErrorText', apiErrorMessage)
+  njkEnv.addGlobal('placeholderPrisonerImageUrl', '/assets/images/prisoner-profile-image.png')
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
@@ -132,7 +133,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)

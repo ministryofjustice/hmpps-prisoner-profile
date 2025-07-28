@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow
 export enum CsipStatus {
   referralPending = 'REFERRAL_PENDING',
   referralSubmitted = 'REFERRAL_SUBMITTED',

@@ -502,7 +502,6 @@ export const formatCategoryALabel = (code: string): string => {
   }
 }
 
-// eslint-disable-next-line no-shadow
 export enum SortType {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -890,7 +889,6 @@ export const blankStringsToNull = <T>(object: T): T => {
   return object
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getCommonRequestData = (req: any) => {
   const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
   const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })

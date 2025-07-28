@@ -12,14 +12,6 @@ const MAX_COMMENT_LENGTH = 240
 export const addIdentityNumbersValidator = (body: Record<string, AddIdentityNumberSubmission>) => {
   const errors: HmppsError[] = []
 
-  const { pnc, cro } = body
-  if (pnc?.selected) {
-    validatePnc(pnc?.value, '#pnc-value-input', errors)
-  }
-  if (cro?.selected) {
-    validateCro(cro?.value, '#cro-value-input', errors)
-  }
-
   Object.entries(body).forEach(([key, value]) => {
     if (value.selected) {
       if (!value.value) {
@@ -29,7 +21,15 @@ export const addIdentityNumbersValidator = (body: Record<string, AddIdentityNumb
         })
       }
 
-      if (value.value && value.value.length > MAX_LENGTH) {
+      if (key === 'cro') {
+        validateCro(value.value, '#cro-value-input', errors)
+      }
+
+      if (key === 'pnc') {
+        validatePnc(value.value, '#pnc-value-input', errors)
+      }
+
+      if (key !== 'cro' && key !== 'pnc' && value.value && value.value.length > MAX_LENGTH) {
         errors.push({
           text: `Enter the ${IdentifierMappings[key]?.description ?? 'ID number'} using ${MAX_LENGTH} characters or less`,
           href: `#${key}-value-input`,
@@ -58,7 +58,19 @@ export const editIdentityNumberValidator = (body: EditIdentityNumberSubmission) 
     })
   }
 
-  if (body.value && body.value.length > MAX_LENGTH) {
+  if (body.type === OffenderIdentifierType.CroNumber) {
+    validateCro(body.value, '#identifier-value-input', errors)
+  }
+  if (body.type === OffenderIdentifierType.PncNumber) {
+    validatePnc(body.value, '#identifier-value-input', errors)
+  }
+
+  if (
+    body.type !== OffenderIdentifierType.CroNumber &&
+    body.type !== OffenderIdentifierType.PncNumber &&
+    body.value &&
+    body.value.length > MAX_LENGTH
+  ) {
     errors.push({ text: `Enter the ID number using ${MAX_LENGTH} characters or less`, href: `#identifier-value-input` })
   }
 
@@ -69,18 +81,11 @@ export const editIdentityNumberValidator = (body: EditIdentityNumberSubmission) 
     })
   }
 
-  if (body.type === OffenderIdentifierType.PncNumber) {
-    validatePnc(body.value, '#identifier-value-input', errors)
-  }
-  if (body.type === OffenderIdentifierType.CroNumber) {
-    validateCro(body.value, '#identifier-value-input', errors)
-  }
-
   return errors
 }
 
 const validatePnc = (input: string, href: string, errors: HmppsError[]) => {
-  if (!input || input.length > MAX_LENGTH) {
+  if (!input) {
     return
   }
 
@@ -88,7 +93,7 @@ const validatePnc = (input: string, href: string, errors: HmppsError[]) => {
 }
 
 const validateCro = (input: string, href: string, errors: HmppsError[]) => {
-  if (!input || input.length > MAX_LENGTH) {
+  if (!input) {
     return
   }
 

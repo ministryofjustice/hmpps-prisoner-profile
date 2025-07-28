@@ -7,7 +7,6 @@ import {
 import { formatDateISO } from '../../utils/dateHelpers'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 
-// eslint-disable-next-line no-shadow
 export enum AddressLocation {
   uk = 'uk',
   overseas = 'overseas',

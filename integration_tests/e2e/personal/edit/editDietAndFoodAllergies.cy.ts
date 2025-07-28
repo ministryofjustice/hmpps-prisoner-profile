@@ -99,6 +99,6 @@ context('Edit medical diet', () => {
         ],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'diet-and-food-allergies',
   })
 })

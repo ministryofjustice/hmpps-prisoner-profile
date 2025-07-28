@@ -31,6 +31,6 @@ context('Edit city or town of birth', () => {
         errorMessages: ['City or town of birth must be 25 characters or less.'],
       },
     ],
-    redirectAnchor: 'personal-details',
+    redirectAnchor: 'city-or-town-of-birth',
   })
 })

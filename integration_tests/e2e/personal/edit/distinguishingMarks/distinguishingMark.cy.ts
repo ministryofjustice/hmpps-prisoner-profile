@@ -168,7 +168,7 @@ context('New distinguishing feature', () => {
 
       page.saveAndReturnBtn().click()
       cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
-      cy.location('hash').should('eq', '#marks')
+      cy.location('hash').should('eq', '#other-marks')
     })
 
     it('No selection causes a validation error', () => {

@@ -3,13 +3,16 @@ import { Role } from '../../server/data/enums/role'
 import NotFoundPage from '../pages/notFoundPage'
 import Page from '../pages/page'
 
-// eslint-disable-next-line import/prefer-default-export
 export function permissionsTests<TPage extends Page>({
   prisonerNumber,
   visitPage,
   pageToDisplay,
   pageWithTitleToDisplay,
-  options = { additionalRoles: [], preventGlobalAccess: false },
+  options = {
+    additionalRoles: [],
+    preventGlobalSearchAccessOfOtherCaseloads: false,
+    preventGlobalSearchAccessOfTransferringPrisoners: false,
+  },
 }: {
   prisonerNumber: string
   visitPage: (prisonerDataOverrides: Partial<Prisoner>) => void
@@ -17,7 +20,8 @@ export function permissionsTests<TPage extends Page>({
   pageWithTitleToDisplay?: { page: new (title: string) => TPage; title: string }
   options?: {
     additionalRoles: Role[]
-    preventGlobalAccess?: boolean
+    preventGlobalSearchAccessOfOtherCaseloads?: boolean
+    preventGlobalSearchAccessOfTransferringPrisoners?: boolean
   }
 }) {
   const verifyPageDisplayed = () => {
@@ -77,7 +81,7 @@ export function permissionsTests<TPage extends Page>({
         cy.task('stubPrisonerData', { prisonerNumber, overrides })
       })
 
-      if (options?.preventGlobalAccess) {
+      if (options?.preventGlobalSearchAccessOfOtherCaseloads) {
         it('Does not display the page', () => {
           visitPage(overrides)
           new NotFoundPage().shouldBeDisplayed()
@@ -157,10 +161,17 @@ export function permissionsTests<TPage extends Page>({
         cy.setupComponentsData()
       })
 
-      it('Displays the page', () => {
-        visitPage(overrides)
-        verifyPageDisplayed()
-      })
+      if (options?.preventGlobalSearchAccessOfTransferringPrisoners) {
+        it('Does not display the page', () => {
+          visitPage(overrides)
+          new NotFoundPage().shouldBeDisplayed()
+        })
+      } else {
+        it('Displays the page', () => {
+          visitPage(overrides)
+          verifyPageDisplayed()
+        })
+      }
     })
   })
 }

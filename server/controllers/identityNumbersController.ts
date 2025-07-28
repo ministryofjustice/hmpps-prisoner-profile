@@ -47,6 +47,7 @@ export default class IdentityNumbersController {
       }),
       submit: this.postIdentityNumbers({
         errorRedirect: 'home-office-id-numbers',
+        successRedirectAnchor: 'home-office-numbers',
       }),
     }
   }
@@ -61,6 +62,7 @@ export default class IdentityNumbersController {
       }),
       submit: this.postIdentityNumbers({
         errorRedirect: 'justice-id-numbers',
+        successRedirectAnchor: 'justice-numbers',
       }),
     }
   }
@@ -75,6 +77,7 @@ export default class IdentityNumbersController {
       }),
       submit: this.postIdentityNumbers({
         errorRedirect: 'personal-id-numbers',
+        successRedirectAnchor: 'personal-numbers',
       }),
     }
   }
@@ -130,7 +133,7 @@ export default class IdentityNumbersController {
         const [offenderId, seqId] = this.parseIdentifierIds(req)
         const errors = req.errors || []
         const formValues: { type?: string; value?: string; comment?: string } = req.body
-        const { description, editPageUrl } = Object.values(IdentifierMappings).find(
+        const { description, editPageUrl, redirectAnchor } = Object.values(IdentifierMappings).find(
           item => item.type === formValues.type,
         )
 
@@ -195,7 +198,7 @@ export default class IdentityNumbersController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
       },
     }
   }
@@ -241,7 +244,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  private postIdentityNumbers = (options: { errorRedirect: string }) => {
+  private postIdentityNumbers = (options: { errorRedirect: string; successRedirectAnchor: string }) => {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
@@ -291,7 +294,7 @@ export default class IdentityNumbersController {
         })
         .catch(error => logger.error(error))
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#identity-numbers`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${options.successRedirectAnchor}`)
     }
   }
 
@@ -317,7 +320,7 @@ export default class IdentityNumbersController {
   private getUpdatedFieldsFromFormValues = (formValues: Record<string, AddIdentityNumberSubmission>) =>
     Object.entries(formValues)
       .map(([id, value]): string =>
-        value.selected && value.value ? `${IdentifierMappings[id]?.editPageUrl}-row` : null,
+        value.selected && value.value ? `'${IdentifierMappings[id]?.editPageUrl}-row'` : null,
       )
       .filter(Boolean)
       .join(',')

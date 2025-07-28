@@ -1,6 +1,5 @@
 import { PagedListItem } from './PagedList'
 
-// eslint-disable-next-line no-shadow
 export enum VisitType {
   Social = 'SCON',
   Official = 'OFFI',

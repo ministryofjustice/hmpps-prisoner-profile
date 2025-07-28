@@ -328,7 +328,7 @@ export default class MilitaryRecordsController {
       if (action === 'continue') {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/disciplinary-action/${militarySeq}`)
       }
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-conflict`)
     }
   }
 
@@ -446,7 +446,7 @@ export default class MilitaryRecordsController {
       if (action === 'continue') {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/discharge-details/${militarySeq}`)
       }
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-disciplinary-action`)
     }
   }
 
@@ -570,7 +570,7 @@ export default class MilitaryRecordsController {
         })
         .catch(error => logger.error(error))
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-discharge`)
     }
   }
 }

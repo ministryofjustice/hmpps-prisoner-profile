@@ -115,12 +115,18 @@ export default class OverviewController {
         : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       isGranted(PrisonerIncentivesPermission.read, prisonerPermissions)
-        ? this.incentivesService.getIncentiveOverview(clientToken, bookingId)
+        ? this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.offenderService.getPrisoner(clientToken, prisonerNumber),
-      this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
+      this.professionalContactsService.getProfessionalContactsOverview(
+        clientToken,
+        prisonerData,
+        isServiceEnabled('allocate-key-workers', res.locals.feComponents?.sharedData) ||
+          isServiceEnabled('allocate-personal-officers', res.locals.feComponents?.sharedData),
+        apiErrorCallback,
+      ),
       this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
       Result.wrap(
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),

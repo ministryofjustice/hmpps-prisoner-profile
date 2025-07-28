@@ -209,9 +209,7 @@ describe('Alias Controller', () => {
         newName,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#name`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
@@ -349,9 +347,7 @@ describe('Alias Controller', () => {
         newName,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#name`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
@@ -503,9 +499,7 @@ describe('Alias Controller', () => {
         },
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#aliases`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Alias added',
@@ -639,9 +633,7 @@ describe('Alias Controller', () => {
         '1999-02-01',
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#date-of-birth`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Date of birth updated',
@@ -725,13 +717,13 @@ describe('Alias Controller', () => {
     })
 
     it.each([
-      [undefined, 'personal#personal-details'],
+      [undefined, 'personal#ethnic-group'],
       ['white', 'personal/white'],
       ['mixed', 'personal/mixed'],
       ['asian', 'personal/asian'],
       ['black', 'personal/black'],
       ['other', 'personal/other'],
-      ['NS', 'personal#personal-details'],
+      ['NS', 'personal#ethnic-group'],
     ])('for choice %s should redirect to %s page', async (ethnicGroup: string, redirect: string) => {
       req = { ...req, body: { radioField: ethnicGroup } } as unknown as Request
 
@@ -765,9 +757,7 @@ describe('Alias Controller', () => {
         PrisonerMockDataA.prisonerNumber,
         'NS',
       )
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#ethnic-group`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',
@@ -860,9 +850,7 @@ describe('Alias Controller', () => {
         ethnicityCodeSubmitted,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#ethnic-group`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',

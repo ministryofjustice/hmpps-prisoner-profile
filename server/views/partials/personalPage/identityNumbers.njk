@@ -9,6 +9,7 @@
   {% if identityNumbers.length > 0 %}
     {% for identityNumber in identityNumbers %}
       <div class="identity-number-sub-row govuk-!-padding-top-2">
+        <span class="anchor-center" id="{{ options.redirectAnchor }}"></span>
         <div>
           <p class="govuk-body">{{ identityNumber.value }}</p>
           {% if identityNumber.comment %}
@@ -44,7 +45,7 @@
   {% set id = identityNumbers[0].editPageUrl | d("prison-number") %}
   {% set updatedFields = flashMessage.fieldName | d("") %}
   {% set rowClasses %}
-    {{ "row-updated" if (id + "-row") in updatedFields else "" }}
+    {{ "row-updated" if ("'" + id + "-row'") in updatedFields else "" }}
   {% endset %}
   {% if identityNumbers.length > 0 or not options.hideIfEmpty %}
     {{ summaryListRow(name, identityNumbersWithComment(identityNumbers, options), id, {html: true, classes: rowClasses}) }}
@@ -64,30 +65,30 @@
         {% set identityNumberEditEnabled = editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
 
         {{ summaryListSectionHeading("Justice numbers", "justice-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/justice-id-numbers", text: "Add justice ID numbers" }) }}
-        {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], { editable: false }) }}
-        {{ identityNumber("PNC number", identityNumbers.justice.pncNumber) }}
-        {{ identityNumber("CRO number", identityNumbers.justice.croNumber, { hideIfEmpty: true }) }}
-        {{ identityNumber("Prison legacy system number", identityNumbers.justice.prisonLegacySystemNumber, { hideIfEmpty: true }) }}
-        {{ identityNumber("Local Inmate Data System (LIDS) number", identityNumbers.justice.localInmateDataSystemNumber, { hideIfEmpty: true, editable: false }) }}
-        {{ identityNumber("Probation legacy system number", identityNumbers.justice.probationLegacySystemNumber, { hideIfEmpty: true }) }}
-        {{ identityNumber("Scottish PNC number", identityNumbers.justice.scottishPncNumber, { hideIfEmpty: true }) }}
-        {{ identityNumber("Youth Justice Application Framework (YJAF) number", identityNumbers.justice.yjafNumber, { hideIfEmpty: true }) }}
+        {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], { editable: false, redirectAnchor: 'prison-number' }) }}
+        {{ identityNumber("PNC number", identityNumbers.justice.pncNumber, { redirectAnchor: 'pnc-number' }) }}
+        {{ identityNumber("CRO number", identityNumbers.justice.croNumber, { hideIfEmpty: true, redirectAnchor: 'cro-number' }) }}
+        {{ identityNumber("Prison legacy system number", identityNumbers.justice.prisonLegacySystemNumber, { hideIfEmpty: true, redirectAnchor: 'prison-legacy-system-number' }) }}
+        {{ identityNumber("Local Inmate Data System (LIDS) number", identityNumbers.justice.localInmateDataSystemNumber, { hideIfEmpty: true, editable: false, redirectAnchor: 'lids-number' }) }}
+        {{ identityNumber("Probation legacy system number", identityNumbers.justice.probationLegacySystemNumber, { hideIfEmpty: true, redirectAnchor: 'probation-legacy-system-number' }) }}
+        {{ identityNumber("Scottish PNC number", identityNumbers.justice.scottishPncNumber, { hideIfEmpty: true, redirectAnchor: 'scottish-pnc-number' }) }}
+        {{ identityNumber("Youth Justice Application Framework (YJAF) number", identityNumbers.justice.yjafNumber, { hideIfEmpty: true, redirectAnchor: 'yjaf-number' }) }}
 
         {% if hasPersonalId %}
           {{ summaryListSectionHeading("Personal numbers", "personal-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/personal-id-numbers", text: "Add personal ID numbers" }) }}
-          {{ identityNumber("Driving licence number", identityNumbers.personal.drivingLicenceNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("National Insurance number", identityNumbers.personal.nationalInsuranceNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Parkrun number", identityNumbers.personal.parkrunNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Passport number", identityNumbers.personal.passportNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Staff ID card number", identityNumbers.personal.staffIdentityCardNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Unique learner number (ULN)", identityNumbers.personal.uniqueLearnerNumber, { hideIfEmpty: true }) }}
+          {{ identityNumber("Driving licence number", identityNumbers.personal.drivingLicenceNumber, { hideIfEmpty: true, redirectAnchor: 'driving-licence-number' }) }}
+          {{ identityNumber("National Insurance number", identityNumbers.personal.nationalInsuranceNumber, { hideIfEmpty: true, redirectAnchor: 'national-insurance-number' }) }}
+          {{ identityNumber("Parkrun number", identityNumbers.personal.parkrunNumber, { hideIfEmpty: true, redirectAnchor: 'parkrun-number' }) }}
+          {{ identityNumber("Passport number", identityNumbers.personal.passportNumber, { hideIfEmpty: true, redirectAnchor: 'passport-number' }) }}
+          {{ identityNumber("Staff ID card number", identityNumbers.personal.staffIdentityCardNumber, { hideIfEmpty: true, redirectAnchor: 'staff-id-card-number' }) }}
+          {{ identityNumber("Unique learner number (ULN)", identityNumbers.personal.uniqueLearnerNumber, { hideIfEmpty: true, redirectAnchor: 'unique-learner-number' }) }}
         {% endif %}
 
         {% if hasHomeOfficeId %}
           {{ summaryListSectionHeading("Home office numbers", "home-office-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/home-office-id-numbers", text: "Add Home Office ID numbers" }) }}
-          {{ identityNumber("Case Information Database (CID) number", identityNumbers.homeOffice.caseInformationDatabase, { hideIfEmpty: true }) }}
-          {{ identityNumber("Home Office reference number", identityNumbers.homeOffice.homeOfficeReferenceNumber, { hideIfEmpty: true }) }}
-          {{ identityNumber("Port reference number", identityNumbers.homeOffice.portReferenceNumber, { hideIfEmpty: true }) }}
+          {{ identityNumber("Case Information Database (CID) number", identityNumbers.homeOffice.caseInformationDatabase, { hideIfEmpty: true, redirectAnchor: 'cid-number' }) }}
+          {{ identityNumber("Home Office reference number", identityNumbers.homeOffice.homeOfficeReferenceNumber, { hideIfEmpty: true, redirectAnchor: 'home-office-reference-number' }) }}
+          {{ identityNumber("Port reference number", identityNumbers.homeOffice.portReferenceNumber, { hideIfEmpty: true, redirectAnchor: 'port-reference-number' }) }}
         {% endif %}
 
         {% if showAdditionalIdRow and identityNumberEditEnabled %}
