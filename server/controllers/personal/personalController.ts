@@ -77,6 +77,7 @@ type TextFieldSetter = (
   value: string,
 ) => Promise<SetterOutcome | void>
 export enum SetterOutcome {
+  SUCCESS,
   DUPLICATE,
 }
 
@@ -527,7 +528,7 @@ export default class PersonalController {
           res,
           prisonerNumber,
           submit: async () => {
-            return await setter(req, res, fieldData, updatedValue)
+            return setter(req, res, fieldData, updatedValue)
           },
           fieldData,
           auditDetails: { fieldName, previous: previousValue, updated: updatedValue },
@@ -1884,6 +1885,7 @@ export default class PersonalController {
       }
 
       await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailUpdateValue)
+      return SetterOutcome.SUCCESS
     }
 
     const globalEmailCreator: TextFieldSetter = async (req, _res, _fieldData, value) => {
@@ -1899,6 +1901,7 @@ export default class PersonalController {
       }
 
       await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailUpdateValue)
+      return SetterOutcome.SUCCESS
     }
 
     const globalEmailOnSubmit = async (
@@ -1978,7 +1981,7 @@ export default class PersonalController {
     try {
       const setterOutcome = await submit()
 
-      if (setterOutcome === undefined) {
+      if (setterOutcome === SetterOutcome.SUCCESS || setterOutcome === undefined) {
         req.flash('flashMessage', {
           text: `${successFlashFieldName ?? pageTitle} updated`,
           type: FlashMessageType.success,
