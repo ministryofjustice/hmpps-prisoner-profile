@@ -24,8 +24,6 @@ import { mockOffenderContacts } from './localMockData/offenderContacts'
 import { mockReferenceDomains } from './localMockData/referenceDomains'
 import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments'
 import { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
-import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
-import { formatDateISO } from '../utils/dateHelpers'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
@@ -279,19 +277,6 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall('/api/bookings/12345/reasonable-adjustments?type=A,B,C', mockReasonableAdjustments)
       const output = await prisonApiClient.getReasonableAdjustments(12345, ['A', 'B', 'C'])
       expect(output).toEqual(mockReasonableAdjustments)
-    })
-  })
-
-  describe('getCaseNoteUsage', () => {
-    it('Should return data from the API', async () => {
-      const prisonerNumber = 'AB1234C'
-      const today = formatDateISO(new Date())
-      mockSuccessfulPrisonApiCall(
-        `/api/case-notes/usage?offenderNo=AB1234C&toDate=${today}&numMonths=1200`,
-        caseNoteUsageMock,
-      )
-      const output = await prisonApiClient.getCaseNotesUsage(prisonerNumber)
-      expect(output).toEqual(caseNoteUsageMock)
     })
   })
 

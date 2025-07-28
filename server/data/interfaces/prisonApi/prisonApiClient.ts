@@ -5,7 +5,7 @@ import VisitSummary from './VisitSummary'
 import VisitBalances from './VisitBalances'
 import Assessment from './Assessment'
 import { ContactDetail } from './StaffContacts'
-import CaseNote, { CaseNoteCount, CaseNoteUsage } from './CaseNote'
+import CaseNote, { CaseNoteCount } from './CaseNote'
 import ScheduledEvent from './ScheduledEvent'
 import PrisonerDetail from './PrisonerDetail'
 import InmateDetail from './InmateDetail'
@@ -122,8 +122,6 @@ export interface PrisonApiClient {
   getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]>
 
   getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments>
-
-  getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
 
   getCaseNoteCount(
     bookingId: number,

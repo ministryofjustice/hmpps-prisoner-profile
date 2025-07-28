@@ -216,6 +216,7 @@ export const convertNameCommaToHuman = (name: string): string => {
  * @param itemDescription
  * @param sortOptions
  * @param sortLabel
+ * @param enableShowAll
  */
 export const generateListMetadata = <T extends PagedListQueryParams>(
   pagedList: PagedList<PagedListItem>,
