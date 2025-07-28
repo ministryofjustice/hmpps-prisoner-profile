@@ -40,7 +40,7 @@ context('Change email address', () => {
       },
       {
         testDescription: 'Duplicate email',
-        input: { textInputs: { emailAddress: 'foo@example.com' } },
+        input: { textInputs: { emailAddress: 'duplicate@example.com' } },
         errorMessages: ['This email address already exists for this person. Add a new email or edit the saved one'],
       },
     ],
