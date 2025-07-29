@@ -8,7 +8,11 @@ import { formatDate } from '../../../server/utils/dateHelpers'
 import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
-import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import {
+  CountryReferenceDataCodesMock,
+  MilitaryRecordsMock,
+  ReligionReferenceDataCodesMock,
+} from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
 import {
@@ -82,6 +86,15 @@ context('When signed in', () => {
         prisonerNumber,
         resp: PersonalRelationshipsDomesticStatusMock,
       })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'COUNTRY',
+        referenceData: CountryReferenceDataCodesMock,
+      })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'RELF',
+        referenceData: ReligionReferenceDataCodesMock,
+      })
+      cy.task('stubGetPseudonyms', { prisonerNumber, response: [] })
       visitPersonalDetailsPage()
     })
 
