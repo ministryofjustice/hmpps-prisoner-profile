@@ -38,6 +38,11 @@ context('Change email address', () => {
         input: { textInputs: { emailAddress: 'notavalidemail' } },
         errorMessages: ['Email address must include an @ symbol'],
       },
+      {
+        testDescription: 'Duplicate email',
+        input: { textInputs: { emailAddress: 'duplicate@example.com' } },
+        errorMessages: ['This email address already exists for this person. Add a new email or edit the saved one'],
+      },
     ],
     editPageWithTitle: ChangeEmailAddress,
     editPageTitle: 'Change John Saunders’s email address',

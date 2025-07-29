@@ -508,9 +508,20 @@ export const ContactsResponseMock: ContactsResponseDto[] = [
     contactPhoneExtension: '1234',
   },
   {
+    contactId: 5,
+    contactType: 'BUS',
+    contactValue: '07123456789',
+    contactPhoneExtension: '1234',
+  },
+  {
     contactId: 10,
     contactType: 'EMAIL',
     contactValue: 'foo@example.com',
+  },
+  {
+    contactId: 20,
+    contactType: 'EMAIL',
+    contactValue: 'duplicate@example.com',
   },
 ]
 
