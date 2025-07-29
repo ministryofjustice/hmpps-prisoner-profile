@@ -2,6 +2,8 @@ import { Role } from '../../../../../server/data/enums/role'
 import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { PseudonymResponseMock } from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { PrisonerMockDataA } from '../../../../../server/data/localMockData/prisoner'
+import { parseDate } from '../../../../../server/utils/dateHelpers'
 
 context('Add new alias', () => {
   const prisonerNumber = 'G6123VU'
@@ -134,6 +136,22 @@ context('Add new alias', () => {
           radioInputs: { sex: 'M' },
         },
         errorMessages: ['Date of birth must include a day'],
+      },
+      {
+        testDescription: 'Alias already added',
+        input: {
+          textInputs: {
+            firstName: PrisonerMockDataA.firstName,
+            middleName1: PrisonerMockDataA.middleNames.split(' ')[0],
+            middleName2: PrisonerMockDataA.middleNames.split(' ')[1],
+            lastName: PrisonerMockDataA.lastName,
+            'dateOfBirth-day': parseDate(PrisonerMockDataA.dateOfBirth).getDay().toString(),
+            'dateOfBirth-month': parseDate(PrisonerMockDataA.dateOfBirth).getMonth().toString(),
+            'dateOfBirth-year': parseDate(PrisonerMockDataA.dateOfBirth).getFullYear().toString(),
+          },
+          radioInputs: { sex: PrisonerMockDataA.gender.charAt(0) },
+        },
+        errorMessages: ['This alias already exists'],
       },
     ],
     redirectAnchor: 'aliases',
