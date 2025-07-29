@@ -3,7 +3,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { Alias } from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { convertToTitleCase, formatName } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
@@ -102,6 +101,7 @@ describe('PersonalPageService', () => {
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
     personIntegrationApiClient = personIntegrationApiClientMock()
+    personIntegrationApiClient.getPseudonyms = jest.fn(async () => [] as PseudonymResponseDto[])
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
@@ -201,48 +201,11 @@ describe('PersonalPageService', () => {
     })
 
     describe('Aliases', () => {
-      describe('Aliases from Prisoner Search', () => {
-        const getResponseWithAliases = async (aliases: Alias[]) => {
-          const prisonerData = { ...PrisonerMockDataA }
-          prisonerData.aliases = aliases
-          const service = constructService()
-          return service.get('token', prisonerData)
-        }
-
-        it('Handles no aliases', async () => {
-          const response = await getResponseWithAliases([])
-          expect(response.personalDetails.aliases).toEqual([])
-        })
-
-        it('Maps multiple aliases', async () => {
-          const response = await getResponseWithAliases([
-            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: 'Male' },
-            {
-              dateOfBirth: '2023-01-01',
-              firstName: 'First',
-              middleNames: 'Middle',
-              lastName: 'Last',
-              gender: 'Female',
-            },
-          ])
-          expect(response.personalDetails.aliases[0]).toEqual({
-            alias: 'First Name Last Name',
-            dateOfBirth: '01/01/2022',
-            sex: 'Male',
-          })
-          expect(response.personalDetails.aliases[1]).toEqual({
-            alias: 'First Middle Last',
-            dateOfBirth: '01/01/2023',
-            sex: 'Female',
-          })
-        })
-      })
-
-      describe('Aliases from Person Integration API after an update', () => {
+      describe('Aliases from Person Integration API', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, true, null, { fieldName: 'fullName' })
+          return service.get('token', PrisonerMockDataA, false, false, true, null)
         }
 
         it('Handles no pseudonyms', async () => {
@@ -301,30 +264,6 @@ describe('PersonalPageService', () => {
             dateOfBirth: '01/01/2023',
             sex: 'Female',
           })
-        })
-
-        it('Falls back to Prisoner Search results if Person Integration API call fails', async () => {
-          personIntegrationApiClient.getPseudonyms = async () => {
-            throw new Error()
-          }
-          const service = constructService()
-          const prisonerData = { ...PrisonerMockDataA }
-          prisonerData.aliases = [
-            {
-              dateOfBirth: '2022-01-01',
-              firstName: 'First name',
-              lastName: 'Last name',
-            } as Alias,
-          ]
-          const response = await service.get('token', prisonerData, false, false, true, null, {
-            fieldName: 'full-name',
-          })
-          expect(response.personalDetails.aliases).toEqual([
-            {
-              alias: 'First Name Last Name',
-              dateOfBirth: '01/01/2022',
-            },
-          ])
         })
       })
     })

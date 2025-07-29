@@ -147,9 +147,9 @@ context('When signed in', () => {
       it('Displays all the information from the API', () => {
         const page = Page.verifyOnPage(PersonalPage)
         page.personalDetails().fullName().should('have.text', 'John Middle Names Saunders')
-        page.personalDetails().aliases().row(1).name().should('have.text', 'Master Cordian')
+        page.personalDetails().aliases().row(1).name().should('have.text', 'John Middleone Middletwo Alias')
         page.personalDetails().aliases().row(1).dateOfBirth().should('have.text', '15/08/1990')
-        page.personalDetails().aliases().row(2).name().should('have.text', 'Master J117 Chief')
+        page.personalDetails().aliases().row(2).name().should('have.text', 'Harry Smith')
         page.personalDetails().aliases().row(2).dateOfBirth().should('have.text', '17/06/1983')
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
         page.personalDetails().cityOrTownOfBirth().should('have.text', 'La La Land')
