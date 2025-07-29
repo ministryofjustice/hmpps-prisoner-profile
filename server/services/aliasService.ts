@@ -20,6 +20,20 @@ export default class AliasService {
     private readonly metricsService: MetricsService,
   ) {}
 
+  async checkForDuplicateAlias(clientToken: string, prisonerNumber: string, pseudonym: PseudonymRequestDto) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const normalise = (value: string | null | undefined) => value?.trim().toUpperCase() || ''
+    return (await personIntegrationApiClient.getPseudonyms(prisonerNumber)).some(
+      alias =>
+        normalise(alias.firstName) === normalise(pseudonym.firstName) &&
+        normalise(alias.middleName1) === normalise(pseudonym.middleName1) &&
+        normalise(alias.middleName2) === normalise(pseudonym.middleName2) &&
+        normalise(alias.lastName) === normalise(pseudonym.lastName) &&
+        alias.dateOfBirth === pseudonym.dateOfBirth.toString() &&
+        alias.sex.code === pseudonym.sex,
+    )
+  }
+
   async getWorkingNameAlias(clientToken: string, prisonerNumber: string) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     return (await personIntegrationApiClient.getPseudonyms(prisonerNumber)).filter(

@@ -6,9 +6,29 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% from "../../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
+
+{% set duplicateFound = false %}
+{% for error in errors %}
+  {% if error.text == "This alias already exists" %}
+    {% set duplicateFound = true %}
+  {% endif %}
+{% endfor %}
+
+{% if duplicateFound %}
+  {% set inputClass = "govuk-input--error" %}
+  {% set formClass = "govuk-form-group--error" %}
+{% endif %}
+
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ formTitle }}</h1>
-  <form class="hmpps-name-change" method="post" novalidate="novalidate" autocomplete="off">
+  <form class="hmpps-name-change {{ formClass }}" method="post" novalidate="novalidate" autocomplete="off">
+
+    {% if duplicateFound %}
+      <p id="alias-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> This alias already exists
+      </p>
+    {% endif %}
+
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {{ govukInput({
       id: 'firstName',
       name: 'firstName',
@@ -17,7 +37,8 @@
         classes: 'govuk-label--s'
       },
       value: formValues.firstName,
-      errorMessage: errors | findError('firstName')
+      errorMessage: errors | findError('firstName'),
+      classes: inputClass
     }) }}
     {{ govukInput({
         id: 'middleName1',
@@ -27,7 +48,8 @@
           classes: 'govuk-label--s'
         },
         value: formValues.middleName1,
-        errorMessage: errors | findError('middleName1')
+        errorMessage: errors | findError('middleName1'),
+        classes: inputClass
       }) }}
     {{ govukInput({
       id: 'middleName2',
@@ -37,7 +59,8 @@
         classes: 'govuk-label--s'
       },
       value: formValues.middleName2,
-      errorMessage: errors | findError('middleName2')
+      errorMessage: errors | findError('middleName2'),
+      classes: inputClass
     }) }}
     {{ govukInput({
       id: 'lastName',
@@ -47,11 +70,12 @@
         classes: 'govuk-label--s'
       },
       value: formValues.lastName,
-      errorMessage: errors | findError('lastName')
+      errorMessage: errors | findError('lastName'),
+      classes: inputClass
     }) }}
-    {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else '' %}
-    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else '' %}
-    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else '' %}
+    {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else ' ' + inputClass %}
+    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else ' ' + inputClass %}
+    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else ' ' + inputClass %}
     {{ govukDateInput({
       id: "dateOfBirth",
       namePrefix: "dateOfBirth",

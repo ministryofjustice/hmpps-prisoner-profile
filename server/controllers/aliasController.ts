@@ -193,6 +193,14 @@ export default class AliasController {
       }
 
       const errors = req.errors || []
+
+      if (await this.aliasService.checkForDuplicateAlias(clientToken, prisonerNumber, formValues)) {
+        errors.unshift({
+          text: 'This alias already exists',
+          href: '#alias-error',
+        })
+      }
+
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(req.body))
         req.flash('errors', errors)

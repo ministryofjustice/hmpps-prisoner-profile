@@ -1,6 +1,7 @@
 import AliasService from '../../server/services/aliasService'
 import { PseudonymResponseMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import Interface from './Interface'
+import { PseudonymRequestDto } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export const aliasServiceMock = (): Interface<AliasService> => ({
   getWorkingNameAlias: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
@@ -9,4 +10,5 @@ export const aliasServiceMock = (): Interface<AliasService> => ({
   updateEthnicity: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
   createNewWorkingName: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
   addNewAlias: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
+  checkForDuplicateAlias: jest.fn().mockImplementation(() => Promise.resolve(false)),
 })

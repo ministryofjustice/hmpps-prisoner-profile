@@ -113,4 +113,19 @@ describe('AliasService', () => {
       await expect(attemptUpdate).rejects.toThrow('Existing working name not found')
     })
   })
+
+  describe('checkForDuplicateAlias', () => {
+    it('should return true if there is a duplicate of the input', async () => {
+      const result = await aliasService.checkForDuplicateAlias(clientToken, prisonerNumber, PseudonymRequestMock)
+      expect(personIntegrationApiClient.getPseudonyms).toHaveBeenCalledWith(prisonerNumber)
+      expect(result).toEqual(true)
+    })
+    it('should return false if there is not a duplicate of the input', async () => {
+      const pseudonym = PseudonymRequestMock
+      pseudonym.firstName = 'SomeoneElse'
+      const result = await aliasService.checkForDuplicateAlias(clientToken, prisonerNumber, pseudonym)
+      expect(personIntegrationApiClient.getPseudonyms).toHaveBeenCalledWith(prisonerNumber)
+      expect(result).toEqual(false)
+    })
+  })
 })
