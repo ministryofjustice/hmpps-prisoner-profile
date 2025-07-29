@@ -143,7 +143,16 @@ export default class AliasController {
     return async (req: Request, res: Response) => {
       const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
-      const errors = req.flash('errors')
+      const errors = [
+        {
+          text: 'This alias already exists',
+          href: '#alias-error',
+        },
+        {
+          text: 'This date of birth is bonkers',
+          href: '#date-of-birth',
+        },
+      ] // req.flash('errors')
 
       const formValues = requestBodyFromFlash<DateOfBirthForm | { sex: string }>(req) || {
         'dateOfBirth-year': currentWorkingName.dateOfBirth?.split('-')[0],

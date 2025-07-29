@@ -5,11 +5,17 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "../../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ formTitle }}</h1>
   <form class="hmpps-name-change" method="post" novalidate="novalidate" autocomplete="off">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {{ govukInput({
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <div class="govuk-form-group govuk-form-group--error">
+      <p id="alias-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> This alias already exists
+      </p>
+    {{ govukInput({
       id: 'firstName',
       name: 'firstName',
       label: {
@@ -17,6 +23,7 @@
         classes: 'govuk-label--s'
       },
       value: formValues.firstName,
+      classes: 'govuk-input--error',
       errorMessage: errors | findError('firstName')
     }) }}
     {{ govukInput({
@@ -24,9 +31,10 @@
         name: 'middleName1',
         label: {
           text: 'Middle name',
-          classes: 'govuk-label--s'
+          classes: 'govuk-label--s govuk-input--error'
         },
         value: formValues.middleName1,
+      classes: 'govuk-input--error',
         errorMessage: errors | findError('middleName1')
       }) }}
     {{ govukInput({
@@ -34,8 +42,9 @@
       name: 'middleName2',
       label: {
         text: 'Second middle name',
-        classes: 'govuk-label--s'
+        classes: 'govuk-label--s govuk-input--error'
       },
+      classes: 'govuk-input--error',
       value: formValues.middleName2,
       errorMessage: errors | findError('middleName2')
     }) }}
@@ -44,14 +53,15 @@
       name: 'lastName',
       label: {
         text: 'Last name',
-        classes: 'govuk-label--s'
+        classes: 'govuk-label--s govuk-input--error'
       },
+      classes: 'govuk-input--error',
       value: formValues.lastName,
       errorMessage: errors | findError('lastName')
     }) }}
-    {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else '' %}
-    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else '' %}
-    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else '' %}
+    {% set dayErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-day")) or (errors | findError("dateOfBirth")) else ' govuk-input--error' %}
+    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-month")) or (errors | findError("dateOfBirth")) else ' govuk-input--error' %}
+    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("dateOfBirth-year")) or (errors | findError("dateOfBirth")) else ' govuk-input--error' %}
     {{ govukDateInput({
       id: "dateOfBirth",
       namePrefix: "dateOfBirth",
@@ -85,10 +95,7 @@
         }
       ],
       value: formValues.dateOfBirth,
-      errorMessage: (errors | findError('dateOfBirth'))
-        or (errors | findError('dateOfBirth-day'))
-        or (errors | findError('dateOfBirth-month'))
-        or (errors | findError('dateOfBirth-year'))
+      errorMessage: { text: 'This date of birth is bonkers '}
     }) }}
     {{ govukRadios({
       name: "sex",
@@ -98,19 +105,23 @@
           classes: 'govuk-!-font-weight-bold'
         }
       },
+      classes: 'dgovuk-input--error',
       items: [
         {
           value: "F",
           text: "Female",
+          classes: 'govuk-input--error',
           checked: formValues.sex === "F"
         },
         {
           value: "M",
           text: "Male",
+          classes: 'govuk-input--error',
           checked: formValues.sex === "M"
         }
       ]
     }) }}
+    </div>
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Save",
@@ -123,5 +134,6 @@
         class="govuk-link govuk-link--no-visited-state"
         data-qa="edit-cancel-button">Cancel</a>
     </div>
+
   </form>
 {% endblock %}
