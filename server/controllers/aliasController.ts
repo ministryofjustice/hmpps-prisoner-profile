@@ -196,7 +196,7 @@ export default class AliasController {
 
       if (await this.aliasService.checkForDuplicateAlias(clientToken, prisonerNumber, formValues)) {
         errors.unshift({
-          text: 'This alias already exists',
+          text: 'This alias already exists for this person',
           href: '#alias-error',
         })
       }

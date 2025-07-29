@@ -461,7 +461,9 @@ describe('Alias Controller', () => {
       expect(res.redirect).toHaveBeenCalledWith(
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-alias-details`,
       )
-      expect(req.flash).toHaveBeenCalledWith('errors', [{ href: '#alias-error', text: 'This alias already exists' }])
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        { href: '#alias-error', text: 'This alias already exists for this person' },
+      ])
     })
 
     it('Populates the field value from the flash', async () => {

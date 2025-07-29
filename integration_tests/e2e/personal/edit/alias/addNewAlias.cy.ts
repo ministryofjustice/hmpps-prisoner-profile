@@ -151,7 +151,7 @@ context('Add new alias', () => {
           },
           radioInputs: { sex: PrisonerMockDataA.gender.charAt(0) },
         },
-        errorMessages: ['This alias already exists'],
+        errorMessages: ['This alias already exists for this person'],
       },
     ],
     redirectAnchor: 'aliases',
