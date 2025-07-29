@@ -20,7 +20,7 @@ context('Change email address', () => {
       cy.task('stubPersonIntegrationCreateContact', { prisonerNumber })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/add-email-address`,
-    validInputs: [{ textInputs: { emailAddress: 'foo@example.com' } }],
+    validInputs: [{ textInputs: { emailAddress: 'someemail@example.com' } }],
     invalidInputs: [
       {
         testDescription: 'Empty email',
@@ -37,6 +37,11 @@ context('Change email address', () => {
         testDescription: 'Invalid format',
         input: { textInputs: { emailAddress: 'notavalidemail' } },
         errorMessages: ['Email address must include an @ symbol'],
+      },
+      {
+        testDescription: 'Duplicate email',
+        input: { textInputs: { emailAddress: 'duplicate@example.com' } },
+        errorMessages: ['This email address already exists for this person. Add a new email or edit the saved one'],
       },
     ],
     editPageWithTitle: AddEmailAddress,

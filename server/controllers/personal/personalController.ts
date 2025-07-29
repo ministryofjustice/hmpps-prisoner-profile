@@ -70,7 +70,16 @@ import { NomisLockedError } from '../../utils/nomisLockedError'
 
 type TextFieldDataGetter = (req: Request) => TextFieldData
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
-type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
+type TextFieldSetter = (
+  req: Request,
+  res: Response,
+  fieldData: TextFieldData,
+  value: string,
+) => Promise<SetterOutcome | void>
+export enum SetterOutcome {
+  SUCCESS,
+  DUPLICATE,
+}
 
 export default class PersonalController {
   constructor(
@@ -519,7 +528,7 @@ export default class PersonalController {
           res,
           prisonerNumber,
           submit: async () => {
-            await setter(req, res, fieldData, updatedValue)
+            return setter(req, res, fieldData, updatedValue)
           },
           fieldData,
           auditDetails: { fieldName, previous: previousValue, updated: updatedValue },
@@ -1694,6 +1703,23 @@ export default class PersonalController {
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
           const fieldData = addPhoneNumberFieldData({ firstName, lastName })
 
+          const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
+          const isDuplicate = phones.some(
+            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension,
+          )
+
+          if (isDuplicate) {
+            req.flash('errors', [
+              {
+                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
+                href: '#phone-number',
+              },
+            ])
+            req.flash('requestBody', JSON.stringify(req.body))
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+          }
+
           return this.submit({
             req,
             res,
@@ -1775,8 +1801,24 @@ export default class PersonalController {
           } = req.middleware
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
           const fieldData = changePhoneNumberFieldData(phoneNumberId, { firstName, lastName })
-          const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-          const previousValue = phonesAndEmails.phones.find(phone => phone.id.toString() === phoneNumberId)
+          const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
+          const previousValue = phones.find(phone => phone.id.toString() === phoneNumberId)
+
+          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
+          const isDuplicate = phones
+            .filter(phone => phone.id.toString() !== phoneNumberId)
+            .some(phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension)
+
+          if (isDuplicate) {
+            req.flash('errors', [
+              {
+                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
+                href: '#phone-number',
+              },
+            ])
+            req.flash('requestBody', JSON.stringify(req.body))
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+          }
 
           return this.submit({
             req,
@@ -1831,20 +1873,56 @@ export default class PersonalController {
     const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
       const { prisonerNumber, emailAddressId } = req.params
       const { clientToken } = req.middleware
+      const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
 
-      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, value)
+      const emailUpdateValue = value.replace(/\s/g, '').toLowerCase()
+      const isDuplicateEmail = emails
+        .filter(email => email.id.toString() !== emailAddressId)
+        .some(email => email.email === emailUpdateValue)
+
+      if (isDuplicateEmail) {
+        return SetterOutcome.DUPLICATE
+      }
+
+      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailUpdateValue)
+      return SetterOutcome.SUCCESS
     }
 
     const globalEmailCreator: TextFieldSetter = async (req, _res, _fieldData, value) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
+      const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
 
-      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, value)
+      const emailUpdateValue = value.replace(/\s/g, '').toLowerCase()
+      const isDuplicateEmail = emails.some(email => email.email === emailUpdateValue)
+
+      if (isDuplicateEmail) {
+        return SetterOutcome.DUPLICATE
+      }
+
+      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailUpdateValue)
+      return SetterOutcome.SUCCESS
     }
 
-    const globalEmailCreatorOnSubmit = async (req: Request, res: Response, fieldData: TextFieldData) => {
+    const globalEmailOnSubmit = async (
+      req: Request,
+      res: Response,
+      fieldData: TextFieldData,
+      submitStatus: SetterOutcome | void,
+    ) => {
       const { prisonerNumber } = req.params
       const addAnother = req.query?.addAnother ?? 'false'
+
+      if (submitStatus === SetterOutcome.DUPLICATE) {
+        req.flash('errors', [
+          {
+            text: 'This email address already exists for this person. Add a new email or edit the saved one',
+            href: '#email',
+          },
+        ])
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
+      }
 
       if (addAnother === 'true') {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
@@ -1856,9 +1934,11 @@ export default class PersonalController {
     return {
       add: this.textInput(fieldDataGetter('add'), async () => '', globalEmailCreator, {
         template: 'addEmail',
-        onSubmit: globalEmailCreatorOnSubmit,
+        onSubmit: globalEmailOnSubmit,
       }),
-      edit: this.textInput(fieldDataGetter('change'), globalEmailGetter, globalEmailSetter),
+      edit: this.textInput(fieldDataGetter('change'), globalEmailGetter, globalEmailSetter, {
+        onSubmit: globalEmailOnSubmit,
+      }),
     }
   }
 
@@ -1884,34 +1964,43 @@ export default class PersonalController {
     req: Request
     res: Response
     prisonerNumber: string
-    submit: () => Promise<void>
+    submit: () => Promise<SetterOutcome | void>
     fieldData: FieldData
     auditDetails: object
-    options?: { onSubmit: (submitReq: Request, submitRes: Response, submitFieldData: FieldData) => Promise<void> }
+    options?: {
+      onSubmit: (
+        submitReq: Request,
+        submitRes: Response,
+        submitFieldData: FieldData,
+        setterOutcome: SetterOutcome | void,
+      ) => Promise<void>
+    }
   }) {
     const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
 
     try {
-      await submit()
+      const setterOutcome = await submit()
 
-      req.flash('flashMessage', {
-        text: `${successFlashFieldName ?? pageTitle} updated`,
-        type: FlashMessageType.success,
-        fieldName,
-      })
-
-      this.auditService
-        .sendPostSuccess({
-          user: res.locals.user,
-          prisonerNumber,
-          correlationId: req.id,
-          action: auditEditPostAction,
-          details: auditDetails,
+      if (setterOutcome === SetterOutcome.SUCCESS || setterOutcome === undefined) {
+        req.flash('flashMessage', {
+          text: `${successFlashFieldName ?? pageTitle} updated`,
+          type: FlashMessageType.success,
+          fieldName,
         })
-        .catch(error => logger.error(error))
+
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: auditEditPostAction,
+            details: auditDetails,
+          })
+          .catch(error => logger.error(error))
+      }
 
       if (options?.onSubmit) {
-        return options?.onSubmit(req, res, fieldData)
+        return options?.onSubmit(req, res, fieldData, setterOutcome)
       }
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
