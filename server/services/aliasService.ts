@@ -6,6 +6,7 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../utils/notFoundError'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import logger from '../../logger'
 
 export interface Name {
   firstName: string
@@ -23,6 +24,8 @@ export default class AliasService {
   async checkForDuplicateAlias(clientToken: string, prisonerNumber: string, pseudonym: PseudonymRequestDto) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     const normalise = (value: string | null | undefined) => value?.trim().toUpperCase() || ''
+    logger.error(await personIntegrationApiClient.getPseudonyms(prisonerNumber))
+    logger.error(pseudonym)
     return (await personIntegrationApiClient.getPseudonyms(prisonerNumber)).some(
       alias =>
         normalise(alias.firstName) === normalise(pseudonym.firstName) &&
