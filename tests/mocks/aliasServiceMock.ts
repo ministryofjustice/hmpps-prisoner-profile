@@ -9,4 +9,5 @@ export const aliasServiceMock = (): Interface<AliasService> => ({
   updateEthnicity: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
   createNewWorkingName: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
   addNewAlias: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
+  checkForDuplicateAlias: jest.fn().mockImplementation(() => Promise.resolve(false)),
 })
