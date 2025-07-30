@@ -103,7 +103,7 @@ export const hairCodesMock: ReferenceDataCodeDto[] = [
 
 export const facialHairCodesMock: ReferenceDataCodeDto[] = [
   {
-    id: 'FACIAL_HAIR_CLEAN SHAVEN',
+    id: 'FACIAL_HAIR_CLEAN_SHAVEN',
     code: 'CLEAN SHAVEN',
     description: 'No facial hair',
     listSequence: 0,

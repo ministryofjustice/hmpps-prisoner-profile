@@ -57,7 +57,6 @@ import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePersonPhysicalAttributes'
-import logger from '../../logger'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import NextOfKinService from './nextOfKinService'
@@ -222,7 +221,6 @@ export default class PersonalPageService {
     editProfileEnabled: boolean = false,
     personalRelationshipsApiReadEnabled: boolean = true,
     apiErrorCallback: (error: Error) => void = () => null,
-    flashMessage: { fieldName: string } = null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
@@ -301,7 +299,6 @@ export default class PersonalPageService {
         healthAndMedication,
         personalRelationshipsNumberOfChildren,
         personalRelationshipsDomesticStatus,
-        flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -378,11 +375,10 @@ export default class PersonalPageService {
     healthAndMedication: HealthAndMedication,
     numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
     domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
-    flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
 
-    const aliases = await this.aliases(personIntegrationApiClient, prisonerData, flashMessage)
+    const aliases = await this.aliases(personIntegrationApiClient, prisonerData)
 
     let ethnicGroup = 'Not entered'
     if (prisonerDetail?.ethnicity) {
@@ -481,33 +477,15 @@ export default class PersonalPageService {
     return override ? (override.description ?? religion) : religion
   }
 
-  private aliases = async (
-    personIntegrationApiClient: PersonIntegrationApiClient,
-    prisonerData: Prisoner,
-    flashMessage: { fieldName: string },
-  ) => {
-    if (flashMessage?.fieldName === 'fullName' || flashMessage?.fieldName === 'aliases') {
-      try {
-        logger.debug('Retrieving aliases from Person Integration API after update')
-
-        const pseudonyms = await personIntegrationApiClient.getPseudonyms(prisonerData.prisonerNumber)
-        return pseudonyms
-          .filter(pseudonym => !pseudonym.isWorkingName)
-          .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth, sex }) => ({
-            alias: formatName(firstName, [middleName1, middleName2].join(' ').trim(), lastName),
-            dateOfBirth: formatDate(dateOfBirth, 'short'),
-            sex: sex.description,
-          }))
-      } catch (error) {
-        logger.error('Failed to retrieve aliases from Person Integration API', error)
-      }
-    }
-
-    return prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth, gender }) => ({
-      alias: formatName(firstName, middleNames, lastName),
-      dateOfBirth: formatDate(dateOfBirth, 'short'),
-      sex: gender,
-    }))
+  private aliases = async (personIntegrationApiClient: PersonIntegrationApiClient, prisonerData: Prisoner) => {
+    const pseudonyms = await personIntegrationApiClient.getPseudonyms(prisonerData.prisonerNumber)
+    return pseudonyms
+      .filter(pseudonym => !pseudonym.isWorkingName)
+      .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth, sex }) => ({
+        alias: formatName(firstName, [middleName1, middleName2].join(' ').trim(), lastName),
+        dateOfBirth: formatDate(dateOfBirth, 'short'),
+        sex: sex.description,
+      }))
   }
 
   private mapDietAndAllergy = (

@@ -92,7 +92,7 @@ export default class PersonalController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
-      const { user, flashMessage, apiErrorCallback } = res.locals
+      const { user, apiErrorCallback } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled } = config.featureToggles
@@ -105,7 +105,6 @@ export default class PersonalController {
           editEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
-          flashMessage,
         ),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),

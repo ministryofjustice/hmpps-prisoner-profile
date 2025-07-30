@@ -7,6 +7,7 @@ import {
   CountryReferenceDataCodesMock,
   MilitaryRecordsMock,
   phoneUsageReferenceDataMock,
+  PseudonymResponseMock,
   ReligionReferenceDataCodesMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
@@ -193,6 +194,30 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
+  cy.task('stubGetPseudonyms', {
+    prisonerNumber,
+    response: [
+      PseudonymResponseMock,
+      {
+        ...PseudonymResponseMock,
+        firstName: 'John',
+        middleName1: 'Middleone',
+        middleName2: 'Middletwo',
+        lastName: 'Alias',
+        dateOfBirth: '1990-08-15',
+        isWorkingName: false,
+      },
+      {
+        ...PseudonymResponseMock,
+        firstName: 'Harry',
+        middleName1: null,
+        middleName2: null,
+        lastName: 'Smith',
+        dateOfBirth: '1983-06-17',
+        isWorkingName: false,
+      },
+    ],
+  })
   cy.task('stubPersonalCareNeeds')
   cy.task('stubPersonalRelationshipsContacts', { prisonerNumber, resp: PersonalRelationshipsContactsDtoMock })
   cy.task('stubPersonalRelationshipsGetNumberOfChildren', {
