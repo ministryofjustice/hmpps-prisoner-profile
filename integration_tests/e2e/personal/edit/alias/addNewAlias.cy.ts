@@ -145,7 +145,7 @@ context('Add new alias', () => {
             middleName1: PrisonerMockDataA.middleNames.split(' ')[0],
             middleName2: PrisonerMockDataA.middleNames.split(' ')[1],
             lastName: PrisonerMockDataA.lastName,
-            'dateOfBirth-day': parseDate(PrisonerMockDataA.dateOfBirth).getDay().toString(),
+            'dateOfBirth-day': parseDate(PrisonerMockDataA.dateOfBirth).getDate().toString(),
             'dateOfBirth-month': parseDate(PrisonerMockDataA.dateOfBirth).getMonth().toString(),
             'dateOfBirth-year': parseDate(PrisonerMockDataA.dateOfBirth).getFullYear().toString(),
           },
