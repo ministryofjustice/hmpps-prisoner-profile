@@ -3,7 +3,6 @@ import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { PseudonymResponseMock } from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../../../../server/data/localMockData/prisoner'
-import { parseDate } from '../../../../../server/utils/dateHelpers'
 
 context('Add new alias', () => {
   const prisonerNumber = 'G6123VU'
