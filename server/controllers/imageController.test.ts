@@ -7,10 +7,13 @@ import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import { AuditService } from '../services/auditService'
 import ImageController from './imageController'
 import MulterFile from './interfaces/MulterFile'
+import MetricsService from '../services/metrics/metricsService'
+import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 
 describe('ImageController', () => {
   let controller: ImageController
   let auditService: AuditService
+  let metricsService: MetricsService
   let personIntegrationApi: PersonIntegrationApiClient
   let prisonerProfileApi: PrisonerProfileApiClient
 
@@ -52,6 +55,7 @@ describe('ImageController', () => {
 
   beforeEach(() => {
     auditService = auditServiceMock()
+    metricsService = metricsServiceMock()
     personIntegrationApi = personIntegrationApiClientMock()
     prisonerProfileApi = {
       getWithheldPrisonerPhoto: jest.fn(async () => fileStream()),
@@ -60,6 +64,7 @@ describe('ImageController', () => {
       () => personIntegrationApi,
       () => prisonerProfileApi,
       auditService,
+      metricsService,
     )
   })
 
@@ -235,6 +240,27 @@ describe('ImageController', () => {
       await controller.updateProfileImage().submitImage(request, response, () => {})
       expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
     })
+
+    it('Records that the image was updated', async () => {
+      const request = {
+        body: { photoType: 'new' },
+        file,
+        flash: jest.fn(),
+        middleware: defaultMiddleware,
+      } as any
+
+      const response = {
+        locals: { user: {} },
+        redirect: jest.fn(),
+      } as any
+
+      await controller.updateProfileImage().submitImage(request, response, () => {})
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        user: expect.anything(),
+        fieldsUpdated: ['profile-image'],
+        prisonerNumber: 'ABC123',
+      })
+    })
   })
 
   describe('newWithheldImage', () => {
@@ -348,6 +374,27 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
+      })
+
+      it('Records that the image was updated', async () => {
+        const request = {
+          body: { photoType: 'new' },
+          file,
+          flash: jest.fn(),
+          middleware: defaultMiddleware,
+        } as any
+
+        const response = {
+          locals: { user: {} },
+          redirect: jest.fn(),
+        } as any
+
+        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+          user: expect.anything(),
+          fieldsUpdated: ['withheld-profile-image'],
+          prisonerNumber: 'ABC123',
+        })
       })
     })
   })
