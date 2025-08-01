@@ -3705,7 +3705,7 @@ describe('PersonalController', () => {
           })
         })
 
-        it('Handles duplicate phone numbers', async () => {
+        it('Handles duplicate phone numbers with extensions', async () => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
             phones: [
               {
@@ -3718,6 +3718,31 @@ describe('PersonalController', () => {
           })
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
+
+          await action(validRequest, res)
+
+          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
+            {
+              href: '#phone-number',
+              text: 'This phone number already exists for this person. Add a new number or edit the saved one',
+            },
+          ])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+        })
+
+        it('Handles duplicate phone numbers without extensions', async () => {
+          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+            phones: [
+              {
+                number: '(12)34',
+                type: 'MOB',
+                extension: null,
+              },
+            ],
+            emails: [],
+          })
+
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '' }
 
           await action(validRequest, res)
 

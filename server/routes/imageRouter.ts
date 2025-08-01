@@ -31,6 +31,7 @@ export default function imageRouter(services: Services): Router {
     services.dataAccess.personIntegrationApiClientBuilder,
     services.dataAccess.prisonerProfileApiClientBuilder,
     services.auditService,
+    services.metricsService,
   )
 
   const buildBreadcrumbsAndReferer: (includeFacialImagesLink?: boolean) => RequestHandler = (
