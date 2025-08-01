@@ -5,10 +5,10 @@ import { Services } from '../services'
 import AliasController from '../controllers/aliasController'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { nameValidator } from '../validators/personal/nameValidator'
-import { dateValidator } from '../validators/personal/dateValidator'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
 import { radioFieldValidator } from '../validators/personal/radioFieldValidator'
+import { dateOfBirthValidator } from '../validators/personal/dateOfBirthValidator'
 
 export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -40,7 +40,7 @@ export default function aliasRouter(services: Services): Router {
     ...commonMiddleware,
     validationMiddleware(
       [
-        dateValidator({
+        dateOfBirthValidator({
           namePrefix: 'dateOfBirth',
           label: 'Date of birth',
           missingText: 'Enter this person’s date of birth',
@@ -91,7 +91,7 @@ export default function aliasRouter(services: Services): Router {
     validationMiddleware(
       [
         nameValidator,
-        dateValidator({
+        dateOfBirthValidator({
           namePrefix: 'dateOfBirth',
           label: 'Date of birth',
           missingText: 'Enter this person’s date of birth',

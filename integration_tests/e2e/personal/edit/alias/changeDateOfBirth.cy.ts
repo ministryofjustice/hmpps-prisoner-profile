@@ -81,6 +81,28 @@ context('Change date of birth', () => {
         },
         errorMessages: ['Date of birth must include a day'],
       },
+      {
+        testDescription: 'Too young (14 years ago)',
+        input: {
+          textInputs: {
+            'dateOfBirth-day': `${new Date().getDate()}`,
+            'dateOfBirth-month': `${new Date().getMonth() + 1}`,
+            'dateOfBirth-year': `${new Date().getFullYear() - 14}`,
+          },
+        },
+        errorMessages: ['This person cannot be younger than 15 years old. Enter a valid date of birth'],
+      },
+      {
+        testDescription: 'Too old (126 years ago)',
+        input: {
+          textInputs: {
+            'dateOfBirth-day': `${new Date().getDate()}`,
+            'dateOfBirth-month': `${new Date().getMonth() + 1}`,
+            'dateOfBirth-year': `${new Date().getFullYear() - 126}`,
+          },
+        },
+        errorMessages: ['This person cannot be older than 125 years old. Enter a valid date of birth'],
+      },
     ],
     redirectAnchor: 'date-of-birth',
   })
