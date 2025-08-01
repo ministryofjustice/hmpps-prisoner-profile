@@ -1706,7 +1706,7 @@ export default class PersonalController {
           const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
           const sanitisedNumber = phoneNumber.replace(/\D/g, '')
           const isDuplicate = phones.some(
-            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension,
+            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && (phone.extension ?? '') === phoneExtension,
           )
 
           if (isDuplicate) {
@@ -1807,7 +1807,10 @@ export default class PersonalController {
           const sanitisedNumber = phoneNumber.replace(/\D/g, '')
           const isDuplicate = phones
             .filter(phone => phone.id.toString() !== phoneNumberId)
-            .some(phone => phone.number.replace(/\D/g, '') === sanitisedNumber && phone.extension === phoneExtension)
+            .some(
+              phone =>
+                phone.number.replace(/\D/g, '') === sanitisedNumber && (phone.extension ?? '') === phoneExtension,
+            )
 
           if (isDuplicate) {
             req.flash('errors', [
