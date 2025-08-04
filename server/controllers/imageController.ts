@@ -8,12 +8,15 @@ import MulterFile from './interfaces/MulterFile'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import logger from '../../logger'
 import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
+import MetricsService from '../services/metrics/metricsService'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class ImageController {
   constructor(
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly prisonerProfileApiClientBuilder: RestClientBuilder<PrisonerProfileApiClient>,
     private readonly auditService: AuditService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   public updateProfileImage() {
@@ -71,6 +74,12 @@ export default class ImageController {
           })
           .catch(error => logger.error(error))
 
+        this.metricsService.trackPersonIntegrationUpdate({
+          prisonerNumber,
+          fieldsUpdated: ['profile-image'],
+          user: res.locals.user as PrisonUser,
+        })
+
         return res.redirect(
           `/prisoner/${prisonerNumber}/image${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
         )
@@ -127,6 +136,12 @@ export default class ImageController {
               details: {},
             })
             .catch(error => logger.error(error))
+
+          this.metricsService.trackPersonIntegrationUpdate({
+            prisonerNumber,
+            fieldsUpdated: ['withheld-profile-image'],
+            user: res.locals.user as PrisonUser,
+          })
 
           return res.redirect(
             `/prisoner/${prisonerNumber}/image${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,

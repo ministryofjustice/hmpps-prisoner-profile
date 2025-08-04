@@ -437,6 +437,35 @@ describe('Alias Controller', () => {
       expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
     })
 
+    it('Populates the errors when the alias has already been added', async () => {
+      req = {
+        ...req,
+        body: {
+          firstName: 'first',
+          middleName1: 'middleone',
+          middleName2: 'middletwo',
+          lastName: 'last',
+          'dateOfBirth-day': '01',
+          'dateOfBirth-month': '02',
+          'dateOfBirth-year': '1990',
+          sex: 'M',
+        },
+      } as unknown as Request
+
+      aliasService.checkForDuplicateAlias = jest.fn().mockResolvedValue(true)
+      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+
+      await controller.submitAddNewAlias()(req, res, next)
+
+      expect(aliasService.addNewAlias).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-alias-details`,
+      )
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        { href: '#alias-error', text: 'This alias already exists for this person' },
+      ])
+    })
+
     it('Populates the field value from the flash', async () => {
       req = {
         ...req,
