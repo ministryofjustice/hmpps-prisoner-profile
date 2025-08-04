@@ -1,6 +1,7 @@
 import { RequestHandler, Router } from 'express'
-import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
+import { getFrontendComponents } from '@ministryofjustice/hmpps-connect-dps-components'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
@@ -34,6 +35,12 @@ export default function imageRouter(services: Services): Router {
     services.auditService,
     services.metricsService,
   )
+  const getFeComponents = getFrontendComponents({
+    logger,
+    authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, services.dataAccess.tokenStore),
+    componentApiConfig: config.apis.componentApi,
+    dpsUrl: config.serviceUrls.digitalPrison,
+  })
 
   const buildBreadcrumbsAndReferer: (includeFacialImagesLink?: boolean) => RequestHandler = (
     includeFacialImagesLink = false,
@@ -154,11 +161,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
-    dpsComponents.getPageComponents({
-      logger,
-      includeSharedData: true,
-      dpsUrl: config.serviceUrls.digitalPrison,
-    }),
+    getFeComponents,
     validationMiddleware([editPhotoValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -173,11 +176,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
-    dpsComponents.getPageComponents({
-      logger,
-      includeSharedData: true,
-      dpsUrl: config.serviceUrls.digitalPrison,
-    }),
+    getFeComponents,
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().submitImage,
   )

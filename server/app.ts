@@ -1,8 +1,9 @@
 import express from 'express'
 
 import path from 'path'
-import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import multer from 'multer'
+import { getFrontendComponents, retrieveCaseLoadData } from '@ministryofjustice/hmpps-connect-dps-components'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import { appInsightsMiddleware } from './utils/azureAppInsights'
@@ -46,7 +47,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, path)
   setUpEnvironmentName(app)
-  app.use(setUpAuthentication())
+  app.use(setUpAuthentication(services))
   app.use(authorisationMiddleware(['ROLE_PRISON']))
 
   /*
@@ -78,13 +79,22 @@ export default function createApp(services: Services): express.Application {
 
   app.get(
     standardGetPaths,
-    dpsComponents.getPageComponents({
+    getFrontendComponents({
       logger,
-      includeSharedData: true,
+      authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, services.dataAccess.tokenStore),
+      componentApiConfig: config.apis.componentApi,
       dpsUrl: config.serviceUrls.digitalPrison,
+      requestOptions: { includeSharedData: true },
     }),
   )
-  app.use(dpsComponents.retrieveCaseLoadData({ logger }))
+
+  app.use(
+    retrieveCaseLoadData({
+      logger,
+      authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, services.dataAccess.tokenStore),
+      prisonApiConfig: config.apis.prisonApi,
+    }),
+  )
   app.use(nomisLockedRenderMiddleware)
   app.use(routes(services))
   app.use(nomisLockedMiddleware(services.metricsService))
