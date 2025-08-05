@@ -269,10 +269,10 @@ export default {
     alertsApi: {
       url: get('ALERTS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('ALERTS_API_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('ALERTS_API_TIMEOUT_DEADLINE', 3000)),
+        response: Number(get('ALERTS_API_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('ALERTS_API_TIMEOUT_DEADLINE', 5000)),
       },
-      agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 3000))),
+      agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 5000))),
     },
     personIntegrationApi: {
       url: get('PERSON_INTEGRATION_API_URL', 'http://localhost:8082', requiredInProduction),
