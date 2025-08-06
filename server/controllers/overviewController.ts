@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import {
   isGranted,
+  PersonalRelationshipsPermission,
   PersonInterventionsPermission,
   PersonPrisonCategoryPermission,
   PersonSentenceCalculationPermission,
@@ -93,7 +94,6 @@ export default class OverviewController {
       staffContacts,
       offencesOverview,
       nonAssociationSummary,
-
       currentCsipDetail,
       externalContactsSummary,
     ] = await Promise.all([
@@ -136,7 +136,7 @@ export default class OverviewController {
       isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions)
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      externalContactsEnabled(prisonId)
+      externalContactsEnabled(prisonId) && isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
         ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
         : null,
     ])
