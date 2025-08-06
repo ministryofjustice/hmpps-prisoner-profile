@@ -2,7 +2,8 @@
 {% from "./miniSummaryBoxes/macro.njk" import  miniSummaryMacro %}
 {% from "../../components/miniCard/miniCard.njk" import  miniCard %}
 
-{% set showExternalContacts = externalContactsEnabled(prisonId) %}
+{% set showExternalContacts = externalContactsEnabled(prisonId) and
+  isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions) %}
 
 <div class="govuk-grid-row">
   <section class="govuk-grid-column-full" aria-label="Status List">
@@ -38,11 +39,13 @@
   </div>
 </div>
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
-  {% if showExternalContacts %}
-    <div class="govuk-grid-column-one-third">
-      {% include "./externalContacts/externalContactsSummary.njk" %}
-    </div>
-  {% endif %}
+  {% call conditionallyShow({
+    condition: showExternalContacts,
+    id: 'external-contacts',
+    visibleClasses: 'govuk-grid-column-one-third'
+  }) %}
+    {% include "./externalContacts/externalContactsSummary.njk" %}
+  {% endcall %}
   <div class="hmpps-full-width-print govuk-grid-column-{% if showExternalContacts %}two-thirds{% else %}full{% endif %}">
     {% if isYouthPrisoner %}
       {% include "./staffContacts/staffContactsYouthEstate.njk" %}

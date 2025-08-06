@@ -55,21 +55,25 @@ context('Overview Page', () => {
             },
           ],
         })
+        visitOverviewPage()
       })
 
       it('Does not display the facial images link', () => {
-        visitOverviewPage()
         cy.get('[data-qa=prisoner-photo-link]').should('not.exist')
       })
 
       it('Does not display the sidebar', () => {
-        visitOverviewPage()
         cy.getDataQa('hidden-overview-side-bar').should('exist')
       })
 
       it('Does not display the schedule', () => {
-        visitOverviewPage()
         cy.getDataQa('hidden-overview-schedule').should('exist')
+      })
+
+      it('Does not display the external contacts summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.externalContacts().card().should('not.exist')
+        cy.getDataQa('hidden-external-contacts').should('exist')
       })
     })
   })
