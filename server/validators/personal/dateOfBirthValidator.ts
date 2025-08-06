@@ -8,14 +8,10 @@ const validateDateWithinYearRange = ({
   namePrefix,
   minYearsAgo,
   maxYearsAgo,
-  tooRecentText,
-  tooOldText,
 }: {
   namePrefix: string
   minYearsAgo: number
   maxYearsAgo: number
-  tooRecentText: string
-  tooOldText: string
 }): Validator => {
   return (body: Record<string, string>) => {
     const day = body[`${namePrefix}-day`]
@@ -30,9 +26,15 @@ const validateDateWithinYearRange = ({
     const errors: HmppsError[] = []
 
     if (isBefore(parsedDate, minDate)) {
-      errors.push({ text: tooOldText, href: `#${namePrefix}` })
+      errors.push({
+        text: `This person cannot be older than ${maxYearsAgo} years old. Enter a valid date of birth`,
+        href: `#${namePrefix}`,
+      })
     } else if (isAfter(parsedDate, maxDate)) {
-      errors.push({ text: tooRecentText, href: `#${namePrefix}` })
+      errors.push({
+        text: `This person cannot be younger than ${minYearsAgo} years old. Enter a valid date of birth`,
+        href: `#${namePrefix}`,
+      })
     }
 
     return errors
@@ -47,8 +49,6 @@ export const dateOfBirthValidator = ({
   isRequired = true,
   minYearsAgo = 15,
   maxYearsAgo = 125,
-  tooRecentText = 'This person cannot be younger than 15 years old. Enter a valid date of birth',
-  tooOldText = 'This person cannot be older than 125 years old. Enter a valid date of birth',
 }: {
   namePrefix: string
   label: string
@@ -57,8 +57,6 @@ export const dateOfBirthValidator = ({
   isRequired?: boolean
   minYearsAgo?: number
   maxYearsAgo?: number
-  tooRecentText?: string
-  tooOldText?: string
 }): Validator => {
   return async (body: Record<string, string>) => {
     const baseErrors = await dateValidator({
@@ -74,8 +72,6 @@ export const dateOfBirthValidator = ({
         namePrefix,
         minYearsAgo,
         maxYearsAgo,
-        tooRecentText,
-        tooOldText,
       })(body)
     }
 
