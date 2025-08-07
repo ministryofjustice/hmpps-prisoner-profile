@@ -35,6 +35,7 @@ export function permissionsTests<TPage extends Page>({
 
   beforeEach(() => {
     cy.task('reset')
+    cy.setupComponentsData()
   })
 
   context('The prisoner is outside the users case load', () => {
