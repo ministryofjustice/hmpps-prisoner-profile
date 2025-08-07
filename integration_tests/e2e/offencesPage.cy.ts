@@ -7,6 +7,7 @@ context('Offenses page - Permissions', () => {
   const prisonerNumber = 'G6123VU'
   const visitPage = prisonerDataOverrides => {
     cy.setupPermissionsCheckStubs({ prisonerNumber, prisonerDataOverrides })
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber, bookingId: 1102484 })
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/offences' })

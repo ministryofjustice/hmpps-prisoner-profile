@@ -28,7 +28,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/component/.*',
+        urlPattern: '/component.*',
       },
       response: {
         status: 200,

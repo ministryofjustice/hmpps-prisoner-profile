@@ -645,7 +645,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/users/me/caseLoads\\?allCaseloads=true`,
+        urlPattern: `/prison/api/users/me/caseloads\\?allCaseloads=true`,
       },
       response: {
         status: 200,
