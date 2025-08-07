@@ -22,7 +22,21 @@ context('Editing the photo', () => {
     })
 
     context('Permissions', () => {
-      context('Prisoner is not in active caseload', () => {
+      it('Doesnt let the user access if they dont have the permissions', () => {
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
+
+        cy.signIn({ redirectPath: '/prisoner/G6123VU/image/new', failOnStatusCode: false })
+        Page.verifyOnPage(NotFoundPage)
+      })
+
+      it('Allows access to users with Prisoner Profile Photo Upload role', () => {
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfilePhotoUpload] })
+
+        cy.signIn({ redirectPath: '/prisoner/G6123VU/image/new', failOnStatusCode: false })
+        page = Page.verifyOnPage(EditPhotoPage)
+      })
+
+      context('Doesnt let the user access if prison doesnt match active caseload', () => {
         it('Displays Page Not Found', () => {
           cy.setupComponentsData({
             caseLoads: [
