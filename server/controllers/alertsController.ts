@@ -4,8 +4,7 @@ import { HttpError } from 'http-errors'
 import { isGranted, PrisonerAlertsPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { formatLocation, formatName, sortByDateTime } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { sortByDateTime } from '../utils/utils'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
@@ -14,6 +13,7 @@ import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import AlertView from '../services/interfaces/alertsService/AlertView'
 import { Alert, AlertCode, AlertForm, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -109,11 +109,9 @@ export default class AlertsController {
   }
 
   public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
-    const types = await this.alertsService.getAlertTypes(req.middleware.clientToken)
+    const { clientToken, alerts, prisonId, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
-    // Get data from middleware
-    const { firstName, lastName, prisonerNumber, alerts, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+    const types = await this.alertsService.getAlertTypes(clientToken)
 
     const existingAlerts = alerts
       .filter((alert: Prisoner['alerts'][0]) => alert.active)
@@ -154,11 +152,7 @@ export default class AlertsController {
       alertCodes,
       refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
       errors,
-      miniBannerData: {
-        prisonerName: prisonerBannerName,
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
+      miniBannerData,
     })
   }
 
@@ -209,14 +203,8 @@ export default class AlertsController {
 
   public displayAlert(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const {
-        prisonerData: { firstName, lastName, prisonerNumber, cellLocation },
-      } = req.middleware
-      const { clientToken } = req.middleware
+      const { clientToken, miniBannerData } = getCommonRequestData(req, res)
       const alertIds = req.query.ids
-
-      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-
       const alerts: Alert[] = await Promise.all(
         [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, String(alertId))),
       )
@@ -225,11 +213,7 @@ export default class AlertsController {
 
       return res.render('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
-        miniBannerData: {
-          prisonerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
         alerts,
       })
     }
@@ -257,14 +241,8 @@ export default class AlertsController {
   }
 
   public async displayAddMoreDetails(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = req.middleware
-    const { alertId } = req.params
-
-    // Get data from middleware
-    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
-
-    const alert = await this.alertsService.getAlertDetails(clientToken, alertId)
+    const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const alert = await this.alertsService.getAlertDetails(clientToken, req.params.alertId)
 
     // If alert already closed, redirect
     if (!alert.isActive) {
@@ -298,11 +276,7 @@ export default class AlertsController {
 
     return res.render('pages/alerts/addMoreDetails', {
       pageTitle: 'Add more details to alert',
-      miniBannerData: {
-        prisonerName,
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
+      miniBannerData,
       alert,
       formValues,
       refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -345,12 +319,8 @@ export default class AlertsController {
   }
 
   public async displayCloseAlert(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = req.middleware
     const { alertId } = req.params
-
-    // Get data from middleware
-    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+    const { prisonerNumber, prisonId, miniBannerData, clientToken } = getCommonRequestData(req, res)
 
     const alert = await this.alertsService.getAlertDetails(clientToken, alertId)
 
@@ -391,11 +361,7 @@ export default class AlertsController {
 
     return res.render('pages/alerts/closeAlert', {
       pageTitle: 'Close alert',
-      miniBannerData: {
-        prisonerName,
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
+      miniBannerData,
       alert,
       formValues,
       tomorrow: formatDate(addDays(new Date(), 1).toISOString(), 'short'),
@@ -444,12 +410,8 @@ export default class AlertsController {
   }
 
   public async displayChangeEndDate(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = req.middleware
     const { alertId } = req.params
-
-    // Get data from middleware
-    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+    const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
     const alert = await this.alertsService.getAlertDetails(clientToken, alertId)
 
@@ -490,11 +452,7 @@ export default class AlertsController {
 
     return res.render('pages/alerts/changeEndDate', {
       pageTitle: 'Change or remove alert end date',
-      miniBannerData: {
-        prisonerName,
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
+      miniBannerData,
       alert,
       formValues,
       today: formatDate(formatDateISO(new Date()), 'short'),

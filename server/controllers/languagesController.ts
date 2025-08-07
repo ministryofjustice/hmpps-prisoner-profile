@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, getCommonRequestData, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
+import { apostrophe, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import LanguagesService from '../services/languagesService'
@@ -12,6 +12,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import HmppsError from '../interfaces/HmppsError'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export default class LanguagesController {
   constructor(
@@ -21,7 +22,10 @@ export default class LanguagesController {
 
   public displayUpdateMainLanguage(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } = getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const errors = req.flash('errors')
       const spokenInvalidInput = req.flash('spokenInvalidInput')
       const writtenInvalidInput = req.flash('writtenInvalidInput')
@@ -79,10 +83,7 @@ export default class LanguagesController {
         errors,
         spokenInvalidInput,
         writtenInvalidInput,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
         preferredSpokenLanguageOptions,
         preferredWrittenLanguageOptions,
         otherLanguages: communicationNeeds.secondaryLanguages,
@@ -92,7 +93,7 @@ export default class LanguagesController {
 
   public submitUpdateMainLanguage(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const {
         preferredSpokenLanguageCode,
         preferredWrittenLanguageCode,
@@ -160,7 +161,10 @@ export default class LanguagesController {
 
   public displayUpdateOtherLanguages(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } = getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const { languageCode } = req.params
       const errors = req.flash('errors')
       const invalidInput = req.flash('invalidInput')
@@ -211,10 +215,7 @@ export default class LanguagesController {
         formValues,
         errors,
         invalidInput,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
         languageOptions,
         mainLanguage: communicationNeeds.languagePreferences,
         otherLanguages: communicationNeeds.secondaryLanguages,
@@ -224,7 +225,7 @@ export default class LanguagesController {
 
   public submitUpdateOtherLanguages(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const { languageCode } = req.params
       const { language, languageSkills, languageError, action } = req.body
       const formValues: SecondaryLanguageRequest & {

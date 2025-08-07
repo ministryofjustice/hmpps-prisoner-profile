@@ -2,9 +2,10 @@ import { Request, RequestHandler, Response } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
-import { getCommonRequestData, mapToQueryString } from '../../utils/utils'
+import { mapToQueryString } from '../../utils/utils'
 import EphemeralDataService from '../../services/ephemeralDataService'
 import AddressService from '../../services/addressService'
+import getCommonRequestData from '../../utils/getCommonRequestData'
 
 export interface DisplayFindUkAddressOptions {
   pageTitle: string
@@ -28,7 +29,7 @@ export function displayFindUkAddressHandler(
   options: DisplayFindUkAddressOptions,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const { prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+    const { prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const { pageTitle, formTitle, auditPage, manualEntryAnchor, backLink, cancelAnchor } = options
     const { optimisationOff } = req.query
 
@@ -58,7 +59,7 @@ export function displayFindUkAddressHandler(
       cancelLink: `/prisoner/${prisonerNumber}/personal#${cancelAnchor}`,
       manualEntryUrl: `/prisoner/${prisonerNumber}/personal/${manualEntryAnchor}${query}`,
       breadcrumbPrisonerName: prisonerName,
-      miniBannerData: { prisonerNumber, prisonerName },
+      miniBannerData,
     })
   }
 }
@@ -70,7 +71,7 @@ export function submitFindUkAddressHandler(
   options: SubmitFindUkAddressOptions,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const { clientToken, prisonerNumber } = getCommonRequestData(req)
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
     const { auditAction, route, confirmRedirectUrl, queryParams } = options
     const { uprn } = req.body
 

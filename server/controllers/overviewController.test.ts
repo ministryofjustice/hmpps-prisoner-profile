@@ -84,7 +84,7 @@ const getResLocals = ({
 }
 
 describe('overviewController', () => {
-  const offenderNo = 'ABC123'
+  const offenderNo = 'A1234BC'
   let req: any
   let res: any
   let controller: OverviewController

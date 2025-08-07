@@ -703,7 +703,7 @@ describe('utils', () => {
           agencyId: 'MDI',
           assignedLivingUnitDescription: 'NMI-RECP',
           nonAssociationName: 'John Doe',
-          offenderNo: 'ABC123',
+          offenderNo: 'A1234BC',
           reasonDescription: 'Victim',
         },
         {
@@ -716,8 +716,8 @@ describe('utils', () => {
       ])
       expect(res).toEqual([
         [
-          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/ABC123">John Doe</a>' },
-          { text: 'ABC123' },
+          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/A1234BC">John Doe</a>' },
+          { text: 'A1234BC' },
           { text: 'NMI-RECP' },
           { text: 'Victim' },
         ],

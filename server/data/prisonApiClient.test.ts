@@ -233,7 +233,7 @@ describe('prisonApiClient', () => {
 
   describe('getAddresses', () => {
     it('Should return data from the API', async () => {
-      const prisonerNumber = 'ABC123'
+      const prisonerNumber = 'A1234BC'
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/addresses`, mockAddresses)
       const output = await prisonApiClient.getAddresses(prisonerNumber)
       expect(output).toEqual(mockAddresses)
@@ -251,7 +251,7 @@ describe('prisonApiClient', () => {
 
   describe('getOffenderContacts', () => {
     it('Should return data from the API', async () => {
-      const prisonerNumber = 'ABC123'
+      const prisonerNumber = 'A1234BC'
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/contacts`, mockOffenderContacts)
       const output = await prisonApiClient.getOffenderContacts(prisonerNumber)
       expect(output).toEqual(mockOffenderContacts)
@@ -617,7 +617,7 @@ describe('prisonApiClient', () => {
 
   describe('getImagesForPrisoner', () => {
     it('Should return data from the API', async () => {
-      const prisonerNumber = 'abc123'
+      const prisonerNumber = 'A1234BC'
       mockSuccessfulPrisonApiCall(`/api/images/offenders/${prisonerNumber}`, imageDetailListMock)
       const output = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
       expect(output).toEqual(imageDetailListMock)

@@ -954,10 +954,10 @@ describe('PersonalPageService', () => {
         personalisedDietaryRequirements: [{ value: 'PERSONALISED_DIET' }],
       }
 
-      await constructService().updateDietAndFoodAllergies('token', prisonUserMock, 'ABC123', update)
-      expect(healthAndMedicationApiClient.updateDietAndAllergyData).toHaveBeenCalledWith('ABC123', update)
+      await constructService().updateDietAndFoodAllergies('token', prisonUserMock, 'A1234BC', update)
+      expect(healthAndMedicationApiClient.updateDietAndAllergyData).toHaveBeenCalledWith('A1234BC', update)
       expect(metricsService.trackHealthAndMedicationUpdate).toHaveBeenLastCalledWith({
-        prisonerNumber: 'ABC123',
+        prisonerNumber: 'A1234BC',
         fieldsUpdated: ['foodAllergies', 'medicalDietaryRequirements', 'personalisedDietaryRequirements'],
         user: prisonUserMock,
       })
@@ -1140,7 +1140,7 @@ describe('PersonalPageService', () => {
     describe('getGlobalPhonesAndEmails', () => {
       it('Gets the phones and emails from the service', async () => {
         const service = constructService()
-        const result = await service.getGlobalPhonesAndEmails('token', 'ABC123')
+        const result = await service.getGlobalPhonesAndEmails('token', 'A1234BC')
         expect(result).toEqual(globalPhonesAndEmailsMock)
       })
     })
@@ -1152,11 +1152,11 @@ describe('PersonalPageService', () => {
           async () => globalEmailsMock[0],
         )
 
-        const result = await service.createGlobalEmail('token', 'ABC123', 'email@email.com')
+        const result = await service.createGlobalEmail('token', 'A1234BC', 'email@email.com')
 
         expect(globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber).toHaveBeenCalledWith(
           'token',
-          'ABC123',
+          'A1234BC',
           'email@email.com',
         )
         expect(result).toEqual(globalEmailsMock[0])
@@ -1170,11 +1170,11 @@ describe('PersonalPageService', () => {
           async () => globalEmailsMock[0],
         )
 
-        const result = await service.updateGlobalEmail('token', 'ABC123', '123', 'email@email.com')
+        const result = await service.updateGlobalEmail('token', 'A1234BC', '123', 'email@email.com')
 
         expect(globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber).toHaveBeenCalledWith(
           'token',
-          'ABC123',
+          'A1234BC',
           '123',
           'email@email.com',
         )
@@ -1189,7 +1189,7 @@ describe('PersonalPageService', () => {
           async () => globalPhonesMock[0],
         )
 
-        const result = await service.createGlobalPhoneNumber('token', 'ABC123', {
+        const result = await service.createGlobalPhoneNumber('token', 'A1234BC', {
           phoneNumber: '123',
           phoneNumberType: 'MOB',
           phoneExtension: '1234',
@@ -1197,7 +1197,7 @@ describe('PersonalPageService', () => {
 
         expect(globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
           'token',
-          'ABC123',
+          'A1234BC',
           {
             phoneNumber: '123',
             phoneNumberType: 'MOB',
@@ -1215,7 +1215,7 @@ describe('PersonalPageService', () => {
           async () => globalPhonesMock[0],
         )
 
-        const result = await service.updateGlobalPhoneNumber('token', 'ABC123', '123', {
+        const result = await service.updateGlobalPhoneNumber('token', 'A1234BC', '123', {
           phoneNumber: '123',
           phoneNumberType: 'MOB',
           phoneExtension: '1234',
@@ -1223,7 +1223,7 @@ describe('PersonalPageService', () => {
 
         expect(globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
           'token',
-          'ABC123',
+          'A1234BC',
           '123',
           {
             phoneNumber: '123',

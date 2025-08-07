@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-import { apostrophe, capitaliseFirstLetter, formatLocation, formatName } from '../utils/utils'
+import { apostrophe, capitaliseFirstLetter } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import IdentityNumbersService from '../services/identityNumbersService'
@@ -24,6 +23,7 @@ import {
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import OffenderIdentifier from '../data/interfaces/prisonApi/OffenderIdentifier'
 import HmppsError from '../interfaces/HmppsError'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export interface EditIdentityNumberSubmission {
   type?: string
@@ -85,8 +85,7 @@ export default class IdentityNumbersController {
   public idNumber() {
     return {
       edit: async (req: Request, res: Response) => {
-        const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-        const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
+        const { prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(req, res)
         const { clientToken } = req.middleware
         const errors = req.flash('errors')
         const [offenderId, seqId] = this.parseIdentifierIds(req)
@@ -120,11 +119,7 @@ export default class IdentityNumbersController {
           formValues,
           identifierType: type,
           errors,
-          miniBannerData: {
-            prisonerNumber,
-            prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-            cellLocation: formatLocation(cellLocation),
-          },
+          miniBannerData,
         })
       },
       submit: async (req: Request, res: Response, next: NextFunction) => {
@@ -210,8 +205,7 @@ export default class IdentityNumbersController {
     mappings: Record<string, IdentifierMapping>
   }) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-      const { clientToken } = req.middleware
+      const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
@@ -235,11 +229,7 @@ export default class IdentityNumbersController {
         title: options.title,
         identifierOptions,
         errors,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }

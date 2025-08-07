@@ -2,7 +2,8 @@ import { Request, RequestHandler, Response } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import logger from '../../../logger'
 import { AddressLocation } from '../../services/mappers/addressMapper'
-import { getCommonRequestData, mapToQueryString } from '../../utils/utils'
+import { mapToQueryString } from '../../utils/utils'
+import getCommonRequestData from '../../utils/getCommonRequestData'
 
 export interface AddressRedirects {
   [AddressLocation.uk]: string
@@ -28,7 +29,7 @@ export function displayWhereIsTheAddressHandler(
   options: DisplayWhereIsTheAddressOptions,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const { prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+    const { prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const { pageTitle, formTitle, page, cancelAnchor } = options
     const errors = req.flash('errors')
 
@@ -56,10 +57,7 @@ export function displayWhereIsTheAddressHandler(
       prisonerNumber,
       redirectAnchor: cancelAnchor,
       breadcrumbPrisonerName: prisonerName,
-      miniBannerData: {
-        prisonerNumber,
-        prisonerName,
-      },
+      miniBannerData,
     })
   }
 }
@@ -69,7 +67,7 @@ export function submitWhereIsTheAddressHandler(
   options: SubmitWhereIsTheAddressOptions,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const { prisonerNumber } = getCommonRequestData(req)
+    const { prisonerNumber } = getCommonRequestData(req, res)
     const { radioField: location } = req.body
     const { redirectOptions, action } = options
     const query = options.queryParams ? `?${mapToQueryString(options.queryParams)}` : ''

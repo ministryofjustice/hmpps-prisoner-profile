@@ -8,7 +8,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 describe('Prisoner schedule', () => {
-  const offenderNo = 'ABC123'
+  const offenderNo = 'A1234BC'
   let prisonApi: PrisonApiClient
 
   let req: any

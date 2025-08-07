@@ -34,6 +34,8 @@ jest.mock('../data/prisonApiClient.ts')
 const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 const prisonerPermissions = {} as PrisonerPermissions
 
+const { prisonerNumber } = PrisonerMockDataA
+
 describe('Case Notes Controller', () => {
   let prisonApiClient: PrisonApiClient
 
@@ -227,6 +229,8 @@ describe('Case Notes Controller', () => {
         cellLocation: '1-1-035',
         prisonerName: 'Saunders, John',
         prisonerNumber: 'G6123VU',
+        prisonerPermissions: {},
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       errors: undefined,
     })
@@ -326,19 +330,21 @@ describe('Case Notes Controller', () => {
       )
 
       expect(res.render).toHaveBeenCalledWith('pages/caseNotes/updateCaseNote', {
-        refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/case-notes`,
+        refererUrl: `/prisoner/${prisonerNumber}/case-notes`,
         caseNoteText: '',
         currentCaseNote,
         maxLength: 4000 - currentLength - prisonApiAdditionalCaseNoteTextLength - res.locals.user.username.length,
         miniBannerData: {
           cellLocation: '1-1-035',
           prisonerName: 'Saunders, John',
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
+          prisonerPermissions: {},
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
         isOMICOpen: false,
         isExternal: false,
         prisonerDisplayName: 'John Saunders',
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         currentLength,
         errors: undefined,
       })

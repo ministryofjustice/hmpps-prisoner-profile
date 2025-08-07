@@ -3,11 +3,12 @@ import { AddressLocation } from '../../services/mappers/addressMapper'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
-import { convertToTitleCase, getCommonRequestData, mapToQueryString, objectToSelectOptions } from '../../utils/utils'
+import { convertToTitleCase, mapToQueryString, objectToSelectOptions } from '../../utils/utils'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { formatDateISO } from '../../utils/dateHelpers'
 import EphemeralDataService from '../../services/ephemeralDataService'
 import AddressService from '../../services/addressService'
+import getCommonRequestData from '../../utils/getCommonRequestData'
 
 export interface DisplayManualEditAddressOptions {
   addressLocation: AddressLocation
@@ -33,7 +34,7 @@ export function displayManualEditAddressHandler(
 ): RequestHandler {
   return async (req: Request, res: Response) => {
     const { addressLocation, pageTitle, formTitle, auditPage, backLink, cancelAnchor } = options
-    const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+    const { clientToken, prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const requestBody = requestBodyFromFlash<{ townOrCity: string; county: string; country: string }>(req)
     const errors = req.flash('errors')
 
@@ -70,10 +71,7 @@ export function displayManualEditAddressHandler(
       backLinkUrl: `${backLink}${query}`,
       cancelLink: `/prisoner/${prisonerNumber}/personal#${cancelAnchor}`,
       prisonerNumber,
-      miniBannerData: {
-        prisonerNumber,
-        prisonerName,
-      },
+      miniBannerData,
     })
   }
 }
@@ -86,7 +84,7 @@ export function submitManualEditAddressHandler(
 ): RequestHandler {
   return async (req: Request, res: Response) => {
     const { addressLocation, auditAction, confirmRedirectUrl, queryParams } = options
-    const { prisonerNumber } = getCommonRequestData(req)
+    const { prisonerNumber } = getCommonRequestData(req, res)
     const {
       noFixedAddress,
       houseOrBuildingName,

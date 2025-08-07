@@ -13,7 +13,7 @@ describe('Validation middleware', () => {
     jest.resetAllMocks()
     res = { redirect: jest.fn() } as any
     req = {
-      params: { prisonerNumber: 'ABC123' },
+      params: { prisonerNumber: 'A1234BC' },
       body: { example: '    text    ' },
       header: (key: string) => {
         if (key === 'Referer') {
@@ -85,7 +85,7 @@ describe('Validation middleware', () => {
       res,
       next,
     )
-    expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/path/in/options')
+    expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/path/in/options')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify({ example: 'text' }))
     expect(req.flash).toHaveBeenCalledWith('errors', [error])
   })
@@ -96,8 +96,8 @@ describe('Validation middleware', () => {
     await validationMiddleware([alwaysFailsValidator], {
       redirectBackOnError: true,
       redirectWithParams: ({ id }) => `path/with/id/${id}`,
-    })({ ...req, params: { prisonerNumber: 'ABC123', id: '123' } } as any, res, next)
-    expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/path/with/id/123')
+    })({ ...req, params: { prisonerNumber: 'A1234BC', id: '123' } } as any, res, next)
+    expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/path/with/id/123')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify({ example: 'text' }))
     expect(req.flash).toHaveBeenCalledWith('errors', [error])
   })

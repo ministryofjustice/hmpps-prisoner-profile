@@ -9,6 +9,7 @@ import ImageController from './imageController'
 import MulterFile from './interfaces/MulterFile'
 import MetricsService from '../services/metrics/metricsService'
 import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 describe('ImageController', () => {
   let controller: ImageController
@@ -16,6 +17,7 @@ describe('ImageController', () => {
   let metricsService: MetricsService
   let personIntegrationApi: PersonIntegrationApiClient
   let prisonerProfileApi: PrisonerProfileApiClient
+  let response: any
 
   const defaultMiddleware = {
     clientToken: 'token',
@@ -23,15 +25,17 @@ describe('ImageController', () => {
       firstName: 'First',
       lastName: 'Last',
       cellLocation: '2-3-001',
-      prisonerNumber: 'ABC123',
+      prisonerNumber: 'A1234BC',
       prisonId: 999,
     },
+    inmateDetail: inmateDetailMock,
   }
 
   const miniBannerData = {
     cellLocation: '2-3-001',
     prisonerName: 'Last, First',
-    prisonerNumber: 'ABC123',
+    prisonerNumber: 'A1234BC',
+    prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
   }
 
   const file = {
@@ -66,6 +70,11 @@ describe('ImageController', () => {
       auditService,
       metricsService,
     )
+    response = {
+      render: jest.fn(),
+      redirect: jest.fn(),
+      locals: { user: {} },
+    }
   })
 
   describe('newImage', () => {
@@ -76,15 +85,11 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        const response = {
-          render: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newImage.get(request, response, () => {})
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
           miniBannerData,
           pageTitle: 'Add a new facial image',
-          prisonerNumber: 'ABC123',
+          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -95,10 +100,6 @@ describe('ImageController', () => {
             if (s === 'errors') return ['Error']
             return null
           }),
-        } as any
-
-        const response = {
-          render: jest.fn(),
         } as any
 
         await controller.updateProfileImage().newImage.get(request, response, () => {})
@@ -112,10 +113,6 @@ describe('ImageController', () => {
             if (s === 'requestBody') return [JSON.stringify({ value: 'Example' })]
             return null
           }),
-        } as any
-
-        const response = {
-          render: jest.fn(),
         } as any
 
         await controller.updateProfileImage().newImage.get(request, response, () => {})
@@ -132,10 +129,6 @@ describe('ImageController', () => {
           file,
         } as any
 
-        const response = {
-          render: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newImage.post(request, response, () => {})
 
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/editPhoto', {
@@ -143,7 +136,7 @@ describe('ImageController', () => {
           fileType: 'image/jpeg',
           imgSrc: 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU=',
           miniBannerData,
-          prisonerNumber: 'ABC123',
+          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -154,14 +147,9 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        const response = {
-          render: jest.fn(),
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newImage.post(request, response, () => {})
 
-        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image/new-withheld')
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld')
       })
 
       it('Withheld: Redirects with referer', async () => {
@@ -172,14 +160,9 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        const response = {
-          render: jest.fn(),
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newImage.post(request, response, () => {})
 
-        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image/new-withheld?referer=case-notes')
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld?referer=case-notes')
       })
     })
   })
@@ -193,13 +176,8 @@ describe('ImageController', () => {
         middleware: defaultMiddleware,
       } as any
 
-      const response = {
-        locals: { user: {} },
-        redirect: jest.fn(),
-      } as any
-
       await controller.updateProfileImage().submitImage(request, response, () => {})
-      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('ABC123', file)
+      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file)
     })
 
     it('Populates the flash and redirects', async () => {
@@ -210,17 +188,12 @@ describe('ImageController', () => {
         middleware: defaultMiddleware,
       } as any
 
-      const response = {
-        locals: { user: {} },
-        redirect: jest.fn(),
-      } as any
-
       await controller.updateProfileImage().submitImage(request, response, () => {})
       expect(request.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Profile image updated',
         type: FlashMessageType.success,
       })
-      expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image')
+      expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image')
     })
 
     it('Redirects with referer', async () => {
@@ -232,13 +205,8 @@ describe('ImageController', () => {
         middleware: defaultMiddleware,
       } as any
 
-      const response = {
-        locals: { user: {} },
-        redirect: jest.fn(),
-      } as any
-
       await controller.updateProfileImage().submitImage(request, response, () => {})
-      expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
+      expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image?referer=case-notes')
     })
 
     it('Records that the image was updated', async () => {
@@ -249,16 +217,11 @@ describe('ImageController', () => {
         middleware: defaultMiddleware,
       } as any
 
-      const response = {
-        locals: { user: {} },
-        redirect: jest.fn(),
-      } as any
-
       await controller.updateProfileImage().submitImage(request, response, () => {})
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
         user: expect.anything(),
         fieldsUpdated: ['profile-image'],
-        prisonerNumber: 'ABC123',
+        prisonerNumber: 'A1234BC',
       })
     })
   })
@@ -271,10 +234,6 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        const response = {
-          render: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWithheld', {
           miniBannerData,
@@ -282,7 +241,7 @@ describe('ImageController', () => {
           fileName: 'prisoner-profile-withheld-image.png',
           fileType: 'image/png',
           imgSrc: 'data:image/png;base64,VG90YWxseSBhIGZpbGUgc3RyZWFt',
-          prisonerNumber: 'ABC123',
+          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -293,10 +252,6 @@ describe('ImageController', () => {
             if (s === 'errors') return ['Error']
             return null
           }),
-        } as any
-
-        const response = {
-          render: jest.fn(),
         } as any
 
         await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
@@ -312,10 +267,6 @@ describe('ImageController', () => {
           }),
         } as any
 
-        const response = {
-          render: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
         expect(response.locals.formValues).toEqual({ value: 'Example' })
       })
@@ -328,13 +279,8 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
         } as any
 
-        const response = {
-          locals: { user: {} },
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
-        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('ABC123', withheldFile)
+        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile)
       })
 
       it('Populates the flash and redirects', async () => {
@@ -345,17 +291,12 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
         } as any
 
-        const response = {
-          locals: { user: {} },
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Profile image updated',
           type: FlashMessageType.success,
         })
-        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image')
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image')
       })
 
       it('Redirects with referer', async () => {
@@ -367,13 +308,8 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
         } as any
 
-        const response = {
-          locals: { user: {} },
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
-        expect(response.redirect).toHaveBeenCalledWith('/prisoner/ABC123/image?referer=case-notes')
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image?referer=case-notes')
       })
 
       it('Records that the image was updated', async () => {
@@ -384,16 +320,11 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
         } as any
 
-        const response = {
-          locals: { user: {} },
-          redirect: jest.fn(),
-        } as any
-
         await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
         expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
           user: expect.anything(),
           fieldsUpdated: ['withheld-profile-image'],
-          prisonerNumber: 'ABC123',
+          prisonerNumber: 'A1234BC',
         })
       })
     })

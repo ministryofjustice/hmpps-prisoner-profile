@@ -322,20 +322,20 @@ const basePhoneNumberFieldData = {
   successFlashFieldName: 'Phone number',
 }
 
-export const addPhoneNumberFieldData = (name: { firstName: string; lastName: string }): FieldData => ({
+export const addPhoneNumberFieldData = (name: string): FieldData => ({
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.AddPhoneNumber,
   auditEditPostAction: PostAction.AddPhoneNumber,
-  formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
+  formTitle: `Add ${name}’s phone number`,
   pageTitle: `Add this person’s phone number`,
   url: `add-phone-number`,
 })
 
-export const changePhoneNumberFieldData = (id: string, name: { firstName: string; lastName: string }): FieldData => ({
+export const changePhoneNumberFieldData = (id: string, name: string): FieldData => ({
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.EditPhoneNumber,
   auditEditPostAction: PostAction.EditPhoneNumber,
-  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s phone number`,
+  formTitle: `Change ${name}’s phone number`,
   pageTitle: `Change this person’s phone number`,
   url: `change-phone-number/${id}`,
 })

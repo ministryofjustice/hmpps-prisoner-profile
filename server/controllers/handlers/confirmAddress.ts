@@ -6,7 +6,7 @@ import { AuditService, Page } from '../../services/auditService'
 import logger from '../../../logger'
 import AddressService from '../../services/addressService'
 import EphemeralDataService from '../../services/ephemeralDataService'
-import { getCommonRequestData } from '../../utils/utils'
+import getCommonRequestData from '../../utils/getCommonRequestData'
 
 export interface ConfirmAddressOptions {
   pageTitle: string
@@ -24,7 +24,7 @@ export function displayConfirmAddressHandler(
   options: ConfirmAddressOptions,
 ): RequestHandler {
   return async (req: Request, res: Response) => {
-    const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+    const { clientToken, prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const {
       pageTitle,
       formTitle,
@@ -76,7 +76,7 @@ export function displayConfirmAddressHandler(
       cancelLink: `/prisoner/${prisonerNumber}/personal#${cancelAnchor}`,
       enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/${enterDifferentAddressAnchor}`,
       breadcrumbPrisonerName: prisonerName,
-      miniBannerData: { prisonerNumber, prisonerName },
+      miniBannerData,
     })
   }
 }

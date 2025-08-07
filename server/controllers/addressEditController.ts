@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { apostrophe, blankStringsToNull, getCommonRequestData } from '../utils/utils'
+import { apostrophe, blankStringsToNull } from '../utils/utils'
 import EphemeralDataService from '../services/ephemeralDataService'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
@@ -14,6 +14,7 @@ import { displayWhereIsTheAddressHandler, submitWhereIsTheAddressHandler } from 
 import { displayManualEditAddressHandler, submitManualEditAddressHandler } from './handlers/manualEditAddress'
 import { displayConfirmAddressHandler } from './handlers/confirmAddress'
 import { displayFindUkAddressHandler, submitFindUkAddressHandler } from './handlers/findUkAddress'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export default class AddressEditController {
   constructor(
@@ -24,7 +25,7 @@ export default class AddressEditController {
 
   public displayWhereIsTheAddress(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { naturalPrisonerName } = getCommonRequestData(req)
+      const { naturalPrisonerName } = getCommonRequestData(req, res)
 
       return displayWhereIsTheAddressHandler(this.auditService, {
         pageTitle: 'Where is this person’s address? - Prisoner personal details',
@@ -48,7 +49,7 @@ export default class AddressEditController {
 
   public displayFindUkAddress(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { naturalPrisonerName } = getCommonRequestData(req)
+      const { naturalPrisonerName } = getCommonRequestData(req, res)
       return displayFindUkAddressHandler(this.auditService, {
         pageTitle: 'Find a UK address - Prisoner personal details',
         formTitle: `Find a UK address for ${naturalPrisonerName}`,
@@ -81,7 +82,8 @@ export default class AddressEditController {
 
   public displayPrimaryOrPostalAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } =
+        getCommonRequestData(req, res)
       const { address: addressCacheId } = req.query
       const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
         addressCacheId as UUID,
@@ -126,14 +128,14 @@ export default class AddressEditController {
         prisonerNumber,
         backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         breadcrumbPrisonerName: prisonerName,
-        miniBannerData: { prisonerNumber, prisonerName },
+        miniBannerData,
       })
     }
   }
 
   public submitPrimaryOrPostalAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const { primaryOrPostal: primaryOrPostalResponse } = req.body
       const { address: addressCacheId } = req.query
 
@@ -193,7 +195,7 @@ export default class AddressEditController {
   }): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { addressLocation, pageTitlePrefix, formTitlePrefix, auditPage } = options
-      const { naturalPrisonerName } = getCommonRequestData(req)
+      const { naturalPrisonerName } = getCommonRequestData(req, res)
       const backLink = addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address'
 
       return displayManualEditAddressHandler(this.addressService, this.auditService, {

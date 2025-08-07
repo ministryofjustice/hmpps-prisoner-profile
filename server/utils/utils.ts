@@ -889,11 +889,3 @@ export const blankStringsToNull = <T>(object: T): T => {
   }
   return object
 }
-
-export const getCommonRequestData = (req: any) => {
-  const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-  const prisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst })
-  const naturalPrisonerName = formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })
-  const { clientToken } = req.middleware
-  return { prisonerNumber, prisonId, cellLocation, prisonerName, naturalPrisonerName, clientToken }
-}
