@@ -1,6 +1,6 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import { dietAndAllergyEnabled, externalContactsEnabled } from './featureToggles'
+import { dietAndAllergyEnabled, editProfilePhotoEnabled, externalContactsEnabled } from './featureToggles'
 
 describe('featureToggles', () => {
   describe('dietAndAllergyEnabled', () => {
@@ -75,6 +75,44 @@ describe('featureToggles', () => {
       config.featureToggles.externalContactsEnabledPrisons = ['***']
 
       expect(externalContactsEnabled('MDI')).toBeTruthy()
+    })
+  })
+
+  describe('profilePhotoEditEnabled', () => {
+    afterEach(() => {
+      // reset to defaults:
+      config.featureToggles.editProfilePhotoEnabledPrisons = []
+      config.featureToggles.editProfileEnabledPrisons = []
+      config.featureToggles.editProfileEnabled = false
+    })
+
+    it('is not enabled by default', () => {
+      expect(editProfilePhotoEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if active case load is not listed as enabled', () => {
+      config.featureToggles.editProfilePhotoEnabledPrisons = ['LEI']
+
+      expect(editProfilePhotoEnabled('MDI')).toBeFalsy()
+    })
+
+    it('enabled if active case load is listed as enabled', () => {
+      config.featureToggles.editProfilePhotoEnabledPrisons = ['MDI']
+
+      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if wildcard is listed as enabled', () => {
+      config.featureToggles.editProfilePhotoEnabledPrisons = ['***']
+
+      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if profile edit is enabled', () => {
+      config.featureToggles.editProfileEnabled = true
+      config.featureToggles.editProfileEnabledPrisons = ['MDI']
+
+      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
     })
   })
 })

@@ -12,7 +12,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDateTime } from '../utils/dateHelpers'
 import NotFoundError from '../utils/notFoundError'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { editProfileEnabled } from '../utils/featureToggles'
+import { editProfilePhotoEnabled } from '../utils/featureToggles'
 import config from '../config'
 import logger from '../../logger'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -97,7 +97,7 @@ export default function imageRouter(services: Services): Router {
         },
         imageUploadedDate,
         photoStatus,
-        editEnabled: editProfileEnabled(activeCaseLoadId),
+        editEnabled: editProfilePhotoEnabled(activeCaseLoadId),
       })
     },
   )
@@ -144,7 +144,7 @@ export default function imageRouter(services: Services): Router {
           prisonerNumber,
         },
         facialImages,
-        editEnabled: editProfileEnabled(activeCaseLoadId),
+        editEnabled: editProfilePhotoEnabled(activeCaseLoadId),
       })
     },
   )
@@ -153,7 +153,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
     getPrisonerData(services),
-    featureFlagGuard('Profile Edit', editProfileEnabled),
+    featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newImage.get,
@@ -163,7 +163,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
     getPrisonerData(services),
-    featureFlagGuard('Profile Edit', editProfileEnabled),
+    featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
     dpsComponents.getPageComponents({
       logger,
@@ -182,7 +182,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/submit`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    featureFlagGuard('Profile Edit', editProfileEnabled),
+    featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
     dpsComponents.getPageComponents({
       logger,
@@ -197,7 +197,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImageWithheld }),
     getPrisonerData(services),
-    featureFlagGuard('Profile Edit', editProfileEnabled),
+    featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newWithheldImage.get,
@@ -207,7 +207,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.PostEditProfileImageWithheld }),
     getPrisonerData(services),
-    featureFlagGuard('Profile Edit', editProfileEnabled),
+    featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().newWithheldImage.post,
