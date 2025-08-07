@@ -5,6 +5,11 @@ import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
 export const editProfileEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
 
+export const editProfilePhotoEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  editProfileEnabled(activeCaseLoadId) ||
+  config.featureToggles.editProfilePhotoEnabledPrisons.includes(activeCaseLoadId) ||
+  config.featureToggles.editProfilePhotoEnabledPrisons.includes('***')
+
 export const dietAndAllergyEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId) ||
   (isAfter(Date.now(), config.featureToggles.dietAndAllergyEnabledPrisonsFrom) &&
