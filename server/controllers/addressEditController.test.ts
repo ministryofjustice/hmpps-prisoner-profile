@@ -13,6 +13,7 @@ import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AddressLocation } from '../services/mappers/addressMapper'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 const clientToken = 'CLIENT_TOKEN'
 const { prisonerNumber } = PrisonerMockDataA
@@ -44,7 +45,7 @@ describe('Address Edit Controller', () => {
       id: '123',
       query: {},
       params: { prisonerNumber },
-      middleware: { clientToken, prisonerData: PrisonerMockDataA },
+      middleware: { clientToken, prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -90,6 +91,8 @@ describe('Address Edit Controller', () => {
         miniBannerData: {
           prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
 
@@ -133,11 +136,16 @@ describe('Address Edit Controller', () => {
           formTitle: `Find a UK address for John Saunders`,
           errors: [],
           prisonerNumber,
-          manualEntryUrl: '/prisoner/G6123VU/personal/add-uk-address',
+          manualEntryUrl: `/prisoner/${prisonerNumber}/personal/add-uk-address`,
           cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
           backLinkUrl: 'where-is-address',
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          },
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
@@ -199,7 +207,12 @@ describe('Address Edit Controller', () => {
           },
           prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          },
           backLinkUrl: `/prisoner/${prisonerNumber}/personal/find-uk-address`,
           cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
           enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/where-is-address`,
@@ -293,7 +306,12 @@ describe('Address Edit Controller', () => {
           errors: [],
           prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          },
           backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         })
 
@@ -500,7 +518,12 @@ describe('Address Edit Controller', () => {
             cancelLink: `/prisoner/${prisonerNumber}/personal#addresses`,
             prisonerNumber,
             breadcrumbPrisonerName: 'Saunders, John',
-            miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+            miniBannerData: {
+              prisonerNumber,
+              prisonerName: 'Saunders, John',
+              cellLocation: '1-1-035',
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+            },
           })
 
           expect(auditService.sendPageView).toHaveBeenCalledWith({

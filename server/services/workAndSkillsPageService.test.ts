@@ -43,7 +43,7 @@ describe('WorkAndSkillsService', () => {
   prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
   prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
 
-  const curiousApiClientMock = (prisonerNumber: string = 'ABC123') => {
+  const curiousApiClientMock = (prisonerNumber: string = 'A1234BC') => {
     const learnerGoals = aValidLearnerGoals({
       prn: prisonerNumber,
       employmentGoals: ['An employment goal'],
@@ -77,7 +77,7 @@ describe('WorkAndSkillsService', () => {
     )
   })
 
-  const prisonerNumber = 'ABC123'
+  const prisonerNumber = 'A1234BC'
 
   const expectedCuriousGoals: CuriousGoals = {
     prisonerNumber,

@@ -154,7 +154,7 @@ describe('Appointment Service', () => {
     it('should call API to get a video link booking', async () => {
       bookAVideoLinkApiClient.getVideoLinkBooking = jest.fn().mockResolvedValue({ bookingType: 'COURT' })
       const response = await appointmentService.getVideoLinkBooking('', {
-        prisonerNumber: 'abc123',
+        prisonerNumber: 'A1234BC',
       } as VideoBookingSearchRequest)
 
       expect(bookAVideoLinkApiClient.getVideoLinkBooking).toHaveBeenCalled()

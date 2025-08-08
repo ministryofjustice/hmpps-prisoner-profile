@@ -28,8 +28,8 @@ describe('PhotoService', () => {
   describe('getAllFacialPhotos', () => {
     it('Gets the images detail from the API and returns the facial photos correctly', async () => {
       service = new PhotoService(() => prisonApiClient)
-      const res = await service.getAllFacialPhotos('abc123', 1680496, 'clientToken')
-      expect(prisonApiClient.getImagesForPrisoner).toHaveBeenCalledWith('abc123')
+      const res = await service.getAllFacialPhotos('A1234BC', 1680496, 'clientToken')
+      expect(prisonApiClient.getImagesForPrisoner).toHaveBeenCalledWith('A1234BC')
       expect(res.length).toEqual(10)
       expect(res[0].main).toEqual(true)
       expect(res[0].imageId).toEqual(1680496)

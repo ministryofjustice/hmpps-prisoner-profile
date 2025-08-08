@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatNamePart, getCommonRequestData } from '../utils/utils'
+import { apostrophe, formatNamePart } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { FlashMessageType } from '../data/enums/flashMessageType'
@@ -20,6 +20,7 @@ import {
 } from './utils/alias/ethnicityUtils'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
 import { NomisLockedError } from '../utils/nomisLockedError'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 interface DateOfBirthForm {
   'dateOfBirth-year': string
@@ -36,7 +37,10 @@ export default class AliasController {
 
   public displayChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const errors = req.flash('errors')
 
       this.auditService
@@ -68,17 +72,14 @@ export default class AliasController {
         errors,
         prisonerNumber,
         breadcrumbPrisonerName: prisonerName,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }
 
   public submitChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { naturalPrisonerName, prisonerNumber } = getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber } = getCommonRequestData(req, res)
       const { radioField: purpose } = req.body
 
       if (!purpose) {
@@ -141,7 +142,7 @@ export default class AliasController {
 
   public displayAddNewAlias(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
@@ -167,10 +168,7 @@ export default class AliasController {
         formTitle: 'Enter alias details',
         errors,
         formValues,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }
@@ -243,7 +241,7 @@ export default class AliasController {
 
   public displayChangeDateOfBirth(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
@@ -268,10 +266,7 @@ export default class AliasController {
         warningText: 'This will become their date of birth in DPS and NOMIS.',
         errors,
         formValues,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }
@@ -333,7 +328,8 @@ export default class AliasController {
 
   public displayChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } =
+        getCommonRequestData(req, res)
       const errors = req.flash('errors')
       const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
         this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
@@ -362,17 +358,14 @@ export default class AliasController {
         errors,
         prisonerNumber,
         breadcrumbPrisonerName: prisonerName,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }
 
   public submitChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = getCommonRequestData(req)
+      const { prisonerNumber } = getCommonRequestData(req, res)
       const { radioField: ethnicGroup } = req.body
 
       if (!ethnicGroup) {
@@ -400,7 +393,8 @@ export default class AliasController {
 
   public displayChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } =
+        getCommonRequestData(req, res)
       const { group } = req.params
       const errors = req.flash('errors')
 
@@ -434,17 +428,14 @@ export default class AliasController {
         errors,
         prisonerNumber,
         breadcrumbPrisonerName: prisonerName,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }
 
   public submitChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const { group } = req.params
       const { radioField: ethnicBackground } = req.body
 
@@ -506,7 +497,10 @@ export default class AliasController {
     prepopulateFields: boolean
   }): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId } = getCommonRequestData(req)
+      const { clientToken, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const { firstName, middleName1, middleName2, lastName } = await this.aliasService.getWorkingNameAlias(
         clientToken,
         prisonerNumber,
@@ -541,10 +535,7 @@ export default class AliasController {
         warningText,
         errors,
         formValues,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-        },
+        miniBannerData,
       })
     }
   }

@@ -26,7 +26,7 @@ const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Prisoner Location Details', () => {
-  const offenderNo = 'ABC123'
+  const offenderNo = 'A1234BC'
   let req: any
   let res: any
   let controller: LocationDetailsController

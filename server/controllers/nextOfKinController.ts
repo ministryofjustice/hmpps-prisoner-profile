@@ -1,13 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { UUID } from 'node:crypto'
-import {
-  apostrophe,
-  formatLocation,
-  formatName,
-  getCommonRequestData,
-  mapRelationshipDescriptionByCode,
-  objectToSelectOptions,
-} from '../utils/utils'
+import { apostrophe, formatName, mapRelationshipDescriptionByCode, objectToSelectOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinService from '../services/nextOfKinService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -32,6 +25,7 @@ import { displayFindUkAddressHandler, submitFindUkAddressHandler } from './handl
 import NotFoundError from '../utils/notFoundError'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PhoneNumberTypeMappings } from '../data/constants/phoneNumberMappings'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export interface NextOfKinSubmission {
   contactType: string
@@ -94,8 +88,10 @@ export default class NextOfKinController {
 
   public displayNextOfKinEmergencyContact(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const requestBodyFlash = requestBodyFromFlash<PersonalRelationshipsContactForm>(req)
       const errors = req.flash('errors')
 
@@ -154,11 +150,7 @@ export default class NextOfKinController {
         naturalPrisonerName,
         relationshipOptions,
         cityOptions,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }
@@ -359,7 +351,7 @@ export default class NextOfKinController {
 
   public submitConfirmAddress(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { clientToken, prisonerNumber } = getCommonRequestData(req)
+      const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
 
       const { address: addressCacheId, contact: contactCacheId } = req.query
 

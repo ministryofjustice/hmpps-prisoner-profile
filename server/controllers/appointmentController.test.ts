@@ -39,6 +39,7 @@ import {
 } from '../data/localMockData/courtHearingsMock'
 import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 import { courtBookingMock, probationBookingMock } from '../data/localMockData/videoLinkBookingMock'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -133,6 +134,7 @@ describe('Appointment Controller', () => {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
       },
       flash: jest.fn(),
     }
@@ -210,6 +212,7 @@ describe('Appointment Controller', () => {
         prisonerName: 'Saunders, John',
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
         cellLocation: PrisonerMockDataA.cellLocation,
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       appointmentTypes: appointmentTypesSelectOptionsMock,
       probationTeams: probationTeamsSelectOptionsMock,
@@ -248,6 +251,7 @@ describe('Appointment Controller', () => {
         prisonerName: 'Saunders, John',
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
         cellLocation: PrisonerMockDataA.cellLocation,
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       appointmentTypes: appointmentTypesSelectOptionsMock,
       probationTeams: probationTeamsSelectOptionsMock,
@@ -295,6 +299,7 @@ describe('Appointment Controller', () => {
         prisonerName: 'Saunders, John',
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
         cellLocation: PrisonerMockDataA.cellLocation,
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       appointmentTypes: appointmentTypesSelectOptionsMock,
       probationTeams: probationTeamsSelectOptionsMock,
@@ -607,6 +612,7 @@ describe('Appointment Controller', () => {
         prisonerName: 'Saunders, John',
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       location: locationsApiMock[0].localName,
       date: formBody.date,
@@ -672,6 +678,7 @@ describe('Appointment Controller', () => {
         prisonerName: 'Saunders, John',
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
+        prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       location: locationsApiMock[0].localName,
       date: formBody.date,

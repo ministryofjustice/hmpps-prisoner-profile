@@ -82,7 +82,6 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       res.locals = {
         ...res.locals,
         prisonerImageUrl: `/api/prisoner/${prisonerData.prisonerNumber}/image?imageId=${inmateDetail.facialImageId}`,
-        prisonerThumbnailImageUrl: `/api/prisoner/${prisonerData.prisonerNumber}/image?imageId=${inmateDetail.facialImageId}&fullSizeImage=false`,
       }
     } catch (error) {
       logger.error(error, `Failed to retrieve get prisoner data: ${error.endpoint}`)

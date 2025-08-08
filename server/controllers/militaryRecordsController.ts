@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatLocation, getCommonRequestData, objectToRadioOptions } from '../utils/utils'
+import { apostrophe, objectToRadioOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import MilitaryRecordsService from '../services/militaryRecordsService'
@@ -15,6 +15,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { dateToIsoDate } from '../utils/dateHelpers'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export default class MilitaryRecordsController {
   constructor(
@@ -24,8 +25,10 @@ export default class MilitaryRecordsController {
 
   public displayMilitaryServiceInformation(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<MilitaryServiceInformation>(req)
       const errors = req.flash('errors')
@@ -143,11 +146,7 @@ export default class MilitaryRecordsController {
         rankOptionsNavy,
         rankOptionsRAF,
         rankOptionsRoyalMarines,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }
@@ -224,8 +223,10 @@ export default class MilitaryRecordsController {
 
   public displayConflicts(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<Conflicts>(req)
       const errors = req.flash('errors')
@@ -269,11 +270,7 @@ export default class MilitaryRecordsController {
         formValues,
         errors,
         warZoneOptions,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }
@@ -334,8 +331,10 @@ export default class MilitaryRecordsController {
 
   public displayDisciplinaryAction(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<DisciplinaryAction>(req)
       const errors = req.flash('errors')
@@ -387,11 +386,7 @@ export default class MilitaryRecordsController {
         formValues,
         errors,
         disciplinaryActionOptions,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }
@@ -452,8 +447,10 @@ export default class MilitaryRecordsController {
 
   public displayDischargeDetails(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
-        getCommonRequestData(req)
+      const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
       const militarySeq = +req.params.militarySeq
       const requestBodyFlash = requestBodyFromFlash<DischargeDetails>(req)
       const errors = req.flash('errors')
@@ -512,11 +509,7 @@ export default class MilitaryRecordsController {
         formValues,
         errors,
         dischargeOptions,
-        miniBannerData: {
-          prisonerNumber,
-          prisonerName,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }

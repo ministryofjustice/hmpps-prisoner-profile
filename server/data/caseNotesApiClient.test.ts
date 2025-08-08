@@ -140,9 +140,9 @@ describe('caseNotesApiClient', () => {
 
   describe('updateCaseNote', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulCaseNotesPutApiCall(`/case-notes/${prisonerNumber}/abc123`, findCaseNotesMock.content[0])
+      mockSuccessfulCaseNotesPutApiCall(`/case-notes/${prisonerNumber}/A1234BC`, findCaseNotesMock.content[0])
 
-      const output = await caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, 'MDI', 'abc123', 'text')
+      const output = await caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, 'MDI', 'A1234BC', 'text')
       expect(output).toEqual(findCaseNotesMock.content[0])
     })
   })

@@ -149,9 +149,6 @@ describe('GetPrisonerDataMiddleware', () => {
     await getPrisonerData(services)(req, res, next)
 
     expect(res.locals.prisonerImageUrl).toEqual('/api/prisoner/G6123VU/image?imageId=1413311')
-    expect(res.locals.prisonerThumbnailImageUrl).toEqual(
-      '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
-    )
   })
 
   it('should set the newArrival24 flag if latest arrival date is today', async () => {

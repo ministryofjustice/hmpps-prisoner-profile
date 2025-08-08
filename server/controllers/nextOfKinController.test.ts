@@ -18,6 +18,7 @@ import EphemeralDataService from '../services/ephemeralDataService'
 import { AddressLocation } from '../services/mappers/addressMapper'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 describe('NextOfKinController', () => {
   let nextOfKinService: NextOfKinService
@@ -78,6 +79,7 @@ describe('NextOfKinController', () => {
           ...PrisonerMockDataA,
           prisonerNumber,
         },
+        inmateDetail: inmateDetailMock,
         clientToken,
       },
       flash: jest.fn(),
@@ -146,6 +148,7 @@ describe('NextOfKinController', () => {
           cellLocation: '1-1-035',
           prisonerName: 'Saunders, John',
           prisonerNumber: 'A1234BC',
+          prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
         },
       })
     })
@@ -169,6 +172,7 @@ describe('NextOfKinController', () => {
           cellLocation: '1-1-035',
           prisonerName: 'Saunders, John',
           prisonerNumber: 'A1234BC',
+          prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
         },
       })
     })
@@ -414,6 +418,8 @@ describe('NextOfKinController', () => {
         miniBannerData: {
           prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
         },
       })
 
@@ -468,7 +474,12 @@ describe('NextOfKinController', () => {
           backLinkUrl: `where-is-next-of-kin-address?contact=${contactCacheId}`,
           cancelLink: `/prisoner/${prisonerNumber}/personal#next-of-kin`,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
+          },
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({
@@ -555,7 +566,12 @@ describe('NextOfKinController', () => {
             cancelLink: `/prisoner/${prisonerNumber}/personal#next-of-kin`,
             prisonerNumber,
             breadcrumbPrisonerName: 'Saunders, John',
-            miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+            miniBannerData: {
+              prisonerNumber,
+              prisonerName: 'Saunders, John',
+              cellLocation: '1-1-035',
+              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
+            },
           })
 
           expect(auditService.sendPageView).toHaveBeenCalledWith({
@@ -678,7 +694,12 @@ describe('NextOfKinController', () => {
           },
           prisonerNumber,
           breadcrumbPrisonerName: 'Saunders, John',
-          miniBannerData: { prisonerNumber, prisonerName: 'Saunders, John' },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
+          },
           backLinkUrl: `/prisoner/${prisonerNumber}/personal/find-uk-next-of-kin-address`,
           cancelLink: `/prisoner/${prisonerNumber}/personal#next-of-kin`,
           enterDifferentAddressLink: `/prisoner/${prisonerNumber}/personal/where-is-next-of-kin-address?contact=${contactCacheId}`,

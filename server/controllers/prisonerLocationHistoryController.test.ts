@@ -16,7 +16,7 @@ import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSy
 import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
 
 describe('Specific Prisoner Location History', () => {
-  const offenderNo = 'ABC123'
+  const offenderNo = 'A1234BC'
   let req: any
   let res: any
   let controller: PrisonerLocationHistoryController

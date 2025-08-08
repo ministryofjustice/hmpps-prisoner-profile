@@ -14,7 +14,7 @@ export const courtBookingMock: VideoLinkBooking = {
     {
       prisonCode: 'MDI',
       prisonLocKey: 'ABC',
-      prisonerNumber: 'ABC123',
+      prisonerNumber: 'A1234BC',
       appointmentDate: '2023-01-01',
       startTime: '12:34',
       endTime: '13:34',
@@ -23,7 +23,7 @@ export const courtBookingMock: VideoLinkBooking = {
     {
       prisonCode: 'MDI',
       prisonLocKey: 'ABC',
-      prisonerNumber: 'ABC123',
+      prisonerNumber: 'A1234BC',
       appointmentDate: '2023-01-01',
       startTime: '12:19',
       endTime: '12:34',
@@ -32,7 +32,7 @@ export const courtBookingMock: VideoLinkBooking = {
     {
       prisonCode: 'MDI',
       prisonLocKey: 'ABC',
-      prisonerNumber: 'ABC123',
+      prisonerNumber: 'A1234BC',
       appointmentDate: '2023-01-01',
       startTime: '13:34',
       endTime: '13:49',
@@ -55,7 +55,7 @@ export const probationBookingMock: VideoLinkBooking = {
     {
       prisonCode: 'MDI',
       prisonLocKey: 'ABC',
-      prisonerNumber: 'ABC123',
+      prisonerNumber: 'A1234BC',
       appointmentDate: '2023-01-01',
       startTime: '12:34',
       endTime: '13:34',

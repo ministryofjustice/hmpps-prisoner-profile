@@ -16,6 +16,9 @@ import {
   getEthnicGroupDescriptionForHeading,
   getEthnicGroupRadioOptions,
 } from './utils/alias/ethnicityUtils'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+
+const { prisonerNumber } = PrisonerMockDataA
 
 describe('Alias Controller', () => {
   let req: Request
@@ -29,8 +32,8 @@ describe('Alias Controller', () => {
   beforeEach(() => {
     req = {
       id: '123',
-      params: { prisonerNumber: 'G6123VU' },
-      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
+      params: { prisonerNumber },
+      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -61,7 +64,7 @@ describe('Alias Controller', () => {
         formTitle: `Why are you changing John Saunders’ name?`,
         errors: [],
         breadcrumbPrisonerName: 'Saunders, John',
-        prisonerNumber: 'G6123VU',
+        prisonerNumber,
         submitButtonText: 'Continue',
         options: [
           {
@@ -76,8 +79,10 @@ describe('Alias Controller', () => {
           },
         ],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
 
@@ -99,7 +104,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeNamePurpose()(req, res, next)
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/${redirect}`)
 
       if (!purpose) {
         expect(req.flash).toHaveBeenCalledWith('errors', [
@@ -133,8 +138,10 @@ describe('Alias Controller', () => {
           middleName2: 'Names',
         },
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -205,11 +212,11 @@ describe('Alias Controller', () => {
       expect(aliasService.updateWorkingName).toHaveBeenCalledWith(
         expect.anything(),
         prisonUserMock,
-        PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         newName,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#name`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#name`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
@@ -226,9 +233,7 @@ describe('Alias Controller', () => {
       await controller.submitChangeNameCorrection()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-corrected-name`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/enter-corrected-name`)
     })
 
     it('Sends a post success audit event', async () => {
@@ -247,7 +252,7 @@ describe('Alias Controller', () => {
 
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditNameCorrection,
         details: {
@@ -278,8 +283,10 @@ describe('Alias Controller', () => {
         errors: [],
         formValues: {},
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -319,7 +326,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameLegal,
@@ -343,11 +350,11 @@ describe('Alias Controller', () => {
       expect(aliasService.createNewWorkingName).toHaveBeenCalledWith(
         expect.anything(),
         prisonUserMock,
-        PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         newName,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#name`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#name`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
@@ -364,7 +371,7 @@ describe('Alias Controller', () => {
       await controller.submitChangeNameLegal()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-new-name`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/enter-new-name`)
     })
 
     it('Sends a post success audit event', async () => {
@@ -383,7 +390,7 @@ describe('Alias Controller', () => {
 
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditNameLegal,
         details: {
@@ -417,8 +424,10 @@ describe('Alias Controller', () => {
           sex: PseudonymResponseMock.sex.code,
         },
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -487,7 +496,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.AddNewAlias,
@@ -571,7 +580,7 @@ describe('Alias Controller', () => {
 
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddNewAlias,
         details: PseudonymResponseMock,
@@ -595,8 +604,10 @@ describe('Alias Controller', () => {
           'dateOfBirth-year': PseudonymResponseMock.dateOfBirth.split('-')[0],
         },
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -636,7 +647,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditDateOfBirth,
@@ -658,11 +669,11 @@ describe('Alias Controller', () => {
       expect(aliasService.updateDateOfBirth).toHaveBeenCalledWith(
         expect.anything(),
         prisonUserMock,
-        PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         '1999-02-01',
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#date-of-birth`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#date-of-birth`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Date of birth updated',
@@ -679,7 +690,7 @@ describe('Alias Controller', () => {
       await controller.submitChangeDateOfBirth()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/date-of-birth`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/date-of-birth`)
     })
 
     it('Sends a post success audit event', async () => {
@@ -701,7 +712,7 @@ describe('Alias Controller', () => {
 
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDateOfBirth,
         details: {
@@ -725,10 +736,12 @@ describe('Alias Controller', () => {
         hintText:
           "Choose the group which best describes this person’s ethnic group. You'll need to select a more detailed ethnic group on the next page.",
         breadcrumbPrisonerName: 'Saunders, John',
-        prisonerNumber: 'G6123VU',
+        prisonerNumber,
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
         // This is tested separately in `ethnicityUtils.test.ts`:
         options: getEthnicGroupRadioOptions(ethnicityCodesMock, 'W1'),
@@ -738,7 +751,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicGroup,
@@ -763,7 +776,7 @@ describe('Alias Controller', () => {
       if (ethnicGroup) {
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          prisonerNumber,
           correlationId: req.id,
           action: PostAction.EditEthnicGroup,
           details: { ethnicGroup },
@@ -780,13 +793,8 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeEthnicGroup()(req, res, next)
 
-      expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
-        expect.anything(),
-        prisonUserMock,
-        PrisonerMockDataA.prisonerNumber,
-        'NS',
-      )
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#ethnic-group`)
+      expect(aliasService.updateEthnicity).toHaveBeenCalledWith(expect.anything(), prisonUserMock, prisonerNumber, 'NS')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#ethnic-group`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',
@@ -796,7 +804,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditEthnicBackground,
         details: {
@@ -830,10 +838,12 @@ describe('Alias Controller', () => {
         backLinkUrl: '/prisoner/G6123VU/personal/ethnic-group',
         formTitle: `Which of the following best describes John Saunders’ ${headingDescription} background?`,
         breadcrumbPrisonerName: 'Saunders, John',
-        prisonerNumber: 'G6123VU',
+        prisonerNumber,
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
         // This is tested separately in `ethnicityUtils.test.ts`:
         options: getEthnicBackgroundRadioOptions(ethnicGroup, ethnicityCodesMock, 'W1'),
@@ -860,7 +870,7 @@ describe('Alias Controller', () => {
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicBackground,
@@ -875,11 +885,11 @@ describe('Alias Controller', () => {
       expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
         expect.anything(),
         prisonUserMock,
-        PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         ethnicityCodeSubmitted,
       )
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#ethnic-group`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#ethnic-group`)
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',
@@ -898,7 +908,7 @@ describe('Alias Controller', () => {
       await controller.submitChangeEthnicBackground()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/${ethnicGroup}`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
     })
 
     it('Sends a post success audit event', async () => {
@@ -913,7 +923,7 @@ describe('Alias Controller', () => {
 
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditEthnicBackground,
         details: {

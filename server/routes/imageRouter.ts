@@ -20,6 +20,7 @@ import { editPhotoValidator } from '../validators/editPhotoValidator'
 import ImageController from '../controllers/imageController'
 import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -65,13 +66,10 @@ export default function imageRouter(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.read_photo] }),
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {
-      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
+      const { prisonerNumber, miniBannerData, clientToken } = getCommonRequestData(req, res)
+      const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { activeCaseLoadId } = res.locals.user as PrisonUser
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
-      const { prisonerNumber } = prisonerData
-      const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
-        style: NameFormatStyle.lastCommaFirst,
-      })
       let imageUploadedDate = ''
 
       // As long as there's a photo ID we can get information about it
@@ -91,10 +89,7 @@ export default function imageRouter(services: Services): Router {
       return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerNumber}`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
-        miniBannerData: {
-          prisonerName,
-          prisonerNumber,
-        },
+        miniBannerData,
         imageUploadedDate,
         photoStatus,
         editEnabled: editProfilePhotoEnabled(activeCaseLoadId),
@@ -109,12 +104,9 @@ export default function imageRouter(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.read_photo] }),
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {
+      const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
       const { activeCaseLoadId } = res.locals.user as PrisonUser
-      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
-      const { prisonerNumber } = prisonerData
-      const prisonerName = formatName(prisonerData.firstName, '', prisonerData.lastName, {
-        style: NameFormatStyle.lastCommaFirst,
-      })
+      const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
       // Do not display this page for prisoners with their photos withheld or with no image
@@ -139,10 +131,7 @@ export default function imageRouter(services: Services): Router {
       return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
-        miniBannerData: {
-          prisonerName,
-          prisonerNumber,
-        },
+        miniBannerData,
         facialImages,
         editEnabled: editProfilePhotoEnabled(activeCaseLoadId),
       })

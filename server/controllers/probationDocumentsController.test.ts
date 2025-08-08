@@ -9,7 +9,7 @@ import Conviction from '../data/interfaces/deliusApi/Conviction'
 import { Result } from '../utils/result/result'
 
 describe('Prisoner schedule', () => {
-  const offenderNo = 'ABC123'
+  const offenderNo = 'A1234BC'
 
   let req: any
   let res: any

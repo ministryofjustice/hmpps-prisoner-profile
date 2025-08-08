@@ -10,6 +10,9 @@ import {
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { objectToRadioOptions } from '../utils/utils'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+
+const { prisonerNumber } = PrisonerMockDataA
 
 describe('MilitaryRecordsController', () => {
   let req: Request
@@ -21,7 +24,7 @@ describe('MilitaryRecordsController', () => {
   beforeEach(() => {
     req = {
       params: { prisonerNumber: 'G6123VU', militarySeq: '1' },
-      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
+      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -78,9 +81,10 @@ describe('MilitaryRecordsController', () => {
         rankOptionsRAF: [],
         rankOptionsRoyalMarines: [],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -184,9 +188,10 @@ describe('MilitaryRecordsController', () => {
           { text: 'Unknown', value: null },
         ],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -241,9 +246,10 @@ describe('MilitaryRecordsController', () => {
           { text: 'Unknown', value: null },
         ],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -306,9 +312,10 @@ describe('MilitaryRecordsController', () => {
           MilitaryRecordsMock[0].militaryDischargeCode,
         ),
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })

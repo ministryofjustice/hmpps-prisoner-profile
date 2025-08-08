@@ -5,5 +5,5 @@ export const nextCourtEventMock: CourtEvent = {
   startTime: '2030-01-01T12:34:56',
   courtLocation: 'Test court location',
   courtEventType: 'Sentencing',
-  caseReference: 'ABC123',
+  caseReference: 'A1234BC',
 }

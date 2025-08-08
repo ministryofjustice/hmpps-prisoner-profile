@@ -14,6 +14,7 @@ import {
   LanguageRefDataMock,
 } from '../data/localMockData/personCommunicationNeedsApiRefDataMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 describe('LanguagesController', () => {
   let languagesService: LanguagesService
@@ -43,6 +44,7 @@ describe('LanguagesController', () => {
           ...PrisonerMockDataA,
           prisonerNumber,
         },
+        inmateDetail: inmateDetailMock,
         clientToken,
       },
       flash: jest.fn(),
@@ -351,6 +353,8 @@ describe('LanguagesController', () => {
           miniBannerData: {
             prisonerNumber,
             prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
           },
           errors: [],
           languageOptions: [

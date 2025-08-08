@@ -386,6 +386,7 @@ describe('Alerts Controller', () => {
           prisonerName,
           prisonerNumber,
           cellLocation: formatLocation(cellLocation),
+          prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
         },
         alerts: [alertDetailsMock],
       })
@@ -411,6 +412,7 @@ describe('Alerts Controller', () => {
           prisonerName,
           prisonerNumber,
           cellLocation: formatLocation(cellLocation),
+          prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
         },
         alerts: [alertDetailsMock, alertDetailsMock],
       })
@@ -522,9 +524,10 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/alerts/addMoreDetails', {
         pageTitle: 'Add more details to alert',
         miniBannerData: {
-          prisonerName: 'John Saunders',
+          prisonerName: 'Saunders, John',
           prisonerNumber: 'G6123VU',
           cellLocation: formatLocation('1-1-035'),
+          prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
         },
         alert: existingAlert,
         formValues: {
@@ -651,9 +654,10 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/alerts/closeAlert', {
         pageTitle: 'Close alert',
         miniBannerData: {
-          prisonerName: 'John Saunders',
+          prisonerName: 'Saunders, John',
           prisonerNumber: 'G6123VU',
           cellLocation: formatLocation('1-1-035'),
+          prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
         },
         alert: existingAlert,
         formValues: {
@@ -754,9 +758,10 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/alerts/changeEndDate', {
         pageTitle: 'Change or remove alert end date',
         miniBannerData: {
-          prisonerName: 'John Saunders',
+          prisonerName: 'Saunders, John',
           prisonerNumber: 'G6123VU',
           cellLocation: formatLocation('1-1-035'),
+          prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
         },
         alert: existingAlert,
         formValues: {

@@ -958,7 +958,7 @@ context('Court cases and release dates', () => {
         overviewPage.offencesHeader().should('not.exist')
         overviewPage.courtCasesAndReleaseDates().courtCasesCount().should('contain.text', '5')
 
-        nextCourtAppearance.caseReference().should('contain.text', 'ABC123')
+        nextCourtAppearance.caseReference().should('contain.text', 'A1234BC')
         nextCourtAppearance.location().should('contain.text', 'Test court location')
         nextCourtAppearance.hearingType().should('contain.text', 'Sentencing')
         nextCourtAppearance.date().should('contain.text', '1 January 2030')

@@ -3,13 +3,13 @@ import { RestClientBuilder } from '../data'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AuditService, PostAction } from '../services/auditService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import miniBannerData from './utils/miniBannerData'
 import MulterFile from './interfaces/MulterFile'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import logger from '../../logger'
 import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 export default class ImageController {
   constructor(
@@ -23,30 +23,30 @@ export default class ImageController {
     return {
       newImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerData } = req.middleware
+          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
 
           return res.render('pages/edit/photo/addNew', {
             pageTitle: 'Add a new facial image',
-            miniBannerData: miniBannerData(prisonerData),
-            prisonerNumber: prisonerData.prisonerNumber,
+            miniBannerData,
+            prisonerNumber,
           })
         },
 
         post: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerData } = req.middleware
+          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
           if (req.body.photoType === 'withheld') {
             return res.redirect(
-              `/prisoner/${prisonerData.prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+              `/prisoner/${prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
             )
           }
 
           const file = req.file as MulterFile
           return res.render('pages/edit/photo/editPhoto', {
-            miniBannerData: miniBannerData(prisonerData),
+            prisonerNumber,
+            miniBannerData,
             imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-            prisonerNumber: prisonerData.prisonerNumber,
             fileName: file.originalname,
             fileType: file.mimetype,
           })
@@ -87,7 +87,7 @@ export default class ImageController {
 
       newWithheldImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerData, clientToken } = req.middleware
+          const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
           const fileStream = await this.prisonerProfileApiClientBuilder(clientToken).getWithheldPrisonerPhoto()
 
@@ -99,8 +99,8 @@ export default class ImageController {
 
           return res.render('pages/edit/photo/addWithheld', {
             pageTitle: 'Confirm facial image',
-            miniBannerData: miniBannerData(prisonerData),
-            prisonerNumber: prisonerData.prisonerNumber,
+            miniBannerData,
+            prisonerNumber,
             imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
             fileName: file.originalname,
             fileType: file.mimetype,

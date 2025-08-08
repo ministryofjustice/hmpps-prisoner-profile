@@ -18,6 +18,9 @@ import { FlashMessageType } from '../data/enums/flashMessageType'
 
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import { capitaliseFirstLetter } from '../utils/utils'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+
+const { prisonerNumber } = PrisonerMockDataA
 
 describe('IdentityNumbersController', () => {
   let req: Request
@@ -29,8 +32,8 @@ describe('IdentityNumbersController', () => {
 
   beforeEach(() => {
     req = {
-      params: { prisonerNumber: 'G6123VU' },
-      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
+      params: { prisonerNumber },
+      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -87,9 +90,10 @@ describe('IdentityNumbersController', () => {
         identifierOptions: buildIdentityNumberOptions({}, GetIdentifiersMock, pageData),
         errors: [],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -133,9 +137,10 @@ describe('IdentityNumbersController', () => {
         identifierOptions,
         errors: [],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
       expect(identifierOptions.find(item => item.id === id)).toEqual({
@@ -286,9 +291,10 @@ describe('IdentityNumbersController', () => {
         identifierType: type,
         errors: [],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })
@@ -326,9 +332,10 @@ describe('IdentityNumbersController', () => {
         identifierType: type,
         errors: [],
         miniBannerData: {
-          prisonerNumber: 'G6123VU',
+          prisonerNumber,
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
         },
       })
     })

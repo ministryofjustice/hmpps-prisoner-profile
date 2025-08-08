@@ -4,9 +4,7 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { canAddCaseNotes } from '../utils/roleHelpers'
-import { formatLocation, formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
@@ -20,6 +18,7 @@ import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import { Result } from '../utils/result/result'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -103,9 +102,7 @@ export default class CaseNotesController {
 
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-      const { prisonerPermissions } = res.locals
+      const { prisonerNumber, prisonId, miniBannerData, prisonerPermissions } = getCommonRequestData(req, res)
 
       const now = new Date()
       const caseNoteFlash = req.flash('caseNote')
@@ -155,11 +152,7 @@ export default class CaseNotesController {
         typeSubTypeMap,
         behaviourPrompts: this.chooseBehaviourPrompts(),
         errors,
-        miniBannerData: {
-          prisonerName: prisonerBannerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
       })
     }
   }
@@ -233,11 +226,8 @@ export default class CaseNotesController {
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
-      const { clientToken } = req.middleware
-      const { prisonerPermissions } = res.locals
-      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
-      const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
-      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const { clientToken, prisonerNumber, prisonId, prisonerPermissions, naturalPrisonerName, miniBannerData } =
+        getCommonRequestData(req, res)
 
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
@@ -272,7 +262,7 @@ export default class CaseNotesController {
 
       return res.render('pages/caseNotes/updateCaseNote', {
         refererUrl,
-        prisonerDisplayName,
+        prisonerDisplayName: naturalPrisonerName,
         prisonerNumber,
         caseNoteText,
         currentCaseNote,
@@ -280,11 +270,7 @@ export default class CaseNotesController {
         maxLength,
         isOMICOpen,
         isExternal,
-        miniBannerData: {
-          prisonerName: prisonerBannerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
         errors,
       })
     }

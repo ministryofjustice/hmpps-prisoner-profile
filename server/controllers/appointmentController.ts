@@ -41,6 +41,7 @@ import CreateVideoBookingRequest, {
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 import { bvlsHmctsLinkGuestPinEnabled } from '../utils/featureToggles'
+import getCommonRequestData from '../utils/getCommonRequestData'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -131,10 +132,9 @@ export default class AppointmentController {
 
     return async (req: Request, res: Response, next: NextFunction) => {
       const { appointmentId } = req.params
-      const { clientToken } = req.middleware
+      const { clientToken, miniBannerData } = getCommonRequestData(req, res)
       const { prisonerNumber } = req.params
-      const { firstName, lastName, bookingId, cellLocation, prisonId } = req.middleware.prisonerData
-      const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const { bookingId, prisonId } = req.middleware.prisonerData
       const user = res.locals.user as PrisonUser
 
       const appointment = appointmentId
@@ -166,11 +166,7 @@ export default class AppointmentController {
 
       return res.render('pages/appointments/addAppointment', {
         pageTitle: appointmentId ? 'Change appointment details' : 'Add an appointment',
-        miniBannerData: {
-          prisonerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
         appointmentTypes: refDataToSelectOptions(appointmentTypes),
         probationTeams: objectToSelectOptions(probationTeams, 'code', 'description'),
         meetingTypes: objectToRadioOptions(meetingTypes, 'code', 'description'),
@@ -440,8 +436,8 @@ export default class AppointmentController {
     }
 
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber, appointmentId } = req.params
-      const { clientToken } = req.middleware
+      const { appointmentId } = req.params
+      const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('prePostAppointmentDetails')
 
@@ -455,10 +451,6 @@ export default class AppointmentController {
         clientToken,
         user.activeCaseLoadId,
       )
-
-      // Get the prisoner details in context
-      const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
-      const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       // If editing, get the existing appointment into context
       const appointment = appointmentId
@@ -484,11 +476,7 @@ export default class AppointmentController {
 
       // Build up an object for the appointment
       const appointmentData = {
-        miniBannerData: {
-          prisonerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
+        miniBannerData,
         location,
         date: appointmentForm.date,
         startTime: `${appointmentForm.startTimeHours}:${appointmentForm.startTimeMinutes}`,
