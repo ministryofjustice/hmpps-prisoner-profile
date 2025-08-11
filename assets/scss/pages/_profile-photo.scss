@@ -8,13 +8,10 @@
 }
 
 .photo-feedback-banner {
-  @include govuk-font(16);
-  display: inline-block;
   border: 1px solid #594d00;
   padding: 8px 8px 6px;
   margin-bottom: 15px;
   background: #fff7bf;
-  color: #594d00;
 
   a,
   a:visited {
@@ -24,6 +21,12 @@
   a:hover,
   a:active {
     color: #2f2900 !important;
+  }
+
+  p {
+    @include govuk-font(16);
+    color: #594d00;
+    margin: 0;
   }
 }
 
