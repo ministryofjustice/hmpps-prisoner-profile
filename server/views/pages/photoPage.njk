@@ -13,7 +13,9 @@
 {% macro description() %}
   {% if not photoStatus.placeholder %}
     <div class="hmpps-profile-photo__description">
-      {% include '../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
+      {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+        {% include '../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
+      {% endif %}
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
       {{ govukSummaryList({
         rows: [
