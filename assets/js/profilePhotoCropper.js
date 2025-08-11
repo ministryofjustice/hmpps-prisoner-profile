@@ -134,18 +134,20 @@ function resetSelectionLocation() {
   const cropperCanvasRect = cropperCanvas.getBoundingClientRect()
 
   // Check that setting the width doesnt overflow the height being constrained to the image
-  const minWidth = Math.min(cropperImageRect.width, cropperCanvasRect.width)
-  const heightWithMinWidth = minWidth / RATIO
+  const maxWidth = Math.min(cropperImageRect.width, cropperCanvasRect.width)
+  const heightWithMaxWidth = maxWidth / RATIO
   const selectionX = cropperImageRect.left - cropperCanvasRect.left
   const selectionY = cropperImageRect.top - cropperCanvasRect.top
-  if (heightWithMinWidth < MAX_HEIGHT) {
+  if (heightWithMaxWidth < MAX_HEIGHT) {
     // Scale the width so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, minWidth * 0.9).$center()
+    selection.$change(selectionX, selectionY, maxWidth * 0.9, heightWithMaxWidth * 0.9).$center()
   } else {
     // Set the height in the cases the width overflows the height
-    const minHeight = Math.min(cropperImageRect.height, cropperCanvasRect.height)
+    const maxHeight = Math.min(cropperImageRect.height, cropperCanvasRect.height)
+    const widthWithMaxHeight = maxHeight * RATIO
+
     // Scale the height so that it can be dragged without being locked
-    selection.$change(selectionX, selectionY, 0, minHeight * 0.9).$center()
+    selection.$change(selectionX, selectionY, widthWithMaxHeight * 0.9, maxHeight * 0.9).$center()
   }
 
   // Reenable constraining
