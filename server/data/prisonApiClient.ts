@@ -1,12 +1,8 @@
 import { Readable } from 'stream'
+import { RestClient } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
-import RestClient from './restClient'
 import CaseLoad from './interfaces/prisonApi/CaseLoad'
-import {
-  CaseNoteSummaryByTypesParams,
-  PrisonApiClient,
-  TransactionHistoryParams,
-} from './interfaces/prisonApi/prisonApiClient'
+import { CaseNoteSummaryByTypesParams, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
 import AccountBalances from './interfaces/prisonApi/AccountBalances'
 import VisitSummary from './interfaces/prisonApi/VisitSummary'
 import VisitBalances from './interfaces/prisonApi/VisitBalances'
@@ -57,16 +53,27 @@ import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
 import ImageDetails from './interfaces/prisonApi/ImageDetails'
+import logger from '../../logger'
 
-export default class PrisonApiRestClient implements PrisonApiClient {
-  private readonly restClient: RestClient
+export default class PrisonApiRestClient extends RestClient {
+  private token: string
 
   constructor(token: string) {
-    this.restClient = new RestClient('Prison API', config.apis.prisonApi, token)
+    super('Prison API', config.apis.prisonApi, logger)
+    this.token = token
   }
 
-  private async post(args: object): Promise<unknown> {
-    return this.restClient.post(args)
+  async getAndIgnore404<T>(options: Parameters<typeof this.get>[0]): Promise<T> {
+    return this.get<T>(
+      {
+        ...options,
+        errorHandler: (_path, _method, error): null => {
+          if (error.responseStatus === 404) return null
+          throw error
+        },
+      },
+      this.token,
+    )
   }
 
   async getOffenderAttendanceHistory(
@@ -74,58 +81,69 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     fromDate: string,
     toDate: string,
   ): Promise<OffenderAttendanceHistory> {
-    return this.restClient.get<OffenderAttendanceHistory>({
-      path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=1000`,
-    })
+    return this.get<OffenderAttendanceHistory>(
+      {
+        path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=1000`,
+      },
+      this.token,
+    )
   }
 
   async getUserCaseLoads(): Promise<CaseLoad[]> {
-    return this.restClient.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
+    return this.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }, this.token)
   }
 
   async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
-    return this.restClient.stream({
-      path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
-    })
+    return this.stream(
+      {
+        path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
+      },
+      this.token,
+    )
   }
 
   async getAccountBalances(bookingId: number): Promise<AccountBalances> {
-    return this.restClient.get<AccountBalances>({
-      path: `/api/bookings/${bookingId}/balances`,
-    })
+    return this.get<AccountBalances>(
+      {
+        path: `/api/bookings/${bookingId}/balances`,
+      },
+      this.token,
+    )
   }
 
   async getVisitSummary(bookingId: number): Promise<VisitSummary> {
-    return this.restClient.get<VisitSummary>({ path: `/api/bookings/${bookingId}/visits/summary` })
+    return this.get<VisitSummary>({ path: `/api/bookings/${bookingId}/visits/summary` }, this.token)
   }
 
   async getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null> {
-    return this.restClient.get<VisitBalances | null>({
+    return this.getAndIgnore404<VisitBalances | null>({
       path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
-      ignore404: true,
     })
   }
 
   async getAssessments(bookingId: number): Promise<Assessment[]> {
-    return this.restClient.get<Assessment[]>({ path: `/api/bookings/${bookingId}/assessments` })
+    return this.get<Assessment[]>({ path: `/api/bookings/${bookingId}/assessments` }, this.token)
   }
 
   async getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
-    return this.restClient.get<ScheduledEvent[]>({
-      path: `/api/bookings/${bookingId}/events/today`,
-    })
+    return this.get<ScheduledEvent[]>(
+      {
+        path: `/api/bookings/${bookingId}/events/today`,
+      },
+      this.token,
+    )
   }
 
   async getBookingContacts(bookingId: number): Promise<ContactDetail> {
     try {
-      return await this.restClient.get<ContactDetail>({ path: `/api/bookings/${bookingId}/contacts` })
+      return await this.get<ContactDetail>({ path: `/api/bookings/${bookingId}/contacts` }, this.token)
     } catch (error) {
       return error
     }
   }
 
   async getPrisoner(prisonerNumber: string): Promise<PrisonerDetail> {
-    const prisoner = await this.restClient.get<PrisonerDetail>({ path: `/api/prisoners/${prisonerNumber}` })
+    const prisoner = await this.get<PrisonerDetail>({ path: `/api/prisoners/${prisonerNumber}` }, this.token)
     // API returns array with one entry, so extract this to return a single object
     if (Array.isArray(prisoner)) {
       return prisoner[0]
@@ -135,14 +153,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]> {
     try {
-      return await this.restClient.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` })
+      return await this.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` }, this.token)
     } catch (error) {
       return error
     }
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {
-    return this.restClient.get<InmateDetail>({ path: `/api/bookings/${bookingId}` })
+    return this.get<InmateDetail>({ path: `/api/bookings/${bookingId}` }, this.token)
   }
 
   async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
@@ -150,11 +168,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     if (types?.length) {
       query = `type=${types.join()}`
     }
-    return this.restClient.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
+    return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query }, this.token)
   }
 
   async getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds> {
-    return this.restClient.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs/all` })
+    return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs/all` }, this.token)
   }
 
   async getOffenderActivitiesHistory(
@@ -162,41 +180,50 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     earliestEndDate: string,
   ): Promise<OffenderActivitiesHistory> {
     try {
-      return await this.restClient.get<OffenderActivitiesHistory>({
-        path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
-      })
+      return await this.get<OffenderActivitiesHistory>(
+        {
+          path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
+        },
+        this.token,
+      )
     } catch (error) {
       return error
     }
   }
 
   async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
-    return this.restClient.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
+    return this.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` }, this.token)
   }
 
   async getProperty(bookingId: number): Promise<PropertyContainer[]> {
-    return this.restClient.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
+    return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` }, this.token)
   }
 
   async getCourtCases(bookingId: number): Promise<CourtCase[]> {
-    return this.restClient.get<CourtCase[]>({ path: `/api/bookings/${bookingId}/court-cases` })
+    return this.get<CourtCase[]>({ path: `/api/bookings/${bookingId}/court-cases` }, this.token)
   }
 
   async getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]> {
-    return this.restClient.get<OffenceHistoryDetail[]>({
-      path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory`,
-    })
+    return this.get<OffenceHistoryDetail[]>(
+      {
+        path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory`,
+      },
+      this.token,
+    )
   }
 
   async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]> {
-    return this.restClient.get<OffenderSentenceTerms[]>({
-      path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
-    })
+    return this.get<OffenderSentenceTerms[]>(
+      {
+        path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+      },
+      this.token,
+    )
   }
 
   async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
     try {
-      return this.restClient.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences` })
+      return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences` }, this.token)
     } catch (error) {
       return error
     }
@@ -204,40 +231,52 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   // NB: This can return 404 for released prisoners
   async getAddresses(prisonerNumber: string): Promise<Address[]> {
-    return this.restClient.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses`, ignore404: true })
+    return this.getAndIgnore404<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
   }
 
   async getAddressesForPerson(personId: number): Promise<Address[]> {
-    return this.restClient.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
+    return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` }, this.token)
   }
 
   async getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
-    return this.restClient.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` })
+    return this.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` }, this.token)
   }
 
   async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
-    return this.restClient.stream({
-      path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
-    })
+    return this.stream(
+      {
+        path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
+      },
+      this.token,
+    )
   }
 
   async getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]> {
-    return this.restClient.get<ReferenceCode[]>({
-      path: `/api/reference-domains/domains/${domain}`,
-      headers: { 'page-limit': '1000' },
-    })
+    return this.get<ReferenceCode[]>(
+      {
+        path: `/api/reference-domains/domains/${domain}`,
+        headers: { 'page-limit': '1000' },
+      },
+      this.token,
+    )
   }
 
   async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
-    return this.restClient.get<ReasonableAdjustments>({
-      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
-    })
+    return this.get<ReasonableAdjustments>(
+      {
+        path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
+      },
+      this.token,
+    )
   }
 
   async getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments> {
-    return this.restClient.get<ReasonableAdjustments>({
-      path: `/api/bookings/${bookingId}/reasonable-adjustments/all`,
-    })
+    return this.get<ReasonableAdjustments>(
+      {
+        path: `/api/bookings/${bookingId}/reasonable-adjustments/all`,
+      },
+      this.token,
+    )
   }
 
   async getCaseNoteCount(
@@ -247,55 +286,68 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     fromDate: string,
     toDate: string,
   ): Promise<CaseNoteCount> {
-    return this.restClient.get({
-      path: `/api/bookings/${bookingId}/caseNotes/${type}/${subType}/count`,
-      query: `fromDate=${fromDate}&toDate=${toDate}`,
-    })
+    return this.get(
+      {
+        path: `/api/bookings/${bookingId}/caseNotes/${type}/${subType}/count`,
+        query: `fromDate=${fromDate}&toDate=${toDate}`,
+      },
+      this.token,
+    )
   }
 
   async getMainOffence(bookingId: number): Promise<MainOffence[]> {
-    return this.restClient.get({ path: `/api/bookings/${bookingId}/mainOffence` })
+    return this.get({ path: `/api/bookings/${bookingId}/mainOffence` }, this.token)
   }
 
   async getFullStatus(prisonerNumber: string): Promise<FullStatus> {
-    return this.restClient.get({ path: `/api/prisoners/${prisonerNumber}/full-status` })
+    return this.get({ path: `/api/prisoners/${prisonerNumber}/full-status` }, this.token)
   }
 
   async getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
-    return this.restClient.get<CourtDateResults[]>({
-      path: `/api/court-date-results/${prisonerNumber}`,
-    })
+    return this.get<CourtDateResults[]>(
+      {
+        path: `/api/court-date-results/${prisonerNumber}`,
+      },
+      this.token,
+    )
   }
 
   async getIdentifier(offenderId: number, seqId: number): Promise<OffenderIdentifier> {
-    return this.restClient.get<OffenderIdentifier>({
-      path: `/api/aliases/${offenderId}/offender-identifiers/${seqId}`,
-    })
+    return this.get<OffenderIdentifier>(
+      {
+        path: `/api/aliases/${offenderId}/offender-identifiers/${seqId}`,
+      },
+      this.token,
+    )
   }
 
   async getIdentifiers(prisonerNumber: string, includeAliases: boolean = false): Promise<OffenderIdentifier[]> {
-    return this.restClient.get<OffenderIdentifier[]>({
-      path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=${includeAliases}`,
-    })
+    return this.get<OffenderIdentifier[]>(
+      {
+        path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=${includeAliases}`,
+      },
+      this.token,
+    )
   }
 
   async getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary> {
-    return this.restClient.get<SentenceSummary>({
-      path: `/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
-    })
+    return this.get<SentenceSummary>(
+      {
+        path: `/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
+      },
+      this.token,
+    )
   }
 
   async hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean> {
-    return this.restClient.get<boolean>({
+    return this.getAndIgnore404<boolean>({
       path: `/api/staff/${staffId}/${agencyId}/roles/${roleType}`,
-      ignore404: true,
     })
   }
 
   async getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {
-    return this.restClient.get<AgencyDetails>({
+    return this.getAndIgnore404<AgencyDetails>({
       path: `/api/agencies/${agencyId}?activeOnly=false`,
-      ignore404: true,
     })
   }
 
@@ -303,53 +355,71 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     bookingId: number,
     params: { page?: number; size?: number },
   ): Promise<OffenderCellHistory> {
-    return this.restClient.get<OffenderCellHistory>({
-      path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
-    })
+    return this.get<OffenderCellHistory>(
+      {
+        path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
+      },
+      this.token,
+    )
   }
 
   async getStaffDetails(username: string): Promise<StaffDetails> {
-    return this.restClient.get<StaffDetails>({ path: `/api/users/${username}`, ignore404: true })
+    return this.getAndIgnore404<StaffDetails>({ path: `/api/users/${username}` })
   }
 
   async getInmatesAtLocation(locationId: number): Promise<OffenderBooking[]> {
-    return this.restClient.get<OffenderBooking[]>({
-      path: `/api/locations/${locationId}/inmates`,
-    })
+    return this.get<OffenderBooking[]>(
+      {
+        path: `/api/locations/${locationId}/inmates`,
+      },
+      this.token,
+    )
   }
 
   async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
-    return this.restClient.get<CsraAssessment>({
-      path: `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
-    })
+    return this.get<CsraAssessment>(
+      {
+        path: `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
+      },
+      this.token,
+    )
   }
 
   async getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]> {
-    return this.restClient.get<CsraAssessment[]>({
-      path: `/api/offender-assessments/csra/${prisonerNumber}`,
-    })
+    return this.get<CsraAssessment[]>(
+      {
+        path: `/api/offender-assessments/csra/${prisonerNumber}`,
+      },
+      this.token,
+    )
   }
 
   async getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]> {
-    return this.restClient.get<Transaction[]>({
-      path: `/api/offenders/${prisonerNumber}/transaction-history`,
-      query: mapToQueryString(params),
-    })
+    return this.get<Transaction[]>(
+      {
+        path: `/api/offenders/${prisonerNumber}/transaction-history`,
+        query: mapToQueryString(params),
+      },
+      this.token,
+    )
   }
 
   async getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer> {
-    return this.restClient.get<DamageObligationContainer>({
-      path: `/api/offenders/${prisonerNumber}/damage-obligations`,
-      query: mapToQueryString({ status: status || 'ACTIVE' }),
-    })
+    return this.get<DamageObligationContainer>(
+      {
+        path: `/api/offenders/${prisonerNumber}/damage-obligations`,
+        query: mapToQueryString({ status: status || 'ACTIVE' }),
+      },
+      this.token,
+    )
   }
 
   async getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]> {
-    return this.restClient.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/thisWeek` })
+    return this.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/thisWeek` }, this.token)
   }
 
   async getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]> {
-    return this.restClient.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` })
+    return this.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` }, this.token)
   }
 
   async getMovements(
@@ -357,29 +427,38 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     movementTypes: MovementType[],
     latestOnly: boolean = true,
   ): Promise<Movement[]> {
-    return (await this.restClient.post({
-      path: `/api/movements/offenders`,
-      query: mapToQueryString({ movementTypes, latestOnly }),
-      data: prisonerNumbers,
-    })) as Movement[]
+    return (await this.post(
+      {
+        path: `/api/movements/offenders`,
+        query: mapToQueryString({ movementTypes, latestOnly }),
+        data: prisonerNumbers,
+      },
+      this.token,
+    )) as Movement[]
   }
 
   async getAppointmentTypes(): Promise<ReferenceCode[]> {
-    return this.restClient.get<ReferenceCode[]>({ path: '/api/reference-domains/scheduleReasons?eventType=APP' })
+    return this.get<ReferenceCode[]>({ path: '/api/reference-domains/scheduleReasons?eventType=APP' }, this.token)
   }
 
   async getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]> {
-    return (await this.restClient.post({
-      path: '/api/offender-sentences',
-      data: offenderNumbers,
-    })) as OffenderSentenceDetail[]
+    return (await this.post(
+      {
+        path: '/api/offender-sentences',
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as OffenderSentenceDetail[]
   }
 
   async getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
-    return (await this.restClient.post({
-      path: `/api/schedules/${agencyId}/courtEvents?date=${date}`,
-      data: offenderNumbers,
-    })) as PrisonerSchedule[]
+    return (await this.post(
+      {
+        path: `/api/schedules/${agencyId}/courtEvents?date=${date}`,
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as PrisonerSchedule[]
   }
 
   async getVisits(
@@ -388,11 +467,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]> {
-    return (await this.restClient.post({
-      path: `/api/schedules/${agencyId}/visits`,
-      query: mapToQueryString({ date, timeSlot }),
-      data: offenderNumbers,
-    })) as PrisonerSchedule[]
+    return (await this.post(
+      {
+        path: `/api/schedules/${agencyId}/visits`,
+        query: mapToQueryString({ date, timeSlot }),
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as PrisonerSchedule[]
   }
 
   async getAppointments(
@@ -401,11 +483,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]> {
-    return (await this.restClient.post({
-      path: `/api/schedules/${agencyId}/appointments`,
-      query: mapToQueryString({ date, timeSlot }),
-      data: offenderNumbers,
-    })) as PrisonerSchedule[]
+    return (await this.post(
+      {
+        path: `/api/schedules/${agencyId}/appointments`,
+        query: mapToQueryString({ date, timeSlot }),
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as PrisonerSchedule[]
   }
 
   async getActivities(
@@ -414,18 +499,24 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]> {
-    return (await this.restClient.post({
-      path: `/api/schedules/${agencyId}/activities`,
-      query: mapToQueryString({ date, timeSlot }),
-      data: offenderNumbers,
-    })) as PrisonerSchedule[]
+    return (await this.post(
+      {
+        path: `/api/schedules/${agencyId}/activities`,
+        query: mapToQueryString({ date, timeSlot }),
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as PrisonerSchedule[]
   }
 
   async getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
-    return (await this.restClient.post({
-      path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
-      data: offenderNumbers,
-    })) as PrisonerSchedule[]
+    return (await this.post(
+      {
+        path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
+        data: offenderNumbers,
+      },
+      this.token,
+    )) as PrisonerSchedule[]
   }
 
   async getActivitiesAtLocation(
@@ -434,10 +525,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     timeSlot?: TimeSlot,
     includeSuspended = false,
   ): Promise<PrisonerSchedule[]> {
-    return this.restClient.get<PrisonerSchedule[]>({
-      path: `/api/schedules/locations/${locationId}/activities`,
-      query: mapToQueryString({ date, timeSlot, includeSuspended }),
-    })
+    return this.get<PrisonerSchedule[]>(
+      {
+        path: `/api/schedules/locations/${locationId}/activities`,
+        query: mapToQueryString({ date, timeSlot, includeSuspended }),
+      },
+      this.token,
+    )
   }
 
   async getActivityList(
@@ -447,99 +541,134 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]> {
-    return this.restClient.get<PrisonerSchedule[]>({
-      path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
-      query: mapToQueryString({ date, timeSlot }),
-    })
+    return this.get<PrisonerSchedule[]>(
+      {
+        path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
+        query: mapToQueryString({ date, timeSlot }),
+      },
+      this.token,
+    )
   }
 
   async getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details> {
-    return this.restClient.get<Details>({
-      path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
-    })
+    return this.get<Details>(
+      {
+        path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
+      },
+      this.token,
+    )
   }
 
   async getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
-    return this.restClient.get<HistoryForLocationItem[]>({
-      path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
-    })
+    return this.get<HistoryForLocationItem[]>(
+      {
+        path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
+      },
+      this.token,
+    )
   }
 
   async getCellMoveReasonTypes(): Promise<CellMoveReasonType[]> {
-    return this.restClient.get<CellMoveReasonType[]>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' })
+    return this.get<CellMoveReasonType[]>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' }, this.token)
   }
 
   async getPersonEmails(personId: number): Promise<AgenciesEmail[]> {
-    return this.restClient.get<AgenciesEmail[]>({
-      path: `/api/persons/${personId}/emails`,
-    })
+    return this.get<AgenciesEmail[]>(
+      {
+        path: `/api/persons/${personId}/emails`,
+      },
+      this.token,
+    )
   }
 
   async getPersonPhones(personId: number): Promise<Telephone[]> {
-    return this.restClient.get<Telephone[]>({
-      path: `/api/persons/${personId}/phones`,
-    })
+    return this.get<Telephone[]>(
+      {
+        path: `/api/persons/${personId}/phones`,
+      },
+      this.token,
+    )
   }
 
   async getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]> {
-    return this.restClient.get<PrisonerPrisonSchedule[]>({
+    return this.getAndIgnore404<PrisonerPrisonSchedule[]>({
       path: `/api/schedules/${prisonerNumber}/scheduled-transfers`,
-      ignore404: true,
     })
   }
 
   async getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
-    return this.restClient.get<Reception[]>({
-      path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
-    })
+    return this.get<Reception[]>(
+      {
+        path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
+      },
+      this.token,
+    )
   }
 
   async getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]> {
-    return this.restClient.get<Belief[]>({
-      path: `/api/offenders/${prisonerNumber}/belief-history`,
-      query: bookingId ? `bookingId=${bookingId}` : undefined,
-    })
+    return this.get<Belief[]>(
+      {
+        path: `/api/offenders/${prisonerNumber}/belief-history`,
+        query: bookingId ? `bookingId=${bookingId}` : undefined,
+      },
+      this.token,
+    )
   }
 
   async getVisitsForBookingWithVisitors(
     bookingId: number,
     params: VisitsListQueryParams,
   ): Promise<PagedList<VisitWithVisitors>> {
-    return this.restClient.get<PagedList<VisitWithVisitors>>({
-      path: `/api/bookings/${bookingId}/visits-with-visitors`,
-      query: mapToQueryString(params),
-    })
+    return this.get<PagedList<VisitWithVisitors>>(
+      {
+        path: `/api/bookings/${bookingId}/visits-with-visitors`,
+        query: mapToQueryString(params),
+      },
+      this.token,
+    )
   }
 
   async getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]> {
-    return this.restClient.get<PrisonDetails[]>({
-      path: `/api/bookings/${bookingId}/visits/prisons`,
-    })
+    return this.get<PrisonDetails[]>(
+      {
+        path: `/api/bookings/${bookingId}/visits/prisons`,
+      },
+      this.token,
+    )
   }
 
   async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
-    return this.restClient.get<CourtEvent>({ path: `/api/court/${bookingId}/next-court-event` })
+    return this.get<CourtEvent>({ path: `/api/court/${bookingId}/next-court-event` }, this.token)
   }
 
   async getActiveCourtCasesCount(bookingId: number): Promise<number> {
-    return this.restClient.get<number>({ path: `/api/court/${bookingId}/count-active-cases` })
+    return this.get<number>({ path: `/api/court/${bookingId}/count-active-cases` }, this.token)
   }
 
   async getLatestArrivalDate(prisonerNumber: string): Promise<string> {
-    return this.restClient.get<string>({
-      path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
-    })
+    return this.get<string>(
+      {
+        path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
+      },
+      this.token,
+    )
   }
 
   async getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]> {
-    return this.restClient.get<ImageDetails[]>({
-      path: `/api/images/offenders/${prisonerNumber}`,
-    })
+    return this.get<ImageDetails[]>(
+      {
+        path: `/api/images/offenders/${prisonerNumber}`,
+      },
+      this.token,
+    )
   }
 
   async getImageDetail(imageId: number): Promise<ImageDetails> {
-    return this.restClient.get<ImageDetails>({
-      path: `/api/images/${imageId}`,
-    })
+    return this.get<ImageDetails>(
+      {
+        path: `/api/images/${imageId}`,
+      },
+      this.token,
+    )
   }
 }
