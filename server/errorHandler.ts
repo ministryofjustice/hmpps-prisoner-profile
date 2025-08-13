@@ -1,14 +1,16 @@
 import type { NextFunction, Request, Response } from 'express'
 import type { HTTPError } from 'superagent'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../logger'
 import NotFoundError from './utils/notFoundError'
 import ServerError from './utils/serverError'
 import RoleError from './utils/roleError'
 import { HmppsStatusCode } from './data/enums/hmppsStatusCode'
+import { errorHasStatus, getErrorStatus } from './utils/errorHelpers'
 
 export default function createErrorHandler(production: boolean) {
   return (
-    error: HTTPError | NotFoundError | ServerError | RoleError,
+    error: HTTPError | NotFoundError | ServerError | RoleError | SanitisedError,
     req: Request,
     res: Response,
     next: NextFunction,
@@ -19,25 +21,25 @@ export default function createErrorHandler(production: boolean) {
       logger.error(`Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`, error)
     }
 
-    if (error.status === 401) {
+    if (errorHasStatus(error, 401)) {
       logger.info('Logging user out')
       return res.redirect('/sign-out')
     }
 
     res.locals.hideBackLink = true
 
-    if (error.status === 404 || error.status === 403) {
-      res.status(error.status)
+    if (errorHasStatus(error, 404) || errorHasStatus(error, 403)) {
+      res.status(getErrorStatus(error))
       return res.render('notFound', { url: req.headers.referer || '/' })
     }
 
     res.locals.message = production
       ? 'Something went wrong. The error has been logged. Please try again'
       : error.message
-    res.locals.status = error.status
+    res.locals.status = getErrorStatus(error)
     res.locals.stack = production ? null : error.stack
 
-    res.status(error.status || 500)
+    res.status(getErrorStatus(error) || 500)
 
     return res.render('pages/error')
   }
