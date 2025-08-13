@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'node:crypto'
 import Page from '../../../../pages/page'
 import { Role } from '../../../../../server/data/enums/role'
 import ConfirmAddressPage from '../../../../pages/editPages/address/confirmAddressPage'
@@ -12,7 +12,7 @@ import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/
 context('Confirm Address Page', () => {
   const prisonerNumber = 'G6123VU'
   const bookingId = 1102484
-  const addressCacheId = uuidv4()
+  const addressCacheId = randomUUID()
   const addressKey = `ephemeral:${addressCacheId}`
   const address: AddressRequestDto = {
     buildingNumber: '1',

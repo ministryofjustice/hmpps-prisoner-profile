@@ -139,8 +139,7 @@
     "passport-oauth2": "^1.8.0",
     "redis": "^4.7.1",
     "superagent": "^9.0.2",
-    "url-value-parser": "^2.2.0",
-    "uuid": "^11.1.0"
+    "url-value-parser": "^2.2.0"
   },
   "devDependencies": {
     "@ministryofjustice/eslint-config-hmpps": "^0.0.3",
@@ -162,7 +161,6 @@
     "@types/passport-oauth2": "^1.8.0",
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^6.0.3",
-    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "audit-ci": "^7.1.0",
     "aws-sdk-client-mock": "^4.1.0",

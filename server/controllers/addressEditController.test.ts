@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'node:crypto'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { AuditService, Page, PostAction } from '../services/auditService'
@@ -18,7 +18,7 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 const clientToken = 'CLIENT_TOKEN'
 const { prisonerNumber } = PrisonerMockDataA
 const uprn = 1234
-const addressCacheId = uuidv4()
+const addressCacheId = randomUUID()
 const addressRequest: AddressRequestDto = {
   uprn,
   buildingNumber: '1',
