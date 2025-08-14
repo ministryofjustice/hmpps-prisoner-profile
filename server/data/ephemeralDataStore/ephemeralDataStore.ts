@@ -26,7 +26,7 @@ export class EphemeralDataStore {
 
   async getData<T>(key: UUID): Promise<EphemeralDataStoreResponse<T>> {
     await this.ensureConnected()
-    const data = await this.client.get(`ephemeral:${key}`)
+    const data = (await this.client.get(`ephemeral:${key}`))?.toString()
     return data && { key, value: JSON.parse(data) }
   }
 

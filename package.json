@@ -118,7 +118,7 @@
     "bunyan-format": "^0.2.1",
     "compression": "^1.8.1",
     "connect-flash": "^0.1.1",
-    "connect-redis": "^7.1.1",
+    "connect-redis": "^9.0.0",
     "contentful": "^11.7.15",
     "cropperjs": "^2.0.1",
     "csurf": "^1.11.0",
@@ -137,7 +137,7 @@
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^4.7.1",
+    "redis": "^5.7.0",
     "superagent": "^10.2.3",
     "url-value-parser": "^2.2.0"
   },
