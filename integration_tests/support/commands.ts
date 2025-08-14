@@ -52,6 +52,7 @@ Cypress.Commands.add(
     prisonerDataOverrides = {},
     isAKeyWorker = true,
     complexityLevel = ComplexityLevel.Low,
+    failToLoadKeyWorker = false,
   }) => {
     cy.task('stubNonAssociations', prisonerNumber)
     cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, overrides: prisonerDataOverrides })
@@ -66,6 +67,8 @@ Cypress.Commands.add(
     cy.task('stubPomData')
     cy.task('stubKeyWorkerData', { prisonerNumber })
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
+    if (failToLoadKeyWorker) cy.task('stubCurrentAllocationsFail', prisonerNumber)
+    else cy.task('stubCurrentAllocations', { prisonerNumber, complexityLevel })
     cy.task('stubGetOffenderContacts')
     cy.task('stubEventsForProfileImage', prisonerNumber)
     cy.task('stubGetMainOffence', bookingId)
