@@ -4,11 +4,9 @@ import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
 import PrisonerNonAssociations from './interfaces/nonAssociationsApi/PrisonerNonAssociations'
 
-export default class NonAssociationsApiRestClient implements NonAssociationsApiClient {
-  private restClient: RestClient
-
+export default class NonAssociationsApiRestClient extends RestClient implements NonAssociationsApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Non associations API', config.apis.nonAssociationsApi, token)
+    super('Non associations API', config.apis.nonAssociationsApi, token)
   }
 
   getPrisonerNonAssociations(
@@ -19,9 +17,12 @@ export default class NonAssociationsApiRestClient implements NonAssociationsApiC
       includeOtherPrisons?: 'true' | 'false'
     },
   ): Promise<PrisonerNonAssociations> {
-    return this.restClient.get<PrisonerNonAssociations>({
-      path: `/prisoner/${prisonerNumber}/non-associations`,
-      query: mapToQueryString(params),
-    })
+    return this.get<PrisonerNonAssociations>(
+      {
+        path: `/prisoner/${prisonerNumber}/non-associations`,
+        query: mapToQueryString(params),
+      },
+      this.token,
+    )
   }
 }

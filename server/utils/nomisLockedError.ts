@@ -1,4 +1,5 @@
 import logger from '../../logger'
+import { errorHasStatus } from './errorHelpers'
 
 export class NomisLockedError extends Error {
   status = 423
@@ -16,7 +17,7 @@ export async function handleNomisLockedError<T>(apiClientFunction: () => Promise
   try {
     return await apiClientFunction()
   } catch (e) {
-    if (e.status === 423) {
+    if (errorHasStatus(e, 423)) {
       logger.warn(`NomisLockedError: 423 status occurred when calling ${e.endpoint}`)
       throw new NomisLockedError(e.message, e.endpoint)
     }

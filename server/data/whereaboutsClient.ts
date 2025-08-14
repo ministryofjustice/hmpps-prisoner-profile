@@ -6,22 +6,23 @@ import { AppointmentDefaults, AppointmentDetails } from './interfaces/whereabout
 import config from '../config'
 import CellMoveReason from './interfaces/whereaboutsApi/CellMoveReason'
 
-export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
-  private readonly restClient: RestClient
-
+export default class WhereaboutsRestApiClient extends RestClient implements WhereaboutsApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApi, token)
+    super('Whereabouts API', config.apis.whereaboutsApi, token)
   }
 
   async getAppointment(appointmentId: number): Promise<AppointmentDetails> {
-    return this.restClient.get<AppointmentDetails>({ path: `/appointment/${appointmentId}` })
+    return this.get<AppointmentDetails>({ path: `/appointment/${appointmentId}` }, this.token)
   }
 
   async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {
-    return this.restClient.post<AppointmentDefaults>({
-      path: `/appointment`,
-      data: appointments,
-    })
+    return this.post<AppointmentDefaults>(
+      {
+        path: `/appointment`,
+        data: appointments as Record<string, any>,
+      },
+      this.token,
+    )
   }
 
   getUnacceptableAbsences(
@@ -30,9 +31,12 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     toDate: string,
     page: PageableQuery,
   ): Promise<UnacceptableAbsences> {
-    return this.restClient.get<UnacceptableAbsences>({
-      path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
-    })
+    return this.get<UnacceptableAbsences>(
+      {
+        path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
+      },
+      this.token,
+    )
   }
 
   getCellMoveReason(
@@ -40,9 +44,16 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     bedAssignmentHistorySequence: number,
     ignore404 = false,
   ): Promise<CellMoveReason> {
-    return this.restClient.get<CellMoveReason>({
-      path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
-      ignore404,
-    })
+    if (ignore404) {
+      return this.getAndIgnore404<CellMoveReason>({
+        path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
+      })
+    }
+    return this.get<CellMoveReason>(
+      {
+        path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
+      },
+      this.token,
+    )
   }
 }

@@ -6,22 +6,26 @@ import config from '../config'
 /**
  * REST API client implementation of [PrisonRegisterApiClient]
  */
-export default class PrisonRegisterApiRestClient implements PrisonRegisterApiClient {
-  private readonly restClient: RestClient
-
+export default class PrisonRegisterApiRestClient extends RestClient implements PrisonRegisterApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Prison Register API', config.apis.prisonRegisterApi, token)
+    super('Prison Register API', config.apis.prisonRegisterApi, token)
   }
 
   getPrisonByPrisonId(prisonId: string): Promise<PrisonDto> {
-    return this.restClient.get<PrisonDto>({
-      path: `/prisons/id/${prisonId}`,
-    })
+    return this.get<PrisonDto>(
+      {
+        path: `/prisons/id/${prisonId}`,
+      },
+      this.token,
+    )
   }
 
   getAllPrisons(): Promise<Array<PrisonDto>> {
-    return this.restClient.get<Array<PrisonDto>>({
-      path: '/prisons',
-    })
+    return this.get<Array<PrisonDto>>(
+      {
+        path: '/prisons',
+      },
+      this.token,
+    )
   }
 }

@@ -6,6 +6,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import AddressService from '../services/addressService'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
+import { getErrorStatus } from '../utils/errorHelpers'
 
 const simplePostCodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
 
@@ -78,7 +79,7 @@ export default class AddressController {
 
       res.json({ status: 200, results: optimisationOff ? rawApiResults : optimisedResults })
     } catch (error) {
-      res.status(error.status).json({ status: error.status, error: error.message })
+      res.status(getErrorStatus(error)).json({ status: getErrorStatus(error), error: error.message })
     }
   }
 }
