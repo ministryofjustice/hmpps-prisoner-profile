@@ -189,20 +189,12 @@ export default class ProfessionalContactsService {
   getProfessionalContactsOverview(
     clientToken: string,
     { prisonId, bookingId, prisonerNumber }: Prisoner,
-    isNewKeyWorkerServiceEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<YouthStaffContacts | StaffContacts> {
     const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
     return isYouthPrisoner
       ? this.getYouthStaffContactsOverview(clientToken, bookingId)
-      : this.getStaffContactsOverview(
-          clientToken,
-          bookingId,
-          prisonerNumber,
-          prisonId,
-          isNewKeyWorkerServiceEnabled,
-          apiErrorCallback,
-        )
+      : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, apiErrorCallback)
   }
 
   private async getYouthStaffContactsOverview(clientToken: string, bookingId: number) {
@@ -250,74 +242,41 @@ export default class ProfessionalContactsService {
     clientToken: string,
     bookingId: number,
     prisonerNumber: string,
-    prisonId: string,
-    isNewKeyWorkerServiceEnabled: boolean,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<StaffContacts> {
     const prisonApi = this.prisonApiClientBuilder(clientToken)
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
     const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
 
-    if (isNewKeyWorkerServiceEnabled) {
-      const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+    const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
 
-      const [communityManager, allocationManager, currentAllocatedStaff, bookingContacts] = await Promise.all([
-        Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
-        Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
-        Result.wrap(keyWorkerClient.getCurrentAllocations(prisonerNumber), apiErrorCallback),
-        prisonApi.getBookingContacts(bookingId),
-      ])
-
-      return {
-        keyWorker: currentAllocatedStaff
-          .map(({ allocations, latestRecordedEvents, hasHighComplexityOfNeeds }) => {
-            const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
-            const lastKeyWorkerSession = latestRecordedEvents.find(itm => itm.type === 'SESSION')
-            let name: string
-            if (hasHighComplexityOfNeeds) {
-              name = 'None - high complexity of need'
-            } else if (allocatedKeyWorker) {
-              name = `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
-            } else {
-              name = 'Not allocated'
-            }
-            return {
-              name,
-              lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
-            }
-          })
-          .toPromiseSettledResult(),
-        prisonOffenderManager: allocationManager
-          .map(pom => formatPomName(pom?.primary_pom?.name))
-          .toPromiseSettledResult(),
-        coworkingPrisonOffenderManager: allocationManager
-          .map(pom => formatPomName(pom?.secondary_pom?.name))
-          .toPromiseSettledResult(),
-        communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
-        resettlementWorker: bookingContacts.otherContacts
-          ?.filter(contact => contact.relationship === 'RW' && contact.activeFlag)
-          ?.sort((a, b) => sortByDateTime(b.createDateTime, a.createDateTime))
-          ?.map(contact =>
-            formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
-          )?.[0],
-      }
-    }
-
-    const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions, bookingContacts] = await Promise.all([
+    const [communityManager, allocationManager, currentAllocatedStaff, bookingContacts] = await Promise.all([
       Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
       Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
-      Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
-      prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+      Result.wrap(keyWorkerClient.getCurrentAllocations(prisonerNumber), apiErrorCallback),
       prisonApi.getBookingContacts(bookingId),
     ])
 
     return {
-      keyWorker: keyWorkerName
-        .map(name => ({
-          name,
-          lastSession:
-            keyWorkerSessions?.[0] !== undefined ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short') : '',
-        }))
+      keyWorker: currentAllocatedStaff
+        .map(({ allocations, latestRecordedEvents, hasHighComplexityOfNeeds }) => {
+          const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
+          const lastKeyWorkerSession = latestRecordedEvents.find(
+            itm => itm.type === 'SESSION' && itm.policy === 'KEY_WORKER',
+          )
+          let name: string
+          if (hasHighComplexityOfNeeds) {
+            name = 'None - high complexity of need'
+          } else if (allocatedKeyWorker) {
+            name = `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
+          } else {
+            name = 'Not allocated'
+          }
+          return {
+            name,
+            lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
+          }
+        })
         .toPromiseSettledResult(),
       prisonOffenderManager: allocationManager
         .map(pom => formatPomName(pom?.primary_pom?.name))
@@ -333,22 +292,6 @@ export default class ProfessionalContactsService {
           formatName(contact.firstName, null, contact.lastName, { style: NameFormatStyle.firstLast }),
         )?.[0],
     }
-  }
-
-  private getKeyWorkerName = async (clientToken: string, prisonerNumber: string, prisonId: string): Promise<string> => {
-    const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
-    const complexityApiClient = this.complexityApiClientBuilder(clientToken)
-
-    const complexityLevel =
-      config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
-      (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
-
-    if (complexityLevel === ComplexityLevel.High) return 'None - high complexity of need'
-
-    const keyWorker = await keyWorkerClient.getOffendersKeyWorker(prisonerNumber)
-    return keyWorker && keyWorker.firstName
-      ? `${convertToTitleCase(keyWorker.firstName)} ${convertToTitleCase(keyWorker.lastName)}`
-      : 'Not allocated'
   }
 }
 

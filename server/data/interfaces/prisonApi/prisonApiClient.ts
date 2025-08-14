@@ -78,8 +78,6 @@ export interface PrisonApiClient {
 
   getBookingContacts(bookingId: number): Promise<ContactDetail>
 
-  getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]>
-
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
 
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
