@@ -17,57 +17,63 @@ import {
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mapToQueryString } from '../utils/utils'
 
-export default class PersonalRelationshipsApiRestClient implements PersonalRelationshipsApiClient {
+export default class PersonalRelationshipsApiRestClient extends RestClient implements PersonalRelationshipsApiClient {
   private readonly restClient: RestClient
 
   constructor(token: string) {
-    this.restClient = new RestClient('Personal Relationships API', config.apis.personalRelationshipsApi, token)
+    super('Personal Relationships API', config.apis.personalRelationshipsApi, token)
   }
 
   getContacts(
     prisonerNumber: string,
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto> {
-    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) })
+    return this.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) }, this.token)
   }
 
   getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount> {
-    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact/count` })
+    return this.get({ path: `/prisoner/${prisonerNumber}/contact/count` }, this.token)
   }
 
   getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/number-of-children`, ignore404: true })
+    return this.getAndIgnore404({ path: `/prisoner/${prisonerNumber}/number-of-children` })
   }
 
   updateNumberOfChildren(
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest })
+    return this.put(
+      { path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest as Record<string, any> },
+      this.token,
+    )
   }
 
   getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto> {
-    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/domestic-status`, ignore404: true })
+    return this.getAndIgnore404({ path: `/prisoner/${prisonerNumber}/domestic-status` })
   }
 
   updateDomesticStatus(
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
   ): Promise<PersonalRelationshipsDomesticStatusDto> {
-    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest })
+    return this.put(
+      { path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest as Record<string, any> },
+      this.token,
+    )
   }
 
   getReferenceDataCodes(
     domain: PersonalRelationshipsReferenceDataDomain,
   ): Promise<PersonalRelationshipsReferenceCode[]> {
-    return this.restClient.get({ path: `/reference-codes/group/${domain}` })
+    return this.get({ path: `/reference-codes/group/${domain}` }, this.token)
   }
 
   createContact(contact: PersonalRelationshipsContactRequest): Promise<PersonalRelationshipsContactCreationResultDto> {
-    return this.restClient.post({ path: '/contact', data: contact })
+    return this.post({ path: '/contact', data: contact as Record<string, any> }, this.token)
   }
 
   addContactAddress(contactId: number, address: PersonalRelationshipsContactRequestAddress): Promise<void> {
-    return this.restClient.post({ path: `/contact/${contactId}/address`, data: address })
+    return this.post({ path: `/contact/${contactId}/address`, data: address as Record<string, any> }, this.token)
   }
 }

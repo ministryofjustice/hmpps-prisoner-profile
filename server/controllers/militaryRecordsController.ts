@@ -16,6 +16,7 @@ import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { dateToIsoDate } from '../utils/dateHelpers'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 export default class MilitaryRecordsController {
   constructor(
@@ -186,7 +187,7 @@ export default class MilitaryRecordsController {
             )
           }
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }
@@ -295,7 +296,7 @@ export default class MilitaryRecordsController {
             formValues,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }
@@ -411,7 +412,7 @@ export default class MilitaryRecordsController {
             formValues,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }
@@ -536,7 +537,7 @@ export default class MilitaryRecordsController {
             formValues,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }

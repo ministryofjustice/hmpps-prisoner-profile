@@ -6,28 +6,29 @@ import { LocationsInsidePrisonApiClient } from './interfaces/locationsInsidePris
 import LocationsApiLocation from './interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 import LocationsAttributes from './interfaces/locationsInsidePrisonApi/LocationsAttributes'
 
-export default class LocationsInsidePrisonApiRestClient implements LocationsInsidePrisonApiClient {
-  private readonly restClient: RestClient
-
+export default class LocationsInsidePrisonApiRestClient extends RestClient implements LocationsInsidePrisonApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Locations inside prison API', config.apis.locationsInsidePrisonApi, token)
+    super('Locations inside prison API', config.apis.locationsInsidePrisonApi, token)
   }
 
   async getLocation(id: string): Promise<LocationsApiLocation> {
-    return this.restClient.get<LocationsApiLocation>({ path: `/locations/${id}?formatLocalName=true` })
+    return this.get<LocationsApiLocation>({ path: `/locations/${id}?formatLocalName=true` }, this.token)
   }
 
   async getLocationByKey(key: string): Promise<LocationsApiLocation> {
-    return this.restClient.get<LocationsApiLocation>({ path: `/locations/key/${key}` })
+    return this.get<LocationsApiLocation>({ path: `/locations/key/${key}` }, this.token)
   }
 
   async getLocationAttributes(id: string): Promise<LocationsAttributes[]> {
-    return this.restClient.get<LocationsAttributes[]>({ path: `/locations/${id}/attributes` })
+    return this.get<LocationsAttributes[]>({ path: `/locations/${id}/attributes` }, this.token)
   }
 
   async getLocationsForAppointments(id: string): Promise<LocationsApiLocation[]> {
-    return this.restClient.get<LocationsApiLocation[]>({
-      path: `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
-    })
+    return this.get<LocationsApiLocation[]>(
+      {
+        path: `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
+      },
+      this.token,
+    )
   }
 }

@@ -19,6 +19,7 @@ import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -190,7 +191,7 @@ export default class CaseNotesController {
             caseNote,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }
@@ -301,7 +302,7 @@ export default class CaseNotesController {
             text,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }

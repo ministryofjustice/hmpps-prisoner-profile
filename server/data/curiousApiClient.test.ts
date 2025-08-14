@@ -108,7 +108,7 @@ describe('curiousApiClient', () => {
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)
-        expect(e.status).toEqual(401)
+        expect(e.responseStatus).toEqual(401)
         expect(e.data).toEqual(expectedResponseBody)
       }
     })

@@ -3,16 +3,17 @@ import config from '../config'
 import CurrentCsipDetail from './interfaces/csipApi/csip'
 import { CsipApiClient } from './interfaces/csipApi/csipApiClient'
 
-export default class CsipApiRestClient implements CsipApiClient {
-  private readonly restClient: RestClient
-
+export default class CsipApiRestClient extends RestClient implements CsipApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('CSIP API', config.apis.csipApi, token)
+    super('CSIP API', config.apis.csipApi, token)
   }
 
   async getCurrentCsip(prisonerNumber: string): Promise<CurrentCsipDetail> {
-    return this.restClient.get<CurrentCsipDetail>({
-      path: `/prisoners/${prisonerNumber}/csip-records/current`,
-    })
+    return this.get<CurrentCsipDetail>(
+      {
+        path: `/prisoners/${prisonerNumber}/csip-records/current`,
+      },
+      this.token,
+    )
   }
 }

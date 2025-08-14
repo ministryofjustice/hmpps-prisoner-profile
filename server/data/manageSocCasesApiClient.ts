@@ -3,14 +3,12 @@ import Nominal from './interfaces/manageSocCasesApi/Nominal'
 import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import config from '../config'
 
-export default class ManageSocCasesApiRestClient implements ManageSocCasesApiClient {
-  private readonly restClient: RestClient
-
+export default class ManageSocCasesApiRestClient extends RestClient implements ManageSocCasesApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Manage SOC Cases API', config.apis.manageSocCasesApi, token)
+    super('Manage SOC Cases API', config.apis.manageSocCasesApi, token)
   }
 
   async getNominal(offenderNumber: string): Promise<Nominal | null> {
-    return this.restClient.get<Nominal | null>({ path: `/soc/nominal/nomsId/${offenderNumber}`, ignore404: true })
+    return this.getAndIgnore404<Nominal | null>({ path: `/soc/nominal/nomsId/${offenderNumber}` })
   }
 }

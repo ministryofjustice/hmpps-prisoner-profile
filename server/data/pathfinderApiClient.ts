@@ -3,17 +3,14 @@ import { PathfinderApiClient } from './interfaces/pathfinderApi/pathfinderApiCli
 import Nominal from './interfaces/manageSocCasesApi/Nominal'
 import config from '../config'
 
-export default class PathfinderApiRestClient implements PathfinderApiClient {
-  private readonly restClient: RestClient
-
+export default class PathfinderApiRestClient extends RestClient implements PathfinderApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Pathfinder API', config.apis.pathfinderApi, token)
+    super('Pathfinder API', config.apis.pathfinderApi, token)
   }
 
   async getNominal(offenderNumber: string): Promise<Nominal | null> {
-    return this.restClient.get<Nominal | null>({
+    return this.getAndIgnore404<Nominal | null>({
       path: `/pathfinder/nominal/noms-id/${offenderNumber}`,
-      ignore404: true,
     })
   }
 }

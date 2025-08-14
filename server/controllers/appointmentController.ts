@@ -42,6 +42,7 @@ import CreateVideoBookingRequest, {
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 import { bvlsHmctsLinkGuestPinEnabled } from '../utils/featureToggles'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -279,7 +280,7 @@ export default class AppointmentController {
         try {
           await this.createOrAmendAppointments(clientToken, prisonerNumber, appointmentsToCreate, appointmentForm)
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.data.userMessage })
           } else throw error
         }
@@ -581,7 +582,7 @@ export default class AppointmentController {
             prePostAppointmentDetails,
           )
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.data.userMessage })
           } else {
             throw error

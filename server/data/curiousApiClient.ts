@@ -9,55 +9,47 @@ import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
 import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
 import { CuriousApiToken } from './hmppsAuthClient'
 
-export default class CuriousRestApiClient implements CuriousApiClient {
-  private readonly restClient: RestClient
-
+export default class CuriousRestApiClient extends RestClient implements CuriousApiClient {
   constructor(token: CuriousApiToken) {
-    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
+    super('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
   }
 
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {
-    return this.restClient.get<LearnerEmployabilitySkills>({
+    return this.getAndIgnore404<LearnerEmployabilitySkills>({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
-      ignore404: true,
     })
   }
 
   async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[]> {
-    return this.restClient.get<LearnerProfile[]>({
+    return this.getAndIgnore404<LearnerProfile[]>({
       path: `/learnerProfile/${offenderNumber}`,
-      ignore404: true,
     })
   }
 
   async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
-    return this.restClient.get<LearnerEductionPagedResponse>({
+    return this.getAndIgnore404<LearnerEductionPagedResponse>({
       path: `/learnerEducation/${offenderNumber}`,
       query: {
         page,
       },
-      ignore404: true,
     })
   }
 
   async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[]> {
-    return this.restClient.get<LearnerLatestAssessment[]>({
+    return this.getAndIgnore404<LearnerLatestAssessment[]>({
       path: `/latestLearnerAssessments/${offenderNumber}`,
-      ignore404: true,
     })
   }
 
   async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals> {
-    return this.restClient.get<LearnerGoals>({
+    return this.getAndIgnore404<LearnerGoals>({
       path: `/learnerGoals/${offenderNumber}`,
-      ignore404: true,
     })
   }
 
   async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[]> {
-    return this.restClient.get<LearnerNeurodivergence[]>({
+    return this.getAndIgnore404<LearnerNeurodivergence[]>({
       path: `/learnerNeurodivergence/${offenderNumber}`,
-      ignore404: true,
     })
   }
 }

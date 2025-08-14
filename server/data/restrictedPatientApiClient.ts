@@ -3,17 +3,14 @@ import RestClient from './restClient'
 import { RestrictedPatientApiClient } from './interfaces/restrictedPatientApi/restrictedPatientApiClient'
 import RestrictedPatient from './interfaces/restrictedPatientApi/RestrictedPatient'
 
-export default class RestrictedPatientApiRestClient implements RestrictedPatientApiClient {
-  private readonly restClient: RestClient
-
+export default class RestrictedPatientApiRestClient extends RestClient implements RestrictedPatientApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Restricted Patient API', config.apis.restrictedPatientApi, token)
+    super('Restricted Patient API', config.apis.restrictedPatientApi, token)
   }
 
   async getRestrictedPatient(prisonerNumber: string): Promise<RestrictedPatient> {
-    return this.restClient.get<RestrictedPatient>({
+    return this.getAndIgnore404<RestrictedPatient>({
       path: `/restricted-patient/prison-number/${prisonerNumber}`,
-      ignore404: true,
     })
   }
 }

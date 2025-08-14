@@ -6,11 +6,9 @@ export interface PrisonerProfileApiClient {
   getWithheldPrisonerPhoto(): Promise<Readable>
 }
 
-export default class PrisonerProfileApiRestClient implements PrisonerProfileApiClient {
-  private readonly restClient: RestClient
-
+export default class PrisonerProfileApiRestClient extends RestClient implements PrisonerProfileApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient(
+    super(
       'Prisoner profile API',
       { url: config.domain, timeout: { response: 5000, deadline: 5000 }, agent: new AgentConfig(5000) },
       token,
@@ -18,7 +16,7 @@ export default class PrisonerProfileApiRestClient implements PrisonerProfileApiC
   }
 
   async getWithheldPrisonerPhoto(): Promise<Readable> {
-    return this.restClient.stream({
+    return this.stream({
       path: '/assets/images/category-a-prisoner-image.jpg',
     })
   }

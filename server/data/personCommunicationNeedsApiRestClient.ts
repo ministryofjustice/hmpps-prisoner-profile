@@ -10,19 +10,20 @@ import {
 import { ReferenceDataCode } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { handleNomisLockedError } from '../utils/nomisLockedError'
 
-export default class PersonCommunicationNeedsApiRestClient implements PersonCommunicationNeedsApiClient {
-  private readonly restClient: RestClient
-
+export default class PersonCommunicationNeedsApiRestClient
+  extends RestClient
+  implements PersonCommunicationNeedsApiClient
+{
   constructor(token: string) {
-    this.restClient = new RestClient('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token)
+    super('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token)
   }
 
   getReferenceDataCodes(domain: PersonCommunicationNeedsReferenceDataDomain): Promise<ReferenceDataCode[]> {
-    return this.restClient.get({ path: `/v1/reference-data/domains/${domain}/codes` })
+    return this.get({ path: `/v1/reference-data/domains/${domain}/codes` }, this.token)
   }
 
   getCommunicationNeeds(prisonerNumber: string): Promise<CommunicationNeedsDto> {
-    return this.restClient.get({ path: `/v1/prisoner/${prisonerNumber}/communication-needs` })
+    return this.get({ path: `/v1/prisoner/${prisonerNumber}/communication-needs` }, this.token)
   }
 
   updateLanguagePreferences(
@@ -30,25 +31,31 @@ export default class PersonCommunicationNeedsApiRestClient implements PersonComm
     languagePreferencesRequest: LanguagePreferencesRequest,
   ): Promise<void> {
     return handleNomisLockedError(() =>
-      this.restClient.put({
-        path: `/v1/prisoner/${prisonerNumber}/language-preferences`,
-        data: languagePreferencesRequest,
-      }),
+      this.put(
+        {
+          path: `/v1/prisoner/${prisonerNumber}/language-preferences`,
+          data: languagePreferencesRequest as Record<string, any>,
+        },
+        this.token,
+      ),
     )
   }
 
   updateSecondaryLanguage(prisonerNumber: string, secondaryLanguageRequest: SecondaryLanguageRequest): Promise<void> {
     return handleNomisLockedError(() =>
-      this.restClient.put({
-        path: `/v1/prisoner/${prisonerNumber}/secondary-language`,
-        data: secondaryLanguageRequest,
-      }),
+      this.put(
+        {
+          path: `/v1/prisoner/${prisonerNumber}/secondary-language`,
+          data: secondaryLanguageRequest as Record<string, any>,
+        },
+        this.token,
+      ),
     )
   }
 
   deleteSecondaryLanguage(prisonerNumber: string, languageCode: string): Promise<void> {
     return handleNomisLockedError(() =>
-      this.restClient.delete({ path: `/v1/prisoner/${prisonerNumber}/secondary-language/${languageCode}` }),
+      this.delete({ path: `/v1/prisoner/${prisonerNumber}/secondary-language/${languageCode}` }, this.token),
     )
   }
 }

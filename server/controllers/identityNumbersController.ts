@@ -24,6 +24,7 @@ import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import OffenderIdentifier from '../data/interfaces/prisonApi/OffenderIdentifier'
 import HmppsError from '../interfaces/HmppsError'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 export interface EditIdentityNumberSubmission {
   type?: string
@@ -164,7 +165,7 @@ export default class IdentityNumbersController {
                 request,
               )
             } catch (error) {
-              if (error.status === 400) {
+              if (errorHasStatus(error, 400)) {
                 errors.push({ text: error?.data?.userMessage ?? error.message })
               } else throw error
             }
@@ -255,7 +256,7 @@ export default class IdentityNumbersController {
               request,
             )
           } catch (error) {
-            if (error.status === 400) {
+            if (errorHasStatus(error, 400)) {
               errors.push({ text: error?.data?.userMessage ?? error.message })
             } else throw error
           }
