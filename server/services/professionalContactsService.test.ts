@@ -17,6 +17,7 @@ import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiC
 import { complexityOfNeedHighMock } from '../data/localMockData/complexityOfNeedMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { mockContactDetail, mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
+import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -568,8 +569,8 @@ describe('professionalContactsService', () => {
         keyWorker: {
           status: 'fulfilled',
           value: {
-            name: 'Dave Stevens',
-            lastSession: '',
+            name: 'New Key-Worker',
+            lastSession: '24/06/2025',
           },
         },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
@@ -598,7 +599,14 @@ describe('professionalContactsService', () => {
 
     it('should get the staff contact details for a prisoner with complex needs', async () => {
       prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
-      complexityApiClient.getComplexityOfNeed = jest.fn().mockResolvedValue(complexityOfNeedHighMock)
+      keyWorkerApiClient.getCurrentAllocations = jest.fn(
+        async () =>
+          ({
+            ...staffAllocationMock,
+            hasHighComplexityOfNeeds: true,
+            latestRecordedEvents: [],
+          }) as StaffAllocation,
+      )
       const result = await professionalContactsService.getProfessionalContactsOverview('token', {
         ...PrisonerMockDataA,
         prisonId: 'AGI',
@@ -621,7 +629,7 @@ describe('professionalContactsService', () => {
     it('should use new key worker endpoint to get key worker details for prisons onboard the new version of key worker service', async () => {
       prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
 
-      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA, true)
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
         keyWorker: {
@@ -640,7 +648,7 @@ describe('professionalContactsService', () => {
 
     it('should handle error getting keyworkers name', async () => {
       prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
-      keyWorkerApiClient.getOffendersKeyWorker = jest.fn().mockRejectedValue('Some error')
+      keyWorkerApiClient.getCurrentAllocations = jest.fn().mockRejectedValue('Some error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
@@ -660,8 +668,8 @@ describe('professionalContactsService', () => {
         keyWorker: {
           status: 'fulfilled',
           value: {
-            name: 'Dave Stevens',
-            lastSession: '',
+            name: 'New Key-Worker',
+            lastSession: '24/06/2025',
           },
         },
         prisonOffenderManager: { status: 'rejected', reason: 'API error' },
@@ -679,8 +687,8 @@ describe('professionalContactsService', () => {
         keyWorker: {
           status: 'fulfilled',
           value: {
-            name: 'Dave Stevens',
-            lastSession: '',
+            name: 'New Key-Worker',
+            lastSession: '24/06/2025',
           },
         },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
