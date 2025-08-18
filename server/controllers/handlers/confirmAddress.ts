@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../../utils/notFoundError'
 import { AuditService, Page } from '../../services/auditService'

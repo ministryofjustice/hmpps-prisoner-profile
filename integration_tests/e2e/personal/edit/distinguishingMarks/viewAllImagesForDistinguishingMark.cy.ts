@@ -8,7 +8,10 @@ const bookingId = 1102484
 const markId = 100
 
 const visitAllImagesPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/all-photos` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/all-photos`,
+  })
 }
 
 context('View all images for a distinguishing mark', () => {

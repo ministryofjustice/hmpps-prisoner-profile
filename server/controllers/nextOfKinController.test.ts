@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { randomUUID, UUID } from 'node:crypto'
+import { randomUUID, UUID } from 'crypto'
 import NextOfKinService from '../services/nextOfKinService'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'

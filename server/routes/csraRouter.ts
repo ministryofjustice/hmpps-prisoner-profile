@@ -10,7 +10,7 @@ import checkCsraAccess from '../middleware/checkCsraAccessMiddleware'
 export default function alertsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
-  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const basePath = '/prisoner/:prisonerNumber'
 
   const csraController = new CsraController(services.csraService, services.auditService)
 

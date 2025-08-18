@@ -1,4 +1,4 @@
-import { randomUUID, UUID } from 'node:crypto'
+import { randomUUID, UUID } from 'crypto'
 import type { RedisClient } from '../redisClient'
 
 import logger from '../../../logger'

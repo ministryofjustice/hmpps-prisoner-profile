@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import { apostrophe, formatName, mapRelationshipDescriptionByCode, objectToSelectOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinService from '../services/nextOfKinService'

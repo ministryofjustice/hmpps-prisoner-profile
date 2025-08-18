@@ -96,6 +96,23 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
   })
 
+  it.each([undefined, null, '', 'ABC123', 'G6123VUT'])(
+    'should return NotFoundError if a valid prisonerNumber is not provided: %s',
+    async prisonerNumber => {
+      req = {
+        ...req,
+        params: { prisonerNumber },
+      }
+
+      await getPrisonerData(services)(req, res, next)
+
+      expect(next).toHaveBeenCalledWith(new NotFoundError())
+      expect(prisonerSearchApiClient.getPrisonerDetails).not.toHaveBeenCalled()
+      expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+      expect(prisonApiClient.getAssessments).not.toHaveBeenCalled()
+    },
+  )
+
   it('should return NotFoundError if prisonerData.prisonerNumber is undefined', async () => {
     prisonerSearchApiClient.getPrisonerDetails = jest.fn(
       async (): Promise<Prisoner> => ({

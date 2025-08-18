@@ -19,16 +19,31 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
 import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import setUpCsrf from '../middleware/setUpCsrf'
+import { parameterGuard } from '../middleware/parameterGuard'
 
 // Define valid mark types
-export const markTypes = 'tattoo|scar|mark'
+export const markTypes = ['tattoo', 'scar', 'mark']
 
 // Define valid body parts
-const validBodyParts =
-  'face|front-and-sides|right-arm|right-leg|right-hand|right-foot|left-arm|left-leg|left-hand|left-foot|back|neck'
+const validBodyParts = [
+  'face',
+  'front-and-sides',
+  'right-arm',
+  'right-leg',
+  'right-hand',
+  'right-foot',
+  'left-arm',
+  'left-leg',
+  'left-hand',
+  'left-foot',
+  'back',
+  'neck',
+]
 
 export function distinguishingMarksMulterExceptions(path: string): boolean {
-  return path.match(`\\/personal\\/(${markTypes})\\/(${validBodyParts})`) != null
+  return (
+    path.match(`\\/personal\\/distinguishing-marks\\/(${markTypes.join('|')})\\/(${validBodyParts.join('|')})`) != null
+  )
 }
 
 export default function distinguishingMarksRouter(services: Services): Router {
@@ -55,7 +70,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
     return next()
   })
 
-  router.get('*', (req, res, next) => {
+  router.get('*splat', (req, res, next) => {
     res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
     next()
   })
@@ -78,13 +93,15 @@ export default function distinguishingMarksRouter(services: Services): Router {
 
   // Add distinguishing mark with detail
   get(
-    `/:bodyPart(${validBodyParts})`,
+    `/:bodyPart/detail`,
+    parameterGuard('bodyPart', validBodyParts),
     ...commonMiddleware,
     setUpCsrf(),
     distinguishingMarksController.newDistinguishingMarkWithDetail,
   )
   post(
-    `/:bodyPart(${validBodyParts})`,
+    `/:bodyPart/detail`,
+    parameterGuard('bodyPart', validBodyParts),
     ...commonMiddleware,
     multer().fields(allBodyParts.map(part => ({ name: `file-${part}`, maxCount: 1 }))),
     setUpCsrf(),

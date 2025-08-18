@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'crypto'
 import { RedisClient } from '../redisClient'
 import { EphemeralDataStore } from './ephemeralDataStore'
 

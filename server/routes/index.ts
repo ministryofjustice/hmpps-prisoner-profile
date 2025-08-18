@@ -45,7 +45,7 @@ export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
-  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const basePath = '/prisoner/:prisonerNumber'
 
   router.use(async (req, res, next) => {
     res.locals = {

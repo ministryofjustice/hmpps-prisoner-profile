@@ -45,6 +45,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
+        backLinkUrl: '/prisoner/A12345/personal#marks',
         markType,
         selected: undefined,
       })
@@ -71,6 +72,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
+        backLinkUrl: '/prisoner/A12345/personal#marks',
         markType: 'tattoo',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
@@ -86,6 +88,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
+        backLinkUrl: '/prisoner/A12345/personal#marks',
         markType: 'tattoo',
         selected: 'invalidSelection',
         verifiedSelection: undefined,
@@ -217,6 +220,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
+        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}?selected=left-leg`,
         markType,
         bodyPart: 'leftLeg',
       })
@@ -231,6 +235,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
+        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo?selected=${bodyPart}`,
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
       })
@@ -441,7 +446,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType,
-        cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
         selected: 'left-leg',
         verifiedSelection: 'leftLeg',
       })
@@ -460,7 +465,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType: 'tattoo',
-        cancelUrl: '/prisoner/A12345/personal/tattoo/100',
+        cancelUrl: '/prisoner/A12345/personal/distinguishing-marks/tattoo/100',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
       })
@@ -508,7 +513,7 @@ describe('Distinguishing Marks Controller', () => {
           bodyPartMap[bodyPart],
         )
         expect(res.redirect).toHaveBeenCalledWith(
-          `/prisoner/A12345/personal/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
+          `/prisoner/A12345/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
         )
       },
     )
@@ -537,7 +542,9 @@ describe('Distinguishing Marks Controller', () => {
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/tattoo/100?updated=true`)
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true`,
+        )
       },
     )
 
@@ -602,8 +609,8 @@ describe('Distinguishing Marks Controller', () => {
         markType,
         bodyPart: 'leftLeg',
         specificBodyPart: 'leftLeg',
-        backLinkUrl: `/prisoner/A12345/personal/${markType}/100/body-part?selected=left-leg`,
-        cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
+        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100/body-part?selected=left-leg`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
       })
     })
 
@@ -622,7 +629,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
-        cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
       })
     })
 
@@ -856,7 +863,7 @@ describe('Distinguishing Marks Controller', () => {
           url: `/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345`,
           alt: `Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}`,
         },
-        cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
         upload: false,
       })
     })
@@ -885,7 +892,7 @@ describe('Distinguishing Marks Controller', () => {
           url: `/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345`,
           alt: `Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}`,
         },
-        cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
         upload: false,
       })
     })
@@ -990,7 +997,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType,
-        cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
         upload: false,
       })
     })
@@ -1012,7 +1019,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType: 'tattoo',
-        cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
         upload: false,
       })
     })
@@ -1052,9 +1059,9 @@ describe('Distinguishing Marks Controller', () => {
 
   describe('addPhoto', () => {
     it.each([
-      [undefined, '/prisoner/A12345/personal/tattoo/100?updated=true'],
-      ['returnToMarkSummary', '/prisoner/A12345/personal/tattoo/100?updated=true'],
-      ['addAnotherPhoto', '/prisoner/A12345/personal/tattoo/100/photo?updated=true'],
+      [undefined, '/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true'],
+      ['returnToMarkSummary', '/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true'],
+      ['addAnotherPhoto', '/prisoner/A12345/personal/distinguishing-marks/tattoo/100/photo?updated=true'],
     ])(
       'should add a new distinguishing mark photo and redirect correctly',
       async (action: string | undefined, redirectUrl: string) => {
