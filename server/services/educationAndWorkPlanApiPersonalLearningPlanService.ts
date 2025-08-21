@@ -4,6 +4,7 @@ import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPla
 import toPersonalLearningPlanActionPlan from './mappers/personalLearningPlanActionPlanMapper'
 import logger from '../../logger'
 import PersonalLearningPlanService from './personalLearningPlanService'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 /**
  * Implementation of [PersonalLearningPlanService] that uses the [EducationAndWorkPlanApiClient] as data source
@@ -19,7 +20,7 @@ export default class EducationAndWorkPlanApiPersonalLearningPlanService extends 
       const allGoals = await this.educationAndWorkPlanApiClientBuilder(systemToken).getAllGoals(prisonerNumber)
       return toPersonalLearningPlanActionPlan(prisonerNumber, allGoals)
     } catch (error) {
-      if (error.status === 404) {
+      if (errorHasStatus(error, 404)) {
         return toPersonalLearningPlanActionPlan(prisonerNumber, { goals: [] })
       }
       logger.error('Error calling the Education And Work Plan API to get the prisoner action plan', error)
