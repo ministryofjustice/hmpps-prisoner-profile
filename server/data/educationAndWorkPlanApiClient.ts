@@ -7,15 +7,13 @@ import GetGoalsResponse from './interfaces/educationAndWorkPlanApi/GetGoalsRespo
 /**
  * REST API client implementation of [EducationAndWorkPlanApiClient] (aka. the PLP API Client)
  */
-export default class EducationAndWorkPlanApiRestClient implements EducationAndWorkPlanApiClient {
-  private readonly restClient: RestClient
-
+export default class EducationAndWorkPlanApiRestClient extends RestClient implements EducationAndWorkPlanApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Education And Work Plan API', config.apis.educationAndWorkPlanApi, token)
+    super('Education And Work Plan API', config.apis.educationAndWorkPlanApi, token)
   }
 
   getAllGoals(prisonerNumber: string): Promise<GetGoalsResponse> {
-    return this.restClient.get<ActionPlanResponse>({
+    return this.get<ActionPlanResponse>({
       path: `/action-plans/${prisonerNumber}/goals`,
     })
   }

@@ -1,15 +1,13 @@
-import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
 import PagedList from './interfaces/prisonApi/PagedList'
 import { AlertsApiClient } from './interfaces/alertsApi/alertsApiClient'
 import { Alert, AlertChanges, AlertsApiQueryParams, AlertType, CreateAlert } from './interfaces/alertsApi/Alert'
 import config from '../config'
+import RestClient from './restClient'
 
-export default class AlertsApiRestClient implements AlertsApiClient {
-  private readonly restClient: RestClient
-
+export default class AlertsApiRestClient extends RestClient implements AlertsApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Alerts API', config.apis.alertsApi, token)
+    super('Alerts API', config.apis.alertsApi, token)
   }
 
   async getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>> {
@@ -20,25 +18,31 @@ export default class AlertsApiRestClient implements AlertsApiClient {
       ...rest,
     }
 
-    return this.restClient.get<PagedList<Alert>>({
-      path: `/prisoners/${prisonerNumber}/alerts`,
-      query: mapToQueryString(params),
-    })
+    return this.get<PagedList<Alert>>(
+      {
+        path: `/prisoners/${prisonerNumber}/alerts`,
+        query: mapToQueryString(params),
+      },
+      this.token,
+    )
   }
 
   async getAlertDetails(alertId: string): Promise<Alert> {
-    return this.restClient.get<Alert>({ path: `/alerts/${alertId}` })
+    return this.get<Alert>({ path: `/alerts/${alertId}` }, this.token)
   }
 
   async createAlert(prisonerNumber: string, alert: CreateAlert): Promise<Alert> {
-    return this.restClient.post<Alert>({ path: `/prisoners/${prisonerNumber}/alerts`, data: alert })
+    return this.post<Alert>(
+      { path: `/prisoners/${prisonerNumber}/alerts`, data: alert as Record<string, any> },
+      this.token,
+    )
   }
 
   async updateAlert(alertId: string, alertChanges: AlertChanges): Promise<Alert> {
-    return this.restClient.put<Alert>({ path: `/alerts/${alertId}`, data: alertChanges })
+    return this.put<Alert>({ path: `/alerts/${alertId}`, data: alertChanges as Record<string, any> }, this.token)
   }
 
   async getAlertTypes(): Promise<AlertType[]> {
-    return this.restClient.get<AlertType[]>({ path: '/alert-types' })
+    return this.get<AlertType[]>({ path: '/alert-types' }, this.token)
   }
 }

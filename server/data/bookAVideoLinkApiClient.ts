@@ -1,4 +1,3 @@
-import RestClient from './restClient'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import CreateVideoBookingRequest, {
@@ -9,45 +8,62 @@ import CreateVideoBookingRequest, {
 import { mapToQueryString } from '../utils/utils'
 import Court, { ProbationTeam } from './interfaces/bookAVideoLinkApi/Court'
 import ReferenceCode from './interfaces/bookAVideoLinkApi/ReferenceCode'
+import RestClient from './restClient'
 
-export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiClient {
-  private readonly restClient: RestClient
-
+export default class BookAVideoLinkRestApiClient extends RestClient implements BookAVideoLinkApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Book A Video Link API', config.apis.bookAVideoLinkApi, token)
+    super('Book A Video Link API', config.apis.bookAVideoLinkApi, token)
   }
 
   async addVideoLinkBooking(videoLinkBooking: CreateVideoBookingRequest): Promise<number> {
-    return this.restClient.post<number>({ path: '/video-link-booking', data: videoLinkBooking })
+    return this.post<number>({ path: '/video-link-booking', data: videoLinkBooking as Record<string, any> }, this.token)
   }
 
   async amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: AmendVideoBookingRequest): Promise<void> {
-    return this.restClient.put<void>({ path: `/video-link-booking/id/${videoBookingId}`, data: videoLinkBooking })
+    return this.put<void>(
+      {
+        path: `/video-link-booking/id/${videoBookingId}`,
+        data: videoLinkBooking as Record<string, any>,
+      },
+      this.token,
+    )
   }
 
   async getVideoLinkBooking(searchRequest: VideoBookingSearchRequest): Promise<VideoLinkBooking> {
-    return this.restClient.post<VideoLinkBooking>({ path: '/video-link-booking/search', data: searchRequest })
+    return this.post<VideoLinkBooking>(
+      {
+        path: '/video-link-booking/search',
+        data: searchRequest as Record<string, any>,
+      },
+      this.token,
+    )
   }
 
   async getCourts(): Promise<Court[]> {
-    return this.restClient.get({
-      path: `/courts`,
-      query: mapToQueryString({ enabledOnly: false }),
-    })
+    return this.get(
+      {
+        path: `/courts`,
+        query: mapToQueryString({ enabledOnly: false }),
+      },
+      this.token,
+    )
   }
 
   async getProbationTeams(): Promise<ProbationTeam[]> {
-    return this.restClient.get({
-      path: `/probation-teams`,
-      query: mapToQueryString({ enabledOnly: false }),
-    })
+    return this.get(
+      {
+        path: `/probation-teams`,
+        query: mapToQueryString({ enabledOnly: false }),
+      },
+      this.token,
+    )
   }
 
   async getCourtHearingTypes(): Promise<ReferenceCode[]> {
-    return this.restClient.get({ path: `/reference-codes/group/COURT_HEARING_TYPE` })
+    return this.get({ path: `/reference-codes/group/COURT_HEARING_TYPE` }, this.token)
   }
 
   async getProbationMeetingTypes(): Promise<ReferenceCode[]> {
-    return this.restClient.get({ path: `/reference-codes/group/PROBATION_MEETING_TYPE` })
+    return this.get({ path: `/reference-codes/group/PROBATION_MEETING_TYPE` }, this.token)
   }
 }

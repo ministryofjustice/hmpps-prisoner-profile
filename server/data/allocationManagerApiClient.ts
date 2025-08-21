@@ -3,14 +3,12 @@ import config from '../config'
 import AllocationManagerClient from './interfaces/allocationManagerApi/allocationManagerClient'
 import Pom from './interfaces/allocationManagerApi/Pom'
 
-export default class AllocationManagerApiClient implements AllocationManagerClient {
-  private readonly restClient: RestClient
-
+export default class AllocationManagerApiClient extends RestClient implements AllocationManagerClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Allocation Manager API', config.apis.allocationManager, token)
+    super('Allocation Manager API', config.apis.allocationManager, token)
   }
 
   async getPomByOffenderNo(offenderNumber: string): Promise<Pom> {
-    return this.restClient.get<Pom>({ path: `/api/allocation/${offenderNumber}`, ignore404: true })
+    return this.getAndIgnore404<Pom>({ path: `/api/allocation/${offenderNumber}` })
   }
 }

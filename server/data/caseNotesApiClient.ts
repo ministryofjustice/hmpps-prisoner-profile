@@ -1,6 +1,5 @@
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-
 import config from '../config'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
 import { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
@@ -8,23 +7,9 @@ import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
 import FindCaseNotesResponse from './interfaces/caseNotesApi/FindCaseNotesResponse'
 
-export default class CaseNotesApiRestClient implements CaseNotesApiClient {
-  private readonly restClient: RestClient
-
+export default class CaseNotesApiRestClient extends RestClient implements CaseNotesApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Case Notes API', config.apis.caseNotesApi, token)
-  }
-
-  private async get<T>(args: object): Promise<T> {
-    return this.restClient.get<T>(args)
-  }
-
-  private async post(args: object): Promise<unknown> {
-    return this.restClient.post(args)
-  }
-
-  private async put(args: object): Promise<unknown> {
-    return this.restClient.put(args)
+    super('Case Notes API', config.apis.caseNotesApi, token)
   }
 
   async getCaseNotes(prisonerNumber: string, queryParams?: CaseNotesListQueryParams): Promise<FindCaseNotesResponse> {
@@ -37,10 +22,13 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
       size: queryParams?.showAll ? 9999 : (queryParams?.size ?? 20),
       sort: queryParams?.sort,
     }
-    return (await this.post({
-      path: `/search/case-notes/${prisonerNumber}`,
-      data: request,
-    })) as Promise<FindCaseNotesResponse>
+    return this.post<FindCaseNotesResponse>(
+      {
+        path: `/search/case-notes/${prisonerNumber}`,
+        data: request,
+      },
+      this.token,
+    )
   }
 
   async getCaseNoteTypes(queryParams: CaseNotesTypeParams): Promise<CaseNoteType[]> {
@@ -49,18 +37,21 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
       includeInactive: queryParams.includeInactive,
       includeRestricted: queryParams.includeRestricted,
     }
-    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
+    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) }, this.token)
   }
 
   async addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote> {
-    return (await this.post({
-      path: `/case-notes/${prisonerNumber}`,
-      data: {
-        ...caseNote,
-        locationId: caseloadId,
+    return this.post<CaseNote>(
+      {
+        path: `/case-notes/${prisonerNumber}`,
+        data: {
+          ...caseNote,
+          locationId: caseloadId,
+        },
+        headers: { caseloadId },
       },
-      headers: { caseloadId },
-    })) as Promise<CaseNote>
+      this.token,
+    )
   }
 
   async addCaseNoteAmendment(
@@ -69,11 +60,14 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     caseNoteId: string,
     text: string,
   ): Promise<CaseNote> {
-    return (await this.put({
-      path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      data: { text },
-      headers: { caseloadId },
-    })) as Promise<CaseNote>
+    return this.put<CaseNote>(
+      {
+        path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
+        data: { text },
+        headers: { caseloadId },
+      },
+      this.token,
+    )
   }
 
   async getCaseNote(
@@ -82,11 +76,20 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     caseNoteId: string,
     ignore404 = false,
   ): Promise<CaseNote> {
-    return this.get<CaseNote>({
-      path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      headers: { caseloadId },
-      ignore404,
-    })
+    if (ignore404) {
+      return this.getAndIgnore404<CaseNote>({
+        path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
+        headers: { caseloadId },
+      })
+    }
+
+    return this.get<CaseNote>(
+      {
+        path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
+        headers: { caseloadId },
+      },
+      this.token,
+    )
   }
 
   private mapTypeAndSubType(type?: string, subtype?: string): { type: string; subTypes: string[] }[] | undefined {
