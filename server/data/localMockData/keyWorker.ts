@@ -33,6 +33,7 @@ export const staffAllocationMock: StaffAllocation = {
         code: 'CODE',
         description: 'Description',
       },
+      policy: 'KEY_WORKER',
       type: 'SESSION',
       occurredAt: '2025-06-24T12:00:00',
     },
