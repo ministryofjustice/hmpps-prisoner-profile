@@ -15,15 +15,24 @@ const visitChangePhotoTattooPage = ({
   prisonerNo = prisonerNumber,
   photoId = imageId,
 } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/photo/${photoId}` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/photo/${photoId}`,
+  })
 }
 
 const visitChangePhotoScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber, photoId = imageId } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/photo/${photoId}` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}/photo/${photoId}`,
+  })
 }
 
 const visitChangePhotoMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber, photoId = imageId } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/photo/${photoId}` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark/${markId}/photo/${photoId}`,
+  })
 }
 
 context('Change distinguishing mark photo', () => {
@@ -65,7 +74,7 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/tattoo/100')
     })
 
     it('User can change scar photo', () => {
@@ -81,7 +90,7 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100')
     })
 
     it('User can change mark photo', () => {
@@ -97,7 +106,7 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100')
     })
   })
 })

@@ -8,15 +8,15 @@ const bookingId = 1102484
 const prisonerName = 'Saunders, John'
 
 const visitNewTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo` })
 }
 
 const visitNewScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar` })
 }
 
 const visitNewMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark` })
 }
 
 context('New distinguishing feature', () => {

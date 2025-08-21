@@ -1,4 +1,4 @@
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import { EphemeralDataStore, EphemeralDataStoreResponse } from '../data/ephemeralDataStore/ephemeralDataStore'
 
 export default class EphemeralDataService {

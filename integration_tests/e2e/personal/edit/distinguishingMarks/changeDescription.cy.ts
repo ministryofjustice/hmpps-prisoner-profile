@@ -10,15 +10,24 @@ const prisonerName = 'Saunders, John'
 const markId = '100'
 
 const visitChangeDescriptionTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/description` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/description`,
+  })
 }
 
 const visitChangeDescriptionScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/description` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}/description`,
+  })
 }
 
 const visitChangeDescriptionMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/description` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark/${markId}/description`,
+  })
 }
 
 context('Change distinguishing mark description', () => {
@@ -58,7 +67,7 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/tattoo/100')
     })
 
     it('User can change scar description', () => {
@@ -71,7 +80,7 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100')
     })
 
     it('User can change mark description', () => {
@@ -84,7 +93,7 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100')
     })
   })
 })

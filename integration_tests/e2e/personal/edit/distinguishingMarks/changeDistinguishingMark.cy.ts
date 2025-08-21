@@ -10,15 +10,18 @@ const prisonerName = 'Saunders, John'
 const markId = '100'
 
 const visitChangeTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}`,
+  })
 }
 
 const visitChangeScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}` })
 }
 
 const visitChangeMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark/${markId}` })
 }
 
 context('Change distinguishing mark', () => {

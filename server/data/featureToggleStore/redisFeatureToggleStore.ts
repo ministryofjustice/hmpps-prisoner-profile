@@ -25,7 +25,7 @@ export default class RedisFeatureToggleStore implements FeatureToggleStore {
 
   public async getToggle(prisonId: string, featureToggle: string): Promise<boolean> {
     await this.ensureConnected()
-    const status = await this.client.get(`featureToggle:${prisonId}:${featureToggle}`)
+    const status = (await this.client.get(`featureToggle:${prisonId}:${featureToggle}`))?.toString()
 
     return status ? JSON.parse(status) : false
   }

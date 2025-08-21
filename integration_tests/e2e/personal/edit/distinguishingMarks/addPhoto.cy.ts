@@ -10,15 +10,24 @@ const prisonerName = 'Saunders, John'
 const markId = '100'
 
 const visitAddPhotoScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/photo` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}/photo`,
+  })
 }
 
 const visitAddPhotoMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/photo` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark/${markId}/photo`,
+  })
 }
 
 const visitAddPhotoTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/photo` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/photo`,
+  })
 }
 
 context('Add distinguishing mark photo', () => {
@@ -69,13 +78,13 @@ context('Add distinguishing mark photo', () => {
       it('Save photo and return to profile', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the tattoo')
         page.saveAndReturnBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/tattoo/100')
       })
 
       it('Save photo and add another', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the tattoo')
         page.saveAndAddAnotherBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100/photo')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/tattoo/100/photo')
 
         page.fileUploadButton().should('be.visible')
         page.imagePreview().should('not.be.visible')
@@ -109,13 +118,13 @@ context('Add distinguishing mark photo', () => {
       it('Save photo and return to profile', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the scar')
         page.saveAndReturnBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100')
       })
 
       it('Save photo and add another', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the scar')
         page.saveAndAddAnotherBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100/photo')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100/photo')
 
         page.fileUploadButton().should('be.visible')
         page.imagePreview().should('not.be.visible')
@@ -149,13 +158,13 @@ context('Add distinguishing mark photo', () => {
       it('Save photo and return to profile', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the mark')
         page.saveAndReturnBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100')
       })
 
       it('Save photo and add another', () => {
         const page = Page.verifyOnPageWithTitle(AddPhoto, 'Add the photo of the mark')
         page.saveAndAddAnotherBtn().click()
-        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100/photo')
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100/photo')
 
         page.fileUploadButton().should('be.visible')
         page.imagePreview().should('not.be.visible')

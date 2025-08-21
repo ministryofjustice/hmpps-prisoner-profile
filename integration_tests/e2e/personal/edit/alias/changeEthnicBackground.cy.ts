@@ -59,7 +59,7 @@ export function changeEthnicBackground(options: { group: string; pageTitle: stri
           response: PseudonymResponseMock,
         })
       },
-      editUrl: `prisoner/${prisonerNumber}/personal/${options.group}`,
+      editUrl: `prisoner/${prisonerNumber}/personal/ethnic-group/${options.group}`,
       editPageWithTitle: EditPage,
       editPageTitle: options.pageTitle,
       successfulFlashMessage: 'Ethnic group updated',

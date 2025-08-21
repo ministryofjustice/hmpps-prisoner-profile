@@ -46,6 +46,7 @@ import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGu
 import { personalPageBasePath } from './personalRouter'
 import PersonalController from '../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
+import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
@@ -62,7 +63,8 @@ export default function editRouter(services: Services): Router {
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
   router.use(
-    `${personalPageBasePath}/:markType(${markTypes})`,
+    `${personalPageBasePath}/distinguishing-marks/:markType`,
+    parameterGuard('markType', markTypes),
     ...commonMiddleware,
     distinguishingMarksRouter(services),
   )

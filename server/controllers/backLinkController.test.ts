@@ -55,7 +55,7 @@ describe('Back Link Controller', () => {
       redirect: jest.fn(),
     }
 
-    await expect(saveBackLink()(req, res)).rejects.toThrowError('Required query parameters missing')
+    await expect(saveBackLink()(req, res)).rejects.toThrow('Required query parameters missing')
 
     expect(req.flash).not.toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()
@@ -75,7 +75,7 @@ describe('Back Link Controller', () => {
       redirect: jest.fn(),
     }
 
-    await expect(saveBackLink()(req, res)).rejects.toThrowError('Could not find service: [invalid-service]')
+    await expect(saveBackLink()(req, res)).rejects.toThrow('Could not find service: [invalid-service]')
 
     expect(req.flash).not.toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()

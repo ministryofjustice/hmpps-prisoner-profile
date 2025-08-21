@@ -18,9 +18,7 @@ export default function identityNumbersRouter(services: Services): Router {
   const post = postRequest(router)
   const { prisonPermissionsService } = services
 
-  const identityNumberRoutes = Object.values(IdentifierMappings)
-    .map(mapping => mapping.editPageUrl)
-    .join('|')
+  const identityNumberRoutes = Object.values(IdentifierMappings).map(mapping => `/${mapping.editPageUrl}/:compositeId`)
 
   const identityNumbersController = new IdentityNumbersController(
     services.identityNumbersService,
@@ -68,13 +66,9 @@ export default function identityNumbersRouter(services: Services): Router {
   )
 
   // Edit individual existing ID numbers
-  get(
-    `/:identifier(${identityNumberRoutes})/:compositeId`,
-    ...commonMiddleware,
-    identityNumbersController.idNumber().edit,
-  )
+  get(identityNumberRoutes, ...commonMiddleware, identityNumbersController.idNumber().edit)
   post(
-    `/:identifier(${identityNumberRoutes})/:compositeId`,
+    identityNumberRoutes,
     ...commonMiddleware,
     validationMiddleware([editIdentityNumberValidator], {
       redirectBackOnError: true,

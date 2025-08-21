@@ -10,6 +10,8 @@ import { toAlertSummaryData } from '../services/mappers/alertMapper'
 import { Result } from '../utils/result/result'
 import { isActiveCaseLoad } from '../utils/utils'
 
+const prisonerNumberRegex = /^[a-zA-Z][0-9]{4}[a-zA-Z]{2}$/
+
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
     try {
@@ -21,7 +23,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         prisonerNumber = req.query.prisonerNumber as string
       }
 
-      if (prisonerNumber === '') {
+      if (prisonerNumber === '' || !prisonerNumberRegex.test(prisonerNumber)) {
         return next(new NotFoundError())
       }
 

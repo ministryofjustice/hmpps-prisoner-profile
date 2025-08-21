@@ -1,5 +1,5 @@
 import { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import HmppsError from '../../interfaces/HmppsError'
 import { HmppsUser } from '../../interfaces/HmppsUser'
 import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'

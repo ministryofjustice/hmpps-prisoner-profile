@@ -19,12 +19,14 @@ export default class ReferenceDataStore {
 
   async setReferenceData(domain: string, codes: ReferenceDataCodeDto[], durationHours = 1): Promise<string> {
     await this.ensureConnected()
-    return this.client.set(REFERENCE_DATA_PREFIX + domain, JSON.stringify(codes), { EX: durationHours * 60 * 60 })
+    return (
+      await this.client.set(REFERENCE_DATA_PREFIX + domain, JSON.stringify(codes), { EX: durationHours * 60 * 60 })
+    )?.toString()
   }
 
   async getReferenceData(domain: string): Promise<ReferenceDataCodeDto[]> {
     await this.ensureConnected()
-    const serializedReferenceDataCodes = await this.client.get(REFERENCE_DATA_PREFIX + domain)
+    const serializedReferenceDataCodes = (await this.client.get(REFERENCE_DATA_PREFIX + domain))?.toString()
     return serializedReferenceDataCodes ? (JSON.parse(serializedReferenceDataCodes) as ReferenceDataCodeDto[]) : []
   }
 }
