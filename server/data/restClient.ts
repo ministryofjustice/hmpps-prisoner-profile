@@ -111,7 +111,7 @@ export default class RestClient extends HmppsRestClient {
 
       if (files) {
         Object.entries(files).forEach(([key, file]) => {
-          request.attach(key, file.buffer, file.originalname)
+          request.attach(key, file.buffer, file.originalname?.replaceAll("'", ''))
         })
       }
 
