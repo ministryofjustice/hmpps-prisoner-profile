@@ -1,8 +1,9 @@
 /* eslint-disable no-param-reassign */
-import * as pathModule from 'path'
+import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
 import { setupNunjucksPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import fs from 'fs'
 import {
   addDefaultSelectedValue,
   addressToLines,
@@ -66,26 +67,22 @@ import { bvlsHmctsLinkGuestPinEnabled, externalContactsEnabled, militaryHistoryE
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
+import logger from '../../logger'
 
-const production = process.env.NODE_ENV === 'production'
-
-export default function nunjucksSetup(app: express.Express, path: pathModule.PlatformPath): void {
+export default function nunjucksSetup(app: express.Express): void {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'DPS'
   app.locals.config = config
 
-  // Cachebusting version string
-  if (production) {
-    // Version only changes on reboot
-    app.locals.version = Date.now().toString()
-  } else {
-    // Version changes every request
-    app.use((req, res, next) => {
-      res.locals.version = Date.now().toString()
-      return next()
-    })
+  let assetManifest: Record<string, string> = {}
+
+  try {
+    const assetMetadataPath = path.resolve(__dirname, '../../assets/manifest.json')
+    assetManifest = JSON.parse(fs.readFileSync(assetMetadataPath, 'utf8'))
+  } catch (e) {
+    logger.error('Could not read asset manifest file')
   }
 
   const njkEnv = nunjucks.configure(
@@ -126,6 +123,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
   njkEnv.addGlobal('bvlsHmctsLinkGuestPinEnabled', bvlsHmctsLinkGuestPinEnabled)
 
+  njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
   njkEnv.addFilter('formatDate', formatDate)

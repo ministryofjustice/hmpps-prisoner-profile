@@ -1,6 +1,5 @@
 import express from 'express'
 
-import path from 'path'
 import multer from 'multer'
 import { getFrontendComponents, retrieveCaseLoadData } from '@ministryofjustice/hmpps-connect-dps-components'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
@@ -45,7 +44,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebSession())
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
-  nunjucksSetup(app, path)
+  nunjucksSetup(app)
   setUpEnvironmentName(app)
   app.use(setUpAuthentication(services))
   app.use(authorisationMiddleware(['ROLE_PRISON']))
@@ -57,7 +56,7 @@ export default function createApp(services: Services): express.Application {
 
     If multipart forms are needed in other cases, more specific rules based on path will be required, e.g.
     update the app.use(csrf stuff) to only run for routes which don't contain distinguishing-marks, then set
-    up the Multer and CSRF middleware separately within the distinguishing marks router using the unless 
+    up the Multer and CSRF middleware separately within the distinguishing marks router using the unless
     middleware to skip it here as required.
    */
   app.use(

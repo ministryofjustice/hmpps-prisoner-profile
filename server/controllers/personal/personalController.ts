@@ -1103,7 +1103,7 @@ export default class PersonalController {
   }
 
   countryOfBirth() {
-    const { fieldName, url } = countryOfBirthFieldData
+    const { fieldName } = countryOfBirthFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
