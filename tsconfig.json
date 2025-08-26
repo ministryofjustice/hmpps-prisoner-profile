@@ -10,7 +10,6 @@
     "allowJs": false,
     "strict": false,
     "resolveJsonModule": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
@@ -25,7 +24,8 @@
     "cypress.config.ts",
     "coverage",
     "server/views/components",
-    "esbuild"
+    "esbuild",
+    "eslint.config.mjs"
   ],
   "include": ["**/*.js", "**/*.ts"]
 }
