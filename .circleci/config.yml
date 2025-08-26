@@ -55,7 +55,6 @@ jobs:
             - build-info.json
             - build
             - dist
-            - assets/stylesheets
 
   unit_test:
     executor:

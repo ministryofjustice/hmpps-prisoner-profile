@@ -17,7 +17,7 @@ For local running, start a test db, redis, and wiremock instance by:
 
 Then run the server in test mode by:
 
-`npm run start-feature` (or `npm run start-feature:dev` to run with nodemon)
+`npm run start-feature` (or `npm run start-feature:dev` to run with auto-start on changes)
 
 And then either, run tests in headless mode with:
 
