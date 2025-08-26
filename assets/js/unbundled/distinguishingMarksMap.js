@@ -59,8 +59,10 @@ BodyPartSelector.prototype.updateQueryParam = function (key, value) {
   history.pushState(null, '', url)
 }
 
-const $baseContainer = document.querySelector('.new-dm-body-image-container')
-const $selections = document.querySelectorAll('.new-dm-body-image-container area')
-const $description = document.querySelector('#distinguishing-mark-selection-text')
-const $formField = document.querySelector('#body-part-form input[name="bodyPart"]')
-new BodyPartSelector($baseContainer, $selections, $description, $formField).init()
+document.addEventListener('DOMContentLoaded', function () {
+  const $baseContainer = document.querySelector('.new-dm-body-image-container')
+  const $selections = document.querySelectorAll('.new-dm-body-image-container area')
+  const $description = document.querySelector('#distinguishing-mark-selection-text')
+  const $formField = document.querySelector('#body-part-form input[name="bodyPart"]')
+  new BodyPartSelector($baseContainer, $selections, $description, $formField).init()
+})

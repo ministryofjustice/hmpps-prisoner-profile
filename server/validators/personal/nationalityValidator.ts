@@ -1,12 +1,15 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
 export const nationalityValidator: Validator = (body: Record<string, string>) => {
-  const { radioField, autocompleteField, additionalNationalities } = body
+  const { radioField, autocompleteField, autocompleteError, additionalNationalities } = body
   const errors = []
 
-  if (!autocompleteField && ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(radioField)) {
-    const validationText = radioField === 'OTHER' ? 'Enter nationality' : 'This is not a valid nationality'
-    errors.push({ href: '#autocomplete', text: validationText })
+  if (radioField === 'OTHER' && !autocompleteField && !autocompleteError) {
+    errors.push({ href: '#autocomplete', text: 'Enter nationality' })
+  }
+
+  if (radioField === 'OTHER' && autocompleteError) {
+    errors.push({ text: 'This is not a valid nationality', href: '#autocomplete' })
   }
 
   if (additionalNationalities?.length > 40) {

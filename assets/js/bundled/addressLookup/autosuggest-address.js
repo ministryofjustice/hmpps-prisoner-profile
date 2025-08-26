@@ -1,10 +1,12 @@
 // Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/components/address-input/autosuggest.address.js
+import { AutosuggestUi, NoResults } from './autosuggest-ui'
+import { abortableFetch, abortError, FetchStatus } from './abortable-fetch'
 
 const classUPRN = 'hmpps-js-uprn'
 const classInputContainer = 'hmpps-address-autosuggest'
 const classInput = 'hmpps-js-autosuggest-input'
 
-class AutosuggestAddress {
+export class AutosuggestAddress {
   constructor(context) {
     this.context = context
     this.input = context.querySelector(`.${classInput}`)
@@ -88,12 +90,3 @@ class AutosuggestAddress {
     this.uprn.value = selectedResult.uprn
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Setup all address autosuggest instances:
-  const addressAutosuggests = [...document.querySelectorAll('.hmpps-js-address-autosuggest')]
-
-  if (addressAutosuggests.length) {
-    addressAutosuggests.forEach(addressAutosuggest => new AutosuggestAddress(addressAutosuggest))
-  }
-})

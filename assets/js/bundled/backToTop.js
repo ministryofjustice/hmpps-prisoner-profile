@@ -14,34 +14,34 @@ BackToTop.prototype.init = function () {
     return this.$module.classList.remove('hmpps-back-to-top--hidden')
   }
 
-  var $h1 = document.querySelector('h1')
-  var $footer = document.querySelector('.connect-dps-common-footer') ?? document.querySelector('.govuk-footer')
-  var $sidebar = document.querySelector('.app-sidebar')
-  var $header = document.querySelector('.connect-dps-common-header')
+  const $h1 = document.querySelector('h1')
+  const $footer = document.querySelector('.connect-dps-common-footer') ?? document.querySelector('.govuk-footer')
+  const $sidebar = document.querySelector('.app-sidebar')
+  const $header = document.querySelector('.connect-dps-common-header')
 
   // Check if there is anything to observe
   if (!$h1 || !$footer || !$sidebar || !$header) {
     return
   }
 
-  var h1IsIntersecting = false
-  var footerIsIntersecting = false
-  var sidebarIsIntersecting = false
-  var headerIsIntersecting = false
+  let h1IsIntersecting = false
+  let footerIsIntersecting = false
+  let sidebarIsIntersecting = false
+  let headerIsIntersecting = false
 
-  var observer = new window.IntersectionObserver(
+  const observer = new window.IntersectionObserver(
     function (entries) {
       // Find the elements we care about from the entries
-      var h1Entry = entries.find(function (entry) {
+      const h1Entry = entries.find(function (entry) {
         return entry.target === $h1
       })
-      var footerEntry = entries.find(function (entry) {
+      const footerEntry = entries.find(function (entry) {
         return entry.target === $footer
       })
-      var sidebarEntry = entries.find(function (entry) {
+      const sidebarEntry = entries.find(function (entry) {
         return entry.target === $sidebar
       })
-      var headerEntry = entries.find(function (entry) {
+      const headerEntry = entries.find(function (entry) {
         return entry.target === $header
       })
 
@@ -81,6 +81,7 @@ BackToTop.prototype.init = function () {
   observer.observe($header)
 }
 
-// Initialise back to top
-var $backToTop = document.querySelector('[data-module="hmpps-back-to-top"]')
-new BackToTop($backToTop).init()
+export function backToTop() {
+  const $backToTop = document.querySelector('[data-module="hmpps-back-to-top"]')
+  new BackToTop($backToTop).init()
+}

@@ -1625,21 +1625,6 @@ describe('PersonalController', () => {
           expect.objectContaining({ autocompleteSelected: true }),
         )
       })
-
-      it('Selects the autocomplete radio when the flash indicates an invalid autocomplete field', async () => {
-        const req = {
-          params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
-            return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER__VALIDATION_ERROR' })] : []
-          },
-          middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
-        expect(res.render).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.objectContaining({ autocompleteSelected: true }),
-        )
-      })
     })
 
     describe('submit', () => {

@@ -1,7 +1,10 @@
 const WARNING = {
-  'OMIC.OPEN_COMM': 'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
-  'KA.KE': 'Use this option to record an activity related to key work that was not a full session. This could include recording when a session did not take place or any other interaction with an allocated prisoner.',
-  'KA.KS': 'You should only use this option when you’ve completed a full key worker session with a prisoner. Any other interaction should be recorded as an entry.',
+  'OMIC.OPEN_COMM':
+    'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
+  'KA.KE':
+    'Use this option to record an activity related to key work that was not a full session. This could include recording when a session did not take place or any other interaction with an allocated prisoner.',
+  'KA.KS':
+    'You should only use this option when you’ve completed a full key worker session with a prisoner. Any other interaction should be recorded as an entry.',
 }
 
 function toggleBehaviourPrompts() {
@@ -20,8 +23,6 @@ function toggleBehaviourPrompts() {
     behaviourPromptsNeg.classList.add('is-visible')
   }
 }
-
-toggleBehaviourPrompts()
 
 function toggleOpenCaseNoteWarning() {
   const openCaseNoteWarning = document.querySelectorAll('.case-notes-open-warning')
@@ -43,8 +44,6 @@ function toggleOpenCaseNoteWarning() {
   }
 }
 
-toggleOpenCaseNoteWarning()
-
 function initTypeSubTypeDropdowns() {
   const typeElement = document.getElementById('type')
   const subTypeElement = document.getElementById('subType')
@@ -65,4 +64,8 @@ function initTypeSubTypeDropdowns() {
   })
 }
 
-initTypeSubTypeDropdowns()
+document.addEventListener('DOMContentLoaded', function () {
+  toggleBehaviourPrompts()
+  toggleOpenCaseNoteWarning()
+  initTypeSubTypeDropdowns()
+})

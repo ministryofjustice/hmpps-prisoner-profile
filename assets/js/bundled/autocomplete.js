@@ -1,4 +1,7 @@
-document.addEventListener('DOMContentLoaded', function () {
+import accessibleAutocomplete from 'accessible-autocomplete'
+import { getParentConditionalRadioInput } from './helpers'
+
+export function autocomplete() {
   document.querySelectorAll('.js-autocomplete-select').forEach(selectElement => {
     const invalidInput = document.getElementById(`${selectElement.id}-error`)?.value
 
@@ -7,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     accessibleAutocomplete.enhanceSelectElement({
       defaultValue: invalidInput ?? '',
-      selectElement: selectElement,
+      selectElement,
       inputClasses,
       menuClasses,
     })
@@ -20,7 +23,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const autocompleteSelect = document.getElementById(`${inputElement.id}-select`)
         const errorField = document.getElementById(`${inputElement.id}-error`)
 
-        if (!autocompleteInput.length) {
+        // Handling case where an autocomplete input box may be within a conditional radio button
+        const parentConditionalRadioInput = getParentConditionalRadioInput(inputElement)
+
+        if (!autocompleteInput.length || parentConditionalRadioInput?.checked === false) {
           autocompleteSelect.value = ''
           return
         }
@@ -39,4 +45,4 @@ document.addEventListener('DOMContentLoaded', function () {
       })
     })
   })
-})
+}

@@ -649,6 +649,7 @@ export default class PersonalController {
         const { inmateDetail } = req.middleware
         const requestBodyFlash = requestBodyFromFlash<{
           autocompleteField: string
+          autocompleteError: string
           radioField: string
           additionalNationalities: string
         }>(req)
@@ -702,9 +703,10 @@ export default class PersonalController {
             fieldValue,
           ),
           additionalNationalitiesValue,
-          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A different nationality',
           autocompleteOptionLabel: 'Select nationality',
+          autocompleteError: requestBodyFlash?.autocompleteError,
           miniBannerData,
         })
       },
@@ -1131,7 +1133,7 @@ export default class PersonalController {
           fieldData: countryOfBirthFieldData,
           radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
           autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
-          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A different country',
           autocompleteOptionLabel: 'Country name',
         })(req, res, next)
@@ -1144,14 +1146,6 @@ export default class PersonalController {
         const radioField = req.body.radioField || null
         const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
         const previousValue = inmateDetail.birthCountryCode
-
-        if (radioField === 'OTHER__VALIDATION_ERROR' || (radioField === 'OTHER' && !autocompleteField)) {
-          const validationText =
-            radioField === 'OTHER__VALIDATION_ERROR' ? 'This is not a valid country' : 'Enter country name'
-          req.flash('errors', [{ href: '#autocomplete', text: validationText }])
-          req.flash('requestBody', JSON.stringify(req.body))
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
-        }
 
         return this.submit({
           req,

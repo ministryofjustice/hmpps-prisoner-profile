@@ -54,7 +54,7 @@
  * ```
  */
 /* eslint-disable no-underscore-dangle */
-class Modal {
+export class Modal {
   constructor(element) {
     this.element = element
     this.element.setAttribute('hidden', true)

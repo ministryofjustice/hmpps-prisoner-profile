@@ -24,7 +24,8 @@
     "dist",
     "cypress.config.ts",
     "coverage",
-    "server/views/components"
+    "server/views/components",
+    "esbuild"
   ],
   "include": ["**/*.js", "**/*.ts"]
 }
