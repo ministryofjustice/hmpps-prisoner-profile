@@ -68,7 +68,7 @@ context('Change ethnic group', () => {
         cy.get(`input[name=radioField][value=${group}]`).click()
         page.continueButton().click()
 
-        cy.location('pathname').should('eq', `/prisoner/G6123VU/personal/${group}`)
+        cy.location('pathname').should('eq', `/prisoner/G6123VU/personal/ethnic-group/${group}`)
       })
     })
   })

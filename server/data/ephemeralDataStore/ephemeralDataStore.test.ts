@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
-import { UUID } from 'node:crypto'
+import { randomUUID } from 'crypto'
 import { RedisClient } from '../redisClient'
 import { EphemeralDataStore } from './ephemeralDataStore'
 
@@ -11,7 +10,7 @@ const redisClient = {
   connect: jest.fn(),
 }
 
-const key = uuidv4() as UUID
+const key = randomUUID()
 const dataObject = { some: { nested: 'data' } }
 const ttlMinutes = 60
 

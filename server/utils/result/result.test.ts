@@ -137,7 +137,7 @@ describe('result', () => {
     })
 
     it('maps a rejected result to itself by default', () => {
-      expect(Result.rejected<number, Error>(error).map(value => value + 1).getOrThrow).toThrowError(error)
+      expect(Result.rejected<number, Error>(error).map(value => value + 1).getOrThrow).toThrow(error)
     })
 
     it('maps a rejected result', () => {

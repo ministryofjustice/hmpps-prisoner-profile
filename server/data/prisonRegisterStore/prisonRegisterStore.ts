@@ -19,12 +19,14 @@ export default class PrisonRegisterStore {
 
   async setActivePrisons(activePrisons: Array<PrisonDto>, durationDays = 1): Promise<string> {
     await this.ensureConnected()
-    return this.client.set(ACTIVE_PRISONS, JSON.stringify(activePrisons), { EX: durationDays * 24 * 60 * 60 })
+    return (
+      await this.client.set(ACTIVE_PRISONS, JSON.stringify(activePrisons), { EX: durationDays * 24 * 60 * 60 })
+    )?.toString()
   }
 
   async getActivePrisons(): Promise<Array<PrisonDto>> {
     await this.ensureConnected()
-    const serializedActivePrisons = await this.client.get(ACTIVE_PRISONS)
+    const serializedActivePrisons = (await this.client.get(ACTIVE_PRISONS))?.toString()
     return serializedActivePrisons ? (JSON.parse(serializedActivePrisons) as Array<PrisonDto>) : []
   }
 }

@@ -7,7 +7,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { Services } from '../services'
 import PersonalController from '../controllers/personal/personalController'
 
-export const personalPageBasePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})/personal'
+export const personalPageBasePath = '/prisoner/:prisonerNumber/personal'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()

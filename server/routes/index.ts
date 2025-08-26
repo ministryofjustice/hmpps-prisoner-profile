@@ -39,13 +39,16 @@ import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import checkIfKeyWorkerAtPrison from '../middleware/checkIfKeyWorkerAtPrison'
 import editRouter from './editRouter'
+import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
-  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const basePath = '/prisoner/:prisonerNumber'
+
+  router.use(basePath, prisonerNumberGuard())
 
   router.use(async (req, res, next) => {
     res.locals = {

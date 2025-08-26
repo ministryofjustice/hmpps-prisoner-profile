@@ -9,6 +9,7 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
 import { radioFieldValidator } from '../validators/personal/radioFieldValidator'
 import { dateOfBirthValidator } from '../validators/personal/dateOfBirthValidator'
+import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -16,7 +17,7 @@ export default function aliasRouter(services: Services): Router {
   const post = postRequest(router)
   const { prisonPermissionsService } = services
 
-  const ethnicGroups = ['white', 'mixed', 'asian', 'black', 'other'].join('|')
+  const ethnicGroups = ['white', 'mixed', 'asian', 'black', 'other']
 
   const aliasController = new AliasController(
     services.aliasService,
@@ -65,8 +66,18 @@ export default function aliasRouter(services: Services): Router {
     ),
     aliasController.submitChangeEthnicGroup(),
   )
-  get(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.displayChangeEthnicBackground())
-  post(`/:group(${ethnicGroups})`, ...commonMiddleware, aliasController.submitChangeEthnicBackground())
+  get(
+    `/ethnic-group/:group`,
+    parameterGuard('group', ethnicGroups),
+    ...commonMiddleware,
+    aliasController.displayChangeEthnicBackground(),
+  )
+  post(
+    `/ethnic-group/:group`,
+    parameterGuard('group', ethnicGroups),
+    ...commonMiddleware,
+    aliasController.submitChangeEthnicBackground(),
+  )
 
   get('/enter-corrected-name', ...commonMiddleware, aliasController.displayChangeNameCorrection())
   post(

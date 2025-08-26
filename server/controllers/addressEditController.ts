@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { apostrophe, blankStringsToNull } from '../utils/utils'

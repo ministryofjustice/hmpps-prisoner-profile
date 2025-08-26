@@ -9,11 +9,11 @@ const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 
 const visitNewTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo` })
 }
 
 const visitNewScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar` })
 }
 
 context('New distinguishing mark on face', () => {

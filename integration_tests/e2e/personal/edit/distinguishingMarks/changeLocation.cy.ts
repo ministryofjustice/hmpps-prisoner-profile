@@ -10,11 +10,17 @@ const bookingId = 1102484
 const markId = '100'
 
 const visitChangeLocationTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/body-part` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/body-part`,
+  })
 }
 
 const visitChangeLocationScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/body-part` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}/body-part`,
+  })
 }
 
 context('Change location of distinguishing mark on face', () => {
@@ -65,7 +71,7 @@ context('Change location of distinguishing mark on face', () => {
           page.bodyPartRadios().filter(`[value="${bodyPart}"]`).check()
 
           page.saveBtn().click()
-          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
+          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100')
         })
       }
     }

@@ -218,13 +218,13 @@ describe('personIntegrationApiClient', () => {
   })
 
   describe('updateIdentityNumber', () => {
-    it('should up[date existing identity number', async () => {
+    it('should update existing identity number', async () => {
       fakePersonIntegrationApi
         .put('/v1/core-person-record/identifiers?offenderId=1&seqId=2&sourceSystem=NOMIS')
         .reply(204)
-      expect(async () =>
+      await expect(async () =>
         personIntegrationApiClient.updateIdentityNumber(1, 2, UpdateIdentityNumberRequestMock),
-      ).not.toThrow()
+      ).resolves.not.toThrow()
     })
   })
 
@@ -233,16 +233,16 @@ describe('personIntegrationApiClient', () => {
       fakePersonIntegrationApi
         .post('/v1/core-person-record/identifiers?prisonerNumber=A1234AA&sourceSystem=NOMIS')
         .reply(204)
-      expect(async () =>
+      await expect(async () =>
         personIntegrationApiClient.addIdentityNumbers('A1234AA', AddIdentityNumbersRequestMock),
-      ).not.toThrow()
+      ).resolves.not.toThrow()
     })
   })
 
   describe('updateProfileImage', () => {
     it('Should upload the image and return the response', async () => {
       fakePersonIntegrationApi.put('/v1/core-person-record/profile-image?prisonerNumber=A1234AA').reply(200)
-      expect(async () => personIntegrationApiClient.updateProfileImage('A1234AA', image)).not.toThrow()
+      await expect(async () => personIntegrationApiClient.updateProfileImage('A1234AA', image)).resolves.not.toThrow()
     })
   })
 

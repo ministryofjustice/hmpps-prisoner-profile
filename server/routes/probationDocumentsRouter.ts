@@ -10,7 +10,7 @@ import ProbationDocumentsController from '../controllers/probationDocumentsContr
 export default function probationDocumentsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
-  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
   const probationDocumentsController = new ProbationDocumentsController(
