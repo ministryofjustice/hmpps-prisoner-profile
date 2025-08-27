@@ -87,7 +87,6 @@
     "@aws-sdk/client-sqs": "^3.875.0",
     "@contentful/rich-text-html-renderer": "^17.1.0",
     "@contentful/rich-text-types": "^17.1.0",
-    "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/frontend": "^3.7.2",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1",
     "@ministryofjustice/hmpps-connect-dps-components": "3.0.0",
@@ -101,7 +100,6 @@
     "body-parser": "^2.2.0",
     "bunyan": "^1.8.15",
     "bunyan-format": "^0.2.1",
-    "chokidar": "^3.6.0",
     "compression": "^1.8.1",
     "connect-flash": "^0.1.1",
     "connect-redis": "^9.0.0",
@@ -109,11 +107,6 @@
     "cropperjs": "^2.0.1",
     "csurf": "^1.11.0",
     "date-fns": "^3.6.0",
-    "esbuild": "^0.25.9",
-    "esbuild-plugin-clean": "^1.0.1",
-    "esbuild-plugin-copy": "^2.1.1",
-    "esbuild-plugin-manifest": "^1.0.5",
-    "esbuild-sass-plugin": "^3.3.1",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "fuse.js": "^7.1.0",
@@ -134,6 +127,7 @@
     "url-value-parser": "^2.2.0"
   },
   "devDependencies": {
+    "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.3",
     "@ministryofjustice/hmpps-precommit-hooks": "^0.0.3",
     "@tsconfig/node22": "^22.0.2",
@@ -157,12 +151,17 @@
     "audit-ci": "^7.1.0",
     "aws-sdk-client-mock": "^4.1.0",
     "cheerio": "^1.1.2",
+    "chokidar": "^4.0.3",
     "concurrently": "^9.2.1",
     "cookie-session": "^2.1.1",
     "cypress": "^14.5.4",
     "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
-    "dotenv": "^16.6.1",
+    "esbuild": "^0.25.9",
+    "esbuild-plugin-clean": "^1.0.1",
+    "esbuild-plugin-copy": "^2.1.1",
+    "esbuild-plugin-manifest": "^1.0.5",
+    "esbuild-sass-plugin": "^3.3.1",
     "eslint-import-resolver-typescript": "^4.4.4",
     "jest": "^30.0.5",
     "jest-html-reporter": "^4.3.0",
@@ -181,6 +180,12 @@
   "overrides": {
     "csurf": {
       "cookie": "0.7.2"
+    },
+    "@jgoz/esbuild-plugin-typecheck": {
+      "esbuild": "$esbuild"
+    },
+    "nunjucks": {
+      "chokidar": "$chokidar"
     }
   }
 }

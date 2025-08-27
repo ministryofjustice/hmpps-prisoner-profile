@@ -76,11 +76,12 @@ const main = () => {
   }
 
   /** @type {string | null} */
-  let serverEnv
+  let serverEnv = null
   if (args.includes('--dev-server')) serverEnv = '.env'
   if (args.includes('--dev-test-server')) serverEnv = 'feature.env'
 
   if (serverEnv) {
+    /** @type {childProcess.ChildProcess | null} */
     let serverProcess = null
     chokidar.watch(['dist']).on(
       'all',
