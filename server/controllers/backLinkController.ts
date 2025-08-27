@@ -29,6 +29,16 @@ export const registeredBackLinkServices: RegisteredService[] = [
     hostname: sanitizeUrl(config.serviceUrls.assessForEarlyRelease),
     defaultBackLinkText: 'Back to Assess for early release',
   },
+  {
+    name: 'allocate-key-workers',
+    hostname: sanitizeUrl(config.serviceUrls.allocateKeyWorkers),
+    defaultBackLinkText: 'Back to key workers',
+  },
+  {
+    name: 'allocate-personal-officers',
+    hostname: sanitizeUrl(config.serviceUrls.allocatePersonalOfficers),
+    defaultBackLinkText: 'Back to personal officers',
+  },
 ]
 
 export const saveBackLink =
