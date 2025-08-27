@@ -97,7 +97,18 @@ export default class ImageController {
         const { prisonerData, clientToken } = req.middleware
         const { prisonerNumber } = prisonerData
         const file = req.file as MulterFile
-        await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerData.prisonerNumber, file)
+
+        try {
+          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(
+            prisonerData.prisonerNumber,
+            file,
+          )
+        } catch (_error) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(
+            `/prisoner/${prisonerNumber}/image/new${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+          )
+        }
 
         req.flash('flashMessage', {
           text: `Profile image updated`,
@@ -160,7 +171,14 @@ export default class ImageController {
             mimetype: 'image/png',
           }
 
-          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          try {
+            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          } catch (_error) {
+            req.flash('errors', [{ text: 'There was an error please try again' }])
+            return res.redirect(
+              `/prisoner/${prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+            )
+          }
 
           req.flash('flashMessage', {
             text: `Profile image updated`,

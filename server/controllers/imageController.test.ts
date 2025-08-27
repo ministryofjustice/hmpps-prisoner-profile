@@ -273,6 +273,26 @@ describe('ImageController', () => {
         prisonerNumber: 'A1234BC',
       })
     })
+
+    it('Redirects if the update throws an error', async () => {
+      personIntegrationApi.updateProfileImage = jest.fn().mockRejectedValue(null)
+      const request = {
+        body: { photoType: 'new' },
+        file,
+        query: { referer: 'personal' },
+        flash: jest.fn(),
+        middleware: defaultMiddleware,
+      } as any
+
+      await controller.updateProfileImage().submitImage(request, response, () => {})
+      expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
+      expect(request.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'There was an error please try again',
+        },
+      ])
+      expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new?referer=personal')
+    })
   })
 
   describe('newWithheldImage', () => {
@@ -375,6 +395,26 @@ describe('ImageController', () => {
           fieldsUpdated: ['withheld-profile-image'],
           prisonerNumber: 'A1234BC',
         })
+      })
+
+      it('Redirects if the update throws an error', async () => {
+        personIntegrationApi.updateProfileImage = jest.fn().mockRejectedValue(null)
+        const request = {
+          body: { photoType: 'new' },
+          file,
+          query: { referer: 'personal' },
+          flash: jest.fn(),
+          middleware: defaultMiddleware,
+        } as any
+
+        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
+        expect(request.flash).toHaveBeenCalledWith('errors', [
+          {
+            text: 'There was an error please try again',
+          },
+        ])
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld?referer=personal')
       })
     })
   })

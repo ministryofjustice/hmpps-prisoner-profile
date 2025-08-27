@@ -191,6 +191,7 @@ export default class RestClient extends HmppsRestClient {
         .auth(token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
+        .timeout(this.config.timeout)
         .retry(2, (err, res) => {
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
