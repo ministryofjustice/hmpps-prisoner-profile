@@ -5,6 +5,7 @@
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <input type="hidden" id="autocomplete-error" name="autocompleteError" value="{{ autocompleteError }}"/>
 
     <div class="govuk-form-group">
       {% set autocompleteOptions = [{ value: '', text: 'Please select a country' }].concat(autocompleteOptions) %}

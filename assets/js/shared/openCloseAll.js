@@ -59,12 +59,13 @@ OpenCloseAll.prototype.init = function () {
   })
 
   function areAllOpen($allDetails) {
+    let allOpen = true
     $allDetails.forEach(function ($detail) {
       if (!$detail.hasAttribute('open')) {
-        return false
+        allOpen = false
       }
     })
-    return true
+    return allOpen
   }
 }
 

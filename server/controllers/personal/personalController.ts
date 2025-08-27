@@ -559,6 +559,7 @@ export default class PersonalController {
     autocompleteSelected,
     autocompleteOptionTitle,
     autocompleteOptionLabel,
+    autocompleteError,
   }: {
     formTitle: string
     fieldData: RadioFieldData
@@ -567,6 +568,7 @@ export default class PersonalController {
     autocompleteSelected: boolean
     autocompleteOptionTitle: string
     autocompleteOptionLabel: string
+    autocompleteError: string
   }) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
@@ -593,6 +595,7 @@ export default class PersonalController {
         autocompleteSelected,
         autocompleteOptionTitle,
         autocompleteOptionLabel,
+        autocompleteError,
         redirectAnchor,
         miniBannerData,
       })
@@ -1109,15 +1112,20 @@ export default class PersonalController {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
+        const { autocompleteField, autocompleteError, radioField } =
+          requestBodyFromFlash<{
+            autocompleteField: string
+            autocompleteError: string
+            radioField: string
+          }>(req) || {}
         const countryReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
           CorePersonRecordReferenceDataDomain.country,
         )
 
         const fieldValue =
-          requestBodyFlash?.autocompleteField ||
-          requestBodyFlash?.radioField ||
+          autocompleteField ||
+          radioField ||
           countryReferenceData.find(country => country.code === inmateDetail.birthCountryCode)?.code
 
         const countriesAsRadioOptions = ['ENG', 'SCOT', 'WALES', 'NI']
@@ -1136,6 +1144,7 @@ export default class PersonalController {
           autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A different country',
           autocompleteOptionLabel: 'Country name',
+          autocompleteError,
         })(req, res, next)
       },
 

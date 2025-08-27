@@ -185,12 +185,10 @@ function pageInit() {
   setButtonListeners()
 }
 
-export function profilePhotoCropper() {
-  if (uploadedPhoto) {
-    pageInit()
-    toggleCrop()
-    withImageManipulation(cropperImage => cropperImage.$center('contain'))
-    resetSelectionLocation()
-    setFormPhotoToCroppedResult()
-  }
+window.onload = () => {
+  pageInit()
+  toggleCrop()
+  withImageManipulation(cropperImage => cropperImage.$center('contain'))
+  resetSelectionLocation()
+  setFormPhotoToCroppedResult()
 }
