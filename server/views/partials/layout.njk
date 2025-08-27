@@ -23,7 +23,7 @@
     <!-- End Google Tag Manager -->
   {% endif %}
 
-  <link href="{{ '/assets/css/app.css' | assetMap }}" rel="stylesheet"/>
+  <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
   <script src="/assets/js/jquery.min.js"></script>
   <script
     src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
@@ -110,7 +110,7 @@
 {% block bodyEnd %}
   {# Run JavaScript at end of the
   <body>, to avoid blocking the initial render. #}
-  <script type="module" src="{{ '/assets/js/app.js' | assetMap }}"></script>
+  <script type="module" src="{{ '/assets/js/index.js' | assetMap }}"></script>
 
   {# Javascript block for individual pages #}
   {% block pageScripts %}

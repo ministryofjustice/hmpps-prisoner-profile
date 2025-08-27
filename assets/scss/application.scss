@@ -71,7 +71,9 @@ $govuk-page-width: $moj-page-width;
 @import './pages/prisoner-schedule';
 @import './pages/location-details';
 @import './pages/profile-photo';
-@import './local';
-@import './helpers';
-@import './print';
-@import './typography';
+
+@import './overrides/local';
+@import './overrides/print';
+
+@import './helpers/index';
+@import './helpers/typography';
