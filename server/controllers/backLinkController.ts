@@ -32,12 +32,12 @@ export const registeredBackLinkServices: RegisteredService[] = [
   {
     name: 'allocate-key-workers',
     hostname: sanitizeUrl(config.serviceUrls.allocateKeyWorkers),
-    defaultBackLinkText: 'Back to key workers',
+    defaultBackLinkText: 'Back to Key workers',
   },
   {
     name: 'allocate-personal-officers',
     hostname: sanitizeUrl(config.serviceUrls.allocatePersonalOfficers),
-    defaultBackLinkText: 'Back to personal officers',
+    defaultBackLinkText: 'Back to Personal officers',
   },
 ]
 
