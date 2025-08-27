@@ -12,7 +12,6 @@ import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { openCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
-import { profilePhotoCropper } from './profilePhotoCropper'
 
 document.addEventListener('DOMContentLoaded', function () {
   addressLookup()
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
   fileUploadWithPreview()
   openCloseAll()
   printPage()
-  profilePhotoCropper()
   sortSelector()
 })
 

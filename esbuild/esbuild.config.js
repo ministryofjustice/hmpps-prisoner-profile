@@ -45,15 +45,15 @@ const buildConfig = {
 
   assets: {
     outDir: path.join(cwd, 'dist/assets'),
-    entryPoints: glob.sync([path.join(cwd, 'assets/js/bundled/index.js'), path.join(cwd, 'assets/scss/*.scss')]),
+    entryPoints: glob.sync([
+      path.join(cwd, 'assets/js/shared/index.js'),
+      path.join(cwd, 'assets/js/*.js'),
+      path.join(cwd, 'assets/scss/*.scss'),
+    ]),
     copy: [
       {
         from: path.join(cwd, 'assets/images/**/*'),
         to: path.join(cwd, 'dist/assets/images'),
-      },
-      {
-        from: path.join(cwd, 'assets/js/unbundled/**'),
-        to: path.join(cwd, 'dist/assets/js'),
       },
     ],
     clear: glob.sync([path.join(cwd, 'dist/assets/{css,js}')]),

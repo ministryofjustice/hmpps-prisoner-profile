@@ -61,5 +61,5 @@
 {% endblock %}
 
 {% block pageScripts %}
-    <script src="/assets/js/unbundled/distinguishingMarksMap.js" nonce="{{ cspNonce }}"></script>
+    <script src={{ "/assets/js/distinguishingMarksMap.js" | assetMap }} nonce="{{ cspNonce }}"></script>
 {% endblock %}

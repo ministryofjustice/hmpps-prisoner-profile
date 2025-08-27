@@ -169,5 +169,5 @@
   </form>
 {% endblock %}
 {% block pageScripts %}
-  <script src="/assets/js/unbundled/militaryRankRadios.js" nonce="{{ cspNonce }}"></script>
+  <script src={{ "/assets/js/militaryRankRadios.js" | assetMap }} nonce="{{ cspNonce }}"></script>
 {% endblock %}
