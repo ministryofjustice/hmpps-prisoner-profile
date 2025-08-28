@@ -24,12 +24,15 @@ export default class ImageController {
       newImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const requestBodyFlash = requestBodyFromFlash<{ photoType?: string }>(req)
+          const photoType = requestBodyFlash?.photoType
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
 
           return res.render('pages/edit/photo/addNew', {
             pageTitle: 'Add a new facial image',
             miniBannerData,
             prisonerNumber,
+            photoType,
           })
         },
 
@@ -57,7 +60,24 @@ export default class ImageController {
         const { prisonerData, clientToken } = req.middleware
         const { prisonerNumber } = prisonerData
         const file = req.file as MulterFile
-        await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerData.prisonerNumber, file)
+
+        try {
+          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(
+            prisonerData.prisonerNumber,
+            file,
+          )
+        } catch (_error) {
+          req.flash(
+            'requestBody',
+            JSON.stringify({
+              photoType: 'upload',
+            }),
+          )
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(
+            `/prisoner/${prisonerNumber}/image/new${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+          )
+        }
 
         req.flash('flashMessage', {
           text: `Profile image updated`,
@@ -120,7 +140,20 @@ export default class ImageController {
             mimetype: 'image/png',
           }
 
-          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          try {
+            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          } catch (_error) {
+            req.flash('errors', [{ text: 'There was an error please try again' }])
+            req.flash(
+              'requestBody',
+              JSON.stringify({
+                photoType: 'withheld',
+              }),
+            )
+            return res.redirect(
+              `/prisoner/${prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+            )
+          }
 
           req.flash('flashMessage', {
             text: `Profile image updated`,
