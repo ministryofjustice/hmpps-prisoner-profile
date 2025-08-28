@@ -26,6 +26,8 @@ export default class ImageController {
       newImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const requestBodyFlash = requestBodyFromFlash<{ photoType?: string }>(req)
+          const photoType = requestBodyFlash?.photoType
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
           const isDpsAppDeveloper = userHasAllRoles([Role.DpsApplicationDeveloper], res.locals.user.userRoles)
 
@@ -34,6 +36,7 @@ export default class ImageController {
             miniBannerData,
             prisonerNumber,
             isDpsAppDeveloper,
+            photoType,
           })
         },
 
@@ -104,6 +107,12 @@ export default class ImageController {
             file,
           )
         } catch (_error) {
+          req.flash(
+            'requestBody',
+            JSON.stringify({
+              photoType: 'upload',
+            }),
+          )
           req.flash('errors', [{ text: 'There was an error please try again' }])
           return res.redirect(
             `/prisoner/${prisonerNumber}/image/new${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
@@ -175,6 +184,12 @@ export default class ImageController {
             await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
           } catch (_error) {
             req.flash('errors', [{ text: 'There was an error please try again' }])
+            req.flash(
+              'requestBody',
+              JSON.stringify({
+                photoType: 'withheld',
+              }),
+            )
             return res.redirect(
               `/prisoner/${prisonerNumber}/image/new-withheld${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
             )

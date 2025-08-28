@@ -60,7 +60,7 @@
               {% for part in formConfig.specificParts %}
                 {% set errorOnDescOrPhoto = errors.length > 0 and (errors[0].href === "#description-"+part.name or errors[0].href === "#file-"+part.name) %}
                 <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="{{ part.name }}" name="specificBodyPart" type="radio" value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint" {% endif %} data-aria-controls="conditional-details-form-{{ part.name }}" {% if errorOnDescOrPhoto %} checked aria-expanded="true" {% endif %}>
+                  <input class="govuk-radios__input" id="{{ part.name }}" name="specificBodyPart" type="radio" value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint" {% endif %} data-aria-controls="conditional-details-form-{{ part.name }}" {% if errorOnDescOrPhoto or formValues["specificBodyPart"] === part.name %} checked aria-expanded="true" {% endif %}>
                     <label class="govuk-label govuk-radios__label" for="{{ part.name }}">
                       {{ part.desc }}
                     </label>

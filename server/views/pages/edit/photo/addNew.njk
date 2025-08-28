@@ -58,7 +58,7 @@
                 conditional: {
                   html: fileHtml
                 },
-                checked: formValues['photoType'] == 'upload'
+                checked: photoType == 'upload'
               },
               {
                 value: "webcam",
@@ -74,7 +74,7 @@
                 hint: {
                   text: 'This should be used for all Category A prisoners.'
                 },
-                checked: formValues['photoType'] == 'withheld'
+                checked: photoType == 'withheld'
               }
             ]
           }) }}
