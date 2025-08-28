@@ -40,7 +40,7 @@
     <div class="govuk-grid-column-two-thirds">
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors[0].href === '#photoType' }}">
           {{ govukRadios({
             name: "photoType",
             id: 'photoType',

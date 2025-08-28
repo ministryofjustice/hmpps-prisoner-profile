@@ -13,6 +13,23 @@ import getCommonRequestData from '../utils/getCommonRequestData'
 import { userHasAllRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 
+const photoErrorHtml = (backLinkHref: string) => `
+<p>There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file.</p>
+<a class="govuk-link--no-visited-state photo-upload-error__back-link" href="${backLinkHref}">Go back to the previous page and try uploading the file again</a><br /><br />
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      If you've tried to upload the file more than once
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <p>
+      Try to open the file on your computer. If it does not open, it may be corrupt and you will not be able to upload it. You'll need to take a new photo.<br /><br />
+      If there's an issue with your connection, you may need to cancel and try again later.
+    </p>
+  </div>
+</details>`
+
 export default class ImageController {
   constructor(
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
@@ -56,11 +73,13 @@ export default class ImageController {
           }
 
           const file = req.file as MulterFile
+          const originalImgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             prisonerNumber,
             miniBannerData,
             photoType: 'upload',
             imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+            originalImgSrc,
             fileName: file.originalname,
             fileType: file.mimetype,
           })
@@ -97,26 +116,24 @@ export default class ImageController {
       },
 
       submitImage: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerData, clientToken } = req.middleware
-        const { prisonerNumber } = prisonerData
+        const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
         const file = req.file as MulterFile
 
         try {
-          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(
-            prisonerData.prisonerNumber,
-            file,
-          )
+          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
         } catch (_error) {
-          req.flash(
-            'requestBody',
-            JSON.stringify({
-              photoType: 'upload',
-            }),
-          )
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-          return res.redirect(
-            `/prisoner/${prisonerNumber}/image/new${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
-          )
+          const { originalImgSrc } = req.body
+          const imgSrc = originalImgSrc || `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
+          return res.render('pages/edit/photo/editPhoto', {
+            prisonerNumber,
+            miniBannerData,
+            photoType: 'upload',
+            imgSrc,
+            originalImgSrc,
+            fileName: file.originalname,
+            fileType: file.mimetype,
+            errors: [{ html: photoErrorHtml(`/prisoner/${prisonerNumber}/image/new`) }],
+          })
         }
 
         req.flash('flashMessage', {
@@ -183,7 +200,7 @@ export default class ImageController {
           try {
             await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
           } catch (_error) {
-            req.flash('errors', [{ text: 'There was an error please try again' }])
+            req.flash('errors', [{ html: photoErrorHtml(`/prisoner/${prisonerNumber}/image/new`) }])
             req.flash(
               'requestBody',
               JSON.stringify({

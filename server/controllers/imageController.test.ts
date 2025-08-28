@@ -154,10 +154,13 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().newImage.post(request, response, () => {})
 
+        const imgSrc = 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU='
+
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/editPhoto', {
           fileName: 'A name dot jpeg.jpeg',
           fileType: 'image/jpeg',
-          imgSrc: 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU=',
+          imgSrc,
+          originalImgSrc: imgSrc,
           miniBannerData,
           photoType: 'upload',
           prisonerNumber: 'A1234BC',
@@ -274,7 +277,7 @@ describe('ImageController', () => {
       })
     })
 
-    it('Redirects if the update throws an error', async () => {
+    it('Re-renders the page with an error message if the update throws an error', async () => {
       personIntegrationApi.updateProfileImage = jest.fn().mockRejectedValue(null)
       const request = {
         body: { photoType: 'new' },
@@ -286,12 +289,18 @@ describe('ImageController', () => {
 
       await controller.updateProfileImage().submitImage(request, response, () => {})
       expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
-      expect(request.flash).toHaveBeenCalledWith('errors', [
-        {
-          text: 'There was an error please try again',
-        },
-      ])
-      expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new?referer=personal')
+      expect(response.render).toHaveBeenCalledWith(
+        'pages/edit/photo/editPhoto',
+        expect.objectContaining({
+          errors: [
+            {
+              html: expect.stringContaining(
+                '<p>There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file.</p>',
+              ),
+            },
+          ],
+        }),
+      )
     })
   })
 
@@ -411,7 +420,9 @@ describe('ImageController', () => {
         expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
         expect(request.flash).toHaveBeenCalledWith('errors', [
           {
-            text: 'There was an error please try again',
+            html: expect.stringContaining(
+              '<p>There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file.</p>',
+            ),
           },
         ])
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld?referer=personal')

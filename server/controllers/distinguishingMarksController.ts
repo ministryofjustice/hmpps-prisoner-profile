@@ -39,6 +39,25 @@ const redirectAnchors: Record<MarkTypeSelection, string> = {
   mark: 'other-marks',
 }
 
+const photoErrorText =
+  'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.'
+
+const photoErrorHtml = (linkHref: string) => `
+<a href="${linkHref}">${photoErrorText}</a><br /><br />
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      If you've tried to upload the photo more than once
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <p>
+      If there's an issue with your connection, you may need to cancel and try again later.<br /><br />
+      If you've tried the same file more than once, there might be a problem with it. You may need to take the photo again and upload the new file.
+    </p>
+  </div>
+</details>`
+
 export default class DistinguishingMarksController {
   constructor(
     private readonly distinguishingMarksService: DistinguishingMarksService,
@@ -187,7 +206,9 @@ export default class DistinguishingMarksController {
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
     } catch (_error) {
-      req.flash('errors', [{ text: 'There was an error please try again' }])
+      req.flash('errors', [
+        { text: photoErrorText, html: photoErrorHtml(`#file-${specificBodyPart}`), href: `#file-${specificBodyPart}` },
+      ])
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}/${bodyPart}/detail`,
@@ -532,7 +553,7 @@ export default class DistinguishingMarksController {
         })
         .catch(error => logger.error(error))
     } catch (_error) {
-      req.flash('errors', [{ text: 'There was an error please try again' }])
+      req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo/${photoId}`,
       )
@@ -572,7 +593,7 @@ export default class DistinguishingMarksController {
         })
         .catch(error => logger.error(error))
     } catch (_error) {
-      req.flash('errors', [{ text: 'There was an error please try again' }])
+      req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
       return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo`)
     }
 

@@ -385,9 +385,9 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.postNewDistinguishingMarkWithDetail(partReq, res)
       expect(partReq.flash).toHaveBeenCalledWith('errors', [
-        {
-          text: 'There was an error please try again',
-        },
+        expect.objectContaining({
+          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+        }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/left-arm/detail`)
@@ -1040,9 +1040,9 @@ describe('Distinguishing Marks Controller', () => {
       await controller.updatePhoto(photoReq, res)
 
       expect(photoReq.flash).toHaveBeenCalledWith('errors', [
-        {
-          text: 'There was an error please try again',
-        },
+        expect.objectContaining({
+          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+        }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/100/photo/123`)
@@ -1190,9 +1190,9 @@ describe('Distinguishing Marks Controller', () => {
       await controller.addPhoto(photoReq, res)
 
       expect(photoReq.flash).toHaveBeenCalledWith('errors', [
-        {
-          text: 'There was an error please try again',
-        },
+        expect.objectContaining({
+          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+        }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/101/photo`)
