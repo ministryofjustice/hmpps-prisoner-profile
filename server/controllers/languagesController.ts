@@ -4,13 +4,13 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import LanguagesService from '../services/languagesService'
 import {
+  CommunicationNeedsDto,
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import HmppsError from '../interfaces/HmppsError'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import getCommonRequestData from '../utils/getCommonRequestData'
 
@@ -112,25 +112,21 @@ export default class LanguagesController {
         preferredWrittenLanguageCodeError,
       }
 
-      const errors = req.errors || []
+      const communicationNeeds = await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      const previousLanguagePreferences = communicationNeeds?.languagePreferences
 
-      const { spokenInvalidInput, writtenInvalidInput } = this.validateLanguagePreferencesRequest(formValues, errors)
-
-      if (errors.length) {
+      const languageErrors = this.checkMainLanguageForErrors(formValues, communicationNeeds)
+      if (languageErrors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
-        req.flash('errors', errors)
-        req.flash('spokenInvalidInput', spokenInvalidInput)
-        req.flash('writtenInvalidInput', writtenInvalidInput)
+        req.flash('errors', languageErrors)
+        req.flash('spokenInvalidInput', preferredSpokenLanguageCodeError)
+        req.flash('writtenInvalidInput', preferredWrittenLanguageCodeError)
         return res.redirect(`/prisoner/${prisonerNumber}/personal/main-language`)
       }
 
       if (!formValues.preferredSpokenLanguageCode) {
         formValues.interpreterRequired = undefined
       }
-
-      const previousLanguagePreferences = (
-        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
-      )?.languagePreferences
 
       await this.languagesService.updateMainLanguage(
         clientToken,
@@ -238,21 +234,14 @@ export default class LanguagesController {
         languageError,
       }
 
-      const errors = req.errors || []
+      const communicationNeeds = await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
+      const previousSecondaryLanguages = communicationNeeds?.secondaryLanguages
 
-      const previousSecondaryLanguages = (
-        await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
-      )?.secondaryLanguages
-
-      const languageDescription = previousSecondaryLanguages.find(lang => lang.language.code === languageCode)?.language
-        ?.description
-
-      const invalidInput = this.validateSecondaryLanguageRequest(formValues, languageCode, languageDescription, errors)
-
-      if (errors.length) {
+      const languageErrors = this.checkSecondaryLanguageForErrors(languageCode, formValues, communicationNeeds)
+      if (languageErrors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
-        req.flash('errors', errors)
-        req.flash('invalidInput', invalidInput)
+        req.flash('errors', languageErrors)
+        req.flash('invalidInput', languageError)
         return res.redirect(
           `/prisoner/${prisonerNumber}/personal/other-languages${languageCode ? `/${languageCode}` : ''}`,
         )
@@ -307,72 +296,71 @@ export default class LanguagesController {
     }
   }
 
-  private validateLanguagePreferencesRequest(
-    formValues: LanguagePreferencesRequest & {
+  private checkMainLanguageForErrors(
+    request: LanguagePreferencesRequest & {
       preferredSpokenLanguageCodeError?: string
       preferredWrittenLanguageCodeError?: string
     },
-    errors: HmppsError[],
+    communicationNeeds: CommunicationNeedsDto,
   ) {
-    const [spokenErrorType, spokenInvalidInput] = formValues.preferredSpokenLanguageCodeError?.split(':') ?? []
-    const [writtenErrorType, writtenInvalidInput] = formValues.preferredWrittenLanguageCodeError?.split(':') ?? []
+    const errors = []
+    const validationError = 'This is not a valid language'
+    const duplicateError = 'Language must be different from the saved languages'
+    const secondaryLanguages = communicationNeeds?.secondaryLanguages
+      ?.map(lang => lang.language?.description?.toUpperCase())
+      .filter(Boolean)
 
-    if (spokenErrorType === 'DUPLICATE') {
+    if (request.preferredSpokenLanguageCodeError) {
       errors.push({
-        text: 'Language must be different from the saved languages',
-        href: '#preferredSpokenLanguageCode',
-      })
-    } else if (spokenErrorType === 'INVALID') {
-      errors.push({
-        text: 'This is not a valid language',
-        href: '#preferredSpokenLanguageCode',
+        text: secondaryLanguages.includes(request.preferredSpokenLanguageCodeError.trim().toUpperCase())
+          ? duplicateError
+          : validationError,
+        href: '#preferred-spoken-language-code',
       })
     }
-    if (formValues.interpreterRequired === undefined) {
+
+    if (request.preferredWrittenLanguageCodeError) {
       errors.push({
-        text: 'Select if an interpreter is required',
-        href: '#interpreterRequired',
+        text: secondaryLanguages.includes(request.preferredWrittenLanguageCodeError.trim().toUpperCase())
+          ? duplicateError
+          : validationError,
+        href: '#preferred-written-language-code',
       })
     }
-    if (writtenErrorType === 'DUPLICATE') {
-      errors.push({
-        text: 'Language must be different from the saved languages',
-        href: '#preferredWrittenLanguageCode',
-      })
-    } else if (writtenErrorType === 'INVALID') {
-      errors.push({
-        text: 'This is not a valid language',
-        href: '#preferredWrittenLanguageCode',
-      })
-    }
-    return { spokenInvalidInput, writtenInvalidInput }
+
+    return errors
   }
 
-  private validateSecondaryLanguageRequest(
-    formValues: SecondaryLanguageRequest & {
+  private checkSecondaryLanguageForErrors(
+    currentLanguageCode: string,
+    request: SecondaryLanguageRequest & {
       languageError?: string
     },
-    languageCode: string,
-    languageDescription: string,
-    errors: HmppsError[],
+    communicationNeeds: CommunicationNeedsDto,
   ) {
-    const [errorType, invalidInput] = formValues.languageError?.split(':') ?? []
-    if (errorType === 'DUPLICATE' && languageDescription !== invalidInput) {
-      errors.push({
-        text: 'Language must be different from the saved languages',
-        href: '#language',
-      })
-    } else if (errorType === 'INVALID') {
-      errors.push({
-        text: 'This is not a valid language',
-        href: '#language',
-      })
-    } else if (!languageCode && !formValues.language) {
-      errors.push({
-        text: 'Select a language',
-        href: '#language',
-      })
+    const errors = []
+    const validationError = 'This is not a valid language'
+    const duplicateError = 'Language must be different from the saved languages'
+    const mainSpokenLanguage =
+      communicationNeeds?.languagePreferences?.preferredSpokenLanguage?.description?.toUpperCase()
+    const mainWrittenLanguage =
+      communicationNeeds?.languagePreferences?.preferredWrittenLanguage?.description?.toUpperCase()
+    const secondaryLanguages = communicationNeeds?.secondaryLanguages
+      ?.map(lang => lang.language?.description?.toUpperCase())
+      .filter(Boolean)
+
+    if (request.language === currentLanguageCode) return []
+
+    if (request.languageError) {
+      const formattedInputForComparison = request.languageError.trim().toUpperCase()
+      const duplicate =
+        mainSpokenLanguage === formattedInputForComparison ||
+        mainWrittenLanguage === formattedInputForComparison ||
+        secondaryLanguages.includes(formattedInputForComparison)
+
+      errors.push({ text: duplicate ? duplicateError : validationError, href: '#language' })
     }
-    return invalidInput
+
+    return errors
   }
 }

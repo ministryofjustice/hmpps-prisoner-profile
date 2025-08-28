@@ -46,6 +46,7 @@ import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGu
 import { personalPageBasePath } from './personalRouter'
 import PersonalController from '../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
+import { countryOfBirthValidator } from '../validators/personal/countryOfBirthValidator'
 import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function editRouter(services: Services): Router {
@@ -374,6 +375,10 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditCountryOfBirth,
       method: personalController.countryOfBirth().submit,
+      validation: {
+        validators: [countryOfBirthValidator],
+        redirectBackOnError: true,
+      },
     },
     requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })

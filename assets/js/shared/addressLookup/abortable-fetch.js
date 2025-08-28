@@ -1,13 +1,13 @@
 // Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/js/abortable-fetch.js
 
-const FetchStatus = {
+export const FetchStatus = {
   unsent: 'UNSENT',
   loading: 'LOADING',
   done: 'DONE',
 }
 
-const abortError = 'AbortError'
-const abortTimeout = 'AbortTimeout'
+export const abortError = 'AbortError'
+export const abortTimeout = 'AbortTimeout'
 
 class AbortableFetch {
   constructor(url) {
@@ -19,7 +19,9 @@ class AbortableFetch {
   async send() {
     this.status = FetchStatus.loading
     try {
-      setTimeout(() => { this.controller.abort(abortTimeout) }, 5000)
+      setTimeout(() => {
+        this.controller.abort(abortTimeout)
+      }, 5000)
       const response = await window.fetch(this.url, { signal: this.controller.signal })
 
       if (!(+response.status === 200)) {
@@ -38,4 +40,4 @@ class AbortableFetch {
   }
 }
 
-const abortableFetch = (url, options) => new AbortableFetch(url, options)
+export const abortableFetch = (url, options) => new AbortableFetch(url, options)

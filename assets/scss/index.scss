@@ -4,17 +4,10 @@ $path: '/assets/images/';
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
 
-@import "node_modules/govuk-frontend/dist/govuk/base";
-@import "node_modules/govuk-frontend/dist/govuk/core";
-@import "node_modules/govuk-frontend/dist/govuk/objects";
-@import "node_modules/govuk-frontend/dist/govuk/components";
-@import "node_modules/govuk-frontend/dist/govuk/utilities";
-@import "node_modules/govuk-frontend/dist/govuk/overrides";
-@import 'moj/all';
-
+@import "govuk-frontend/dist/govuk/index";
+@import "@ministryofjustice/frontend/moj/all";
 @import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
 @import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
-
 @import 'node_modules/@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all';
 
 @import 'server/views/components/catAPrisonerTag/catAPrisonerTag';
@@ -78,7 +71,9 @@ $govuk-page-width: $moj-page-width;
 @import './pages/prisoner-schedule';
 @import './pages/location-details';
 @import './pages/profile-photo';
-@import './local';
-@import './helpers';
-@import './print';
-@import './typography';
+
+@import './overrides/local';
+@import './overrides/print';
+
+@import './helpers/index';
+@import './helpers/typography';

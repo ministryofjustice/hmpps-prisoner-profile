@@ -33,7 +33,7 @@ function showUploadControls(component) {
   inputContainer.style.display = 'flex'
 }
 
-window.onload = () => {
+export function fileUploadWithPreview() {
   const components = document.querySelectorAll('[data-component="file-upload-with-preview-component"]')
   components.forEach(component => {
     const imageInput = component.querySelector('input[type="file"]')

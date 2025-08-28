@@ -149,8 +149,11 @@
         or (errors | findError('dateOfBirth-month'))
         or (errors | findError('dateOfBirth-year'))
     }) }}
-    <input type="hidden" id="relationshipTypeIdError" name="relationshipTypeIdError" value="{{ relationshipTypeIdError }}"/> {{ govukSelect({
-      id: "relationshipTypeId",
+
+    <input type="hidden" id="relationship-type-id-error" name="relationshipTypeIdError" value="{{ formValues.relationshipTypeIdError }}"/>
+
+    {{ govukSelect({
+      id: "relationship-type-id",
       name: "relationshipTypeId",
       label: {
         text: "Contact’s relationship to " + naturalPrisonerName,
@@ -159,10 +162,14 @@
       hint: {
         text: "Start typing to select relationship, for example, brother or solicitor."
       },
-      errorMessage: errors | findError('relationshipTypeId'),
-      classes: "govuk-input--width-30 js-autocomplete-select",
+      errorMessage: errors | findError('relationship-type-id'),
+      classes: "js-autocomplete-select",
       items: relationshipOptions,
-      attributes: { autocomplete: "off" }
+      attributes: {
+        autocomplete: "off",
+        "data-input-classes": "govuk-input--width-20",
+        "data-menu-classes": "govuk-input--width-20"
+      }
     }) }}
     {{ govukRadios({
       idPrefix: "radio",
@@ -229,8 +236,4 @@
         data-qa="cancel-button">Cancel</a>
     </div>
   </form>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/accessible-autocomplete.min.js"></script>
-  <script src="/assets/js/nextOfKin.js"></script>
 {% endblock %}

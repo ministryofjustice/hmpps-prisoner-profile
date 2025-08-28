@@ -17,7 +17,11 @@ describe('Nationality validators', () => {
 
   it.each([
     [{ radioField: 'OTHER' }, `Enter nationality`, '#autocomplete'],
-    [{ radioField: 'OTHER__VALIDATION_ERROR' }, `This is not a valid nationality`, '#autocomplete'],
+    [
+      { radioField: 'OTHER', autocompleteError: 'not-a-nationality' },
+      `This is not a valid nationality`,
+      '#autocomplete',
+    ],
     [
       { radioField: 'BRIT', additionalNationalities: messageExceedingMaxLength },
       `Additional nationalities must be 40 characters or less`,
@@ -26,12 +30,17 @@ describe('Nationality validators', () => {
   ])(
     'Validations: %s: %s',
     async (
-      { radioField, additionalNationalities }: { radioField: string; additionalNationalities: string },
+      {
+        radioField,
+        autocompleteError,
+        additionalNationalities,
+      }: { radioField: string; autocompleteError: string; additionalNationalities: string },
       errorMessage: string,
       errorHref: string,
     ) => {
       const body = {
         radioField,
+        autocompleteError,
         additionalNationalities,
       }
       const errors = await nationalityValidator(body)

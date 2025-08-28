@@ -11,19 +11,24 @@
   <h1 class="govuk-heading-l">{{ title }}</h1>
   <form id="mainLanguageForm" method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-    <input type="hidden" id="preferredSpokenLanguageCodeError" name="preferredSpokenLanguageCodeError" value="{{ spokenInvalidInput }}"/>
-    <input type="hidden" id="preferredWrittenLanguageCodeError" name="preferredWrittenLanguageCodeError" value="{{ writtenInvalidInput }}"/> {{ govukSelect({
-      id: "preferredSpokenLanguageCode",
+
+    <input type="hidden" id="preferred-spoken-language-code-error" name="preferredSpokenLanguageCodeError" value="{{ spokenInvalidInput }}"/>
+    <input type="hidden" id="preferred-written-language-code-error" name="preferredWrittenLanguageCodeError" value="{{ writtenInvalidInput }}"/>
+
+    {{ govukSelect({
+      id: "preferred-spoken-language-code",
       name: "preferredSpokenLanguageCode",
       label: {
         text: mainLanguageLabel,
         classes: 'govuk-label--s'
       },
       items: preferredSpokenLanguageOptions,
-      errorMessage: errors | findError("preferredSpokenLanguageCode"),
+      errorMessage: errors | findError("preferred-spoken-language-code"),
       classes: "js-autocomplete-select",
       attributes: {
-        "data-qa": "select-preferred-spoken-language-input"
+        "data-qa": "select-preferred-spoken-language-input",
+        "data-input-classes": "govuk-input--width-30",
+        "data-menu-classes": "govuk-input--width-30"
       }
     }) }}
     {{ govukRadios({
@@ -50,17 +55,19 @@
       errorMessage: errors | findError('interpreterRequired')
     }) }}
     {{ govukSelect({
-      id: "preferredWrittenLanguageCode",
+      id: "preferred-written-language-code",
       name: "preferredWrittenLanguageCode",
       label: {
         text: 'What is their main written language?',
         classes: 'govuk-label--s'
       },
       items: preferredWrittenLanguageOptions,
-      errorMessage: errors | findError("preferredWrittenLanguageCode"),
+      errorMessage: errors | findError("preferred-written-language-code"),
       classes: "js-autocomplete-select",
       attributes: {
-        "data-qa": "select-preferred-written-language-input"
+        "data-qa": "select-preferred-written-language-input",
+        "data-input-classes": "govuk-input--width-30",
+        "data-menu-classes": "govuk-input--width-30"
       }
     }) }}
     <div class="govuk-button-group">
@@ -88,8 +95,4 @@
       {% endfor %}
     </aside>
   {% endif %}
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/accessible-autocomplete.min.js"></script>
-  <script src="/assets/js/languages.js"></script>
 {% endblock %}

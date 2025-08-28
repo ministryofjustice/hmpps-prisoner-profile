@@ -37,10 +37,6 @@
   padding-right: 8px;
 }
 
-.hmpps-font-weight-normal dt {
-  font-weight: normal;
-}
-
 .hmpps-grid-container {
   display: grid;
   grid-template-columns: 25% 25% 25% 25%;
@@ -58,14 +54,6 @@
   border-left: 5px solid govuk-colour('mid-grey');
   margin: 0;
   background-color: govuk-colour('light-grey');
-}
-
-.hmpps-dark-grey-font {
-  color: govuk-colour('dark-grey');
-}
-
-.hmpps-white-font {
-  color: govuk-colour('white');
 }
 
 @media (min-width: 40.0625em) {

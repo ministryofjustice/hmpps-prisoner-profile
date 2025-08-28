@@ -54,22 +54,22 @@ describe('Next of Kin Validator', () => {
   describe('validateRelationshipType', () => {
     it.each([
       // Valid case
-      ['#relationshipTypeId', 'S_SIS', undefined, []],
+      ['#relationship-type-id', 'S_SIS', undefined, []],
       // Invalid value
       [
-        '#relationshipTypeId',
+        '#relationship-type-id',
         undefined,
         'invalid',
         [
           {
-            href: '#relationshipTypeId',
+            href: '#relationship-type-id',
             text: 'We could not find a matching relationship. Check the spelling or try typing something else',
           },
         ],
       ],
       // Missing value
-      ['#relationshipTypeId', '', undefined, [{ href: '#relationshipTypeId', text: 'Enter relationship' }]],
-      ['#relationshipTypeId', undefined, undefined, [{ href: '#relationshipTypeId', text: 'Enter relationship' }]],
+      ['#relationship-type-id', '', undefined, [{ href: '#relationship-type-id', text: 'Enter relationship' }]],
+      ['#relationship-type-id', undefined, undefined, [{ href: '#relationship-type-id', text: 'Enter relationship' }]],
     ])(
       'href: %s, relationshipTypeId: %s, invalidValue: %s',
       (href, relationshipTypeId, invalidValue, expectedErrors) => {
@@ -137,7 +137,7 @@ describe('Next of Kin Validator', () => {
       expect(errors.some(error => error.href === '#contactType')).toBe(true)
       expect(errors.some(error => error.href === '#firstName')).toBe(true)
       expect(errors.some(error => error.href === '#lastName')).toBe(true)
-      expect(errors.some(error => error.href === '#relationshipTypeId')).toBe(true)
+      expect(errors.some(error => error.href === '#relationship-type-id')).toBe(true)
 
       // Check that we have error messages containing specific substrings
       const errorTexts = errors.map(error => error.text)
@@ -292,7 +292,7 @@ describe('Next of Kin Validator', () => {
         text: 'This is not a valid town or city',
       })
       expect(errors).toContainEqual({
-        href: '#relationshipTypeId',
+        href: '#relationship-type-id',
         text: 'We could not find a matching relationship. Check the spelling or try typing something else',
       })
     })

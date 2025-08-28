@@ -8,6 +8,9 @@ import { Services } from '../services'
 import LanguagesController from '../controllers/languagesController'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../utils/featureToggles'
+import validationMiddleware from '../middleware/validationMiddleware'
+import { mainLanguageValidator } from '../validators/personal/mainLanguageValidator'
+import { otherLanguageValidator } from '../validators/personal/otherLanguageValidator'
 
 export default function languagesRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -24,13 +27,28 @@ export default function languagesRouter(services: Services): Router {
   ]
 
   get('/main-language', ...commonMiddleware, languagesController.displayUpdateMainLanguage())
-  post('/main-language', ...commonMiddleware, languagesController.submitUpdateMainLanguage())
+  post(
+    '/main-language',
+    ...commonMiddleware,
+    validationMiddleware([mainLanguageValidator], { redirectBackOnError: true }),
+    languagesController.submitUpdateMainLanguage(),
+  )
 
   get('/other-languages', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
-  post('/other-languages', ...commonMiddleware, languagesController.submitUpdateOtherLanguages())
+  post(
+    '/other-languages',
+    ...commonMiddleware,
+    validationMiddleware([otherLanguageValidator], { redirectBackOnError: true }),
+    languagesController.submitUpdateOtherLanguages(),
+  )
 
   get('/other-languages/:languageCode', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
-  post('/other-languages/:languageCode', ...commonMiddleware, languagesController.submitUpdateOtherLanguages())
+  post(
+    '/other-languages/:languageCode',
+    ...commonMiddleware,
+    validationMiddleware([otherLanguageValidator], { redirectBackOnError: true }),
+    languagesController.submitUpdateOtherLanguages(),
+  )
 
   return router
 }

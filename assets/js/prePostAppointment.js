@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const date = document.getElementById('date').value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
+      date &&
+      locationId &&
+      (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
       container.innerHTML = await response.text()

@@ -342,7 +342,7 @@ describe('NextOfKinController', () => {
       }
       req.errors = [
         { text: 'First name is required', href: '#firstName' },
-        { text: 'Relationship type is required', href: '#relationshipTypeId' },
+        { text: 'Relationship type is required', href: '#relationship-type-id' },
       ]
 
       const handler = controller.submitNextOfKinEmergencyContact()

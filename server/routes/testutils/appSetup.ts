@@ -1,4 +1,3 @@
-import path from 'path'
 import express, { Express } from 'express'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
@@ -17,7 +16,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app, path)
+  nunjucksSetup(app)
   app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
     req.user = userSupplier()

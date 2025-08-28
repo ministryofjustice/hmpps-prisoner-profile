@@ -10,6 +10,18 @@
   color: govuk-colour('green');
 }
 
+.hmpps-dark-grey-font {
+  color: govuk-colour('dark-grey');
+}
+
+.hmpps-white-font {
+  color: govuk-colour('white');
+}
+
+.hmpps-font-weight-normal dt {
+  font-weight: normal;
+}
+
 pre {
   white-space: pre-wrap;
 }

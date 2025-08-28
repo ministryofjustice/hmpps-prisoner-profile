@@ -16,10 +16,6 @@
     <input type="hidden" id="town-or-city-error" name="townOrCityError" value="{{ requestBody.townOrCityError }}"/>
     <input type="hidden" id="county-error" name="countyError" value="{{ requestBody.countyError }}"/>
     <input type="hidden" id="country-error" name="countryError" value="{{ requestBody.countryError }}"/>
-    <div
-      id="hmpps-autocomplete-options"
-      data-input-classes="govuk-input hmpps-address-field"
-      data-menu-classes="hmpps-address-field"></div>
     {% if noFixedAddressCheckbox %}
       {{ govukCheckboxes({
         name: "noFixedAddress",
@@ -119,8 +115,4 @@
       <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-link">Cancel</a>
     </div>
   </form>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/accessible-autocomplete.min.js"></script>
-  <script src="/assets/js/autocomplete.js"></script>
 {% endblock %}

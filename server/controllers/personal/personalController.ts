@@ -559,6 +559,7 @@ export default class PersonalController {
     autocompleteSelected,
     autocompleteOptionTitle,
     autocompleteOptionLabel,
+    autocompleteError,
   }: {
     formTitle: string
     fieldData: RadioFieldData
@@ -567,6 +568,7 @@ export default class PersonalController {
     autocompleteSelected: boolean
     autocompleteOptionTitle: string
     autocompleteOptionLabel: string
+    autocompleteError: string
   }) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
@@ -593,6 +595,7 @@ export default class PersonalController {
         autocompleteSelected,
         autocompleteOptionTitle,
         autocompleteOptionLabel,
+        autocompleteError,
         redirectAnchor,
         miniBannerData,
       })
@@ -649,6 +652,7 @@ export default class PersonalController {
         const { inmateDetail } = req.middleware
         const requestBodyFlash = requestBodyFromFlash<{
           autocompleteField: string
+          autocompleteError: string
           radioField: string
           additionalNationalities: string
         }>(req)
@@ -702,9 +706,10 @@ export default class PersonalController {
             fieldValue,
           ),
           additionalNationalitiesValue,
-          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A different nationality',
           autocompleteOptionLabel: 'Select nationality',
+          autocompleteError: requestBodyFlash?.autocompleteError,
           miniBannerData,
         })
       },
@@ -1101,21 +1106,26 @@ export default class PersonalController {
   }
 
   countryOfBirth() {
-    const { fieldName, url } = countryOfBirthFieldData
+    const { fieldName } = countryOfBirthFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
+        const { autocompleteField, autocompleteError, radioField } =
+          requestBodyFromFlash<{
+            autocompleteField: string
+            autocompleteError: string
+            radioField: string
+          }>(req) || {}
         const countryReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
           CorePersonRecordReferenceDataDomain.country,
         )
 
         const fieldValue =
-          requestBodyFlash?.autocompleteField ||
-          requestBodyFlash?.radioField ||
+          autocompleteField ||
+          radioField ||
           countryReferenceData.find(country => country.code === inmateDetail.birthCountryCode)?.code
 
         const countriesAsRadioOptions = ['ENG', 'SCOT', 'WALES', 'NI']
@@ -1131,9 +1141,10 @@ export default class PersonalController {
           fieldData: countryOfBirthFieldData,
           radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
           autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
-          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A different country',
           autocompleteOptionLabel: 'Country name',
+          autocompleteError,
         })(req, res, next)
       },
 
@@ -1144,14 +1155,6 @@ export default class PersonalController {
         const radioField = req.body.radioField || null
         const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
         const previousValue = inmateDetail.birthCountryCode
-
-        if (radioField === 'OTHER__VALIDATION_ERROR' || (radioField === 'OTHER' && !autocompleteField)) {
-          const validationText =
-            radioField === 'OTHER__VALIDATION_ERROR' ? 'This is not a valid country' : 'Enter country name'
-          req.flash('errors', [{ href: '#autocomplete', text: validationText }])
-          req.flash('requestBody', JSON.stringify(req.body))
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
-        }
 
         return this.submit({
           req,
