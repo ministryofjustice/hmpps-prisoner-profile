@@ -382,7 +382,7 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const cancelUrl = `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}`
 
     const formValues = res.locals.formValues ?? {
       description: mark.comment,

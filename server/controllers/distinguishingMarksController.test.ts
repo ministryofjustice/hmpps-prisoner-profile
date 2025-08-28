@@ -739,7 +739,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType,
         formValues: { description: 'Comment' },
-        cancelUrl: `/prisoner/A12345/personal/${markType}/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
       })
     })
 
@@ -758,7 +758,7 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         formValues: { description: 'Horrible arm scar' },
-        cancelUrl: `/prisoner/A12345/personal/tattoo/100`,
+        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
       })
     })
 
