@@ -5,7 +5,7 @@
 {% set heading =  "Change " + markType + " details" %}
 {% set pageTitle =  heading + " - Prisoner personal details" %}
 {% set personalPath = '/prisoner/' + prisonerNumber + '/personal' %}
-{% set basePath = personalPath + '/' + markType + '/' + mark.id %}
+{% set basePath = personalPath + '/distinguishing-marks/' + markType + '/' + mark.id %}
 {% block form %}
     <span class="govuk-caption-l">Distinguishing marks</span>
     <h1 class='govuk-!-margin-top-0 govuk-!-font-size-36'>{{ heading }}</h1>
