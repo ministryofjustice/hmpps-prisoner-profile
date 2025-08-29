@@ -43,7 +43,7 @@ export const nextOfKinValidator: Validator = (body: NextOfKinSubmission): HmppsE
     ...validateFieldLength('#street', 'Street', street, 160, false),
     ...validateAutocomplete('#cityCode', 'Town or city', cityCodeError),
     ...validateFieldLength('#postcode', 'Postcode', postcode, 12, false),
-    ...validateRelationshipType('#relationshipTypeId', relationshipTypeId, relationshipTypeIdError),
+    ...validateRelationshipType('#relationship-type-id', relationshipTypeId, relationshipTypeIdError),
   ]
 }
 

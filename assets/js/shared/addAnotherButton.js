@@ -1,5 +1,6 @@
-function addAnotherButton() {
+export function addAnotherButton() {
   const button = document.getElementById('submit-and-add-another')
+
   if (button) {
     function onAddAnotherButtonClick(e) {
       e.preventDefault()
@@ -12,5 +13,3 @@ function addAnotherButton() {
     button.onclick = onAddAnotherButtonClick
   }
 }
-
-addAnotherButton()

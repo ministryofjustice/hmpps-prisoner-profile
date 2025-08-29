@@ -4,6 +4,7 @@ import { OsPlacesApiClient } from './interfaces/osPlacesApi/osPlacesApiClient'
 import OsPlacesQueryResponse from './interfaces/osPlacesApi/osPlacesQueryResponse'
 import logger from '../../logger'
 import AddressLookupError from '../utils/addressLookupError'
+import { getErrorStatus } from '../utils/errorHelpers'
 
 export default class OsPlacesApiRestClient implements OsPlacesApiClient {
   private baseUrl: string
@@ -46,7 +47,11 @@ export default class OsPlacesApiRestClient implements OsPlacesApiClient {
       return result.body
     } catch (error) {
       const errorMessage = `Error calling OS Places API: ${error.message}`
-      const lookupError = new AddressLookupError(errorMessage, error.status, error.response ? error.response.body : {})
+      const lookupError = new AddressLookupError(
+        errorMessage,
+        getErrorStatus(error),
+        error.response ? error.response.body : {},
+      )
       logger.warn(lookupError, errorMessage)
       throw lookupError
     }

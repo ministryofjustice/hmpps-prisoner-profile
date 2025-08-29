@@ -56,7 +56,7 @@ import ImageDetails from './interfaces/prisonApi/ImageDetails'
 import logger from '../../logger'
 
 export default class PrisonApiRestClient extends RestClient {
-  private token: string
+  private readonly token: string
 
   constructor(token: string) {
     super('Prison API', config.apis.prisonApi, logger)

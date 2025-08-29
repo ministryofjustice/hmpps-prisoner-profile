@@ -39,7 +39,7 @@
                                             <div class="personal-distinguishing-marks__row__populated__row">
                                                 <p class="govuk-!-margin-top-3 govuk-!-margin-bottom-0">1 of {{ mark.photographUuids.length }} photos.
                                                     <a data-qa="mark-images-link"
-                                                       href="/prisoner/{{ prisonerNumber }}/personal/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
+                                                       href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
                                                        class='govuk-link govuk-link--no-visited-state'
                                                     >All images</a></p>
                                             </div>
@@ -48,7 +48,7 @@
                                 </dl>
                                 {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                                     <div>
-                                        <a href="/prisoner/{{ prisonerNumber }}/personal/{{ mark.markType.description | lower }}/{{ mark.id }}"
+                                        <a href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}"
                                            class="govuk-link govuk-link--no-visited-state">Change</a>
                                     </div>
                                 {% endif %}
@@ -82,7 +82,7 @@
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                   <dd class='personal-distinguishing-marks__row__actions'>
                       <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/tattoo'>Add tattoo</a>
+                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/tattoo'>Add tattoo</a>
                   </dd>
                 {% endif %}
             </div>
@@ -94,7 +94,7 @@
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                   <dd class='personal-distinguishing-marks__row__actions'>
                       <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/scar'>Add scar</a>
+                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/scar'>Add scar</a>
                   </dd>
                 {% endif %}
             </div>
@@ -106,7 +106,7 @@
                 {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                   <dd class='personal-distinguishing-marks__row__actions'>
                       <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/mark'>Add mark</a>
+                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/mark'>Add mark</a>
                   </dd>
                 {% endif %}
             </div>

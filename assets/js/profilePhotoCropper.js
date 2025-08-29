@@ -1,4 +1,4 @@
-import '../cropper.js'
+import 'cropperjs'
 
 let cropping = false
 let croppingInit = false
@@ -13,8 +13,8 @@ const MAX_HEIGHT = 276
 const RATIO = MAX_WIDTH / MAX_HEIGHT
 
 const uploadedPhoto = document.getElementById('photo-preview')
-const fileName = uploadedPhoto.attributes['data-file-name'].value
-const fileType = uploadedPhoto.attributes['data-file-type'].value
+const fileName = uploadedPhoto?.attributes['data-file-name']?.value
+const fileType = uploadedPhoto?.attributes['data-file-type']?.value
 
 function dataURLtoFile(dataurl, filename) {
   let arr = dataurl.split(',')

@@ -55,8 +55,8 @@ describe('Csra Service', () => {
       const csraData = await csraService.getCsraAssessment('', 123456, 9)
 
       expect(prisonApiClientSpy.getCsraAssessment).toHaveBeenCalledWith(123456, 9)
-      expect(prisonApiClientSpy.getAgencyDetails).toBeCalledTimes(0)
-      expect(prisonApiClientSpy.getStaffDetails).toBeCalledTimes(0)
+      expect(prisonApiClientSpy.getAgencyDetails).toHaveBeenCalledTimes(0)
+      expect(prisonApiClientSpy.getStaffDetails).toHaveBeenCalledTimes(0)
 
       expect(csraData).toEqual({
         csraAssessment: csraResponse,
@@ -132,7 +132,7 @@ describe('Csra Service', () => {
         { ...csraAssessmentMock, assessmentAgencyId: 'LEI' },
       ])
 
-      expect(prisonApiClientSpy.getAgencyDetails).toBeCalledTimes(2)
+      expect(prisonApiClientSpy.getAgencyDetails).toHaveBeenCalledTimes(2)
       expect(output).toEqual([AgencyMock, AgencyMock])
     })
 
@@ -145,7 +145,7 @@ describe('Csra Service', () => {
 
       await csraService.getAgenciesForCsraAssessments('', [csraAssessmentMock, csraAssessmentMock])
 
-      expect(prisonApiClientSpy.getAgencyDetails).toBeCalledTimes(1)
+      expect(prisonApiClientSpy.getAgencyDetails).toHaveBeenCalledTimes(1)
     })
   })
 

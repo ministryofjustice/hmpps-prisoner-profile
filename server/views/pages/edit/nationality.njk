@@ -7,6 +7,8 @@
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Nationality</h1>
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <input type="hidden" id="autocomplete-error" name="autocompleteError" value="{{ autocompleteError }}"/>
+
     <div class="govuk-form-group">
       {% set autocompleteOptions = [{ value: '', text: 'Please select a nationality' }].concat(autocompleteOptions) %}
       {% set autocompleteHtml %}
@@ -23,7 +25,9 @@
             classes: "govuk-!-width-one-third"
         },
         attributes: {
-            "data-test": "select-autocomplete-input"
+            "data-test": "select-autocomplete-input",
+            "data-input-classes": "govuk-input--width-30",
+            "data-menu-classes": "govuk-input--width-30"
         }
       }) }}
       {% endset -%}
@@ -80,8 +84,4 @@
         data-qa="edit-cancel-button">Cancel</a>
     </div>
   </form>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/accessible-autocomplete.min.js"></script>
-  <script src="/assets/js/radioFieldWithAutocomplete.js"></script>
 {% endblock %}

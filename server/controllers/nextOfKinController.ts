@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { UUID } from 'node:crypto'
+import { UUID } from 'crypto'
 import { apostrophe, formatName, mapRelationshipDescriptionByCode, objectToSelectOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinService from '../services/nextOfKinService'
@@ -26,6 +26,7 @@ import NotFoundError from '../utils/notFoundError'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PhoneNumberTypeMappings } from '../data/constants/phoneNumberMappings'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 export interface NextOfKinSubmission {
   contactType: string
@@ -186,7 +187,7 @@ export default class NextOfKinController {
             })
           }
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }

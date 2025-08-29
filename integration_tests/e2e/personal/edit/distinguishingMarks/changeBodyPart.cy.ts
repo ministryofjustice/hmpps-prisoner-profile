@@ -10,15 +10,24 @@ const prisonerName = 'Saunders, John'
 const markId = '100'
 
 const visitChangeTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/body-part` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/tattoo/${markId}/body-part`,
+  })
 }
 
 const visitChangeScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/body-part` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/scar/${markId}/body-part`,
+  })
 }
 
 const visitChangeMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/body-part` })
+  cy.signIn({
+    failOnStatusCode,
+    redirectPath: `/prisoner/${prisonerNo}/personal/distinguishing-marks/mark/${markId}/body-part`,
+  })
 }
 
 context('Change body part', () => {
@@ -166,7 +175,7 @@ context('Change body part', () => {
       page.formValue('bodyPart').should('have.value', 'neck')
 
       page.continueBtn().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100')
     })
 
     it('User can submit selection and move to change location', () => {
@@ -182,7 +191,7 @@ context('Change body part', () => {
       page.formValue('bodyPart').should('have.value', 'face')
 
       page.continueBtn().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100/location')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100/location')
     })
 
     it('No selection causes a validation error', () => {

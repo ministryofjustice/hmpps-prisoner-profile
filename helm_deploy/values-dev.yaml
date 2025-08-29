@@ -45,6 +45,8 @@ generic-service:
     CCRD_UI_URL: "https://court-cases-release-dates-dev.hmpps.service.justice.gov.uk"
     CSIP_UI_URL: "https://csip-dev.hmpps.service.justice.gov.uk"
     CONTACTS_UI_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
+    ALLOCATE_KEY_WORKERS_UI_URL: "https://allocate-key-workers-dev.hmpps.service.justice.gov.uk/key-worker"
+    ALLOCATE_PERSONAL_OFFICERS_UI_URL: "https://allocate-key-workers-dev.hmpps.service.justice.gov.uk/personal-officer"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"

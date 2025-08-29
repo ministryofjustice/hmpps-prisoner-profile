@@ -46,7 +46,7 @@ describe('prisonRegisterClient', () => {
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)
-        expect(e.status).toEqual(501)
+        expect(e.responseStatus).toEqual(501)
         expect(e.data).toEqual(expectedResponseBody)
       }
     })
@@ -86,7 +86,7 @@ describe('prisonRegisterClient', () => {
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)
-        expect(e.status).toEqual(404)
+        expect(e.responseStatus).toEqual(404)
         expect(e.data).toEqual(expectedResponseBody)
       }
     })
@@ -108,7 +108,7 @@ describe('prisonRegisterClient', () => {
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)
-        expect(e.status).toEqual(501)
+        expect(e.responseStatus).toEqual(501)
         expect(e.data).toEqual(expectedResponseBody)
       }
     })

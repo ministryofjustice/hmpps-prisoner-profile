@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
-import { UUID } from 'node:crypto'
+import { randomUUID, UUID } from 'crypto'
 import NextOfKinService from '../services/nextOfKinService'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'
@@ -32,8 +31,8 @@ describe('NextOfKinController', () => {
   const prisonerNumber = 'A1234BC'
   const clientToken = 'CLIENT_TOKEN'
   const uprn = 1234
-  const addressCacheId = uuidv4()
-  const contactCacheId = uuidv4()
+  const addressCacheId = randomUUID()
+  const contactCacheId = randomUUID()
   const cachedContact = {
     id: 9876,
     name: 'Albert Wesker',
@@ -343,7 +342,7 @@ describe('NextOfKinController', () => {
       }
       req.errors = [
         { text: 'First name is required', href: '#firstName' },
-        { text: 'Relationship type is required', href: '#relationshipTypeId' },
+        { text: 'Relationship type is required', href: '#relationship-type-id' },
       ]
 
       const handler = controller.submitNextOfKinEmergencyContact()

@@ -45,6 +45,8 @@ generic-service:
     INCENTIVES_UI_URL: "https://incentives-ui.hmpps.service.justice.gov.uk"
     CSIP_UI_URL: "https://csip.hmpps.service.justice.gov.uk"
     CONTACTS_UI_URL: "https://contacts.hmpps.service.justice.gov.uk"
+    ALLOCATE_KEY_WORKERS_UI_URL: "https://allocate-key-workers.hmpps.service.justice.gov.uk/key-worker"
+    ALLOCATE_PERSONAL_OFFICERS_UI_URL: "https://allocate-key-workers.hmpps.service.justice.gov.uk/personal-officer"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"

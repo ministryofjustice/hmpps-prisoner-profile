@@ -46,6 +46,8 @@ import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGu
 import { personalPageBasePath } from './personalRouter'
 import PersonalController from '../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
+import { countryOfBirthValidator } from '../validators/personal/countryOfBirthValidator'
+import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
@@ -62,7 +64,8 @@ export default function editRouter(services: Services): Router {
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
   router.use(
-    `${personalPageBasePath}/:markType(${markTypes})`,
+    `${personalPageBasePath}/distinguishing-marks/:markType`,
+    parameterGuard('markType', markTypes),
     ...commonMiddleware,
     distinguishingMarksRouter(services),
   )
@@ -372,6 +375,10 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditCountryOfBirth,
       method: personalController.countryOfBirth().submit,
+      validation: {
+        validators: [countryOfBirthValidator],
+        redirectBackOnError: true,
+      },
     },
     requiredPermission: CorePersonRecordPermission.edit_place_of_birth,
   })

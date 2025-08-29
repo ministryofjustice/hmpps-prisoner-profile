@@ -14,6 +14,7 @@ import AlertView from '../services/interfaces/alertsService/AlertView'
 import { Alert, AlertCode, AlertForm, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -175,7 +176,7 @@ export default class AlertsController {
             alertForm,
           })
         } catch (error) {
-          if (error.status === 400) {
+          if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
           } else throw error
         }
@@ -545,10 +546,10 @@ export default class AlertsController {
   }
 
   private handleUpdateErrors(error: HttpError): { text: string } {
-    if (error.status === 400) {
+    if (errorHasStatus(error, 400)) {
       return { text: error.message }
     }
-    if (error.status === 423) {
+    if (errorHasStatus(error, 423)) {
       // Handle alert being locked in NOMIS
       return {
         text: 'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.',

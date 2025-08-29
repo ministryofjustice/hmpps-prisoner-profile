@@ -387,7 +387,7 @@ export default class AliasController {
         return this.submitChangeEthnicBackground()(req, res, next)
       }
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/ethnic-group/${ethnicGroup}`)
     }
   }
 
@@ -441,7 +441,7 @@ export default class AliasController {
 
       if (!ethnicBackground) {
         req.flash('errors', [{ href: '#radio', text: `Select an ethnic group` }])
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${group}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/ethnic-group/${group}`)
       }
 
       try {
@@ -478,7 +478,7 @@ export default class AliasController {
         if (e instanceof NomisLockedError) throw e
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${group}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/ethnic-group/${group}`)
       }
     }
   }

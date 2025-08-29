@@ -760,11 +760,11 @@ describe('Alias Controller', () => {
 
     it.each([
       [undefined, 'personal#ethnic-group'],
-      ['white', 'personal/white'],
-      ['mixed', 'personal/mixed'],
-      ['asian', 'personal/asian'],
-      ['black', 'personal/black'],
-      ['other', 'personal/other'],
+      ['white', 'personal/ethnic-group/white'],
+      ['mixed', 'personal/ethnic-group/mixed'],
+      ['asian', 'personal/ethnic-group/asian'],
+      ['black', 'personal/ethnic-group/black'],
+      ['other', 'personal/ethnic-group/other'],
       ['NS', 'personal#ethnic-group'],
     ])('for choice %s should redirect to %s page', async (ethnicGroup: string, redirect: string) => {
       req = { ...req, body: { radioField: ethnicGroup } } as unknown as Request
@@ -908,7 +908,7 @@ describe('Alias Controller', () => {
       await controller.submitChangeEthnicBackground()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/ethnic-group/${ethnicGroup}`)
     })
 
     it('Sends a post success audit event', async () => {

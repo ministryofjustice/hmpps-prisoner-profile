@@ -5,6 +5,8 @@
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <input type="hidden" id="autocomplete-error" name="autocompleteError" value="{{ autocompleteError }}"/>
+
     <div class="govuk-form-group">
       {% set autocompleteOptions = [{ value: '', text: 'Please select a country' }].concat(autocompleteOptions) %}
       {% set autocompleteHtml %}
@@ -18,7 +20,9 @@
         errorMessage: errors | findError("autocomplete"),
         classes: "js-autocomplete-select",
         attributes: {
-          "data-test": "select-autocomplete-input"
+          "data-test": "select-autocomplete-input",
+          "data-input-classes": "govuk-input--width-30",
+          "data-menu-classes": "govuk-input--width-30"
         }
       }) }}
       {% endset %}
@@ -61,8 +65,4 @@
         data-qa="edit-cancel-button">Cancel</a>
     </div>
   </form>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/accessible-autocomplete.min.js"></script>
-  <script src="/assets/js/radioFieldWithAutocomplete.js"></script>
 {% endblock %}

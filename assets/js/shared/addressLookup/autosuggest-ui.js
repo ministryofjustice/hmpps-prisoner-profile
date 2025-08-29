@@ -1,4 +1,5 @@
 // Based on ONSDigital's https://github.com/ONSdigital/design-system/blob/main/src/components/autosuggest/autosuggest.ui.js
+import { abortError, abortTimeout } from './abortable-fetch'
 
 const jsBaseClass = 'hmpps-js-autosuggest'
 
@@ -8,13 +9,13 @@ const classSuffixOptionFocused = `${classSuffixOption}--focused`
 const classSuffixOptionNoResults = `${classSuffixOption}--no-results`
 const classSuffixHasResults = '--has-results'
 
-const NoResults = {
+export const NoResults = {
   type_more: 'TYPE_MORE',
   no_match: 'NO_MATCH',
   server_error: 'SERVER_ERROR',
 }
 
-class AutosuggestUi {
+export class AutosuggestUi {
   constructor({ context, onSelect, suggestionFunction }) {
     // DOM Elements
     this.context = context

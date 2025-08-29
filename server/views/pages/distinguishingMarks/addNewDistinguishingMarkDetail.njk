@@ -6,7 +6,6 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 {% from '../../components/fileUploadWithPreview/macro.njk' import fileUploadWithPreview %}
-{% set backLinkUrl = "/prisoner/" + prisonerNumber + "/personal/"+ markType +"?selected="+ bodyPart %}
 {% set formConfig = bodyPart | toBodyPartSpecificFormData(markType) %}
 {% set pageTitle = formConfig.tab + " - Prisoner personal details" %}
 {% macro formSet(postfix) %}
@@ -89,7 +88,4 @@
       </form>
     </div>
   </div>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/fileUploadWithPreview.js" nonce="{{ cspNonce }}"></script>
 {% endblock %}

@@ -66,7 +66,7 @@ context('Edit next of kin and emergency contacts', () => {
           lastName: 'Doe',
         },
         autocompleteInputs: {
-          relationshipTypeId: 'Friend',
+          'relationship-type-id': 'Friend',
         },
       },
       {
@@ -77,7 +77,7 @@ context('Edit next of kin and emergency contacts', () => {
           lastName: 'Smith',
         },
         autocompleteInputs: {
-          relationshipTypeId: 'Brother',
+          'relationship-type-id': 'Brother',
         },
       },
       {
@@ -94,7 +94,7 @@ context('Edit next of kin and emergency contacts', () => {
           'dateOfBirth-year': '1980',
         },
         autocompleteInputs: {
-          relationshipTypeId: 'Father',
+          'relationship-type-id': 'Father',
         },
         radioInputs: {
           '"phoneNumber[type]"': {
@@ -119,7 +119,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
         },
         errorMessages: ['Select if the contact is a next of kin or an emergency contact'],
@@ -133,7 +133,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
         },
         errorMessages: ['Enter this person’s first name'],
@@ -147,7 +147,7 @@ context('Edit next of kin and emergency contacts', () => {
             firstName: 'Jane',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
         },
         errorMessages: ['Enter this person’s last name'],
@@ -174,7 +174,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Random',
+            'relationship-type-id': 'Random',
           },
         },
         errorMessages: ['We could not find a matching relationship. Check the spelling or try typing something else'],
@@ -192,7 +192,7 @@ context('Edit next of kin and emergency contacts', () => {
             'dateOfBirth-year': '2050',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
         },
         errorMessages: ['Date of birth must be a real date'],
@@ -207,7 +207,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
           radioInputs: { '"phoneNumber[type]"': 'HOME' },
         },
@@ -223,7 +223,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
           radioInputs: {
             '"phoneNumber[type]"': {
@@ -248,7 +248,7 @@ context('Edit next of kin and emergency contacts', () => {
             lastName: 'Doe',
           },
           autocompleteInputs: {
-            relationshipTypeId: 'Friend',
+            'relationship-type-id': 'Friend',
           },
           radioInputs: {
             '"phoneNumber[type]"': {

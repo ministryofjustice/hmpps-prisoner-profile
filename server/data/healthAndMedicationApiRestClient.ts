@@ -12,25 +12,23 @@ import {
 import { mapToQueryString } from '../utils/utils'
 import { handleNomisLockedError } from '../utils/nomisLockedError'
 
-export default class HealthAndMedicationApiRestClient implements HealthAndMedicationApiClient {
-  private readonly restClient: RestClient
-
+export default class HealthAndMedicationApiRestClient extends RestClient implements HealthAndMedicationApiClient {
   constructor(token: string) {
-    this.restClient = new RestClient('Health and medication API', config.apis.healthAndMedicationApi, token)
+    super('Health and medication API', config.apis.healthAndMedicationApi, token)
   }
 
   async getReferenceDataCodes(
     domain: HealthAndMedicationReferenceDataDomain,
     includeInactive = false,
   ): Promise<ReferenceDataCode[]> {
-    return this.restClient.get<ReferenceDataCode[]>({
+    return this.get<ReferenceDataCode[]>({
       path: `/reference-data/domains/${domain}/codes`,
       query: mapToQueryString({ includeInactive }),
     })
   }
 
   getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication> {
-    return this.restClient.get<HealthAndMedication>({ path: `/prisoners/${prisonerNumber}`, ignore404: true })
+    return this.getAndIgnore404<HealthAndMedication>({ path: `/prisoners/${prisonerNumber}` })
   }
 
   updateDietAndAllergyData(
@@ -38,7 +36,7 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
     dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy> {
     return handleNomisLockedError(() =>
-      this.restClient.put<DietAndAllergy>({
+      this.put<DietAndAllergy>({
         path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
         data: dietAndAllergyUpdate,
       }),
@@ -47,7 +45,7 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
 
   updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void> {
     return handleNomisLockedError(() =>
-      this.restClient.put<void>({
+      this.put<void>({
         path: `/prisoners/${prisonerNumber}/smoker`,
         data: smokerStatusUpdate,
       }),
