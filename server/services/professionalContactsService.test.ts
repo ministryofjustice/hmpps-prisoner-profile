@@ -566,13 +566,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'Unassigned' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -613,13 +609,9 @@ describe('professionalContactsService', () => {
       })
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'None - high complexity of need',
-            lastSession: '',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'None - high complexity of need' },
+        personalOfficer: { status: 'fulfilled', value: 'Unassigned' },
+        lastSession: { status: 'fulfilled', value: 'No previous session' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -632,13 +624,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'Unassigned' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -653,6 +641,8 @@ describe('professionalContactsService', () => {
 
       expect(result).toEqual({
         keyWorker: { status: 'rejected', reason: 'Some error' },
+        personalOfficer: { status: 'rejected', reason: 'Some error' },
+        lastSession: { status: 'rejected', reason: 'Some error' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -665,13 +655,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'Unassigned' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'rejected', reason: 'API error' },
         coworkingPrisonOffenderManager: { status: 'rejected', reason: 'API error' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -684,13 +670,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'Unassigned' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'rejected', reason: 'API error' },

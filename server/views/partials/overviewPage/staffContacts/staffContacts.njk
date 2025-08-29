@@ -21,7 +21,25 @@
                 </p>
             {% endset %}
 
-            {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
+          {% if staffContacts.keyWorker.status === 'fulfilled' %}
+            {% set keyWorker = staffContacts.keyWorker.value %}
+          {% else %}
+            {% set keyWorker = standardApiErrorText %}
+          {% endif %}
+
+          {% if staffContacts.personalOfficer.status === 'fulfilled' %}
+            {% set personalOfficer = staffContacts.personalOfficer.value %}
+          {% else %}
+            {% set personalOfficer = standardApiErrorText %}
+          {% endif %}
+
+          {% if staffContacts.lastSession.status === 'fulfilled' %}
+            {% set lastSession = staffContacts.lastSession.value %}
+          {% else %}
+            {% set lastSession = standardApiErrorText %}
+          {% endif %}
+
+          {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
                 {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
             {% else %}
                 {% set communityOffenderManager = standardApiErrorText %}
@@ -49,12 +67,28 @@
                             text: "Key worker"
                         },
                         value: {
-                            html: keyWorkerHtml
+                          text: keyWorker
                         }
                     },
                     {
                         key: {
-                            text: "Prison Offender Manager"
+                            text: "Personal officer"
+                        },
+                        value: {
+                            text: personalOfficer
+                        }
+                    },
+                    {
+                        key: {
+                            text: "Last key worker or personal officer session"
+                        },
+                        value: {
+                            text: lastSession
+                        }
+                    },
+                    {
+                        key: {
+                            text: "Prison offender manager"
                         },
                         value: {
                             text: prisonOffenderManager,
@@ -65,7 +99,7 @@
                     },
                     {
                         key: {
-                            text: "Co-working Prison Offender Manager"
+                            text: "Co-working prison offender manager"
                         },
                         value: {
                             text: coworkingPrisonOffenderManager,
@@ -76,7 +110,7 @@
                     },
                     {
                         key: {
-                            text: "Community Offender Manager"
+                            text: "Community offender manager"
                         },
                         value: {
                             text: communityOffenderManager
@@ -84,7 +118,7 @@
                     },
                     {
                         key: {
-                            text: "Resettlement Worker"
+                            text: "Resettlement worker"
                         },
                         value: {
                             text: resettlementWorker
