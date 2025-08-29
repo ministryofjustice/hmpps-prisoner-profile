@@ -2,14 +2,14 @@ import { Readable } from 'stream'
 import { RestClient } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
 import CaseLoad from './interfaces/prisonApi/CaseLoad'
-import { CaseNoteSummaryByTypesParams, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
+import { TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
 import AccountBalances from './interfaces/prisonApi/AccountBalances'
 import VisitSummary from './interfaces/prisonApi/VisitSummary'
 import VisitBalances from './interfaces/prisonApi/VisitBalances'
 import Assessment from './interfaces/prisonApi/Assessment'
 import { ContactDetail } from './interfaces/prisonApi/StaffContacts'
 import { mapToQueryString } from '../utils/utils'
-import CaseNote, { CaseNoteCount } from './interfaces/prisonApi/CaseNote'
+import { CaseNoteCount } from './interfaces/prisonApi/CaseNote'
 import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
 import PrisonerDetail from './interfaces/prisonApi/PrisonerDetail'
 import InmateDetail from './interfaces/prisonApi/InmateDetail'
@@ -149,14 +149,6 @@ export default class PrisonApiRestClient extends RestClient {
       return prisoner[0]
     }
     return prisoner
-  }
-
-  async getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]> {
-    try {
-      return await this.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` }, this.token)
-    } catch (error) {
-      return error
-    }
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {

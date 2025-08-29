@@ -120,13 +120,7 @@ export default class OverviewController {
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.offenderService.getPrisoner(clientToken, prisonerNumber),
-      this.professionalContactsService.getProfessionalContactsOverview(
-        clientToken,
-        prisonerData,
-        isServiceEnabled('allocate-key-workers', res.locals.feComponents?.sharedData) ||
-          isServiceEnabled('allocate-personal-officers', res.locals.feComponents?.sharedData),
-        apiErrorCallback,
-      ),
+      this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
       this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
       Result.wrap(
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
