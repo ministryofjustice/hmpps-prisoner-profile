@@ -257,23 +257,40 @@ export default class ProfessionalContactsService {
 
     return {
       keyWorker: currentAllocatedStaff
-        .map(({ allocations, latestRecordedEvents, hasHighComplexityOfNeeds }) => {
+        .map(({ allocations, hasHighComplexityOfNeeds }) => {
           const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
-          const lastKeyWorkerSession = latestRecordedEvents.find(
-            itm => itm.type === 'SESSION' && itm.policy === 'KEY_WORKER',
-          )
-          let name: string
           if (hasHighComplexityOfNeeds) {
-            name = 'None - high complexity of need'
-          } else if (allocatedKeyWorker) {
-            name = `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
-          } else {
-            name = 'Not allocated'
+            return 'None - high complexity of need'
           }
-          return {
-            name,
-            lastSession: lastKeyWorkerSession ? formatDate(lastKeyWorkerSession.occurredAt, 'short') : '',
+          if (allocatedKeyWorker) {
+            return `${convertToTitleCase(allocatedKeyWorker.firstName)} ${convertToTitleCase(allocatedKeyWorker.lastName)}`
           }
+          return 'Unassigned'
+        })
+        .toPromiseSettledResult(),
+      personalOfficer: currentAllocatedStaff
+        .map(({ allocations }) => {
+          const allocatedStaff = allocations.find(itm => itm.policy.code === 'PERSONAL_OFFICER')?.staffMember
+          if (allocatedStaff) {
+            return `${convertToTitleCase(allocatedStaff.firstName)} ${convertToTitleCase(allocatedStaff.lastName)}`
+          }
+          return 'Unassigned'
+        })
+        .toPromiseSettledResult(),
+      lastSession: currentAllocatedStaff
+        .map(({ latestRecordedEvents }) => {
+          const lastSessions = latestRecordedEvents.filter(
+            itm =>
+              (itm.type === 'SESSION' && itm.policy === 'KEY_WORKER') ||
+              (itm.type === 'ENTRY' && itm.policy === 'PERSONAL_OFFICER'),
+          )
+          if (lastSessions.length) {
+            return formatDate(
+              lastSessions.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0].occurredAt,
+              'short',
+            )
+          }
+          return 'No previous session'
         })
         .toPromiseSettledResult(),
       prisonOffenderManager: allocationManager
