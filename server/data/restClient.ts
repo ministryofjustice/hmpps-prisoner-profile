@@ -1,6 +1,33 @@
-import { RestClient as HmppsRestClient } from '@ministryofjustice/hmpps-rest-client'
+import { RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
+import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
+import { Readable } from 'stream'
 import logger from '../../logger'
 import { ApiConfig } from '../config'
+
+interface ErrorHandler<Response, ErrorData> {
+  (path: string, method: string, error: SanitisedError<ErrorData>): Response
+}
+
+interface Request<Response, ErrorData> {
+  path: string
+  query?: object | string
+  headers?: Record<string, string>
+  responseType?: string
+  retries?: number
+  raw?: boolean
+  errorHandler?: ErrorHandler<Response, ErrorData>
+}
+
+interface RequestWithBody<Response, ErrorData> extends Request<Response, ErrorData> {
+  data?: Record<string, unknown> | string | Array<unknown> | undefined
+  retry?: boolean
+}
+
+export interface StreamRequest<ErrorData> {
+  path: string
+  headers?: Record<string, string>
+  errorLogger?: ErrorLogger<ErrorData>
+}
 
 interface PostRequest {
   path?: string
@@ -27,6 +54,70 @@ export default class RestClient extends HmppsRestClient {
     protected readonly token: string,
   ) {
     super(name, config, logger)
+  }
+
+  // Overridden get function to enforce use of token
+  async get<Response = unknown, ErrorData = unknown>(
+    {
+      path,
+      query = {},
+      headers = {},
+      responseType = '',
+      raw = false,
+      retries = 2,
+      errorHandler = this.handleError,
+    }: Request<Response, ErrorData>,
+    token: string,
+  ): Promise<Response> {
+    return super.get<Response, ErrorData>({ path, query, headers, responseType, raw, retries, errorHandler }, token)
+  }
+
+  // Overridden patch function to enforce use of token
+  async patch<Response = unknown, ErrorData = unknown>(
+    request: RequestWithBody<Response, ErrorData>,
+    token: string,
+  ): Promise<Response> {
+    return super.patch(request, token)
+  }
+
+  // Overridden post function to enforce use of token
+  async post<Response = unknown, ErrorData = unknown>(
+    request: RequestWithBody<Response, ErrorData>,
+    token: string,
+  ): Promise<Response> {
+    return super.post(request, token)
+  }
+
+  // Overridden put function to enforce use of token
+  async put<Response = unknown, ErrorData = unknown>(
+    request: RequestWithBody<Response, ErrorData>,
+    token: string,
+  ): Promise<Response> {
+    return super.put(request, token)
+  }
+
+  // Overridden delete function to enforce use of token
+  async delete<Response = unknown, ErrorData = unknown>(
+    {
+      path,
+      query = {},
+      headers = {},
+      responseType = '',
+      raw = false,
+      retries = 2,
+      errorHandler = this.handleError,
+    }: Request<Response, ErrorData>,
+    token: string,
+  ): Promise<Response> {
+    return super.delete({ path, query, headers, responseType, raw, retries, errorHandler }, token)
+  }
+
+  // Overridden stream function to enforce use of token
+  async stream<ErrorData = unknown>(
+    { path, headers = {}, errorLogger = this.logError }: StreamRequest<ErrorData>,
+    token: string,
+  ): Promise<Readable> {
+    return super.stream({ path, headers, errorLogger }, token)
   }
 
   async getAndIgnore404<T>(options: Parameters<typeof this.get>[0]): Promise<T> {

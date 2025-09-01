@@ -16,8 +16,11 @@ export default class PrisonerProfileApiRestClient extends RestClient implements 
   }
 
   async getWithheldPrisonerPhoto(): Promise<Readable> {
-    return this.stream({
-      path: '/assets/images/category-a-prisoner-image.jpg',
-    })
+    return this.stream(
+      {
+        path: '/assets/images/category-a-prisoner-image.jpg',
+      },
+      this.token,
+    )
   }
 }
