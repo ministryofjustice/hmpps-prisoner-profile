@@ -4,11 +4,11 @@ $path: '/assets/images/';
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
 
-@import "govuk-frontend/dist/govuk/index";
-@import "@ministryofjustice/frontend/moj/all";
-@import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
-@import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
-@import 'node_modules/@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all';
+@import 'govuk-frontend/dist/govuk/index';
+@import '@ministryofjustice/frontend/moj/all';
+@import '@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
+@import '@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
+@import '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all';
 
 @import 'server/views/components/catAPrisonerTag/catAPrisonerTag';
 @import 'server/views/components/fileUploadWithPreview/fileUploadWithPreview';

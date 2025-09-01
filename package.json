@@ -90,7 +90,7 @@
     "@ministryofjustice/frontend": "^3.7.2",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1",
     "@ministryofjustice/hmpps-connect-dps-components": "3.0.0",
-    "@ministryofjustice/hmpps-connect-dps-shared-items": "^1.2.1",
+    "@ministryofjustice/hmpps-connect-dps-shared-items": "^2.0.0",
     "@ministryofjustice/hmpps-prison-permissions-lib": "^0.2.0",
     "@ministryofjustice/hmpps-rest-client": "^0.0.1",
     "@types/multer": "^1.4.13",

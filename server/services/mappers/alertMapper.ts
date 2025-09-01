@@ -1,4 +1,4 @@
-import dpsShared from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import { getAlertFlagLabelsForAlerts } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import { Alert, AlertForm, AlertSummaryData, CreateAlert } from '../../data/interfaces/alertsApi/Alert'
 import { formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
@@ -74,7 +74,7 @@ export const toAlertSummaryData = (pagedAlerts: Result<PagedList<Alert>>): Alert
   return {
     ...toAlertCounts(alertsContent),
     ...toAlertTypesFilters(alertsContent),
-    alertFlags: dpsShared.alertFlags.getAlertFlagLabelsForAlerts(alertsContent),
+    alertFlags: getAlertFlagLabelsForAlerts(alertsContent),
     apiUnavailable: false,
     highPublicInterestPrisoner: alertsContent.some(a => a.alertCode.code === 'HPI' && a.isActive),
   }
