@@ -1,0 +1,144 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% macro photoInstructions() %}
+  <p class="govuk-body">
+    To capture a photo with a webcam:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>ask the person to stand in front of the board</li>
+    <li>make sure the person is stood centrally within the webcam’s view and not to one side</li>
+    <li>after you’ve checked the person is positioned centrally, take the photo</li>
+    <li>you can retake the photo, or save and continue to edit it</li>
+  </ul>
+{% endmacro %}
+{% macro photoPreview() %}
+  <div class="hmpps-webcam-capture-photo-container" id="photo-preview-container">
+    <div class="hmpps-webcam-capture-photo-container__content">
+      <div class="hmpps-webcam-capture-photo-container__photo-preview">
+        <img id="snapshot" src="/assets/images/placeholder.svg" alt="Captured frame will appear here"/>
+        <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
+          {{ govukButton({
+                  text: "Retake",
+                  type: "button",
+                  id: "clearImageButton",
+                  classes: "hmpps-button__toggle-crop hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
+                  preventDoubleClick: true
+                }) }}
+        </div>
+      </div>
+      <div class="hmpps-webcam-capture-photo-container__description">
+        {{ photoInstructions() }}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+{% macro photoCapture() %}
+  <div class="hmpps-webcam-capture-photo-container" id="photo-capture-container">
+    <div class="hmpps-webcam-capture-photo-container__content">
+      <div class="hmpps-webcam-capture-photo-container__photo">
+        <div class="hmpps-webcam-video-container">
+          <video id="webcam" autoplay playsinline></video>
+          <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
+            {{ govukButton({
+              id: "captureImageButton",
+              type: "button",
+              text: "Capture image",
+              classes: "hmpps-button__toggle-crop hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
+              preventDoubleClick: true
+            }) }}
+          </div>
+        </div>
+      </div>
+      <div class="hmpps-webcam-capture-photo-container__description">
+        <p class="govuk-body" id="permission-requested">
+          Requesting webcam permissions
+        </p>
+        <p class="govuk-body" id="permission-denied">
+          Webcam permissions denied
+        </p>
+        <p class="govuk-body" id="webcam-not-found">
+          No webcam found
+        </p>
+        <p class="govuk-body" id="webcam-error">
+          Error accessing webcam, check log for details
+        </p>
+        <div id="permission-granted">
+          {{ govukSelect({
+            id: "select-webcam",
+            name: "select-webcam",
+            label: {
+              text: "Select webcam"
+            },
+            items: []
+          }) }}
+          {{ photoInstructions() }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row govuk-!-margin-bottom-4">
+    <div class="govuk-grid-column-full">
+      {{ govukBackLink({
+        text: "Back",
+        classes: "govuk-!-margin-0",
+        href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
+      }) }}
+    </div>
+  </div>
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{ govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
+          }) }}
+      </div>
+    </div>
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form id="image-capture-form" method='post' enctype='multipart/form-data'>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+        <input type="hidden" name="photoType" value="webcam"/>
+        <input type="file" id="webcam-image-input" name="file" hidden/>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Take a photo with a webcam</h1>
+        {{ photoPreview() }}
+        {{ photoCapture() }}
+        <div class="govuk-button-group">
+          {{ govukButton({
+            id: "webcam-submit",
+            text: "Save new facial image",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "submit-button" },
+            disabled: true
+          }) }}
+          <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+            Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% block pageScripts %}
+  <script type="module" src={{ "/assets/js/captureWebcamImage.js" | assetMap }} nonce="{{ cspNonce }}"></script>
+{% endblock %}
