@@ -13,8 +13,11 @@ export default class EducationAndWorkPlanApiRestClient extends RestClient implem
   }
 
   getAllGoals(prisonerNumber: string): Promise<GetGoalsResponse> {
-    return this.get<ActionPlanResponse>({
-      path: `/action-plans/${prisonerNumber}/goals`,
-    })
+    return this.get<ActionPlanResponse>(
+      {
+        path: `/action-plans/${prisonerNumber}/goals`,
+      },
+      this.token,
+    )
   }
 }
