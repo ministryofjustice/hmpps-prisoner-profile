@@ -10,6 +10,8 @@ import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import { userHasAllRoles } from '../utils/utils'
+import { Role } from '../data/enums/role'
 
 export default class ImageController {
   constructor(
@@ -25,11 +27,13 @@ export default class ImageController {
         get: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
+          const isDpsAppDeveloper = userHasAllRoles([Role.DpsApplicationDeveloper], res.locals.user.userRoles)
 
           return res.render('pages/edit/photo/addNew', {
             pageTitle: 'Add a new facial image',
             miniBannerData,
             prisonerNumber,
+            isDpsAppDeveloper,
           })
         },
 
@@ -42,10 +46,46 @@ export default class ImageController {
             )
           }
 
+          if (req.body.photoType === 'webcam') {
+            return res.redirect(
+              `/prisoner/${prisonerNumber}/image/webcam${req.query?.referer ? `?referer=${req.query.referer}` : ''}`,
+            )
+          }
+
           const file = req.file as MulterFile
           return res.render('pages/edit/photo/editPhoto', {
             prisonerNumber,
             miniBannerData,
+            photoType: 'upload',
+            imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+            fileName: file.originalname,
+            fileType: file.mimetype,
+          })
+        },
+      },
+
+      webcamImage: {
+        get: async (req: Request, res: Response, next: NextFunction) => {
+          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
+
+          return res.render('pages/edit/photo/addWebcam', {
+            pageTitle: 'Take a photo with a webcam',
+            miniBannerData,
+            prisonerNumber,
+          })
+        },
+
+        post: async (req: Request, res: Response, next: NextFunction) => {
+          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+
+          const file = req.file as MulterFile
+          return res.render('pages/edit/photo/editPhoto', {
+            pageTitle: 'Confirm facial image taken by webcam',
+            prisonerNumber,
+            miniBannerData,
+            webcamImage: true,
+            photoType: 'webcam',
             imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
             fileName: file.originalname,
             fileType: file.mimetype,

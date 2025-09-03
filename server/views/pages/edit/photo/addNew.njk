@@ -61,6 +61,14 @@
                 checked: formValues['photoType'] == 'upload'
               },
               {
+                value: "webcam",
+                text: "Use a webcam",
+                hint: {
+                  text: 'The webcam must be connected to the computer you are using to access DPS.'
+                },
+                checked: formValues['photoType'] == 'webcam'
+              } if isDpsAppDeveloper,
+              {
                 value: "withheld",
                 text: "Use the 'Photo withheld for security reasons' image",
                 hint: {

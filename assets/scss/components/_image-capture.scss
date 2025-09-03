@@ -1,0 +1,90 @@
+$hmpps-webcam-capture-width: 221px;
+$hmpps-webcam-capture-height: 276px;
+
+.hmpps-webcam-capture-photo-container {
+  @include govuk-responsive-padding(2);
+  @include govuk-responsive-margin(6, 'bottom');
+  border: 1px solid $govuk-border-colour;
+  width: 100%;
+
+  &__content {
+    display: flex;
+    width: 100%;
+  }
+
+  &__photo-preview {
+    img {
+      background: #000;
+      border: 2px solid #333;
+      height: $hmpps-webcam-capture-height;
+      object-fit: contain;
+      width: $hmpps-webcam-capture-width;
+    }
+  }
+
+  &__description {
+    @include govuk-responsive-padding(2, 'top');
+    margin-left: 24px;
+    min-width: 0;
+
+    h2 {
+      @include govuk-responsive-margin(3, 'bottom');
+    }
+
+    #permission-requested {
+      display: block;
+    }
+
+    #permission-denied {
+      display: none;
+    }
+
+    #permission-granted {
+      display: none;
+    }
+
+    #webcam-not-found {
+      display: none;
+    }
+
+    #webcam-error {
+      display: none;
+    }
+  }
+
+  &__controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    &__full-width {
+      width: 100%;
+    }
+
+    &__half-width {
+      width: calc(($hmpps-webcam-capture-width/2) - 3px);
+    }
+  }
+
+  .hmpps-webcam-video-container,
+  .hmpps-webcam-image-container {
+    max-width: fit-content;
+    img,
+    video {
+      // width: 480px;
+      // height: 640px;
+      width: 221px;
+      height: 276px;
+      border: 2px solid #333;
+      background: #000;
+    }
+  }
+}
+
+#photo-capture-container {
+  display: none;
+}
+
+#rotate-button-group {
+  display: none;
+}

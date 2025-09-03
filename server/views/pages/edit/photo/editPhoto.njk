@@ -39,7 +39,7 @@
       {{ govukBackLink({
         text: "Back",
         classes: "govuk-!-margin-0",
-        href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
+        href: "/prisoner/" + prisonerNumber + ("/image/webcam" if webcamImage else "/image/new") | appendRefererToUrl(referer)
       }) }}
     </div>
   </div>
@@ -65,7 +65,10 @@
       <form method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/submit" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <input type="file" id="js-cropped-image-input" name="file" hidden/>
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
+        {% if photoType %}
+          <input type="hidden" name="photoType" value="{{ photoType }}"/>
+        {% endif %}
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image{{ " captured by webcam" if webcamImage }}</h1>
         <div class="hmpps-cropper-photo-container" id="photo-preview-container">
           <div class="hmpps-cropper-photo-container__content">
             <div class="hmpps-cropper-photo-container__photo-preview">
