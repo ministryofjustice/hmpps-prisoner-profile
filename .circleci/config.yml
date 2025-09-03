@@ -128,12 +128,13 @@ workflows:
           requires:
             - build
       - integration_test:
-          name: integration_test_<< matrix.command >>
+          name: << matrix.command >>
           matrix:
             parameters:
               command:
-                - int-test-ci-1
-                - int-test-ci-2
+                - integration-test-1
+                - integration-test-2
+                - integration-test-3
           requires:
             - build
       - hmpps/helm_lint:

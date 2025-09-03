@@ -28,5 +28,5 @@ Or run tests with the cypress UI:
 `npm run int-test-ui`
 
 When running in CI the tests are split into groups and run in parallel. When writing Cypress tests, if you
-add any new folders or modify the directory structure you'll need to check the file glob patterns in the `int-test-ci-*`
+add any new folders or modify the directory structure you'll need to check the file glob patterns in the `integration-test-*`
 jobs within `package.json` cover all the tests properly.
