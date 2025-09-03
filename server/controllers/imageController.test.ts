@@ -10,6 +10,7 @@ import MulterFile from './interfaces/MulterFile'
 import MetricsService from '../services/metrics/metricsService'
 import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { Role } from '../data/enums/role'
 
 describe('ImageController', () => {
   let controller: ImageController
@@ -73,7 +74,7 @@ describe('ImageController', () => {
     response = {
       render: jest.fn(),
       redirect: jest.fn(),
-      locals: { user: {} },
+      locals: { user: { userRoles: [] } },
     }
   })
 
@@ -87,6 +88,28 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().newImage.get(request, response, () => {})
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
+          isDpsAppDeveloper: false,
+          miniBannerData,
+          pageTitle: 'Add a new facial image',
+          prisonerNumber: 'A1234BC',
+        })
+      })
+
+      it('DPS App Developer: Loads the page with the correct information', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          flash: jest.fn(),
+        } as any
+
+        await controller
+          .updateProfileImage()
+          .newImage.get(
+            request,
+            { ...response, locals: { user: { userRoles: [Role.DpsApplicationDeveloper] } } },
+            () => {},
+          )
+        expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
+          isDpsAppDeveloper: true,
           miniBannerData,
           pageTitle: 'Add a new facial image',
           prisonerNumber: 'A1234BC',
@@ -136,6 +159,7 @@ describe('ImageController', () => {
           fileType: 'image/jpeg',
           imgSrc: 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU=',
           miniBannerData,
+          photoType: 'upload',
           prisonerNumber: 'A1234BC',
         })
       })
@@ -163,6 +187,31 @@ describe('ImageController', () => {
         await controller.updateProfileImage().newImage.post(request, response, () => {})
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld?referer=case-notes')
+      })
+
+      it('Webcam: Redirects the users', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          body: { photoType: 'webcam' },
+          flash: jest.fn(),
+        } as any
+
+        await controller.updateProfileImage().newImage.post(request, response, () => {})
+
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/webcam')
+      })
+
+      it('Webcam: Redirects with referer', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          body: { photoType: 'webcam' },
+          query: { referer: 'case-notes' },
+          flash: jest.fn(),
+        } as any
+
+        await controller.updateProfileImage().newImage.post(request, response, () => {})
+
+        expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/webcam?referer=case-notes')
       })
     })
   })
@@ -324,6 +373,49 @@ describe('ImageController', () => {
         expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
           user: expect.anything(),
           fieldsUpdated: ['withheld-profile-image'],
+          prisonerNumber: 'A1234BC',
+        })
+      })
+    })
+  })
+
+  describe('webcamImage', () => {
+    describe('get', () => {
+      it('Loads the page with the correct information', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          flash: jest.fn(),
+          file,
+        } as any
+
+        await controller.updateProfileImage().webcamImage.get(request, response, () => {})
+
+        expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWebcam', {
+          pageTitle: expect.anything(),
+          miniBannerData,
+          prisonerNumber: 'A1234BC',
+        })
+      })
+    })
+
+    describe('post', () => {
+      it('Loads the page with the correct information', async () => {
+        const request = {
+          middleware: defaultMiddleware,
+          flash: jest.fn(),
+          file,
+        } as any
+
+        await controller.updateProfileImage().webcamImage.post(request, response, () => {})
+
+        expect(response.render).toHaveBeenCalledWith('pages/edit/photo/editPhoto', {
+          pageTitle: expect.anything(),
+          photoType: 'webcam',
+          webcamImage: true,
+          fileName: 'A name dot jpeg.jpeg',
+          fileType: 'image/jpeg',
+          imgSrc: 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU=',
+          miniBannerData,
           prisonerNumber: 'A1234BC',
         })
       })
