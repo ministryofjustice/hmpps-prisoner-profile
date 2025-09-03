@@ -22,6 +22,8 @@
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open --e2e --browser chrome",
+    "int-test-ci-1": "cypress open --e2e --browser chrome --spec \"**/personal/edit/**/*\"",
+    "int-test-ci-2": "cypress open --e2e --browser chrome --spec \"**/e2e/*,**/alerts/**/*,**/personal/*,**/photo/**/*,**/workAndSkillsPage/**/*\"",
     "clean": "rm -rf dist test_results",
     "rebuild": "npm run clean && npm i && npm run build",
     "postinstall": "npx patch-package",
