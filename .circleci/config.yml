@@ -74,6 +74,10 @@ jobs:
           path: test_results/unit-test-reports.html
 
   integration_test:
+    parameters:
+      command:
+        default: int-test
+        type: string
     executor:
       name: hmpps/node_redis
       node_tag: << pipeline.parameters.node-version >>
@@ -103,7 +107,7 @@ jobs:
           command: sleep 5
       - run:
           name: integration tests
-          command: npm run int-test
+          command: npm run << parameters.command >>
       - store_test_results:
           path: test_results
       - store_artifacts:
@@ -124,6 +128,13 @@ workflows:
           requires:
             - build
       - integration_test:
+          name: << matrix.command >>
+          matrix:
+            parameters:
+              command:
+                - integration-test-1
+                - integration-test-2
+                - integration-test-3
           requires:
             - build
       - hmpps/helm_lint:
