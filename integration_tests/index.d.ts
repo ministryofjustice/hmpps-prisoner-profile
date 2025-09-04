@@ -31,6 +31,7 @@ declare global {
         prisonId?: string
         isAKeyWorker?: boolean
         complexityLevel?: ComplexityLevel
+        failToLoadKeyWorker?: boolean
       }): Chainable<AUTWindow>
 
       setupAlertsPageStubs(options: {
