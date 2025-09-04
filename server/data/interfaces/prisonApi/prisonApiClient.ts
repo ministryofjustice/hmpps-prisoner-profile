@@ -5,7 +5,7 @@ import VisitSummary from './VisitSummary'
 import VisitBalances from './VisitBalances'
 import Assessment from './Assessment'
 import { ContactDetail } from './StaffContacts'
-import CaseNote, { CaseNoteCount } from './CaseNote'
+import { CaseNoteCount } from './CaseNote'
 import ScheduledEvent from './ScheduledEvent'
 import PrisonerDetail from './PrisonerDetail'
 import InmateDetail from './InmateDetail'
@@ -77,8 +77,6 @@ export interface PrisonApiClient {
   getAssessments(bookingId: number): Promise<Assessment[]>
 
   getBookingContacts(bookingId: number): Promise<ContactDetail>
-
-  getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]>
 
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
 

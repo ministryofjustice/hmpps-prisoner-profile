@@ -20,6 +20,7 @@ export default interface StaffAllocation {
       code: string
       description: string
     }
+    policy: string
     type: string
     occurredAt: string
   }[]

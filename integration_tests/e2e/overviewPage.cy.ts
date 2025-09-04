@@ -760,8 +760,7 @@ context('Overview Page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', error: true })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, failToLoadKeyWorker: true })
       visitOverviewPage()
     })
 
