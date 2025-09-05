@@ -1,9 +1,10 @@
-import OsAddress from '../interfaces/osPlacesApi/osAddress'
+import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 
 export const mockOsAddresses: OsAddress[] = [
   {
     addressString: '2 The Road, My Town, A123BC',
     buildingNumber: 2,
+    buildingName: '',
     subBuildingName: '',
     thoroughfareName: 'The Road',
     dependentLocality: 'My Town',
@@ -16,6 +17,7 @@ export const mockOsAddresses: OsAddress[] = [
   {
     addressString: '1 The Road, My Town, A123BC',
     buildingNumber: 1,
+    buildingName: '',
     subBuildingName: '',
     thoroughfareName: 'The Road',
     dependentLocality: 'My Town',
