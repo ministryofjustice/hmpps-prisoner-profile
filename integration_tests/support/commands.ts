@@ -65,7 +65,6 @@ Cypress.Commands.add(
     cy.task('stubAssessments', bookingId)
     cy.task('stubEventsForToday', bookingId)
     cy.task('stubPomData')
-    cy.task('stubKeyWorkerData', { prisonerNumber })
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
     if (failToLoadKeyWorker) cy.task('stubCurrentAllocationsFail', prisonerNumber)
     else cy.task('stubCurrentAllocations', { prisonerNumber, complexityLevel })

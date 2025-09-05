@@ -1,5 +1,7 @@
 export default interface StaffContacts {
-  keyWorker: PromiseSettledResult<KeyWorkerSummary>
+  keyWorker: PromiseSettledResult<string>
+  personalOfficer: PromiseSettledResult<string>
+  lastSession: PromiseSettledResult<string>
   prisonOffenderManager: PromiseSettledResult<string>
   coworkingPrisonOffenderManager: PromiseSettledResult<string>
   communityOffenderManager: PromiseSettledResult<string>
@@ -13,11 +15,6 @@ export interface YouthStaffContacts {
   resettlementPractitioner: string | null
   youthJusticeService: string | null
   youthJusticeServiceCaseManager: string | null
-}
-
-export interface KeyWorkerSummary {
-  name: string
-  lastSession: string
 }
 
 export interface Contact {

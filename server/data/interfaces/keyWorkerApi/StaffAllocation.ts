@@ -13,6 +13,7 @@ export default interface StaffAllocation {
       staffId: number
       firstName: string
       lastName: string
+      emailAddresses: string[]
     }
   }[]
   latestRecordedEvents: {

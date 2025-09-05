@@ -7,7 +7,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { Contact, ContactDetail } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
-import { keyWorkerMock, staffAllocationMock } from '../data/localMockData/keyWorker'
+import { staffAllocationMock } from '../data/localMockData/keyWorker'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
@@ -111,12 +111,23 @@ const expectedComResponse = [
 
 const expectedKeyWorkerResponse = [
   Result.fulfilled({
-    emails: ['1@1.com'],
-    firstName: 'Dave',
-    lastName: 'Stevens',
+    emails: ['new@key.worker'],
+    firstName: 'NEW',
+    lastName: 'KEY-WORKER',
     phones: [] as string[],
     relationshipDescription: 'Key Worker',
     relationship: 'KW',
+  }).toPromiseSettledResult(),
+]
+
+const expectedPersonalOfficerResponse = [
+  Result.fulfilled({
+    emails: ['new@personal.officer'],
+    firstName: 'NEW',
+    lastName: 'PERSONAL-OFFICER',
+    phones: [] as string[],
+    relationshipDescription: 'Personal Officer',
+    relationship: 'PO',
   }).toPromiseSettledResult(),
 ]
 
@@ -143,7 +154,6 @@ describe('professionalContactsService', () => {
     }
 
     keyWorkerApiClient = {
-      getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
       getCurrentAllocations: jest.fn(async () => staffAllocationMock),
     }
 
@@ -175,6 +185,7 @@ describe('professionalContactsService', () => {
 
       expect(response).toEqual([
         ...expectedKeyWorkerResponse,
+        ...expectedPersonalOfficerResponse,
         ...expectedPomResponse,
         ...expectedComResponse,
         Result.fulfilled({
@@ -217,14 +228,15 @@ describe('professionalContactsService', () => {
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
 
-      expect(response.length).toEqual(7)
+      expect(response.length).toEqual(8)
       expect(response[0].relationshipDescription).toEqual('Key Worker')
-      expect(response[1].relationshipDescription).toEqual('Prison Offender Manager')
-      expect(response[2].relationshipDescription).toEqual('Co-working Prison Offender Manager')
-      expect(response[3].relationshipDescription).toEqual('Community Offender Manager')
-      expect(response[4].relationshipDescription).toEqual('Prison Guard')
+      expect(response[1].relationshipDescription).toEqual('Personal Officer')
+      expect(response[2].relationshipDescription).toEqual('Prison Offender Manager')
+      expect(response[3].relationshipDescription).toEqual('Co-working Prison Offender Manager')
+      expect(response[4].relationshipDescription).toEqual('Community Offender Manager')
       expect(response[5].relationshipDescription).toEqual('Prison Guard')
-      expect(response[6].relationshipDescription).toEqual('Responsible officer')
+      expect(response[6].relationshipDescription).toEqual('Prison Guard')
+      expect(response[7].relationshipDescription).toEqual('Responsible officer')
     })
 
     it('should handle keyworker API error', async () => {
@@ -234,7 +246,7 @@ describe('professionalContactsService', () => {
         otherContacts: [PrisonerContactBuilder()],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
-      keyWorkerApiClient.getOffendersKeyWorker = jest.fn(async () => Promise.reject(Error('some error!')))
+      keyWorkerApiClient.getCurrentAllocations = jest.fn(async () => Promise.reject(Error('some error!')))
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -250,6 +262,7 @@ describe('professionalContactsService', () => {
 
       expect(response).toEqual([
         Result.rejected({ relationship: 'KW', relationshipDescription: 'Key Worker' }).toPromiseSettledResult(),
+        Result.rejected({ relationship: 'PO', relationshipDescription: 'Personal Officer' }).toPromiseSettledResult(),
         ...expectedPomResponse,
         ...expectedComResponse,
         Result.fulfilled({
@@ -293,6 +306,7 @@ describe('professionalContactsService', () => {
 
       expect(response).toEqual([
         ...expectedKeyWorkerResponse,
+        ...expectedPersonalOfficerResponse,
         ...[
           Result.rejected({
             relationship: 'POM',
@@ -345,6 +359,7 @@ describe('professionalContactsService', () => {
 
       expect(response).toEqual([
         ...expectedKeyWorkerResponse,
+        ...expectedPersonalOfficerResponse,
         ...expectedPomResponse,
         Result.rejected({
           relationship: 'COM',
@@ -389,7 +404,12 @@ describe('professionalContactsService', () => {
         contact.toPromiseSettledResult(),
       )
 
-      expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
+      expect(response).toEqual([
+        ...expectedKeyWorkerResponse,
+        ...expectedPersonalOfficerResponse,
+        ...expectedPomResponse,
+        ...expectedComResponse,
+      ])
     })
 
     it('should return a contact for each address with valid or no endate', async () => {
@@ -442,7 +462,12 @@ describe('professionalContactsService', () => {
         contact.toPromiseSettledResult(),
       )
 
-      expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
+      expect(response).toEqual([
+        ...expectedKeyWorkerResponse,
+        ...expectedPersonalOfficerResponse,
+        ...expectedPomResponse,
+        ...expectedComResponse,
+      ])
     })
 
     it('should return a "Not entered" contact if there are no addresses for a person', async () => {
@@ -566,13 +591,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -613,13 +634,9 @@ describe('professionalContactsService', () => {
       })
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'None - high complexity of need',
-            lastSession: '',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'None - high complexity of need' },
+        personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
+        lastSession: { status: 'fulfilled', value: 'No previous session' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -632,13 +649,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -653,6 +666,8 @@ describe('professionalContactsService', () => {
 
       expect(result).toEqual({
         keyWorker: { status: 'rejected', reason: 'Some error' },
+        personalOfficer: { status: 'rejected', reason: 'Some error' },
+        lastSession: { status: 'rejected', reason: 'Some error' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -665,13 +680,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'rejected', reason: 'API error' },
         coworkingPrisonOffenderManager: { status: 'rejected', reason: 'API error' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
@@ -684,13 +695,9 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: {
-          status: 'fulfilled',
-          value: {
-            name: 'New Key-Worker',
-            lastSession: '24/06/2025',
-          },
-        },
+        keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
+        personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
+        lastSession: { status: 'fulfilled', value: '24/06/2025' },
         prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
         coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'rejected', reason: 'API error' },

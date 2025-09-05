@@ -26,6 +26,7 @@ import {
   prependHmppsAuthBaseUrl,
   prisonerIsOut,
   prisonerIsTRN,
+  sentenceCase,
   sortByLatestAndUuid,
   summaryListOneHalfWidth,
   toFullCourtLink,
@@ -219,6 +220,7 @@ export default function nunjucksSetup(app: express.Express): void {
   njkEnv.addFilter('includes', arrayIncludes)
   njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
   njkEnv.addFilter('sexualOrientationText', mapSexualOrientationText)
+  njkEnv.addFilter('sentenceCase', sentenceCase)
 
   // BVLS specific filter
   njkEnv.addFilter('toFullCourtLink', toFullCourtLink)
