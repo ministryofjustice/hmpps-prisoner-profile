@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AddressController from '../controllers/addressController'
 import { Services } from '../services'
@@ -6,6 +6,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import { getRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
+import { getErrorStatus } from '../utils/errorHelpers'
 
 export default function addressRouter(services: Services): Router {
   const router = Router()
@@ -28,6 +29,15 @@ export default function addressRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
     (req, res, next) => addressController.findAddressesByFreeTextQuery(req, res),
   )
+
+  router.get('/api/addresses/find/:query', async (req: Request, res: Response) => {
+    try {
+      const results = await this.addressService.getAddressesMatchingQuery(req.params.query)
+      res.json({ status: 200, results })
+    } catch (error) {
+      res.status(getErrorStatus(error)).json({ status: getErrorStatus(error), error: error.message })
+    }
+  })
 
   return router
 }

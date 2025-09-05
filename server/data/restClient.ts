@@ -1,8 +1,7 @@
-import { RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
+import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
 import { Readable } from 'stream'
 import logger from '../../logger'
-import { ApiConfig } from '../config'
 
 interface ErrorHandler<Response, ErrorData> {
   (path: string, method: string, error: SanitisedError<ErrorData>): Response

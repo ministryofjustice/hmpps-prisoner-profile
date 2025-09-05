@@ -1,5 +1,5 @@
+import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import ReferenceDataService from '../referenceData/referenceDataService'
-import OsAddress from '../../data/interfaces/osPlacesApi/osAddress'
 import {
   AddressRequestDto,
   CorePersonRecordReferenceDataDomain,

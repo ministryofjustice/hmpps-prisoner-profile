@@ -1,14 +1,10 @@
 import { Request, Response } from 'express'
-import Fuse from 'fuse.js'
 import { formatName } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import AddressService from '../services/addressService'
-import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { getErrorStatus } from '../utils/errorHelpers'
-
-const simplePostCodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
 
 export default class AddressController {
   constructor(
@@ -53,31 +49,9 @@ export default class AddressController {
   }
 
   public async findAddressesByFreeTextQuery(req: Request, res: Response): Promise<void> {
-    const { query } = req.params
-    const { optimisationOff } = req.query
-
     try {
-      const rawApiResults = (await this.addressService.getAddressesMatchingQuery(query, !optimisationOff)) || []
-
-      const bestMatchResults = new Fuse(rawApiResults, {
-        shouldSort: true,
-        threshold: 0.2,
-        ignoreLocation: true,
-        keys: [{ name: 'addressString' }],
-      })
-        .search(query)
-        .map(result => result.item)
-
-      const buildingNumberSort = simplePostCodeRegex.test(query.trim())
-        ? (a: OsAddress, b: OsAddress) =>
-            a.addressString.localeCompare(b.addressString, undefined, { numeric: true, sensitivity: 'base' })
-        : (_a: OsAddress, _b: OsAddress) => 1
-
-      const optimisedResults = (bestMatchResults.length ? bestMatchResults : rawApiResults)
-        .sort(buildingNumberSort)
-        .slice(0, 100)
-
-      res.json({ status: 200, results: optimisationOff ? rawApiResults : optimisedResults })
+      const results = await this.addressService.getAddressesMatchingQuery(req.params.query)
+      res.json({ status: 200, results })
     } catch (error) {
       res.status(getErrorStatus(error)).json({ status: getErrorStatus(error), error: error.message })
     }

@@ -1,15 +1,9 @@
 import { subDays } from 'date-fns'
+import { OsAddress, OsPlacesAddressService } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { OsPlacesApiClient } from '../data/interfaces/osPlacesApi/osPlacesApiClient'
 import AddressService from './addressService'
-import { osPlacesApiClientMock } from '../../tests/mocks/osPlacesApiClientMock'
-import {
-  mockOsPlacesAddressQueryEmptyResponse,
-  mockOsPlacesAddressQueryResponse,
-  mockOsPlacesAddressQuerySingleResponse,
-} from '../data/localMockData/osPlacesAddressQueryResponse'
-import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
+import { osPlacesAddressServiceMock } from '../../tests/mocks/osPlacesAddressServiceMock'
 import { mockAddresses } from '../data/localMockData/addresses'
 import {
   AddressResponseDto,
@@ -25,23 +19,23 @@ import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import { AddressLocation } from './mappers/addressMapper'
 import { formatDateISO } from '../utils/dateHelpers'
 import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
-import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryResponse'
 import NotFoundError from '../utils/notFoundError'
+import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 
 const clientToken = 'CLIENT_TOKEN'
 
 describe('addressService', () => {
   let metricsService: MetricsService
   let referenceDataService: ReferenceDataService
+  let osPlacesAddressService: OsPlacesAddressService
   let prisonApiClient: PrisonApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
-  let osPlacesApiClient: OsPlacesApiClient
   let addressService: AddressService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
     personIntegrationApiClient = personIntegrationApiClientMock()
-    osPlacesApiClient = osPlacesApiClientMock()
+    osPlacesAddressService = osPlacesAddressServiceMock()
 
     metricsService = new MetricsService() as jest.Mocked<MetricsService>
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
@@ -51,9 +45,9 @@ describe('addressService', () => {
     addressService = new AddressService(
       metricsService,
       referenceDataService,
+      osPlacesAddressService,
       () => prisonApiClient,
       () => personIntegrationApiClient,
-      osPlacesApiClient,
     )
   })
 
@@ -265,19 +259,9 @@ describe('addressService', () => {
   })
 
   describe('sanitisePostcode - UK', () => {
-    it.each([
-      [undefined, undefined],
-      [null, null],
-      ['', ''],
-      ['a12bc', 'A1 2BC'],
-      ['SW1H 9AJ', 'SW1H 9AJ'],
-      ['SW1H9AJ', 'SW1H 9AJ'],
-      ['sw1h9aj', 'SW1H 9AJ'],
-      ['before sw1h9aj after', 'before SW1H 9AJ after'],
-      ['b.&e?for"e sw1+-//h#9a...j af,_ter', 'before SW1H 9AJ after'],
-      ['not a postcode', 'not a postcode'],
-    ])(`before: '%s', after: '%s'`, (before, after) => {
-      expect(addressService.sanitisePostcode(before, AddressLocation.uk)).toEqual(after)
+    it('delegates to OsPlacesAddressService', () => {
+      addressService.sanitisePostcode('SW1H 9AJ', AddressLocation.uk)
+      expect(osPlacesAddressService.sanitiseUkPostcode).toHaveBeenCalledWith('SW1H 9AJ')
     })
   })
 
@@ -295,52 +279,23 @@ describe('addressService', () => {
   describe('getAddressesMatchingQuery', () => {
     const searchQuery = 'test,query'
 
-    it('Handles empty address response', async () => {
-      osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryEmptyResponse)
+    it('Delegates to the osPlacesAddressService', async () => {
+      osPlacesAddressService.getAddressesMatchingQuery = jest.fn(async () => mockOsAddresses)
       const addresses = await addressService.getAddressesMatchingQuery(searchQuery)
-      expect(addresses.length).toEqual(0)
-    })
-
-    it('Maps the returned addresses correctly', async () => {
-      osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryResponse)
-      const addresses = await addressService.getAddressesMatchingQuery(searchQuery)
-      validateExpectedAddressResponse(addresses)
-    })
-
-    it('Sanitises post codes before querying the API', async () => {
-      osPlacesApiClient.getAddressesByFreeTextQuery = jest.fn(async () => mockOsPlacesAddressQueryResponse)
-      await addressService.getAddressesMatchingQuery('petty france sw1H9eA 102')
-      expect(osPlacesApiClient.getAddressesByFreeTextQuery).toHaveBeenCalledWith('petty france SW1H 9EA 102')
+      expect(addresses).toEqual(mockOsAddresses)
     })
   })
 
   describe('getAddressesByUprn', () => {
     it('Throws NotFoundException if empty result returned', async () => {
-      osPlacesApiClient.getAddressesByUprn = jest.fn(async () => mockOsPlacesAddressQueryEmptyResponse)
+      osPlacesAddressService.getAddressByUprn = jest.fn(async () => null as OsAddress)
       await expect(addressService.getAddressByUprn('123', clientToken)).rejects.toThrow(
         new NotFoundError('Could not find address by UPRN'),
       )
     })
 
-    it('Picks the last result if multiple are returned', async () => {
-      osPlacesApiClient.getAddressesByUprn = jest.fn(
-        async () =>
-          ({
-            header: { ...mockOsPlacesAddressQueryEmptyResponse.header, totalresults: 2 },
-            results: [
-              { DPA: { UPRN: 12345, ADDRESS: '', BUILDING_NUMBER: 1 } },
-              { DPA: { UPRN: 12345, ADDRESS: '', BUILDING_NUMBER: 2 } },
-            ],
-          }) as OsPlacesQueryResponse,
-      )
-
-      const address = await addressService.getAddressByUprn('12345', clientToken)
-
-      expect(address.buildingNumber).toEqual('2')
-    })
-
     it('Maps the returned address correctly', async () => {
-      osPlacesApiClient.getAddressesByUprn = jest.fn(async () => mockOsPlacesAddressQuerySingleResponse)
+      osPlacesAddressService.getAddressByUprn = jest.fn(async () => mockOsAddresses[1])
       referenceDataService.getActiveReferenceDataCodes = jest
         .fn()
         .mockResolvedValue([{ description: 'My Post Town', code: 'CITY1' } as ReferenceDataCodeDto])
@@ -349,7 +304,7 @@ describe('addressService', () => {
 
       expect(address).toEqual(
         expect.objectContaining({
-          uprn: 12345,
+          uprn: 12346,
           buildingNumber: '1',
           subBuildingName: '',
           buildingName: '',
@@ -363,29 +318,4 @@ describe('addressService', () => {
       )
     })
   })
-
-  function validateExpectedAddressResponse(addresses: OsAddress[]) {
-    expect(addresses.length).toEqual(2)
-    expect(addresses[0].addressString).toEqual('1 The Road, My Town, A123BC')
-    expect(addresses[0].buildingNumber).toEqual(1)
-    expect(addresses[0].subBuildingName).toEqual('')
-    expect(addresses[0].thoroughfareName).toEqual('The Road')
-    expect(addresses[0].dependentLocality).toEqual('My Town')
-    expect(addresses[0].postTown).toEqual('My Post Town')
-    expect(addresses[0].county).toEqual('My County')
-    expect(addresses[0].postcode).toEqual('A123BC')
-    expect(addresses[0].country).toEqual('E')
-    expect(addresses[0].uprn).toEqual(12345)
-
-    expect(addresses[1].addressString).toEqual('2 The Road, My Town, A123BC')
-    expect(addresses[1].buildingNumber).toEqual(2)
-    expect(addresses[1].subBuildingName).toEqual('')
-    expect(addresses[1].thoroughfareName).toEqual('The Road')
-    expect(addresses[1].dependentLocality).toEqual('My Town')
-    expect(addresses[1].postTown).toEqual('My Post Town')
-    expect(addresses[1].county).toEqual('My County')
-    expect(addresses[1].postcode).toEqual('A123BC')
-    expect(addresses[1].country).toEqual('E')
-    expect(addresses[1].uprn).toEqual(12346)
-  }
 })
