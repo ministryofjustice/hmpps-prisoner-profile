@@ -1,4 +1,4 @@
-import OsPlacesQueryResponse from '../interfaces/osPlacesApi/osPlacesQueryResponse'
+import { OsPlacesQueryResponse } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 
 export const mockOsPlacesAddressQueryResponse: OsPlacesQueryResponse = {
   header: {
@@ -366,15 +366,6 @@ export const mockOsPlacesAddressQuerySingleResponse: OsPlacesQueryResponse = {
       },
     },
   ],
-}
-
-export const mockOsPlacesInvalidApiKey = {
-  fault: {
-    faultstring: 'Invalid ApiKey',
-    detail: {
-      errorcode: 'oauth.v2.InvalidApiKey',
-    },
-  },
 }
 
 export const mockOsPlacesApiUnavailable = {

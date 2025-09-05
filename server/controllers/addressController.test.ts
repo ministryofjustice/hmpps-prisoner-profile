@@ -77,8 +77,6 @@ describe('Address controller', () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       }
-
-      addressService.sanitisePostcode = jest.fn().mockResolvedValue([...addressesPrimaryAndMailMock])
     })
 
     it('should render the correct json response', async () => {
@@ -87,37 +85,8 @@ describe('Address controller', () => {
         .mockResolvedValue(mockOsAddresses)
 
       await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
-      expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
-    })
-
-    it('should use fuse to remove spurious results', async () => {
-      const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
-        .mockResolvedValue([
-          ...mockOsAddresses,
-          {
-            addressString: 'something completely random',
-            uprn: 12345,
-          },
-        ])
-
-      await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
-      expect(res.json).toHaveBeenCalledWith({ results: [mockOsAddresses[1], mockOsAddresses[0]], status: 200 })
-    })
-
-    it('should order by building number if query is a postcode', async () => {
-      const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
-        .mockResolvedValue(mockOsAddresses)
-
-      await controller.findAddressesByFreeTextQuery({ ...req, params: { query: 'SW1H9EA' } }, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith('SW1H9EA', true)
-      expect(res.json).toHaveBeenCalledWith({
-        results: [expect.objectContaining({ buildingNumber: 1 }), expect.objectContaining({ buildingNumber: 2 })],
-        status: 200,
-      })
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
     })
 
     it('should handle errors correctly', async () => {
@@ -128,7 +97,7 @@ describe('Address controller', () => {
         })
 
       await controller.findAddressesByFreeTextQuery(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query, true)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
       expect(res.status).toHaveBeenCalledWith(testError().status)
       expect(res.json).toHaveBeenCalledWith({ error: testError().message, status: 500 })
     })
