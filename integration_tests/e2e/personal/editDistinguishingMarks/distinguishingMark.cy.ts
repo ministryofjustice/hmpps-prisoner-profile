@@ -1,7 +1,7 @@
-import { Role } from '../../../../../server/data/enums/role'
-import Page from '../../../../pages/page'
-import NotFoundPage from '../../../../pages/notFoundPage'
-import NewDistinguishingMark from '../../../../pages/editPages/distinguishingMarks/newDistinguishingMark'
+import { Role } from '../../../../server/data/enums/role'
+import Page from '../../../pages/page'
+import NotFoundPage from '../../../pages/notFoundPage'
+import NewDistinguishingMark from '../../../pages/editPages/distinguishingMarks/newDistinguishingMark'
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484

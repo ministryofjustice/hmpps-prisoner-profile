@@ -1,8 +1,8 @@
-import { Role } from '../../../../../server/data/enums/role'
-import Page from '../../../../pages/page'
-import NotFoundPage from '../../../../pages/notFoundPage'
-import { markMock, scarMock, tattooMock } from '../../../../../server/data/localMockData/distinguishingMarksMock'
-import ChangeBodyPart from '../../../../pages/editPages/distinguishingMarks/changeBodyPart'
+import { Role } from '../../../../server/data/enums/role'
+import Page from '../../../pages/page'
+import NotFoundPage from '../../../pages/notFoundPage'
+import { markMock, scarMock, tattooMock } from '../../../../server/data/localMockData/distinguishingMarksMock'
+import ChangeBodyPart from '../../../pages/editPages/distinguishingMarks/changeBodyPart'
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
