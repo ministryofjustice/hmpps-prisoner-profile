@@ -15,7 +15,6 @@ import StaffContacts, { Contact, YouthStaffContacts } from '../data/interfaces/p
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
-import KeyWorker from '../data/interfaces/keyWorkerApi/KeyWorker'
 import { AgenciesEmail } from '../data/interfaces/prisonApi/Agency'
 import Telephone from '../data/interfaces/prisonApi/Telephone'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
@@ -27,6 +26,7 @@ import { formatDate } from '../utils/dateHelpers'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -61,7 +61,7 @@ export default class ProfessionalContactsService {
     isYouthPrisoner: boolean,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<Result<ProfessionalContact, ProfessionalContactApiError>[]> {
-    const [contacts, allocationManager, communityManager, keyWorker] = await Promise.all([
+    const [contacts, allocationManager, communityManager, allocations] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
       Result.wrap(
         isYouthPrisoner ? null : this.allocationApiClientBuilder(clientToken).getPomByOffenderNo(prisonerNumber),
@@ -74,7 +74,9 @@ export default class ProfessionalContactsService {
         apiErrorCallback,
       ),
       Result.wrap(
-        isYouthPrisoner ? null : this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+        isYouthPrisoner
+          ? null
+          : this.keyworkerApiClientBuilder(clientToken).getCurrentAllocations(prisonerNumber, true),
         apiErrorCallback,
       ),
     ])
@@ -113,7 +115,8 @@ export default class ProfessionalContactsService {
     return [
       ...contactForEachAddress,
       mapCommunityManagerToProfessionalContact(communityManager),
-      mapKeyWorkerToProfessionalContact(keyWorker),
+      mapAllocationsToKeyWorkerContacts(allocations),
+      mapAllocationsToPersonalOfficerContacts(allocations),
       mapPomToProfessionalContact(allocationManager),
     ]
       .flat()
@@ -126,6 +129,7 @@ export default class ProfessionalContactsService {
   ) => {
     const jobTitleOrder = [
       'Key Worker',
+      'Personal Officer',
       'Prison Offender Manager',
       'Co-working Prison Offender Manager',
       'Community Offender Manager',
@@ -335,27 +339,68 @@ function mapCommunityManagerToProfessionalContact(
   ]
 }
 
-function mapKeyWorkerToProfessionalContact(
-  keyWorkerResult: Result<KeyWorker>,
+function mapAllocationsToKeyWorkerContacts(
+  allocationResult: Result<StaffAllocation>,
 ): Result<ProfessionalContact, ProfessionalContactApiError>[] {
-  if (keyWorkerResult.isFulfilled() && keyWorkerResult.getOrThrow() === null) return []
+  if (allocationResult.isFulfilled() && allocationResult.getOrThrow() === null) return []
 
   const keyworkerRelationship = { relationship: 'KW', relationshipDescription: 'Key Worker' }
 
-  return [
-    keyWorkerResult.map(
-      keyWorker =>
-        ({
-          ...keyworkerRelationship,
-          firstName: keyWorker.firstName,
-          lastName: keyWorker.lastName,
-          emails: [keyWorker.email].filter(Boolean),
-          phones: [],
-          address: undefined,
-        }) as ProfessionalContact,
-      _error => keyworkerRelationship,
-    ),
-  ]
+  try {
+    return [
+      allocationResult.map(
+        ({ allocations }) => {
+          const staff = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
+          if (staff) {
+            return {
+              ...keyworkerRelationship,
+              firstName: staff.firstName,
+              lastName: staff.lastName,
+              emails: staff.emailAddresses.filter(Boolean),
+              phones: [],
+              address: undefined,
+            } as ProfessionalContact
+          }
+          throw new Error('No key worker found')
+        },
+        _error => keyworkerRelationship,
+      ),
+    ]
+  } catch {
+    return []
+  }
+}
+
+function mapAllocationsToPersonalOfficerContacts(
+  allocationResult: Result<StaffAllocation>,
+): Result<ProfessionalContact, ProfessionalContactApiError>[] {
+  if (allocationResult.isFulfilled() && allocationResult.getOrThrow() === null) return []
+
+  const personalOfficerRelationship = { relationship: 'PO', relationshipDescription: 'Personal Officer' }
+
+  try {
+    return [
+      allocationResult.map(
+        ({ allocations }) => {
+          const staff = allocations.find(itm => itm.policy.code === 'PERSONAL_OFFICER')?.staffMember
+          if (staff) {
+            return {
+              ...personalOfficerRelationship,
+              firstName: staff.firstName,
+              lastName: staff.lastName,
+              emails: staff.emailAddresses.filter(Boolean),
+              phones: [],
+              address: undefined,
+            } as ProfessionalContact
+          }
+          throw new Error('No personal officer found')
+        },
+        _error => personalOfficerRelationship,
+      ),
+    ]
+  } catch {
+    return []
+  }
 }
 
 function mapPomToProfessionalContact(

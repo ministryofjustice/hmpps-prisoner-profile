@@ -1,12 +1,4 @@
-import KeyWorker from '../interfaces/keyWorkerApi/KeyWorker'
 import StaffAllocation from '../interfaces/keyWorkerApi/StaffAllocation'
-
-export const keyWorkerMock: KeyWorker = {
-  staffId: 3532453,
-  firstName: 'Dave',
-  lastName: 'Stevens',
-  email: '1@1.com',
-}
 
 export const staffAllocationMock: StaffAllocation = {
   hasHighComplexityOfNeeds: false,
@@ -24,6 +16,23 @@ export const staffAllocationMock: StaffAllocation = {
         staffId: 3532453,
         firstName: 'NEW',
         lastName: 'KEY-WORKER',
+        emailAddresses: ['new@key.worker'],
+      },
+    },
+    {
+      policy: {
+        code: 'PERSONAL_OFFICER',
+        description: 'Personal officer',
+      },
+      prison: {
+        code: 'CODE',
+        description: 'Description',
+      },
+      staffMember: {
+        staffId: 1532453,
+        firstName: 'NEW',
+        lastName: 'PERSONAL-OFFICER',
+        emailAddresses: ['new@personal.officer'],
       },
     },
   ],
@@ -41,6 +50,5 @@ export const staffAllocationMock: StaffAllocation = {
 }
 
 export default {
-  keyWorkerMock,
   StaffAllocationMock: staffAllocationMock,
 }
