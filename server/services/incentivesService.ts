@@ -22,9 +22,13 @@ export default class IncentivesService {
       if (!incentiveReviews)
         return { positiveBehaviourCount: null, negativeBehaviourCount: null, nextReviewDate: null, daysOverdue: null }
 
+      const startDate = incentiveReviews?.iepDate
+        ? formatDateTimeISO(new Date(incentiveReviews?.iepDate), { startOfDay: true })
+        : undefined
+
       const { positiveBehaviourCount, negativeBehaviourCount } = await caseNotesApiClient.getIncentivesCaseNoteCount(
         prisonerNumber,
-        formatDateTimeISO(new Date(incentiveReviews?.iepDate), { startOfDay: true }),
+        startDate,
         formatDateTimeISO(new Date(), { endOfDay: true }),
       )
 

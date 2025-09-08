@@ -56,6 +56,21 @@ describe('prisonerScheduleService', () => {
       })
     })
 
+    it('should handle missing iepDate', async () => {
+      incentivesApiClient.getReviews = jest.fn().mockResolvedValue({
+        ...incentiveReviewsMock,
+        iepDate: undefined,
+      })
+
+      const result = await service.getIncentiveOverview('token', 'A1234AB')
+      expect(result).toEqual({
+        daysOverdue: 2,
+        negativeBehaviourCount: 1,
+        nextReviewDate: '2024-01-01',
+        positiveBehaviourCount: 2,
+      })
+    })
+
     it('should return error object if api errors', async () => {
       incentivesApiClient.getReviews = jest.fn().mockRejectedValue('error')
 
