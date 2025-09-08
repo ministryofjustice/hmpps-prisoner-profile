@@ -5,6 +5,9 @@ import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import { findCaseNotesMock } from './localMockData/findCaseNotesMock'
+import { caseNoteUsageMock, caseNoteUsageMockWithNoResults } from './localMockData/caseNoteUsageMock'
+import { CaseNoteSubType, CaseNoteType } from './enums/caseNoteType'
+import { BehaviourCaseNoteCount } from './interfaces/caseNotesApi/CaseNoteUsage'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const prisonerNumber = 'AB1234Y'
@@ -144,6 +147,72 @@ describe('caseNotesApiClient', () => {
 
       const output = await caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, 'MDI', 'A1234BC', 'text')
       expect(output).toEqual(findCaseNotesMock.content[0])
+    })
+  })
+
+  describe('getCaseNoteUsage', () => {
+    it('Should return data from the API', async () => {
+      const typeSubTypes = [
+        {
+          type: 'TYPE_ONE',
+          subTypes: ['SUB_ONE'],
+        },
+        {
+          type: 'TYPE_TWO',
+          subTypes: ['SUB_TWO', 'SUB_THREE'],
+        },
+      ]
+      const expectedRequest: RequestBodyMatcher = {
+        personIdentifiers: [prisonerNumber],
+        typeSubTypes,
+      }
+      mockSuccessfulCaseNotesPostApiCallWithExpectedBody(`/case-notes/usage`, expectedRequest, caseNoteUsageMock)
+
+      const output = await caseNotesApiClient.getCaseNoteUsage(prisonerNumber, typeSubTypes)
+      expect(output).toEqual(caseNoteUsageMock)
+    })
+  })
+
+  describe('getIncentivesCaseNoteCount', () => {
+    const incentivesPrisonerNumber = 'G6123VU'
+
+    it('Should return data from the API', async () => {
+      const typeSubTypes = [
+        {
+          type: CaseNoteType.PositiveBehaviour,
+          subTypes: [CaseNoteSubType.IncentiveEncouragement],
+        },
+        {
+          type: CaseNoteType.NegativeBehaviour,
+          subTypes: [CaseNoteSubType.IncentiveWarning],
+        },
+      ]
+      const expectedRequest: RequestBodyMatcher = {
+        personIdentifiers: [incentivesPrisonerNumber],
+        typeSubTypes,
+      }
+      mockSuccessfulCaseNotesPostApiCallWithExpectedBody(`/case-notes/usage`, expectedRequest, caseNoteUsageMock)
+
+      const expected: BehaviourCaseNoteCount = {
+        positiveBehaviourCount: 2,
+        negativeBehaviourCount: 1,
+      }
+      const output = await caseNotesApiClient.getIncentivesCaseNoteCount(incentivesPrisonerNumber)
+      expect(output).toEqual(expected)
+    })
+
+    it('Should handle no results in response', async () => {
+      mockSuccessfulCaseNotesPostApiCall(`/case-notes/usage`, caseNoteUsageMockWithNoResults)
+      const expected = {
+        positiveBehaviourCount: 0,
+        negativeBehaviourCount: 0,
+      }
+
+      const output = await caseNotesApiClient.getIncentivesCaseNoteCount(
+        incentivesPrisonerNumber,
+        CaseNoteType.PositiveBehaviour,
+      )
+      expect(output).toEqual(expected)
     })
   })
 })

@@ -14,6 +14,7 @@ import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereabo
 import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
 import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
 import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
+import { caseNotesApiClientMock } from '../../tests/mocks/caseNotesApiClientMock'
 
 describe('Specific Prisoner Location History', () => {
   const offenderNo = 'A1234BC'
@@ -57,14 +58,7 @@ describe('Specific Prisoner Location History', () => {
       createAppointments: jest.fn(),
     }
 
-    const caseNotesApiClient = {
-      getCaseNoteTypes: jest.fn(),
-      getCaseNoteTypesForUser: jest.fn(),
-      getCaseNotes: jest.fn(),
-      addCaseNote: jest.fn(),
-      addCaseNoteAmendment: jest.fn(),
-      getCaseNote: jest.fn(),
-    }
+    const caseNotesApiClient = caseNotesApiClientMock()
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)

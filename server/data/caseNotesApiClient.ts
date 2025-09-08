@@ -6,6 +6,23 @@ import { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
 import FindCaseNotesResponse from './interfaces/caseNotesApi/FindCaseNotesResponse'
+import {
+  BehaviourCaseNoteCount,
+  CaseNoteTypeSubTypeRequest,
+  CaseNoteUsageSummary,
+} from './interfaces/caseNotesApi/CaseNoteUsage'
+import { CaseNoteType as Type, CaseNoteSubType } from './enums/caseNoteType'
+
+const incentiveTypeSubTypes: CaseNoteTypeSubTypeRequest[] = [
+  {
+    type: Type.PositiveBehaviour,
+    subTypes: [CaseNoteSubType.IncentiveEncouragement],
+  },
+  {
+    type: Type.NegativeBehaviour,
+    subTypes: [CaseNoteSubType.IncentiveWarning],
+  },
+]
 
 export default class CaseNotesApiRestClient extends RestClient implements CaseNotesApiClient {
   constructor(token: string) {
@@ -90,6 +107,39 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
       },
       this.token,
     )
+  }
+
+  async getCaseNoteUsage(
+    prisonerNumber: string,
+    typeSubTypes: CaseNoteTypeSubTypeRequest[],
+    from?: string,
+    to?: string,
+  ): Promise<CaseNoteUsageSummary> {
+    return this.post<CaseNoteUsageSummary>(
+      {
+        path: `/case-notes/usage`,
+        data: {
+          personIdentifiers: [prisonerNumber],
+          typeSubTypes,
+          from,
+          to,
+        },
+      },
+      this.token,
+    )
+  }
+
+  async getIncentivesCaseNoteCount(
+    prisonerNumber: string,
+    from?: string,
+    to?: string,
+  ): Promise<BehaviourCaseNoteCount> {
+    const summary = await this.getCaseNoteUsage(prisonerNumber, incentiveTypeSubTypes, from, to)
+    const usage = summary?.content?.[prisonerNumber]
+    return {
+      positiveBehaviourCount: usage?.find(it => it.subType === CaseNoteSubType.IncentiveEncouragement)?.count ?? 0,
+      negativeBehaviourCount: usage?.find(it => it.subType === CaseNoteSubType.IncentiveWarning)?.count ?? 0,
+    }
   }
 
   private mapTypeAndSubType(type?: string, subtype?: string): { type: string; subTypes: string[] }[] | undefined {

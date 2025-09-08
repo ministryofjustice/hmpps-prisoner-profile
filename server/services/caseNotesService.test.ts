@@ -6,6 +6,7 @@ import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
 import FindCaseNotesResponse from '../data/interfaces/caseNotesApi/FindCaseNotesResponse'
+import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
 
 jest.mock('../data/caseNotesApiClient')
 
@@ -22,6 +23,13 @@ describe('Case Notes Page', () => {
       addCaseNote: jest.fn(async () => findCaseNotesMock.content[0]),
       addCaseNoteAmendment: jest.fn(async () => findCaseNotesMock.content[0]),
       getCaseNote: jest.fn(async () => findCaseNotesMock.content[0]),
+      getCaseNoteUsage: jest.fn(async () => caseNoteUsageMock),
+      getIncentivesCaseNoteCount: jest.fn(async () => {
+        return {
+          positiveBehaviourCount: 1,
+          negativeBehaviourCount: 1,
+        }
+      }),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
   })

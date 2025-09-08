@@ -1,22 +1,25 @@
-import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import IncentivesService from './incentivesService'
-import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import { caseNotesApiClientMock } from '../../tests/mocks/caseNotesApiClientMock'
 
 describe('prisonerScheduleService', () => {
-  let prisonApiClient: PrisonApiClient
+  let caseNotesApiClient: CaseNotesApiClient
   let incentivesApiClient: IncentivesApiClient
   let service: IncentivesService
 
   beforeEach(() => {
-    prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getCaseNoteCount = jest.fn(async () => caseNoteCountMock)
+    const caseNoteCount = {
+      positiveBehaviourCount: 2,
+      negativeBehaviourCount: 1,
+    }
+    caseNotesApiClient = caseNotesApiClientMock()
+    caseNotesApiClient.getIncentivesCaseNoteCount = jest.fn().mockResolvedValue(caseNoteCount)
     incentivesApiClient = { getReviews: jest.fn() }
     service = new IncentivesService(
+      () => caseNotesApiClient,
       () => incentivesApiClient,
-      () => prisonApiClient,
     )
   })
 
@@ -37,7 +40,7 @@ describe('prisonerScheduleService', () => {
         daysOverdue: 2,
         negativeBehaviourCount: 1,
         nextReviewDate: '2024-01-01',
-        positiveBehaviourCount: 1,
+        positiveBehaviourCount: 2,
       })
     })
 

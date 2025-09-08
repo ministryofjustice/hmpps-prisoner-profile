@@ -257,7 +257,7 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.incentivesCard().contains('h2', 'Incentives')
         overviewPage.incentivesCard().contains('p', 'Since last review')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 2')
         overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
         overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
         overviewPage
