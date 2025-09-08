@@ -672,7 +672,8 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('exist')
         overviewPage
           .staffContacts()
-          .find('[data-qa=keyworker-details]')
+          .contains('dt', 'Key worker')
+          .next()
           .should('contain.text', 'None - high complexity of need')
         overviewPage.resettlementWorkerName().should('contain.text', 'Ivan Smirnov')
       })
@@ -695,7 +696,7 @@ context('Overview Page', () => {
       it('Displays the offender staff contact details', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.staffContacts().should('exist')
-        overviewPage.staffContacts().find('[data-qa=keyworker-details]').should('contain.text', 'Dave Stevens')
+        overviewPage.staffContacts().contains('dt', 'Key worker').next().should('contain.text', 'Dave Stevens')
       })
     })
   })
@@ -772,7 +773,8 @@ context('Overview Page', () => {
 
       overviewPage
         .staffContacts()
-        .find('[data-qa=keyworker-details]')
+        .contains('dt', 'Key worker')
+        .next()
         .should('contain.text', 'We cannot show these details right now. Try again later.')
     })
   })
