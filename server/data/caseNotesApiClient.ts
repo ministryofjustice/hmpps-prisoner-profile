@@ -112,8 +112,8 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
   async getCaseNoteUsage(
     prisonerNumber: string,
     typeSubTypes: CaseNoteTypeSubTypeRequest[],
-    from?: string,
-    to?: string,
+    fromDateTime?: string,
+    toDateTime?: string,
   ): Promise<CaseNoteUsageSummary> {
     return this.post<CaseNoteUsageSummary>(
       {
@@ -121,8 +121,8 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
         data: {
           personIdentifiers: [prisonerNumber],
           typeSubTypes,
-          from,
-          to,
+          from: fromDateTime,
+          to: toDateTime,
         },
       },
       this.token,
@@ -131,10 +131,10 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
 
   async getIncentivesCaseNoteCount(
     prisonerNumber: string,
-    from?: string,
-    to?: string,
+    fromDateTime?: string,
+    toDateTime?: string,
   ): Promise<BehaviourCaseNoteCount> {
-    const summary = await this.getCaseNoteUsage(prisonerNumber, incentiveTypeSubTypes, from, to)
+    const summary = await this.getCaseNoteUsage(prisonerNumber, incentiveTypeSubTypes, fromDateTime, toDateTime)
     const usage = summary?.content?.[prisonerNumber]
     return {
       positiveBehaviourCount: usage?.find(it => it.subType === CaseNoteSubType.IncentiveEncouragement)?.count ?? 0,

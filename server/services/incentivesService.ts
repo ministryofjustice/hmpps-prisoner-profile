@@ -1,6 +1,6 @@
 import { differenceInDays, isAfter } from 'date-fns'
 import { RestClientBuilder } from '../data'
-import { formatDateISO } from '../utils/dateHelpers'
+import { formatDateTimeISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import IncentiveSummary from './interfaces/incentivesService/IncentiveSummary'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
@@ -24,8 +24,8 @@ export default class IncentivesService {
 
       const { positiveBehaviourCount, negativeBehaviourCount } = await caseNotesApiClient.getIncentivesCaseNoteCount(
         prisonerNumber,
-        incentiveReviews?.iepDate,
-        formatDateISO(new Date()),
+        formatDateTimeISO(new Date(incentiveReviews?.iepDate), { startOfDay: true }),
+        formatDateTimeISO(new Date(), { endOfDay: true }),
       )
 
       return {

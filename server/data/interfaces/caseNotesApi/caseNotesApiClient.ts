@@ -13,8 +13,12 @@ export default interface CaseNotesApiClient {
   getCaseNoteUsage(
     prisonerNumber: string,
     typeSubTypes: CaseNoteTypeSubTypeRequest[],
-    from?: string,
-    to?: string,
+    fromDateTime?: string,
+    toDateTime?: string,
   ): Promise<CaseNoteUsageSummary>
-  getIncentivesCaseNoteCount(prisonerNumber: string, from?: string, to?: string): Promise<BehaviourCaseNoteCount>
+  getIncentivesCaseNoteCount(
+    prisonerNumber: string,
+    fromDateTime?: string,
+    toDateTime?: string,
+  ): Promise<BehaviourCaseNoteCount>
 }
