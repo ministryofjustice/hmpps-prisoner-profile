@@ -9,6 +9,7 @@ import {
   findPomCaseNotesMock,
   findSingleCaseNoteWithTypes,
 } from '../../server/data/localMockData/findCaseNotesMock'
+import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 
 export default {
   stubGetCaseNotes: ({ prisonerNumber }: { prisonerNumber: string }) => {
@@ -256,6 +257,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: findCaseNotesMock.content[0],
+      },
+    })
+  },
+
+  stubCaseNoteUsage: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/casenotes/case-notes/usage`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: caseNoteUsageMock,
       },
     })
   },

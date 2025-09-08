@@ -9,7 +9,6 @@ import VisitBalances from './interfaces/prisonApi/VisitBalances'
 import Assessment from './interfaces/prisonApi/Assessment'
 import { ContactDetail } from './interfaces/prisonApi/StaffContacts'
 import { mapToQueryString } from '../utils/utils'
-import { CaseNoteCount } from './interfaces/prisonApi/CaseNote'
 import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
 import PrisonerDetail from './interfaces/prisonApi/PrisonerDetail'
 import InmateDetail from './interfaces/prisonApi/InmateDetail'
@@ -266,22 +265,6 @@ export default class PrisonApiRestClient extends RestClient {
     return this.get<ReasonableAdjustments>(
       {
         path: `/api/bookings/${bookingId}/reasonable-adjustments/all`,
-      },
-      this.token,
-    )
-  }
-
-  async getCaseNoteCount(
-    bookingId: number,
-    type: string,
-    subType: string,
-    fromDate: string,
-    toDate: string,
-  ): Promise<CaseNoteCount> {
-    return this.get(
-      {
-        path: `/api/bookings/${bookingId}/caseNotes/${type}/${subType}/count`,
-        query: `fromDate=${fromDate}&toDate=${toDate}`,
       },
       this.token,
     )

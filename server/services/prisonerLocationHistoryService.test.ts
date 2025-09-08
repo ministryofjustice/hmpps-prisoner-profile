@@ -19,6 +19,7 @@ import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncP
 import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
 import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
 import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
+import { caseNotesApiClientMock } from '../../tests/mocks/caseNotesApiClientMock'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
@@ -32,19 +33,12 @@ describe('prisonerLocationHistoryService', () => {
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
+    caseNotesApiClient = caseNotesApiClientMock()
     whereaboutsApiClient = {
       getAppointment: jest.fn(),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
       createAppointments: jest.fn(),
-    }
-
-    caseNotesApiClient = {
-      getCaseNoteTypes: jest.fn(),
-      getCaseNotes: jest.fn(),
-      addCaseNote: jest.fn(),
-      addCaseNoteAmendment: jest.fn(),
-      getCaseNote: jest.fn(),
     }
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)

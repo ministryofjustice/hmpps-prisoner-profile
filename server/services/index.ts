@@ -166,7 +166,7 @@ export const services = () => {
   )
   const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
-  const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
+  const incentivesService = new IncentivesService(caseNotesApiClientBuilder, incentivesApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)

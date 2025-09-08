@@ -31,7 +31,6 @@ import {
   CourtDateResultsUnsentencedMockA,
 } from '../../server/data/localMockData/courtDateResultsMock'
 import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
-import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import CaseLoad from '../../server/data/interfaces/prisonApi/CaseLoad'
 
@@ -621,22 +620,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: CourtDateResultsUnsentencedMockA,
-      },
-    })
-  },
-
-  stubGetCaseNoteCount: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/caseNotes/(.*)`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: caseNoteCountMock,
       },
     })
   },
