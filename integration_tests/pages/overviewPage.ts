@@ -97,11 +97,11 @@ export default class OverviewPage extends Page {
 
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 
-  resettlementWorkerName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
+  resettlementWorkerName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(7) dd')
 
-  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(2) dd')
+  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(4) dd')
 
-  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(3) dd')
+  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
 
   schedule = () => ({
     morning: () => ({

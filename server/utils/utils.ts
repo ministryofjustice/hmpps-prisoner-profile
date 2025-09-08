@@ -889,3 +889,24 @@ export const blankStringsToNull = <T>(object: T): T => {
   }
   return object
 }
+
+const isLowerCase = (val: string): boolean => /^[a-z]*$/.test(val)
+
+const lowercaseExceptAcronym = (val: string): string => {
+  if (val.includes('-')) {
+    return val
+      .split('-')
+      .map(part => (Array.from(part).some(isLowerCase) ? part.toLowerCase() : part))
+      .join('-')
+  }
+  if (val.length < 2 || [val[0], val.slice(-1)].some(isLowerCase)) {
+    return val.toLowerCase()
+  }
+  return val
+}
+
+export const sentenceCase = (val: string, startsWithUppercase: boolean = true): string => {
+  const words = val.split(/\s+/)
+  const sentence = words.map(lowercaseExceptAcronym).join(' ')
+  return startsWithUppercase ? sentence.charAt(0).toUpperCase() + sentence.slice(1) : sentence
+}

@@ -29,7 +29,7 @@
     {% for contactResult in professionalContacts %}
         {% if contactResult.status === 'fulfilled' %}
             {% set contact = contactResult.value %}
-            {%- call summaryCard({title: contact.relationshipDescription}) -%}
+            {%- call summaryCard({title: contact.relationshipDescription | sentenceCase}) -%}
                 <dl class="govuk-summary-list" >
                     <div class="govuk-summary-list__row" data-qa="contact-name">
                         <dt class="govuk-summary-list__key">
@@ -69,7 +69,7 @@
                         </dd>
                     </div>
 
-                    {% if contact.relationship !== "POM" %}
+                    {% if contact.relationship !== "POM" and contact.relationship !== "PO" and contact.relationship !== "KW" %}
                         <div class="govuk-summary-list__row" data-qa="contact-address">
                             <dt class="govuk-summary-list__key">
                                 Address
@@ -87,7 +87,7 @@
             {%- endcall -%}
         {% else %}
             {% set contactApiError = contactResult.reason %}
-            {% call summaryCard({title: contactApiError.relationshipDescription}) %}
+            {% call summaryCard({title: contactApiError.relationshipDescription | sentenceCase}) %}
                 <dl class="govuk-summary-list" >
                     <div class="govuk-summary-list__row" data-qa="contact-api-error">
                         {{ standardApiErrorText }}
