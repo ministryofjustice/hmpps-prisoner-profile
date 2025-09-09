@@ -335,7 +335,7 @@ export default class AppointmentController {
           plural: 'appointments have',
           includeCount: false,
         },
-      )} been added`
+      )} been ${appointmentDetails.appointmentId ? 'updated' : 'added'}`
 
       const lastAppointmentISODate = formatDateISO(
         calculateEndDate(parseDate(appointmentDetails.date), appointmentDetails.repeats, appointmentDetails.times),
