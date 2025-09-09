@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .alerts-list {
 
   min-height: 50px;
@@ -52,8 +54,8 @@
 .non-association {
   @extend %status-style;
 
-  background: lighten(#d4351c, 40);
-  border-color: lighten(#d4351c, 40);
+  background: color.adjust(#d4351c, $lightness: 40%);
+  border-color: color.adjust(#d4351c, $lightness: 40%);
   font-weight: bold;
   color: #d4351c;
 }

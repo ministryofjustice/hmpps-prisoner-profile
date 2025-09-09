@@ -16,7 +16,7 @@ body {
 
   .js-enabled .hmpps-back-to-top--fixed {
     position: fixed;
-    top: calc(100% - #{govuk-spacing(8)});
+    top: calc(100% - govuk-spacing(8));
     bottom: auto;
     left: auto;
   }
