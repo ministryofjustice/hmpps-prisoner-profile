@@ -13,8 +13,8 @@
 
   .govuk-warning-text {
     &__text {
-      @include govuk-font($size: 16, $weight: 'bold');
       margin-top: 5px;
+      @include govuk-font($size: 16, $weight: 'bold');
     }
   }
 }

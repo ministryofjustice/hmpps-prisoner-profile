@@ -1,9 +1,9 @@
 .hmpps-photo-list {
   .hmpps-photo-list__item {
-    @include govuk-responsive-margin(4, 'bottom');
-    @include govuk-responsive-padding(2);
     border-bottom: solid 1px $govuk-border-colour;
     display: flex;
+    @include govuk-responsive-margin(4, 'bottom');
+    @include govuk-responsive-padding(2);
   }
 
   .hmpps-photo-list__main {

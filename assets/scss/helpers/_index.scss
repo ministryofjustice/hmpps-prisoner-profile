@@ -103,8 +103,8 @@
   }
 
   &__search {
-    @include govuk-font($size: 16);
     float: left;
+    @include govuk-font($size: 16);
 
     &:has(+ .prisoner-profile-breadcrumbs__breadcrumbs ol > li > a) {
       border-right: 1px solid $govuk-secondary-text-colour;
