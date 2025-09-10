@@ -2,10 +2,10 @@ $hmpps-webcam-capture-width: 221px;
 $hmpps-webcam-capture-height: 276px;
 
 .hmpps-webcam-capture-photo-container {
-  @include govuk-responsive-padding(2);
-  @include govuk-responsive-margin(6, 'bottom');
   border: 1px solid $govuk-border-colour;
   width: 100%;
+  @include govuk-responsive-padding(2);
+  @include govuk-responsive-margin(6, 'bottom');
 
   &__content {
     display: flex;

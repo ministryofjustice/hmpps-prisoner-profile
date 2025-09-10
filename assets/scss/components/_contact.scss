@@ -6,15 +6,15 @@
   }
 
   .hmpps-contact__emergency-contact {
+    color: govuk-colour('red');
     @include govuk-font($size: 16, $weight: 'bold');
     @include govuk-responsive-margin(0, 'bottom');
-    color: govuk-colour('red');
   }
 
   .hmpps-contact__next-of-kin {
+    color: govuk-colour('dark-grey');
     @include govuk-font($size: 16, $weight: 'bold');
     @include govuk-responsive-margin(1, 'bottom');
-    color: govuk-colour('dark-grey');
   }
 
   .hmpps-contact__name {

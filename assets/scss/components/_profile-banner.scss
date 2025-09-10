@@ -35,6 +35,8 @@
       'photo name name'
       'photo info info';
 
+    background-color: govuk-colour('blue');
+
     @media print {
       padding: 15px 10px;
       grid-template-rows: 3em 6em;
@@ -88,6 +90,7 @@
       grid-area: name;
       line-height: 26px;
     }
+
     .info {
       grid-area: info;
       display: flex;
@@ -120,8 +123,6 @@
         margin-bottom: 0;
       }
     }
-
-    background-color: govuk-colour('blue');
 
     h2,
     p,
@@ -205,6 +206,10 @@
   }
 
   .hmpps-profile-banner-bottom {
+    background-color: #f3f2f1;
+    border-bottom: 2px solid $govuk-border-colour;
+    overflow: auto;
+
     & > div {
       padding: 0 15px;
 
@@ -212,10 +217,6 @@
         padding: 0 10px;
       }
     }
-
-    background-color: #f3f2f1;
-    border-bottom: 2px solid $govuk-border-colour;
-    overflow: auto;
 
     nav {
       padding: 10px 15px 0 15px;

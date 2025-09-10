@@ -31,9 +31,9 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    @include govuk-font($size: 19, $weight: 'bold');
     padding: 10px 30px;
     margin-bottom: 0;
+    @include govuk-font($size: 19, $weight: 'bold');
   }
 
   &--success p {

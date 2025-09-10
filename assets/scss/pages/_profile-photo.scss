@@ -24,9 +24,9 @@
   }
 
   p {
-    @include govuk-font(16);
     color: #594d00;
     margin: 0;
+    @include govuk-font(16);
   }
 }
 

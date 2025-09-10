@@ -1,85 +1,85 @@
 #court-cases-sentence-details {
-    .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
-        visibility: hidden;
-    }
+  .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
+    visibility: hidden;
+  }
 }
 
 #court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
-    content:'Show all offences and sentence details'; 
+    content: 'Show all offences and sentence details';
     visibility: hidden;
     visibility: visible;
 }
 
 #court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
-    content:'Hide all offences and sentence details'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Hide all offences and sentence details';
+  visibility: hidden;
+  visibility: visible;
 }
 
 #court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
-    content:'Show offences and sentence details'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Show offences and sentence details';
+  visibility: hidden;
+  visibility: visible;
 }
 
 #court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
-    content:'Hide offences and sentence details'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Hide offences and sentence details';
+  visibility: hidden;
+  visibility: visible;
 }
 
 #court-cases-upcoming-appearances {
-    .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
-        visibility: hidden;
-    }
+  .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
+    visibility: hidden;
+  }
 }
 
 #court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
-    content:'Show all offences and upcoming court appearances'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Show all offences and upcoming court appearances';
+  visibility: hidden;
+  visibility: visible;
 }
 
 #court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
-    content:'Hide all offences and upcoming court appearances'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Hide all offences and upcoming court appearances';
+  visibility: hidden;
+  visibility: visible;
 }
 
 
 #court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
-    content:'Show offences and upcoming court appearances'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Show offences and upcoming court appearances';
+  visibility: hidden;
+  visibility: visible;
 }
 
 #court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
-    content:'Hide offences and upcoming court appearances'; 
-    visibility: hidden;
-    visibility: visible;
+  content: 'Hide offences and upcoming court appearances';
+  visibility: hidden;
+  visibility: visible;
 }
 
 .empty-accordion-header {
-    @include govuk-font($size: 24, $weight: bold);
-    @include govuk-text-colour;
+  display: block;
+  margin-bottom: 0;
+  width: 100%;
 
-    display: block;
-    margin-bottom: 0;
-    width: 100%;
+  border: 0;
 
-    border: 0;
+  // Visually separate the section from the one underneath when user changes colours in their
+  // browser. See https://github.com/alphagov/govuk-frontend/issues/2321#issuecomment-924201488
+  border-bottom: govuk-spacing(2) solid transparent;
 
-    // Visually separate the section from the one underneath when user changes colours in their
-    // browser. See https://github.com/alphagov/govuk-frontend/issues/2321#issuecomment-924201488
-    border-bottom: govuk-spacing(2) solid transparent;
+  color: $govuk-text-colour;
+  background: none;
 
-    color: $govuk-text-colour;
-    background: none;
+  text-align: left;
+  -webkit-appearance: none;
 
-    text-align: left;
-    -webkit-appearance: none;
+  @include govuk-font($size: 24, $weight: bold);
+  @include govuk-text-colour;
 
-    @include govuk-media-query($from: tablet) {
-        padding-bottom: govuk-spacing(2);
-    }
+  @include govuk-media-query($from: tablet) {
+    padding-bottom: govuk-spacing(2);
+  }
 }
