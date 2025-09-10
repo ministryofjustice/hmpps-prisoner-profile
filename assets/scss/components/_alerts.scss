@@ -1,8 +1,13 @@
-.alerts-list {
+@use 'sass:color';
 
+.alerts-list {
   min-height: 50px;
   @extend %govuk-list;
   margin: 17px 15px 13px 150px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 15px;
 
   @media (max-width: 800px) {
     margin-left: 15px;
@@ -12,10 +17,6 @@
     min-height: 0;
     margin: 15px 0;
   }
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 15px;
 
   &__more-link {
     padding-top: 8px;
@@ -52,8 +53,8 @@
 .non-association {
   @extend %status-style;
 
-  background: lighten(#d4351c, 40);
-  border-color: lighten(#d4351c, 40);
+  background: color.adjust(#d4351c, $lightness: 40%);
+  border-color: color.adjust(#d4351c, $lightness: 40%);
   font-weight: bold;
   color: #d4351c;
 }
