@@ -73,13 +73,13 @@ export default class ImageController {
           }
 
           const file = req.file as MulterFile
-          const originalImgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
+          const imgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             prisonerNumber,
             miniBannerData,
             photoType: 'upload',
-            imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-            originalImgSrc,
+            imgSrc,
+            originalImgSrc: imgSrc,
             fileName: file.originalname,
             fileType: file.mimetype,
           })
@@ -102,13 +102,15 @@ export default class ImageController {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
           const file = req.file as MulterFile
+          const imgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             pageTitle: 'Confirm facial image taken by webcam',
             prisonerNumber,
             miniBannerData,
             webcamImage: true,
             photoType: 'webcam',
-            imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+            imgSrc,
+            originalImgSrc: imgSrc,
             fileName: file.originalname,
             fileType: file.mimetype,
           })
@@ -122,12 +124,13 @@ export default class ImageController {
         try {
           await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
         } catch (_error) {
-          const { originalImgSrc } = req.body
+          const { originalImgSrc, photoType } = req.body
           const imgSrc = originalImgSrc || `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             prisonerNumber,
             miniBannerData,
-            photoType: 'upload',
+            photoType,
+            webcamImage: photoType === 'webcam',
             imgSrc,
             originalImgSrc,
             fileName: file.originalname,

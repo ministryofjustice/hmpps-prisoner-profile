@@ -459,13 +459,16 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().webcamImage.post(request, response, () => {})
 
+        const imgSrc = 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU='
+
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/editPhoto', {
           pageTitle: expect.anything(),
           photoType: 'webcam',
           webcamImage: true,
           fileName: 'A name dot jpeg.jpeg',
           fileType: 'image/jpeg',
-          imgSrc: 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU=',
+          imgSrc,
+          originalImgSrc: imgSrc,
           miniBannerData,
           prisonerNumber: 'A1234BC',
         })
