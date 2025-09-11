@@ -206,9 +206,11 @@ export default class DistinguishingMarksController {
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
     } catch (_error) {
-      req.flash('errors', [
-        { text: photoErrorText, html: photoErrorHtml(`#file-${specificBodyPart}`), href: `#file-${specificBodyPart}` },
-      ])
+      const error = files?.[`file-${specificBodyPart}`]?.[0]
+        ? { text: photoErrorText, html: photoErrorHtml(`#file-${specificBodyPart}`), href: `#file-${specificBodyPart}` }
+        : { text: `There was an error please try again` }
+
+      req.flash('errors', [error])
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}/${bodyPart}/detail`,

@@ -368,7 +368,14 @@ describe('Distinguishing Marks Controller', () => {
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
 
-    it('redirects back and shows an error if the upload fails', async () => {
+    it.each([
+      [
+        true,
+        'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+      ],
+      [false, 'There was an error please try again'],
+    ])('redirects back and shows an error if the upload fails fileUploaded=%s', async (fileUploaded, errorMessage) => {
+      const files = fileUploaded ? { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] } : undefined
       const partReq = {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-arm' },
@@ -376,7 +383,7 @@ describe('Distinguishing Marks Controller', () => {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
         },
-        files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
+        files,
         query: {},
         flash: jest.fn(),
       } as Request
@@ -386,7 +393,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.postNewDistinguishingMarkWithDetail(partReq, res)
       expect(partReq.flash).toHaveBeenCalledWith('errors', [
         expect.objectContaining({
-          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+          text: errorMessage,
         }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
