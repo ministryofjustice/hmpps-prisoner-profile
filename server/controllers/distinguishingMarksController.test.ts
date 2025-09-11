@@ -196,6 +196,28 @@ describe('Distinguishing Marks Controller', () => {
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
 
+    it('redirects back and shows an error if the upload fails', async () => {
+      const typeReq = {
+        ...req,
+        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        body: { bodyPart: 'left-leg' },
+        flash: jest.fn(),
+      } as Request
+
+      jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
+
+      await controller.postNewDistinguishingMark(typeReq, res)
+      expect(typeReq.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'There was an error please try again',
+        },
+      ])
+      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/A12345/personal/distinguishing-marks/tattoo?selected=left-leg`,
+      )
+    })
+
     const getRedirectAnchor = (markType: string): string => {
       switch (markType) {
         case 'tattoo':
@@ -344,6 +366,38 @@ describe('Distinguishing Marks Controller', () => {
       await controller.postNewDistinguishingMarkWithDetail(partReq, res)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+
+    it.each([
+      [
+        true,
+        'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+      ],
+      [false, 'There was an error please try again'],
+    ])('redirects back and shows an error if the upload fails fileUploaded=%s', async (fileUploaded, errorMessage) => {
+      const files = fileUploaded ? { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] } : undefined
+      const partReq = {
+        ...req,
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-arm' },
+        body: {
+          specificBodyPart: 'lowerLeftArm',
+          'description-lowerLeftArm': 'A tattoo',
+        },
+        files,
+        query: {},
+        flash: jest.fn(),
+      } as Request
+
+      jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
+
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res)
+      expect(partReq.flash).toHaveBeenCalledWith('errors', [
+        expect.objectContaining({
+          text: errorMessage,
+        }),
+      ])
+      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/left-arm/detail`)
     })
   })
 
@@ -977,6 +1031,29 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
+
+    it('redirects back and shows an error if the upload fails', async () => {
+      const photoReq = {
+        ...req,
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100', photoId: '123' },
+        body: {},
+        file: { originalname: 'file.jpg' },
+        query: {},
+        flash: jest.fn(),
+      } as Request
+
+      jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockRejectedValue(null)
+
+      await controller.updatePhoto(photoReq, res)
+
+      expect(photoReq.flash).toHaveBeenCalledWith('errors', [
+        expect.objectContaining({
+          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+        }),
+      ])
+      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/100/photo/123`)
+    })
   })
 
   describe('addNewPhoto', () => {
@@ -1104,6 +1181,28 @@ describe('Distinguishing Marks Controller', () => {
       await controller.addPhoto(photoReq, res)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+
+    it('Redirects back and shows an error if the upload fails', async () => {
+      const photoReq = {
+        ...req,
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '101' },
+        body: {},
+        file: { originalname: 'file.jpg' },
+        query: {},
+      } as Request
+
+      jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockRejectedValue(null)
+
+      await controller.addPhoto(photoReq, res)
+
+      expect(photoReq.flash).toHaveBeenCalledWith('errors', [
+        expect.objectContaining({
+          text: 'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.',
+        }),
+      ])
+      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/101/photo`)
     })
   })
 

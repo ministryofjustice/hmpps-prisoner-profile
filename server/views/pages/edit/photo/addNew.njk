@@ -40,7 +40,7 @@
     <div class="govuk-grid-column-two-thirds">
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-        <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+        <div class="govuk-form-group {{ " govuk-form-group--error" if errors[0].href === '#photoType' }}">
           {{ govukRadios({
             name: "photoType",
             id: 'photoType',
@@ -58,7 +58,7 @@
                 conditional: {
                   html: fileHtml
                 },
-                checked: formValues['photoType'] == 'upload'
+                checked: photoType == 'upload'
               },
               {
                 value: "webcam",
@@ -74,7 +74,7 @@
                 hint: {
                   text: 'This should be used for all Category A prisoners.'
                 },
-                checked: formValues['photoType'] == 'withheld'
+                checked: photoType == 'withheld'
               }
             ]
           }) }}

@@ -14,11 +14,11 @@
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
     <input type="hidden" name="bodyPart" value="{{ selected }}">
 
-    <div id="body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+    <div id="body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors[0].href === '#body-part-selection' }}">
 
         <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
 
-        {% if errors.length > 0 %}
+        {% if errors[0].href === '#body-part-selection' %}
             <p id="body-part-selection-error" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span> Select a body part.
             </p>
