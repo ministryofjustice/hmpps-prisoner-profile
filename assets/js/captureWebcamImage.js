@@ -4,7 +4,9 @@ const clearImageBtn = document.getElementById('clearImageButton')
 const snapshot = document.getElementById('snapshot')
 const webcamImageFileInput = document.getElementById('webcam-image-input')
 const webcamSelect = document.getElementById('select-webcam')
+const webcamSelectFormGroup = document.getElementById('webcam-select-form-group')
 const webcamSubmit = document.getElementById('webcam-submit')
+const webcamPlaceholder = document.getElementById('webcam-placeholder')
 const prisonerNumber = document.getElementById('prisonerNumber').textContent ?? ''
 
 // Permissions
@@ -38,8 +40,14 @@ async function getWebcamList() {
         webcamSelect.appendChild(option)
       })
 
+      if (videoDevices.length < 2) {
+        webcamSelectFormGroup.style.display = 'none'
+      }
+
       if (videoDevices.length > 0) {
         startWebcam(videoDevices[0].deviceId)
+        webcamPlaceholder.style.display = 'none'
+        video.style.display = 'block'
       }
     })
   } catch (e) {
