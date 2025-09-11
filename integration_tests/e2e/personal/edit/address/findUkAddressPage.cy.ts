@@ -32,7 +32,7 @@ context('Find UK Address', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/find-uk-address`,
     editPageWithTitle: EditPage,
     editPageTitle: `Find a UK address for John Saunders`,
-    validInputs: [{ addressAutoSuggestInputs: { address: '1 The Road' } }],
+    validInputs: [{ addressAutoSuggestInputs: { 'address-input': '1 The Road' } }],
     invalidInputs: [
       {
         testDescription: 'Nothing selected',

@@ -36,8 +36,6 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByFreeTextSearchError')
       cy.request({ method: 'GET', url: '/api/addresses/find/error', failOnStatusCode: false }).then(response => {
         expect(response.status).to.eq(500)
-        expect(response.body.status).to.eq(500)
-        expect(response.body.error).to.eq('Error calling OS Places API: Internal Server Error')
       })
     })
 

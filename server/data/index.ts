@@ -1,8 +1,10 @@
+/* eslint-disable import/order */
 /*
  * Do appinsights first as it does some magic instrumentation work, i.e. it affects other 'require's
  * In particular, applicationinsights automatically collects bunyan logs
  */
 import { buildAppInsightsClient, initialiseAppInsights } from '../utils/azureAppInsights'
+import { OsPlacesApiClient } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import AllocationManagerApiClient from './allocationManagerApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import CuriousRestApiClient from './curiousApiClient'
@@ -39,11 +41,11 @@ import CsipApiRestClient from './csipApiClient'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import ReferenceDataStore from './referenceDataStore/referenceDataStore'
 import HealthAndMedicationApiRestClient from './healthAndMedicationApiRestClient'
-import OsPlacesApiRestClient from './osPlacesApiRestClient'
 import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApiRestClient'
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
+import logger from '../../logger'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -89,7 +91,7 @@ export const dataAccess = {
   csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
   healthAndMedicationApiClientBuilder: (token: string) => new HealthAndMedicationApiRestClient(token),
   telemetryClient,
-  osPlacesApiClient: new OsPlacesApiRestClient(),
+  osPlacesApiClient: new OsPlacesApiClient(logger, config.apis.osPlacesApi),
   personCommunicationNeedsApiClientBuilder: (token: string) => new PersonCommunicationNeedsApiRestClient(token),
   prisonerProfileApiClientBuilder: (token: string) => new PrisonerProfileApiRestClient(token),
   personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
