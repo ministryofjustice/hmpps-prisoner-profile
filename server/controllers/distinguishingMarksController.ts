@@ -39,6 +39,25 @@ const redirectAnchors: Record<MarkTypeSelection, string> = {
   mark: 'other-marks',
 }
 
+const photoErrorText =
+  'There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file. Try uploading the file again.'
+
+const photoErrorHtml = (linkHref: string) => `
+<a href="${linkHref}">${photoErrorText}</a><br /><br />
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      If you've tried to upload the photo more than once
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <p>
+      If there's an issue with your connection, you may need to cancel and try again later.<br /><br />
+      If you've tried the same file more than once, there might be a problem with it. You may need to take the photo again and upload the new file.
+    </p>
+  </div>
+</details>`
+
 export default class DistinguishingMarksController {
   constructor(
     private readonly distinguishingMarksService: DistinguishingMarksService,
@@ -99,30 +118,38 @@ export default class DistinguishingMarksController {
       return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${bodyPart}/detail`)
     }
 
-    const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
-      clientToken,
-      prisonerNumber,
-      verifiedMarkType,
-      bodyPartMap[bodyPart] as BodyPartSelection,
-    )
-
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
+    try {
+      const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
+        clientToken,
         prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.AddDistinguishingMark,
-        details: {
-          markId: mark.id,
-        },
-      })
-      .catch(error => logger.error(error))
+        verifiedMarkType,
+        bodyPartMap[bodyPart] as BodyPartSelection,
+      )
 
-    req.flash('flashMessage', {
-      text: updateMessages[verifiedMarkType],
-      type: FlashMessageType.success,
-      fieldName: `distinguishing-marks-${verifiedMarkType}`,
-    })
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AddDistinguishingMark,
+          details: {
+            markId: mark.id,
+          },
+        })
+        .catch(error => logger.error(error))
+
+      req.flash('flashMessage', {
+        text: updateMessages[verifiedMarkType],
+        type: FlashMessageType.success,
+        fieldName: `distinguishing-marks-${verifiedMarkType}`,
+      })
+    } catch (error) {
+      req.flash('errors', [{ text: 'There was an error please try again' }])
+      logger.error(error)
+      return res.redirect(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}?selected=${bodyPart}`,
+      )
+    }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
   }
@@ -143,7 +170,7 @@ export default class DistinguishingMarksController {
   }
 
   public async postNewDistinguishingMarkWithDetail(req: Request, res: Response) {
-    const { markType, prisonerNumber } = req.params
+    const { markType, bodyPart, prisonerNumber } = req.params
     const { specificBodyPart, action } = req.body
     const { clientToken } = req.middleware
     const files = req.files as MulterFiles
@@ -151,33 +178,46 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
-      clientToken,
-      prisonerNumber,
-      verifiedMarkType,
-      specificBodyPart as AllBodyPartSelection,
-      req.body[`description-${specificBodyPart}`],
-      files?.[`file-${specificBodyPart}`]?.[0],
-    )
-
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
+    try {
+      const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
+        clientToken,
         prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.AddDistinguishingMark,
-        details: {
-          markId: mark.id,
-          photoId: mark.photographUuids?.find(id => id.latest)?.id,
-        },
-      })
-      .catch(error => logger.error(error))
+        verifiedMarkType,
+        specificBodyPart as AllBodyPartSelection,
+        req.body[`description-${specificBodyPart}`],
+        files?.[`file-${specificBodyPart}`]?.[0],
+      )
 
-    req.flash('flashMessage', {
-      text: updateMessages[verifiedMarkType],
-      type: FlashMessageType.success,
-      fieldName: `distinguishing-marks-${verifiedMarkType}`,
-    })
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AddDistinguishingMark,
+          details: {
+            markId: mark.id,
+            photoId: mark.photographUuids?.find(id => id.latest)?.id,
+          },
+        })
+        .catch(error => logger.error(error))
+
+      req.flash('flashMessage', {
+        text: updateMessages[verifiedMarkType],
+        type: FlashMessageType.success,
+        fieldName: `distinguishing-marks-${verifiedMarkType}`,
+      })
+    } catch (error) {
+      logger.error(error)
+      const displayError = files?.[`file-${specificBodyPart}`]?.[0]
+        ? { text: photoErrorText, html: photoErrorHtml(`#file-${specificBodyPart}`), href: `#file-${specificBodyPart}` }
+        : { text: `There was an error please try again` }
+
+      req.flash('errors', [displayError])
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}/${bodyPart}/detail`,
+      )
+    }
 
     return action === 'returnToProfile'
       ? res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
@@ -501,20 +541,28 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
+    try {
+      await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
 
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
-        prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.EditDistinguishingMarkPhoto,
-        details: {
-          markId,
-          photoId,
-        },
-      })
-      .catch(error => logger.error(error))
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDistinguishingMarkPhoto,
+          details: {
+            markId,
+            photoId,
+          },
+        })
+        .catch(error => logger.error(error))
+    } catch (error) {
+      logger.error(error)
+      req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
+      return res.redirect(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo/${photoId}`,
+      )
+    }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
@@ -528,26 +576,32 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const updatedMark = await this.distinguishingMarksService.addDistinguishingMarkPhoto(
-      clientToken,
-      prisonerNumber,
-      markId,
-      file,
-    )
-    const newPhotoId = updatedMark.photographUuids?.find(photo => photo.latest)?.id
-
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
+    try {
+      const updatedMark = await this.distinguishingMarksService.addDistinguishingMarkPhoto(
+        clientToken,
         prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.AddDistinguishingMarkPhoto,
-        details: {
-          markId,
-          photoId: newPhotoId,
-        },
-      })
-      .catch(error => logger.error(error))
+        markId,
+        file,
+      )
+      const newPhotoId = updatedMark.photographUuids?.find(photo => photo.latest)?.id
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AddDistinguishingMarkPhoto,
+          details: {
+            markId,
+            photoId: newPhotoId,
+          },
+        })
+        .catch(error => logger.error(error))
+    } catch (error) {
+      logger.error(error)
+      req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo`)
+    }
 
     return action === 'addAnotherPhoto'
       ? res.redirect(

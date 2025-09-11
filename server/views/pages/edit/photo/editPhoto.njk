@@ -65,6 +65,7 @@
       <form method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/submit" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <input type="file" id="js-cropped-image-input" name="file" hidden/>
+        <input type="hidden" name="originalImgSrc" value="{{ originalImgSrc }}"/>
         {% if photoType %}
           <input type="hidden" name="photoType" value="{{ photoType }}"/>
         {% endif %}
