@@ -27,7 +27,7 @@ export default class CsraService {
     const csraAssessments = await prisonApi.getCsraAssessmentsForPrisoner(prisonerNumber)
 
     return csraAssessments
-      .filter(assessment => assessment.classificationCode && assessment.assessmentAgencyId)
+      .filter(assessment => assessment.classificationCode)
       .sort((left, right) => sortByDateTime(right.assessmentDate, left.assessmentDate))
   }
 
