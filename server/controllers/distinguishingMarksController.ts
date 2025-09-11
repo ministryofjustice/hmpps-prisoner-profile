@@ -143,8 +143,9 @@ export default class DistinguishingMarksController {
         type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
-    } catch (_error) {
+    } catch (error) {
       req.flash('errors', [{ text: 'There was an error please try again' }])
+      logger.error(error)
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}?selected=${bodyPart}`,
       )
@@ -205,12 +206,13 @@ export default class DistinguishingMarksController {
         type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
-    } catch (_error) {
-      const error = files?.[`file-${specificBodyPart}`]?.[0]
+    } catch (error) {
+      logger.error(error)
+      const displayError = files?.[`file-${specificBodyPart}`]?.[0]
         ? { text: photoErrorText, html: photoErrorHtml(`#file-${specificBodyPart}`), href: `#file-${specificBodyPart}` }
         : { text: `There was an error please try again` }
 
-      req.flash('errors', [error])
+      req.flash('errors', [displayError])
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}/${bodyPart}/detail`,
@@ -554,7 +556,8 @@ export default class DistinguishingMarksController {
           },
         })
         .catch(error => logger.error(error))
-    } catch (_error) {
+    } catch (error) {
+      logger.error(error)
       req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
       return res.redirect(
         `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo/${photoId}`,
@@ -594,7 +597,8 @@ export default class DistinguishingMarksController {
           },
         })
         .catch(error => logger.error(error))
-    } catch (_error) {
+    } catch (error) {
+      logger.error(error)
       req.flash('errors', [{ text: photoErrorText, html: photoErrorHtml('#file-upload'), href: '#file-upload' }])
       return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}/photo`)
     }

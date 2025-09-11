@@ -123,7 +123,8 @@ export default class ImageController {
 
         try {
           await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
-        } catch (_error) {
+        } catch (error) {
+          logger.error(error)
           const { originalImgSrc, photoType } = req.body
           const imgSrc = originalImgSrc || `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
@@ -202,7 +203,8 @@ export default class ImageController {
 
           try {
             await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
-          } catch (_error) {
+          } catch (error) {
+            logger.error(error)
             req.flash('errors', [{ html: photoErrorHtml(`/prisoner/${prisonerNumber}/image/new`) }])
             req.flash(
               'requestBody',
