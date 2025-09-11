@@ -49,9 +49,7 @@ export default class CsraService {
       if (filters.from && parseDate(filters.from) > csraDate) return false
       if (filters.to && parseDate(filters.to) < csraDate) return false
       if (filters.csra && !csraFilters.includes(classificationCode)) return false
-      if (filters.location && !locationFilters.includes(assessmentAgencyId)) return false
-
-      return true
+      return !(filters.location && !locationFilters.includes(assessmentAgencyId))
     })
   }
 
