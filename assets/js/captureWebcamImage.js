@@ -24,6 +24,16 @@ const mimetype = 'image/jpeg'
 
 let stream = null
 
+function updateWebcamList({ activeDeviceId }) {
+  webcamSelect.querySelectorAll('option').forEach(option => {
+    if (option.value === activeDeviceId && option.label.indexOf('- Active') === -1) {
+      option.label = `${option.label} - Active`
+    } else if (option.value !== activeDeviceId && option.label.indexOf('- Active') > -1) {
+      option.label = option.label.replace(' - Active', '')
+    }
+  })
+}
+
 async function getWebcamList() {
   // get camera permissions
   try {
@@ -48,10 +58,11 @@ async function getWebcamList() {
         startWebcam(videoDevices[0].deviceId)
         webcamPlaceholder.style.display = 'none'
         video.style.display = 'block'
+        captureBtn.disabled = false
       }
     })
   } catch (e) {
-    console.log(e)
+    console.error(e)
     if (e.name === 'NotAllowedError') {
       permissionRequested.style.display = 'none'
       permissionDenied.style.display = 'block'
@@ -79,6 +90,7 @@ async function startWebcam(deviceId) {
     video.srcObject = stream
     permissionRequested.style.display = 'none'
     permissionGranted.style.display = 'block'
+    updateWebcamList({ activeDeviceId: deviceId })
   } catch (error) {
     permissionRequested.style.display = 'none'
     webcamError.style.display = 'block'

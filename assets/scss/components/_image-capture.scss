@@ -88,20 +88,21 @@ $hmpps-webcam-capture-height: 276px;
     max-width: fit-content;
 
     video {
-      width: 221px;
-      height: 276px;
-      border: 2px solid #333;
       background: #000;
+      border: 2px solid #333;
       display: none;
+      height: 276px;
+      width: 221px;
     }
 
     &__placeholder {
-      display: flex;
-      width: 221px;
-      height: 276px;
-      background-color: #505a5f;
       align-items: center;
+      background-color: #505a5f;
+      border: 2px solid #333;
+      display: flex;
+      height: 276px;
       justify-content: center;
+      width: 221px;
     }
   }
 }
