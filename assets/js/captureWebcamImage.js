@@ -56,9 +56,6 @@ async function getWebcamList() {
 
       if (videoDevices.length > 0) {
         startWebcam(videoDevices[0].deviceId)
-        webcamPlaceholder.style.display = 'none'
-        video.style.display = 'block'
-        captureBtn.disabled = false
       }
     })
   } catch (e) {
@@ -90,6 +87,9 @@ async function startWebcam(deviceId) {
     video.srcObject = stream
     permissionRequested.style.display = 'none'
     permissionGranted.style.display = 'block'
+    webcamPlaceholder.style.display = 'none'
+    video.style.display = 'block'
+    captureBtn.disabled = false
     updateWebcamList({ activeDeviceId: deviceId })
   } catch (error) {
     permissionRequested.style.display = 'none'
