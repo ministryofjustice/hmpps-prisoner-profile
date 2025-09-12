@@ -16,6 +16,12 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 
+// Some alert codes cannot be added or made inactive via the Prisoner Profile:
+const excludedAlertCodes: string[] = [
+  'DOCGM', // OCG Nominal - Do not share
+  'DRONE', // Drone Nominal - Do not share
+]
+
 /**
  * Parse request for alerts page and orchestrate response
  */
@@ -67,7 +73,7 @@ export default class AlertsController {
 
     // Insert correct links into alerts
     const alertsList = pagedAlerts?.content.map<AlertView>((alert: Alert) => {
-      const alertUpdatable = canUpdateAlert && alert.isActive && alert.alertCode.code !== 'DOCGM'
+      const alertUpdatable = canUpdateAlert && alert.isActive && !excludedAlertCodes.includes(alert.alertCode.code)
       return {
         ...alert,
         addMoreDetailsLinkUrl: alertUpdatable
@@ -534,7 +540,7 @@ export default class AlertsController {
     existingAlertCodes?: string,
   ): { text: string; value: string }[] {
     return alertTypes
-      ?.filter(alertType => alertType.isActive && alertType.code !== 'DOCGM') // Exclude 'OCG Nominal - Do not share'
+      ?.filter(alertType => alertType.isActive && !excludedAlertCodes.includes(alertType.code))
       .map(alertType => {
         return {
           value: alertType.code,
