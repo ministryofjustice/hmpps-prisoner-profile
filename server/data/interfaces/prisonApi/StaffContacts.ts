@@ -1,4 +1,8 @@
 export default interface StaffContacts {
+  allocationPolicies: PromiseSettledResult<{
+    keyWorkerEnabled: boolean
+    personalOfficerEnabled: boolean
+  }>
   keyWorker: PromiseSettledResult<string>
   personalOfficer: PromiseSettledResult<string>
   lastSession: PromiseSettledResult<string>

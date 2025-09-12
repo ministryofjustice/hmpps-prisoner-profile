@@ -21,6 +21,14 @@
                 </p>
             {% endset %}
 
+          {% if staffContacts.allocationPolicies.status === 'fulfilled' %}
+            {% set keyWorkerEnabled = staffContacts.allocationPolicies.value.keyWorkerEnabled %}
+            {% set personalOfficerEnabled = staffContacts.allocationPolicies.value.personalOfficerEnabled %}
+          {% else %}
+            {% set keyWorkerEnabled = true %}
+            {% set personalOfficerEnabled = true %}
+          {% endif %}
+
           {% if staffContacts.keyWorker.status === 'fulfilled' %}
             {% set keyWorker = staffContacts.keyWorker.value %}
           {% else %}
@@ -69,7 +77,7 @@
                         value: {
                           text: keyWorker
                         }
-                    },
+                    } if keyWorkerEnabled else null,
                     {
                         key: {
                             text: "Personal officer"
@@ -77,15 +85,15 @@
                         value: {
                             text: personalOfficer
                         }
-                    },
+                    } if personalOfficerEnabled else null,
                     {
                         key: {
-                            text: "Last key worker or personal officer session"
+                            text: "Last key worker or personal officer session" if keyWorkerEnabled and personalOfficerEnabled else ("Last key worker session" if keyWorkerEnabled else "Last personal officer session")
                         },
                         value: {
                             text: lastSession
                         }
-                    },
+                    } if keyWorkerEnabled or personalOfficerEnabled else null,
                     {
                         key: {
                             text: "Prison offender manager"
@@ -124,7 +132,7 @@
                             text: resettlementWorker
                         }
                     }
-                ] | summaryListOneHalfWidth
+                ] | removeNullish | summaryListOneHalfWidth
             }) }}
         </div>
     </div>
