@@ -142,6 +142,7 @@ export default function nunjucksSetup(app: express.Express): void {
   njkEnv.addFilter('findError', findError)
   njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
   njkEnv.addFilter('containsSelected', (items: { selected: boolean }[]) => items && items.some(item => item.selected))
+  njkEnv.addFilter('removeNullish', arr => arr.filter((o: unknown) => o !== undefined && o !== null))
 
   njkEnv.addFilter(
     'setSelected',

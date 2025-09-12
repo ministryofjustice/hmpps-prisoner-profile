@@ -591,6 +591,7 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'fulfilled', value: { keyWorkerEnabled: true, personalOfficerEnabled: true } },
         keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
         personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
         lastSession: { status: 'fulfilled', value: '24/06/2025' },
@@ -634,6 +635,7 @@ describe('professionalContactsService', () => {
       })
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'fulfilled', value: { keyWorkerEnabled: true, personalOfficerEnabled: true } },
         keyWorker: { status: 'fulfilled', value: 'None - high complexity of need' },
         personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
         lastSession: { status: 'fulfilled', value: 'No previous session' },
@@ -649,6 +651,7 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'fulfilled', value: { keyWorkerEnabled: true, personalOfficerEnabled: true } },
         keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
         personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
         lastSession: { status: 'fulfilled', value: '24/06/2025' },
@@ -665,6 +668,7 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'rejected', reason: 'Some error' },
         keyWorker: { status: 'rejected', reason: 'Some error' },
         personalOfficer: { status: 'rejected', reason: 'Some error' },
         lastSession: { status: 'rejected', reason: 'Some error' },
@@ -680,6 +684,7 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'fulfilled', value: { keyWorkerEnabled: true, personalOfficerEnabled: true } },
         keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
         personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
         lastSession: { status: 'fulfilled', value: '24/06/2025' },
@@ -695,6 +700,7 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
+        allocationPolicies: { status: 'fulfilled', value: { keyWorkerEnabled: true, personalOfficerEnabled: true } },
         keyWorker: { status: 'fulfilled', value: 'New Key-Worker' },
         personalOfficer: { status: 'fulfilled', value: 'New Personal-Officer' },
         lastSession: { status: 'fulfilled', value: '24/06/2025' },
