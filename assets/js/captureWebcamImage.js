@@ -4,7 +4,9 @@ const clearImageBtn = document.getElementById('clearImageButton')
 const snapshot = document.getElementById('snapshot')
 const webcamImageFileInput = document.getElementById('webcam-image-input')
 const webcamSelect = document.getElementById('select-webcam')
+const webcamSelectFormGroup = document.getElementById('webcam-select-form-group')
 const webcamSubmit = document.getElementById('webcam-submit')
+const webcamPlaceholder = document.getElementById('webcam-placeholder')
 const prisonerNumber = document.getElementById('prisonerNumber').textContent ?? ''
 
 // Permissions
@@ -22,6 +24,16 @@ const mimetype = 'image/jpeg'
 
 let stream = null
 
+function updateWebcamList({ activeDeviceId }) {
+  webcamSelect.querySelectorAll('option').forEach(option => {
+    if (option.value === activeDeviceId && option.label.indexOf('- Active') === -1) {
+      option.label = `${option.label} - Active`
+    } else if (option.value !== activeDeviceId && option.label.indexOf('- Active') > -1) {
+      option.label = option.label.replace(' - Active', '')
+    }
+  })
+}
+
 async function getWebcamList() {
   // get camera permissions
   try {
@@ -38,12 +50,16 @@ async function getWebcamList() {
         webcamSelect.appendChild(option)
       })
 
+      if (videoDevices.length < 2) {
+        webcamSelectFormGroup.style.display = 'none'
+      }
+
       if (videoDevices.length > 0) {
         startWebcam(videoDevices[0].deviceId)
       }
     })
   } catch (e) {
-    console.log(e)
+    console.error(e)
     if (e.name === 'NotAllowedError') {
       permissionRequested.style.display = 'none'
       permissionDenied.style.display = 'block'
@@ -71,6 +87,10 @@ async function startWebcam(deviceId) {
     video.srcObject = stream
     permissionRequested.style.display = 'none'
     permissionGranted.style.display = 'block'
+    webcamPlaceholder.style.display = 'none'
+    video.style.display = 'block'
+    captureBtn.disabled = false
+    updateWebcamList({ activeDeviceId: deviceId })
   } catch (error) {
     permissionRequested.style.display = 'none'
     webcamError.style.display = 'block'
