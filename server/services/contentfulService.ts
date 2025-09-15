@@ -1,10 +1,10 @@
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
-import { ApolloClient, gql } from '@apollo/client/core'
-import { BannerApollo } from '../data/interfaces/contentfulApi/bannerApollo'
+import { ApolloClient, gql, TypedDocumentNode } from '@apollo/client'
+import { BannerQuery, BannerQueryVariables } from '../data/interfaces/contentfulApi/bannerApollo'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class ContentfulService {
-  constructor(private readonly apolloClient: ApolloClient<unknown>) {}
+  constructor(private readonly apolloClient: ApolloClient) {}
 
   /**
    * Get `banner` entry.
@@ -16,7 +16,7 @@ export default class ContentfulService {
       ? { OR: [{ prisons_exists: false }, { prisons_contains_some: activeCaseLoadId }] }
       : { prisons_exists: false }
 
-    const getBannerQuery = gql`
+    const getBannerQuery: TypedDocumentNode<BannerQuery, BannerQueryVariables> = gql`
       query Banner($condition: BannerFilter!) {
         bannerCollection(limit: 1, order: sys_publishedAt_DESC, where: $condition) {
           items {
@@ -40,7 +40,7 @@ export default class ContentfulService {
       return undefined
     }
 
-    return items.map((banner: BannerApollo) => ({
+    return items.map(banner => ({
       ...banner,
       text: documentToHtmlString(banner.text.json),
     }))[0]?.text
