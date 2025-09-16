@@ -1,11 +1,7 @@
+import { OsAddress, OsPlacesAddressService } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Address from '../data/interfaces/prisonApi/Address'
-import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
-import { OsPlacesApiClient } from '../data/interfaces/osPlacesApi/osPlacesApiClient'
-import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryResponse'
-import OsPlacesDeliveryPointAddress from '../data/interfaces/osPlacesApi/osPlacesDeliveryPointAddress'
-import { convertToTitleCase } from '../utils/utils'
 import ReferenceDataService from './referenceData/referenceDataService'
 import AddressMapper, { AddressLocation } from './mappers/addressMapper'
 import {
@@ -21,9 +17,7 @@ import MetricsService from './metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { AddressForDisplay } from './interfaces/personalPageService/PersonalPage'
 import { transformPhones } from '../utils/transformPhones'
-import logger from '../../logger'
 
-const stringContainingPostCodeRegex = /^(.*?)([A-Z]{1,2}\d[A-Z\d]? ?)(\d[A-Z]{2})(.*)$/i
 const numericStringRegex = /^[0-9]+$/i
 const buildingNumberAtEndOfStringRegex = /^(.*?),? ([0-9]+)$/i
 
@@ -33,9 +27,9 @@ export default class AddressService {
   constructor(
     private readonly metricsService: MetricsService,
     private readonly referenceDataService: ReferenceDataService,
+    private readonly osPlacesAddressService: OsPlacesAddressService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
-    private readonly osPlacesApiClient: OsPlacesApiClient,
   ) {
     this.addressMapper = new AddressMapper(referenceDataService)
   }
@@ -123,20 +117,15 @@ export default class AddressService {
   }
 
   public async getAddressesMatchingQuery(searchQuery: string, sanitisePostcode: boolean = true): Promise<OsAddress[]> {
-    const response = await this.osPlacesApiClient.getAddressesByFreeTextQuery(
-      sanitisePostcode ? this.sanitisePostcode(searchQuery, AddressLocation.uk) : searchQuery,
-    )
-    return this.handleResponse(response)
+    return this.osPlacesAddressService.getAddressesMatchingQuery(searchQuery, sanitisePostcode)
   }
 
   public async getAddressByUprn(uprn: string, token: string): Promise<AddressRequestDto> {
-    const response = await this.osPlacesApiClient.getAddressesByUprn(uprn)
-    const result = this.handleResponse(response)
+    const result = await this.osPlacesAddressService.getAddressByUprn(uprn)
 
-    if (result.length === 0) throw new NotFoundError('Could not find address by UPRN')
-    if (result.length > 1) logger.info(`Multiple results returned for UPRN`)
+    if (!result) throw new NotFoundError('Could not find address by UPRN')
 
-    return this.addressMapper.toAddressRequestDto(result[result.length - 1], token)
+    return this.addressMapper.toAddressRequestDto(result, token)
   }
 
   public async getCityCode(code: string, token: string): Promise<ReferenceDataCodeDto> {
@@ -175,55 +164,8 @@ export default class AddressService {
 
   public sanitisePostcode(stringContainingPostcode: string, addressLocation: AddressLocation) {
     if (addressLocation !== AddressLocation.overseas) {
-      const postCodeQuery = stringContainingPostCodeRegex.exec(stringContainingPostcode?.replace(/[^A-Z0-9 ]/gi, ''))
-      if (!postCodeQuery) return stringContainingPostcode
-
-      return `${postCodeQuery[1]}${postCodeQuery[2].toUpperCase().trim()} ${postCodeQuery[3].toUpperCase().trim()}${postCodeQuery[4]}`
+      return this.osPlacesAddressService.sanitiseUkPostcode(stringContainingPostcode)
     }
     return stringContainingPostcode?.trim()?.toUpperCase() ?? stringContainingPostcode
-  }
-
-  private handleResponse(response: OsPlacesQueryResponse): OsAddress[] {
-    if (response.header && response.header.totalresults === 0) return []
-
-    return response.results.map(result => this.toOsAddress(result.DPA))
-  }
-
-  private toOsAddress(addressResult: OsPlacesDeliveryPointAddress): OsAddress {
-    const {
-      UPRN,
-      DEPENDENT_LOCALITY,
-      SUB_BUILDING_NAME,
-      BUILDING_NAME,
-      BUILDING_NUMBER,
-      THOROUGHFARE_NAME,
-      POST_TOWN,
-      POSTCODE,
-      COUNTRY_CODE,
-      LOCAL_CUSTODIAN_CODE_DESCRIPTION,
-    } = addressResult
-
-    return {
-      addressString: this.formatAddressString(addressResult),
-      buildingNumber: BUILDING_NUMBER,
-      buildingName: convertToTitleCase(BUILDING_NAME),
-      subBuildingName: convertToTitleCase(SUB_BUILDING_NAME),
-      thoroughfareName: convertToTitleCase(THOROUGHFARE_NAME),
-      dependentLocality: convertToTitleCase(DEPENDENT_LOCALITY),
-      postTown: convertToTitleCase(POST_TOWN),
-      county: convertToTitleCase(LOCAL_CUSTODIAN_CODE_DESCRIPTION),
-      postcode: POSTCODE,
-      country: COUNTRY_CODE,
-      uprn: UPRN,
-    }
-  }
-
-  private formatAddressString(addressResult: OsPlacesDeliveryPointAddress) {
-    const { ADDRESS, BUILDING_NUMBER, THOROUGHFARE_NAME, POSTCODE } = addressResult
-    const withoutPostcode = ADDRESS.replace(`, ${POSTCODE}`, '').replace(
-      `${BUILDING_NUMBER}, ${THOROUGHFARE_NAME}`,
-      `${BUILDING_NUMBER} ${THOROUGHFARE_NAME}`,
-    )
-    return `${convertToTitleCase(withoutPostcode)}, ${POSTCODE}`
   }
 }

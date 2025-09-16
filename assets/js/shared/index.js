@@ -1,7 +1,7 @@
 import * as govukFrontend from 'govuk-frontend'
 import * as mojFrontend from '@ministryofjustice/frontend'
+import * as connectDps from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/js/all'
 
-import { addressLookup } from './addressLookup'
 import { addAnotherButton } from './addAnotherButton'
 import { alertDynamicDropdowns } from './alertDynamicDropdowns'
 import { alertFlags } from './alertFlags'
@@ -14,7 +14,6 @@ import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
 
 document.addEventListener('DOMContentLoaded', function () {
-  addressLookup()
   addAnotherButton()
   alertDynamicDropdowns()
   alertFlags()
@@ -29,3 +28,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 govukFrontend.initAll()
 mojFrontend.initAll()
+connectDps.initAll()
