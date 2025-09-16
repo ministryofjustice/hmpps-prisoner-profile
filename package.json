@@ -108,7 +108,7 @@
     "connect-redis": "^9.0.0",
     "contentful": "^11.7.18",
     "cropperjs": "^2.0.1",
-    "csurf": "^1.11.0",
+    "csrf-sync": "^4.2.1",
     "date-fns": "^3.6.0",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
@@ -138,7 +138,6 @@
     "@types/compression": "^1.8.1",
     "@types/connect-flash": "0.0.40",
     "@types/cookie-session": "^2.0.49",
-    "@types/csurf": "^1.11.5",
     "@types/express-session": "^1.18.2",
     "@types/http-errors": "^2.0.5",
     "@types/jest": "^30.0.0",
@@ -181,9 +180,6 @@
     "uuid": "^11.1.0"
   },
   "overrides": {
-    "csurf": {
-      "cookie": "0.7.2"
-    },
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
     },
