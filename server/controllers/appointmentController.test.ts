@@ -233,8 +233,6 @@ describe('Appointment Controller', () => {
     })
   })
 
-  // Check when BVLS feature toggle is removed - blvsMasterPublicPrivateNotesEnabled
-
   it('should display add appointment with data prepopulated when editing a VLB', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
@@ -280,8 +278,6 @@ describe('Appointment Controller', () => {
       errors: undefined,
     })
   })
-
-  // Check when BVLS feature toggle is removed - blvsMasterPublicPrivateNotesEnabled
 
   it('should display add appointment with data prepopulated when editing a VLPM', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
