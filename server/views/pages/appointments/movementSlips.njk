@@ -31,11 +31,14 @@
             {{ labelAndValue('Moving to', location) }}
             {{ labelAndValue('Reason', appointmentType) }}
 
-            {# BVLS appointments show the notes for prisoners if enabled, otherwise suppress the comments #}
-            {% if (appointmentTypeCode == 'VLB' or appointmentTypeCode == 'VLPM') %}
+            {% if (appointmentTypeCode in ['VLB', 'VLPM']) %}
+                {# BVLS appointments show only the notes for prisoners on movement slips #}
                 {{ labelAndValue('Comments', notesForPrisoners, true) }}
+            {% elif appointmentTypeCode in ['VLOO', 'VLLA', 'VLAP', 'VLPA'] %}
+              {# Non-BVLS video appointments suppress comments from movement slips #}
+              {{ labelAndValue('Comments', '', true) }}
             {% else %}
-                {# All other appointment types show the comment from the appointment #}
+                {# All other appointment types show the comments on movement slips #}
                 {{ labelAndValue('Comments', comment, true) }}
             {% endif %}
         </div>
