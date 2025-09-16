@@ -47,6 +47,16 @@ export const staffAllocationMock: StaffAllocation = {
       occurredAt: '2025-06-24T12:00:00',
     },
   ],
+  policies: [
+    {
+      policy: 'KEY_WORKER',
+      enabled: true,
+    },
+    {
+      policy: 'PERSONAL_OFFICER',
+      enabled: true,
+    },
+  ],
 }
 
 export default {

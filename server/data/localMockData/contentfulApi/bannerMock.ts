@@ -1,7 +1,7 @@
 import { Document } from '@contentful/rich-text-types'
 import { BannerApollo } from '../../interfaces/contentfulApi/bannerApollo'
 
-export const bannerApolloMock: BannerApollo[] = [
+const bannerApolloMock: BannerApollo[] = [
   {
     text: {
       json: {
@@ -14,8 +14,9 @@ export const bannerApolloMock: BannerApollo[] = [
           },
         ],
         nodeType: 'document',
-      } as unknown as Document,
+      } as Document,
     },
+    prisons: [],
   },
 ]
 
