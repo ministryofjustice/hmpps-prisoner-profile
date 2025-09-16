@@ -44,12 +44,11 @@ export default class AddressService {
     return this.personIntegrationApiClientBuilder(token).getAddresses(prisonerNumber)
   }
 
-  async getAddressesForDisplay(token: string, prisonerNumber: string): Promise<AddressForDisplay[]> {
-    const [addresses, phoneTypes] = await Promise.all([
-      this.getAddresses(token, prisonerNumber),
-      this.referenceDataService.getActiveReferenceDataCodes(CorePersonRecordReferenceDataDomain.phoneTypes, token),
-    ])
-
+  async transformAddresses(token: string, addresses: AddressResponseDto[]): Promise<AddressForDisplay[]> {
+    const phoneTypes = await this.referenceDataService.getActiveReferenceDataCodes(
+      CorePersonRecordReferenceDataDomain.phoneTypes,
+      token,
+    )
     return (
       addresses
         ?.map(address => {
@@ -69,6 +68,11 @@ export default class AddressService {
         ?.filter(address => !address.toDate || new Date(address.toDate) > new Date())
         .sort(a => (a.primaryAddress ? -1 : 1)) || []
     )
+  }
+
+  async getAddressesForDisplay(token: string, prisonerNumber: string): Promise<AddressForDisplay[]> {
+    const addresses = await this.getAddresses(token, prisonerNumber)
+    return this.transformAddresses(token, addresses)
   }
 
   private getBuildingNumberForDisplay(buildingNumber: string, buildingName: string) {

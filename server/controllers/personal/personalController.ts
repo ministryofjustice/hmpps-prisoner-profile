@@ -98,6 +98,7 @@ export default class PersonalController {
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(
+          // this is the method which has the calls in it
           clientToken,
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),

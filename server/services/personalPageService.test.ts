@@ -22,6 +22,7 @@ import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import {
   PersonIntegrationApiClient,
+  PrisonerProfileSummary,
   PseudonymResponseDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import ReferenceDataService from './referenceData/referenceDataService'
@@ -72,6 +73,16 @@ import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
+
+const prisonerSummaryMock = (overrides: Partial<PrisonerProfileSummary> = {}): PrisonerProfileSummary => ({
+  pseudonyms: [],
+  addresses: [],
+  contacts: [],
+  militaryRecords: [],
+  physicalAttributes: {},
+  distinguishingMarks: [],
+  ...overrides,
+})
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -146,6 +157,7 @@ describe('PersonalPageService', () => {
       null,
     ) as jest.Mocked<GlobalPhoneNumberAndEmailAddressesService>
     globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber = jest.fn(async () => globalPhonesAndEmailsMock)
+    globalPhoneNumberAndEmailAddressesService.transformContacts = jest.fn(async () => globalPhonesAndEmailsMock)
 
     addressService = addressServiceMock() as AddressService
   })
@@ -202,67 +214,78 @@ describe('PersonalPageService', () => {
 
     describe('Aliases', () => {
       describe('Aliases from Person Integration API', () => {
-        const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
+        const getResponseWithPseudonyms = async (
+          pseudonyms: PseudonymResponseDto[],
+          personEndpointsEnabled: boolean,
+        ) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
+          personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () =>
+            prisonerSummaryMock({ pseudonyms }),
+          )
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, true, null)
+          return service.get('token', PrisonerMockDataA, false, false, true, null, personEndpointsEnabled)
         }
-
-        it('Handles no pseudonyms', async () => {
-          const response = await getResponseWithPseudonyms([])
-          expect(response.personalDetails.aliases).toEqual([])
-        })
-
-        it('Handles only working name pseudonym', async () => {
-          const response = await getResponseWithPseudonyms([
-            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
-          ])
-          expect(response.personalDetails.aliases).toEqual([])
-        })
-
-        it('Maps multiple pseudonyms', async () => {
-          const male = { description: 'Male' } as ReferenceDataValue
-          const female = { description: 'Female' } as ReferenceDataValue
-
-          const response = await getResponseWithPseudonyms([
-            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
-            {
-              dateOfBirth: '2022-01-01',
-              firstName: 'First name',
-              lastName: 'Last name',
-              sex: male,
-            } as PseudonymResponseDto,
-            {
-              dateOfBirth: '2023-01-01',
-              firstName: 'First',
-              middleName1: 'Middleone',
-              lastName: 'Last',
-              sex: female,
-            } as PseudonymResponseDto,
-            {
-              dateOfBirth: '2023-01-01',
-              firstName: 'First',
-              middleName1: 'Middleone',
-              middleName2: 'Middletwo',
-              lastName: 'Last',
-              sex: female,
-            } as PseudonymResponseDto,
-          ])
-
-          expect(response.personalDetails.aliases[0]).toEqual({
-            alias: 'First Name Last Name',
-            dateOfBirth: '01/01/2022',
-            sex: 'Male',
+        describe.each([false, true])('personEndpointsEnabled=%s', personEndpointsEnabled => {
+          it('Handles no pseudonyms', async () => {
+            const response = await getResponseWithPseudonyms([], personEndpointsEnabled)
+            expect(response.personalDetails.aliases).toEqual([])
           })
-          expect(response.personalDetails.aliases[1]).toEqual({
-            alias: 'First Middleone Last',
-            dateOfBirth: '01/01/2023',
-            sex: 'Female',
+
+          it('Handles only working name pseudonym', async () => {
+            const response = await getResponseWithPseudonyms(
+              [{ firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto],
+              personEndpointsEnabled,
+            )
+            expect(response.personalDetails.aliases).toEqual([])
           })
-          expect(response.personalDetails.aliases[2]).toEqual({
-            alias: 'First Middleone Middletwo Last',
-            dateOfBirth: '01/01/2023',
-            sex: 'Female',
+
+          it('Maps multiple pseudonyms', async () => {
+            const male = { description: 'Male' } as ReferenceDataValue
+            const female = { description: 'Female' } as ReferenceDataValue
+
+            const response = await getResponseWithPseudonyms(
+              [
+                { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
+                {
+                  dateOfBirth: '2022-01-01',
+                  firstName: 'First name',
+                  lastName: 'Last name',
+                  sex: male,
+                } as PseudonymResponseDto,
+                {
+                  dateOfBirth: '2023-01-01',
+                  firstName: 'First',
+                  middleName1: 'Middleone',
+                  lastName: 'Last',
+                  sex: female,
+                } as PseudonymResponseDto,
+                {
+                  dateOfBirth: '2023-01-01',
+                  firstName: 'First',
+                  middleName1: 'Middleone',
+                  middleName2: 'Middletwo',
+                  lastName: 'Last',
+                  sex: female,
+                } as PseudonymResponseDto,
+              ],
+              personEndpointsEnabled,
+            )
+
+            expect(response.personalDetails.aliases[0]).toEqual({
+              alias: 'First Name Last Name',
+              dateOfBirth: '01/01/2022',
+              sex: 'Male',
+            })
+            expect(response.personalDetails.aliases[1]).toEqual({
+              alias: 'First Middleone Last',
+              dateOfBirth: '01/01/2023',
+              sex: 'Female',
+            })
+            expect(response.personalDetails.aliases[2]).toEqual({
+              alias: 'First Middleone Middletwo Last',
+              dateOfBirth: '01/01/2023',
+              sex: 'Female',
+            })
           })
         })
       })
@@ -1122,10 +1145,15 @@ describe('PersonalPageService', () => {
   describe('Phone numbers and email addresses', () => {
     describe('Get', () => {
       describe('Edit profile enabled', () => {
-        it('Gets the phones and emails from the service', async () => {
-          const service = constructService()
-          const result = await service.get('token', PrisonerMockDataA, true, true)
-          expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
+        describe.each([false, true])('personEndpointsEnabled=%s', personEndpointsEnabled => {
+          it('Gets the phones and emails from the service', async () => {
+            const service = constructService()
+            personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () =>
+              prisonerSummaryMock({ contacts: [] }),
+            )
+            const result = await service.get('token', PrisonerMockDataA, true, true, null, null, personEndpointsEnabled)
+            expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
+          })
         })
       })
       describe('Edit profile disabled', () => {

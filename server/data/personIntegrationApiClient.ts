@@ -14,6 +14,7 @@ import {
   MilitaryRecord,
   PersonIntegrationApiClient,
   PersonIntegrationDistinguishingMark,
+  PrisonerProfileSummary,
   PseudonymRequestDto,
   PseudonymResponseDto,
   UpdateIdentifierRequestDto,
@@ -25,6 +26,10 @@ import { handleNomisLockedError } from '../utils/nomisLockedError'
 export default class PersonIntegrationApiRestClient extends RestClient implements PersonIntegrationApiClient {
   constructor(token: string) {
     super('Person Integration API', config.apis.personIntegrationApi, token)
+  }
+
+  getPrisonerProfileSummary(prisonerNumber: string): Promise<PrisonerProfileSummary> {
+    return this.get<PrisonerProfileSummary>({ path: `/v2/person/${prisonerNumber}` }, this.token)
   }
 
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void> {
