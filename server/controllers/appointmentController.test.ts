@@ -233,7 +233,7 @@ describe('Appointment Controller', () => {
     })
   })
 
-  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+  // Check when BVLS feature toggle is removed - blvsMasterPublicPrivateNotesEnabled
 
   it('should display add appointment with data prepopulated when editing a VLB', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
@@ -281,7 +281,7 @@ describe('Appointment Controller', () => {
     })
   })
 
-  // Check when BVLS feature toggles are removed - blvsMasterPublicPrivateNotesEnabled and blvsHmctsLinkGuestPinEnabled
+  // Check when BVLS feature toggle is removed - blvsMasterPublicPrivateNotesEnabled
 
   it('should display add appointment with data prepopulated when editing a VLPM', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1

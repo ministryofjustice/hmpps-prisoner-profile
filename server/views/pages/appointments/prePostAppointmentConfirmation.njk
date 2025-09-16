@@ -180,17 +180,9 @@
                                 text: "Court hearing link"
                             },
                             value: {
-                                text: videoLinkUrl or "Not yet known"
+                                text: formatCvpLink(hmctsNumber, videoLinkUrl)
                             }
-                        } if not bvlsHmctsLinkGuestPinEnabled(),
-                        {
-                            key: {
-                                text: "Court hearing link"
-                            },
-                            value: {
-                                text: formatCvpLink(hmctsNumber, videoLinkUrl, bvlsHmctsLinkGuestPinEnabled())
-                            }
-                        } if bvlsHmctsLinkGuestPinEnabled(),
+                        },
                         {
                             key: {
                                 text: "Guest pin"
@@ -198,7 +190,7 @@
                             value: {
                                 text: guestPin or "None entered"
                             }
-                        } if bvlsHmctsLinkGuestPinEnabled()
+                        }
                     ]
                 }) }}
 

@@ -1,8 +1,8 @@
-{# Macro to format the BVLS appointment CVP link for court hearings based on known information and the feature switch value #}
+{# Macro to format the BVLS appointment CVP link for court hearings based on known information #}
 
-{% macro formatCvpLink(hmctsNumber, videoLinkUrl, feature) %}
+{% macro formatCvpLink(hmctsNumber, videoLinkUrl) %}
     {% set cvpLinkUrl %}
-        {% if feature and hmctsNumber %}
+        {% if hmctsNumber %}
             {{ (hmctsNumber | toFullCourtLink) }}
         {% elseif videoLinkUrl %}
             {{ videoLinkUrl }}
