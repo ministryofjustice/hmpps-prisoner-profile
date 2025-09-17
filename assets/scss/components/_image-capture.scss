@@ -2,10 +2,24 @@ $hmpps-webcam-capture-width: 221px;
 $hmpps-webcam-capture-height: 276px;
 
 .hmpps-webcam-capture-photo-container {
-  border: 1px solid $govuk-border-colour;
   width: 100%;
   @include govuk-responsive-padding(2);
   @include govuk-responsive-margin(6, 'bottom');
+
+  &__with-border {
+    border: 1px solid $govuk-border-colour;
+  }
+
+  &__error {
+    border: 5px solid rgb(235, 97, 28);
+
+    .hmpps-webcam-error-icon {
+      display: block;
+      width: 1.875rem;
+      height: 1.875rem;
+      color: rgb(235, 97, 28);
+    }
+  }
 
   &__content {
     display: flex;
@@ -25,6 +39,8 @@ $hmpps-webcam-capture-height: 276px;
 
   &__description {
     @include govuk-responsive-padding(2, 'top');
+    display: flex;
+    gap: 10px;
     margin-left: 24px;
     min-width: 0;
 
@@ -112,5 +128,9 @@ $hmpps-webcam-capture-height: 276px;
 }
 
 #rotate-button-group {
+  display: none;
+}
+
+#photo-capture-container__error {
   display: none;
 }
