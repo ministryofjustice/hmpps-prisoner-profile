@@ -117,7 +117,7 @@
     "http-errors": "^2.0.0",
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
-    "libphonenumber-js": "^1.12.13",
+    "libphonenumber-js": "^1.12.17",
     "multer": "^2.0.2",
     "nocache": "^4.0.0",
     "nunjucks": "^3.2.4",
