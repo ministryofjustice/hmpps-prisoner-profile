@@ -1,8 +1,7 @@
 import { Readable } from 'stream'
-import { RestClient } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
 import CaseLoad from './interfaces/prisonApi/CaseLoad'
-import { TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
+import { PrisonApiClient, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
 import AccountBalances from './interfaces/prisonApi/AccountBalances'
 import VisitSummary from './interfaces/prisonApi/VisitSummary'
 import VisitBalances from './interfaces/prisonApi/VisitBalances'
@@ -52,27 +51,11 @@ import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
 import ImageDetails from './interfaces/prisonApi/ImageDetails'
-import logger from '../../logger'
+import RestClient from './restClient'
 
-export default class PrisonApiRestClient extends RestClient {
-  private readonly token: string
-
+export default class PrisonApiRestClient extends RestClient implements PrisonApiClient {
   constructor(token: string) {
-    super('Prison API', config.apis.prisonApi, logger)
-    this.token = token
-  }
-
-  async getAndIgnore404<T>(options: Parameters<typeof this.get>[0]): Promise<T> {
-    return this.get<T>(
-      {
-        ...options,
-        errorHandler: (_path, _method, error): null => {
-          if (error.responseStatus === 404) return null
-          throw error
-        },
-      },
-      this.token,
-    )
+    super('Prison API', config.apis.prisonApi, token)
   }
 
   async getOffenderAttendanceHistory(

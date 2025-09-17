@@ -1,7 +1,8 @@
 import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
 import { Readable } from 'stream'
-import logger from '../../logger'
+import appConfig from '../config'
+import logger, { warnLevelLogger } from '../../logger'
 
 interface ErrorHandler<Response, ErrorData> {
   (path: string, method: string, error: SanitisedError<ErrorData>): Response
@@ -52,7 +53,9 @@ export default class RestClient extends HmppsRestClient {
     protected readonly config: ApiConfig,
     protected readonly token: string,
   ) {
-    super(name, config, logger)
+    // only log warn level and above in production for API clients to reduce app insights usage
+    // (dependencies are separately tracked):
+    super(name, config, appConfig.production ? warnLevelLogger : logger)
   }
 
   // Overridden get function to enforce use of token
