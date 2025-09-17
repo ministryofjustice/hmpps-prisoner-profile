@@ -27,8 +27,10 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import ReferenceDataService from './referenceData/referenceDataService'
 import {
+  createPrisonerProfileSummary,
   EnglandCountryReferenceDataCodeMock,
   MilitaryRecordsMock,
+  PrisonerProfileSummaryMock,
   ReligionReferenceDataCodesMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import {
@@ -73,16 +75,6 @@ import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
-
-const prisonerSummaryMock = (overrides: Partial<PrisonerProfileSummary> = {}): PrisonerProfileSummary => ({
-  pseudonyms: [],
-  addresses: [],
-  contacts: [],
-  militaryRecords: [],
-  physicalAttributes: {},
-  distinguishingMarks: [],
-  ...overrides,
-})
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -220,7 +212,7 @@ describe('PersonalPageService', () => {
         ) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () =>
-            prisonerSummaryMock({ pseudonyms }),
+            createPrisonerProfileSummary({ pseudonyms }),
           )
           const service = constructService()
           return service.get('token', PrisonerMockDataA, false, false, true, null, personEndpointsEnabled)
@@ -1148,9 +1140,7 @@ describe('PersonalPageService', () => {
         describe.each([false, true])('personEndpointsEnabled=%s', personEndpointsEnabled => {
           it('Gets the phones and emails from the service', async () => {
             const service = constructService()
-            personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () =>
-              prisonerSummaryMock({ contacts: [] }),
-            )
+            personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () => PrisonerProfileSummaryMock)
             const result = await service.get('token', PrisonerMockDataA, true, true, null, null, personEndpointsEnabled)
             expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
           })

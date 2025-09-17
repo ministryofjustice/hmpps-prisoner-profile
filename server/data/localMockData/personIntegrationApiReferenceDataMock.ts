@@ -548,3 +548,12 @@ export const PrisonerProfileSummaryMock: PrisonerProfileSummary = {
   physicalAttributes: corePersonPhysicalAttributesMock,
   distinguishingMarks: DistinguishingMarksMock,
 }
+
+export const createPrisonerProfileSummary = (overrides?: Partial<PrisonerProfileSummary>): PrisonerProfileSummary => ({
+  pseudonyms: overrides?.pseudonyms ?? PrisonerProfileSummaryMock.pseudonyms,
+  addresses: overrides?.addresses ?? PrisonerProfileSummaryMock.addresses,
+  contacts: overrides?.contacts ?? PrisonerProfileSummaryMock.contacts,
+  militaryRecords: overrides?.militaryRecords ?? PrisonerProfileSummaryMock.militaryRecords,
+  physicalAttributes: overrides?.physicalAttributes ?? PrisonerProfileSummaryMock.physicalAttributes,
+  distinguishingMarks: overrides?.distinguishingMarks ?? PrisonerProfileSummaryMock.distinguishingMarks,
+})
