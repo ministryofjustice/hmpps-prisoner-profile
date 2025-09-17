@@ -21,7 +21,7 @@
     "test:ci": "jest --runInBand",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run",
-    "int-test-ui": "cypress open --browser chrome",
+    "int-test-ui": "cypress open --e2e --browser chrome",
     "integration-test-1": "cypress run --spec \"**/personal/edit/**/*.cy.ts\"",
     "integration-test-2": "cypress run --spec \"**/personal/editDistinguishingMarks/**/*.cy.ts\"",
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
