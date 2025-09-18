@@ -37,7 +37,7 @@
 {% endset -%}
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Religion, faith or belief</h1>
-  {% if currentReligion %}
+  {% if currentReligion and currentReligion.code %}
     {{ govukInsetText({
       id: "current-religion-display",
       html: currentReligionHtml,
@@ -49,9 +49,9 @@
     <input type="hidden" name="currentReligionCode" value="{{ currentReligion.code }}"/>
     <div class="govuk-form-group">
       {{ govukRadios({
-        idPrefix: "radio",
         name: "religion",
         errorMessage: errors | findError("religion"),
+        attributes: { "data-qa": "religion-value-input" },
         fieldset: {
           classes: "religion-radio-fieldset",
           legend: {
@@ -66,11 +66,11 @@
         items: options
       }) }}
     </div>
-    {% if currentReligion %}
+    {% if currentReligion and currentReligion.code %}
       {{ govukRadios({
-        idPrefix: "radio-yes-no",
         name: "reasonKnown",
         errorMessage: errors | findError("reasonKnown"),
+        attributes: { "data-qa": "change-reason-input" },
         fieldset: {
           id: "reasonRadioFieldset",
           legend: {
@@ -99,7 +99,8 @@
         ]
       }) }}
       {{ govukWarningText({
-        text: "This will record a new religion, faith or belief. The current religion, faith or belief will be made inactive."
+        text: "This will record a new religion, faith or belief. The current religion, faith or belief will be made inactive.",
+        attributes: { "data-qa": "religion-update-warning" }
       }) }}
     {% endif %}
     <div class="govuk-button-group">
