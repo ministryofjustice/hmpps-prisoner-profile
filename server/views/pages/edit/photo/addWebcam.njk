@@ -10,6 +10,11 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% set retakePhotoHtml %}
+<div class="hmpps-webcam-button-text">
+  Retake
+</div>
+{% endset %}
 {% set takePhotoHtml %}
 <div class="hmpps-webcam-button-text">
   <img src="/assets/images/imageEditing/camera.svg" role="presentation" alt=""/> Take photo
@@ -39,7 +44,7 @@
         </div>
         <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
           {{ govukButton({
-                  text: "Retake",
+                  html: retakePhotoHtml,
                   type: "button",
                   id: "clearImageButton",
                   classes: "hmpps-button hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
