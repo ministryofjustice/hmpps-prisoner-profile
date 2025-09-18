@@ -8,7 +8,7 @@ export interface PrisonerProfileSummary {
   addresses: AddressResponseDto[]
   contacts: ContactsResponseDto[]
   militaryRecords: MilitaryRecord[]
-  physicalAttributes: CorePersonPhysicalAttributes
+  physicalAttributes: CorePersonPhysicalAttributesDto
   distinguishingMarks: PersonIntegrationDistinguishingMark[]
 }
 

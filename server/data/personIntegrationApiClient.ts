@@ -228,16 +228,22 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
   }
 
   async getDistinguishingMarkImage(imageId: string): Promise<Readable> {
-    return this.stream(
-      {
-        path: `/v1/distinguishing-mark/image/${imageId}?sourceSystem=NOMIS`,
-      },
-      this.token,
-    )
+    const placeHolderPrisonNumber = 'AB123CD' // Use real when possible
+    const request = config.featureToggles.personEndpointsEnabled
+      ? {
+          path: `/v2/person/${placeHolderPrisonNumber}/distinguishing-mark/image/${imageId}`,
+        }
+      : {
+          path: `/v1/distinguishing-mark/image/${imageId}?sourceSystem=NOMIS`,
+        }
+    return this.stream(request, this.token)
   }
 
   getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributesDto> {
-    return this.get({ path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } }, this.token)
+    const request = config.featureToggles.personEndpointsEnabled
+      ? { path: `/v2/person/${prisonerNumber}/physical-attributes` }
+      : { path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } }
+    return this.get<CorePersonPhysicalAttributesDto>(request, this.token)
   }
 
   updatePhysicalAttributes(

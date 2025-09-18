@@ -37,6 +37,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { noCallbackOnErrorBecause, Result } from '../utils/result/result'
 import {
+  CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
@@ -166,9 +167,9 @@ export default class PersonalPageService {
     return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
-  async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
-    const apiClient = this.personIntegrationApiClientBuilder(token)
-    const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
+  private transformPhyscialAttributes(
+    physicalAttributesDto: CorePersonPhysicalAttributesDto,
+  ): CorePersonPhysicalAttributes {
     return {
       height: physicalAttributesDto.height,
       weight: physicalAttributesDto.weight,
@@ -186,6 +187,12 @@ export default class PersonalPageService {
       rightEyeColourDescription: physicalAttributesDto.rightEyeColour?.description,
       shoeSize: physicalAttributesDto.shoeSize,
     }
+  }
+
+  async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+    const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
+    return this.transformPhyscialAttributes(physicalAttributesDto)
   }
 
   async updatePhysicalAttributes(
@@ -282,7 +289,7 @@ export default class PersonalPageService {
         : null
       distinguishingMarks = editProfileEnabled ? profileSummary.distinguishingMarks : null
       militaryRecords = (await militaryHistoryEnabled()) ? profileSummary.militaryRecords : null
-      physicalAttributes = profileSummary.physicalAttributes
+      physicalAttributes = this.transformPhyscialAttributes(profileSummary.physicalAttributes)
       globalNumbersAndEmails = editProfileEnabled
         ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
         : null
