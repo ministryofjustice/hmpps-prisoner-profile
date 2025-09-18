@@ -260,6 +260,14 @@ export default class ProfessionalContactsService {
     ])
 
     return {
+      allocationPolicies: currentAllocatedStaff
+        .map(({ policies }) => {
+          return {
+            keyWorkerEnabled: !!policies.find(({ policy, enabled }) => policy === 'KEY_WORKER' && enabled),
+            personalOfficerEnabled: !!policies.find(({ policy, enabled }) => policy === 'PERSONAL_OFFICER' && enabled),
+          }
+        })
+        .toPromiseSettledResult(),
       keyWorker: currentAllocatedStaff
         .map(({ allocations, hasHighComplexityOfNeeds }) => {
           const allocatedKeyWorker = allocations.find(itm => itm.policy.code === 'KEY_WORKER')?.staffMember
@@ -282,11 +290,16 @@ export default class ProfessionalContactsService {
         })
         .toPromiseSettledResult(),
       lastSession: currentAllocatedStaff
-        .map(({ latestRecordedEvents }) => {
+        .map(({ policies, latestRecordedEvents }) => {
+          const keyWorkerEnabled = !!policies.find(({ policy, enabled }) => policy === 'KEY_WORKER' && enabled)
+          const personalOfficerEnabled = !!policies.find(
+            ({ policy, enabled }) => policy === 'PERSONAL_OFFICER' && enabled,
+          )
+
           const lastSessions = latestRecordedEvents.filter(
             itm =>
-              (itm.type === 'SESSION' && itm.policy === 'KEY_WORKER') ||
-              (itm.type === 'ENTRY' && itm.policy === 'PERSONAL_OFFICER'),
+              (keyWorkerEnabled && itm.type === 'SESSION' && itm.policy === 'KEY_WORKER') ||
+              (personalOfficerEnabled && itm.type === 'ENTRY' && itm.policy === 'PERSONAL_OFFICER'),
           )
           if (lastSessions.length) {
             return formatDate(

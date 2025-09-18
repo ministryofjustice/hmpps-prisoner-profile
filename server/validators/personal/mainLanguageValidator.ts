@@ -1,15 +1,25 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
 export const mainLanguageValidator: Validator = (body: Record<string, string>) => {
-  const { interpreterRequired } = body
+  const {
+    preferredSpokenLanguageCode,
+    preferredSpokenLanguageCodeError,
+    preferredWrittenLanguageCode,
+    preferredWrittenLanguageCodeError,
+  } = body
 
   const errors = []
 
-  if (interpreterRequired === undefined) {
-    errors.push({ text: 'Select if an interpreter is required', href: '#interpreterRequired' })
+  // If an invalid value is entered, the code will be '' and the codeError will be populated, so we have to check both
+  // to avoid a false positive
+  if (!preferredSpokenLanguageCode && !preferredSpokenLanguageCodeError) {
+    errors.push({ text: 'Enter this person’s main spoken language', href: '#preferred-spoken-language-code' })
+  }
+  if (!preferredWrittenLanguageCode && !preferredWrittenLanguageCodeError) {
+    errors.push({ text: 'Enter this person’s main written language', href: '#preferred-written-language-code' })
   }
 
-  // Errors with the selected language input are dealt with in the controller to
+  // Other errors with the selected language input are dealt with in the controller to
   // enable duplicate checks
 
   return errors

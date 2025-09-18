@@ -15,6 +15,7 @@ const publicPrivateNotes = document.querySelector('.js-public-private-notes')
 const comments = document.querySelector('.js-comments')
 const courtHintText = document.getElementById('court-hint-text')
 const probationHintText = document.getElementById('probation-hint-text')
+const optionalVideoLabel = document.getElementById('optional-video-label')
 
 async function getEventsForLocation() {
   const date = appointmentDateInput.value
@@ -92,6 +93,16 @@ function showHideProbationFields() {
   }
 }
 
+function showHideVideoLabel() {
+  const appointmentType = appointmentTypeSelect.value
+
+  if (appointmentType && ['VLOO', 'VLLA', 'VLPA', 'VLAP'].includes(appointmentType)) {
+    optionalVideoLabel.style.display = 'block'
+  } else {
+    optionalVideoLabel.style.display = 'none'
+  }
+}
+
 function showHidePublicPrivateNotes() {
   if (!publicPrivateNotes) {
     return
@@ -121,6 +132,7 @@ appointmentTypeSelect.addEventListener('change', () => {
   showHideRecurring()
   showHideProbationFields()
   showHidePublicPrivateNotes()
+  showHideVideoLabel()
 })
 
 appointmentLocationSelect.addEventListener('change', () => {
@@ -154,4 +166,5 @@ document.addEventListener('DOMContentLoaded', function () {
   showHideRecurring()
   showHideProbationFields()
   showHidePublicPrivateNotes()
+  showHideVideoLabel()
 })

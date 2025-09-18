@@ -44,6 +44,12 @@ export const alertTypesMock: AlertType[] = [
         isActive: true,
         alertTypeCode: 'C',
       },
+      {
+        code: 'DRONE',
+        description: 'Drone Nominal - Do not share',
+        isActive: true,
+        alertTypeCode: 'C',
+      },
     ],
   },
 ]

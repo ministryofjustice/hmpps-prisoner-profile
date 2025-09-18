@@ -25,4 +25,8 @@ export default interface StaffAllocation {
     type: string
     occurredAt: string
   }[]
+  policies: {
+    policy: 'KEY_WORKER' | 'PERSONAL_OFFICER'
+    enabled: boolean
+  }[]
 }

@@ -1,6 +1,6 @@
+import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import AddressMapper, { AddressLocation } from './addressMapper'
 import ReferenceDataService from '../referenceData/referenceDataService'
-import OsAddress from '../../data/interfaces/osPlacesApi/osAddress'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 
 const clientToken = 'CLIENT_TOKEN'

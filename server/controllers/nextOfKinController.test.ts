@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { randomUUID, UUID } from 'crypto'
+import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import NextOfKinService from '../services/nextOfKinService'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'
@@ -16,7 +17,6 @@ import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataService
 import EphemeralDataService from '../services/ephemeralDataService'
 import { AddressLocation } from '../services/mappers/addressMapper'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 describe('NextOfKinController', () => {

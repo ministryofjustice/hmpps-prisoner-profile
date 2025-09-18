@@ -29,6 +29,16 @@ export default {
                     hasHighComplexityOfNeeds: true,
                     allocations: [],
                     latestRecordedEvents: [],
+                    policies: [
+                      {
+                        policy: 'KEY_WORKER',
+                        enabled: true,
+                      },
+                      {
+                        policy: 'PERSONAL_OFFICER',
+                        enabled: true,
+                      },
+                    ],
                   }
                 : {
                     hasHighComplexityOfNeeds: false,
@@ -59,6 +69,16 @@ export default {
                         policy: 'KEY_WORKER',
                         type: 'SESSION',
                         occurredAt: '2025-06-24T12:00:00',
+                      },
+                    ],
+                    policies: [
+                      {
+                        policy: 'KEY_WORKER',
+                        enabled: true,
+                      },
+                      {
+                        policy: 'PERSONAL_OFFICER',
+                        enabled: true,
                       },
                     ],
                   },

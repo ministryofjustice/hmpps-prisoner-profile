@@ -1,7 +1,8 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
-import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 import { PermissionsService as PrisonPermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import { OsPlacesAddressService } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -150,12 +151,13 @@ export const services = () => {
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
+  const osPlacesAddressService = new OsPlacesAddressService(logger, osPlacesApiClient)
   const addressService = new AddressService(
     metricsService,
     referenceDataService,
+    osPlacesAddressService,
     prisonApiClientBuilder,
     personIntegrationApiClientBuilder,
-    osPlacesApiClient,
   )
   const prisonerLocationHistoryService = new PrisonerLocationHistoryService(
     prisonApiClientBuilder,
@@ -222,10 +224,12 @@ export const services = () => {
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
-    headers: {
-      Authorization: `Bearer ${config.apis.contentful.accessToken}`,
-    },
+    link: new HttpLink({
+      uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
+      headers: {
+        Authorization: `Bearer ${config.apis.contentful.accessToken}`,
+      },
+    }),
     ssrMode: true,
     defaultOptions: {
       watchQuery: {
