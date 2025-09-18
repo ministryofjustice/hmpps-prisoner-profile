@@ -22,7 +22,6 @@ import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import {
   PersonIntegrationApiClient,
-  PrisonerProfileSummary,
   PseudonymResponseDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import ReferenceDataService from './referenceData/referenceDataService'
