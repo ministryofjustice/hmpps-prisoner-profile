@@ -19,6 +19,7 @@ const webcamError = document.getElementById('webcam-error')
 // Preview elements
 const photoPreviewContainer = document.getElementById('photo-preview-container')
 const photoCaptureContainer = document.getElementById('photo-capture-container')
+const photoCaptureErrorContainer = document.getElementById('photo-capture-container__error')
 
 const mimetype = 'image/jpeg'
 
@@ -60,13 +61,8 @@ async function getWebcamList() {
     })
   } catch (e) {
     console.error(e)
-    if (e.name === 'NotAllowedError') {
-      permissionRequested.style.display = 'none'
-      permissionDenied.style.display = 'block'
-    } else if (e.name === 'NotFoundError') {
-      permissionRequested.style.display = 'none'
-      webcamNotFound.style.display = 'block'
-    }
+    photoCaptureContainer.style.display = 'none'
+    photoCaptureErrorContainer.style.display = 'block'
   }
 }
 
