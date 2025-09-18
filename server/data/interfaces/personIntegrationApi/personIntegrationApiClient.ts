@@ -1,7 +1,6 @@
 import { Readable } from 'stream'
 import { ReferenceDataValue } from '../ReferenceDataValue'
 import MulterFile from '../../../controllers/interfaces/MulterFile'
-import { CorePersonPhysicalAttributes } from '../../../services/interfaces/corePerson/corePersonPhysicalAttributes'
 
 export interface PrisonerProfileSummary {
   pseudonyms: PseudonymResponseDto[]
