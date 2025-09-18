@@ -80,7 +80,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
       if (mark.partOrientation?.id === 'PART_ORIENT_UPP') return 'Upper arm'
-      return 'Not entered'
+      return 'Arm (general)'
     },
   },
   arm: {
