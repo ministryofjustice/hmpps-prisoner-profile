@@ -10,6 +10,7 @@ import {
   PseudonymRequestMock,
   PseudonymResponseMock,
   UpdateIdentityNumberRequestMock,
+  PrisonerProfileSummaryMock,
 } from './localMockData/personIntegrationApiReferenceDataMock'
 import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -253,6 +254,14 @@ describe('personIntegrationApiClient (v2)', () => {
         contactValue: 'updated@email.com',
       })
       expect(result).toEqual(ContactsResponseMock[1])
+    })
+  })
+
+  describe('getPrisonerProfileSummary', () => {
+    it('should return a fully formed summary', async () => {
+      fakePersonIntegrationApi.get('/v2/person/A1234AA').reply(200, PrisonerProfileSummaryMock)
+      const output = await personIntegrationApiClient.getPrisonerProfileSummary('A1234AA')
+      expect(output).toEqual(PrisonerProfileSummaryMock)
     })
   })
 })
