@@ -2,6 +2,8 @@ import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
 import { inmateDetailMock } from '../../../../server/data/localMockData/inmateDetailMock'
+import Page from '../../../pages/page'
+import EditReligion from '../../../pages/editPages/religion'
 
 context('Edit religion, faith or belief', () => {
   const prisonerNumber = 'G6123VU'
@@ -71,6 +73,22 @@ context('Edit religion, faith or belief', () => {
       ],
       redirectAnchor: 'religion-faith-or-belief',
     })
+
+    it('Shows the current religion and change reason question', () => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+
+      cy.signIn({ redirectPath: `/prisoner/${prisonerNumber}/personal/religion`, failOnStatusCode: false })
+      const page = Page.verifyOnPageWithTitle(EditReligion, 'Religion, faith or belief')
+
+      page.currentReligionDisplay().should('exist')
+      page.religionValueInput().should('exist')
+      page.changeReasonInput().should('exist')
+      page.updateWarning().should('exist')
+    })
   })
 
   context('Prisoner without existing religion, faith or belief', () => {
@@ -104,6 +122,29 @@ context('Edit religion, faith or belief', () => {
         },
       ],
       redirectAnchor: 'religion-faith-or-belief',
+    })
+
+    it('Does not show the current religion or ask why the value has changed', () => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubInmateDetail', {
+        bookingId,
+        inmateDetail: {
+          ...inmateDetailMock,
+          profileInformation: [],
+        },
+      })
+      cy.task('stubPersonalCareNeeds')
+
+      cy.signIn({ redirectPath: `/prisoner/${prisonerNumber}/personal/religion`, failOnStatusCode: false })
+      const page = Page.verifyOnPageWithTitle(EditReligion, 'Religion, faith or belief')
+
+      page.currentReligionDisplay().should('not.exist')
+      page.religionValueInput().should('exist')
+      page.changeReasonInput().should('not.exist')
+      page.updateWarning().should('not.exist')
     })
   })
 })
