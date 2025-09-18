@@ -87,8 +87,9 @@ $hmpps-webcam-capture-height: 276px;
       margin-bottom: 0 !important;
 
       .hmpps-webcam-button-text {
-        display: flex;
         align-items: center;
+        display: flex;
+        gap: 5px;
         justify-content: center;
 
         img {
