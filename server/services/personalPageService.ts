@@ -221,6 +221,7 @@ export default class PersonalPageService {
     editProfileEnabled: boolean = false,
     personalRelationshipsApiReadEnabled: boolean = true,
     apiErrorCallback: (error: Error) => void = () => null,
+    personEndpointsEnabled = false,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
@@ -232,34 +233,25 @@ export default class PersonalPageService {
       secondaryLanguages,
       property,
       oldAddressList,
-      addresses,
       offenderContacts,
       identifiers,
       beliefs,
-      distinguishingMarks,
       learnerNeurodivergence,
       healthAndMedication,
-      militaryRecords,
-      physicalAttributes,
       nextOfKinAndEmergencyContacts,
       personalRelationshipsNumberOfChildren,
       personalRelationshipsDomesticStatus,
-      globalNumbersAndEmails,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       !editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
-      editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
-      editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
-      militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
-      this.getPhysicalAttributes(token, prisonerNumber),
       personalRelationshipsApiReadEnabled
         ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback)
         : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
@@ -275,8 +267,35 @@ export default class PersonalPageService {
             noCallbackOnErrorBecause('we are falling back to prison api data'),
           )
         : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
-      editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
     ])
+
+    let profileSummary
+    let addresses
+    let distinguishingMarks
+    let militaryRecords
+    let physicalAttributes
+    let globalNumbersAndEmails
+    if (personEndpointsEnabled) {
+      profileSummary = await personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber)
+      addresses = editProfileEnabled
+        ? await this.addressService.transformAddresses(token, profileSummary.addresses)
+        : null
+      distinguishingMarks = editProfileEnabled ? profileSummary.distinguishingMarks : null
+      militaryRecords = (await militaryHistoryEnabled()) ? profileSummary.militaryRecords : null
+      physicalAttributes = profileSummary.physicalAttributes
+      globalNumbersAndEmails = editProfileEnabled
+        ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
+        : null
+    } else {
+      ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
+        await Promise.all([
+          editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
+          editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
+          militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
+          this.getPhysicalAttributes(token, prisonerNumber),
+          editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
+        ])
+    }
 
     const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(oldAddressList)
     const primaryOrPostalAddresses = addresses?.filter(address => address.primaryAddress || address.postalAddress)

@@ -1,6 +1,16 @@
 import { Readable } from 'stream'
 import { ReferenceDataValue } from '../ReferenceDataValue'
 import MulterFile from '../../../controllers/interfaces/MulterFile'
+import { CorePersonPhysicalAttributes } from '../../../services/interfaces/corePerson/corePersonPhysicalAttributes'
+
+export interface PrisonerProfileSummary {
+  pseudonyms: PseudonymResponseDto[]
+  addresses: AddressResponseDto[]
+  contacts: ContactsResponseDto[]
+  militaryRecords: MilitaryRecord[]
+  physicalAttributes: CorePersonPhysicalAttributes
+  distinguishingMarks: PersonIntegrationDistinguishingMark[]
+}
 
 export interface CorePersonRecordReferenceDataCodeDto {
   id: string
@@ -266,6 +276,8 @@ export interface UpdateIdentifierRequestDto {
 }
 
 export interface PersonIntegrationApiClient {
+  getPrisonerProfileSummary(prisonerNumber: string): Promise<PrisonerProfileSummary>
+
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void>
