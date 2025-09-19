@@ -345,7 +345,7 @@ export default {
     response?: PrisonerProfileSummary
   }) =>
     stubGetWithBody({
-      path: `/v2/person/${prisonerNumber}`,
+      path: `${baseUrl}/v2/person/${prisonerNumber}`,
       body: response,
     }),
 }
