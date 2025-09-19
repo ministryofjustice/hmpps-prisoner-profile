@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { formatName } from '../utils/utils'
@@ -12,8 +13,8 @@ import { careNeedsMock, xrayBodyScansMock } from '../data/localMockData/careNeed
 describe('Care needs controller', () => {
   const prisonerNumber = 'G6123VU'
 
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: CareNeedsController
 
   beforeEach(() => {
@@ -28,7 +29,7 @@ describe('Care needs controller', () => {
       query: {},
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -40,7 +41,7 @@ describe('Care needs controller', () => {
       },
       render: jest.fn(),
       status: jest.fn(),
-    }
+    } as unknown as Response
     controller = new CareNeedsController(new CareNeedsService(null), auditServiceMock())
   })
 
@@ -51,9 +52,7 @@ describe('Care needs controller', () => {
 
   describe('displayPastCareNeeds', () => {
     it('should call the service and render the page', async () => {
-      jest
-        .spyOn<any, string>(controller['careNeedsService'], 'getCareNeedsAndAdjustments')
-        .mockResolvedValue(careNeedsMock)
+      jest.spyOn(controller.careNeedsService, 'getCareNeedsAndAdjustments').mockResolvedValue(careNeedsMock)
 
       await controller.displayPastCareNeeds(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/careNeeds/pastCareNeeds', {
@@ -68,7 +67,7 @@ describe('Care needs controller', () => {
 
   describe('displayXrayBodyScans', () => {
     it('should call the service and render the page', async () => {
-      jest.spyOn<any, string>(controller['careNeedsService'], 'getXrayBodyScans').mockResolvedValue(xrayBodyScansMock)
+      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans').mockResolvedValue(xrayBodyScansMock)
 
       await controller.displayXrayBodyScans(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {

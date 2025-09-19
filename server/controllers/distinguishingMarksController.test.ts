@@ -15,8 +15,8 @@ const getResLocals = () => ({
 })
 
 describe('Distinguishing Marks Controller', () => {
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: DistinguishingMarksController
   let distinguishingMarksService: DistinguishingMarksService
   let auditService: AuditService
@@ -28,12 +28,12 @@ describe('Distinguishing Marks Controller', () => {
         prisonerData: PrisonerMockDataA,
       },
       flash: jest.fn(),
-    }
+    } as unknown as Request
     res = {
       locals: getResLocals(),
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
     distinguishingMarksService = new DistinguishingMarksService(null)
     auditService = auditServiceMock() as AuditService
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)

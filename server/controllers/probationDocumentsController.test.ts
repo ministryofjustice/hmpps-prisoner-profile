@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import ProbationDocumentsController from './probationDocumentsController'
@@ -11,8 +12,8 @@ import { Result } from '../utils/result/result'
 describe('Prisoner schedule', () => {
   const offenderNo = 'A1234BC'
 
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: ProbationDocumentsController
 
   beforeEach(() => {
@@ -26,8 +27,8 @@ describe('Prisoner schedule', () => {
       query: {},
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
-    res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() }
+    } as unknown as Request
+    res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() } as unknown as Response
 
     controller = new ProbationDocumentsController(new ProbationDocumentsService(null), auditServiceMock())
   })
@@ -44,7 +45,7 @@ describe('Prisoner schedule', () => {
       }
       const result = Result.fulfilled(probationDocuments)
 
-      jest.spyOn<any, string>(controller['probationDocumentsService'], 'getDocuments').mockResolvedValue(result)
+      jest.spyOn(controller.probationDocumentsService, 'getDocuments').mockResolvedValue(result)
 
       await controller.displayDocuments(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/probationDocuments/probationDocuments', {

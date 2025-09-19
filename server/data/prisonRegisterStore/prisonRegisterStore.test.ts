@@ -11,8 +11,8 @@ const redisClient = {
 }
 
 const activePrisons: Array<PrisonDto> = [
-  prisonsKeyedByPrisonId['ASI'], // an active prison
-  prisonsKeyedByPrisonId['MDI'], // an active prison
+  prisonsKeyedByPrisonId.ASI, // an active prison
+  prisonsKeyedByPrisonId.MDI, // an active prison
 ]
 
 describe('prisonRegisterStore', () => {

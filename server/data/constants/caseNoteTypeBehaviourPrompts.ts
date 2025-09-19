@@ -54,3 +54,5 @@ export const behaviourPrompts = {
     },
   ],
 }
+
+export default { behaviourPrompts }

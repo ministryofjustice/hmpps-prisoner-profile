@@ -1,8 +1,8 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request } from 'express'
 import NotFoundError from '../utils/notFoundError'
 import { addMiddlewareError } from './middlewareHelpers'
 
-let req: any
+let req: Request
 let next: NextFunction
 
 describe('MiddlewareHelpers', () => {
@@ -11,7 +11,7 @@ describe('MiddlewareHelpers', () => {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
       middleware: {},
-    }
+    } as unknown as Request
     next = jest.fn()
   })
 

@@ -1,4 +1,4 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import {
   CaseNotesPermission,
   isGranted,
@@ -21,11 +21,12 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import CaseNotesPageData from '../services/interfaces/caseNotesService/CaseNotesPageData'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
-let controller: any
+let controller: CaseNotesController
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/caseNotesService.ts')
@@ -73,7 +74,7 @@ describe('Case Notes Controller', () => {
       },
       path: 'case-notes',
       flash: jest.fn(),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user,
@@ -81,7 +82,7 @@ describe('Case Notes Controller', () => {
       },
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
     next = jest.fn()
 
     prisonApiClient = prisonApiClientMock()
@@ -92,16 +93,16 @@ describe('Case Notes Controller', () => {
 
   describe('displayCaseNotes', () => {
     it('should get case notes', async () => {
-      const getCaseNotesSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockResolvedValue({
+      const getCaseNotesSpy = jest.spyOn(controller.caseNotesService, 'get').mockResolvedValue({
         pagedCaseNotes: pagedCaseNotesMock,
         listMetadata: null,
         caseNoteTypes: caseNoteTypesMock,
         fullName: 'John Middle Names Saunders',
-      })
+      } as CaseNotesPageData)
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
 
-      await controller.displayCaseNotes()(req, res)
+      await controller.displayCaseNotes()(req, res, next)
 
       expect(getCaseNotesSpy).toHaveBeenCalledWith({
         token: req.middleware.clientToken,
@@ -128,9 +129,9 @@ describe('Case Notes Controller', () => {
     })
 
     it('should handle API being unavailable', async () => {
-      jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockRejectedValue(new Error())
+      jest.spyOn(controller.caseNotesService, 'get').mockRejectedValue(new Error())
 
-      await controller.displayCaseNotes()(req, res)
+      await controller.displayCaseNotes()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/caseNotes/caseNotesPage',
@@ -141,17 +142,17 @@ describe('Case Notes Controller', () => {
     })
 
     it('should allow view of sensitive case notes if user has the appropriate permission', async () => {
-      const getCaseNotesSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockResolvedValue({
+      const getCaseNotesSpy = jest.spyOn(controller.caseNotesService, 'get').mockResolvedValue({
         pagedCaseNotes: pagedCaseNotesMock,
         listMetadata: null,
         caseNoteTypes: caseNoteTypesMock,
         fullName: 'John Middle Names Saunders',
-      })
+      } as CaseNotesPageData)
       jest.spyOn(headerMappers, 'mapHeaderData')
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
       mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
 
-      await controller.displayCaseNotes()(req, res)
+      await controller.displayCaseNotes()(req, res, next)
 
       expect(getCaseNotesSpy).toHaveBeenCalledWith({
         token: req.middleware.clientToken,
@@ -173,10 +174,10 @@ describe('Case Notes Controller', () => {
 
   it('should display add case note page', async () => {
     const getCaseNoteTypesForUserSpy = jest
-      .spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser')
+      .spyOn(controller.caseNotesService, 'getCaseNoteTypesForUser')
       .mockResolvedValue(caseNoteTypesMock.slice(0, 2))
 
-    await controller.displayAddCaseNote()(req, res)
+    await controller.displayAddCaseNote()(req, res, next)
 
     expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith({
       token: req.middleware.clientToken,
@@ -255,14 +256,14 @@ describe('Case Notes Controller', () => {
           ...caseNoteForm,
           refererUrl: 'http://referer',
         },
-      }
+      } as unknown as Request
       const addCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'addCaseNote')
+        .spyOn(controller.caseNotesService, 'addCaseNote')
         .mockResolvedValue(pagedCaseNotesMock.content[0])
 
       jest
-        .spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser')
-        .mockResolvedValue([{ code: 'REPORTS' }])
+        .spyOn(controller.caseNotesService, 'getCaseNoteTypesForUser')
+        .mockResolvedValue([{ code: 'REPORTS', description: 'Reports', subCodes: [] }])
 
       await controller.post()(req, res, next)
 
@@ -295,10 +296,10 @@ describe('Case Notes Controller', () => {
           ...caseNoteForm,
           refererUrl: 'http://referer',
         },
-      }
+      } as unknown as Request
 
-      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser').mockResolvedValue([])
-      const addCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNote')
+      jest.spyOn(controller.caseNotesService, 'getCaseNoteTypesForUser').mockResolvedValue([])
+      const addCaseNoteSpy = jest.spyOn(controller.caseNotesService, 'addCaseNote')
 
       await controller.post()(req, res, next)
 
@@ -315,12 +316,10 @@ describe('Case Notes Controller', () => {
         currentCaseNote.amendments[0].additionalNoteText.length +
         prisonApiAdditionalCaseNoteTextLength +
         currentCaseNote.amendments[0].authorUserName.length
-      const getCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'getCaseNote')
-        .mockResolvedValue(currentCaseNote)
+      const getCaseNoteSpy = jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
       req.params.caseNoteId = 'abc123'
 
-      await controller.displayUpdateCaseNote()(req, res)
+      await controller.displayUpdateCaseNote()(req, res, next)
 
       expect(getCaseNoteSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -352,7 +351,7 @@ describe('Case Notes Controller', () => {
 
     it('should display update page for a sensitive case note for the appropriate permissions', async () => {
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
-      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
       mockPermissionCheck(CaseNotesPermission.edit_sensitive, true)
 
       await controller.displayUpdateCaseNote()(req, res, next)
@@ -364,7 +363,7 @@ describe('Case Notes Controller', () => {
       res.locals.user.userRoles = []
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
 
-      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
 
       await controller.displayUpdateCaseNote()(req, res, next)
 
@@ -388,16 +387,14 @@ describe('Case Notes Controller', () => {
           text,
           refererUrl: 'http://referer',
         },
-      }
+      } as unknown as Request
       const updateCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
+        .spyOn(controller.caseNotesService, 'addCaseNoteAmendment')
         .mockResolvedValue(pagedCaseNotesMock.content[0])
 
-      jest
-        .spyOn<any, string>(controller['caseNotesService'], 'getCaseNote')
-        .mockResolvedValue(pagedCaseNotesMock.content[0])
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(pagedCaseNotesMock.content[0])
 
-      await controller.postUpdate()(req, res)
+      await controller.postUpdate()(req, res, next)
 
       expect(updateCaseNoteSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -418,10 +415,10 @@ describe('Case Notes Controller', () => {
           text: 'Note text',
           refererUrl: 'http://referer',
         },
-      }
+      } as Request
 
-      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
-      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      const updateCaseNoteSpy = jest.spyOn(controller.caseNotesService, 'addCaseNoteAmendment')
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
 
       await controller.postUpdate()(reqWithBody, res, next)
 
@@ -440,10 +437,10 @@ describe('Case Notes Controller', () => {
           text: 'Note text',
           refererUrl: 'http://referer',
         },
-      }
+      } as unknown as Request
 
-      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
-      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      const updateCaseNoteSpy = jest.spyOn(controller.caseNotesService, 'addCaseNoteAmendment')
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
 
       await controller.postUpdate()(req, res, next)
 

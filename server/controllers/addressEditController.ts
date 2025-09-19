@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { UUID } from 'crypto'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -24,7 +24,7 @@ export default class AddressEditController {
   ) {}
 
   public displayWhereIsTheAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { naturalPrisonerName } = getCommonRequestData(req, res)
 
       return displayWhereIsTheAddressHandler(this.auditService, {
@@ -48,7 +48,7 @@ export default class AddressEditController {
   }
 
   public displayFindUkAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { naturalPrisonerName } = getCommonRequestData(req, res)
       return displayFindUkAddressHandler(this.auditService, {
         pageTitle: 'Find a UK address - Prisoner personal details',
@@ -81,7 +81,7 @@ export default class AddressEditController {
   }
 
   public displayPrimaryOrPostalAddress(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } =
         getCommonRequestData(req, res)
       const { address: addressCacheId } = req.query
@@ -134,7 +134,7 @@ export default class AddressEditController {
   }
 
   public submitPrimaryOrPostalAddress(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const { primaryOrPostal: primaryOrPostalResponse } = req.body
       const { address: addressCacheId } = req.query
@@ -179,6 +179,7 @@ export default class AddressEditController {
           .catch(error => logger.error(error))
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_error) {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
@@ -193,7 +194,7 @@ export default class AddressEditController {
     formTitlePrefix: string
     auditPage: Page
   }): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { addressLocation, pageTitlePrefix, formTitlePrefix, auditPage } = options
       const { naturalPrisonerName } = getCommonRequestData(req, res)
       const backLink = addressLocation === AddressLocation.uk ? 'find-uk-address' : 'where-is-address'

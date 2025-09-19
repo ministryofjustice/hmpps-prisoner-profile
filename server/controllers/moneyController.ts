@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { format, parseISO } from 'date-fns'
 import { formatMoney, formatName, isEmpty } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -24,25 +24,25 @@ export default class MoneyController {
   ) {}
 
   public displaySpends(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
     }
   }
 
   public displayPrivateCash(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.PrivateCash, 'Private cash', Page.MoneyPrivateCash, req, res)
     }
   }
 
   public displaySavings(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.Savings, 'Savings', Page.MoneySavings, req, res)
     }
   }
 
   public displayDamageObligations(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getDamageObligations(req, res)
     }
   }

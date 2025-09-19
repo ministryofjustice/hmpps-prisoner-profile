@@ -14,7 +14,7 @@ export interface BaseUser {
   displayName: string
   userRoles: Role[]
   token?: string
-  backLink?: string
+  backLink?: { url: string; text: string }
 }
 
 /**

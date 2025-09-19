@@ -1,9 +1,11 @@
+import { NextFunction, Request, Response } from 'express'
 import { addDays } from 'date-fns'
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
+import AlertsPageData from '../services/interfaces/alertsService/AlertsPageData'
 import AlertsService from '../services/alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { alertTypesMock } from '../data/localMockData/alertTypesMock'
@@ -15,9 +17,9 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 
-let req: any
-let res: any
-let next: any
+let req: Request
+let res: Response
+let next: NextFunction
 let controller: AlertsController
 
 jest.mock('../services/prisonerSearch.ts')
@@ -36,7 +38,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
           alertSummaryData: { alertFlags: [] },
         },
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -48,15 +50,15 @@ describe('Alerts Controller', () => {
           },
         },
         render: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
 
     it('should get active alerts', async () => {
       const getAlertsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'get')
-        .mockResolvedValue({ pagedAlerts: pagedActiveAlertsMock })
+        .spyOn(controller.alertsService, 'get')
+        .mockResolvedValue({ pagedAlerts: pagedActiveAlertsMock } as AlertsPageData)
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
       await controller.displayAlerts(req, res, next, true)
@@ -86,8 +88,8 @@ describe('Alerts Controller', () => {
     it('should handle API being unavailable', async () => {
       req.middleware.alertSummaryData.apiUnavailable = true
       const getAlertsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'get')
-        .mockResolvedValue({ pagedAlerts: pagedInactiveAlertsMock })
+        .spyOn(controller.alertsService, 'get')
+        .mockResolvedValue({ pagedAlerts: pagedInactiveAlertsMock } as AlertsPageData)
 
       await controller.displayAlerts(req, res, next, true)
 
@@ -103,11 +105,11 @@ describe('Alerts Controller', () => {
     })
 
     it('should get inactive alerts', async () => {
-      req.path = 'alerts/inactive'
+      req = { ...req, path: 'alerts/inactive' } as Request
 
       const getAlertsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'get')
-        .mockResolvedValue({ pagedAlerts: pagedInactiveAlertsMock })
+        .spyOn(controller.alertsService, 'get')
+        .mockResolvedValue({ pagedAlerts: pagedInactiveAlertsMock } as AlertsPageData)
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
       await controller.displayAlerts(req, res, next, false)
@@ -147,7 +149,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
         },
         flash: jest.fn(),
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -160,7 +162,7 @@ describe('Alerts Controller', () => {
         redirect: jest.fn(),
         send: jest.fn(),
         sendStatus: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
@@ -169,9 +171,7 @@ describe('Alerts Controller', () => {
     })
 
     it('should get ref data for alert form', async () => {
-      const getAlertTypes = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertTypes')
-        .mockResolvedValue(alertTypesMock)
+      const getAlertTypes = jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.displayAddAlert(req, res, next)
 
@@ -180,24 +180,29 @@ describe('Alerts Controller', () => {
     })
 
     it('should filter out excluded alert codes (DOCGM and DRONE)', async () => {
-      jest.spyOn<any, string>(controller['alertsService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
+      jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.displayAddAlert(req, res, next)
 
-      expect(res.render.mock.calls[0][1].typeCodeMap).toEqual({
-        A: [{ text: 'AAA111', value: 'A1', attributes: undefined }],
-        B: [{ text: 'BBB111', value: 'B1', attributes: undefined }],
-        C: [{ text: 'CCC111', value: 'C1', attributes: undefined }],
-      })
+      expect(res.render).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          typeCodeMap: {
+            A: [{ text: 'AAA111', value: 'A1', attributes: undefined }],
+            B: [{ text: 'BBB111', value: 'B1', attributes: undefined }],
+            C: [{ text: 'CCC111', value: 'C1', attributes: undefined }],
+          },
+        }),
+      )
     })
 
     it('should add alert', async () => {
       req.body = { ...alertFormMock, bookingId: 123456 }
 
       const createAlertsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'createAlert')
+        .spyOn(controller.alertsService, 'createAlert')
         .mockResolvedValue(pagedActiveAlertsMock.content[0])
-      jest.spyOn<any, string>(controller['alertsService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
+      jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.post()(req, res, next)
 
@@ -219,7 +224,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -230,15 +235,15 @@ describe('Alerts Controller', () => {
           },
         },
         render: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
-      req.query = { ids: 1 }
+      req.query = { ids: '1' }
       const getAlertDetailsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue(alertDetailsMock)
       const { prisonerNumber, cellLocation, firstName, lastName } = PrisonerMockDataA
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
@@ -259,9 +264,9 @@ describe('Alerts Controller', () => {
     })
 
     it('should get two alerts', async () => {
-      req.query = { ids: [1, 2] }
+      req.query = { ids: ['1', '2'] }
       const getAlertDetailsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue(alertDetailsMock)
 
       const { prisonerNumber, cellLocation, firstName, lastName } = PrisonerMockDataA
@@ -295,7 +300,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -306,15 +311,15 @@ describe('Alerts Controller', () => {
           },
         },
         render: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
-      req.query = { ids: 1 }
+      req.query = { ids: '1' }
       const getAlertDetailsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue(alertDetailsMock)
       const { prisonerNumber } = PrisonerMockDataA
 
@@ -328,9 +333,9 @@ describe('Alerts Controller', () => {
     })
 
     it('should get two alerts', async () => {
-      req.query = { ids: [1, 2] }
+      req.query = { ids: ['1', '2'] }
       const getAlertDetailsSpy = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue(alertDetailsMock)
       const { prisonerNumber } = PrisonerMockDataA
 
@@ -357,7 +362,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
         },
         flash: jest.fn(),
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -370,7 +375,7 @@ describe('Alerts Controller', () => {
         redirect: jest.fn(),
         send: jest.fn(),
         sendStatus: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
@@ -380,9 +385,7 @@ describe('Alerts Controller', () => {
 
     it('should get existing alert record and display page', async () => {
       const existingAlert = alertDetailsMock
-      const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
-        .mockResolvedValue(existingAlert)
+      const getAlertDetails = jest.spyOn(controller.alertsService, 'getAlertDetails').mockResolvedValue(existingAlert)
 
       await controller.displayAddMoreDetails(req, res, next)
 
@@ -406,8 +409,8 @@ describe('Alerts Controller', () => {
 
     it('should get render already closed page if expired', async () => {
       const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
-        .mockResolvedValue({ alertDetailsMock, isActive: false })
+        .spyOn(controller.alertsService, 'getAlertDetails')
+        .mockResolvedValue({ ...alertDetailsMock, isActive: false })
 
       await controller.displayAddMoreDetails(req, res, next)
 
@@ -432,9 +435,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'Comment' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      jest
-        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
-        .mockRejectedValue({ status: 400, message: 'Bad request' })
+      jest.spyOn(controller.alertsService, 'updateAlert').mockRejectedValue({ status: 400, message: 'Bad request' })
 
       await controller.postAddMoreDetails()(req, res, next)
 
@@ -447,7 +448,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'Comment' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      jest.spyOn<any, string>(controller['alertsService'], 'updateAlert').mockRejectedValue({ status: 423 })
+      jest.spyOn(controller.alertsService, 'updateAlert').mockRejectedValue({ status: 423 })
 
       await controller.postAddMoreDetails()(req, res, next)
 
@@ -462,9 +463,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'New comment' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      const updateAlert = jest
-        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
-        .mockResolvedValue(alertDetailsMock)
+      const updateAlert = jest.spyOn(controller.alertsService, 'updateAlert').mockResolvedValue(alertDetailsMock)
 
       await controller.postAddMoreDetails()(req, res, next)
 
@@ -487,7 +486,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
         },
         flash: jest.fn(),
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -500,7 +499,7 @@ describe('Alerts Controller', () => {
         redirect: jest.fn(),
         send: jest.fn(),
         sendStatus: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
@@ -510,9 +509,7 @@ describe('Alerts Controller', () => {
 
     it('should get existing alert record and display page', async () => {
       const existingAlert = alertDetailsMock
-      const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
-        .mockResolvedValue(existingAlert)
+      const getAlertDetails = jest.spyOn(controller.alertsService, 'getAlertDetails').mockResolvedValue(existingAlert)
 
       await controller.displayCloseAlert(req, res, next)
 
@@ -539,7 +536,7 @@ describe('Alerts Controller', () => {
 
     it('should render already closed page if expired', async () => {
       const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue({ ...alertDetailsMock, isActive: false })
 
       await controller.displayCloseAlert(req, res, next)
@@ -565,9 +562,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'New comment', today: 'yes' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      const updateAlert = jest
-        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
-        .mockResolvedValue(alertDetailsMock)
+      const updateAlert = jest.spyOn(controller.alertsService, 'updateAlert').mockResolvedValue(alertDetailsMock)
 
       await controller.postCloseAlert()(req, res, next)
 
@@ -591,7 +586,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
         },
         flash: jest.fn(),
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -604,7 +599,7 @@ describe('Alerts Controller', () => {
         redirect: jest.fn(),
         send: jest.fn(),
         sendStatus: jest.fn(),
-      }
+      } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
     })
@@ -614,9 +609,7 @@ describe('Alerts Controller', () => {
 
     it('should get existing alert record and display page', async () => {
       const existingAlert = alertDetailsMock
-      const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
-        .mockResolvedValue(existingAlert)
+      const getAlertDetails = jest.spyOn(controller.alertsService, 'getAlertDetails').mockResolvedValue(existingAlert)
 
       await controller.displayChangeEndDate(req, res, next)
 
@@ -643,7 +636,7 @@ describe('Alerts Controller', () => {
 
     it('should render already closed page if expired', async () => {
       const getAlertDetails = jest
-        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .spyOn(controller.alertsService, 'getAlertDetails')
         .mockResolvedValue({ ...alertDetailsMock, isActive: false })
 
       await controller.displayChangeEndDate(req, res, next)
@@ -669,9 +662,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'New comment', removeEndDate: 'yes' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      const updateAlert = jest
-        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
-        .mockResolvedValue(alertDetailsMock)
+      const updateAlert = jest.spyOn(controller.alertsService, 'updateAlert').mockResolvedValue(alertDetailsMock)
 
       await controller.postChangeEndDate()(req, res, next)
 
@@ -686,9 +677,7 @@ describe('Alerts Controller', () => {
       req.body = { bookingId: 123456, description: 'New comment', activeTo: '01/01/2199', removeEndDate: 'no' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
 
-      const updateAlert = jest
-        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
-        .mockResolvedValue(alertDetailsMock)
+      const updateAlert = jest.spyOn(controller.alertsService, 'updateAlert').mockResolvedValue(alertDetailsMock)
 
       await controller.postChangeEndDate()(req, res, next)
 

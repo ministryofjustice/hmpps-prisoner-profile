@@ -11,6 +11,7 @@ import { RestClientBuilder } from '../data'
 import validateDateRange from '../utils/validateDateRange'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
+import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import PagedList, { CaseNotesListQueryParams, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { HmppsUser } from '../interfaces/HmppsUser'
@@ -137,7 +138,7 @@ export default class CaseNotesService {
   }: {
     token: string
     canEditSensitiveCaseNotes?: boolean
-  }) {
+  }): Promise<CaseNoteType[]> {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     return caseNotesApiClient.getCaseNoteTypes({
       dpsUserSelectableOnly: true,

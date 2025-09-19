@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { RestClientBuilder } from '../data'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AuditService, PostAction } from '../services/auditService'
@@ -41,7 +41,7 @@ export default class ImageController {
   public updateProfileImage() {
     return {
       newImage: {
-        get: async (req: Request, res: Response, next: NextFunction) => {
+        get: async (req: Request, res: Response) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ photoType?: string }>(req)
           const photoType = requestBodyFlash?.photoType
@@ -57,7 +57,7 @@ export default class ImageController {
           })
         },
 
-        post: async (req: Request, res: Response, next: NextFunction) => {
+        post: async (req: Request, res: Response) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
           if (req.body.photoType === 'withheld') {
@@ -87,7 +87,7 @@ export default class ImageController {
       },
 
       webcamImage: {
-        get: async (req: Request, res: Response, next: NextFunction) => {
+        get: async (req: Request, res: Response) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
 
@@ -98,7 +98,7 @@ export default class ImageController {
           })
         },
 
-        post: async (req: Request, res: Response, next: NextFunction) => {
+        post: async (req: Request, res: Response) => {
           const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
           const file = req.file as MulterFile
@@ -117,7 +117,7 @@ export default class ImageController {
         },
       },
 
-      submitImage: async (req: Request, res: Response, next: NextFunction) => {
+      submitImage: async (req: Request, res: Response) => {
         const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
         const file = req.file as MulterFile
 
@@ -167,7 +167,7 @@ export default class ImageController {
       },
 
       newWithheldImage: {
-        get: async (req: Request, res: Response, next: NextFunction) => {
+        get: async (req: Request, res: Response) => {
           const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
           const fileStream = await this.prisonerProfileApiClientBuilder(clientToken).getWithheldPrisonerPhoto()
@@ -188,7 +188,7 @@ export default class ImageController {
           })
         },
 
-        post: async (req: Request, res: Response, next: NextFunction) => {
+        post: async (req: Request, res: Response) => {
           const {
             prisonerData: { prisonerNumber },
             clientToken,

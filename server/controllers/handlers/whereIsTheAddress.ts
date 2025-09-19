@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import logger from '../../../logger'
 import { AddressLocation } from '../../services/mappers/addressMapper'
@@ -28,7 +28,7 @@ export function displayWhereIsTheAddressHandler(
   auditService: AuditService,
   options: DisplayWhereIsTheAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const { pageTitle, formTitle, page, cancelAnchor } = options
     const errors = req.flash('errors')
@@ -66,7 +66,7 @@ export function submitWhereIsTheAddressHandler(
   auditService: AuditService,
   options: SubmitWhereIsTheAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { prisonerNumber } = getCommonRequestData(req, res)
     const { radioField: location } = req.body
     const { redirectOptions, action } = options

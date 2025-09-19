@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
@@ -28,7 +28,7 @@ export function displayFindUkAddressHandler(
   auditService: AuditService,
   options: DisplayFindUkAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const { pageTitle, formTitle, auditPage, manualEntryAnchor, backLink, cancelAnchor } = options
     const { optimisationOff } = req.query
@@ -70,7 +70,7 @@ export function submitFindUkAddressHandler(
   auditService: AuditService,
   options: SubmitFindUkAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
     const { auditAction, route, confirmRedirectUrl, queryParams } = options
     const { uprn } = req.body

@@ -12,3 +12,5 @@ export enum Icon {
   MakeCSIPReferral = 'make-csip-referral',
   ManageAllocations = 'manage-allocations',
 }
+
+export default { Icon }

@@ -30,7 +30,7 @@ export default class PrisonerScheduleController {
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
 
-    let schedule: ScheduledEvent[] = [] as ScheduledEvent[]
+    let schedule: ScheduledEvent[]
     const { when } = req.query
     const { bookingId } = prisonerData
 

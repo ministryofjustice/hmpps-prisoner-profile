@@ -7,3 +7,5 @@ export enum TransactionPayType {
   Retired = 'RETIRED',
   Hospital = 'HOSPITAL',
 }
+
+export default { TransactionPayType }

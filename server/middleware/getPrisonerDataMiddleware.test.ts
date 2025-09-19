@@ -23,8 +23,8 @@ jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
 jest.mock('../data/alertsApiClient')
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 let services: Services
 let prisonApiClient: PrisonApiClient

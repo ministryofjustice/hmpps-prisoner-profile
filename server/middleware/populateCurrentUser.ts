@@ -4,6 +4,7 @@ import logger from '../../logger'
 import { convertToTitleCase } from '../utils/utils'
 import { Role } from '../data/enums/role'
 
+// eslint-disable-next-line import/prefer-default-export
 export function populateCurrentUser(): RequestHandler {
   return async (req, res, next) => {
     try {

@@ -4,8 +4,8 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import RoleError from '../utils/roleError'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 
 describe('CheckHasSomeRolesMiddleware', () => {

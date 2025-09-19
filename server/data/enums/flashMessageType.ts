@@ -4,3 +4,5 @@ export enum FlashMessageType {
   error = 'error',
   success = 'success',
 }
+
+export default { FlashMessageType }

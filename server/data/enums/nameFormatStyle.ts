@@ -4,3 +4,5 @@ export enum NameFormatStyle {
   lastCommaFirst,
   firstLast,
 }
+
+export default { NameFormatStyle }

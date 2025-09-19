@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import {
   isGranted,
   PersonalRelationshipsPermission,
@@ -49,8 +50,6 @@ import { offenderServiceMock } from '../../tests/mocks/offenderServiceMock'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import { professionalContactsServiceMock } from '../../tests/mocks/professionalContactsServiceMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
-import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
-import { OverviewStatus } from './interfaces/OverviewPageData'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
@@ -85,8 +84,8 @@ const getResLocals = ({
 
 describe('overviewController', () => {
   const offenderNo = 'A1234BC'
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: OverviewController
   let moneyService: MoneyService
   let pathfinderApiClient: PathfinderApiClient
@@ -117,12 +116,12 @@ describe('overviewController', () => {
       params: { offenderNo },
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
+    } as unknown as Request
     res = {
       locals: getResLocals(),
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     moneyService = moneyServiceMock() as MoneyService
     pathfinderApiClient = pathfinderApiClientMock() as PathfinderApiClient
@@ -216,7 +215,7 @@ describe('overviewController', () => {
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
-      }
+      } as Response
 
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
@@ -238,7 +237,7 @@ describe('overviewController', () => {
         const resRole = {
           ...res,
           locals: getResLocals({ caseLoads: CaseLoadsDummyDataB, userRoles: [role] }),
-        }
+        } as Response
         adjudicationsService.getAdjudicationsOverview = jest
           .fn()
           .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
@@ -274,7 +273,7 @@ describe('overviewController', () => {
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
-      }
+      } as Response
 
       visitsService.getVisitsOverview = jest
         .fn()
@@ -320,7 +319,7 @@ describe('overviewController', () => {
             ...req.middleware,
             prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
           },
-        },
+        } as Request,
         res,
       )
 
@@ -343,7 +342,7 @@ describe('overviewController', () => {
           ...req.middleware,
           prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
         },
-      }
+      } as Request
 
       await controller.displayOverview(reqEditCategory, res)
 
@@ -372,7 +371,7 @@ describe('overviewController', () => {
             ...req.middleware,
             prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
           },
-        },
+        } as Request,
         res,
       )
 
@@ -439,7 +438,7 @@ describe('overviewController', () => {
         {
           ...req,
           middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        },
+        } as Request,
         res,
       )
 
@@ -477,7 +476,7 @@ describe('overviewController', () => {
         {
           ...req,
           middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        },
+        } as Request,
         res,
       )
 
@@ -503,7 +502,7 @@ describe('overviewController', () => {
             ...req.middleware,
             prisonerData: { ...PrisonerMockDataA, prisonId: 'LII', inOutStatus: 'OUT', status: 'ACTIVE OUT' },
           },
-        },
+        } as Request,
         res,
       )
 
@@ -531,7 +530,7 @@ describe('overviewController', () => {
               locationDescription: 'Outside - released from Moorland (HMP & YOI)',
             },
           },
-        },
+        } as Request,
         res,
       )
 
@@ -557,7 +556,7 @@ describe('overviewController', () => {
               inOutStatus: 'TRN',
             },
           },
-        },
+        } as Request,
         res,
       )
 
@@ -581,13 +580,7 @@ describe('overviewController', () => {
       ['Suitable None/Recognised No', null, recognisedListenerNo, false, false],
     ])(
       'given %s should show correct suitable and/or recognised listener statuses',
-      async (
-        _: string,
-        suitableListener: ProfileInformation,
-        recognisedListener: ProfileInformation,
-        displaySuitable: boolean,
-        displayRecognised: boolean,
-      ) => {
+      async (_, suitableListener, recognisedListener, displaySuitable, displayRecognised) => {
         const profileInformation = [suitableListener, recognisedListener].filter(Boolean)
         offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
@@ -598,15 +591,28 @@ describe('overviewController', () => {
               ...req.middleware,
               inmateDetail: { ...inmateDetailMock, profileInformation },
             },
-          },
+          } as Request,
           res,
         )
 
-        const { statuses } = res.render.mock.calls[0][1]
+        const suitableMatcher = (displaySuitable ? expect.arrayContaining : expect.not.arrayContaining)([
+          expect.objectContaining({
+            label: 'Suitable Listener',
+          }),
+        ])
+        expect(res.render).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({ statuses: suitableMatcher }),
+        )
 
-        expect(statuses.some((status: OverviewStatus) => status.label === 'Suitable Listener')).toEqual(displaySuitable)
-        expect(statuses.some((status: OverviewStatus) => status.label === 'Recognised Listener')).toEqual(
-          displayRecognised,
+        const recognisedMatcher = (displayRecognised ? expect.arrayContaining : expect.not.arrayContaining)([
+          expect.objectContaining({
+            label: 'Recognised Listener',
+          }),
+        ])
+        expect(res.render).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({ statuses: recognisedMatcher }),
         )
       },
     )
@@ -667,7 +673,7 @@ describe('overviewController', () => {
               conditionalReleaseDate: 'CdRD',
             },
           },
-        },
+        } as Request,
         res,
       )
 

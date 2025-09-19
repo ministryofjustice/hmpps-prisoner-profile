@@ -8,3 +8,5 @@ export const communityManagerMock: CommunityManager = {
   telephone: '07700000000',
   unallocated: false,
 }
+
+export default { communityManagerMock }

@@ -11,7 +11,7 @@ export declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    userBackLink: string
+    userBackLink: { url: string; text: string }
     movementSlipData: object
     keyWorkerAtPrisons: Record<string, boolean>
     temporaryDataCache: Record<UUID, unknown>

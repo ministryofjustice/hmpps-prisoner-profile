@@ -7,6 +7,7 @@ interface CsraFilterValues {
   to?: string
   from?: string
 }
+
 export default (
   csraAssessments: CsraSummary[],
   filters: {

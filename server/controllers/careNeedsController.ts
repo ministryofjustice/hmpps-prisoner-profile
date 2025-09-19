@@ -7,7 +7,7 @@ import CareNeedsService from '../services/careNeedsService'
 
 export default class CareNeedsController {
   constructor(
-    private readonly careNeedsService: CareNeedsService,
+    readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
   ) {}
 

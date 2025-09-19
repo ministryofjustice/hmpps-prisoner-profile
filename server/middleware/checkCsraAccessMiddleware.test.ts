@@ -5,8 +5,8 @@ import RoleError from '../utils/roleError'
 import checkCsraAccess from './checkCsraAccessMiddleware'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 
 describe('CheckCsraAccessMiddleware', () => {

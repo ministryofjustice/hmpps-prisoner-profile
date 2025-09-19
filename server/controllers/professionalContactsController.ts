@@ -5,7 +5,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 
 export default class ProfessionalContactsController {
-  constructor(private readonly professionalContactsService: ProfessionalContactsService) {}
+  constructor(readonly professionalContactsService: ProfessionalContactsService) {}
 
   public async displayProfessionalContacts(req: Request, res: Response) {
     const { firstName, middleNames, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData

@@ -80,3 +80,5 @@ export const identifiersMock: OffenderIdentifier[] = [
     whenCreated: '2016-11-17T14:21:20.88026',
   },
 ]
+
+export default { identifiersMock }

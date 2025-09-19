@@ -25,14 +25,14 @@ describe('prisonService', () => {
   })
 
   const allPrisons: Array<PrisonDto> = [
-    prisonsKeyedByPrisonId['AKI'], // not an active prison
-    prisonsKeyedByPrisonId['ASI'], // an active prison
-    prisonsKeyedByPrisonId['MDI'], // an active prison
+    prisonsKeyedByPrisonId.AKI, // not an active prison
+    prisonsKeyedByPrisonId.ASI, // an active prison
+    prisonsKeyedByPrisonId.MDI, // an active prison
   ]
 
   const activePrisons: Array<PrisonDto> = [
-    prisonsKeyedByPrisonId['ASI'], // an active prison
-    prisonsKeyedByPrisonId['MDI'], // an active prison
+    prisonsKeyedByPrisonId.ASI, // an active prison
+    prisonsKeyedByPrisonId.MDI, // an active prison
   ]
 
   describe('getPrisonByPrisonId', () => {
@@ -43,7 +43,7 @@ describe('prisonService', () => {
 
       prisonRegisterStore.getActivePrisons.mockResolvedValue(activePrisons)
 
-      const moorlandPrisonResponse = prisonsKeyedByPrisonId['MDI']
+      const moorlandPrisonResponse = prisonsKeyedByPrisonId.MDI
 
       const expectedPrison: Prison = {
         prisonId: 'MDI',
@@ -70,7 +70,7 @@ describe('prisonService', () => {
       prisonRegisterStore.getActivePrisons.mockResolvedValue([])
       prisonRegisterClient.getAllPrisons.mockResolvedValue(allPrisons)
 
-      const moorlandPrisonResponse = prisonsKeyedByPrisonId['MDI']
+      const moorlandPrisonResponse = prisonsKeyedByPrisonId.MDI
 
       const expectedPrison: Prison = {
         prisonId: 'MDI',
@@ -123,7 +123,7 @@ describe('prisonService', () => {
       prisonRegisterStore.getActivePrisons.mockRejectedValue('some-error')
       prisonRegisterClient.getAllPrisons.mockResolvedValue(allPrisons)
 
-      const moorlandPrisonResponse = prisonsKeyedByPrisonId['MDI']
+      const moorlandPrisonResponse = prisonsKeyedByPrisonId.MDI
 
       const expectedPrison: Prison = {
         prisonId: 'MDI',

@@ -172,7 +172,7 @@ describe('groupIdentifyingMarks', () => {
               }),
             ])
 
-            expect(grouped.tattoos?.['Arm']?.length === 1).toBe(isArm)
+            expect(grouped.tattoos?.Arm?.length === 1).toBe(isArm)
           },
         )
 
@@ -194,7 +194,7 @@ describe('groupIdentifyingMarks', () => {
               }),
             ])
 
-            expect(grouped.tattoos?.['Arm']?.[0].location).toBe(locationText)
+            expect(grouped.tattoos?.Arm?.[0].location).toBe(locationText)
           },
         )
       })
@@ -207,7 +207,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Neck']?.length === 1).toBe(true)
+          expect(grouped.tattoos?.Neck?.length === 1).toBe(true)
         })
       })
 
@@ -342,7 +342,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Foot']?.length === 1).toBe(isFoot)
+          expect(grouped.tattoos?.Foot?.length === 1).toBe(isFoot)
         })
 
         test.each`
@@ -358,7 +358,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Foot']?.[0].location).toBe(locationText)
+          expect(grouped.tattoos?.Foot?.[0].location).toBe(locationText)
         })
       })
 
@@ -454,7 +454,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Hand']?.length === 1).toBe(isHand)
+          expect(grouped.tattoos?.Hand?.length === 1).toBe(isHand)
         })
 
         test.each`
@@ -469,7 +469,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Hand']?.[0].location).toBe(locationText)
+          expect(grouped.tattoos?.Hand?.[0].location).toBe(locationText)
         })
       })
 
@@ -576,7 +576,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Leg']?.length === 1).toBe(isLeg)
+          expect(grouped.tattoos?.Leg?.length === 1).toBe(isLeg)
         })
 
         test.each`
@@ -596,7 +596,7 @@ describe('groupIdentifyingMarks', () => {
               }),
             ])
 
-            expect(grouped.tattoos?.['Leg']?.[0].location).toBe(locationText)
+            expect(grouped.tattoos?.Leg?.[0].location).toBe(locationText)
           },
         )
       })
@@ -660,7 +660,7 @@ describe('groupIdentifyingMarks', () => {
             }),
           ])
 
-          expect(grouped.tattoos?.['Back']?.length === 1).toBe(isBack)
+          expect(grouped.tattoos?.Back?.length === 1).toBe(isBack)
         })
 
         test.each`
@@ -679,7 +679,7 @@ describe('groupIdentifyingMarks', () => {
               }),
             ])
 
-            expect(grouped.tattoos?.['Back']?.[0].location).toBe(locationText)
+            expect(grouped.tattoos?.Back?.[0].location).toBe(locationText)
           },
         )
       })

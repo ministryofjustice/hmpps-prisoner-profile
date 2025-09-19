@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { AddressLocation } from '../../services/mappers/addressMapper'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -32,7 +32,7 @@ export function displayManualEditAddressHandler(
   auditService: AuditService,
   options: DisplayManualEditAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { addressLocation, pageTitle, formTitle, auditPage, backLink, cancelAnchor } = options
     const { clientToken, prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const requestBody = requestBodyFromFlash<{ townOrCity: string; county: string; country: string }>(req)
@@ -82,7 +82,7 @@ export function submitManualEditAddressHandler(
   auditService: AuditService,
   options: SubmitManualEditAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { addressLocation, auditAction, confirmRedirectUrl, queryParams } = options
     const { prisonerNumber } = getCommonRequestData(req, res)
     const {

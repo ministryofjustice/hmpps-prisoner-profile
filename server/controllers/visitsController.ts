@@ -23,7 +23,7 @@ const sortByListSequenceThenDescription = (left: ReferenceCode, right: Reference
 const prisonsToDropdown = (prisons: PrisonDetails[]) =>
   hasLength(prisons) ? prisons.map(({ prisonId, prison }) => ({ value: prisonId, text: prison })) : []
 
-/* 
+/*
   We show the status as one dropdown in the frontend however the API requires querying by
   the visit status or the cancellation reason - this and calculateDateAndStatusFilter
   work together to allow that to appear as one dropdown despite being separate filters
@@ -60,7 +60,7 @@ export class VisitsController {
   constructor(private readonly visitsService: VisitsService) {}
 
   public visitsDetails(): RequestHandler {
-    return async (req, res, next) => {
+    return async (req, res) => {
       const queryParams: VisitsListQueryParams = {}
       const { clientToken, prisonerData } = req.middleware
 

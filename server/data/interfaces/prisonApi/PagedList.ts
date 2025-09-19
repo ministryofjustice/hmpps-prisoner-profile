@@ -1,5 +1,6 @@
 import { QueryParams } from '../../../interfaces/QueryParams'
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface PagedListItem {
   // Extended by:
   // Alert

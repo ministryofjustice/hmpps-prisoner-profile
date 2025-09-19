@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
@@ -80,6 +80,11 @@ export enum SetterOutcome {
   DUPLICATE,
 }
 
+interface PersonalControllerRequestHandlers {
+  edit: RequestHandler
+  submit: RequestHandler
+}
+
 export default class PersonalController {
   constructor(
     private readonly personalPageService: PersonalPageService,
@@ -87,8 +92,8 @@ export default class PersonalController {
     private readonly auditService: AuditService,
   ) {}
 
-  displayPersonalPage() {
-    return async (req: Request, res: Response, next: NextFunction) => {
+  displayPersonalPage(): RequestHandler {
+    return async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
       const { user, apiErrorCallback } = res.locals
@@ -144,12 +149,12 @@ export default class PersonalController {
     }
   }
 
-  height() {
+  height(): Record<'metric' | 'imperial', PersonalControllerRequestHandlers> {
     const { pageTitle, fieldName, auditEditPageLoad } = heightFieldData
 
     return {
       metric: {
-        edit: async (req: Request, res: Response, next: NextFunction) => {
+        edit: async (req, res) => {
           const { clientToken, prisonerNumber, prisonerName, prisonId, miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ editField: string }>(req)
           const errors = req.flash('errors')
@@ -174,7 +179,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, next: NextFunction) => {
+        submit: async (req, res) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { editField } = req.body
@@ -203,7 +208,7 @@ export default class PersonalController {
       },
 
       imperial: {
-        edit: async (req: Request, res: Response, next: NextFunction) => {
+        edit: async (req, res) => {
           const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
 
           const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
@@ -235,7 +240,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, next: NextFunction) => {
+        submit: async (req, res) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
@@ -266,12 +271,12 @@ export default class PersonalController {
     }
   }
 
-  weight() {
+  weight(): Record<'metric' | 'imperial', PersonalControllerRequestHandlers> {
     const { pageTitle, fieldName, auditEditPageLoad } = weightFieldData
 
     return {
       metric: {
-        edit: async (req: Request, res: Response, next: NextFunction) => {
+        edit: async (req, res) => {
           const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
           const errors = req.flash('errors')
@@ -296,7 +301,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, next: NextFunction) => {
+        submit: async (req, res) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
@@ -324,7 +329,7 @@ export default class PersonalController {
       },
 
       imperial: {
-        edit: async (req: Request, res: Response, next: NextFunction) => {
+        edit: async (req, res) => {
           const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
 
           const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
@@ -356,7 +361,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, next: NextFunction) => {
+        submit: async (req, res) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
@@ -457,9 +462,9 @@ export default class PersonalController {
     getter: TextFieldGetter,
     setter: TextFieldSetter,
     options?: { template?: string; onSubmit: (req: Request, res: Response, fieldData: TextFieldData) => Promise<void> },
-  ) {
+  ): PersonalControllerRequestHandlers {
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const fieldData = fieldDataGetter(req)
         const {
           pageTitle,
@@ -501,7 +506,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const fieldData = fieldDataGetter(req)
         const { fieldName } = fieldData
         const { prisonerNumber } = req.params
@@ -522,8 +527,12 @@ export default class PersonalController {
     }
   }
 
-  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: (RadioOption | { divider: string })[]) {
-    return async (req: Request, res: Response, next: NextFunction) => {
+  editRadioFields(
+    formTitle: string,
+    fieldData: RadioFieldData,
+    options: (RadioOption | { divider: string })[],
+  ): RequestHandler {
+    return async (req, res) => {
       const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
 
@@ -569,8 +578,8 @@ export default class PersonalController {
     autocompleteOptionTitle: string
     autocompleteOptionLabel: string
     autocompleteError: string
-  }) {
-    return async (req: Request, res: Response, next: NextFunction) => {
+  }): RequestHandler {
+    return async (req, res) => {
       const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
       const errors = req.flash('errors')
@@ -602,9 +611,9 @@ export default class PersonalController {
     }
   }
 
-  smokerOrVaper() {
+  smokerOrVaper(): PersonalControllerRequestHandlers {
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res, next) => {
         const { clientToken, naturalPrisonerName } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const fieldValue = requestBodyFlash?.radioField || this.getSmokerStatus(req.middleware.inmateDetail)
@@ -622,7 +631,7 @@ export default class PersonalController {
         )
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -642,11 +651,11 @@ export default class PersonalController {
     }
   }
 
-  nationality() {
+  nationality(): PersonalControllerRequestHandlers {
     const { fieldName, auditEditPageLoad } = nationalityFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
           getCommonRequestData(req, res)
         const { inmateDetail } = req.middleware
@@ -714,7 +723,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken, inmateDetail } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -767,10 +776,10 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  physicalCharacteristicRadioField(fieldData: RadioFieldData) {
+  physicalCharacteristicRadioField(fieldData: RadioFieldData): PersonalControllerRequestHandlers {
     const { pageTitle, code, domain, fieldName } = fieldData
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res, next) => {
         const { clientToken } = req.middleware
         const { prisonerNumber } = req.params
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
@@ -785,7 +794,7 @@ export default class PersonalController {
         return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -811,11 +820,11 @@ export default class PersonalController {
   /**
    * Handler for editing eye colour.
    */
-  eyeColour() {
+  eyeColour(): PersonalControllerRequestHandlers {
     const { pageTitle, fieldName, auditEditPageLoad } = eyeColourFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const domain = CorePersonRecordReferenceDataDomain.leftEyeColour
         const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ eyeColour: string }>(req)
@@ -853,7 +862,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -885,11 +894,11 @@ export default class PersonalController {
   /**
    * Handler for editing left and right eye colour individually.
    */
-  eyeColourIndividual() {
+  eyeColourIndividual(): PersonalControllerRequestHandlers {
     const { pageTitle, auditEditPageLoad } = eyeColourIndividualFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const domainLeftEyeColour = CorePersonRecordReferenceDataDomain.leftEyeColour
         const domainRightEyeColour = CorePersonRecordReferenceDataDomain.rightEyeColour
 
@@ -925,7 +934,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -955,7 +964,7 @@ export default class PersonalController {
     }
   }
 
-  dietAndFoodAllergies() {
+  dietAndFoodAllergies(): PersonalControllerRequestHandlers {
     const { pageTitle, fieldName, auditEditPageLoad } = dietAndFoodAllergiesFieldData
 
     const mapDietAndAllergy = (
@@ -993,7 +1002,7 @@ export default class PersonalController {
     }
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
           getCommonRequestData(req, res)
 
@@ -1064,7 +1073,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const { prisonerNumber } = req.params
@@ -1105,11 +1114,11 @@ export default class PersonalController {
     }
   }
 
-  countryOfBirth() {
+  countryOfBirth(): PersonalControllerRequestHandlers {
     const { fieldName } = countryOfBirthFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res, next) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const { autocompleteField, autocompleteError, radioField } =
@@ -1148,7 +1157,7 @@ export default class PersonalController {
         })(req, res, next)
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken, inmateDetail } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1175,7 +1184,7 @@ export default class PersonalController {
     }
   }
 
-  religion() {
+  religion(): PersonalControllerRequestHandlers {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
 
     const currentReligionValue = (req: Request, referenceData: ReferenceDataCodeDto[]) => {
@@ -1224,7 +1233,7 @@ export default class PersonalController {
     }
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
           getCommonRequestData(req, res)
 
@@ -1295,7 +1304,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1333,7 +1342,7 @@ export default class PersonalController {
     }
   }
 
-  sexualOrientation() {
+  sexualOrientation(): PersonalControllerRequestHandlers {
     const { fieldName } = sexualOrientationFieldData
 
     const descriptionLookup: Record<string, string> = {
@@ -1364,7 +1373,7 @@ export default class PersonalController {
     }
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res, next) => {
         const { prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
@@ -1398,7 +1407,7 @@ export default class PersonalController {
         )(req, res, next)
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1419,11 +1428,11 @@ export default class PersonalController {
     }
   }
 
-  numberOfChildren() {
+  numberOfChildren(): PersonalControllerRequestHandlers {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = numberOfChildrenFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res) => {
         const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
           getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ hasChildren: string; numberOfChildren?: number }>(req)
@@ -1456,7 +1465,7 @@ export default class PersonalController {
         })
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1485,11 +1494,11 @@ export default class PersonalController {
     }
   }
 
-  domesticStatus() {
+  domesticStatus(): PersonalControllerRequestHandlers {
     const { fieldName } = domesticStatusFieldData
 
     return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
+      edit: async (req, res, next) => {
         const { prisonerNumber } = req.params
         const { prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
@@ -1521,7 +1530,7 @@ export default class PersonalController {
         )(req, res, next)
       },
 
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req, res) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1543,7 +1552,7 @@ export default class PersonalController {
     }
   }
 
-  globalNumbers() {
+  globalNumbers(): Record<'add' | 'edit', PersonalControllerRequestHandlers> {
     const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): RadioOption[] => {
       const orderedReferenceDataCodes = ['MOB', 'HOME', 'ALTH', 'BUS', 'ALTB', 'VISIT', 'FAX']
 
@@ -1571,7 +1580,7 @@ export default class PersonalController {
 
     return {
       add: {
-        edit: async (req: Request, res: Response, _next: NextFunction) => {
+        edit: async (req, res) => {
           const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
             getCommonRequestData(req, res)
           const errors = req.flash('errors')
@@ -1616,7 +1625,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, _next: NextFunction) => {
+        submit: async (req, res) => {
           const { clientToken, prisonerNumber, naturalPrisonerName } = getCommonRequestData(req, res)
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
           const fieldData = addPhoneNumberFieldData(naturalPrisonerName)
@@ -1660,7 +1669,7 @@ export default class PersonalController {
         },
       },
       edit: {
-        edit: async (req: Request, res: Response, _next: NextFunction) => {
+        edit: async (req, res) => {
           const { phoneNumberId } = req.params
           const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
             getCommonRequestData(req, res)
@@ -1706,7 +1715,7 @@ export default class PersonalController {
           })
         },
 
-        submit: async (req: Request, res: Response, _next: NextFunction) => {
+        submit: async (req, res) => {
           const { phoneNumberId } = req.params
           const { clientToken, prisonerNumber, naturalPrisonerName } = getCommonRequestData(req, res)
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
@@ -1760,7 +1769,7 @@ export default class PersonalController {
     }
   }
 
-  globalEmails() {
+  globalEmails(): Record<'add' | 'edit', PersonalControllerRequestHandlers> {
     const globalEmailGetter: TextFieldGetter = async (req, _fieldData) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
@@ -1888,7 +1897,7 @@ export default class PersonalController {
         setterOutcome: SetterOutcome | void,
       ) => Promise<void>
     }
-  }) {
+  }): Promise<void> {
     const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
 
     try {

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { formatName } from '../utils/utils'
 import CsraService from '../services/csraService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -10,11 +10,11 @@ import logger from '../../logger'
 
 export default class CsraController {
   constructor(
-    private readonly csraService: CsraService,
+    readonly csraService: CsraService,
     private readonly auditService: AuditService,
   ) {}
 
-  public async displayHistory(req: Request, res: Response, next: NextFunction) {
+  public async displayHistory(req: Request, res: Response) {
     const { firstName, lastName, middleNames, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
@@ -59,10 +59,11 @@ export default class CsraController {
       prisonerNumber,
       csraAssessments: filteredAsessments,
       filterValues,
+      errors: undefined,
     })
   }
 
-  public async displayReview(req: Request, res: Response, next: NextFunction) {
+  public async displayReview(req: Request, res: Response) {
     const {
       prisonerData,
       prisonerData: { firstName, lastName, middleNames },

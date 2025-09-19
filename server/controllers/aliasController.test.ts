@@ -149,11 +149,11 @@ describe('Alias Controller', () => {
     it('Populates the errors from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           if (key === 'errors') return ['error']
           return []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeNameCorrection()(req, res, next)
 
@@ -163,10 +163,10 @@ describe('Alias Controller', () => {
     it('Populates the field value from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           return key === 'requestBody' ? [JSON.stringify({ firstName: 'first' })] : []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeNameCorrection()(req, res, next)
 
@@ -294,11 +294,11 @@ describe('Alias Controller', () => {
     it('Populates the errors from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           if (key === 'errors') return ['error']
           return []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeNameLegal()(req, res, next)
 
@@ -308,10 +308,10 @@ describe('Alias Controller', () => {
     it('Populates the field value from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           return key === 'requestBody' ? [JSON.stringify({ firstName: 'first' })] : []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeNameLegal()(req, res, next)
 
@@ -435,11 +435,11 @@ describe('Alias Controller', () => {
     it('Populates the errors from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           if (key === 'errors') return ['error']
           return []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayAddNewAlias()(req, res, next)
 
@@ -478,10 +478,10 @@ describe('Alias Controller', () => {
     it('Populates the field value from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           return key === 'requestBody' ? [JSON.stringify({ firstName: 'first' })] : []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayAddNewAlias()(req, res, next)
 
@@ -615,11 +615,11 @@ describe('Alias Controller', () => {
     it('Populates the errors from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           if (key === 'errors') return ['error']
           return []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeDateOfBirth()(req, res, next)
 
@@ -629,10 +629,10 @@ describe('Alias Controller', () => {
     it('Populates the field value from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           return key === 'requestBody' ? [JSON.stringify({ 'dateOfBirth-day': '01' })] : []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeDateOfBirth()(req, res, next)
 
@@ -854,11 +854,11 @@ describe('Alias Controller', () => {
     it('Populates the errors from the flash', async () => {
       req = {
         ...req,
-        flash: (key: string): any => {
+        flash: (key: string) => {
           if (key === 'errors') return ['error']
           return []
         },
-      } as any
+      } as unknown as Request
 
       await controller.displayChangeEthnicBackground()(req, res, next)
 

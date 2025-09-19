@@ -11,3 +11,5 @@ export const auditServiceMock = (): AuditService => ({
   sendPutSuccess: jest.fn().mockImplementation(() => Promise.resolve()),
   sendEvent: jest.fn().mockImplementation(() => Promise.resolve()),
 })
+
+export default { auditServiceMock }

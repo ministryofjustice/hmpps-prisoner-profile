@@ -4,3 +4,5 @@ export enum BooleanString {
   Y = 'Y',
   N = 'N',
 }
+
+export default { BooleanString }

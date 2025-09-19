@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from 'express'
 import { VisitsService } from '../services/visitsService'
 import { VisitsController } from './visitsController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -12,22 +13,26 @@ import { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 describe('Visits controller', () => {
   let controller: VisitsController
   let visitsService: VisitsService
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
+  const next: NextFunction = jest.fn()
 
   beforeEach(() => {
     visitsService = {
-      sortVisitors: jest.fn(() => [pagedVisitsMock.content[0].visitors[0]]),
-      getVisits: jest.fn(() => ({
-        completionReasons: mockReferenceDomains(ReferenceCodeDomain.VisitCompletionReasons),
-        cancellationReasons: mockReferenceDomains(ReferenceCodeDomain.VisitCancellationReasons),
-        prisons: [
-          { prisonId: 'MDI', prison: 'Moorland' },
-          { prisonId: 'LEI', prison: 'Leeds' },
-        ],
-        visitsWithPaginationInfo: pagedVisitsMock,
-      })),
-    } as any
+      sortVisitors: jest.fn(() => [{ ...pagedVisitsMock.content[0].visitors[0], ageInYearsOr18IfNoDob: 18 }]),
+      getVisits: jest.fn(() =>
+        Promise.resolve({
+          completionReasons: mockReferenceDomains(ReferenceCodeDomain.VisitCompletionReasons),
+          cancellationReasons: mockReferenceDomains(ReferenceCodeDomain.VisitCancellationReasons),
+          prisons: [
+            { prisonId: 'MDI', prison: 'Moorland' },
+            { prisonId: 'LEI', prison: 'Leeds' },
+          ],
+          visitsWithPaginationInfo: pagedVisitsMock,
+        }),
+      ),
+      getVisitsOverview: jest.fn(),
+    } as unknown as VisitsService
 
     req = {
       params: { prisonerNumber: 'G6123VU' },
@@ -41,7 +46,7 @@ describe('Visits controller', () => {
       },
       path: 'case-notes',
       flash: jest.fn(),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -55,13 +60,13 @@ describe('Visits controller', () => {
       },
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     controller = new VisitsController(visitsService)
   })
 
   it('Gets the visits from the service', async () => {
-    await controller.visitsDetails()(req, res, jest.fn())
+    await controller.visitsDetails()(req, res, next)
     expect(visitsService.getVisits).toHaveBeenCalledWith('CLIENT_TOKEN', PrisonerMockDataA, {})
   })
 
@@ -69,7 +74,7 @@ describe('Visits controller', () => {
     const page = 'pages/visitsDetails'
 
     it('Provides prisoner information', async () => {
-      await controller.visitsDetails()(req, res, jest.fn())
+      await controller.visitsDetails()(req, res, next)
       expect(res.render).toHaveBeenCalledWith(
         page,
         expect.objectContaining({
@@ -86,7 +91,7 @@ describe('Visits controller', () => {
     })
 
     it('Formats the visit reasons into statuses for the dropdown', async () => {
-      await controller.visitsDetails()(req, res, jest.fn())
+      await controller.visitsDetails()(req, res, next)
       expect(res.render).toHaveBeenCalledWith(
         page,
         expect.objectContaining({
@@ -101,7 +106,7 @@ describe('Visits controller', () => {
     })
 
     it('Formats the prison for the dropdown', async () => {
-      await controller.visitsDetails()(req, res, jest.fn())
+      await controller.visitsDetails()(req, res, next)
       expect(res.render).toHaveBeenCalledWith(
         page,
         expect.objectContaining({
@@ -114,7 +119,7 @@ describe('Visits controller', () => {
     })
 
     it('Provides the visits with sorted visitors', async () => {
-      await controller.visitsDetails()(req, res, jest.fn())
+      await controller.visitsDetails()(req, res, next)
       expect(visitsService.sortVisitors).toHaveBeenCalledWith(pagedVisitsMock.content[0].visitors)
     })
 
@@ -134,7 +139,7 @@ describe('Visits controller', () => {
             prisonId: 'LEI',
           }
 
-          await controller.visitsDetails()(req, res, jest.fn())
+          await controller.visitsDetails()(req, res, next)
 
           expect(visitsService.getVisits).toHaveBeenCalledWith('CLIENT_TOKEN', PrisonerMockDataA, {
             page: 1,

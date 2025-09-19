@@ -5,8 +5,8 @@ import { userServiceMock } from '../../tests/mocks/userServiceMock'
 import checkIfKeyWorkerAtPrison from './checkIfKeyWorkerAtPrison'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 
 describe('checkIfKeyWorkerAtPrison', () => {
