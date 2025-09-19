@@ -98,6 +98,7 @@ generic-service:
     EXTERNAL_CONTACTS_ENABLED_PRISONS: "***"
     MANAGE_ALLOCATIONS_ENABLED: "true"
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
+    PERSON_ENDPOINTS_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32

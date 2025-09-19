@@ -7,6 +7,7 @@ import {
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
   PersonIntegrationDistinguishingMarkImageDetail,
+  PrisonerProfileSummary,
   PseudonymResponseDto,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
@@ -18,7 +19,8 @@ import {
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import { mockAddressResponseDto } from '../../server/data/localMockData/personIntegrationApi/addresses'
 
-const baseUrl = '/personIntegration'
+const baseUrl = '/personIntegration/v2/person'
+const refDataBaseUrl = '/personIntegration/v2/reference-data'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
@@ -30,55 +32,67 @@ export default {
     referenceData: CorePersonRecordReferenceDataCodeDto[]
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/core-person-record/reference-data/domain/${domain}/codes`,
+      path: `${refDataBaseUrl}/domain/${domain}/codes`,
       body: referenceData,
     }),
 
-  stubPersonIntegrationUpdate: () =>
+  stubPersonIntegrationUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPatchWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}`,
       responseBody: null,
     }),
 
-  stubPersonIntegrationReligionUpdate: () =>
+  stubPersonIntegrationReligionUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/person-protected-characteristics/religion\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/religion`,
       responseBody: null,
     }),
 
-  stubPersonIntegrationNationalityUpdate: () =>
+  stubPersonIntegrationNationalityUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/nationality\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/nationality`,
       responseBody: null,
     }),
 
-  stubPersonIntegrationGetMilitaryRecords: (militaryRecords: MilitaryRecord[]) =>
+  stubPersonIntegrationGetMilitaryRecords: ({
+    prisonerNumber,
+    militaryRecords,
+  }: {
+    prisonerNumber: string
+    militaryRecords: MilitaryRecord[]
+  }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/military-records`,
       body: militaryRecords,
     }),
 
-  stubPersonIntegrationUpdateMilitaryRecord: () =>
+  stubPersonIntegrationUpdateMilitaryRecord: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*&militarySeq=.*`,
+      path: `${baseUrl}/${prisonerNumber}/military-records\\?militarySeq=.*`,
       responseBody: null,
     }),
 
-  stubPersonIntegrationCreateMilitaryRecord: () =>
+  stubPersonIntegrationCreateMilitaryRecord: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPostWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/military-records`,
       responseBody: null,
     }),
 
-  stubPersonIntegrationGetPhysicalAttributes: (physicalAttributes: CorePersonPhysicalAttributesDto) =>
+  stubPersonIntegrationGetPhysicalAttributes: ({
+    prisonerNumber,
+    physicalAttributes,
+  }: {
+    prisonerNumber: string
+    physicalAttributes: CorePersonPhysicalAttributesDto
+  }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/physical-attributes`,
       body: physicalAttributes,
     }),
 
-  stubPersonIntegrationUpdatePhysicalAttributes: () =>
+  stubPersonIntegrationUpdatePhysicalAttributes: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
+      path: `${baseUrl}/${prisonerNumber}/physical-attributes`,
       responseBody: null,
     }),
 
@@ -90,17 +104,18 @@ export default {
     response: PersonIntegrationDistinguishingMark[]
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/distinguishing-marks\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      path: `${baseUrl}/${prisonerNumber}/distinguishing-marks`,
       body: response,
     }),
 
   stubGetDistinguishingMarkImage: (
+    prisonerNumber: string,
     photo: PersonIntegrationDistinguishingMarkImageDetail = distinguishingMarkMock.photographUuids[0],
   ) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `${baseUrl}/v1/distinguishing-mark/image/${photo.id}\\?sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/distinguishing-mark/image/${photo.id}`,
       },
       response: {
         status: 200,
@@ -116,7 +131,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}/v1/distinguishing-mark\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/distinguishing-mark`,
       },
       response: {
         status: 200,
@@ -140,7 +155,7 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}\\?sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/distinguishing-mark/${prisonerNumber}-${markId}`,
       },
       response: {
         status: 200,
@@ -153,6 +168,7 @@ export default {
   },
 
   stubPutDistinguishingMarkPhoto: ({
+    prisonerNumber,
     imageId = '100',
     response = distinguishingMarkMock,
   }: {
@@ -163,7 +179,7 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `${baseUrl}/v1/distinguishing-mark/image/${imageId}\\?sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/distinguishing-mark/${imageId}/image`,
       },
       response: {
         status: 200,
@@ -187,7 +203,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}/image\\?sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/distinguishing-mark/${prisonerNumber}-${markId}/image`,
       },
       response: {
         status: 200,
@@ -209,7 +225,7 @@ export default {
     response: PersonIntegrationDistinguishingMark
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}\\?sourceSystem=NOMIS`,
+      path: `${baseUrl}/${prisonerNumber}/distinguishing-mark/${prisonerNumber}-${markId}`,
       body: response,
     }),
 
@@ -221,21 +237,23 @@ export default {
     response: PseudonymResponseDto[]
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/pseudonyms\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      path: `${baseUrl}/${prisonerNumber}/pseudonyms`,
       body: response,
     }),
 
   stubUpdatePseudonym: ({
+    prisonerNumber,
     pseudonymId = 12345,
     response = PseudonymResponseMock,
   }: {
+    prisonerNumber: string
     pseudonymId: number
     response: PseudonymResponseDto
   }) =>
     stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `${baseUrl}/v1/pseudonym/${pseudonymId}\\?sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/pseudonym/${pseudonymId}`,
       },
       response: {
         status: 200,
@@ -256,7 +274,7 @@ export default {
     stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}/v1/pseudonym\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+        urlPattern: `${baseUrl}/${prisonerNumber}/pseudonym`,
       },
       response: {
         status: 200,
@@ -269,7 +287,7 @@ export default {
 
   stubUpdateProfileImage: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse({
-      path: `${baseUrl}/v1/core-person-record/profile-image\\?prisonerNumber=${prisonerNumber}`,
+      path: `${baseUrl}/${prisonerNumber}/profile-image`,
       responseBody: {},
     }),
 
@@ -281,19 +299,19 @@ export default {
     response: AddressResponseDto[]
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
+      path: `${baseUrl}/${prisonerNumber}/addresses`,
       body: response,
     }),
 
   stubCreateAddress: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPostWithResponse({
-      path: `${baseUrl}/v1/person/${prisonerNumber}/addresses`,
+      path: `${baseUrl}/${prisonerNumber}/addresses`,
       responseBody: {},
     }),
 
   stubPersonIntegrationGetContacts: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts`,
+      path: `${baseUrl}/${prisonerNumber}/contacts`,
       body: ContactsResponseMock,
     }),
 
@@ -305,7 +323,7 @@ export default {
     response?: ContactsResponseDto
   }) =>
     stubPostWithResponse({
-      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts`,
+      path: `${baseUrl}/${prisonerNumber}/contacts`,
       responseBody: response ?? ContactsResponseMock[0],
     }),
 
@@ -319,19 +337,39 @@ export default {
     response?: ContactsResponseDto
   }) =>
     stubPutWithResponse({
-      path: `${baseUrl}/v1/person/${prisonerNumber}/contacts/${contactId}`,
+      path: `${baseUrl}/${prisonerNumber}/contacts/${contactId}`,
       responseBody: response ?? ContactsResponseMock[0],
     }),
 
   stubAddIdentifiers: ({ prisonerNumber = PrisonerMockDataA.prisonerNumber }: { prisonerNumber: string }) =>
     stubPostWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/identifiers\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      path: `${baseUrl}/${prisonerNumber}/identifiers`,
       responseBody: null,
     }),
 
-  stubUpdateIdentifier: ({ offenderId = 1, seqId = 1 }: { offenderId: number; seqId: number }) =>
+  stubUpdateIdentifier: ({
+    prisonerNumber,
+    offenderId = 1,
+    seqId = 1,
+  }: {
+    prisonerNumber: string
+    offenderId: number
+    seqId: number
+  }) =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/identifiers\\?offenderId=${offenderId}&seqId=${seqId}&sourceSystem=NOMIS`,
+      path: `${baseUrl}/${prisonerNumber}/identifiers\\?offenderId=${offenderId}&seqId=${seqId}`,
       responseBody: null,
+    }),
+
+  stubGetPrisonerProfileSummary: ({
+    prisonerNumber,
+    response,
+  }: {
+    prisonerNumber: string
+    response: PrisonerProfileSummary
+  }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/${prisonerNumber}`,
+      body: response,
     }),
 }
