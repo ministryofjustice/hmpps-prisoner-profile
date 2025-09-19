@@ -36,9 +36,9 @@ export default {
       body: referenceData,
     }),
 
-  stubPersonIntegrationUpdate: () =>
+  stubPersonIntegrationUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPatchWithResponse<void>({
-      path: `${baseUrl}/v2/person\\?prisonerNumber=.*`,
+      path: `${baseUrl}/v2/person/${prisonerNumber}`,
       responseBody: null,
     }),
 
