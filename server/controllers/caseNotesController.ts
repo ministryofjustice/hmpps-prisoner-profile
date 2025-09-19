@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { CaseNotesPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
@@ -24,12 +24,12 @@ import { errorHasStatus } from '../utils/errorHelpers'
  */
 export default class CaseNotesController {
   constructor(
-    private readonly caseNotesService: CaseNotesService,
+    readonly caseNotesService: CaseNotesService,
     private readonly auditService: AuditService,
   ) {}
 
   public displayCaseNotes(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
       const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
@@ -99,7 +99,7 @@ export default class CaseNotesController {
   }
 
   public displayAddCaseNote(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       const { prisonerNumber, prisonId, miniBannerData, prisonerPermissions } = getCommonRequestData(req, res)
 
       const now = new Date()
@@ -155,7 +155,7 @@ export default class CaseNotesController {
   }
 
   public post(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { prisonerPermissions } = res.locals
       const { prisonerNumber } = req.params
       const { type, subType, text, date, hours, minutes, refererUrl } = req.body
@@ -221,7 +221,7 @@ export default class CaseNotesController {
   }
 
   public displayUpdateCaseNote(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { caseNoteId } = req.params
       const { clientToken, prisonerNumber, prisonId, prisonerPermissions, miniBannerData } = getCommonRequestData(
         req,
@@ -274,7 +274,7 @@ export default class CaseNotesController {
   }
 
   public postUpdate(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { prisonerNumber, caseNoteId } = req.params
       const { text } = req.body
       const { clientToken } = req.middleware

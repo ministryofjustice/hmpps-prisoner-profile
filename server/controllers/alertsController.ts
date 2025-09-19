@@ -27,11 +27,11 @@ const excludedAlertCodes: string[] = [
  */
 export default class AlertsController {
   constructor(
-    private readonly alertsService: AlertsService,
+    readonly alertsService: AlertsService,
     private readonly auditService: AuditService,
   ) {}
 
-  public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
+  public async displayAlerts(req: Request, res: Response, _next: NextFunction, isActive: boolean) {
     // Get data from middleware
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { user, prisonerPermissions } = res.locals
@@ -115,7 +115,7 @@ export default class AlertsController {
     })
   }
 
-  public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
+  public async displayAddAlert(req: Request, res: Response, _next: NextFunction) {
     const { clientToken, alerts, prisonId, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
 
     const types = await this.alertsService.getAlertTypes(clientToken)
@@ -164,7 +164,7 @@ export default class AlertsController {
   }
 
   public post(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { existingAlerts, alertType, alertCode, description, activeFrom, activeTo } = req.body
       const alertForm = {
@@ -209,7 +209,7 @@ export default class AlertsController {
   }
 
   public displayAlert(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, miniBannerData } = getCommonRequestData(req, res)
       const alertIds = req.query.ids
       const alerts: Alert[] = await Promise.all(
@@ -227,7 +227,7 @@ export default class AlertsController {
   }
 
   public getAlertDetails(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const {
         prisonerData: { prisonerNumber },
       } = req.middleware
@@ -247,7 +247,7 @@ export default class AlertsController {
     }
   }
 
-  public async displayAddMoreDetails(req: Request, res: Response, next: NextFunction) {
+  public async displayAddMoreDetails(req: Request, res: Response, _next: NextFunction) {
     const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const alert = await this.alertsService.getAlertDetails(clientToken, req.params.alertId)
 
@@ -292,7 +292,7 @@ export default class AlertsController {
   }
 
   public postAddMoreDetails(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, alertId } = req.params
       const { description, activeTo } = req.body
 
@@ -325,7 +325,7 @@ export default class AlertsController {
     }
   }
 
-  public async displayCloseAlert(req: Request, res: Response, next: NextFunction) {
+  public async displayCloseAlert(req: Request, res: Response, _next: NextFunction) {
     const { alertId } = req.params
     const { prisonerNumber, prisonId, miniBannerData, clientToken } = getCommonRequestData(req, res)
 
@@ -378,7 +378,7 @@ export default class AlertsController {
   }
 
   public postCloseAlert(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, alertId } = req.params
       const { description, activeTo, today } = req.body
       const errors = req.errors || []
@@ -416,7 +416,7 @@ export default class AlertsController {
     }
   }
 
-  public async displayChangeEndDate(req: Request, res: Response, next: NextFunction) {
+  public async displayChangeEndDate(req: Request, res: Response, _next: NextFunction) {
     const { alertId } = req.params
     const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
@@ -469,7 +469,7 @@ export default class AlertsController {
   }
 
   public postChangeEndDate(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, alertId } = req.params
       const { description, activeTo, removeEndDate } = req.body
       const errors = req.errors || []

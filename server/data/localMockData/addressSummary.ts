@@ -21,3 +21,5 @@ export const addressSummaryMock: GovSummaryItem[] = [
     },
   },
 ]
+
+export default { addressSummaryMock }

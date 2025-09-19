@@ -115,7 +115,7 @@ export default class AddressService {
     return this.personIntegrationApiClientBuilder(token).createAddress(prisonerNumber, address)
   }
 
-  public async getAddressesFromPrisonAPI(token: string, prisonerNumber: string): Promise<Address[]> {
+  public async getAddressesFromPrisonAPI(token: string, prisonerNumber: string): Promise<Address[] | null> {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
   }
 

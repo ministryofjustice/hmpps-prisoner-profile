@@ -19,7 +19,7 @@ export default function alertsRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.CsraHistory }),
     getPrisonerData(services, { minimal: true }),
     checkCsraAccess(),
-    (req, res, next) => csraController.displayHistory(req, res, next),
+    (req, res) => csraController.displayHistory(req, res),
   )
 
   get(
@@ -27,7 +27,7 @@ export default function alertsRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.CsraReview }),
     getPrisonerData(services, { minimal: true }),
     checkCsraAccess(),
-    (req, res, next) => csraController.displayReview(req, res, next),
+    (req, res) => csraController.displayReview(req, res),
   )
 
   return router

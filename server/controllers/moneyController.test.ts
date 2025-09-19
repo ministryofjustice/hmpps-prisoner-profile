@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from 'express'
 import { format } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -17,9 +18,9 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { Page } from '../services/auditService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
-let req: any
-let res: any
-let next: any
+let req: Request
+let res: Response
+let next: NextFunction
 let controller: MoneyController
 
 jest.mock('../services/moneyService.ts')
@@ -40,7 +41,7 @@ describe('Money Controller', () => {
       },
       path: 'money/spends',
       flash: jest.fn(),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -53,7 +54,7 @@ describe('Money Controller', () => {
       },
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     moneyService = new MoneyService(null)
     moneyService.getAccountBalances = jest.fn(async () => accountBalancesMock)
@@ -68,7 +69,7 @@ describe('Money Controller', () => {
   })
 
   it('should display spends', async () => {
-    const getTransactions = jest.spyOn<any, string>(controller, 'getTransactions')
+    const getTransactions = jest.spyOn(controller, 'getTransactions')
 
     await controller.displaySpends()(req, res, next)
 
@@ -76,7 +77,7 @@ describe('Money Controller', () => {
   })
 
   it('should display private cash', async () => {
-    const getTransactions = jest.spyOn<any, string>(controller, 'getTransactions')
+    const getTransactions = jest.spyOn(controller, 'getTransactions')
 
     await controller.displayPrivateCash()(req, res, next)
 
@@ -90,7 +91,7 @@ describe('Money Controller', () => {
   })
 
   it('should display savings', async () => {
-    const getTransactions = jest.spyOn<any, string>(controller, 'getTransactions')
+    const getTransactions = jest.spyOn(controller, 'getTransactions')
 
     await controller.displaySavings()(req, res, next)
 
@@ -98,7 +99,7 @@ describe('Money Controller', () => {
   })
 
   it('should display damage obligations', async () => {
-    const getDamageObligations = jest.spyOn<any, string>(controller, 'getDamageObligations')
+    const getDamageObligations = jest.spyOn(controller, 'getDamageObligations')
 
     await controller.displayDamageObligations()(req, res, next)
 
@@ -106,16 +107,16 @@ describe('Money Controller', () => {
   })
 
   it('should get damage obligations', async () => {
-    const mapToObligationTableRows = jest.spyOn<any, string>(controller, 'mapToObligationTableRows')
-    const getRefData = jest.spyOn<any, string>(controller, 'getRefData')
-    const getLast4Years = jest.spyOn<any, string>(controller, 'getLast4Years').mockReturnValue([
+    const mapToObligationTableRows = jest.spyOn(controller, 'mapToObligationTableRows')
+    const getRefData = jest.spyOn(controller, 'getRefData')
+    const getLast4Years = jest.spyOn(controller, 'getLast4Years').mockReturnValue([
       { text: 2023, value: 2023 },
       { text: 2022, value: 2022 },
       { text: 2021, value: 2021 },
       { text: 2020, value: 2020 },
     ])
 
-    await controller['getDamageObligations'](req, res)
+    await controller.getDamageObligations(req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
       req.middleware.clientToken,
@@ -180,20 +181,20 @@ describe('Money Controller', () => {
   })
 
   it('Should get transactions for January (month 0)', async () => {
-    jest.spyOn<any, string>(controller, 'mapToTableRows')
-    jest.spyOn<any, string>(controller, 'getRefData')
-    jest.spyOn<any, string>(controller, 'getLast4Years').mockReturnValue([
+    jest.spyOn(controller, 'mapToTableRows')
+    jest.spyOn(controller, 'getRefData')
+    jest.spyOn(controller, 'getLast4Years').mockReturnValue([
       { text: 2023, value: 2023 },
       { text: 2022, value: 2022 },
       { text: 2021, value: 2021 },
       { text: 2020, value: 2020 },
     ])
 
-    await controller['getTransactions'](
+    await controller.getTransactions(
       AccountCode.Spends,
       'Spends',
       Page.MoneySpends,
-      { ...req, query: { month: '0', year: '2023' } } as any,
+      { ...req, query: { month: '0', year: '2023' } } as unknown as Request,
       res,
     )
 
@@ -211,16 +212,16 @@ describe('Money Controller', () => {
     const month = now.getMonth()
     const year = now.getFullYear()
 
-    const mapToTableRows = jest.spyOn<any, string>(controller, 'mapToTableRows')
-    const getRefData = jest.spyOn<any, string>(controller, 'getRefData')
-    const getLast4Years = jest.spyOn<any, string>(controller, 'getLast4Years').mockReturnValue([
+    const mapToTableRows = jest.spyOn(controller, 'mapToTableRows')
+    const getRefData = jest.spyOn(controller, 'getRefData')
+    const getLast4Years = jest.spyOn(controller, 'getLast4Years').mockReturnValue([
       { text: 2023, value: 2023 },
       { text: 2022, value: 2022 },
       { text: 2021, value: 2021 },
       { text: 2020, value: 2020 },
     ])
 
-    await controller['getTransactions'](AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
+    await controller.getTransactions(AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
       req.middleware.clientToken,
@@ -236,7 +237,7 @@ describe('Money Controller', () => {
     expect(mapToTableRows).toHaveBeenCalledWith(
       [...batchTransactionsMock, ...bonusPayTransactionsMock, ...pieceWorkTransactionsMock]
         .filter(tx => !!tx.penceAmount)
-        .sort(controller['transactionSort']),
+        .sort(controller.transactionSort),
       [AgenciesMock],
     )
     expect(getRefData).toHaveBeenCalledWith(req.middleware.prisonerData)

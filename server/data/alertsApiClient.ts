@@ -18,7 +18,7 @@ export default class AlertsApiRestClient extends RestClient implements AlertsApi
       ...rest,
     }
 
-    return this.get<PagedList<Alert>>(
+    return this.get(
       {
         path: `/prisoners/${prisonerNumber}/alerts`,
         query: mapToQueryString(params),
@@ -28,21 +28,18 @@ export default class AlertsApiRestClient extends RestClient implements AlertsApi
   }
 
   async getAlertDetails(alertId: string): Promise<Alert> {
-    return this.get<Alert>({ path: `/alerts/${alertId}` }, this.token)
+    return this.get({ path: `/alerts/${alertId}` }, this.token)
   }
 
   async createAlert(prisonerNumber: string, alert: CreateAlert): Promise<Alert> {
-    return this.post<Alert>(
-      { path: `/prisoners/${prisonerNumber}/alerts`, data: alert as Record<string, any> },
-      this.token,
-    )
+    return this.post({ path: `/prisoners/${prisonerNumber}/alerts`, data: alert }, this.token)
   }
 
   async updateAlert(alertId: string, alertChanges: AlertChanges): Promise<Alert> {
-    return this.put<Alert>({ path: `/alerts/${alertId}`, data: alertChanges as Record<string, any> }, this.token)
+    return this.put({ path: `/alerts/${alertId}`, data: alertChanges }, this.token)
   }
 
   async getAlertTypes(): Promise<AlertType[]> {
-    return this.get<AlertType[]>({ path: '/alert-types' }, this.token)
+    return this.get({ path: '/alert-types' }, this.token)
   }
 }

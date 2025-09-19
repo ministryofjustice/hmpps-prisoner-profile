@@ -11,3 +11,5 @@ export const radioFieldValidator =
     }
     return []
   }
+
+export default { radioFieldValidator }

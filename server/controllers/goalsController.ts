@@ -4,7 +4,7 @@ import { AuditService, Page } from '../services/auditService'
 
 export default class GoalsController {
   constructor(
-    private readonly workAndSkillsPageService: WorkAndSkillsPageService,
+    readonly workAndSkillsPageService: WorkAndSkillsPageService,
     private readonly auditService: AuditService,
   ) {}
 

@@ -33,7 +33,7 @@ export default class PrisonerScheduleService {
     }
   }
 
-  async getScheduledTransfers(clientToken: string, prisonerNumber: string): Promise<PrisonerPrisonSchedule[]> {
+  async getScheduledTransfers(clientToken: string, prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null> {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
     return prisonApiClient.getScheduledTransfers(prisonerNumber)
   }

@@ -33,3 +33,5 @@ export const prisonerDetailMock: PrisonerDetail = {
   suffix: '',
   title: '',
 }
+
+export default { prisonerDetailMock }

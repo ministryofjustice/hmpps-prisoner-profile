@@ -59,7 +59,7 @@ export class VisitsController {
   constructor(private readonly visitsService: VisitsService) {}
 
   public visitsDetails(): RequestHandler {
-    return async (req, res, next) => {
+    return async (req, res) => {
       const queryParams: VisitsListQueryParams = {}
       const { clientToken, prisonerData } = req.middleware
 

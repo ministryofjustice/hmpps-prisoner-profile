@@ -8,8 +8,8 @@ export default class ComplexityApiRestClient extends RestClient implements Compl
     super('Complexity of Needs API', config.apis.complexityApi, token)
   }
 
-  async getComplexityOfNeed(prisonerNumber: string): Promise<ComplexityOfNeed> {
-    return this.getAndIgnore404<ComplexityOfNeed>({
+  async getComplexityOfNeed(prisonerNumber: string): Promise<ComplexityOfNeed | null> {
+    return this.getAndIgnore404({
       path: `/v1/complexity-of-need/offender-no/${prisonerNumber}`,
     })
   }

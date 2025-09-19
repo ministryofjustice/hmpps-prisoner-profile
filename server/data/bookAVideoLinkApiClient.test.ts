@@ -1,4 +1,4 @@
-import nock from 'nock'
+import nock, { RequestBodyMatcher } from 'nock'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
@@ -23,13 +23,21 @@ describe('bookAVideoLinkApiClient', () => {
   const mockSuccessfulBookAVideoLinkApiCall = <TReturnData>(url: string, returnData: TReturnData) =>
     fakeBookAVideoLinkApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
 
-  const mockSuccessfulBookAVideoLinkApiPost = <TReturnData>(url: string, body: any, returnData: TReturnData) =>
+  const mockSuccessfulBookAVideoLinkApiPost = <TReturnData>(
+    url: string,
+    body: RequestBodyMatcher,
+    returnData: TReturnData,
+  ) =>
     fakeBookAVideoLinkApi
       .post(url, body)
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(200, returnData)
 
-  const mockSuccessfulBookAVideoLinkApiPut = <TReturnData>(url: string, body: any, returnData: TReturnData) =>
+  const mockSuccessfulBookAVideoLinkApiPut = <TReturnData>(
+    url: string,
+    body: RequestBodyMatcher,
+    returnData: TReturnData,
+  ) =>
     fakeBookAVideoLinkApi
       .put(url, body)
       .matchHeader('authorization', `Bearer ${token.access_token}`)

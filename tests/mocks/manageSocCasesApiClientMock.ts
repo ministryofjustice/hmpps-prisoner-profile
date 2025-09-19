@@ -3,3 +3,5 @@ import { ManageSocCasesApiClient } from '../../server/data/interfaces/manageSocC
 export const manageSocCasesApiClientMock = (): ManageSocCasesApiClient => ({
   getNominal: jest.fn(),
 })
+
+export default { manageSocCasesApiClientMock }

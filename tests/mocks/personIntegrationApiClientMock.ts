@@ -34,3 +34,5 @@ export const personIntegrationApiClientMock = (): PersonIntegrationApiClient => 
   addIdentityNumbers: jest.fn(),
   getPrisonerProfileSummary: jest.fn(),
 })
+
+export default { personIntegrationApiClientMock }

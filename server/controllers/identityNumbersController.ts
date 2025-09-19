@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { apostrophe, capitaliseFirstLetter } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -32,13 +32,15 @@ export interface EditIdentityNumberSubmission {
   comment?: string
 }
 
+type IdentityNumbersRequestHandlers = Record<'edit' | 'submit', RequestHandler>
+
 export default class IdentityNumbersController {
   constructor(
     private readonly identityNumbersService: IdentityNumbersService,
     private readonly auditService: AuditService,
   ) {}
 
-  public homeOfficeIdNumbers() {
+  public homeOfficeIdNumbers(): IdentityNumbersRequestHandlers {
     return {
       edit: this.addIdentityNumbers({
         pageTitle: `Add Home Office ID numbers - Prisoner personal details`,
@@ -53,7 +55,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  public justiceIdNumbers() {
+  public justiceIdNumbers(): IdentityNumbersRequestHandlers {
     return {
       edit: this.addIdentityNumbers({
         pageTitle: `Add justice ID numbers - Prisoner personal details`,
@@ -68,7 +70,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  public personalIdNumbers() {
+  public personalIdNumbers(): IdentityNumbersRequestHandlers {
     return {
       edit: this.addIdentityNumbers({
         pageTitle: `Add personal ID numbers - Prisoner personal details`,
@@ -83,7 +85,7 @@ export default class IdentityNumbersController {
     }
   }
 
-  public idNumber() {
+  public idNumber(): IdentityNumbersRequestHandlers {
     return {
       edit: async (req: Request, res: Response) => {
         const { prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(req, res)
@@ -123,7 +125,7 @@ export default class IdentityNumbersController {
           miniBannerData,
         })
       },
-      submit: async (req: Request, res: Response, next: NextFunction) => {
+      submit: async (req: Request, res: Response) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const [offenderId, seqId] = this.parseIdentifierIds(req)
@@ -204,8 +206,8 @@ export default class IdentityNumbersController {
     title: string
     pageViewAuditEvent: Page
     mappings: Record<string, IdentifierMapping>
-  }) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+  }): RequestHandler => {
+    return async (req, res) => {
       const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const existingIdentifiers = await this.identityNumbersService.getIdentityNumbers(clientToken, prisonerNumber)
       const errors = req.flash('errors')
@@ -235,8 +237,8 @@ export default class IdentityNumbersController {
     }
   }
 
-  private postIdentityNumbers = (options: { errorRedirect: string; successRedirectAnchor: string }) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+  private postIdentityNumbers = (options: { errorRedirect: string; successRedirectAnchor: string }): RequestHandler => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const errors = req.errors || []

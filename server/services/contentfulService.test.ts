@@ -16,7 +16,7 @@ describe('ContentfulService', () => {
 
   it('Should get the banner for the users caseload', async () => {
     const apolloSpy = jest
-      .spyOn<any, string>(contentfulService['apolloClient'], 'query')
+      .spyOn(contentfulService.apolloClient, 'query')
       .mockResolvedValue({ data: { bannerCollection: [] } })
 
     await contentfulService.getBanner({ authSource: 'nomis', activeCaseLoadId: 'LEI' } as PrisonUser)
@@ -39,7 +39,7 @@ describe('ContentfulService', () => {
     } as PrisonUser,
   ])('Should get the banner for the users without an active caseload', async user => {
     const apolloSpy = jest
-      .spyOn<any, string>(contentfulService['apolloClient'], 'query')
+      .spyOn(contentfulService.apolloClient, 'query')
       .mockResolvedValue({ data: { bannerCollection: [] } })
 
     await contentfulService.getBanner(user as HmppsUser)

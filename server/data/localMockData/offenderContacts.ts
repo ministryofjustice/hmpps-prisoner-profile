@@ -155,3 +155,5 @@ export const mockOffenderContacts: OffenderContacts = {
     },
   ],
 }
+
+export default { mockOffenderContacts }

@@ -1,4 +1,4 @@
-import nock from 'nock'
+import nock, { DataMatcherMap, RequestBodyMatcher } from 'nock'
 import config from '../config'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
@@ -24,7 +24,11 @@ describe('whereaboutsClient', () => {
     fakeWhereaboutsApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
-  const mockSuccessfulWhereaboutsPostApiCall = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
+  const mockSuccessfulWhereaboutsPostApiCall = <TReturnData>(
+    url: string,
+    body: RequestBodyMatcher,
+    returnData: TReturnData,
+  ) => {
     fakeWhereaboutsApi
       .post(url, body)
       .matchHeader('authorization', `Bearer ${token.access_token}`)
@@ -33,7 +37,7 @@ describe('whereaboutsClient', () => {
 
   describe('getAppointment', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulWhereaboutsGetApiCall(`/appointment/1`, appointmentMock)
+      mockSuccessfulWhereaboutsGetApiCall('/appointment/1', appointmentMock)
 
       const output = await whereaboutsApiClient.getAppointment(1)
       expect(output).toEqual(appointmentMock)
@@ -42,7 +46,11 @@ describe('whereaboutsClient', () => {
 
   describe('createAppointments', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulWhereaboutsPostApiCall(`/appointment`, appointmentMock, appointmentMock)
+      mockSuccessfulWhereaboutsPostApiCall(
+        '/appointment',
+        appointmentMock as unknown as DataMatcherMap,
+        appointmentMock,
+      )
 
       const output = await whereaboutsApiClient.createAppointments(appointmentMock)
       expect(output).toEqual(appointmentMock)

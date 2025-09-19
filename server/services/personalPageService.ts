@@ -107,7 +107,7 @@ export default class PersonalPageService {
       dietAndAllergiesEnabled,
       healthAndMedicationApiReadEnabled,
     }: { dietAndAllergiesEnabled: boolean; healthAndMedicationApiReadEnabled: boolean },
-  ): Promise<HealthAndMedication> {
+  ): Promise<HealthAndMedication | null> {
     if (!dietAndAllergiesEnabled && !healthAndMedicationApiReadEnabled) {
       return null
     }
@@ -317,7 +317,7 @@ export default class PersonalPageService {
         ? await this.addressService.transformAddresses(token, profileSummary.addresses)
         : null
       distinguishingMarks = getOptions.editProfileEnabled ? profileSummary.distinguishingMarks : null
-      militaryRecords = (await militaryHistoryEnabled()) ? profileSummary.militaryRecords : null
+      militaryRecords = militaryHistoryEnabled() ? profileSummary.militaryRecords : null
       physicalAttributes = this.transformPhyscialAttributes(profileSummary.physicalAttributes)
       globalNumbersAndEmails = getOptions.editProfileEnabled
         ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
@@ -748,7 +748,7 @@ export default class PersonalPageService {
     }
   }
 
-  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[]> {
+  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[] | null> {
     if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
     const curiousApiToken = await this.curiousApiTokenBuilder()
     const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import CsraService from '../services/csraService'
 import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSummaryListMapper'
 import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
@@ -8,11 +8,11 @@ import logger from '../../logger'
 
 export default class CsraController {
   constructor(
-    private readonly csraService: CsraService,
+    readonly csraService: CsraService,
     private readonly auditService: AuditService,
   ) {}
 
-  public async displayHistory(req: Request, res: Response, next: NextFunction) {
+  public async displayHistory(req: Request, res: Response) {
     const { prisonerNumber, prisonId } = res.locals
     const { clientToken } = req.middleware
 
@@ -47,10 +47,11 @@ export default class CsraController {
       pageTitle: 'CSRA history',
       csraAssessments: filteredAsessments,
       filterValues,
+      errors: undefined,
     })
   }
 
-  public async displayReview(req: Request, res: Response, next: NextFunction) {
+  public async displayReview(req: Request, res: Response) {
     const { prisonerData } = req.middleware
     const { assessmentSeq, bookingId } = req.query
     const { clientToken } = req.middleware

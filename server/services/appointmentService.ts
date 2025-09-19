@@ -193,7 +193,7 @@ export default class AppointmentService {
     return eventsAtLocationByUsage.sort((left, right) => sortByDateTime(left.startTime, right.startTime)).map(toEvent)
   }
 
-  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyDetails> {
+  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyDetails | null> {
     return this.prisonApiClientBuilder(token).getAgencyDetails(agencyId)
   }
 }

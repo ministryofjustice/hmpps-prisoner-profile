@@ -404,3 +404,5 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
   numberOfElements: 20,
   empty: false,
 }
+
+export default { pagedCaseNotesMock }

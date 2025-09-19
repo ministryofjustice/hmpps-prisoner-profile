@@ -10,13 +10,13 @@ export default class PrisonerProfileDeliusApiRestClient extends RestClient imple
   }
 
   async getCommunityManager(prisonerNumber: string): Promise<CommunityManager | null> {
-    return this.getAndIgnore404<CommunityManager | null>({
+    return this.getAndIgnore404({
       path: `/probation-cases/${prisonerNumber}/community-manager`,
     })
   }
 
   async getProbationDocuments(prisonerNumber: string): Promise<ProbationDocuments> {
-    return this.get<ProbationDocuments>(
+    return this.get(
       {
         path: `/probation-cases/${prisonerNumber}/documents`,
       },

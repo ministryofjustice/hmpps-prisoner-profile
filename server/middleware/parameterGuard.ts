@@ -17,3 +17,5 @@ export function parameterGuard(parameterName: string, acceptedValues: string[]) 
     )
   }
 }
+
+export default { parameterGuard }

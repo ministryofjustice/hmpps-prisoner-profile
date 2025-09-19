@@ -15,3 +15,5 @@ export function populateEditPageData(): RequestHandler {
     next()
   }
 }
+
+export default { populateEditPageData }

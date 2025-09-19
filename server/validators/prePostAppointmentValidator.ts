@@ -100,3 +100,5 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
 
   return errors
 }
+
+export default { PrePostAppointmentValidator }

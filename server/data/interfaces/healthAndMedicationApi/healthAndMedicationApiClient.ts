@@ -67,7 +67,7 @@ export interface HealthAndMedicationApiClient {
     includeInactive?: boolean,
   ): Promise<ReferenceDataCode[]>
 
-  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication>
+  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication | null>
 
   updateDietAndAllergyData(
     prisonerNumber: string,

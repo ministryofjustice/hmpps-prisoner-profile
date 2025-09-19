@@ -1,3 +1,4 @@
+import { RequestHandler } from 'express'
 import config from '../config'
 
 const sanitizeUrl = (url: string) => (url?.endsWith('/') ? url.substring(0, url.length - 1) : url)
@@ -42,9 +43,14 @@ export const registeredBackLinkServices: RegisteredService[] = [
 ]
 
 export const saveBackLink =
-  (registeredServices: Array<RegisteredService> = registeredBackLinkServices) =>
-  async (req: any, res: any) => {
-    const { service, returnPath, redirectPath, backLinkText } = req.query
+  (registeredServices: Array<RegisteredService> = registeredBackLinkServices): RequestHandler =>
+  async (req, res) => {
+    const { service, returnPath, redirectPath, backLinkText } = req.query as Partial<{
+      service: string
+      returnPath: string
+      redirectPath: string
+      backLinkText: string
+    }>
 
     if (!service || !returnPath || !redirectPath) throw new Error('Required query parameters missing')
 

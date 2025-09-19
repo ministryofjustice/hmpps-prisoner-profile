@@ -5,3 +5,5 @@ export const professionalContactsServiceMock = (): Interface<ProfessionalContact
   getContacts: jest.fn(),
   getProfessionalContactsOverview: jest.fn(),
 })
+
+export default { professionalContactsServiceMock }

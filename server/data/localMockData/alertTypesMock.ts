@@ -53,3 +53,5 @@ export const alertTypesMock: AlertType[] = [
     ],
   },
 ]
+
+export default { alertTypesMock }

@@ -13,3 +13,5 @@ export function transformPhones(contacts: ContactsResponseDto[], phoneTypes: Ref
       number: c.contactValue,
     }))
 }
+
+export default { transformPhones }

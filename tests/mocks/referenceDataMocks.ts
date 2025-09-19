@@ -57,3 +57,5 @@ export const getMockReferenceDataCodesForDomain = (domain: string): ReferenceDat
       return []
   }
 }
+
+export default { getMockReferenceDataCodesForDomain }

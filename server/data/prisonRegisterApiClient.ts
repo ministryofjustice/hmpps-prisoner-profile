@@ -12,7 +12,7 @@ export default class PrisonRegisterApiRestClient extends RestClient implements P
   }
 
   getPrisonByPrisonId(prisonId: string): Promise<PrisonDto> {
-    return this.get<PrisonDto>(
+    return this.get(
       {
         path: `/prisons/id/${prisonId}`,
       },
@@ -20,8 +20,8 @@ export default class PrisonRegisterApiRestClient extends RestClient implements P
     )
   }
 
-  getAllPrisons(): Promise<Array<PrisonDto>> {
-    return this.get<Array<PrisonDto>>(
+  getAllPrisons(): Promise<PrisonDto[]> {
+    return this.get(
       {
         path: '/prisons',
       },

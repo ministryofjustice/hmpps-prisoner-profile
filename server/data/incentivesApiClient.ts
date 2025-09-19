@@ -8,8 +8,8 @@ export default class IncentivesApiRestClient extends RestClient implements Incen
     super('Incentives API', config.apis.incentivesApi, token)
   }
 
-  async getReviews(prisonerNumber: string): Promise<IncentiveReviews> {
-    return this.getAndIgnore404<IncentiveReviews>({
+  async getReviews(prisonerNumber: string): Promise<IncentiveReviews | null> {
+    return this.getAndIgnore404({
       path: `/incentive-reviews/prisoner/${prisonerNumber}`,
     })
   }

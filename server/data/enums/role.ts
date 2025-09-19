@@ -38,3 +38,5 @@ export enum Role {
   ViewProbationDocuments = 'ROLE_VIEW_PROBATION_DOCUMENTS',
   ViewSensitiveCaseNotes = 'ROLE_VIEW_SENSITIVE_CASE_NOTES',
 }
+
+export default { Role }

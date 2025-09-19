@@ -9,3 +9,5 @@ export const caseNotesApiClientMock = (): CaseNotesApiClient => ({
   getCaseNoteUsage: jest.fn(),
   getIncentivesCaseNoteCount: jest.fn(),
 })
+
+export default { caseNotesApiClientMock }

@@ -14,7 +14,7 @@ export default function getOverviewStatuses(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
-  scheduledTransfers: PrisonerPrisonSchedule[],
+  scheduledTransfers: PrisonerPrisonSchedule[] | null,
 ): OverviewPageData['statuses'] {
   return [
     getLocationStatus(prisonerData),
@@ -70,7 +70,7 @@ function getNeurodiversitySupportStatus(
 }
 
 function getScheduledTransferStatus(
-  scheduledTransfers: PrisonerPrisonSchedule[],
+  scheduledTransfers: PrisonerPrisonSchedule[] | null,
 ): OverviewPageData['statuses'][number] {
   return (
     scheduledTransfers?.length > 0 && {

@@ -8,3 +8,5 @@ export const restrictedPatientMock: RestrictedPatient = {
     active: true,
   },
 }
+
+export default { restrictedPatientMock }

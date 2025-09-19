@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { format, parseISO } from 'date-fns'
 import { formatMoney, formatName, isEmpty } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -24,30 +24,30 @@ export default class MoneyController {
   ) {}
 
   public displaySpends(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
     }
   }
 
   public displayPrivateCash(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.PrivateCash, 'Private cash', Page.MoneyPrivateCash, req, res)
     }
   }
 
   public displaySavings(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getTransactions(AccountCode.Savings, 'Savings', Page.MoneySavings, req, res)
     }
   }
 
   public displayDamageObligations(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       return this.getDamageObligations(req, res)
     }
   }
 
-  private async getDamageObligations(req: Request, res: Response) {
+  async getDamageObligations(req: Request, res: Response) {
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
@@ -79,7 +79,7 @@ export default class MoneyController {
     })
   }
 
-  private async getTransactions(
+  async getTransactions(
     accountCode: AccountCode,
     accountDescription: string,
     auditPage: Page,
@@ -227,7 +227,7 @@ export default class MoneyController {
     })
   }
 
-  private getRefData(prisonerData: Prisoner) {
+  getRefData(prisonerData: Prisoner) {
     const { firstName, middleNames, lastName, prisonerNumber } = prisonerData
     const breadcrumbPrisonerName = formatName(firstName, middleNames, lastName, {
       style: NameFormatStyle.lastCommaFirst,
@@ -258,7 +258,7 @@ export default class MoneyController {
     }
   }
 
-  private getLast4Years() {
+  getLast4Years() {
     const currentYear = new Date().getFullYear()
     const numberOfYears = 4
     return Array.from({ length: numberOfYears }, (_, i) => i + currentYear - numberOfYears + 1)
@@ -266,7 +266,7 @@ export default class MoneyController {
       .reverse()
   }
 
-  private mapToTableRows(transactions: Transaction[], prisons: Agency[]): object[] {
+  mapToTableRows(transactions: Transaction[], prisons: Agency[]): object[] {
     return transactions.map(t => {
       return [
         { text: formatDate(t.entryDate, 'short') },
@@ -299,7 +299,7 @@ export default class MoneyController {
     })
   }
 
-  private mapToObligationTableRows(obligations: DamageObligation[], prisons: Agency[]): object[] {
+  mapToObligationTableRows(obligations: DamageObligation[], prisons: Agency[]): object[] {
     return obligations.map(t => {
       const location = prisons.find(prison => prison.agencyId === t.prisonId)?.description || t.prisonId
 
@@ -333,7 +333,7 @@ export default class MoneyController {
    * @param b
    * @private
    */
-  private transactionSort(a: Transaction, b: Transaction) {
+  transactionSort(a: Transaction, b: Transaction) {
     const entryDateDiff = parseISO(b.entryDate).getTime() - parseISO(a.entryDate).getTime()
     if (entryDateDiff !== 0) return entryDateDiff
 

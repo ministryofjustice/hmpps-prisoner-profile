@@ -33,3 +33,5 @@ export const religionValidator: Validator = (body: Record<string, string>) => {
 
   return errors
 }
+
+export default { religionValidator }

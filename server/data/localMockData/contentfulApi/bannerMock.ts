@@ -27,3 +27,5 @@ export const bannerCollectionMock = {
     },
   },
 }
+
+export default { bannerCollectionMock }

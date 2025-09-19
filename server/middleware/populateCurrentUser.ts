@@ -37,3 +37,5 @@ export function populateCurrentUser(): RequestHandler {
     }
   }
 }
+
+export default { populateCurrentUser }

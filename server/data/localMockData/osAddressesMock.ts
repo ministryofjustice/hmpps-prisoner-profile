@@ -28,3 +28,5 @@ export const mockOsAddresses: OsAddress[] = [
     uprn: 12346,
   },
 ]
+
+export default { mockOsAddresses }

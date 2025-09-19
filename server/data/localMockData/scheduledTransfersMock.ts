@@ -13,3 +13,5 @@ export const scheduledTransfersMock: PrisonerPrisonSchedule[] = [
     startTime: '2023-11-17T15:09:44',
   },
 ]
+
+export default { scheduledTransfersMock }

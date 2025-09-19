@@ -9,7 +9,7 @@ export default class CsipApiRestClient extends RestClient implements CsipApiClie
   }
 
   async getCurrentCsip(prisonerNumber: string): Promise<CurrentCsipDetail> {
-    return this.get<CurrentCsipDetail>(
+    return this.get(
       {
         path: `/prisoners/${prisonerNumber}/csip-records/current`,
       },

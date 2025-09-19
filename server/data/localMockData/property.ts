@@ -76,3 +76,5 @@ export const propertyMock: PropertyContainer[] = [
     containerType: 'Valuables',
   },
 ]
+
+export default { propertyMock }

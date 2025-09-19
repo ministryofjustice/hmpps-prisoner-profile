@@ -42,3 +42,5 @@ export const secondaryLanguagesMock: SecondaryLanguage[] = [
     canSpeak: false,
   },
 ]
+
+export default { secondaryLanguagesMock }

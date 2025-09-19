@@ -13,7 +13,7 @@ interface AssessmentViewModel {
   staffDetails: StaffDetails
 }
 
-interface AssessmentListViewModel extends CsraAssessment {
+export interface AssessmentListViewModel extends CsraAssessment {
   classification: string
   location: string
 }

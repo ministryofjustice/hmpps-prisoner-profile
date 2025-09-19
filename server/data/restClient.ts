@@ -19,7 +19,8 @@ interface Request<Response, ErrorData> {
 }
 
 interface RequestWithBody<Response, ErrorData> extends Request<Response, ErrorData> {
-  data?: Record<string, unknown> | string | Array<unknown> | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: Record<string, any> | string | Array<any> | undefined
   retry?: boolean
 }
 
@@ -47,8 +48,8 @@ interface PutRequest {
   files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
 
-export default class RestClient extends HmppsRestClient {
-  constructor(
+export default abstract class RestClient extends HmppsRestClient {
+  protected constructor(
     protected readonly name: string,
     protected readonly config: ApiConfig,
     protected readonly token: string,
@@ -122,8 +123,10 @@ export default class RestClient extends HmppsRestClient {
     return super.stream({ path, headers, errorLogger }, token)
   }
 
-  async getAndIgnore404<T>(options: Parameters<typeof this.get>[0]): Promise<T> {
-    return this.get<T>(
+  async getAndIgnore404<Response = unknown, ErrorData = unknown>(
+    options: Parameters<typeof this.get>[0],
+  ): Promise<Response | null> {
+    return this.get<Response, ErrorData>(
       {
         ...options,
         errorHandler: (_path, _method, error): null => {
@@ -194,7 +197,7 @@ export default class RestClient extends HmppsRestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.config.timeout)
-        .retry(2, (err, res) => {
+        .retry(2, (err, _res) => {
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })

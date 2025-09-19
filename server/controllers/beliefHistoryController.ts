@@ -7,7 +7,7 @@ import { religionFieldData } from './personal/fieldData'
 
 export default class BeliefHistoryController {
   constructor(
-    private readonly beliefService: BeliefService,
+    readonly beliefService: BeliefService,
     private readonly auditService: AuditService,
   ) {}
 

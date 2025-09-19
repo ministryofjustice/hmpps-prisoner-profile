@@ -1,11 +1,12 @@
 import { Request, Response } from 'express'
+import logger from '../../logger'
 import { AuditService, Page } from '../services/auditService'
 import ProbationDocumentsService from '../services/probationDocumentsService'
 import config from '../config'
 
 export default class ProbationDocumentsController {
   constructor(
-    private readonly probationDocumentsService: ProbationDocumentsService,
+    readonly probationDocumentsService: ProbationDocumentsService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -17,13 +18,15 @@ export default class ProbationDocumentsController {
       prisonerNumber,
     )
 
-    this.auditService.sendPageView({
-      user: res.locals.user,
-      correlationId: req.id,
-      page: Page.ProbationDocuments,
-      prisonerNumber,
-      prisonId,
-    })
+    this.auditService
+      .sendPageView({
+        user: res.locals.user,
+        correlationId: req.id,
+        page: Page.ProbationDocuments,
+        prisonerNumber,
+        prisonId,
+      })
+      .catch(error => logger.error(error))
 
     res.render('pages/probationDocuments/probationDocuments', {
       pageTitle: 'Probation documents',

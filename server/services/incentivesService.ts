@@ -40,6 +40,7 @@ export default class IncentivesService {
           ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
           : undefined,
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
       return { error: true }
     }

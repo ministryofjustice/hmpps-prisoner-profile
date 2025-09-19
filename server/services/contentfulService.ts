@@ -4,7 +4,7 @@ import { BannerQuery, BannerQueryVariables } from '../data/interfaces/contentful
 import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class ContentfulService {
-  constructor(private readonly apolloClient: ApolloClient) {}
+  constructor(readonly apolloClient: ApolloClient) {}
 
   /**
    * Get `banner` entry.

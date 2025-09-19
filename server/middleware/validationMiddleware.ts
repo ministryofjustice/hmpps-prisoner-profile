@@ -41,20 +41,21 @@ export default function validationMiddleware(
     useReq: false,
   },
 ): RequestHandler {
-  // Recursively iterate into an object and trim any strings inside
-
-  const deepTrim = (object: any): object => {
+  /** Recursively iterate into an object and trim any strings inside */
+  const deepTrim = <O extends object>(object: O): O => {
     const o = object
     if (o) {
-      Object.keys(o).forEach(key => {
-        if (typeof o[key] === 'string') {
-          o[key] = o[key].trim()
-        } else if (typeof o[key] === 'object') {
-          o[key] = deepTrim(o[key])
+      const keys = Object.keys(o) as (keyof O)[]
+      keys.forEach(key => {
+        const value = o[key]
+        if (typeof value === 'string') {
+          o[key] = value.trim() as undefined
+        } else if (typeof value === 'object') {
+          o[key] = deepTrim(value)
         }
       })
     }
-    return o as object
+    return o
   }
 
   return async (req, res, next) => {

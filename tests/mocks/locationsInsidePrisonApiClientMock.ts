@@ -6,3 +6,5 @@ export const locationsInsidePrisonApiClientMock = (): LocationsInsidePrisonApiCl
   getLocationsForAppointments: jest.fn(),
   getLocationAttributes: jest.fn(),
 })
+
+export default { locationsInsidePrisonApiClientMock }

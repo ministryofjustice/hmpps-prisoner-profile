@@ -14,3 +14,5 @@ export const locationDetailsServiceMock = (): Interface<LocationDetailsService> 
   getLocationMappingUsingDpsLocationKey: jest.fn(),
   getLocationsForAppointments: jest.fn(),
 })
+
+export default { locationDetailsServiceMock }

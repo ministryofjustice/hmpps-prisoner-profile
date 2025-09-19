@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import BeliefHistoryController from './beliefHistoryController'
@@ -10,8 +11,8 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 describe('Prisoner belief history', () => {
   const prisonerNumber = 'G6123VU'
 
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: BeliefHistoryController
 
   beforeEach(() => {
@@ -26,7 +27,7 @@ describe('Prisoner belief history', () => {
       query: {},
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -44,7 +45,7 @@ describe('Prisoner belief history', () => {
       },
       render: jest.fn(),
       status: jest.fn(),
-    }
+    } as unknown as Response
     controller = new BeliefHistoryController(new BeliefService(null), auditServiceMock())
   })
 
@@ -55,7 +56,7 @@ describe('Prisoner belief history', () => {
 
   describe('displayBeliefHistory', () => {
     it('should call the service and render the page', async () => {
-      jest.spyOn<any, string>(controller['beliefService'], 'getBeliefHistory').mockResolvedValue(beliefHistoryMock)
+      jest.spyOn(controller.beliefService, 'getBeliefHistory').mockResolvedValue(beliefHistoryMock)
 
       await controller.displayBeliefHistory(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
@@ -66,9 +67,7 @@ describe('Prisoner belief history', () => {
     })
 
     it('should use religion field date override values to render the belief descriptions', async () => {
-      jest
-        .spyOn<any, string>(controller['beliefService'], 'getBeliefHistory')
-        .mockResolvedValue(beliefHistoryOverrideMock)
+      jest.spyOn(controller.beliefService, 'getBeliefHistory').mockResolvedValue(beliefHistoryOverrideMock)
 
       await controller.displayBeliefHistory(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {

@@ -82,6 +82,7 @@ export default function nunjucksSetup(app: express.Express): void {
   try {
     const assetMetadataPath = path.resolve(__dirname, '../../assets/manifest.json')
     assetManifest = JSON.parse(fs.readFileSync(assetMetadataPath, 'utf8'))
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_e) {
     if (process.env.NODE_ENV !== 'test') {
       logger.error('Could not read asset manifest file')
@@ -134,14 +135,14 @@ export default function nunjucksSetup(app: express.Express): void {
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
 
-  njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
+  njkEnv.addFilter('filterNot', <T>(l: T[], iteratee: keyof T, eq: T[keyof T]) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)
-  njkEnv.addFilter('find', (l: never[], iteratee: string, eq: unknown) => l.find(o => o[iteratee] === eq))
+  njkEnv.addFilter('find', <T>(l: T[], iteratee: keyof T, eq: T[keyof T]) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)
   njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
   njkEnv.addFilter('containsSelected', (items: { selected: boolean }[]) => items && items.some(item => item.selected))
-  njkEnv.addFilter('removeNullish', arr => arr.filter((o: unknown) => o !== undefined && o !== null))
+  njkEnv.addFilter('removeNullish', (arr: unknown[]) => arr.filter(o => o !== undefined && o !== null))
 
   njkEnv.addFilter(
     'setSelected',

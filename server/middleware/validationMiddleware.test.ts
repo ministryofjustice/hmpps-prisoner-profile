@@ -11,7 +11,7 @@ describe('Validation middleware', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    res = { redirect: jest.fn() } as any
+    res = { redirect: jest.fn() } as unknown as Response
     req = {
       params: { prisonerNumber: 'A1234BC' },
       body: { example: '    text    ' },
@@ -23,7 +23,7 @@ describe('Validation middleware', () => {
       },
       originalUrl: '/original/url',
       flash: jest.fn(),
-    } as any
+    } as unknown as Request
   })
 
   it('should add errors to request object when any are present', async () => {
@@ -96,7 +96,7 @@ describe('Validation middleware', () => {
     await validationMiddleware([alwaysFailsValidator], {
       redirectBackOnError: true,
       redirectWithParams: ({ id }) => `path/with/id/${id}`,
-    })({ ...req, params: { prisonerNumber: 'A1234BC', id: '123' } } as any, res, next)
+    })({ ...req, params: { prisonerNumber: 'A1234BC', id: '123' } } as unknown as Request, res, next)
     expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/path/with/id/123')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify({ example: 'text' }))
     expect(req.flash).toHaveBeenCalledWith('errors', [error])

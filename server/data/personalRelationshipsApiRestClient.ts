@@ -18,8 +18,6 @@ import {
 import { mapToQueryString } from '../utils/utils'
 
 export default class PersonalRelationshipsApiRestClient extends RestClient implements PersonalRelationshipsApiClient {
-  private readonly restClient: RestClient
-
   constructor(token: string) {
     super('Personal Relationships API', config.apis.personalRelationshipsApi, token)
   }
@@ -35,7 +33,7 @@ export default class PersonalRelationshipsApiRestClient extends RestClient imple
     return this.get({ path: `/prisoner/${prisonerNumber}/contact/count` }, this.token)
   }
 
-  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto> {
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto | null> {
     return this.getAndIgnore404({ path: `/prisoner/${prisonerNumber}/number-of-children` })
   }
 
@@ -43,13 +41,10 @@ export default class PersonalRelationshipsApiRestClient extends RestClient imple
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
-    return this.put(
-      { path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest as Record<string, any> },
-      this.token,
-    )
+    return this.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest }, this.token)
   }
 
-  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto> {
+  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto | null> {
     return this.getAndIgnore404({ path: `/prisoner/${prisonerNumber}/domestic-status` })
   }
 
@@ -57,10 +52,7 @@ export default class PersonalRelationshipsApiRestClient extends RestClient imple
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsDomesticStatusUpdateRequest,
   ): Promise<PersonalRelationshipsDomesticStatusDto> {
-    return this.put(
-      { path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest as Record<string, any> },
-      this.token,
-    )
+    return this.put({ path: `/prisoner/${prisonerNumber}/domestic-status`, data: updateRequest }, this.token)
   }
 
   getReferenceDataCodes(
@@ -70,10 +62,10 @@ export default class PersonalRelationshipsApiRestClient extends RestClient imple
   }
 
   createContact(contact: PersonalRelationshipsContactRequest): Promise<PersonalRelationshipsContactCreationResultDto> {
-    return this.post({ path: '/contact', data: contact as Record<string, any> }, this.token)
+    return this.post({ path: '/contact', data: contact }, this.token)
   }
 
   addContactAddress(contactId: number, address: PersonalRelationshipsContactRequestAddress): Promise<void> {
-    return this.post({ path: `/contact/${contactId}/address`, data: address as Record<string, any> }, this.token)
+    return this.post({ path: `/contact/${contactId}/address`, data: address }, this.token)
   }
 }

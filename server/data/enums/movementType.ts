@@ -5,3 +5,5 @@ export enum MovementType {
   TemporaryAbsence = 'TAP',
   Transfer = 'TRN',
 }
+
+export default { MovementType }

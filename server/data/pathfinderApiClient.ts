@@ -9,7 +9,7 @@ export default class PathfinderApiRestClient extends RestClient implements Pathf
   }
 
   async getNominal(offenderNumber: string): Promise<Nominal | null> {
-    return this.getAndIgnore404<Nominal | null>({
+    return this.getAndIgnore404({
       path: `/pathfinder/nominal/noms-id/${offenderNumber}`,
     })
   }

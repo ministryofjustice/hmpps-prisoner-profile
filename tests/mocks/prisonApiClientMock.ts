@@ -70,3 +70,5 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getImagesForPrisoner: jest.fn(),
   getImageDetail: jest.fn(),
 })
+
+export default { prisonApiClientMock }

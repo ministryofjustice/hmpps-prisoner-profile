@@ -61,3 +61,5 @@ export const addressValidator =
 
     return errors
   }
+
+export default { addressValidator }

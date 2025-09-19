@@ -290,7 +290,7 @@ describe('IdentityNumbersController', () => {
     })
 
     it(`should render the page`, async () => {
-      await controller.idNumber().edit(req, res)
+      await controller.idNumber().edit(req, res, next)
 
       expect(identityNumbersService.getIdentityNumber).toHaveBeenCalledWith('CLIENT_TOKEN', offenderId, seqId)
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
@@ -309,7 +309,7 @@ describe('IdentityNumbersController', () => {
     })
 
     it('should record a page view event', async () => {
-      await controller.idNumber().edit(req, res)
+      await controller.idNumber().edit(req, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: res.locals.user,
@@ -332,7 +332,7 @@ describe('IdentityNumbersController', () => {
         return null
       })
 
-      await controller.idNumber().edit(req, res)
+      await controller.idNumber().edit(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
         pageTitle: `${typeLabel} - Prisoner personal details`,

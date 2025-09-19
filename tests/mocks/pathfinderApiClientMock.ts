@@ -3,3 +3,5 @@ import { PathfinderApiClient } from '../../server/data/interfaces/pathfinderApi/
 export const pathfinderApiClientMock = (): PathfinderApiClient => ({
   getNominal: jest.fn(),
 })
+
+export default { pathfinderApiClientMock }

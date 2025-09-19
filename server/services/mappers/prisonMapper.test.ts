@@ -5,7 +5,7 @@ import { prisonsKeyedByPrisonId } from '../../data/localMockData/prisonRegisterM
 describe('prisonMapper', () => {
   it('should map a PrisonResponse to a Prison', () => {
     // Given
-    const prisonResponse = prisonsKeyedByPrisonId['MDI']
+    const prisonResponse = prisonsKeyedByPrisonId.MDI
 
     const expectedPrison: Prison = {
       prisonId: 'MDI',

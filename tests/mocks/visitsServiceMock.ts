@@ -6,3 +6,5 @@ export const visitsServiceMock = (): Interface<VisitsService> => ({
   getVisits: jest.fn(),
   getVisitsOverview: jest.fn(),
 })
+
+export default { visitsServiceMock }

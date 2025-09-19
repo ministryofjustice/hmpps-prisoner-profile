@@ -17,3 +17,5 @@ export const notEmptyValidator =
 
     return fieldValue?.trim()?.length > 0 ? [] : error
   }
+
+export default { notEmptyValidator }

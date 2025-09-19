@@ -16,7 +16,7 @@ env.addFilter('apostrophe', apostrophe)
 describe('workAndActivities.njk', () => {
   const templatePath = 'partials/workAndSkillsPage/workAndActivities.njk'
 
-  const renderTemplate = (context: Record<string, any>) => {
+  const renderTemplate = (context: object) => {
     return env.render(templatePath, context)
   }
 

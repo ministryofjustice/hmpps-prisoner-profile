@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { apostrophe, objectToRadioOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -25,7 +25,7 @@ export default class MilitaryRecordsController {
   ) {}
 
   public displayMilitaryServiceInformation(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -153,7 +153,7 @@ export default class MilitaryRecordsController {
   }
 
   public postMilitaryServiceInformation(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
@@ -223,7 +223,7 @@ export default class MilitaryRecordsController {
   }
 
   public displayConflicts(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -277,7 +277,7 @@ export default class MilitaryRecordsController {
   }
 
   public postConflicts(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
@@ -331,7 +331,7 @@ export default class MilitaryRecordsController {
   }
 
   public displayDisciplinaryAction(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -393,7 +393,7 @@ export default class MilitaryRecordsController {
   }
 
   public postDisciplinaryAction(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
@@ -447,7 +447,7 @@ export default class MilitaryRecordsController {
   }
 
   public displayDischargeDetails(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -516,7 +516,7 @@ export default class MilitaryRecordsController {
   }
 
   public postDischargeDetails(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {

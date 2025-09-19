@@ -6,3 +6,5 @@ export const ephemeralDataServiceMock = (): Interface<EphemeralDataService> => (
   getData: jest.fn(),
   removeData: jest.fn(),
 })
+
+export default { ephemeralDataServiceMock }

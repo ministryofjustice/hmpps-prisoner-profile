@@ -14,3 +14,5 @@ export const countryOfBirthValidator: Validator = (body: Record<string, string>)
 
   return errors
 }
+
+export default { countryOfBirthValidator }

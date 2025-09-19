@@ -551,3 +551,5 @@ export const mockReferenceDomains = (referenceCode: ReferenceCodeDomain): Refere
       return []
   }
 }
+
+export default { mockReferenceDomains }

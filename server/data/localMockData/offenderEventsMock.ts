@@ -5,3 +5,5 @@ export const offenderEventsMock: OffenderEvent[] = [
     eventDescription: 'Offender Event',
   },
 ]
+
+export default { offenderEventsMock }

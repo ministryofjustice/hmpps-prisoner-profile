@@ -14,3 +14,5 @@ export const currentCsipDetailMock: CurrentCsipDetail = {
   totalOpenedCsipCount: 1,
   totalReferralCount: 1,
 }
+
+export default { currentCsipDetailMock }

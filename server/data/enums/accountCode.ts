@@ -4,3 +4,5 @@ export enum AccountCode {
   Savings = 'savings',
   DamageObligations = 'damageObligations',
 }
+
+export default { AccountCode }

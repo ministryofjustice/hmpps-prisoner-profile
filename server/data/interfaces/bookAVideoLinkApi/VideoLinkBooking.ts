@@ -18,6 +18,7 @@ export default interface CreateVideoBookingRequest {
   notesForPrisoners?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AmendVideoBookingRequest extends CreateVideoBookingRequest {}
 
 interface PrisonerDetails {

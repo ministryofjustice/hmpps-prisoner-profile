@@ -3,3 +3,5 @@ import AdjudicationsApiClient from '../../server/data/interfaces/adjudicationsAp
 export const adjudicationsApiClientMock = (): AdjudicationsApiClient => ({
   getAdjudications: jest.fn(),
 })
+
+export default { adjudicationsApiClientMock }

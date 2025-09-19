@@ -7,3 +7,5 @@ export const alertFormMock: AlertForm = {
   activeFrom: '30/01/2023',
   activeTo: '30/01/2024',
 }
+
+export default { alertFormMock }

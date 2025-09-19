@@ -3,3 +3,5 @@ import { NonAssociationsApiClient } from '../../server/data/interfaces/nonAssoci
 export const nonAssociationsApiClientMock = (): NonAssociationsApiClient => ({
   getPrisonerNonAssociations: jest.fn(),
 })
+
+export default { nonAssociationsApiClientMock }

@@ -1,5 +1,5 @@
 import Pom from './Pom'
 
 export default interface AllocationManagerClient {
-  getPomByOffenderNo(prisonerNumber: string): Promise<Pom>
+  getPomByOffenderNo(prisonerNumber: string): Promise<Pom | null>
 }

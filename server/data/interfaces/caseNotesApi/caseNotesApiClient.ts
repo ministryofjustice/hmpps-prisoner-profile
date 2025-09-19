@@ -9,7 +9,13 @@ export default interface CaseNotesApiClient {
   getCaseNoteTypes(queryParams: CaseNotesTypeParams): Promise<CaseNoteType[]>
   addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote>
   addCaseNoteAmendment(prisonerNumber: string, caseloadId: string, caseNoteId: string, text: string): Promise<CaseNote>
-  getCaseNote(prisonerNumber: string, caseloadId: string, caseNoteId: string, ignore404?: boolean): Promise<CaseNote>
+  getCaseNote(prisonerNumber: string, caseloadId: string, caseNoteId: string, ignore404?: false): Promise<CaseNote>
+  getCaseNote(
+    prisonerNumber: string,
+    caseloadId: string,
+    caseNoteId: string,
+    ignore404: boolean,
+  ): Promise<CaseNote | null>
   getCaseNoteUsage(
     prisonerNumber: string,
     typeSubTypes: CaseNoteTypeSubTypeRequest[],

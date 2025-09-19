@@ -6,3 +6,5 @@ export const careNeedsServiceMock = (): Interface<CareNeedsService> => ({
   getXrayBodyScans: jest.fn(),
   getXrayBodyScanSummary: jest.fn(),
 })
+
+export default { careNeedsServiceMock }

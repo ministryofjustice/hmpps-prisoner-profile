@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import {
   isGranted,
   PrisonerBaseLocationPermission,
@@ -27,8 +28,8 @@ const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Prisoner Location Details', () => {
   const offenderNo = 'A1234BC'
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: LocationDetailsController
   let locationDetailsService: LocationDetailsService
   let auditServiceClient: AuditService
@@ -44,7 +45,7 @@ describe('Prisoner Location Details', () => {
       params: { offenderNo },
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
+    } as unknown as Request
     res = {
       locals: {
         prisonerPermissions,
@@ -57,7 +58,7 @@ describe('Prisoner Location Details', () => {
       },
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     mockPermissionCheck(PrisonerBaseLocationPermission.move_cell, true)
 

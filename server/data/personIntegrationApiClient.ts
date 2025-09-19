@@ -29,7 +29,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
   }
 
   getPrisonerProfileSummary(prisonerNumber: string): Promise<PrisonerProfileSummary> {
-    return this.get<PrisonerProfileSummary>({ path: `/v2/person/${prisonerNumber}` }, this.token)
+    return this.get({ path: `/v2/person/${prisonerNumber}` }, this.token)
   }
 
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void> {
@@ -40,12 +40,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/nationality`,
-          data: { nationality, otherNationalities } as Record<string, any>,
+          data: { nationality, otherNationalities },
         }
       : {
           path: '/v1/core-person-record/nationality',
           query: { prisonerNumber },
-          data: { nationality, otherNationalities } as Record<string, any>,
+          data: { nationality, otherNationalities },
         }
 
     return handleNomisLockedError(() => this.put(request, this.token))
@@ -59,12 +59,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/religion`,
-          data: { religionCode, reasonForChange } as Record<string, any>,
+          data: { religionCode, reasonForChange },
         }
       : {
           path: '/v1/person-protected-characteristics/religion',
           query: { prisonerNumber },
-          data: { religionCode, reasonForChange } as Record<string, any>,
+          data: { religionCode, reasonForChange },
         }
 
     return handleNomisLockedError(() => this.put(request, this.token))
@@ -81,7 +81,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? { path: `/v2/reference-data/domain/${domain}/codes` }
       : { path: `/v1/core-person-record/reference-data/domain/${domain}/codes` }
 
-    return this.get<CorePersonRecordReferenceDataCodeDto[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]> {
@@ -89,7 +89,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? { path: `/v2/person/${prisonerNumber}/military-records` }
       : { path: `/v1/core-person-record/military-records`, query: { prisonerNumber } }
 
-    return this.get<MilitaryRecord[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void> {
@@ -97,12 +97,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? {
           path: `/v2/person/${prisonerNumber}/military-records`,
           query: { militarySeq },
-          data: militaryRecord as Record<string, any>,
+          data: militaryRecord,
         }
       : {
           path: '/v1/core-person-record/military-records',
           query: { prisonerNumber, militarySeq },
-          data: militaryRecord as Record<string, any>,
+          data: militaryRecord,
         }
 
     return handleNomisLockedError(() => this.put(request, this.token))
@@ -112,12 +112,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/military-records`,
-          data: militaryRecord as Record<string, any>,
+          data: militaryRecord,
         }
       : {
           path: '/v1/core-person-record/military-records',
           query: { prisonerNumber },
-          data: militaryRecord as Record<string, any>,
+          data: militaryRecord,
         }
 
     return handleNomisLockedError(() => this.post(request, this.token))
@@ -136,7 +136,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
           query: { sourceSystem: 'NOMIS' },
         }
 
-    return this.get<PersonIntegrationDistinguishingMark>(request, this.token)
+    return this.get(request, this.token)
   }
 
   async getDistinguishingMarks(prisonerNumber: string): Promise<PersonIntegrationDistinguishingMark[]> {
@@ -149,7 +149,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
           query: { prisonerNumber, sourceSystem: 'NOMIS' },
         }
 
-    return this.get<PersonIntegrationDistinguishingMark[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   updateDistinguishingMark(
@@ -160,15 +160,15 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
-          data: distinguishingMarkRequest as Record<string, any>,
+          data: distinguishingMarkRequest,
         }
       : {
           path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
           query: { sourceSystem: 'NOMIS' },
-          data: distinguishingMarkRequest as Record<string, any>,
+          data: distinguishingMarkRequest,
         }
 
-    return handleNomisLockedError(() => this.put<PersonIntegrationDistinguishingMark>(request, this.token))
+    return handleNomisLockedError(() => this.put(request, this.token))
   }
 
   createDistinguishingMark(
@@ -179,13 +179,13 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/distinguishing-mark`,
-          data: distinguishingMarkRequest as Record<string, any>,
+          data: distinguishingMarkRequest,
           files: image ? { file: image } : null,
         }
       : {
           path: '/v1/distinguishing-mark',
           query: { prisonerNumber, sourceSystem: 'NOMIS' },
-          data: distinguishingMarkRequest as Record<string, any>,
+          data: distinguishingMarkRequest,
           files: image ? { file: image } : null,
         }
 
@@ -243,7 +243,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? { path: `/v2/person/${prisonerNumber}/physical-attributes` }
       : { path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } }
-    return this.get<CorePersonPhysicalAttributesDto>(request, this.token)
+    return this.get(request, this.token)
   }
 
   updatePhysicalAttributes(
@@ -253,12 +253,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/physical-attributes`,
-          data: physicalAttributes as Record<string, any>,
+          data: physicalAttributes,
         }
       : {
           path: '/v1/core-person-record/physical-attributes',
           query: { prisonerNumber },
-          data: physicalAttributes as Record<string, any>,
+          data: physicalAttributes,
         }
 
     return handleNomisLockedError(() => this.put(request, this.token))
@@ -269,7 +269,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? { path: `/v2/person/${prisonerNumber}/pseudonyms` }
       : { path: `/v1/pseudonyms`, query: { prisonerNumber, sourceSystem: 'NOMIS' } }
 
-    return this.get<PseudonymResponseDto[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
@@ -277,30 +277,30 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${placeHolderPrisonNumber}/pseudonym/${pseudonymId}`,
-          data: pseudonym as Record<string, any>,
+          data: pseudonym,
         }
       : {
           path: `/v1/pseudonym/${pseudonymId}`,
           query: { sourceSystem: 'NOMIS' },
-          data: pseudonym as Record<string, any>,
+          data: pseudonym,
         }
 
-    return handleNomisLockedError(() => this.put<PseudonymResponseDto>(request, this.token))
+    return handleNomisLockedError(() => this.put(request, this.token))
   }
 
   createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/pseudonym`,
-          data: pseudonym as Record<string, any>,
+          data: pseudonym,
         }
       : {
           path: `/v1/pseudonym`,
           query: { prisonerNumber, sourceSystem: 'NOMIS' },
-          data: pseudonym as Record<string, any>,
+          data: pseudonym,
         }
 
-    return handleNomisLockedError(() => this.post<PseudonymResponseDto>(request, this.token))
+    return handleNomisLockedError(() => this.post(request, this.token))
   }
 
   updateIdentityNumber(offenderId: number, seqId: number, requestDto: UpdateIdentifierRequestDto): Promise<void> {
@@ -309,12 +309,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? {
           path: `/v2/person/${placeHolderPrisonNumber}/identifiers`,
           query: { offenderId, seqId },
-          data: requestDto as Record<string, any>,
+          data: requestDto,
         }
       : {
           path: `/v1/core-person-record/identifiers`,
           query: { offenderId, seqId, sourceSystem: 'NOMIS' },
-          data: requestDto as Record<string, any>,
+          data: requestDto,
         }
 
     return handleNomisLockedError(() => this.put(request, this.token))
@@ -324,12 +324,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/identifiers`,
-          data: requestDto as Record<string, any>,
+          data: requestDto,
         }
       : {
           path: `/v1/core-person-record/identifiers`,
           query: { prisonerNumber, sourceSystem: 'NOMIS' },
-          data: requestDto as Record<string, any>,
+          data: requestDto,
         }
 
     return handleNomisLockedError(() => this.post(request, this.token))
@@ -339,12 +339,12 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}`,
-          data: { fieldName, value } as Record<string, any>,
+          data: { fieldName, value },
         }
       : {
           path: '/v1/core-person-record',
           query: { prisonerNumber },
-          data: { fieldName, value } as Record<string, any>,
+          data: { fieldName, value },
         }
 
     return handleNomisLockedError(() => this.patch(request, this.token))
@@ -373,21 +373,21 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? { path: `/v2/person/${prisonerNumber}/addresses` }
       : { path: `/v1/person/${prisonerNumber}/addresses` }
 
-    return this.get<AddressResponseDto[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   createAddress(prisonerNumber: string, address: AddressRequestDto): Promise<AddressResponseDto> {
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/addresses`,
-          data: address as Record<string, any>,
+          data: address,
         }
       : {
           path: `/v1/person/${prisonerNumber}/addresses`,
-          data: address as Record<string, any>,
+          data: address,
         }
 
-    return handleNomisLockedError(() => this.post<AddressResponseDto>(request, this.token))
+    return handleNomisLockedError(() => this.post(request, this.token))
   }
 
   // Global phones/addresses (contacts)
@@ -396,34 +396,34 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
       ? { path: `/v2/person/${prisonerNumber}/contacts` }
       : { path: `/v1/person/${prisonerNumber}/contacts` }
 
-    return this.get<ContactsResponseDto[]>(request, this.token)
+    return this.get(request, this.token)
   }
 
   createContact(prisonerNumber: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
     const requestPayload = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/contacts`,
-          data: request as Record<string, any>,
+          data: request,
         }
       : {
           path: `/v1/person/${prisonerNumber}/contacts`,
-          data: request as Record<string, any>,
+          data: request,
         }
 
-    return handleNomisLockedError(() => this.post<ContactsResponseDto>(requestPayload, this.token))
+    return handleNomisLockedError(() => this.post(requestPayload, this.token))
   }
 
   updateContact(prisonerNumber: string, contactId: string, request: ContactsRequestDto): Promise<ContactsResponseDto> {
     const requestPayload = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/contacts/${contactId}`,
-          data: request as Record<string, any>,
+          data: request,
         }
       : {
           path: `/v1/person/${prisonerNumber}/contacts/${contactId}`,
-          data: request as Record<string, any>,
+          data: request,
         }
 
-    return handleNomisLockedError(() => this.put<ContactsResponseDto>(requestPayload, this.token))
+    return handleNomisLockedError(() => this.put(requestPayload, this.token))
   }
 }

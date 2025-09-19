@@ -8,8 +8,8 @@ export default class calculateReleaseDatesApiClient extends RestClient implement
     super('Calculate Release Dates API', config.apis.calculateReleaseDatesApi, token)
   }
 
-  getLatestCalculation(prisonNumber: string): Promise<LatestCalculation> {
-    return this.getAndIgnore404<LatestCalculation>({
+  getLatestCalculation(prisonNumber: string): Promise<LatestCalculation | null> {
+    return this.getAndIgnore404({
       path: `/calculation/${prisonNumber}/latest`,
     })
   }

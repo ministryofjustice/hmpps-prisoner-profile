@@ -14,20 +14,20 @@ export default class CuriousRestApiClient extends RestClient implements CuriousA
     super('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
   }
 
-  async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {
-    return this.getAndIgnore404<LearnerEmployabilitySkills>({
+  async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills | null> {
+    return this.getAndIgnore404({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
     })
   }
 
-  async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[]> {
-    return this.getAndIgnore404<LearnerProfile[]>({
+  async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[] | null> {
+    return this.getAndIgnore404({
       path: `/learnerProfile/${offenderNumber}`,
     })
   }
 
-  async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
-    return this.getAndIgnore404<LearnerEductionPagedResponse>({
+  async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse | null> {
+    return this.getAndIgnore404({
       path: `/learnerEducation/${offenderNumber}`,
       query: {
         page,
@@ -35,20 +35,20 @@ export default class CuriousRestApiClient extends RestClient implements CuriousA
     })
   }
 
-  async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[]> {
-    return this.getAndIgnore404<LearnerLatestAssessment[]>({
+  async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[] | null> {
+    return this.getAndIgnore404({
       path: `/latestLearnerAssessments/${offenderNumber}`,
     })
   }
 
-  async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals> {
-    return this.getAndIgnore404<LearnerGoals>({
+  async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals | null> {
+    return this.getAndIgnore404({
       path: `/learnerGoals/${offenderNumber}`,
     })
   }
 
-  async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[]> {
-    return this.getAndIgnore404<LearnerNeurodivergence[]>({
+  async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[] | null> {
+    return this.getAndIgnore404({
       path: `/learnerNeurodivergence/${offenderNumber}`,
     })
   }

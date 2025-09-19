@@ -15,3 +15,5 @@ export const referenceDataServiceMock = (): ReferenceDataService =>
     }),
     getReferenceData: jest.fn(),
   }) as unknown as ReferenceDataService
+
+export default { referenceDataServiceMock }

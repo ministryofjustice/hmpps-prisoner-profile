@@ -10,3 +10,5 @@ export function validationErrorsFromFlash(req: Request): HmppsError[] | null {
 
   return null
 }
+
+export default { validationErrorsFromFlash }

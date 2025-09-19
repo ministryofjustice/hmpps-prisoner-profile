@@ -15,8 +15,8 @@ const getResLocals = () => ({
 })
 
 describe('Distinguishing Marks Controller', () => {
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: DistinguishingMarksController
   let distinguishingMarksService: DistinguishingMarksService
   let auditService: AuditService
@@ -28,12 +28,12 @@ describe('Distinguishing Marks Controller', () => {
         prisonerData: PrisonerMockDataA,
       },
       flash: jest.fn(),
-    }
+    } as unknown as Request
     res = {
       locals: getResLocals(),
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
     distinguishingMarksService = new DistinguishingMarksService(null)
     auditService = auditServiceMock() as AuditService
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)
@@ -41,7 +41,7 @@ describe('Distinguishing Marks Controller', () => {
 
   describe('newDistinguishingMark', () => {
     it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
-      const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType }, query: {} } as Request
+      const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType }, query: {} } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
@@ -56,7 +56,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType' },
         query: {},
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
@@ -68,7 +68,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo' },
         query: { selected: bodyPart },
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
@@ -84,7 +84,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo' },
         query: { selected: 'invalidSelection' },
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
@@ -100,7 +100,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo' },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'G6123VU',
@@ -124,7 +124,7 @@ describe('Distinguishing Marks Controller', () => {
           params: { prisonerNumber: 'A12345', markType: 'tattoo' },
           body: { bodyPart },
           flash: jest.fn(),
-        } as Request
+        } as unknown as Request
 
         jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -146,7 +146,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -166,7 +166,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoos' },
         body: { bodyPart: 'somethingInvalid' },
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -182,7 +182,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -202,7 +202,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
 
@@ -238,7 +238,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType, bodyPart: 'left-leg' },
         query: {},
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
@@ -253,7 +253,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart },
         query: {},
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
@@ -268,7 +268,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'left-leg' },
         query: {},
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
@@ -280,7 +280,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'invalidPart' },
         query: {},
-      } as Request
+      } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
@@ -299,7 +299,7 @@ describe('Distinguishing Marks Controller', () => {
         },
         query: {},
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -326,7 +326,7 @@ describe('Distinguishing Marks Controller', () => {
         files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
         query: {},
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -354,7 +354,7 @@ describe('Distinguishing Marks Controller', () => {
         files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
         query: {},
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -386,7 +386,7 @@ describe('Distinguishing Marks Controller', () => {
         files,
         query: {},
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
 
@@ -408,7 +408,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType, markId: distinguishingMarkMock.id },
         query: {},
-      } as Request
+      } as unknown as Request
 
       await controller.changeDistinguishingMark(typeReq, res)
 
@@ -426,7 +426,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: distinguishingMarkMock.id },
         query: { updated: 'true' },
-      } as Request
+      } as unknown as Request
 
       await controller.changeDistinguishingMark(typeReq, res)
 
@@ -444,7 +444,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: distinguishingMarkMock.id },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'G6123VU',
@@ -467,7 +467,7 @@ describe('Distinguishing Marks Controller', () => {
     ])(
       'creates a flashMessage and redirects to the profile for type: %s',
       async (markType, flashMessage, redirectAnchor) => {
-        const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as Request
+        const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as unknown as Request
 
         await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
 
@@ -492,7 +492,7 @@ describe('Distinguishing Marks Controller', () => {
           markId: '100',
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
@@ -511,7 +511,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         query: { selected: bodyPart },
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -530,7 +530,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -549,7 +549,7 @@ describe('Distinguishing Marks Controller', () => {
           ...req,
           params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
           body: { bodyPart },
-        } as Request
+        } as unknown as Request
 
         jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
         jest
@@ -579,7 +579,7 @@ describe('Distinguishing Marks Controller', () => {
           ...req,
           params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
           body: { bodyPart },
-        } as Request
+        } as unknown as Request
 
         jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
         jest
@@ -607,7 +607,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoos' },
         body: { bodyPart: 'somethingInvalid' },
-      } as Request
+      } as unknown as Request
 
       jest
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
@@ -627,7 +627,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         body: { bodyPart: 'left-leg' },
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -652,7 +652,7 @@ describe('Distinguishing Marks Controller', () => {
           markId: '100',
         },
         query: { bodyPart: 'left-leg', referer: 'body-part' },
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
@@ -673,7 +673,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         query: { bodyPart, bodyPartChanged: 'true' },
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -692,7 +692,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -707,7 +707,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'invalidPart' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -727,7 +727,7 @@ describe('Distinguishing Marks Controller', () => {
           specificBodyPart: 'lowerLeftArm',
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       jest
@@ -758,7 +758,7 @@ describe('Distinguishing Marks Controller', () => {
           specificBodyPart: 'lowerLeftArm',
         },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -783,7 +783,7 @@ describe('Distinguishing Marks Controller', () => {
           markId: '100',
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
@@ -802,7 +802,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -821,7 +821,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -841,7 +841,7 @@ describe('Distinguishing Marks Controller', () => {
           description: 'description',
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       jest
@@ -872,7 +872,7 @@ describe('Distinguishing Marks Controller', () => {
           description: 'updated description',
         },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -903,7 +903,7 @@ describe('Distinguishing Marks Controller', () => {
           photoId: leftLegMarkMock.photographUuids[0].id,
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
@@ -932,7 +932,7 @@ describe('Distinguishing Marks Controller', () => {
           photoId: distinguishingMarkMock.photographUuids[0].id,
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
@@ -956,7 +956,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -971,7 +971,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'G6123VU',
@@ -996,7 +996,7 @@ describe('Distinguishing Marks Controller', () => {
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
@@ -1015,7 +1015,7 @@ describe('Distinguishing Marks Controller', () => {
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -1040,7 +1040,7 @@ describe('Distinguishing Marks Controller', () => {
         file: { originalname: 'file.jpg' },
         query: {},
         flash: jest.fn(),
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockRejectedValue(null)
 
@@ -1067,7 +1067,7 @@ describe('Distinguishing Marks Controller', () => {
           photoId: leftLegMarkMock.photographUuids[0].id,
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
 
@@ -1089,7 +1089,7 @@ describe('Distinguishing Marks Controller', () => {
           photoId: distinguishingMarkMock.photographUuids[0].id,
         },
         query: {},
-      } as Request
+      } as unknown as Request
 
       await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
 
@@ -1106,7 +1106,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       await controller.addNewPhoto(typeReq, res)
 
@@ -1119,7 +1119,7 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'G6123VU',
@@ -1148,7 +1148,7 @@ describe('Distinguishing Marks Controller', () => {
           body: { action },
           file: { originalname: 'file.jpg' },
           query: {},
-        } as Request
+        } as unknown as Request
 
         jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
@@ -1169,7 +1169,7 @@ describe('Distinguishing Marks Controller', () => {
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'A12345',
@@ -1190,7 +1190,7 @@ describe('Distinguishing Marks Controller', () => {
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockRejectedValue(null)
 
@@ -1213,7 +1213,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         body: {},
         query: {},
-      } as Request
+      } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
@@ -1231,7 +1231,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         body: {},
         query: {},
-      } as Request
+      } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
         prisonerNumber: 'G6123VU',

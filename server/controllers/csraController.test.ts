@@ -1,9 +1,11 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import CsraController from './csraController'
-import CsraService from '../services/csraService'
+import CsraService, { AssessmentListViewModel } from '../services/csraService'
+import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import AgencyMock from '../data/localMockData/agency'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
@@ -11,9 +13,8 @@ import csraAssessmentSummaryMock from '../data/localMockData/csraAssessmentSumma
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 
-let req: any
-let res: any
-let next: any
+let req: Request
+let res: Response
 let controller: CsraController
 
 describe('CSRA Controller', () => {
@@ -28,7 +29,7 @@ describe('CSRA Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -39,19 +40,18 @@ describe('CSRA Controller', () => {
           },
         },
         render: jest.fn(),
-      }
-      next = jest.fn()
+      } as unknown as Response
       controller = new CsraController(new CsraService(null), auditServiceMock())
     })
 
     it('should return the data from the services', async () => {
-      jest.spyOn<any, string>(controller['csraService'], 'getCsraAssessment').mockResolvedValue({
+      jest.spyOn(controller.csraService, 'getCsraAssessment').mockResolvedValue({
         csraAssessment: csraAssessmentMock,
-        agencyDetails: AgencyMock,
+        agencyDetails: AgencyMock as AgencyDetails,
         staffDetails: StaffDetailsMock,
       })
 
-      await controller.displayReview(req, res, next)
+      await controller.displayReview(req, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/csra/csraReviewPage', {
         pageTitle: 'CSRA details',
@@ -74,7 +74,7 @@ describe('CSRA Controller', () => {
           inmateDetail: inmateDetailMock,
         },
         query: {},
-      }
+      } as unknown as Request
       res = {
         locals: {
           user: {
@@ -85,33 +85,35 @@ describe('CSRA Controller', () => {
           },
         },
         render: jest.fn(),
-      }
-      next = jest.fn()
+      } as unknown as Response
       controller = new CsraController(new CsraService(null), auditServiceMock())
     })
 
     it('should map the csra assessments to summaries', async () => {
       jest
-        .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+        .spyOn(controller.csraService, 'getCsraHistory')
         .mockResolvedValue([
           { ...csraAssessmentSummaryMock, assessmentAgencyId: AgencyMock.agencyId },
           csraAssessmentSummaryMock,
         ])
 
       jest
-        .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
-        .mockResolvedValue([AgencyMock, AgencyMock])
+        .spyOn(controller.csraService, 'getAgenciesForCsraAssessments')
+        .mockResolvedValue([AgencyMock, AgencyMock] as AgencyDetails[])
 
-      jest
-        .spyOn<any, string>(controller['csraService'], 'getDetailsForAssessments')
-        .mockImplementation((_, args: CsraSummary[]) =>
-          args.map(arg => ({
-            ...csraAssessmentMock,
-            ...arg,
-          })),
-        )
+      jest.spyOn(controller.csraService, 'getDetailsForAssessments').mockImplementation((_, args: CsraSummary[]) =>
+        Promise.resolve(
+          args.map(
+            arg =>
+              ({
+                ...csraAssessmentMock,
+                ...arg,
+              }) as AssessmentListViewModel,
+          ),
+        ),
+      )
 
-      await controller.displayHistory(req, res, next)
+      await controller.displayHistory(req, res)
 
       const expectedOutput = {
         ...csraAssessmentMock,
@@ -126,11 +128,12 @@ describe('CSRA Controller', () => {
         assessmentAgencyId: 'SHEFCC',
       }
 
-      expect(res.render.mock.calls[0][0]).toEqual('pages/csra/prisonerCsraHistoryPage')
-      expect(res.render.mock.calls[0][1].csraAssessments).toEqual([
-        expectedOutput,
-        { ...expectedOutput, location: 'Not entered', assessmentAgencyId: 'HLI' },
-      ])
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/csra/prisonerCsraHistoryPage',
+        expect.objectContaining({
+          csraAssessments: [expectedOutput, { ...expectedOutput, location: 'Not entered', assessmentAgencyId: 'HLI' }],
+        }),
+      )
     })
 
     describe('with filters', () => {
@@ -144,7 +147,7 @@ describe('CSRA Controller', () => {
             inmateDetail: inmateDetailMock,
           },
           query: {},
-        }
+        } as unknown as Request
         res = {
           locals: {
             user: {
@@ -155,8 +158,7 @@ describe('CSRA Controller', () => {
             },
           },
           render: jest.fn(),
-        }
-        next = jest.fn()
+        } as unknown as Response
         controller = new CsraController(new CsraService(null), auditServiceMock())
       })
 
@@ -167,38 +169,47 @@ describe('CSRA Controller', () => {
             csra: 'STANDARD',
             location: [csraAssessmentMock.assessmentAgencyId, AgencyMock.agencyId],
           },
-        }
+        } as unknown as Request
 
         jest
-          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .spyOn(controller.csraService, 'getCsraHistory')
           .mockResolvedValue([
             { ...csraAssessmentSummaryMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
             csraAssessmentSummaryMock,
           ])
 
         jest
-          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
-          .mockResolvedValue([AgencyMock, AgencyMock])
+          .spyOn(controller.csraService, 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock] as AgencyDetails[])
 
-        jest
-          .spyOn<any, string>(controller['csraService'], 'getDetailsForAssessments')
-          .mockImplementation((_, args: CsraSummary[]) =>
-            args.map(arg => ({
-              ...csraAssessmentMock,
-              ...arg,
-            })),
-          )
+        jest.spyOn(controller.csraService, 'getDetailsForAssessments').mockImplementation((_, args: CsraSummary[]) =>
+          Promise.resolve(
+            args.map(
+              arg =>
+                ({
+                  ...csraAssessmentMock,
+                  ...arg,
+                }) as AssessmentListViewModel,
+            ),
+          ),
+        )
 
-        await controller.displayHistory(reqWithQuery, res, next)
-        expect(res.render.mock.calls[0][1].filterValues).toEqual({
-          establishments: [{ checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' }],
-          from: undefined,
-          incentiveLevels: [
-            { checked: false, text: 'Medium', value: 'MED' },
-            { checked: true, text: 'Standard', value: 'STANDARD' },
-          ],
-          to: undefined,
-        })
+        await controller.displayHistory(reqWithQuery, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            filterValues: {
+              establishments: [{ checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' }],
+              from: undefined,
+              incentiveLevels: [
+                { checked: false, text: 'Medium', value: 'MED' },
+                { checked: true, text: 'Standard', value: 'STANDARD' },
+              ],
+              to: undefined,
+            },
+          }),
+        )
       })
 
       it('should validate date filters', async () => {
@@ -208,35 +219,44 @@ describe('CSRA Controller', () => {
             to: '19/03/2020',
             from: '20/03/2020',
           },
-        }
+        } as unknown as Request
         jest
-          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .spyOn(controller.csraService, 'getCsraHistory')
           .mockResolvedValue([
             { ...csraAssessmentSummaryMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
             csraAssessmentSummaryMock,
           ])
 
         jest
-          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
-          .mockResolvedValue([AgencyMock, AgencyMock])
+          .spyOn(controller.csraService, 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock] as AgencyDetails[])
 
-        jest
-          .spyOn<any, string>(controller['csraService'], 'getDetailsForAssessments')
-          .mockImplementation((_, args: CsraSummary[]) =>
-            args.map(arg => ({
-              ...csraAssessmentMock,
-              ...arg,
-            })),
-          )
+        jest.spyOn(controller.csraService, 'getDetailsForAssessments').mockImplementation((_, args: CsraSummary[]) =>
+          Promise.resolve(
+            args.map(
+              arg =>
+                ({
+                  ...csraAssessmentMock,
+                  ...arg,
+                }) as AssessmentListViewModel,
+            ),
+          ),
+        )
 
-        await controller.displayHistory(reqWithQuery, res, next)
-        expect(res.render.mock.calls[0][1].csraAssessments).toEqual([])
-        expect(res.render.mock.calls[0][1].errors).toEqual([
-          {
-            href: '#endDate',
-            text: "'Date to (latest)' must be after or the same as 'Date from (earliest) '",
-          },
-        ])
+        await controller.displayHistory(reqWithQuery, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            csraAssessments: [],
+            errors: [
+              {
+                href: '#endDate',
+                text: "'Date to (latest)' must be after or the same as 'Date from (earliest) '",
+              },
+            ],
+          }),
+        )
       })
 
       it('should return the filtered assessments', async () => {
@@ -245,31 +265,43 @@ describe('CSRA Controller', () => {
           query: {
             location: AgencyMock.agencyId,
           },
-        }
+        } as unknown as Request
         jest
-          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .spyOn(controller.csraService, 'getCsraHistory')
           .mockResolvedValue([
             { ...csraAssessmentSummaryMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
             csraAssessmentSummaryMock,
           ])
 
         jest
-          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
-          .mockResolvedValue([AgencyMock, AgencyMock])
+          .spyOn(controller.csraService, 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock] as AgencyDetails[])
 
-        jest
-          .spyOn<any, string>(controller['csraService'], 'getDetailsForAssessments')
-          .mockImplementation((_, args: CsraSummary[]) =>
-            args.map(arg => ({
-              ...csraAssessmentMock,
-              ...arg,
-            })),
-          )
+        jest.spyOn(controller.csraService, 'getDetailsForAssessments').mockImplementation((_, args: CsraSummary[]) =>
+          Promise.resolve(
+            args.map(
+              arg =>
+                ({
+                  ...csraAssessmentMock,
+                  ...arg,
+                }) as AssessmentListViewModel,
+            ),
+          ),
+        )
 
-        await controller.displayHistory(reqWithQuery, res, next)
-        expect(res.render.mock.calls[0][1].csraAssessments).toHaveLength(1)
-        expect(res.render.mock.calls[0][1].csraAssessments[0].assessmentAgencyId).toEqual(AgencyMock.agencyId)
-        expect(res.render.mock.calls[0][1].errors).toEqual(undefined)
+        await controller.displayHistory(reqWithQuery, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            csraAssessments: [
+              expect.objectContaining({
+                assessmentAgencyId: AgencyMock.agencyId,
+              }),
+            ],
+            errors: undefined,
+          }),
+        )
       })
     })
   })

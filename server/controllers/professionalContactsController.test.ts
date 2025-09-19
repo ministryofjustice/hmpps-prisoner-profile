@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import ProfessionalContactsService from '../services/professionalContactsService'
@@ -7,8 +8,8 @@ import { Result } from '../utils/result/result'
 describe('Prisoner schedule', () => {
   const offenderNo = 'A1234BC'
 
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: ProfessionalContactsController
 
   beforeEach(() => {
@@ -22,8 +23,8 @@ describe('Prisoner schedule', () => {
       query: {},
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
-    res = { locals: {}, render: jest.fn(), status: jest.fn() }
+    } as unknown as Request
+    res = { locals: {}, render: jest.fn(), status: jest.fn() } as unknown as Response
     controller = new ProfessionalContactsController(new ProfessionalContactsService(null, null, null, null, null))
   })
 
@@ -34,28 +35,25 @@ describe('Prisoner schedule', () => {
 
   describe('displayProfessionalContacts', () => {
     it('should call the service and render the page', async () => {
-      const professionalContacts = [
+      const professionalContacts: Awaited<
+        ReturnType<ProfessionalContactsController['professionalContactsService']['getContacts']>
+      > = [
         Result.fulfilled({
-          relationship: 'Prison Offender Manager',
-          contacts: [
-            {
-              jobTitle: false,
-              name: 'John Smith',
-            },
-            {
-              jobTitle: 'Co-worker',
-              name: 'Jane Jones',
-            },
-          ],
-        }).toPromiseSettledResult(),
+          relationship: 'POM',
+          relationshipDescription: 'Prison Offender Manager',
+          emails: ['john.smith@localhost'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: [],
+        }),
       ]
-      jest
-        .spyOn<any, string>(controller['professionalContactsService'], 'getContacts')
-        .mockResolvedValue(professionalContacts.map(Result.from))
+      jest.spyOn(controller.professionalContactsService, 'getContacts').mockResolvedValue(professionalContacts)
 
       await controller.displayProfessionalContacts(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/professionalContacts/professionalContactsPage', {
-        professionalContacts,
+        professionalContacts: professionalContacts.map(professionalContact =>
+          professionalContact.toPromiseSettledResult(),
+        ),
       })
     })
   })

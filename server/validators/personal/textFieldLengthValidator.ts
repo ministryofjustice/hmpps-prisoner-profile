@@ -11,3 +11,5 @@ export const textFieldLengthValidator =
 
     return []
   }
+
+export default { textFieldLengthValidator }

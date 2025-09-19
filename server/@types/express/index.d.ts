@@ -10,7 +10,7 @@ export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
-    userBackLink: string
+    userBackLink?: { url: string; text: string }
     movementSlipData: object
     keyWorkerAtPrisons: Record<string, boolean>
     temporaryDataCache: Record<UUID, unknown>

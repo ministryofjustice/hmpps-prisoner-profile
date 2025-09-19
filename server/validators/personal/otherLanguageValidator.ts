@@ -14,3 +14,5 @@ export const otherLanguageValidator: Validator = (body: Record<string, string>) 
 
   return errors
 }
+
+export default { otherLanguageValidator }
