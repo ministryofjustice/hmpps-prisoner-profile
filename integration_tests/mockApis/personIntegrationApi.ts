@@ -7,12 +7,14 @@ import {
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
   PersonIntegrationDistinguishingMarkImageDetail,
+  PrisonerProfileSummary,
   PseudonymResponseDto,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
 import {
   ContactsResponseMock,
+  PrisonerProfileSummaryMock,
   PseudonymResponseMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
@@ -335,9 +337,15 @@ export default {
       responseBody: null,
     }),
 
-  stubUpdateBirthPlace: ({ prisonerNumber, birthPlace }: { prisonerNumber: string; birthPlace: string }) =>
-    stubPatchWithResponse<void>({
-      path: `${baseUrl}/v2/person/${prisonerNumber}`,
-      responseBody: null,
+  stubGetPrisonerProfileSummary: ({
+    prisonerNumber,
+    response = PrisonerProfileSummaryMock,
+  }: {
+    prisonerNumber: string
+    response?: PrisonerProfileSummary
+  }) =>
+    stubGetWithBody({
+      path: `/v2/person/${prisonerNumber}`,
+      body: response,
     }),
 }
