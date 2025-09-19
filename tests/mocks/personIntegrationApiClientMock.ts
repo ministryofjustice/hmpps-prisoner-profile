@@ -32,4 +32,5 @@ export const personIntegrationApiClientMock = (): PersonIntegrationApiClient => 
   updateContact: jest.fn(),
   updateIdentityNumber: jest.fn(),
   addIdentityNumbers: jest.fn(),
+  getPrisonerProfileSummary: jest.fn(),
 })

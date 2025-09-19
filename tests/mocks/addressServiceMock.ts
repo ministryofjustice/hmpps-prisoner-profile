@@ -15,4 +15,5 @@ export const addressServiceMock = (): Interface<AddressService> => ({
   getCountryCode: jest.fn(),
   getCountryReferenceData: jest.fn(),
   sanitisePostcode: jest.fn(),
+  transformAddresses: jest.fn(),
 })

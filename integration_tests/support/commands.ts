@@ -236,6 +236,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     domain: 'PHONE_USAGE',
     referenceData: phoneUsageReferenceDataMock,
   })
+  cy.task('stubGetPrisonerProfileSummary', { prisonerNumber })
 })
 
 Cypress.Commands.add(

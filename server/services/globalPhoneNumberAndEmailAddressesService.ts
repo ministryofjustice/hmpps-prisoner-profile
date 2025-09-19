@@ -1,5 +1,6 @@
 import { RestClientBuilder } from '../data'
 import {
+  ContactsResponseDto,
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -19,13 +20,11 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     private readonly referenceDataService: ReferenceDataService,
   ) {}
 
-  async getForPrisonerNumber(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
-    const apiClient = this.personIntegrationApiClientBuilder(token)
-    const [contacts, phoneTypes] = await Promise.all([
-      apiClient.getContacts(prisonerNumber),
-      this.referenceDataService.getActiveReferenceDataCodes(CorePersonRecordReferenceDataDomain.phoneTypes, token),
-    ])
-
+  async transformContacts(token: string, contacts: ContactsResponseDto[]): Promise<GlobalNumbersAndEmails> {
+    const phoneTypes = await this.referenceDataService.getActiveReferenceDataCodes(
+      CorePersonRecordReferenceDataDomain.phoneTypes,
+      token,
+    )
     return {
       phones: transformPhones(contacts, phoneTypes).sort((a, b) => b.id - a.id),
       emails: contacts
@@ -33,6 +32,12 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
         .map(c => ({ id: c.contactId, email: c.contactValue }))
         .sort((a, b) => b.id - a.id),
     }
+  }
+
+  async getForPrisonerNumber(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+    const contacts = await apiClient.getContacts(prisonerNumber)
+    return this.transformContacts(token, contacts)
   }
 
   async createEmailForPrisonerNumber(token: string, prisonerNumber: string, value: string): Promise<GlobalEmail> {
