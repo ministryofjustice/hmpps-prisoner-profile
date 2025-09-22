@@ -14,7 +14,7 @@ import { PrisonerMockDataA } from './prisoner'
 
 import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
 import { mockAddressResponseDto } from './personIntegrationApi/addresses'
-import { corePersonPhysicalAttributesMock } from './physicalAttributesMock'
+import { corePersonPhysicalAttributesDtoMock, corePersonPhysicalAttributesMock } from './physicalAttributesMock'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -545,7 +545,7 @@ export const PrisonerProfileSummaryMock: PrisonerProfileSummary = {
   addresses: [mockAddressResponseDto],
   contacts: ContactsResponseMock,
   militaryRecords: MilitaryRecordsMock,
-  physicalAttributes: corePersonPhysicalAttributesMock,
+  physicalAttributes: corePersonPhysicalAttributesDtoMock,
   distinguishingMarks: DistinguishingMarksMock,
 }
 

@@ -10,6 +10,7 @@ import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 import {
   CountryReferenceDataCodesMock,
+  createPrisonerProfileSummary,
   MilitaryRecordsMock,
   ReligionReferenceDataCodesMock,
 } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
@@ -389,10 +390,13 @@ context('When signed in', () => {
       })
 
       it(`Renders only the latest photo when there are multiple photos for a distinguishing mark`, () => {
-        cy.task('stubGetDistinguishingMarksForPrisoner', {
+        cy.task('stubGetPrisonerProfileSummary', {
           prisonerNumber: 'G6123VU',
-          response: [distinguishingMarkMultiplePhotosMock],
+          response: createPrisonerProfileSummary({
+            distinguishingMarks: [distinguishingMarkMultiplePhotosMock],
+          }),
         })
+
         cy.visit(`prisoner/G6123VU/personal`, { failOnStatusCode: false })
 
         const page = Page.verifyOnPage(PersonalPage)
@@ -415,10 +419,13 @@ context('When signed in', () => {
       })
 
       it(`Displays a link allowing the user to view all images for the distinguishing mark`, () => {
-        cy.task('stubGetDistinguishingMarksForPrisoner', {
+        cy.task('stubGetPrisonerProfileSummary', {
           prisonerNumber: 'G6123VU',
-          response: [distinguishingMarkMultiplePhotosMock],
+          response: createPrisonerProfileSummary({
+            distinguishingMarks: [distinguishingMarkMultiplePhotosMock],
+          }),
         })
+
         cy.visit(`prisoner/G6123VU/personal`, { failOnStatusCode: false })
 
         const page = Page.verifyOnPage(PersonalPage)
