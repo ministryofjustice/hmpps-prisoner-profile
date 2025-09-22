@@ -196,7 +196,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
     const placeHolderPrisonNumber = 'AB123CD' // Use real when possible
     const request = config.featureToggles.personEndpointsEnabled
       ? {
-          path: `/v2/person/${placeHolderPrisonNumber}/distinguishing-mark/${photoId}/image`,
+          path: `/v2/person/${placeHolderPrisonNumber}/distinguishing-mark/image/${photoId}`,
           files: { file: image },
         }
       : {
