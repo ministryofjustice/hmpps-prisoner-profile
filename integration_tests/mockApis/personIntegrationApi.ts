@@ -15,12 +15,10 @@ import { stubFor } from './wiremock'
 import {
   ContactsResponseMock,
   createPrisonerProfileSummary,
-  PrisonerProfileSummaryMock,
   PseudonymResponseMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import { mockAddressResponseDto } from '../../server/data/localMockData/personIntegrationApi/addresses'
-import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 
 const baseUrl = '/personIntegration'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'

@@ -14,7 +14,7 @@ import { PrisonerMockDataA } from './prisoner'
 
 import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
 import { mockAddressResponseDto } from './personIntegrationApi/addresses'
-import { corePersonPhysicalAttributesDtoMock, corePersonPhysicalAttributesMock } from './physicalAttributesMock'
+import { corePersonPhysicalAttributesDtoMock } from './physicalAttributesMock'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
