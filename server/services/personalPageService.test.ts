@@ -215,7 +215,13 @@ describe('PersonalPageService', () => {
             createPrisonerProfileSummary({ pseudonyms }),
           )
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, true, null, personEndpointsEnabled)
+          return service.get('token', PrisonerMockDataA, {
+            dietAndAllergyIsEnabled: false,
+            editProfileEnabled: false,
+            personalRelationshipsApiReadEnabled: true,
+            personEndpointsEnabled,
+            apiErrorCallback: null,
+          })
         }
         describe.each([false, true])('personEndpointsEnabled=%s', personEndpointsEnabled => {
           it('Handles no pseudonyms', async () => {
@@ -328,7 +334,10 @@ describe('PersonalPageService', () => {
         ])(
           'Maps the food allergies field (Diet and allergies enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
-            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            const response = await constructService().get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
+              editProfileEnabled: false,
+            })
             expect(response.personalDetails.dietAndAllergy.foodAllergies).toEqual(expectedValue)
           },
         )
@@ -341,7 +350,10 @@ describe('PersonalPageService', () => {
         ])(
           'Maps the medical diet field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
-            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            const response = await constructService().get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
+              editProfileEnabled: false,
+            })
             expect(response.personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual(expectedValue)
           },
         )
@@ -354,7 +366,10 @@ describe('PersonalPageService', () => {
         ])(
           'Maps the medical diet field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
-            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            const response = await constructService().get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
+              editProfileEnabled: false,
+            })
             expect(response.personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual(expectedValue)
           },
         )
@@ -368,7 +383,10 @@ describe('PersonalPageService', () => {
           'Maps the lastModifiedAt field to the latest timestamp (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
             prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: 'Moorland (HMP & YOI)' }) as Prison)
-            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            const response = await constructService().get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
+              editProfileEnabled: false,
+            })
             expect(response.personalDetails.dietAndAllergy.lastModifiedAt).toEqual(expectedValue)
           },
         )
@@ -380,7 +398,10 @@ describe('PersonalPageService', () => {
           'Maps the lastModifiedPrison field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
             prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: expectedValue }) as Prison)
-            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            const response = await constructService().get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
+              editProfileEnabled: false,
+            })
             expect(response.personalDetails.dietAndAllergy.lastModifiedPrison).toEqual(expectedValue)
           },
         )
@@ -525,7 +546,10 @@ describe('PersonalPageService', () => {
       ['Profile edit enabled', true],
       ['Profile edit disabled', false],
     ])('Maps the data from the API - %s', async (_, profileEditEnabled: boolean) => {
-      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, false, profileEditEnabled)
+      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: profileEditEnabled,
+      })
       expect(identityNumbers.justice.croNumber).toEqual([
         { offenderId: 1, sequenceId: 1, comment: 'P/CONS', value: '400862/08W', editPageUrl: 'cro' },
       ])
@@ -719,7 +743,10 @@ describe('PersonalPageService', () => {
 
       const {
         addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, false, true)
+      } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: true,
+      })
 
       expect(totalActive).toEqual(2)
       expect(primaryOrPostal).toHaveLength(1)
@@ -733,7 +760,10 @@ describe('PersonalPageService', () => {
 
       const {
         addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, false, true)
+      } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: true,
+      })
 
       expect(totalActive).toEqual(1)
       expect(primaryOrPostal).toHaveLength(1)
@@ -864,7 +894,12 @@ describe('PersonalPageService', () => {
       }
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
-      const data = await constructService().get('token', prisonerData, false, false, true, apiErrorCallback)
+      const data = await constructService().get('token', prisonerData, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: false,
+        personalRelationshipsApiReadEnabled: true,
+        apiErrorCallback,
+      })
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
@@ -879,7 +914,7 @@ describe('PersonalPageService', () => {
 
   describe('Prison Person API Enabled', () => {
     it('Gets the height and weight from the prison person API', async () => {
-      const data = await constructService().get('token', PrisonerMockDataA, true)
+      const data = await constructService().get('token', PrisonerMockDataA, { dietAndAllergyIsEnabled: true })
       expect(data.physicalCharacteristics.height).toBe('1m')
       expect(data.physicalCharacteristics.weight).toBe('100kg')
     })
@@ -917,7 +952,10 @@ describe('PersonalPageService', () => {
 
   describe('Get diet and allergy data', () => {
     it('Gets the data from the API when diet and allergy is enabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true, false)
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: true,
+        editProfileEnabled: false,
+      })
 
       expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
@@ -941,7 +979,10 @@ describe('PersonalPageService', () => {
         },
       }))
 
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true, false)
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: true,
+        editProfileEnabled: false,
+      })
 
       expect(personalDetails.dietAndAllergy.cateringInstructions).toBeFalsy()
       expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('1 July 2024')
@@ -949,11 +990,28 @@ describe('PersonalPageService', () => {
     })
 
     it('Does not get the data from the API when diet and allergy is disabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false, false)
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: false,
+      })
 
       expect(healthAndMedicationApiClient.getHealthAndMedication).not.toHaveBeenCalledWith(
         PrisonerMockDataA.prisonerNumber,
       )
+
+      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
+      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
+      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([])
+    })
+
+    it('Reads the data from the API but does not dislay it when configured to do so', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+        dietAndAllergyIsEnabled: false,
+        editProfileEnabled: false,
+        healthAndMedicationApiReadEnabled: true,
+      })
+
+      expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
       expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
       expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
@@ -1141,7 +1199,11 @@ describe('PersonalPageService', () => {
           it('Gets the phones and emails from the service', async () => {
             const service = constructService()
             personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () => PrisonerProfileSummaryMock)
-            const result = await service.get('token', PrisonerMockDataA, true, true, null, null, personEndpointsEnabled)
+            const result = await service.get('token', PrisonerMockDataA, {
+              dietAndAllergyIsEnabled: true,
+              editProfileEnabled: true,
+              personEndpointsEnabled,
+            })
             expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
           })
         })
@@ -1149,7 +1211,10 @@ describe('PersonalPageService', () => {
       describe('Edit profile disabled', () => {
         it('Does not get phones and emails from the service', async () => {
           const service = constructService()
-          const result = await service.get('token', PrisonerMockDataA, true, false)
+          const result = await service.get('token', PrisonerMockDataA, {
+            dietAndAllergyIsEnabled: true,
+            editProfileEnabled: false,
+          })
           expect(result.globalNumbersAndEmails).toEqual(null)
         })
       })

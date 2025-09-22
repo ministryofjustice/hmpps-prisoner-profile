@@ -94,18 +94,18 @@ export default class PersonalController {
       const { user, apiErrorCallback } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
-      const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
+      const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
+        config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(
-          clientToken,
-          prisonerData,
-          dietAndAllergyEnabled(activeCaseLoadId),
-          editEnabled,
+        this.personalPageService.get(clientToken, prisonerData, {
+          dietAndAllergyIsEnabled: dietAndAllergyEnabled(activeCaseLoadId),
+          editProfileEnabled: editEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
+          healthAndMedicationApiReadEnabled,
           personEndpointsEnabled,
-        ),
+        }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
@@ -999,7 +999,10 @@ export default class PersonalController {
           getCommonRequestData(req, res)
 
         const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
-          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber),
+          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
+            dietAndAllergiesEnabled: true,
+            healthAndMedicationApiReadEnabled: true,
+          }),
           this.personalPageService.getReferenceDataCodes(
             clientToken,
             HealthAndMedicationReferenceDataDomain.foodAllergy,
@@ -1069,8 +1072,12 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const { prisonerNumber } = req.params
-        const dietAndAllergy = (await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber))
-          ?.dietAndAllergy
+        const dietAndAllergy = (
+          await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
+            dietAndAllergiesEnabled: true,
+            healthAndMedicationApiReadEnabled: true,
+          })
+        )?.dietAndAllergy
 
         const update: Partial<DietAndAllergyUpdate> = {
           foodAllergies: req.body.allergy

@@ -74,6 +74,15 @@ import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEma
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import AddressService from './addressService'
 
+interface PersonalPageGetOptions {
+  dietAndAllergyIsEnabled: boolean
+  editProfileEnabled: boolean
+  personalRelationshipsApiReadEnabled: boolean
+  healthAndMedicationApiReadEnabled: boolean
+  personEndpointsEnabled: boolean
+  apiErrorCallback: (error: Error) => void
+}
+
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
@@ -91,9 +100,20 @@ export default class PersonalPageService {
     private readonly addressService: AddressService,
   ) {}
 
-  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
+  async getHealthAndMedication(
+    token: string,
+    prisonerNumber: string,
+    {
+      dietAndAllergiesEnabled,
+      healthAndMedicationApiReadEnabled,
+    }: { dietAndAllergiesEnabled: boolean; healthAndMedicationApiReadEnabled: boolean },
+  ): Promise<HealthAndMedication> {
+    if (!dietAndAllergiesEnabled && !healthAndMedicationApiReadEnabled) {
+      return null
+    }
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    return apiClient.getHealthAndMedication(prisonerNumber)
+    const response = apiClient.getHealthAndMedication(prisonerNumber)
+    return dietAndAllergiesEnabled ? response : null
   }
 
   async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
@@ -224,12 +244,18 @@ export default class PersonalPageService {
   public async get(
     token: string,
     prisonerData: Prisoner,
-    dietAndAllergyIsEnabled: boolean = false,
-    editProfileEnabled: boolean = false,
-    personalRelationshipsApiReadEnabled: boolean = true,
-    apiErrorCallback: (error: Error) => void = () => null,
-    personEndpointsEnabled = false,
+    options: Partial<PersonalPageGetOptions> = {},
   ): Promise<PersonalPage> {
+    const defaultOptions: PersonalPageGetOptions = {
+      dietAndAllergyIsEnabled: false,
+      editProfileEnabled: false,
+      personalRelationshipsApiReadEnabled: true,
+      healthAndMedicationApiReadEnabled: false,
+      personEndpointsEnabled: false,
+      apiErrorCallback: () => null,
+    }
+    const getOptions: PersonalPageGetOptions = { ...defaultOptions, ...options }
+
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
 
@@ -253,22 +279,25 @@ export default class PersonalPageService {
       prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
-      !editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
+      !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
-      prisonApiClient.getIdentifiers(prisonerNumber, editProfileEnabled),
+      prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
-      Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
-      dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
-      personalRelationshipsApiReadEnabled
-        ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), apiErrorCallback)
+      Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
+      this.getHealthAndMedication(token, prisonerNumber, {
+        dietAndAllergiesEnabled: getOptions.dietAndAllergyIsEnabled,
+        healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
+      }),
+      getOptions.personalRelationshipsApiReadEnabled
+        ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback)
         : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
-      personalRelationshipsApiReadEnabled
+      getOptions.personalRelationshipsApiReadEnabled
         ? Result.wrap(
             this.getNumberOfChildren(token, prisonerNumber),
             noCallbackOnErrorBecause('we are falling back to prisoner search data'),
           )
         : Result.rejected<PersonalRelationshipsNumberOfChildrenDto, Error>(undefined),
-      personalRelationshipsApiReadEnabled
+      getOptions.personalRelationshipsApiReadEnabled
         ? Result.wrap(
             this.getDomesticStatus(token, prisonerNumber),
             noCallbackOnErrorBecause('we are falling back to prison api data'),
@@ -282,29 +311,29 @@ export default class PersonalPageService {
     let militaryRecords
     let physicalAttributes
     let globalNumbersAndEmails
-    if (personEndpointsEnabled) {
+    if (getOptions.personEndpointsEnabled) {
       profileSummary = await personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber)
-      addresses = editProfileEnabled
+      addresses = getOptions.editProfileEnabled
         ? await this.addressService.transformAddresses(token, profileSummary.addresses)
         : null
-      distinguishingMarks = editProfileEnabled ? profileSummary.distinguishingMarks : null
+      distinguishingMarks = getOptions.editProfileEnabled ? profileSummary.distinguishingMarks : null
       militaryRecords = (await militaryHistoryEnabled()) ? profileSummary.militaryRecords : null
       physicalAttributes = this.transformPhyscialAttributes(profileSummary.physicalAttributes)
-      globalNumbersAndEmails = editProfileEnabled
+      globalNumbersAndEmails = getOptions.editProfileEnabled
         ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
         : null
     } else {
       ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
         await Promise.all([
-          editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
-          editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
+          getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
+          getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
           militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
           this.getPhysicalAttributes(token, prisonerNumber),
-          editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
+          getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
         ])
     }
 
-    const oldAddresses: OldAddresses = !editProfileEnabled && this.oldAddresses(oldAddressList)
+    const oldAddresses: OldAddresses = !getOptions.editProfileEnabled && this.oldAddresses(oldAddressList)
     const primaryOrPostalAddresses = addresses?.filter(address => address.primaryAddress || address.postalAddress)
 
     const countryOfBirth =
