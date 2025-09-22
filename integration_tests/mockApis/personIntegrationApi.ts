@@ -165,7 +165,7 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `${baseUrl}/v2/person/.*/distinguishing-mark/${imageId}/image`,
+        urlPattern: `${baseUrl}/v2/person/.*/distinguishing-mark/image/${imageId}`,
       },
       response: {
         status: 200,
