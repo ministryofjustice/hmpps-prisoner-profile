@@ -94,7 +94,8 @@ export default class PersonalController {
       const { user, apiErrorCallback } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
-      const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled } = config.featureToggles
+      const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
+        config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -103,6 +104,7 @@ export default class PersonalController {
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           healthAndMedicationApiReadEnabled,
+          personEndpointsEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),

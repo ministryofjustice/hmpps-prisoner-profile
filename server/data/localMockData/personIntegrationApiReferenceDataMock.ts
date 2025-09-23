@@ -4,6 +4,7 @@ import {
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
+  PrisonerProfileSummary,
   PseudonymRequestDto,
   PseudonymResponseDto,
   UpdateIdentifierRequestDto,
@@ -12,6 +13,8 @@ import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 import { PrisonerMockDataA } from './prisoner'
 
 import { OffenderIdentifierType } from '../interfaces/prisonApi/OffenderIdentifierType'
+import { mockAddressResponseDto } from './personIntegrationApi/addresses'
+import { corePersonPhysicalAttributesDtoMock } from './physicalAttributesMock'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -536,3 +539,21 @@ export const UpdateIdentityNumberRequestMock: UpdateIdentifierRequestDto = {
   value: '2017/0239598Q',
   comments: 'Additional info',
 }
+
+export const PrisonerProfileSummaryMock: PrisonerProfileSummary = {
+  pseudonyms: [PseudonymResponseMock],
+  addresses: [mockAddressResponseDto],
+  contacts: ContactsResponseMock,
+  militaryRecords: MilitaryRecordsMock,
+  physicalAttributes: corePersonPhysicalAttributesDtoMock,
+  distinguishingMarks: DistinguishingMarksMock,
+}
+
+export const createPrisonerProfileSummary = (overrides?: Partial<PrisonerProfileSummary>): PrisonerProfileSummary => ({
+  pseudonyms: overrides?.pseudonyms ?? PrisonerProfileSummaryMock.pseudonyms,
+  addresses: overrides?.addresses ?? PrisonerProfileSummaryMock.addresses,
+  contacts: overrides?.contacts ?? PrisonerProfileSummaryMock.contacts,
+  militaryRecords: overrides?.militaryRecords ?? PrisonerProfileSummaryMock.militaryRecords,
+  physicalAttributes: overrides?.physicalAttributes ?? PrisonerProfileSummaryMock.physicalAttributes,
+  distinguishingMarks: overrides?.distinguishingMarks ?? PrisonerProfileSummaryMock.distinguishingMarks,
+})
