@@ -1,7 +1,7 @@
 import { isBefore, isFuture } from 'date-fns'
 import AlertsPageData from './interfaces/alertsService/AlertsPageData'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { formatName, generateListMetadata } from '../utils/utils'
+import { generateListMetadata } from '../utils/utils'
 import { SortOption } from '../interfaces/SortParams'
 import AlertTypeFilter from './interfaces/alertsService/AlertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
@@ -142,7 +142,6 @@ export default class AlertsService {
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,
-      fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       errors,
     }
   }

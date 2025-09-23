@@ -12,7 +12,7 @@
     href:  "/" | prependBaseUrl
   },
   {
-    text: prisonerBreadcrumbName,
+    text: prisonerName.lastCommaFirst,
     href: "/prisoner/" + prisonerNumber
   },
   {
@@ -24,7 +24,7 @@
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
 
-<h1 class="govuk-heading-l" data-qa="title">{{ prisonerName | apostrophe}} history in location {{ locationName }}</h1>
+<h1 class="govuk-heading-l" data-qa="title">{{ prisonerName.firstLast | apostrophe}} history in location {{ locationName }}</h1>
   <h2 class="govuk-heading-m">Location details</h2>
   <div class="horizontal-information horizontal-information--with-border govuk-!-margin-bottom-6">
     <div class="horizontal-information__item">
@@ -109,7 +109,7 @@
   {% else %}
 
     {{ govukInsetText({
-      text: prisonerName + " has not shared this cell with anyone else.",
+      text: prisonerName.firstLast + " has not shared this cell with anyone else.",
       attributes: { "data-qa": "no-history-message" }
     }) }}
 

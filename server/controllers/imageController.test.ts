@@ -91,7 +91,6 @@ describe('ImageController', () => {
           isDpsAppDeveloper: false,
           miniBannerData,
           pageTitle: 'Add a new facial image',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -112,7 +111,6 @@ describe('ImageController', () => {
           isDpsAppDeveloper: true,
           miniBannerData,
           pageTitle: 'Add a new facial image',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -163,7 +161,6 @@ describe('ImageController', () => {
           originalImgSrc: imgSrc,
           miniBannerData,
           photoType: 'upload',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -319,7 +316,6 @@ describe('ImageController', () => {
           fileName: 'prisoner-profile-withheld-image.png',
           fileType: 'image/png',
           imgSrc: 'data:image/png;base64,VG90YWxseSBhIGZpbGUgc3RyZWFt',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -444,7 +440,6 @@ describe('ImageController', () => {
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWebcam', {
           pageTitle: expect.anything(),
           miniBannerData,
-          prisonerNumber: 'A1234BC',
         })
       })
     })
@@ -470,7 +465,6 @@ describe('ImageController', () => {
           imgSrc,
           originalImgSrc: imgSrc,
           miniBannerData,
-          prisonerNumber: 'A1234BC',
         })
       })
     })

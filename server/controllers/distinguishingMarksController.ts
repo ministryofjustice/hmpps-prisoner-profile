@@ -13,13 +13,11 @@ import {
 import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { formatName } from '../utils/utils'
 import {
   BodyPartId,
   BodyPartSideId,
   PartOrientationId,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 
@@ -613,8 +611,6 @@ export default class DistinguishingMarksController {
   public async viewAllImages(req: Request, res: Response) {
     const { markId, markType, prisonerNumber } = req.params
     const { clientToken, prisonerData } = req.middleware
-    const { firstName, lastName } = prisonerData
-    const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -630,8 +626,6 @@ export default class DistinguishingMarksController {
     })
 
     return res.render('pages/distinguishingMarks/viewAllImages', {
-      prisonerName,
-      prisonerNumber,
       mark,
       markType,
     })

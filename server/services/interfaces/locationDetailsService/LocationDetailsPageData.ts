@@ -21,11 +21,6 @@ export interface GroupedLocationDetailsForDisplay {
 
 export default interface LocationDetailsPageData {
   pageTitle: string
-  name: string
-  prisonerName: string
-  breadcrumbPrisonerName: string
-  prisonerNumber: string
-  prisonId: string
   currentLocation?: LocationDetailsForDisplay
   occupants: LocationDetailsOccupant[]
   locationDetailsGroupedByAgency: GroupedLocationDetailsForDisplay[]

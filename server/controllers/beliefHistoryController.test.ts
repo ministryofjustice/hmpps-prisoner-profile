@@ -35,6 +35,12 @@ describe('Prisoner belief history', () => {
           caseLoads: CaseLoadsDummyDataA,
           token: 'TOKEN',
         },
+        prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
       },
       render: jest.fn(),
       status: jest.fn(),
@@ -56,8 +62,6 @@ describe('Prisoner belief history', () => {
         pageTitle: 'Religion, faith or belief history',
         pageHeading: `John Saunders’ religion, faith or belief history`,
         beliefs: beliefHistoryMock,
-        prisonerNumber,
-        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
 
@@ -74,8 +78,6 @@ describe('Prisoner belief history', () => {
           { ...beliefHistoryOverrideMock[0], beliefDescription: 'Other religion, faith or belief' },
           beliefHistoryOverrideMock[1],
         ],
-        prisonerNumber,
-        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
   })

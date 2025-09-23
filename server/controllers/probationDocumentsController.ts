@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 import { AuditService, Page } from '../services/auditService'
 import ProbationDocumentsService from '../services/probationDocumentsService'
-import { formatName } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 
 export default class ProbationDocumentsController {
@@ -12,7 +10,7 @@ export default class ProbationDocumentsController {
   ) {}
 
   public async displayDocuments(req: Request, res: Response) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, prisonId } = req.middleware.prisonerData
 
     const probationDocuments = await this.probationDocumentsService.getDocuments(
       req.middleware.clientToken,
@@ -30,8 +28,6 @@ export default class ProbationDocumentsController {
     res.render('pages/probationDocuments/probationDocuments', {
       pageTitle: 'Probation documents',
       dpsUrl: config.serviceUrls.digitalPrison,
-      prisonerNumber,
-      prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
       probationDocuments,
     })
   }

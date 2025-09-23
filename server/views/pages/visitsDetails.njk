@@ -4,14 +4,14 @@
 {%
   set breadCrumbs = [
   { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-  { text: prisonerName.breadcrumb, href: "/prisoner/" + prisonerNumber }
+  { text: prisonerName.lastCommaFirst, href: "/prisoner/" + prisonerNumber }
   ]
 %}
 
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ prisonerName.first | formatName('', prisonerName.last) | apostrophe }} visits</h1>
+      <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} visits</h1>
     </div>
   </div>
 

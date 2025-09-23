@@ -56,7 +56,6 @@ describe('Alerts Service', () => {
         expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMock)
         expect(alertsPageData.activeAlertCount).toEqual(80)
         expect(alertsPageData.inactiveAlertCount).toEqual(0)
-        expect(alertsPageData.fullName).toEqual('John Smith')
       })
 
       it('should call Alerts API to get inactive alerts when queryParams includes INACTIVE', async () => {
@@ -80,7 +79,6 @@ describe('Alerts Service', () => {
         expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMock)
         expect(alertsPageData.activeAlertCount).toEqual(0)
         expect(alertsPageData.inactiveAlertCount).toEqual(80)
-        expect(alertsPageData.fullName).toEqual('John Smith')
       })
     })
 

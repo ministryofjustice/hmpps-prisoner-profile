@@ -42,7 +42,7 @@ export default class ImageController {
     return {
       newImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const { miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ photoType?: string }>(req)
           const photoType = requestBodyFlash?.photoType
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
@@ -51,7 +51,6 @@ export default class ImageController {
           return res.render('pages/edit/photo/addNew', {
             pageTitle: 'Add a new facial image',
             miniBannerData,
-            prisonerNumber,
             isDpsAppDeveloper,
             photoType,
           })
@@ -75,7 +74,6 @@ export default class ImageController {
           const file = req.file as MulterFile
           const imgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
-            prisonerNumber,
             miniBannerData,
             photoType: 'upload',
             imgSrc,
@@ -88,24 +86,22 @@ export default class ImageController {
 
       webcamImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const { miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
 
           return res.render('pages/edit/photo/addWebcam', {
             pageTitle: 'Take a photo with a webcam',
             miniBannerData,
-            prisonerNumber,
           })
         },
 
         post: async (req: Request, res: Response, next: NextFunction) => {
-          const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const { miniBannerData } = getCommonRequestData(req, res)
 
           const file = req.file as MulterFile
           const imgSrc = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             pageTitle: 'Confirm facial image taken by webcam',
-            prisonerNumber,
             miniBannerData,
             webcamImage: true,
             photoType: 'webcam',
@@ -128,7 +124,6 @@ export default class ImageController {
           const { originalImgSrc, photoType } = req.body
           const imgSrc = originalImgSrc || `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
-            prisonerNumber,
             miniBannerData,
             photoType,
             webcamImage: photoType === 'webcam',
@@ -168,7 +163,7 @@ export default class ImageController {
 
       newWithheldImage: {
         get: async (req: Request, res: Response, next: NextFunction) => {
-          const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+          const { clientToken, miniBannerData } = getCommonRequestData(req, res)
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
           const fileStream = await this.prisonerProfileApiClientBuilder(clientToken).getWithheldPrisonerPhoto()
 
@@ -181,7 +176,6 @@ export default class ImageController {
           return res.render('pages/edit/photo/addWithheld', {
             pageTitle: 'Confirm facial image',
             miniBannerData,
-            prisonerNumber,
             imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
             fileName: file.originalname,
             fileType: file.mimetype,

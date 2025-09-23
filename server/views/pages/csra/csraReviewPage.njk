@@ -8,12 +8,12 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisoner.prisonerNumber
+        text: prisonerName.lastCommaFirst,
+        href: "/prisoner/" + prisonerNumber
     },
     {
         text: 'CSRA history',
-        href: "/prisoner/" + prisoner.prisonerNumber + "/csra-history"
+        href: "/prisoner/" + prisonerNumber + "/csra-history"
     }
 ] %}
 

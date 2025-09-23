@@ -1,7 +1,7 @@
 {% from "../../macros/conditionallyShow.njk" import conditionallyShow %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if  prisonerIsTRN(prisonId) %}
+    {% if prisonerIsTRN(prisonId) %}
       <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning" data-qa="TRN-establishment-banner">
         <p class="govuk-heading-m">
           This prisoner is being transferred
@@ -60,7 +60,7 @@
             <img class="hmpps-profile-photo" src="/assets/images/prisoner-profile-image.png" alt="Photo of {{ prisonerName }} not available"/>
           {% endif %}
         </div>
-        <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
+        <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName.lastCommaFirst }}</h2>
         <div class="info">
           <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
             {{ prisonerNumber }}

@@ -47,7 +47,7 @@
     <div class="govuk-form-group">
       {% call govukFieldset({
         legend: {
-          text: 'Does ' + prisonerName + ' have any of these medical dietary requirements?',
+          text: 'Does ' + prisonerName.firstLast + ' have any of these medical dietary requirements?',
           classes: "govuk-fieldset__legend--m",
           isPageHeading: false
         }
@@ -103,7 +103,7 @@
     <div class="govuk-form-group">
       {% call govukFieldset({
         legend: {
-          text: 'Does ' + prisonerName + ' have any food allergies?',
+          text: 'Does ' + prisonerName.firstLast + ' have any food allergies?',
           classes: "govuk-fieldset__legend--m",
           isPageHeading: false
         }
@@ -134,7 +134,7 @@
     <div class="govuk-form-group">
       {% call govukFieldset({
         legend: {
-          text: 'Does ' + prisonerName + ' have any personalised dietary requirements?',
+          text: 'Does ' + prisonerName.firstLast + ' have any personalised dietary requirements?',
           classes: "govuk-fieldset__legend--m",
           isPageHeading: false
         }

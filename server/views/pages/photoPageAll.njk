@@ -43,7 +43,7 @@
           hmpps-photo-list__main" if image.main }}"
           data-qa="image-list-item">
           <div class="hmpps-photo-list__photo" data-qa="image-item-photo">
-            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
+            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName.firstLast + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
           </div>
           <div class="hmpps-photo-list__details" data-qa="image-item-details">
             {% if image.main %}

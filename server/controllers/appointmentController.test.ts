@@ -20,7 +20,7 @@ import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data
 import { locationsApiMock, locationsApiSelectOptionsMock, locationsMock } from '../data/localMockData/locationsMock'
 
 import HmppsError from '../interfaces/HmppsError'
-import { formatLocation, formatName } from '../utils/utils'
+import { formatLocation } from '../utils/utils'
 import {
   courtLocationsMock,
   courtLocationsSelectOptionsMock,
@@ -140,7 +140,15 @@ describe('Appointment Controller', () => {
       flash: jest.fn(),
     }
     res = {
-      locals: { user },
+      locals: {
+        user,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+      },
       render: jest.fn(),
       send: jest.fn(),
       redirect: jest.fn(),
@@ -978,8 +986,6 @@ describe('Appointment Controller', () => {
       return []
     }
     const appointmentData = {
-      prisonerName: 'John Saunders',
-      prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
       appointmentType: 'Video Link - Court Hearing',
       appointmentTypeCode: 'VLB',
@@ -1050,8 +1056,6 @@ describe('Appointment Controller', () => {
     const appointmentData = {
       appointmentType: 'Video Link - Court Hearing',
       appointmentTypeCode: 'VLB',
-      prisonerName: 'John Saunders',
-      prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
       location: locationsApiMock[0].localName,
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
@@ -1107,7 +1111,6 @@ describe('Appointment Controller', () => {
     expect(res.render).toHaveBeenCalledWith('components/scheduledEvents/scheduledEvents.njk', {
       events: offenderEventsMock,
       date: formatDate(dateToIsoDate(req.query.date), 'long'),
-      prisonerName: formatName(PrisonerMockDataA.firstName, null, PrisonerMockDataA.lastName),
       type: 'offender',
     })
   })

@@ -123,8 +123,6 @@ describe('PersonalController', () => {
           expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightMetric', {
             pageTitle: expect.anything(),
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             fieldValue: 100,
             miniBannerData: {
@@ -261,8 +259,6 @@ describe('PersonalController', () => {
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightImperial', {
             pageTitle: expect.anything(),
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             feetValue: 3,
             inchesValue: 3,
@@ -430,8 +426,6 @@ describe('PersonalController', () => {
           expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightMetric', {
             pageTitle: 'Weight - Prisoner personal details',
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             fieldValue: 100,
             miniBannerData: {
@@ -571,8 +565,6 @@ describe('PersonalController', () => {
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightImperial', {
             pageTitle: expect.anything(),
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             stoneValue: 15,
             poundsValue: 10,
@@ -762,8 +754,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Build - Prisoner personal details',
           formTitle: 'Build',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           hintText: 'Hint text',
           options: objectToRadioOptions(buildCodesMock, 'code', 'description'),
@@ -918,8 +908,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Smoker or vaper - Prisoner personal details',
           formTitle: 'Does First Last smoke or vape?',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           hintText: undefined,
           errors: [],
           options: expect.arrayContaining([
@@ -1074,8 +1062,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/nationality', {
           pageTitle: 'Nationality - Prisoner personal details',
           formTitle: `What is First Last's nationality?`,
-          breadcrumbPrisonerName: 'Last, First',
-          prisonerNumber: 'A1234BC',
           errors: [],
           radioOptions: expect.arrayContaining([expect.objectContaining({ text: 'British', value: 'BRIT' })]),
           autocompleteOptions: expect.arrayContaining([
@@ -1329,8 +1315,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'Shoe size - Prisoner personal details',
           formTitle: 'Shoe size',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           hintText: shoeSizeFieldData.hintText,
           inputClasses: shoeSizeFieldData.inputClasses,
@@ -1438,8 +1422,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'City or town of birth - Prisoner personal details',
           formTitle: 'City or town of birth',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           hintText: cityOrTownOfBirthFieldData.hintText,
           inputClasses: cityOrTownOfBirthFieldData.inputClasses,
@@ -1545,8 +1527,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioFieldWithAutocomplete', {
           pageTitle: 'Country of birth - Prisoner personal details',
           formTitle: 'What country was First Last born in?',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           radioOptions: [{ value: 'ENG', text: 'England' }],
           autocompleteOptions: [{ value: 'FRA', text: 'France' }],
@@ -1700,8 +1680,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColour', {
           pageTitle: 'Eye colour - Prisoner personal details',
           formTitle: 'Eye colour',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           options: objectToRadioOptions(
             eyeColourCodesMock,
@@ -1873,8 +1851,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColourIndividual', {
           pageTitle: 'Left and right eye colours - Prisoner personal details',
           formTitle: 'Left and right eye colours',
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           leftOptions: objectToRadioOptions(
             eyeColourCodesMock,
@@ -2103,9 +2079,6 @@ describe('PersonalController', () => {
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
           pageTitle: expect.anything(),
-          prisonerNumber: 'A1234BC',
-          prisonerName: 'First Last',
-          breadcrumbPrisonerName: 'Last, First',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -2134,9 +2107,6 @@ describe('PersonalController', () => {
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
           pageTitle: expect.anything(),
-          prisonerNumber: 'A1234BC',
-          prisonerName: 'First Last',
-          breadcrumbPrisonerName: 'Last, First',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -2412,7 +2382,6 @@ describe('PersonalController', () => {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
           formTitle: `Select First Last’s religion, faith or belief`,
           redirectAnchor: 'religion-faith-or-belief',
-          prisonerNumber: 'A1234BC',
           currentReasonForChange: undefined,
           currentReasonForChangeUnknown: undefined,
           currentReasonKnown: undefined,
@@ -2423,7 +2392,6 @@ describe('PersonalController', () => {
             isActive: true,
             listSequence: 99,
           },
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           options: expectedOptions,
           miniBannerData: {
@@ -2735,8 +2703,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Sexual orientation - Prisoner personal details',
           formTitle: `Which of the following best describes First Last’s sexual orientation?`,
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           hintText: undefined,
           errors: [],
           options: expectedOptions,
@@ -2887,8 +2853,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/children', {
           pageTitle: 'Children - Prisoner personal details',
           formTitle: `Does First Last have any children?`,
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           errors: [],
           redirectAnchor: 'number-of-children',
           miniBannerData: {
@@ -3082,8 +3046,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Marital or civil partnership status - Prisoner personal details',
           formTitle: `What is First Last’s marital or civil partnership status?`,
-          prisonerNumber: 'A1234BC',
-          breadcrumbPrisonerName: 'Last, First',
           hintText: undefined,
           errors: [],
           options: expectedOptions,
@@ -3239,8 +3201,6 @@ describe('PersonalController', () => {
             fieldValue: '',
             inputClasses: 'govuk-!-width-one-third',
             submitButtonText: 'Save and return to profile',
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             redirectAnchor: 'phones-and-emails',
             errors: [],
             miniBannerData: {
@@ -3423,9 +3383,7 @@ describe('PersonalController', () => {
             fieldValue: 'one@example.com',
             inputClasses: 'govuk-!-width-one-third',
             submitButtonText: 'Save and return to profile',
-            prisonerNumber: 'A1234BC',
             redirectAnchor: 'phones-and-emails',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             miniBannerData: {
               cellLocation: '2-3-001',
@@ -3607,8 +3565,6 @@ describe('PersonalController', () => {
             phoneExtension: undefined,
             phoneNumber: undefined,
             addAnotherEnabled: true,
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             miniBannerData: {
               cellLocation: '2-3-001',
@@ -3853,8 +3809,6 @@ describe('PersonalController', () => {
             phoneTypeOptions: expect.arrayContaining([{ checked: true, text: 'Business', value: 'BUS' }]),
             phoneNumber: '12345 678 901',
             phoneExtension: '123',
-            prisonerNumber: 'A1234BC',
-            breadcrumbPrisonerName: 'Last, First',
             errors: [],
             miniBannerData: {
               cellLocation: '2-3-001',
