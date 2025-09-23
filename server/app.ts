@@ -64,6 +64,9 @@ export default function createApp(services: Services): express.Application {
       [distinguishingMarksMulterExceptions],
       multer({
         storage: multer.memoryStorage(),
+        limits: {
+          fieldSize: 10 * 1024 * 1024,
+        },
       }).single('file'),
     ),
   )
