@@ -1,10 +1,12 @@
 .personal-distinguishing-marks {
   display: grid;
   grid-template-columns: 30% 70%;
-  grid-column-gap: 20px;
   flex-wrap: wrap;
   margin-bottom: 15px;
-  padding-right: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 100%;
+  }
 
   dl {
     margin: 0;
@@ -222,6 +224,14 @@
       top: calc(13.25% + 20px);
       left: 61.3%;
       width: 29.8%;
+    }
+  }
+
+  &__info {
+    padding-left: 20px;
+
+    @media (max-width: 768px) {
+      padding-left: 0;
     }
   }
 }
