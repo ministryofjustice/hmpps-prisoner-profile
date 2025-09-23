@@ -29,7 +29,16 @@ describe('MilitaryRecordsController', () => {
       body: {},
     } as unknown as Request
     res = {
-      locals: { user: { username: 'testuser' } },
+      locals: {
+        user: { username: 'testuser' },
+        prisonerNumber: 'G6123VU',
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
+      },
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response

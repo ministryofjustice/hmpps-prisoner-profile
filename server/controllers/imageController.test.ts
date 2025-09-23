@@ -74,7 +74,16 @@ describe('ImageController', () => {
     response = {
       render: jest.fn(),
       redirect: jest.fn(),
-      locals: { user: { userRoles: [] } },
+      locals: {
+        user: { userRoles: [] },
+        prisonerNumber: 'A1234BC',
+        prisonerName: {
+          firstLast: 'First Last',
+          lastCommaFirst: 'Last, First',
+          full: 'First Last',
+        },
+        prisonId: 999,
+      },
     }
   })
 
@@ -100,13 +109,23 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        await controller
-          .updateProfileImage()
-          .newImage.get(
-            request,
-            { ...response, locals: { user: { userRoles: [Role.DpsApplicationDeveloper] } } },
-            () => {},
-          )
+        await controller.updateProfileImage().newImage.get(
+          request,
+          {
+            ...response,
+            locals: {
+              user: { userRoles: [Role.DpsApplicationDeveloper] },
+              prisonerNumber: 'A1234BC',
+              prisonerName: {
+                firstLast: 'First Last',
+                lastCommaFirst: 'Last, First',
+                full: 'First Last',
+              },
+              prisonId: 999,
+            },
+          },
+          () => {},
+        )
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
           isDpsAppDeveloper: true,
           miniBannerData,

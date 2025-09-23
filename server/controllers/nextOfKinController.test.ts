@@ -94,6 +94,13 @@ describe('NextOfKinController', () => {
           username: 'USER1',
           staffId: 123,
         },
+        prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
       },
       render: jest.fn(),
       redirect: jest.fn(),

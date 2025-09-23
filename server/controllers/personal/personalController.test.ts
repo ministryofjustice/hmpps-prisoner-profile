@@ -84,6 +84,13 @@ describe('PersonalController', () => {
 
   const defaultLocals = {
     user: prisonUserMock,
+    prisonerNumber: 'A1234BC',
+    prisonerName: {
+      firstLast: 'First Last',
+      lastCommaFirst: 'Last, First',
+      full: 'First Last',
+    },
+    prisonId: 999,
   }
 
   beforeEach(() => {

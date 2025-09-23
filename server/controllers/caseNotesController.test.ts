@@ -74,6 +74,13 @@ describe('Case Notes Controller', () => {
       locals: {
         user,
         prisonerPermissions,
+        prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
       },
       render: jest.fn(),
       redirect: jest.fn(),

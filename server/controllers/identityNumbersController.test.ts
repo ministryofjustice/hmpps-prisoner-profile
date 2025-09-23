@@ -38,7 +38,16 @@ describe('IdentityNumbersController', () => {
       body: {},
     } as unknown as Request
     res = {
-      locals: { user: { username: 'testuser' } },
+      locals: {
+        user: { username: 'testuser' },
+        prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
+      },
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response
