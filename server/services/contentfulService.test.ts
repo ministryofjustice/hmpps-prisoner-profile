@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
 import ContentfulService from './contentfulService'
 import { HmppsUser, PrisonUser } from '../interfaces/HmppsUser'
 
@@ -6,7 +6,12 @@ describe('ContentfulService', () => {
   let contentfulService: ContentfulService
 
   beforeEach(() => {
-    contentfulService = new ContentfulService(new ApolloClient<unknown>({ cache: new InMemoryCache() }))
+    contentfulService = new ContentfulService(
+      new ApolloClient({
+        cache: new InMemoryCache(),
+        link: new HttpLink({}),
+      }),
+    )
   })
 
   it('Should get the banner for the users caseload', async () => {

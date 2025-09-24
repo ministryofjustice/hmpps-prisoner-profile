@@ -66,22 +66,45 @@ context('Edit main language', () => {
             'preferred-written-language-code': 'French',
           },
         },
+        {
+          autocompleteInputs: {
+            'preferred-spoken-language-code': 'English',
+            'preferred-written-language-code': 'French',
+          },
+        },
       ],
       invalidInputs: [
         {
           testDescription: 'Same language as secondary language',
           input: {
-            radioInputs: { interpreterRequired: 'false' },
             autocompleteInputs: {
               'preferred-spoken-language-code': 'Spanish',
+              'preferred-written-language-code': 'French',
             },
           },
           errorMessages: ['Language must be different from the saved languages'],
         },
         {
+          testDescription: 'No spoken language',
+          input: {
+            autocompleteInputs: {
+              'preferred-spoken-language-code': '',
+            },
+          },
+          errorMessages: ['Enter this person’s main spoken language'],
+        },
+        {
+          testDescription: 'No written language',
+          input: {
+            autocompleteInputs: {
+              'preferred-written-language-code': '',
+            },
+          },
+          errorMessages: ['Enter this person’s main written language'],
+        },
+        {
           testDescription: 'Invalid spoken language',
           input: {
-            radioInputs: { interpreterRequired: 'false' },
             autocompleteInputs: {
               'preferred-spoken-language-code': 'Klingon',
             },
@@ -91,7 +114,6 @@ context('Edit main language', () => {
         {
           testDescription: 'Invalid written language',
           input: {
-            radioInputs: { interpreterRequired: 'false' },
             autocompleteInputs: {
               'preferred-written-language-code': 'Klingon',
             },
@@ -133,12 +155,6 @@ context('Edit main language', () => {
       validInputs: [
         {
           radioInputs: { interpreterRequired: 'false' },
-        },
-        {
-          radioInputs: { interpreterRequired: 'true' },
-        },
-        {
-          radioInputs: { interpreterRequired: 'false' },
           autocompleteInputs: {
             'preferred-spoken-language-code': 'French',
             'preferred-written-language-code': 'English',
@@ -151,25 +167,38 @@ context('Edit main language', () => {
             'preferred-written-language-code': 'French',
           },
         },
+        {
+          autocompleteInputs: {
+            'preferred-spoken-language-code': 'English',
+            'preferred-written-language-code': 'French',
+          },
+        },
       ],
       invalidInputs: [
         {
-          testDescription: 'Invalid interpreter required',
+          testDescription: 'No spoken language',
           input: {
-            // Don't set interpreterRequired
             autocompleteInputs: {
-              'preferred-spoken-language-code': 'English',
-              'preferred-written-language-code': 'French',
+              'preferred-written-language-code': 'English',
             },
           },
-          errorMessages: ['Select if an interpreter is required'],
+          errorMessages: ['Enter this person’s main spoken language'],
+        },
+        {
+          testDescription: 'No written language',
+          input: {
+            autocompleteInputs: {
+              'preferred-spoken-language-code': 'French',
+            },
+          },
+          errorMessages: ['Enter this person’s main written language'],
         },
         {
           testDescription: 'Invalid spoken language',
           input: {
-            radioInputs: { interpreterRequired: 'false' },
             autocompleteInputs: {
               'preferred-spoken-language-code': 'Klingon',
+              'preferred-written-language-code': 'French',
             },
           },
           errorMessages: ['This is not a valid language'],
@@ -177,8 +206,8 @@ context('Edit main language', () => {
         {
           testDescription: 'Invalid written language',
           input: {
-            radioInputs: { interpreterRequired: 'false' },
             autocompleteInputs: {
+              'preferred-spoken-language-code': 'English',
               'preferred-written-language-code': 'Klingon',
             },
           },

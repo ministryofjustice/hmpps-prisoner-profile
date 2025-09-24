@@ -25,9 +25,9 @@ export interface CommunicationNeedsDto {
 }
 
 export interface LanguagePreferencesRequest {
-  preferredSpokenLanguageCode?: string
-  preferredWrittenLanguageCode?: string
-  interpreterRequired: boolean
+  preferredSpokenLanguageCode: string
+  preferredWrittenLanguageCode: string
+  interpreterRequired?: boolean
 }
 
 export interface SecondaryLanguageRequest {

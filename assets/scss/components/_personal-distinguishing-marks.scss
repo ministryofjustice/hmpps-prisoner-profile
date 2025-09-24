@@ -1,8 +1,12 @@
 .personal-distinguishing-marks {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30% 70%;
   flex-wrap: wrap;
-  column-gap: 50px;
   margin-bottom: 15px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 100%;
+  }
 
   dl {
     margin: 0;
@@ -107,14 +111,8 @@
     }
   }
 
-  &__info {
-    flex: 2;
-  }
-
   &__image-container {
     position: relative;
-    flex: 1;
-    flex-basis: 10%;
     height: fit-content;
 
     @media (max-width: 768px) {
@@ -155,21 +153,21 @@
       position: absolute;
       top: calc(10.65% + 20px);
       left: 19%;
-      width: 9.2%;
+      width: 9.3%;
     }
 
     .dm-overlay-torso {
       position: absolute;
       top: calc(13.25% + 20px);
       left: 8.7%;
-      width: 29.7%;
+      width: 29.8%;
     }
 
     .dm-overlay-right-arm {
       position: absolute;
       top: calc(15.95% + 20px);
       left: 0;
-      width: 11.3%;
+      width: 11.5%;
     }
 
     .dm-overlay-right-hand {
@@ -183,7 +181,7 @@
       position: absolute;
       top: calc(15.95% + 20px);
       left: 35.8%;
-      width: 11.3%;
+      width: 11.5%;
     }
 
     .dm-overlay-left-hand {
@@ -195,37 +193,45 @@
 
     .dm-overlay-right-leg {
       position: absolute;
-      top: calc(45.4% + 13px);
+      top: calc(45.4% + 12px);
       left: 9.4%;
-      width: 14.4%;
+      width: 14.6%;
     }
 
     .dm-overlay-right-foot {
       position: absolute;
       top: calc(89.4% + 3px);
       left: 12.4%;
-      width: 8.85%;
+      width: 8.95%;
     }
 
     .dm-overlay-left-leg {
       position: absolute;
-      top: calc(45.4% + 13px);
+      top: calc(45.4% + 12px);
       left: 23.4%;
-      width: 14.4%;
+      width: 14.6%;
     }
 
     .dm-overlay-left-foot {
       position: absolute;
       top: calc(89.4% + 3px);
       left: 26.1%;
-      width: 8.85%;
+      width: 8.95%;
     }
 
     .dm-overlay-back {
       position: absolute;
       top: calc(13.25% + 20px);
       left: 61.3%;
-      width: 29.6%;
+      width: 29.8%;
+    }
+  }
+
+  &__info {
+    padding-left: 20px;
+
+    @media (max-width: 768px) {
+      padding-left: 0;
     }
   }
 }

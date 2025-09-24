@@ -40,7 +40,6 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from '../data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
-import { bvlsHmctsLinkGuestPinEnabled } from '../utils/featureToggles'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 
@@ -1006,14 +1005,12 @@ export default class AppointmentController {
           ? prePostAppointmentForm.formValues.videoLinkUrl
           : undefined,
       hmctsNumber:
-        bvlsHmctsLinkGuestPinEnabled() &&
         prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
         prePostAppointmentForm.formValues?.hmctsNumber &&
         prePostAppointmentForm.formValues.hmctsNumber.length > 0
           ? prePostAppointmentForm.formValues.hmctsNumber
           : undefined,
       guestPin:
-        bvlsHmctsLinkGuestPinEnabled() &&
         prePostAppointmentForm?.formValues?.guestPinRequired === 'yes' &&
         prePostAppointmentForm.formValues.guestPin &&
         prePostAppointmentForm.formValues.guestPin?.length > 0

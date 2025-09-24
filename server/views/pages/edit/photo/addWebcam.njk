@@ -10,24 +10,33 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% set retakePhotoHtml %}
+<div class="hmpps-webcam-button-text">
+  Retake
+</div>
+{% endset %}
 {% set takePhotoHtml %}
 <div class="hmpps-webcam-button-text">
   <img src="/assets/images/imageEditing/camera.svg" role="presentation" alt=""/> Take photo
 </div>
 {% endset %}
 {% macro photoInstructions() %}
-  <p class="govuk-body">
-    To capture a photo with a webcam:
-  </p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>ask the person to stand in front of the board</li>
-    <li>make sure the person is stood centrally within the webcam’s view and not to one side</li>
-    <li>after you’ve checked the person is positioned centrally, take the photo</li>
-    <li>you can retake the photo, or save and continue to edit it</li>
-  </ul>
+  <div>
+    <p class="govuk-body">
+      To capture a photo with a webcam:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>ask the person to stand in front of the board</li>
+      <li>make sure the person is stood centrally within the webcam’s view and not to one side</li>
+      <li>after you’ve checked the person is positioned centrally, take the photo</li>
+      <li>you can retake the photo, or save and continue to edit it</li>
+    </ul>
+  </div>
 {% endmacro %}
 {% macro photoPreview() %}
-  <div class="hmpps-webcam-capture-photo-container" id="photo-preview-container">
+  <div
+    class="hmpps-webcam-capture-photo-container hmpps-webcam-capture-photo-container__with-border"
+    id="photo-preview-container">
     <div class="hmpps-webcam-capture-photo-container__content">
       <div class="hmpps-webcam-capture-photo-container__photo-preview">
         <div id="webcam-capture">
@@ -35,7 +44,7 @@
         </div>
         <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
           {{ govukButton({
-                  text: "Retake",
+                  html: retakePhotoHtml,
                   type: "button",
                   id: "clearImageButton",
                   classes: "hmpps-button hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
@@ -50,7 +59,9 @@
   </div>
 {% endmacro %}
 {% macro photoCapture() %}
-  <div class="hmpps-webcam-capture-photo-container" id="photo-capture-container">
+  <div
+    class="hmpps-webcam-capture-photo-container hmpps-webcam-capture-photo-container__with-border"
+    id="photo-capture-container">
     <div class="hmpps-webcam-capture-photo-container__content">
       <div class="hmpps-webcam-capture-photo-container__photo">
         <div class="hmpps-webcam-video-container">
@@ -76,15 +87,6 @@
         <p class="govuk-body" id="permission-requested">
           DPS is asking to access your camera
         </p>
-        <p class="govuk-body" id="permission-denied">
-          Webcam permissions denied
-        </p>
-        <p class="govuk-body" id="webcam-not-found">
-          No webcam found
-        </p>
-        <p class="govuk-body" id="webcam-error">
-          Error accessing webcam, check log for details
-        </p>
         <div id="permission-granted">
           {{ govukSelect({
             id: "select-webcam",
@@ -100,6 +102,76 @@
             }
           }) }}
           {{ photoInstructions() }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+{% macro photoCaptureError() %}
+  <div
+    class="hmpps-webcam-capture-photo-container hmpps-webcam-capture-photo-container__error"
+    id="photo-capture-container__error">
+    <div class="hmpps-webcam-capture-photo-container__content">
+      <div class="hmpps-webcam-capture-photo-container__photo">
+        <div class="hmpps-webcam-video-container">
+          <div id="webcam-placeholder" class="hmpps-webcam-video-container__placeholder">
+            <img src="/assets/images/imageEditing/no-camera.svg" role="presentation" alt=""/>
+          </div>
+          <div id="webcam-video">
+            <video id="webcam" autoplay playsinline></video>
+          </div>
+          <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
+            {{ govukButton({
+              id: "captureImageButton",
+              type: "button",
+              html: takePhotoHtml,
+              classes: "hmpps-button hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
+              preventDoubleClick: true,
+              disabled: true
+            }) }}
+          </div>
+        </div>
+      </div>
+      <div class="hmpps-webcam-capture-photo-container__description">
+        <div>
+          <svg
+            class="hmpps-webcam-error-icon"
+            role="presentation"
+            focusable="false"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 30 30"
+            height="30"
+            width="30">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M15 2.44922L28.75 26.1992H1.25L15 2.44922ZM13.5107 9.49579H16.4697L16.2431 17.7678H13.7461L13.5107 9.49579ZM13.1299
+                21.82C13.1299 21.5661 13.1787 21.3285 13.2764 21.1071C13.374 20.8793 13.5075 20.6807 13.6768 20.5114C13.8525 20.3421
+                14.0544 20.2087 14.2822 20.111C14.5101 20.0134 14.7542 19.9645 15.0146 19.9645C15.2686 19.9645 15.5062 20.0134 15.7275
+                20.111C15.9554 20.2087 16.154 20.3421 16.3232 20.5114C16.4925 20.6807 16.626 20.8793 16.7236 21.1071C16.8213 21.3285
+                16.8701 21.5661 16.8701 21.82C16.8701 22.0804 16.8213 22.3246 16.7236 22.5524C16.626 22.7803 16.4925 22.9789 16.3232
+                23.1481C16.154 23.3174 15.9554 23.4509 15.7275 23.5485C15.5062 23.6462 15.2686 23.695 15.0146 23.695C14.7542 23.695
+                14.5101 23.6462 14.2822 23.5485C14.0544 23.4509 13.8525 23.3174 13.6768 23.1481C13.5075 22.9789 13.374 22.7803 13.2764
+                22.5524C13.1787 22.3246 13.1299 22.0804 13.1299 21.82Z"
+              fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="govuk-heading-m">
+            Your computer cannot access the webcam
+          </h2>
+          <p class="govuk-body govuk-!-margin-bottom-1">
+            You may need to:
+          </p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>open your browser’s settings and look for camera permissions to allow the request</li>
+            <li>check the webcam is connected to the computer you’re using</li>
+          </ul>
+          <p class="govuk-body">
+            <span class="govuk-!-font-weight-bold">If you cannot resolve the issue</span><br/> Call the helpdesk. If you are inside
+              an establishment, dial #6598. If you are working externally, call 0800 917 5148. Tell helpdesk that DPS cannot access
+              the webcam.
+          </p>
         </div>
       </div>
     </div>
@@ -141,6 +213,7 @@
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Take a photo with a webcam</h1>
         {{ photoPreview() }}
         {{ photoCapture() }}
+        {{ photoCaptureError() }}
         <div class="govuk-button-group">
           {{ govukButton({
             id: "webcam-submit",
