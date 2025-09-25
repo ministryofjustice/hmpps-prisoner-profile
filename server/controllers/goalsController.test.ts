@@ -65,17 +65,13 @@ describe('Prisoner goals controller', () => {
       const expectedGoals = aValidLearnerGoals()
       workAndSkillsPageService.get.mockResolvedValue(expectedGoals)
 
-      const expectedView = {
-        prisonerName: 'John Saunders',
-        prisonerNumber: 'G6123VU',
-        ...expectedGoals,
-      }
-
       // When
       await controller.displayGoals(req as unknown as Request, res as unknown as Response)
 
       // Then
-      expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', expectedView)
+      expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', {
+        ...expectedGoals,
+      })
       expect(getGoals).toHaveBeenCalledWith(
         req.middleware.clientToken,
         req.middleware.prisonerData,

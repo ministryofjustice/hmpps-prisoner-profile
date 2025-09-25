@@ -50,9 +50,7 @@ describe('Prisoner schedule', () => {
       expect(res.render).toHaveBeenCalledWith('pages/probationDocuments/probationDocuments', {
         pageTitle: 'Probation documents',
         probationDocuments: expect.objectContaining({ status: 'fulfilled', value: probationDocuments }),
-        prisonerNumber: 'G6123VU',
         dpsUrl: config.serviceUrls.digitalPrison,
-        prisonerBreadcrumbName: 'Saunders, John',
       })
     })
   })

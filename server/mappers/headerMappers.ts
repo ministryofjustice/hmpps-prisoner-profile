@@ -3,12 +3,10 @@ import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
   formatCategoryALabel,
   formatCategoryCodeDescription,
-  formatName,
   isInUsersCaseLoad,
   prisonerIsTRN,
   userHasRoles,
 } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
@@ -101,28 +99,13 @@ export function mapHeaderData(
 
   return {
     backLinkLabel: 'Back to search results',
-    prisonerName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName, {
-      style: NameFormatStyle.lastCommaFirst,
-    }),
-    prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alertSummaryData,
     categoryLabel: formatCategoryALabel(prisonerData.category),
     tabLinks: tabs,
-    prisonId: prisonerData.prisonId,
     restrictedPatient: prisonerData.restrictedPatient,
     hideBanner: hideBanner || false,
     newArrival24: prisonerData.newArrival24,
     newArrival72: prisonerData.newArrival72,
-  }
-}
-
-export function mapHeaderNoBannerData(prisonerData: Prisoner) {
-  return {
-    prisonerName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
-      style: NameFormatStyle.lastCommaFirst,
-    }),
-    prisonerNumber: prisonerData.prisonerNumber,
-    prisonId: prisonerData.prisonId,
   }
 }

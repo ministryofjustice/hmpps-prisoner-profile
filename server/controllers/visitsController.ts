@@ -3,11 +3,10 @@ import { format, isAfter, isBefore, startOfDay } from 'date-fns'
 import { VisitsService } from '../services/visitsService'
 import { VisitsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
-import { compareStrings, formatName, generateListMetadata, hasLength } from '../utils/utils'
+import { compareStrings, generateListMetadata, hasLength } from '../utils/utils'
 import PrisonDetails from '../data/interfaces/prisonApi/PrisonDetails'
 import { VisitType } from '../data/interfaces/prisonApi/VisitWithVisitors'
 import { parseDate } from '../utils/dateHelpers'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 export const VISIT_TYPES = [
   { value: 'SCON', text: 'Social' },
@@ -23,7 +22,7 @@ const sortByListSequenceThenDescription = (left: ReferenceCode, right: Reference
 const prisonsToDropdown = (prisons: PrisonDetails[]) =>
   hasLength(prisons) ? prisons.map(({ prisonId, prison }) => ({ value: prisonId, text: prison })) : []
 
-/* 
+/*
   We show the status as one dropdown in the frontend however the API requires querying by
   the visit status or the cancellation reason - this and calculateDateAndStatusFilter
   work together to allow that to appear as one dropdown despite being separate filters
@@ -88,14 +87,6 @@ export class VisitsController {
 
       return res.render('pages/visitsDetails', {
         pageTitle: 'Visits details',
-        prisonerName: {
-          first: prisonerData.firstName,
-          last: prisonerData.lastName,
-          breadcrumb: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-            style: NameFormatStyle.lastCommaFirst,
-          }),
-        },
-        prisonerNumber: prisonerData.prisonerNumber,
         statuses: visitReasonsToDropdown(cancellationReasons, completionReasons),
         visitTypes: [
           {

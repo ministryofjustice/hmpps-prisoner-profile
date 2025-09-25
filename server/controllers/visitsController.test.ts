@@ -4,8 +4,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { pagedVisitsMock } from '../data/localMockData/pagedVisitsWithVisitors'
-import { formatName } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 
@@ -67,23 +65,6 @@ describe('Visits controller', () => {
 
   describe('Rendering the view', () => {
     const page = 'pages/visitsDetails'
-
-    it('Provides prisoner information', async () => {
-      await controller.visitsDetails()(req, res, jest.fn())
-      expect(res.render).toHaveBeenCalledWith(
-        page,
-        expect.objectContaining({
-          prisonerName: {
-            first: PrisonerMockDataA.firstName,
-            last: PrisonerMockDataA.lastName,
-            breadcrumb: formatName(PrisonerMockDataA.firstName, '', PrisonerMockDataA.lastName, {
-              style: NameFormatStyle.lastCommaFirst,
-            }),
-          },
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        }),
-      )
-    })
 
     it('Formats the visit reasons into statuses for the dropdown', async () => {
       await controller.visitsDetails()(req, res, jest.fn())

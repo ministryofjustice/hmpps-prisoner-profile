@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { isGranted, PrisonerBaseLocationPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -22,8 +21,7 @@ export default class LocationDetailsController {
   ) {}
 
   public async displayLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
-    const { prisonerNumber, bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
-    const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+    const { prisonerNumber, bookingId, prisonId } = prisonerData
     const profileUrl = `/prisoner/${prisonerNumber}`
     const { clientToken } = req.middleware
     const { prisonerPermissions } = res.locals
@@ -61,8 +59,6 @@ export default class LocationDetailsController {
 
     const pageData: LocationDetailsPageData = {
       pageTitle: 'Location details',
-      ...mapHeaderNoBannerData(prisonerData),
-      name,
       locationDetailsGroupedByAgency: this.locationDetailsService
         .getLocationDetailsGroupedByPeriodAtAgency(previousLocations)
         .map(this.locationDetailsConverter.convertGroupedLocationDetails),
@@ -75,14 +71,11 @@ export default class LocationDetailsController {
           name: formatName(occupant.firstName, '', occupant.lastName, { style: NameFormatStyle.firstLast }),
           profileUrl: `/prisoner/${occupant.offenderNo}`,
         })),
-      prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
       profileUrl,
-      breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
       changeCellLink: `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnToService=prisonerProfile`,
       moveToReceptionLink: receptionIsFull
         ? `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/reception-full?returnToService=prisonerProfile`
         : `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception?returnToService=prisonerProfile`,
-      prisonerNumber,
       isTransfer,
       isReleased,
     }

@@ -2,7 +2,7 @@
 {%
   set breadCrumbs = [
   { text: 'Digital Prison Services', href: '/' },
-  { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+  { text: prisonerName.lastCommaFirst, href: "/prisoner/" + prisonerNumber },
   { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal"}
   ]
 %}
@@ -21,7 +21,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">{{ prisonerName | apostrophe }} X-ray body scans</h1>
+      <h1 class="govuk-heading-xl">{{ prisonerName.firstLast | apostrophe }} X-ray body scans</h1>
       {% if bodyScans.length > 0 %}
         {{
           govukTable({

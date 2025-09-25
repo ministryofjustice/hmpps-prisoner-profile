@@ -57,9 +57,6 @@ describe('Address controller', () => {
         primaryAddress: addressesPrimaryAndMailMock[0],
         mailAddress: undefined,
         otherAddresses: addressesNoStartDateMock.reverse(),
-        prisonerNumber: req.middleware.prisonerData.prisonerNumber,
-        prisonerName: 'John Saunders',
-        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
   })

@@ -151,7 +151,7 @@ export default class PersonalController {
     return {
       metric: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
-          const { clientToken, prisonerNumber, prisonerName, prisonId, miniBannerData } = getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ editField: string }>(req)
           const errors = req.flash('errors')
 
@@ -167,8 +167,6 @@ export default class PersonalController {
 
           res.render('pages/edit/heightMetric', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             fieldValue: requestBodyFlash ? requestBodyFlash.editField : height,
             miniBannerData,
@@ -205,7 +203,7 @@ export default class PersonalController {
 
       imperial: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
-          const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
           const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
@@ -227,8 +225,6 @@ export default class PersonalController {
 
           res.render('pages/edit/heightImperial', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             feetValue: requestBodyFlash ? requestBodyFlash.feet : feet,
             inchesValue: requestBodyFlash ? requestBodyFlash.inches : inches,
@@ -273,7 +269,7 @@ export default class PersonalController {
     return {
       metric: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
-          const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
           const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
           const errors = req.flash('errors')
 
@@ -289,8 +285,6 @@ export default class PersonalController {
 
           res.render('pages/edit/weightMetric', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : weight,
             miniBannerData,
@@ -326,7 +320,7 @@ export default class PersonalController {
 
       imperial: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
-          const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
           const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
@@ -348,8 +342,6 @@ export default class PersonalController {
 
           res.render('pages/edit/weightImperial', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
             poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
@@ -472,7 +464,7 @@ export default class PersonalController {
           submitButtonText,
           redirectAnchor,
         } = fieldData
-        const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+        const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
         const errors = req.flash('errors')
 
@@ -489,8 +481,6 @@ export default class PersonalController {
         res.render(options?.template ? `pages/edit/textFields/${options?.template}` : 'pages/edit/textField', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: formTitle ?? pageTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerName,
           errors,
           hintText,
           fieldName,
@@ -525,7 +515,7 @@ export default class PersonalController {
 
   editRadioFields(formTitle: string, fieldData: RadioFieldData, options: (RadioOption | { divider: string })[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+      const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
 
       const errors = req.flash('errors')
@@ -541,8 +531,6 @@ export default class PersonalController {
       res.render('pages/edit/radioField', {
         pageTitle: `${pageTitle} - Prisoner personal details`,
         formTitle,
-        prisonerNumber,
-        breadcrumbPrisonerName: prisonerName,
         errors,
         hintText,
         options,
@@ -572,7 +560,7 @@ export default class PersonalController {
     autocompleteError: string
   }) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+      const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
       const errors = req.flash('errors')
 
@@ -587,8 +575,6 @@ export default class PersonalController {
       res.render('pages/edit/radioFieldWithAutocomplete', {
         pageTitle: `${pageTitle} - Prisoner personal details`,
         formTitle,
-        prisonerNumber,
-        breadcrumbPrisonerName: prisonerName,
         errors,
         hintText,
         radioOptions,
@@ -648,8 +634,10 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-          getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(
+          req,
+          res,
+        )
         const { inmateDetail } = req.middleware
         const requestBodyFlash = requestBodyFromFlash<{
           autocompleteField: string
@@ -696,8 +684,6 @@ export default class PersonalController {
         res.render('pages/edit/nationality', {
           pageTitle: `${nationalityFieldData.pageTitle} - Prisoner personal details`,
           formTitle: `What is ${naturalPrisonerName}'s nationality?`,
-          breadcrumbPrisonerName: prisonerName,
-          prisonerNumber,
           errors,
           radioOptions: britishRadioOption,
           autocompleteOptions: objectToSelectOptions(
@@ -818,7 +804,7 @@ export default class PersonalController {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const domain = CorePersonRecordReferenceDataDomain.leftEyeColour
-        const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ eyeColour: string }>(req)
         const errors = req.flash('errors')
 
@@ -846,8 +832,6 @@ export default class PersonalController {
         res.render('pages/edit/eyeColour', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: pageTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerName,
           errors,
           options: objectToRadioOptions(characteristics, 'code', 'description', fieldValue),
           miniBannerData,
@@ -894,7 +878,7 @@ export default class PersonalController {
         const domainLeftEyeColour = CorePersonRecordReferenceDataDomain.leftEyeColour
         const domainRightEyeColour = CorePersonRecordReferenceDataDomain.rightEyeColour
 
-        const { clientToken, prisonerNumber, prisonId, prisonerName, miniBannerData } = getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ leftEyeColour: string; rightEyeColour: string }>(req)
         const errors = req.flash('errors')
 
@@ -917,8 +901,6 @@ export default class PersonalController {
         res.render('pages/edit/eyeColourIndividual', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: pageTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerName,
           errors,
           leftOptions: objectToRadioOptions(leftEyeColours, 'code', 'description', leftEyeColour),
           rightOptions: objectToRadioOptions(rightEyeColours, 'code', 'description', rightEyeColour),
@@ -995,8 +977,7 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-          getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
         const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
           this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
@@ -1056,9 +1037,6 @@ export default class PersonalController {
 
         res.render('pages/edit/dietAndFoodAllergies', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
-          prisonerNumber,
-          prisonerName: naturalPrisonerName,
-          breadcrumbPrisonerName: prisonerName,
           miniBannerData,
           allergyOptions: checkboxOptions('allergy', allergyCodes, allergiesSelected()),
           medicalDietOptions: checkboxOptions('medical', medicalDietCodes, medicalDietChecked()),
@@ -1233,8 +1211,10 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-          getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, naturalPrisonerName, prisonId, miniBannerData } = getCommonRequestData(
+          req,
+          res,
+        )
 
         const requestBodyFlash = requestBodyFromFlash<{
           religion: string
@@ -1274,12 +1254,10 @@ export default class PersonalController {
         res.render('pages/edit/religion', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: `Select ${apostrophe(naturalPrisonerName)} religion, faith or belief`,
-          prisonerNumber,
           currentReligion,
           currentReasonKnown,
           currentReasonForChange,
           currentReasonForChangeUnknown,
-          breadcrumbPrisonerName: prisonerName,
           redirectAnchor,
           errors,
           options: [
@@ -1432,8 +1410,10 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-          getCommonRequestData(req, res)
+        const { clientToken, prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(
+          req,
+          res,
+        )
         const requestBodyFlash = requestBodyFromFlash<{ hasChildren: string; numberOfChildren?: number }>(req)
         const errors = req.flash('errors')
 
@@ -1454,8 +1434,6 @@ export default class PersonalController {
         res.render('pages/edit/children', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: `Does ${naturalPrisonerName} have any children?`,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerName,
           radioFieldValue,
           currentNumberOfChildren,
           errors,
@@ -1499,8 +1477,7 @@ export default class PersonalController {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { prisonerData, clientToken } = req.middleware
-        const { firstName, lastName } = prisonerData
+        const { clientToken, naturalPrisonerName } = getCommonRequestData(req, res)
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const domesticStatusReferenceData = await this.personalPageService.getDomesticStatusReferenceData(clientToken)
 
@@ -1523,7 +1500,7 @@ export default class PersonalController {
         ]
 
         return this.editRadioFields(
-          `What is ${apostrophe(formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }))} marital or civil partnership status?`,
+          `What is ${apostrophe(naturalPrisonerName)} marital or civil partnership status?`,
           domesticStatusFieldData,
           radioOptions,
         )(req, res, next)
@@ -1580,8 +1557,10 @@ export default class PersonalController {
     return {
       add: {
         edit: async (req: Request, res: Response, _next: NextFunction) => {
-          const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-            getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(
+            req,
+            res,
+          )
           const errors = req.flash('errors')
           const { pageTitle, formTitle } = addPhoneNumberFieldData(naturalPrisonerName)
           const [phoneTypes] = await Promise.all([
@@ -1613,8 +1592,6 @@ export default class PersonalController {
           res.render('pages/edit/phone', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
             formTitle,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             addAnotherEnabled: true,
             phoneTypeOptions: phoneTypeOptions(phoneTypes, phoneValue?.type),
@@ -1670,8 +1647,10 @@ export default class PersonalController {
       edit: {
         edit: async (req: Request, res: Response, _next: NextFunction) => {
           const { phoneNumberId } = req.params
-          const { clientToken, prisonerNumber, prisonId, prisonerName, naturalPrisonerName, miniBannerData } =
-            getCommonRequestData(req, res)
+          const { clientToken, prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(
+            req,
+            res,
+          )
           const errors = req.flash('errors')
           const { pageTitle, formTitle } = changePhoneNumberFieldData(phoneNumberId, naturalPrisonerName)
           const requestBodyFlash = requestBodyFromFlash<{
@@ -1704,8 +1683,6 @@ export default class PersonalController {
           res.render('pages/edit/phone', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
             formTitle,
-            prisonerNumber,
-            breadcrumbPrisonerName: prisonerName,
             errors,
             phoneTypeOptions: phoneTypeOptions(phoneTypes, phoneValue.type),
             phoneNumber: phoneValue.number,
@@ -1774,8 +1751,7 @@ export default class PersonalController {
       const { clientToken } = req.middleware
       const { emailAddressId } = req.params
       const phonesAndEmails = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-      const emailValue = phonesAndEmails.emails.find(email => email.id.toString() === emailAddressId).email
-      return emailValue
+      return phonesAndEmails.emails.find(email => email.id.toString() === emailAddressId).email
     }
 
     const fieldDataGetter =

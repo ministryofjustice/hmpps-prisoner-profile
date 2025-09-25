@@ -3,9 +3,6 @@ import ScheduledEvent from '../interfaces/prisonApi/ScheduledEvent'
 
 export const PrisonerScheduleThisWeekMock = {
   pageTitle: 'Schedule',
-  prisonerName: 'Saunders, John',
-  prisonerNumber: 'G6123VU',
-  prisonId: 'MDI',
   days: [
     {
       date: format(add(startOfToday(), { days: 0 }), 'EEEE d MMMM yyyy'),
@@ -64,15 +61,11 @@ export const PrisonerScheduleThisWeekMock = {
       },
     },
   ],
-  name: 'John Saunders',
   nextWeekStartDate: format(add(startOfToday(), { days: 7 }), 'd MMMM yyyy'),
 }
 
 export const PrisonerScheduleNextWeekMock = {
   pageTitle: 'Schedule',
-  prisonerName: 'Saunders, John',
-  prisonerNumber: 'G6123VU',
-  prisonId: 'MDI',
   days: [
     {
       date: format(add(startOfToday(), { days: 7 }), 'EEEE d MMMM yyyy'),
@@ -131,6 +124,5 @@ export const PrisonerScheduleNextWeekMock = {
       },
     },
   ],
-  name: 'John Saunders',
   nextWeekStartDate: '2020-07-31',
 }

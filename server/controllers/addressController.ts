@@ -1,7 +1,5 @@
 import { Request, Response } from 'express'
-import { formatName } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import AddressService from '../services/addressService'
 import { getErrorStatus } from '../utils/errorHelpers'
@@ -13,7 +11,7 @@ export default class AddressController {
   ) {}
 
   public async displayAddresses(req: Request, res: Response) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
     const addresses = (await this.addressService.getAddressesFromPrisonAPI(clientToken, prisonerNumber)) ?? []
@@ -42,9 +40,6 @@ export default class AddressController {
       primaryAddress,
       mailAddress,
       otherAddresses,
-      prisonerNumber,
-      prisonerName: formatName(firstName, '', lastName),
-      breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
     })
   }
 

@@ -74,7 +74,16 @@ describe('ImageController', () => {
     response = {
       render: jest.fn(),
       redirect: jest.fn(),
-      locals: { user: { userRoles: [] } },
+      locals: {
+        user: { userRoles: [] },
+        prisonerNumber: 'A1234BC',
+        prisonerName: {
+          firstLast: 'First Last',
+          lastCommaFirst: 'Last, First',
+          full: 'First Last',
+        },
+        prisonId: 999,
+      },
     }
   })
 
@@ -91,7 +100,6 @@ describe('ImageController', () => {
           isDpsAppDeveloper: false,
           miniBannerData,
           pageTitle: 'Add a new facial image',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -101,18 +109,27 @@ describe('ImageController', () => {
           flash: jest.fn(),
         } as any
 
-        await controller
-          .updateProfileImage()
-          .newImage.get(
-            request,
-            { ...response, locals: { user: { userRoles: [Role.DpsApplicationDeveloper] } } },
-            () => {},
-          )
+        await controller.updateProfileImage().newImage.get(
+          request,
+          {
+            ...response,
+            locals: {
+              user: { userRoles: [Role.DpsApplicationDeveloper] },
+              prisonerNumber: 'A1234BC',
+              prisonerName: {
+                firstLast: 'First Last',
+                lastCommaFirst: 'Last, First',
+                full: 'First Last',
+              },
+              prisonId: 999,
+            },
+          },
+          () => {},
+        )
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
           isDpsAppDeveloper: true,
           miniBannerData,
           pageTitle: 'Add a new facial image',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -163,7 +180,6 @@ describe('ImageController', () => {
           originalImgSrc: imgSrc,
           miniBannerData,
           photoType: 'upload',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -319,7 +335,6 @@ describe('ImageController', () => {
           fileName: 'prisoner-profile-withheld-image.png',
           fileType: 'image/png',
           imgSrc: 'data:image/png;base64,VG90YWxseSBhIGZpbGUgc3RyZWFt',
-          prisonerNumber: 'A1234BC',
         })
       })
 
@@ -444,7 +459,6 @@ describe('ImageController', () => {
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWebcam', {
           pageTitle: expect.anything(),
           miniBannerData,
-          prisonerNumber: 'A1234BC',
         })
       })
     })
@@ -470,7 +484,6 @@ describe('ImageController', () => {
           imgSrc,
           originalImgSrc: imgSrc,
           miniBannerData,
-          prisonerNumber: 'A1234BC',
         })
       })
     })

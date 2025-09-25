@@ -10,9 +10,9 @@
   {
     text: 'Digital Prison Services',
     href:  "/" | prependBaseUrl
-  },  
+  },
   {
-    text: prisonerName,
+    text: prisonerName.lastCommaFirst,
     href: "/prisoner/" + prisonerNumber
   }
 ] %}
@@ -32,7 +32,7 @@
     {% set firstDay = days | first %}
     {% set lastDay = days | last %}
     <div class="prisoner-schedule">
-      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{name |  apostrophe}} schedule</h1>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{ prisonerName.firstLast |  apostrophe }} schedule</h1>
       <p class="govuk-body govuk-!-font-size-24" data-test="schedule-dates">{{ firstDay.date }} to {{ lastDay.date }}</p>
 
       <div class="govuk-grid-row">

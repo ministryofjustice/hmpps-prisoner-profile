@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
-import { apostrophe, formatName } from '../utils/utils'
+import { apostrophe } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
 import BeliefService from '../services/beliefService'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import { religionFieldData } from './personal/fieldData'
 
@@ -13,7 +12,7 @@ export default class BeliefHistoryController {
   ) {}
 
   public async displayBeliefHistory(req: Request, res: Response) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
     const beliefs = (await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)).map(belief => {
@@ -36,10 +35,8 @@ export default class BeliefHistoryController {
 
     return res.render('pages/beliefHistory', {
       pageTitle: 'Religion, faith or belief history',
-      pageHeading: `${apostrophe(formatName(firstName, '', lastName))} religion, faith or belief history`,
+      pageHeading: `${apostrophe(res.locals.prisonerName?.firstLast)} religion, faith or belief history`,
       beliefs,
-      prisonerNumber,
-      breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
     })
   }
 }

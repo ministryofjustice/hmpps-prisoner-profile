@@ -3,10 +3,8 @@ import { add, format, isAfter, isBefore, startOfToday } from 'date-fns'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { mapHeaderNoBannerData } from '../mappers/headerMappers'
-import { formatName, groupBy, times } from '../utils/utils'
+import { groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import ScheduledEvent, { SelectedWeekDates } from '../data/interfaces/prisonApi/ScheduledEvent'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
@@ -22,15 +20,12 @@ export default class PrisonerScheduleController {
   ) {}
 
   public async displayPrisonerSchedule(req: Request, res: Response, prisonerData: Prisoner) {
-    const { firstName, middleNames, lastName } = prisonerData
-    const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
-
     const { clientToken } = req.middleware
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
 
-    let schedule: ScheduledEvent[] = [] as ScheduledEvent[]
+    let schedule: ScheduledEvent[]
     const { when } = req.query
     const { bookingId } = prisonerData
 
@@ -134,9 +129,7 @@ export default class PrisonerScheduleController {
 
     return res.render('pages/prisonerSchedule', {
       pageTitle: 'Schedule',
-      ...mapHeaderNoBannerData(prisonerData),
       days,
-      name,
       nextWeekStartDate: oneWeekToday,
       when,
     })

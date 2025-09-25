@@ -15,7 +15,6 @@ import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
 import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
 import { pluralise } from './pluralise'
@@ -697,27 +696,6 @@ export const formatPomName = (pomName: string): string => {
   }
 
   return formatName(pomName.split(', ')[1], null, pomName.split(', ')[0])
-}
-
-export const formatPrisonOffenderManagerNames = (
-  pom: Pom,
-): { prisonOffenderManagerName: string; coworkingPrisonOffenderManagerName: string } => {
-  return {
-    prisonOffenderManagerName: pom.primary_pom?.name
-      ? formatName(pom.primary_pom.name.split(', ')[1], null, pom.primary_pom.name.split(', ')[0])
-      : undefined,
-    coworkingPrisonOffenderManagerName: pom.secondary_pom?.name
-      ? formatName(pom.secondary_pom.name.split(', ')[1], null, pom.secondary_pom.name.split(', ')[0])
-      : undefined,
-  }
-}
-
-export const putLastNameFirst = (firstName: string, lastName: string): string => {
-  if (!firstName && !lastName) return null
-  if (!firstName && lastName) return properCaseName(lastName)
-  if (firstName && !lastName) return properCaseName(firstName)
-
-  return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
 }
 
 export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {

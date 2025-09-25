@@ -9,8 +9,8 @@
     href:  "/" | prependBaseUrl
     },
     {
-        text: miniBannerData.prisonerName,
-        href: "/prisoner/" + miniBannerData.prisonerNumber
+        text: prisonerName,
+        href: "/prisoner/" + prisonerNumber
     }
 ] %}
 {% block body %}
@@ -106,7 +106,7 @@
     {% endif %}
     {% endfor %}
     <div>
-        <a href="/prisoner/{{ miniBannerData.prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state">All alerts</a>
+        <a href="/prisoner/{{ prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state">All alerts</a>
     </div>
 
 {% endblock %}
