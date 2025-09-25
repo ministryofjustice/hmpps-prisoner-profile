@@ -2,8 +2,8 @@
 
 {% macro scheduledEvents(events, type, header, prisonerName, date) %}
     {% set eventsHtml %}
-        {% if prisonerName != null %}
-            <h2 class="govuk-heading-m">{{ prisonerName | apostrophe }} schedule</h2>
+        {% if prisonerName != null and prisonerName.firstLast != null %}
+            <h2 class="govuk-heading-m">{{ prisonerName.firstLast | apostrophe }} schedule</h2>
         {% else %}
             <h2 class="govuk-heading-m">{{ header }}</h2>
         {% endif %}

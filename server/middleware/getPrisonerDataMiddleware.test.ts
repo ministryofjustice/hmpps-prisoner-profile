@@ -162,9 +162,29 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(next).toHaveBeenCalledWith()
   })
 
+  it('should populate commonly used data in res.locals for use in template (minimal)', async () => {
+    await getPrisonerData(services, { minimal: true })(req, res, next)
+
+    expect(res.locals.prisonerNumber).toEqual('G6123VU')
+    expect(res.locals.prisonId).toEqual('MDI')
+    expect(res.locals.prisonerName).toEqual({
+      firstLast: 'John Saunders',
+      lastCommaFirst: 'Saunders, John',
+      full: 'John Middle Names Saunders',
+    })
+    expect(res.locals.prisonerImageUrl).toBeUndefined()
+  })
+
   it('should populate commonly used data in res.locals for use in template', async () => {
     await getPrisonerData(services)(req, res, next)
 
+    expect(res.locals.prisonerNumber).toEqual('G6123VU')
+    expect(res.locals.prisonId).toEqual('MDI')
+    expect(res.locals.prisonerName).toEqual({
+      firstLast: 'John Saunders',
+      lastCommaFirst: 'Saunders, John',
+      full: 'John Middle Names Saunders',
+    })
     expect(res.locals.prisonerImageUrl).toEqual('/api/prisoner/G6123VU/image?imageId=1413311')
   })
 

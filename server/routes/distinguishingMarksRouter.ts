@@ -2,8 +2,6 @@ import multer from 'multer'
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { getRequest, postRequest } from './routerUtils'
-import { formatName } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import DistinguishingMarksController from '../controllers/distinguishingMarksController'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -58,17 +56,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
       requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
     }),
   ]
-
-  router.use((req, res, next) => {
-    // set some prisoner data to use in the views
-    const { firstName, lastName, prisonerNumber } = req.middleware.prisonerData
-    res.locals = {
-      ...res.locals,
-      prisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
-      prisonerNumber,
-    }
-    return next()
-  })
 
   router.get('*splat', (req, res, next) => {
     res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }

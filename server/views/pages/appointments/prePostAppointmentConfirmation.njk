@@ -13,7 +13,7 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: prisonerName,
+        text: prisonerName.lastCommaFirst,
         href: "/prisoner/" + prisonerNumber
     }
 ] %}
@@ -51,7 +51,7 @@
                                 text: "Name"
                             },
                             value: {
-                                text: prisonerName
+                                text: prisonerName.firstLast
                             }
                         },
                         {

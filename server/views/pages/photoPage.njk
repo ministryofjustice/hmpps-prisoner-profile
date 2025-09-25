@@ -7,7 +7,7 @@
 {% set photoAllHref = "/prisoner/" + prisonerNumber + "/image/all" + ("?referer=" + referer if referer) %}
 {% macro photo(classSuffix) %}
   <div class="hmpps-profile-photo__{{ classSuffix }}">
-    <img src="{{ prisonerImageUrl }}" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+    <img src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }}" data-qa="prisoner-photo"/>
   </div>
 {% endmacro %}
 {% macro description() %}
@@ -85,7 +85,7 @@
   {% endif %}
   <div class="govuk-grid-row hmpps-!-display-print-only">
     <div class="govuk-grid-column-full center-content profile-photo">
-      <img class="hmpps-profile-photo__large" src="{{ prisonerImageUrl }}" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+      <img class="hmpps-profile-photo__large" src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }}" data-qa="prisoner-photo"/>
     </div>
   </div>
   <div class="govuk-grid-row govuk-!-display-none-print">

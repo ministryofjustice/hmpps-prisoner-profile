@@ -157,7 +157,6 @@ describe('Prisoner Location Details', () => {
 
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
-          prisonId: 'TRN',
           isTransfer: true,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
@@ -244,10 +243,6 @@ describe('Prisoner Location Details', () => {
 
   const locationDetailsPageData: LocationDetailsPageData = {
     pageTitle: 'Location details',
-    breadcrumbPrisonerName: 'John Saunders',
-    name: 'John Saunders',
-    prisonerName: 'Saunders, John',
-    prisonerNumber: PrisonerMockDataA.prisonerNumber,
     profileUrl,
     canViewCellMoveButton: true,
     canViewMoveToReceptionButton: true,
@@ -258,7 +253,6 @@ describe('Prisoner Location Details', () => {
     changeCellLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/cell-move/search-for-cell?returnToService=prisonerProfile`,
     moveToReceptionLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/reception-move/consider-risks-reception?returnToService=prisonerProfile`,
     occupants: [{ name: 'Mate 1', profileUrl: `/prisoner/${PrisonerMockDataB.prisonerNumber}` }],
-    prisonId: 'MDI',
     isTransfer: false,
     isReleased: false,
   }

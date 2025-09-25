@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { formatName } from '../utils/utils'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import { AuditService, Page } from '../services/auditService'
 
@@ -10,7 +9,7 @@ export default class GoalsController {
   ) {}
 
   public async displayGoals(req: Request, res: Response) {
-    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, prisonId } = req.middleware.prisonerData
     const prisonerData = req.middleware?.prisonerData
 
     const workAndSkillsPageData = await this.workAndSkillsPageService.get(
@@ -28,8 +27,6 @@ export default class GoalsController {
     })
 
     return res.render('pages/goals/vc2GoalsPage', {
-      prisonerNumber,
-      prisonerName: formatName(firstName, '', lastName),
       ...workAndSkillsPageData,
     })
   }

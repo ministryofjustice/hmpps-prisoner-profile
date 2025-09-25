@@ -11,7 +11,7 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: breadcrumbPrisonerName,
+        text: prisonerName.lastCommaFirst,
         href: "/prisoner/" + prisonerNumber
     },
     {
@@ -23,7 +23,7 @@
 {% block body %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName | apostrophe }} past care needs</h1>
+            <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName.firstLast | apostrophe }} past care needs</h1>
         </div>
     </div>
 
@@ -34,7 +34,7 @@
         {% endfor %}
     </dl>
     {% else %}
-    <p>{{ prisonerName }} has no past care needs.</p>
+    <p>{{ prisonerName.firstLast }} has no past care needs.</p>
     {% endif %}
 
     <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}" data-qa="care-need-history-back-link">Return to the prisoner's profile</a>

@@ -59,7 +59,6 @@ describe('CSRA Controller', () => {
         agencyDetails: AgencyMock,
         staffDetails: StaffDetailsMock,
         prisoner: PrisonerMockDataA,
-        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
   })
@@ -128,8 +127,6 @@ describe('CSRA Controller', () => {
       }
 
       expect(res.render.mock.calls[0][0]).toEqual('pages/csra/prisonerCsraHistoryPage')
-      expect(res.render.mock.calls[0][1].name).toEqual('John Saunders')
-      expect(res.render.mock.calls[0][1].prisonerNumber).toEqual('G6123VU')
       expect(res.render.mock.calls[0][1].csraAssessments).toEqual([
         expectedOutput,
         { ...expectedOutput, location: 'Not entered', assessmentAgencyId: 'HLI' },

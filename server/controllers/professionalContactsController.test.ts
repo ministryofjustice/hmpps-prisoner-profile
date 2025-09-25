@@ -56,9 +56,6 @@ describe('Prisoner schedule', () => {
       await controller.displayProfessionalContacts(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/professionalContacts/professionalContactsPage', {
         professionalContacts,
-        prisonerName: 'John Saunders',
-        breadcrumbPrisonerName: 'Saunders, John',
-        prisonerNumber: 'G6123VU',
       })
     })
   })

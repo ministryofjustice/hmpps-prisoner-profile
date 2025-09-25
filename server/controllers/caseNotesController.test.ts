@@ -11,8 +11,6 @@ import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import CaseNotesService from '../services/caseNotesService'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { formatDate } from '../utils/dateHelpers'
@@ -37,8 +35,6 @@ const prisonerPermissions = {} as PrisonerPermissions
 const { prisonerNumber } = PrisonerMockDataA
 
 describe('Case Notes Controller', () => {
-  let prisonApiClient: PrisonApiClient
-
   const user: Partial<HmppsUser> = {
     authSource: 'nomis',
     displayName: 'A Name',
@@ -78,14 +74,20 @@ describe('Case Notes Controller', () => {
       locals: {
         user,
         prisonerPermissions,
+        prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
       },
       render: jest.fn(),
       redirect: jest.fn(),
     }
     next = jest.fn()
 
-    prisonApiClient = prisonApiClientMock()
-    controller = new CaseNotesController(() => prisonApiClient, new CaseNotesService(null), auditServiceMock())
+    controller = new CaseNotesController(new CaseNotesService(null), auditServiceMock())
     mockPermissionCheck(CaseNotesPermission.read_sensitive, false)
     mockPermissionCheck(CaseNotesPermission.edit_sensitive, false)
   })
@@ -99,7 +101,6 @@ describe('Case Notes Controller', () => {
         fullName: 'John Middle Names Saunders',
       })
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
-      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
 
       await controller.displayCaseNotes()(req, res)
 
@@ -148,7 +149,6 @@ describe('Case Notes Controller', () => {
         fullName: 'John Middle Names Saunders',
       })
       jest.spyOn(headerMappers, 'mapHeaderData')
-      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
       mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
 
       await controller.displayCaseNotes()(req, res)
@@ -185,7 +185,6 @@ describe('Case Notes Controller', () => {
     expect(res.render).toHaveBeenCalledWith('pages/caseNotes/addCaseNote', {
       today: formatDate(new Date().toISOString(), 'short'),
       refererUrl: req.headers.referer,
-      prisonerNumber: PrisonerMockDataA.prisonerNumber,
       formValues: {
         date: formatDate(new Date().toISOString(), 'short'),
         hours: new Date().getHours().toString().padStart(2, '0'),
@@ -343,8 +342,6 @@ describe('Case Notes Controller', () => {
         },
         isOMICOpen: false,
         isExternal: false,
-        prisonerDisplayName: 'John Saunders',
-        prisonerNumber,
         currentLength,
         errors: undefined,
       })

@@ -2,9 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { CaseNotesPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
-import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { canAddCaseNotes } from '../utils/roleHelpers'
-import { RestClientBuilder } from '../data'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
@@ -26,7 +24,6 @@ import { errorHasStatus } from '../utils/errorHelpers'
  */
 export default class CaseNotesController {
   constructor(
-    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly caseNotesService: CaseNotesService,
     private readonly auditService: AuditService,
   ) {}
@@ -146,7 +143,6 @@ export default class CaseNotesController {
       return res.render('pages/caseNotes/addCaseNote', {
         today: formatDate(now.toISOString(), 'short'),
         refererUrl,
-        prisonerNumber,
         formValues,
         types,
         subTypes,
@@ -227,8 +223,10 @@ export default class CaseNotesController {
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
-      const { clientToken, prisonerNumber, prisonId, prisonerPermissions, naturalPrisonerName, miniBannerData } =
-        getCommonRequestData(req, res)
+      const { clientToken, prisonerNumber, prisonId, prisonerPermissions, miniBannerData } = getCommonRequestData(
+        req,
+        res,
+      )
 
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
@@ -263,8 +261,6 @@ export default class CaseNotesController {
 
       return res.render('pages/caseNotes/updateCaseNote', {
         refererUrl,
-        prisonerDisplayName: naturalPrisonerName,
-        prisonerNumber,
         caseNoteText,
         currentCaseNote,
         currentLength,

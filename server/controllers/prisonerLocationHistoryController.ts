@@ -15,7 +15,7 @@ export default class PrisonerLocationHistoryController {
   public async displayPrisonerLocationHistory(req: Request, res: Response, prisonerData: Prisoner) {
     const { clientToken } = req.middleware
     const { agencyId, locationId, fromDate, toDate } = req.query
-    const { firstName, lastName, prisonerNumber, bookingId } = prisonerData
+    const { firstName, lastName, bookingId } = prisonerData
     const user = res.locals.user as PrisonUser
     const userCaseLoadIds = user.caseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)
 
@@ -55,9 +55,6 @@ export default class PrisonerLocationHistoryController {
     const prisonerName = formatName(firstName, '', lastName)
 
     return res.render('pages/prisonerLocationHistory.njk', {
-      prisonerName,
-      prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-      prisonerNumber,
       locationName: extractLocation(locationAttributes.description, agencyId.toString()),
       locationDetails: {
         description: agencyDetails.description,

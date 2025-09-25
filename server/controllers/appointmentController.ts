@@ -4,12 +4,10 @@ import AppointmentService from '../services/appointmentService'
 import {
   apostrophe,
   formatLocation,
-  formatName,
   objectToRadioOptions,
   objectToSelectOptions,
   refDataToSelectOptions,
 } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import {
   AppointmentDefaults,
   AppointmentDetails,
@@ -324,8 +322,8 @@ export default class AppointmentController {
       const { appointmentTypes, locations, probationTeams, meetingTypes } =
         await this.appointmentService.getAddAppointmentRefData(clientToken, user.activeCaseLoadId)
 
-      const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
-      const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+      const { cellLocation, prisonId } = req.middleware.prisonerData
+      const prisonerName = res.locals.prisonerName?.firstLast
       const appointmentDetails: AppointmentForm = appointmentFlash[0] as never
       const heading = `${apostrophe(prisonerName)} ${pluralise(
         appointmentDetails.recurring === 'yes' ? +appointmentDetails.times : 1,
@@ -626,8 +624,7 @@ export default class AppointmentController {
       const { appointmentId, appointmentDefaults, formValues, appointmentForm } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
-      const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
-      const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+      const { cellLocation, prisonId } = req.middleware.prisonerData
 
       const [{ courts, hearingTypes, locations }, prison] = await Promise.all([
         this.appointmentService.getPrePostAppointmentRefData(clientToken, activeCaseLoadId),
@@ -663,8 +660,6 @@ export default class AppointmentController {
         bookingType: formValues.bookingType,
         appointmentTypeCode: 'VLB',
         appointmentType: 'Video Link - Court Hearing',
-        prisonerName,
-        prisonerNumber,
         prisonName: prison.description,
         location,
         date: formatDate(appointmentDefaults.startTime, 'long'),
@@ -766,15 +761,12 @@ export default class AppointmentController {
       const prisonerNumber = req.query.prisonerNumber as string
       const { appointmentId } = req.query
 
-      const prisonerAndEventsPromise = Promise.all([
-        this.prisonerSearchService.getPrisonerDetails(clientToken, prisonerNumber),
-        this.appointmentService.getExistingEventsForOffender(
-          clientToken,
-          user.activeCaseLoadId,
-          isoDate,
-          prisonerNumber,
-        ),
-      ])
+      const prisonerEventsPromise = this.appointmentService.getExistingEventsForOffender(
+        clientToken,
+        user.activeCaseLoadId,
+        isoDate,
+        prisonerNumber,
+      )
 
       const appointmentPromise = appointmentId
         ? this.appointmentService
@@ -782,7 +774,7 @@ export default class AppointmentController {
             .then(appointment => this.fetchSeparateAppointmentsIfVlb(clientToken, appointment))
         : Promise.resolve([])
 
-      const [[prisonerData, events], appointments] = await Promise.all([prisonerAndEventsPromise, appointmentPromise])
+      const [events, appointments] = await Promise.all([prisonerEventsPromise, appointmentPromise])
 
       this.auditService
         .sendEvent({
@@ -808,7 +800,6 @@ export default class AppointmentController {
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events: filteredEvents,
         date: formatDate(isoDate, 'long'),
-        prisonerName: formatName(prisonerData.firstName, null, prisonerData.lastName),
         type: 'offender',
       })
     }

@@ -1,7 +1,5 @@
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { formatName } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -59,9 +57,6 @@ describe('Care needs controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/careNeeds/pastCareNeeds', {
         pageTitle: 'Past care needs',
         careNeeds: [careNeedsMock[1]],
-        prisonerNumber,
-        breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
-        prisonerName: formatName('John', '', 'Saunders'),
       })
     })
   })
@@ -73,9 +68,6 @@ describe('Care needs controller', () => {
       await controller.displayXrayBodyScans(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
-        prisonerNumber,
-        breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),
-        prisonerName: formatName('John', '', 'Saunders'),
         bodyScans: xrayBodyScansMock,
       })
     })

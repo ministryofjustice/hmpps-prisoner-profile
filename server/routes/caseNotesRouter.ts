@@ -17,11 +17,7 @@ export default function caseNotesRouter(services: Services): Router {
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
-  const caseNotesController = new CaseNotesController(
-    services.dataAccess.prisonApiClientBuilder,
-    services.caseNotesService,
-    services.auditService,
-  )
+  const caseNotesController = new CaseNotesController(services.caseNotesService, services.auditService)
 
   get(
     `${basePath}/case-notes`,

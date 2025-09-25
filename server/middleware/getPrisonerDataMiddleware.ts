@@ -8,7 +8,8 @@ import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
 import { toAlertSummaryData } from '../services/mappers/alertMapper'
 import { Result } from '../utils/result/result'
-import { isActiveCaseLoad } from '../utils/utils'
+import { formatName, isActiveCaseLoad } from '../utils/utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 const prisonerNumberRegex = /^[a-zA-Z][0-9]{4}[a-zA-Z]{2}$/
 
@@ -31,6 +32,19 @@ export default function getPrisonerData(services: Services, options: { minimal?:
 
       if (prisonerData.prisonerNumber === undefined) {
         return next(new NotFoundError())
+      }
+
+      // Provide a minimal set of commonly used data to the template
+      const { firstName, middleNames, lastName } = prisonerData
+      res.locals = {
+        ...res.locals,
+        prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        prisonerName: {
+          firstLast: formatName(firstName, '', lastName),
+          lastCommaFirst: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
+          full: formatName(firstName, middleNames, lastName),
+        },
       }
 
       if (options.minimal) {
@@ -80,7 +94,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         alertSummaryData,
       }
 
-      // Provide commonly used data to the template
+      // Provide additional commonly used data to the template
       res.locals = {
         ...res.locals,
         prisonerImageUrl: `/api/prisoner/${prisonerData.prisonerNumber}/image?imageId=${inmateDetail.facialImageId}`,

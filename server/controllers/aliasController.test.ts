@@ -39,7 +39,16 @@ describe('Alias Controller', () => {
     } as unknown as Request
 
     res = {
-      locals: { user: prisonUserMock },
+      locals: {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonerName: {
+          firstLast: 'John Saunders',
+          lastCommaFirst: 'Saunders, John',
+          full: 'John Middle Names Saunders',
+        },
+        prisonId: PrisonerMockDataA.prisonId,
+      },
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response

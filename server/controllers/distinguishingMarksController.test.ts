@@ -1220,8 +1220,6 @@ describe('Distinguishing Marks Controller', () => {
       await controller.viewAllImages(imagesReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/viewAllImages', {
-        prisonerName: 'John Saunders',
-        prisonerNumber: 'A12345',
         mark: distinguishingMarkMock,
         markType: 'tattoo',
       })

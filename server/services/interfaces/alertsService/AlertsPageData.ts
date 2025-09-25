@@ -10,6 +10,5 @@ export default interface AlertsPageData {
   alertTypes: AlertTypeFilter[]
   activeAlertCount: number
   inactiveAlertCount: number
-  fullName: string
   errors: HmppsError[]
 }
