@@ -15,6 +15,14 @@ import {
   timeFormat,
 } from './dateHelpers'
 
+// NB: all tests in this module run with “now” set to:
+const now = new Date('2025-09-25T13:45:01.0Z')
+
+beforeAll(() => {
+  jest.useFakeTimers({ now })
+  jest.setSystemTime(now)
+})
+
 describe('formatDateISO', () => {
   it('should return an ISO-8601 date string given a valid date', () => {
     const dateStr = formatDateISO(new Date(2023, 0, 1)) // 1 Jan 2023
