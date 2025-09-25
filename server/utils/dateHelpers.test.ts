@@ -219,7 +219,7 @@ describe('formatDateWithAge', () => {
     ['1990-12-01', 'long', '', '1 December 1990 (34 years old)'],
     ['2000-05-20', 'short', '', '20/05/2000 (25 years old)'],
     ['1975-03-10', 'full', '', 'Monday 10 March 1975 (50 years old)'],
-    ['1995-09-25', 'medium', '', '25 Sept 1995 (29 years old)'],
+    ['1995-09-25', 'medium', '', '25 Sept 1995 (30 years old)'],
     [null, 'long', 'Not entered', 'Not entered'],
     [undefined, 'long', 'Not entered', 'Not entered'],
   ])(
