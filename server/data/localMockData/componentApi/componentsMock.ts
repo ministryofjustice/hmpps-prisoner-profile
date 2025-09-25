@@ -37,4 +37,11 @@ export const componentsServicesMock: Service[] = [
     href: '',
     navEnabled: true,
   },
+  {
+    id: 'my-key-worker-allocations',
+    heading: '',
+    description: '',
+    href: '',
+    navEnabled: true,
+  },
 ]

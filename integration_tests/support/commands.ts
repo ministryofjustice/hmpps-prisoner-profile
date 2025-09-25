@@ -1,5 +1,4 @@
 import 'cypress-file-upload'
-import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
@@ -51,7 +50,6 @@ Cypress.Commands.add(
     ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
-    isAKeyWorker = true,
     complexityLevel = ComplexityLevel.Low,
     failToLoadKeyWorker = false,
   }) => {
@@ -88,10 +86,7 @@ Cypress.Commands.add(
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
-    cy.setupComponentsData({
-      caseLoads,
-      services: isAKeyWorker ? [{ id: 'my-key-worker-allocations', navEnabled: true }] : [],
-    } as HeaderFooterSharedData)
+    cy.setupComponentsData({ caseLoads })
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
