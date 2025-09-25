@@ -12,7 +12,6 @@ export declare module 'express-session' {
     returnTo: string
     userBackLink?: { url: string; text: string }
     movementSlipData: object
-    keyWorkerAtPrisons: Record<string, boolean>
     temporaryDataCache: Record<UUID, unknown>
   }
 }

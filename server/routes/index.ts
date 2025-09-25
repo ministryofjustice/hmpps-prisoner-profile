@@ -37,7 +37,6 @@ import CareNeedsController from '../controllers/careNeedsController'
 import personalRouter from './personalRouter'
 import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
-import checkIfKeyWorkerAtPrison from '../middleware/checkIfKeyWorkerAtPrison'
 import editRouter from './editRouter'
 import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
 
@@ -108,7 +107,6 @@ export default function routes(services: Services): Router {
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
-    checkIfKeyWorkerAtPrison(services.userService),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res, next) => {
       return overviewController.displayOverview(req, res)

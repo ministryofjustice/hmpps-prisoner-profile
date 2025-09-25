@@ -42,12 +42,21 @@ export default (
     })
   }
 
-  if (user.authSource === 'nomis' && user.keyWorkerAtPrisons?.[prisonerData.prisonId]) {
+  if (isServiceNavEnabled('my-key-worker-allocations', feComponentsSharedData)) {
     actions.push({
       text: 'Add key worker session',
       icon: Icon.AddKeyWorkerSession,
       url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA`,
       dataQA: 'add-key-worker-session-action-link',
+    })
+  }
+
+  if (isServiceNavEnabled('my-personal-officer-allocations', feComponentsSharedData)) {
+    actions.push({
+      text: 'Add personal officer entry',
+      icon: Icon.AddKeyWorkerSession,
+      url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=REPORT&subType=POE`,
+      dataQA: 'add-personal-officer-entry-action-link',
     })
   }
 

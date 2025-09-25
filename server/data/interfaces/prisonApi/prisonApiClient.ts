@@ -132,8 +132,6 @@ export interface PrisonApiClient {
 
   getIdentifiers(prisonerNumber: string, includeAliases: boolean): Promise<OffenderIdentifier[]>
 
-  hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean | null>
-
   getAgencyDetails(agencyId: string): Promise<AgencyDetails | null>
 
   getOffenderCellHistory(bookingId: number, params: { page?: number; size?: number }): Promise<OffenderCellHistory>

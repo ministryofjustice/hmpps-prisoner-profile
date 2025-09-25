@@ -1,4 +1,5 @@
 import 'cypress-file-upload'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
@@ -78,7 +79,6 @@ Cypress.Commands.add(
     cy.task('stubGetPathfinderNominal404')
     cy.task('stubGetSocNominal')
     cy.task('stubGetSocNominal404')
-    cy.task('stubHasStaffRole', { roleType: 'KW', response: isAKeyWorker })
     cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
@@ -88,7 +88,10 @@ Cypress.Commands.add(
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
-    cy.setupComponentsData({ caseLoads })
+    cy.setupComponentsData({
+      caseLoads,
+      services: isAKeyWorker ? [{ id: 'my-key-worker-allocations', navEnabled: true }] : [],
+    } as HeaderFooterSharedData)
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
@@ -167,7 +170,6 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-  cy.task('stubHasStaffRole', { roleType: 'KW', response: false })
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)

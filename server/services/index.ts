@@ -11,7 +11,6 @@ import OffencesPageService from './offencesPageService'
 import OffenderService from './offenderService'
 import PersonalPageService from './personalPageService'
 import PrisonerSearchService from './prisonerSearch'
-import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import CsraService from './csraService'
 import MoneyService from './moneyService'
@@ -106,7 +105,6 @@ export const services = () => {
   const featureToggleService = new FeatureToggleService(featureToggleStore)
   const ephemeralDataService = new EphemeralDataService(ephemeralDataStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
-  const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
@@ -243,7 +241,6 @@ export const services = () => {
     dataAccess,
     commonApiRoutes,
     offenderService,
-    userService,
     caseNotesService,
     prisonerSearchService,
     alertsService,
@@ -289,4 +286,4 @@ export const services = () => {
 
 export type Services = ReturnType<typeof services>
 
-export { UserService, PrisonerSearchService, CommonApiRoutes }
+export { PrisonerSearchService, CommonApiRoutes }
