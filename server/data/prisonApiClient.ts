@@ -297,12 +297,6 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean | null> {
-    return this.getAndIgnore404({
-      path: `/api/staff/${staffId}/${agencyId}/roles/${roleType}`,
-    })
-  }
-
   async getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {
     return this.getAndIgnore404({
       path: `/api/agencies/${agencyId}?activeOnly=false`,

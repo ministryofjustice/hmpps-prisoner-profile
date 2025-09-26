@@ -774,22 +774,6 @@ export default {
     })
   },
 
-  stubHasStaffRole: ({ roleType, response }: { roleType: string; response: boolean }) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/staff/\\w+/\\w+/roles/${roleType}`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: response,
-      },
-    })
-  },
-
   stubCheckStaffRole: ({ role, staffMemberHasRole }: { role: string; staffMemberHasRole: boolean }) => {
     return stubFor({
       request: {

@@ -50,7 +50,6 @@ Cypress.Commands.add(
     ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
-    isAKeyWorker = true,
     complexityLevel = ComplexityLevel.Low,
     failToLoadKeyWorker = false,
   }) => {
@@ -78,7 +77,6 @@ Cypress.Commands.add(
     cy.task('stubGetPathfinderNominal404')
     cy.task('stubGetSocNominal')
     cy.task('stubGetSocNominal404')
-    cy.task('stubHasStaffRole', { roleType: 'KW', response: isAKeyWorker })
     cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
@@ -167,7 +165,6 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-  cy.task('stubHasStaffRole', { roleType: 'KW', response: false })
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)

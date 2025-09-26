@@ -49,14 +49,38 @@ describe('buildOverviewActions', () => {
         PrisonerMockDataA,
         pathfinderNominal,
         socNominal,
-        { ...prisonUserMock, keyWorkerAtPrisons: keyworker ? { MDI: true } : {} },
+        prisonUserMock,
         config,
-        undefined,
+        {
+          services: keyworker ? [{ id: 'my-key-worker-allocations', navEnabled: true }] : [],
+        } as HeaderFooterSharedData,
         {} as PrisonerPermissions,
       )
       expect(
         !!resp.find(action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA`),
       ).toEqual(keyworker)
+    })
+  })
+
+  describe('Add personal officer entry', () => {
+    it.each([true, false])('When user is a personal officer: %s', (personalOfficer: boolean) => {
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominal,
+        socNominal,
+        prisonUserMock,
+        config,
+        {
+          services: personalOfficer ? [{ id: 'my-personal-officer-allocations', navEnabled: true }] : [],
+        } as HeaderFooterSharedData,
+        {} as PrisonerPermissions,
+      )
+      expect(
+        !!resp.find(
+          action =>
+            action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=REPORT&subType=POE`,
+        ),
+      ).toEqual(personalOfficer)
     })
   })
 
