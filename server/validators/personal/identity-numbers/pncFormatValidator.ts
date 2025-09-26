@@ -45,3 +45,5 @@ const checkCharIsCorrect = (shortYear: string, serialNum: string, checkChar: str
 }
 
 const padSerialNumber = (serialNumber: string): string => serialNumber.padStart(SERIAL_NUM_LENGTH, '0')
+
+export default { pncFormatValidator }

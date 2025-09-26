@@ -12,3 +12,5 @@ export const prisonUserMock: PrisonUser = {
   activeCaseLoadId: 'MDI',
   userRoles: [],
 }
+
+export default { prisonUserMock }

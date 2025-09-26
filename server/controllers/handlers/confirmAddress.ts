@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { UUID } from 'crypto'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../../utils/notFoundError'
@@ -23,7 +23,7 @@ export function displayConfirmAddressHandler(
   auditService: AuditService,
   options: ConfirmAddressOptions,
 ): RequestHandler {
-  return async (req: Request, res: Response) => {
+  return async (req, res) => {
     const { clientToken, prisonerName, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const {
       pageTitle,

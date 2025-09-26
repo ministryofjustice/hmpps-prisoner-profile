@@ -74,3 +74,5 @@ export const caseNoteTypesMock: CaseNoteType[] = [
     ],
   },
 ]
+
+export default { caseNoteTypesMock }

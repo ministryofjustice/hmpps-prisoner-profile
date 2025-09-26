@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { RequestHandler } from 'express'
 import { apostrophe, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -21,7 +21,7 @@ export default class LanguagesController {
   ) {}
 
   public displayUpdateMainLanguage(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -92,7 +92,7 @@ export default class LanguagesController {
   }
 
   public submitUpdateMainLanguage(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const {
         preferredSpokenLanguageCode,
@@ -156,7 +156,7 @@ export default class LanguagesController {
   }
 
   public displayUpdateOtherLanguages(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -220,7 +220,7 @@ export default class LanguagesController {
   }
 
   public submitUpdateOtherLanguages(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const { languageCode } = req.params
       const { language, languageSkills, languageError, action } = req.body

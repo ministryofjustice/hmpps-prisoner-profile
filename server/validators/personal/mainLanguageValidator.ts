@@ -24,3 +24,5 @@ export const mainLanguageValidator: Validator = (body: Record<string, string>) =
 
   return errors
 }
+
+export default { mainLanguageValidator }

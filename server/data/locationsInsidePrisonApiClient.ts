@@ -12,19 +12,19 @@ export default class LocationsInsidePrisonApiRestClient extends RestClient imple
   }
 
   async getLocation(id: string): Promise<LocationsApiLocation> {
-    return this.get<LocationsApiLocation>({ path: `/locations/${id}?formatLocalName=true` }, this.token)
+    return this.get({ path: `/locations/${id}?formatLocalName=true` }, this.token)
   }
 
   async getLocationByKey(key: string): Promise<LocationsApiLocation> {
-    return this.get<LocationsApiLocation>({ path: `/locations/key/${key}` }, this.token)
+    return this.get({ path: `/locations/key/${key}` }, this.token)
   }
 
   async getLocationAttributes(id: string): Promise<LocationsAttributes[]> {
-    return this.get<LocationsAttributes[]>({ path: `/locations/${id}/attributes` }, this.token)
+    return this.get({ path: `/locations/${id}/attributes` }, this.token)
   }
 
   async getLocationsForAppointments(id: string): Promise<LocationsApiLocation[]> {
-    return this.get<LocationsApiLocation[]>(
+    return this.get(
       {
         path: `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
       },

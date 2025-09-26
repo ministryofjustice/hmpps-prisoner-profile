@@ -21,7 +21,7 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
     domain: HealthAndMedicationReferenceDataDomain,
     includeInactive = false,
   ): Promise<ReferenceDataCode[]> {
-    return this.get<ReferenceDataCode[]>(
+    return this.get(
       {
         path: `/reference-data/domains/${domain}/codes`,
         query: mapToQueryString({ includeInactive }),
@@ -30,8 +30,8 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
     )
   }
 
-  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication> {
-    return this.getAndIgnore404<HealthAndMedication>({ path: `/prisoners/${prisonerNumber}` })
+  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication | null> {
+    return this.getAndIgnore404({ path: `/prisoners/${prisonerNumber}` })
   }
 
   updateDietAndAllergyData(
@@ -39,7 +39,7 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
     dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy> {
     return handleNomisLockedError(() =>
-      this.put<DietAndAllergy>(
+      this.put(
         {
           path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
           data: dietAndAllergyUpdate,
@@ -51,7 +51,7 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
 
   updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void> {
     return handleNomisLockedError(() =>
-      this.put<void>(
+      this.put(
         {
           path: `/prisoners/${prisonerNumber}/smoker`,
           data: smokerStatusUpdate,

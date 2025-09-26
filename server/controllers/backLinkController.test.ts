@@ -1,7 +1,10 @@
+import { NextFunction, Request, Response } from 'express'
 import { saveBackLink } from './backLinkController'
 import config from '../config'
 
 describe('Back Link Controller', () => {
+  const next: NextFunction = jest.fn()
+
   it('should save back link to session', () => {
     const req = {
       query: {
@@ -10,15 +13,13 @@ describe('Back Link Controller', () => {
         redirectPath: '/prisoner/Q1234QQ/case-notes',
         backLinkText: 'Back link text',
       },
-      session: {
-        userBackLink: '',
-      },
+      session: {},
       flash: jest.fn(),
-    }
+    } as unknown as Request
     const res = {
       redirect: jest.fn(),
-    }
-    saveBackLink()(req, res)
+    } as unknown as Response
+    saveBackLink()(req, res, next)
 
     expect(req.session.userBackLink).toEqual({
       url: `${config.serviceUrls.welcomePeopleIntoPrison}/return-path`,
@@ -36,11 +37,11 @@ describe('Back Link Controller', () => {
         backLinktext: 'Back link text',
       },
       flash: jest.fn(),
-    }
+    } as unknown as Request
     const res = {
       redirect: jest.fn(),
-    }
-    saveBackLink()(req, res)
+    } as unknown as Response
+    saveBackLink()(req, res, next)
 
     expect(req.flash).toHaveBeenCalled()
     expect(res.redirect).toHaveBeenCalled()
@@ -50,12 +51,12 @@ describe('Back Link Controller', () => {
     const req = {
       query: {},
       flash: jest.fn(),
-    }
+    } as unknown as Request
     const res = {
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
-    await expect(saveBackLink()(req, res)).rejects.toThrow('Required query parameters missing')
+    await expect(saveBackLink()(req, res, next)).rejects.toThrow('Required query parameters missing')
 
     expect(req.flash).not.toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()
@@ -70,12 +71,12 @@ describe('Back Link Controller', () => {
         backLinktext: 'Back link text',
       },
       flash: jest.fn(),
-    }
+    } as unknown as Request
     const res = {
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
-    await expect(saveBackLink()(req, res)).rejects.toThrow('Could not find service: [invalid-service]')
+    await expect(saveBackLink()(req, res, next)).rejects.toThrow('Could not find service: [invalid-service]')
 
     expect(req.flash).not.toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()

@@ -7,3 +7,5 @@ export enum ContactRelationship {
   YouthJusticeService = 'YJS',
   YouthJusticeServiceCaseManager = 'YJSCM',
 }
+
+export default { ContactRelationship }

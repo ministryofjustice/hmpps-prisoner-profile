@@ -202,7 +202,7 @@ describe('NextOfKinController', () => {
       expect(nextOfKinService.createContact).toHaveBeenCalledWith(
         clientToken,
         res.locals.user,
-        controller['mapFormToRequest'](formBody, req.params.prisonerNumber, res.locals.user.username),
+        controller.mapFormToRequest(formBody, req.params.prisonerNumber, res.locals.user.username),
       )
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         fieldName: 'next-of-kin',
@@ -593,7 +593,7 @@ describe('NextOfKinController', () => {
       it('selects options from the requestBody', async () => {
         req = {
           ...req,
-          flash: (key: string): any => {
+          flash: key => {
             return key === 'requestBody'
               ? [JSON.stringify({ townOrCity: 'TOWN1', county: 'COUNTY1', country: 'COUNTRY1' })]
               : []

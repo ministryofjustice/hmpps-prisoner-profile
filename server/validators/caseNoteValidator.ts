@@ -56,8 +56,7 @@ export const CaseNoteValidator: Validator = (body: Record<string, string>) => {
     })
   }
 
-  // eslint-disable-next-line no-restricted-globals
-  if (body.hours && isNaN(parseInt(body.hours, 10))) {
+  if (body.hours && Number.isNaN(parseInt(body.hours, 10))) {
     invalidTime = true
     errors.push({
       text: 'Enter an hour using numbers only',
@@ -65,8 +64,7 @@ export const CaseNoteValidator: Validator = (body: Record<string, string>) => {
     })
   }
 
-  // eslint-disable-next-line no-restricted-globals
-  if (body.minutes && isNaN(parseInt(body.minutes, 10))) {
+  if (body.minutes && Number.isNaN(parseInt(body.minutes, 10))) {
     invalidTime = true
     errors.push({
       text: 'Enter the minutes using numbers only',
@@ -110,3 +108,5 @@ export const CaseNoteValidator: Validator = (body: Record<string, string>) => {
 
   return errors
 }
+
+export default { CaseNoteValidator }

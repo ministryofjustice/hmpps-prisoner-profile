@@ -34,7 +34,7 @@ export default class PersonCommunicationNeedsApiRestClient
       this.put(
         {
           path: `/v1/prisoner/${prisonerNumber}/language-preferences`,
-          data: languagePreferencesRequest as Record<string, any>,
+          data: languagePreferencesRequest,
         },
         this.token,
       ),
@@ -46,7 +46,7 @@ export default class PersonCommunicationNeedsApiRestClient
       this.put(
         {
           path: `/v1/prisoner/${prisonerNumber}/secondary-language`,
-          data: secondaryLanguageRequest as Record<string, any>,
+          data: secondaryLanguageRequest,
         },
         this.token,
       ),

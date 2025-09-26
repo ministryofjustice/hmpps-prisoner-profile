@@ -4,3 +4,5 @@ export const nomisSyncPrisonerMappingApiClientMock = (): NomisSyncPrisonerMappin
   getMappingUsingDpsLocationId: jest.fn(),
   getMappingUsingNomisLocationId: jest.fn(),
 })
+
+export default { nomisSyncPrisonerMappingApiClientMock }

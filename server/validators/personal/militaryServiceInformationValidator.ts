@@ -59,3 +59,5 @@ export const militaryServiceInformationValidator: Validator = (body: Record<stri
 
   return errors
 }
+
+export default { militaryServiceInformationValidator }

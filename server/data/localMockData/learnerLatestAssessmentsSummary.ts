@@ -56,3 +56,5 @@ export const LearnerLatestAssessmentsSummary: GovSummaryGroup[][] = [
     },
   ],
 ]
+
+export default { LearnerLatestAssessmentsSummary }

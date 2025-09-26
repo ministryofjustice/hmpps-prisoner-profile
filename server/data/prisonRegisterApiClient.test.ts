@@ -56,7 +56,7 @@ describe('prisonRegisterClient', () => {
     it('should get prison by ID given prison exists', async () => {
       // Given
       const prisonId = 'MDI'
-      const moorland = prisonsKeyedByPrisonId['MDI']
+      const moorland = prisonsKeyedByPrisonId.MDI
       prisonRegisterApi.get(`/prisons/id/${prisonId}`).reply(200, moorland)
 
       // When

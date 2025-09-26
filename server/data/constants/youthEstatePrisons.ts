@@ -3,3 +3,5 @@ export const youthEstatePrisons: ReadonlyArray<string> = [
   'WNI', // Werrington
   'WYI', // Wetherby
 ]
+
+export default { youthEstatePrisons }

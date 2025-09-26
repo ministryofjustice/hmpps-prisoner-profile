@@ -61,3 +61,5 @@ export class ReferenceDataSourceFactory {
     return this.referenceDataSources.get(domain)
   }
 }
+
+export default { ReferenceDataSourceFactory }

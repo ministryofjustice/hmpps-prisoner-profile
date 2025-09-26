@@ -195,14 +195,14 @@ export interface PersonalRelationshipsApiClient {
 
   addContactAddress(contactId: number, address: PersonalRelationshipsContactRequestAddress): Promise<void>
 
-  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto>
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto | null>
 
   updateNumberOfChildren(
     prisonerNumber: string,
     updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
   ): Promise<PersonalRelationshipsNumberOfChildrenDto>
 
-  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto>
+  getDomesticStatus(prisonerNumber: string): Promise<PersonalRelationshipsDomesticStatusDto | null>
 
   updateDomesticStatus(
     prisonerNumber: string,

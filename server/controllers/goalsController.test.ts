@@ -1,4 +1,3 @@
-import { SessionData } from 'express-session'
 import { Request, Response } from 'express'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -18,55 +17,45 @@ describe('Prisoner goals controller', () => {
     auditServiceMock(),
   )
 
-  const req = {
-    params: {} as Record<string, string>,
-    query: {} as Record<string, string>,
-    headers: {} as Record<string, string>,
-    session: {} as SessionData,
-    middleware: { clientToken: 'token', prisonerData: {} },
-    path: '',
-    flash: jest.fn(),
-  }
-  const res = {
-    locals: {} as Record<string, any>,
-    render: jest.fn(),
-    redirect: jest.fn(),
-  }
+  let req: Request
+  let res: Response
 
   beforeEach(() => {
     jest.resetAllMocks()
-    req.params = { prisonerNumber: 'A9999AA' }
-    req.query = {}
-    req.middleware = {
-      clientToken: 'CLIENT_TOKEN',
-      prisonerData: PrisonerMockDataA,
-    }
-    req.headers = {
-      referer: 'http://referer',
-    }
-    req.path = 'goals'
-
-    res.locals = {
-      user: {
-        displayName: 'A Name',
-        userRoles: [Role.PrisonUser],
-        staffId: 487023,
-        caseLoads: CaseLoadsDummyDataA,
-        token: 'USER_TOKEN',
+    req = {
+      path: 'goals',
+      query: {},
+      params: { prisonerNumber: 'A9999AA' },
+      headers: { referer: 'http://referer' },
+      session: {},
+      middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
+      flash: jest.fn(),
+    } as unknown as Request
+    res = {
+      locals: {
+        user: {
+          displayName: 'A Name',
+          userRoles: [Role.PrisonUser],
+          staffId: 487023,
+          caseLoads: CaseLoadsDummyDataA,
+          token: 'USER_TOKEN',
+        },
       },
-    }
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response
   })
 
   describe('displayGoals', () => {
     it('should render the page with the prisoners goals from VC2', async () => {
       // Given
-      const getGoals = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
+      const getGoals = jest.spyOn(controller.workAndSkillsPageService, 'get')
 
       const expectedGoals = aValidLearnerGoals()
       workAndSkillsPageService.get.mockResolvedValue(expectedGoals)
 
       // When
-      await controller.displayGoals(req as unknown as Request, res as unknown as Response)
+      await controller.displayGoals(req, res)
 
       // Then
       expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', {

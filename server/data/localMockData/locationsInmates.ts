@@ -22,3 +22,5 @@ export const mockInmateAtLocation: OffenderBooking = {
   alertsDetails: ['string'],
   legalStatus: 'REMAND',
 }
+
+export default { mockInmateAtLocation }

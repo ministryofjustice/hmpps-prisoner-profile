@@ -12,3 +12,5 @@ export function editPhotoValidator(req: FileUploadRequest & { body?: { photoType
 
   return errors
 }
+
+export default { editPhotoValidator }

@@ -8,3 +8,5 @@ export const metricsServiceMock = (): MetricsService => ({
   trackPersonalRelationshipsUpdate: jest.fn(),
   trackNomisLockedWarning: jest.fn(),
 })
+
+export default { metricsServiceMock }

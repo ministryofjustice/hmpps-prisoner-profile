@@ -9,6 +9,6 @@ export default class AdjudicationsApiRestClient extends RestClient implements Ad
   }
 
   async getAdjudications(bookingId: number): Promise<AdjudicationSummary> {
-    return this.get<AdjudicationSummary>({ path: `/adjudications/by-booking-id/${bookingId}` }, this.token)
+    return this.get({ path: `/adjudications/by-booking-id/${bookingId}` }, this.token)
   }
 }

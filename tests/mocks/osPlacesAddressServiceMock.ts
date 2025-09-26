@@ -6,3 +6,5 @@ export const osPlacesAddressServiceMock = (): OsPlacesAddressService =>
     getAddressByUprn: jest.fn(),
     sanitiseUkPostcode: jest.fn(),
   }) as unknown as OsPlacesAddressService
+
+export default { osPlacesAddressServiceMock }

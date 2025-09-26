@@ -1,12 +1,12 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataB } from '../data/localMockData/caseLoad'
 import RoleError from '../utils/roleError'
 import checkCsraAccess from './checkCsraAccessMiddleware'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 
 describe('CheckCsraAccessMiddleware', () => {
@@ -18,7 +18,7 @@ describe('CheckCsraAccessMiddleware', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: { ...PrisonerMockDataA, prisonId: 'TRN' },
       },
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -28,7 +28,7 @@ describe('CheckCsraAccessMiddleware', () => {
         },
       },
       render: jest.fn(),
-    }
+    } as unknown as Response
     next = jest.fn()
   })
 

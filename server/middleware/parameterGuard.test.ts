@@ -1,18 +1,18 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { parameterGuard } from './parameterGuard'
 import NotFoundError from '../utils/notFoundError'
 
 describe('Parameter guard middleware', () => {
-  const req: any = {
+  const req = {
     params: { one: 'value1', two: 'value2' },
     path: 'test/path',
     middleware: {
       clientToken: 'CLIENT_TOKEN',
       prisonerData: { ...PrisonerMockDataA, prisonId: 'TRN' },
     },
-  }
-  const res: any = {}
+  } as unknown as Request
+  const res = {} as Response
   let next: NextFunction
 
   beforeEach(() => {

@@ -3,3 +3,5 @@ import CalculateReleaseDatesApiClient from '../../server/data/interfaces/calcula
 export const calculateReleaseDatesApiClientMock = (): CalculateReleaseDatesApiClient => ({
   getLatestCalculation: jest.fn(),
 })
+
+export default { calculateReleaseDatesApiClientMock }

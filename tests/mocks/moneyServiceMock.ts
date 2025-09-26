@@ -7,3 +7,5 @@ export const moneyServiceMock = (): Interface<MoneyService> => ({
   getAgencyDetails: jest.fn(),
   getDamageObligations: jest.fn(),
 })
+
+export default { moneyServiceMock }

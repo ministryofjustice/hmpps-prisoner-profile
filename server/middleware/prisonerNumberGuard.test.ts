@@ -1,18 +1,18 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import NotFoundError from '../utils/notFoundError'
 import { prisonerNumberGuard } from './prisonerNumberGuard'
 
 describe('Prisoner number guard middleware', () => {
-  const req: any = {
+  const req = {
     params: { prisonerNumber: 'A1234AA' },
     path: 'test/path',
     middleware: {
       clientToken: 'CLIENT_TOKEN',
       prisonerData: { ...PrisonerMockDataA, prisonId: 'TRN' },
     },
-  }
-  const res: any = {}
+  } as unknown as Request
+  const res = {} as Response
   let next: NextFunction
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('Prisoner number guard middleware', () => {
         params: {
           prisonerNumber,
         },
-      }
+      } as unknown as Request
       await prisonerNumberGuard()(invalidReq, res, next)
 
       expect(next).toHaveBeenCalledTimes(1)

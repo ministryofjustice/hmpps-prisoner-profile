@@ -234,7 +234,7 @@ describe('NextOfKinService', () => {
         },
       ]
 
-      const result = [...contacts].sort(nextOfKinService['nextOfKinSorter'])
+      const result = [...contacts].sort(nextOfKinService.nextOfKinSorter)
 
       expect(result.map(c => c.firstName)).toEqual(['Bob', 'Charlie', 'Alice'])
     })

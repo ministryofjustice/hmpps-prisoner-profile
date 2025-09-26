@@ -5,3 +5,5 @@ export const incentiveReviewsMock: IncentiveReviews = {
   nextReviewDate: '2024-01-01',
   bookingId: 123456,
 }
+
+export default { incentiveReviewsMock }

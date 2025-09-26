@@ -27,7 +27,7 @@ export default function alertsRouter(services: Services): Router {
 
   const alertsController = new AlertsController(services.alertsService, services.auditService)
 
-  get(`${basePath}/alerts`, auditPageAccessAttempt({ services, page: Page.Alerts }), async (req, res, next) => {
+  get(`${basePath}/alerts`, auditPageAccessAttempt({ services, page: Page.Alerts }), async (req, res) => {
     res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
   })
 

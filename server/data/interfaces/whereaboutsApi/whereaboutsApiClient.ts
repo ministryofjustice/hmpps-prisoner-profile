@@ -12,9 +12,10 @@ export interface WhereaboutsApiClient {
     toDate: string,
     page: PageableQuery,
   ): Promise<UnacceptableAbsences>
+  getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number, ignore404?: false): Promise<CellMoveReason>
   getCellMoveReason(
     bookingId: number,
     bedAssignmentHistorySequence: number,
-    ignore404?: boolean,
-  ): Promise<CellMoveReason>
+    ignore404: boolean,
+  ): Promise<CellMoveReason | null>
 }

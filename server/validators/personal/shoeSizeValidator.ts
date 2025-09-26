@@ -17,3 +17,5 @@ export const shoeSizeValidator: Validator = (body: Record<string, string>) => {
 
   return []
 }
+
+export default { shoeSizeValidator }

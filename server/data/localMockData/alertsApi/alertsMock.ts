@@ -32,3 +32,5 @@ export const alertsMock: Alert[] = [
     lastModifiedByDisplayName: 'Firstname Lastname',
   },
 ]
+
+export default { alertsMock }

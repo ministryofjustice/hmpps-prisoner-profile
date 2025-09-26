@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
 import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
@@ -50,6 +50,7 @@ describe('PersonalController', () => {
   let careNeedsService: CareNeedsService
   let controller: PersonalController
   let res: Response
+  const next: NextFunction = jest.fn()
 
   const defaultMiddleware = {
     clientToken: 'token',
@@ -104,7 +105,7 @@ describe('PersonalController', () => {
     personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
-    res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
+    res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
   describe('displayPersonalPage', () => {
@@ -115,17 +116,15 @@ describe('PersonalController', () => {
   describe('height', () => {
     describe('metric', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.height().metric.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.height().metric.edit(req, response, next)
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightMetric', {
@@ -144,25 +143,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
 
@@ -170,11 +169,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -183,15 +180,15 @@ describe('PersonalController', () => {
             page: Page.EditHeight,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.height().metric.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) => controller.height().metric.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -199,15 +196,15 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC' },
             body: { editField: '123' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
         })
 
         it.each([
           { editField: '', updateRequest: { height: null } },
           { editField: '100', updateRequest: { height: 100 } },
         ])('Valid request: %s', async ({ editField, updateRequest }) => {
-          const request = { ...validRequest, body: { editField } }
-          await action(request, res)
+          const request = { ...validRequest, body: { editField } } as Request
+          await action(request, res, next)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             prisonUserMock,
@@ -227,14 +224,14 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/height')
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { editField: 157 } }
+          const request = { ...validRequest, id: 1, body: { editField: 157 } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -243,7 +240,7 @@ describe('PersonalController', () => {
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -252,17 +249,15 @@ describe('PersonalController', () => {
 
     describe('imperial', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.height().imperial.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.height().imperial.edit(req, response, next)
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightImperial', {
             pageTitle: expect.anything(),
@@ -281,25 +276,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ feetValue: '5', inchesValue: '10' }),
@@ -316,12 +311,10 @@ describe('PersonalController', () => {
           )
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ feetValue: undefined, inchesValue: undefined }),
@@ -332,11 +325,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -345,15 +336,15 @@ describe('PersonalController', () => {
             page: Page.EditHeight,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.height().imperial.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) => controller.height().imperial.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -361,7 +352,7 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC' },
             body: { feet: '5', inches: '10' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
         })
 
         it.each([
@@ -369,8 +360,8 @@ describe('PersonalController', () => {
           { feet: '5', inches: '2', updateRequest: { height: 157 } },
           { feet: '3', inches: '', updateRequest: { height: 91 } },
         ])('Valid request updates physical attributes: %s', async ({ feet, inches, updateRequest }) => {
-          const request = { ...validRequest, body: { feet, inches } }
-          await action(request, res)
+          const request = { ...validRequest, body: { feet, inches } } as Request
+          await action(request, res, next)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             prisonUserMock,
@@ -390,7 +381,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
@@ -398,7 +389,7 @@ describe('PersonalController', () => {
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } }
+          const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -407,7 +398,7 @@ describe('PersonalController', () => {
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -418,17 +409,15 @@ describe('PersonalController', () => {
   describe('weight', () => {
     describe('metric', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.weight().metric.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.weight().metric.edit(req, response, next)
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightMetric', {
@@ -447,25 +436,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
 
@@ -473,11 +462,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -486,15 +473,15 @@ describe('PersonalController', () => {
             page: Page.EditWeight,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.weight().metric.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) => controller.weight().metric.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -502,7 +489,7 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC' },
             body: { kilograms: '80' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
         })
 
         it.each([
@@ -511,8 +498,8 @@ describe('PersonalController', () => {
           { kilograms: '12', updateRequest: { weight: 12 } },
           { kilograms: '640', updateRequest: { weight: 640 } },
         ])('Valid request: %s', async ({ kilograms, updateRequest }) => {
-          const request = { ...validRequest, body: { kilograms } }
-          await action(request, res)
+          const request = { ...validRequest, body: { kilograms } } as Request
+          await action(request, res, next)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             prisonUserMock,
@@ -532,7 +519,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
@@ -540,7 +527,7 @@ describe('PersonalController', () => {
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { kilograms: '96' } }
+          const request = { ...validRequest, id: 1, body: { kilograms: '96' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -549,7 +536,7 @@ describe('PersonalController', () => {
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -558,17 +545,15 @@ describe('PersonalController', () => {
 
     describe('imperial', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.weight().imperial.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.weight().imperial.edit(req, response, next)
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightImperial', {
             pageTitle: expect.anything(),
@@ -587,25 +572,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ stoneValue: '5', poundsValue: '10' }),
@@ -622,12 +607,10 @@ describe('PersonalController', () => {
           )
           const req = {
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ stoneValue: undefined, poundsValue: undefined }),
@@ -638,11 +621,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -651,15 +632,15 @@ describe('PersonalController', () => {
             page: Page.EditWeight,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.weight().imperial.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) => controller.weight().imperial.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -667,7 +648,7 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC' },
             body: { stone: '10', pounds: '12' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
         })
 
         it.each([
@@ -675,8 +656,8 @@ describe('PersonalController', () => {
           { stone: '5', pounds: '2', updateRequest: { weight: 33 } },
           { stone: '3', pounds: '', updateRequest: { weight: 19 } },
         ])('Valid request: %s', async ({ stone, pounds, updateRequest }) => {
-          const request = { ...validRequest, body: { stone, pounds } }
-          await action(request, res)
+          const request = { ...validRequest, body: { stone, pounds } } as Request
+          await action(request, res, next)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             prisonUserMock,
@@ -696,7 +677,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
@@ -704,7 +685,7 @@ describe('PersonalController', () => {
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } }
+          const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -713,7 +694,7 @@ describe('PersonalController', () => {
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -738,20 +719,18 @@ describe('PersonalController', () => {
     }
 
     describe('edit', () => {
-      const action = async (req: any, response: any) =>
-        controller.physicalCharacteristicRadioField(fieldData).edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) =>
+        controller.physicalCharacteristicRadioField(fieldData).edit(req, response, next)
 
       it('Renders the radios edit page with the field data config supplied', async () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
           'token',
@@ -778,13 +757,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
@@ -792,13 +771,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ radioField: 'MEDIUM' })]
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -811,11 +790,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -824,16 +801,16 @@ describe('PersonalController', () => {
           page: fieldData.auditEditPageLoad,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) =>
-        controller.physicalCharacteristicRadioField(fieldData).submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) =>
+        controller.physicalCharacteristicRadioField(fieldData).submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -842,23 +819,23 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'MEDIUM' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the physical characteristic', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           buildCode: 'MEDIUM',
         })
       })
 
       it('Redirects to the personal page #appearance on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Build updated',
@@ -872,7 +849,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/build')
@@ -891,7 +868,7 @@ describe('PersonalController', () => {
           },
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -900,17 +877,15 @@ describe('PersonalController', () => {
 
   describe('Smoker or vaper', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.smokerOrVaper().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.smokerOrVaper().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Smoker or vaper - Prisoner personal details',
@@ -935,25 +910,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -966,11 +941,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -979,15 +952,15 @@ describe('PersonalController', () => {
           page: Page.EditSmokerOrVaper,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.smokerOrVaper().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.smokerOrVaper().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -996,11 +969,11 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the smoker or vaper', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
@@ -1010,12 +983,12 @@ describe('PersonalController', () => {
       })
 
       it('Redirects to the personal page #smoking-and-vaping on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#smoking-and-vaping')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Smoking and vaping updated',
@@ -1029,14 +1002,14 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/smoker-or-vaper')
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } }
+        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -1045,7 +1018,7 @@ describe('PersonalController', () => {
           details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKER_YES', updated: 'SMOKER_NO' },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -1054,17 +1027,15 @@ describe('PersonalController', () => {
 
   describe('Nationality', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.nationality().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.nationality().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/nationality', {
           pageTitle: 'Nationality - Prisoner personal details',
@@ -1091,25 +1062,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the radio field using the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1121,12 +1092,12 @@ describe('PersonalController', () => {
       it('Populates the autocompleteSelected value from the flash when no autocomplete option is chosen', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1139,12 +1110,12 @@ describe('PersonalController', () => {
       it('Populates the field value from the autocomplete field using the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1161,12 +1132,12 @@ describe('PersonalController', () => {
       it('Populates the additional nationalities value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1179,11 +1150,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -1192,15 +1161,15 @@ describe('PersonalController', () => {
           page: Page.EditNationality,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.nationality().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.nationality().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1209,11 +1178,11 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'BRIT' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the nationality', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
@@ -1227,8 +1196,8 @@ describe('PersonalController', () => {
         const request = {
           ...validRequest,
           body: { radioField: 'OTHER', autocompleteField: 'FREN' },
-        }
-        await action(request, res)
+        } as Request
+        await action(request, res, next)
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
@@ -1242,8 +1211,8 @@ describe('PersonalController', () => {
         const request = {
           ...validRequest,
           body: { radioField: 'BRIT', additionalNationalities: 'Updated nationalities' },
-        }
-        await action(request, res)
+        } as Request
+        await action(request, res, next)
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
@@ -1254,12 +1223,12 @@ describe('PersonalController', () => {
       })
 
       it('Redirects to the personal page #nationality on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#nationality')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Nationality updated',
@@ -1273,7 +1242,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/nationality')
@@ -1284,7 +1253,7 @@ describe('PersonalController', () => {
           ...validRequest,
           id: 1,
           body: { radioField: 'FREN', additionalNationalities: 'Updated nationalities' },
-        }
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -1296,7 +1265,7 @@ describe('PersonalController', () => {
           ],
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -1305,18 +1274,16 @@ describe('PersonalController', () => {
 
   describe('physical attributes text input', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) =>
-        controller.physicalAttributesTextInput(shoeSizeFieldData).edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) =>
+        controller.physicalAttributesTextInput(shoeSizeFieldData).edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
@@ -1340,33 +1307,33 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) =>
-        controller.physicalAttributesTextInput(shoeSizeFieldData).submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) =>
+        controller.physicalAttributesTextInput(shoeSizeFieldData).submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1374,7 +1341,7 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { shoeSize: '10' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it.each([
@@ -1382,8 +1349,8 @@ describe('PersonalController', () => {
         { shoeSize: '10', updateRequest: { shoeSize: '10' } },
         { shoeSize: '7.5', updateRequest: { shoeSize: '7.5' } },
       ])('Valid request: %s', async ({ shoeSize, updateRequest }) => {
-        const request = { ...validRequest, body: { shoeSize } }
-        await action(request, res)
+        const request = { ...validRequest, body: { shoeSize } } as Request
+        await action(request, res, next)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
           expect.anything(),
           prisonUserMock,
@@ -1403,7 +1370,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/shoe-size')
@@ -1413,18 +1380,16 @@ describe('PersonalController', () => {
 
   describe('city or town of birth', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) =>
-        controller.cityOrTownOfBirthTextInput().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) =>
+        controller.cityOrTownOfBirthTextInput().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'City or town of birth - Prisoner personal details',
@@ -1447,33 +1412,33 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: 'SHEFFIELD' }))
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) =>
-        controller.cityOrTownOfBirthTextInput().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) =>
+        controller.cityOrTownOfBirthTextInput().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1481,15 +1446,15 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { cityOrTownOfBirth: 'Sheffield' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it.each([
         { cityOrTownOfBirth: '', updateRequest: null },
         { cityOrTownOfBirth: 'Rotherham', updateRequest: 'Rotherham' },
       ])('Valid request: %s', async ({ cityOrTownOfBirth, updateRequest }) => {
-        const request = { ...validRequest, body: { cityOrTownOfBirth } }
-        await action(request, res)
+        const request = { ...validRequest, body: { cityOrTownOfBirth } } as Request
+        await action(request, res, next)
         expect(personalPageService.updateCityOrTownOfBirth).toHaveBeenCalledWith(
           expect.anything(),
           prisonUserMock,
@@ -1509,7 +1474,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/city-or-town-of-birth')
@@ -1519,17 +1484,15 @@ describe('PersonalController', () => {
 
   describe('country of birth', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.countryOfBirth().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.countryOfBirth().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioFieldWithAutocomplete', {
           pageTitle: 'Country of birth - Prisoner personal details',
@@ -1553,25 +1516,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the radio buttons from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'ENG' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1584,12 +1547,12 @@ describe('PersonalController', () => {
       it('Populates the autocomplete from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ autocompleteField: 'FRA' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1601,12 +1564,12 @@ describe('PersonalController', () => {
       it('Selects the autocomplete radio when the flash indicates an empty autocomplete field', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({ autocompleteSelected: true }),
@@ -1615,8 +1578,8 @@ describe('PersonalController', () => {
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.countryOfBirth().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.countryOfBirth().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1624,15 +1587,15 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'ENG' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it.each([
         { body: { radioField: 'ENG' }, updateRequest: 'ENG' },
         { body: { radioField: 'OTHER', autocompleteField: 'FRA' }, updateRequest: 'FRA' },
       ])('Valid request: %s', async ({ body, updateRequest }) => {
-        const request = { ...validRequest, body }
-        await action(request, res)
+        const request = { ...validRequest, body } as Request
+        await action(request, res, next)
         expect(personalPageService.updateCountryOfBirth).toHaveBeenCalledWith(
           expect.anything(),
           prisonUserMock,
@@ -1652,7 +1615,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/country-of-birth')
@@ -1665,19 +1628,17 @@ describe('PersonalController', () => {
    */
   describe('eyeColour', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.eyeColour().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.eyeColour().edit(req, response, next)
 
       it('Renders the eye colour edit page', async () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
           'token',
@@ -1707,13 +1668,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
@@ -1721,13 +1682,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ eyeColour: 'GREEN' })]
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1740,11 +1701,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -1753,15 +1712,15 @@ describe('PersonalController', () => {
           page: Page.EditEyeColour,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.eyeColour().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.eyeColour().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1770,11 +1729,11 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { eyeColour: 'GREEN' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the physical characteristic', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           leftEyeColourCode: 'GREEN',
           rightEyeColourCode: 'GREEN',
@@ -1782,12 +1741,12 @@ describe('PersonalController', () => {
       })
 
       it('Redirects to the personal page #eye-colour on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Eye colour updated',
@@ -1801,7 +1760,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour')
@@ -1820,7 +1779,7 @@ describe('PersonalController', () => {
           },
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -1832,19 +1791,17 @@ describe('PersonalController', () => {
    */
   describe('eyeColourIndividual', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.eyeColourIndividual().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.eyeColourIndividual().edit(req, response, next)
 
       it('Renders the eye colour edit page', async () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
           'token',
@@ -1884,13 +1841,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
@@ -1898,13 +1855,13 @@ describe('PersonalController', () => {
         const req = {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' })]
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -1918,11 +1875,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -1931,15 +1886,16 @@ describe('PersonalController', () => {
           page: Page.EditEyeColour,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.eyeColourIndividual().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) =>
+        controller.eyeColourIndividual().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -1948,11 +1904,11 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the physical characteristic', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           leftEyeColourCode: 'BROWN',
           rightEyeColourCode: 'GREEN',
@@ -1960,12 +1916,12 @@ describe('PersonalController', () => {
       })
 
       it('Redirects to the personal page #eye-colour on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Left and right eye colours updated',
@@ -1979,14 +1935,18 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour-individual')
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' } }
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2002,7 +1962,7 @@ describe('PersonalController', () => {
           },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -2011,7 +1971,8 @@ describe('PersonalController', () => {
 
   describe('Diet and food allergies', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.dietAndFoodAllergies().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) =>
+        controller.dietAndFoodAllergies().edit(req, response, next)
       const editOptions = ({ selections }: { selections: ReferenceDataIdSelection[] }) => ({
         allergyOptions: [
           {
@@ -2077,12 +2038,10 @@ describe('PersonalController', () => {
 
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
           pageTitle: expect.anything(),
@@ -2100,12 +2059,10 @@ describe('PersonalController', () => {
       it('Renders the edit page with the correct data from the health and medications api when data is present', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), 'A1234BC', {
           dietAndAllergiesEnabled: true,
@@ -2135,20 +2092,20 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody'
               ? [
                   JSON.stringify({
@@ -2167,8 +2124,8 @@ describe('PersonalController', () => {
               : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2191,11 +2148,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2204,16 +2159,16 @@ describe('PersonalController', () => {
           page: Page.EditDietAndFoodAllergies,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) =>
-        controller.dietAndFoodAllergies().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) =>
+        controller.dietAndFoodAllergies().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -2233,16 +2188,16 @@ describe('PersonalController', () => {
             cateringInstructions: 'jkl',
           },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Redirects to the personal page #diet-and-food-allergies on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#diet-and-food-allergies')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Diet and food allergies updated',
@@ -2252,7 +2207,7 @@ describe('PersonalController', () => {
       })
 
       it('Updates the prisoner health on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateDietAndFoodAllergies).toHaveBeenCalledWith(
           expect.anything(),
           expect.anything(),
@@ -2280,7 +2235,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/diet-and-food-allergies')
@@ -2318,7 +2273,7 @@ describe('PersonalController', () => {
           },
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -2327,7 +2282,7 @@ describe('PersonalController', () => {
 
   describe('religion, faith or belief', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.religion().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.religion().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison API, overriding option text and sorting correctly', async () => {
         const expectedOptions = [
@@ -2378,12 +2333,10 @@ describe('PersonalController', () => {
         ]
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
           pageTitle: 'Religion, faith or belief - Prisoner personal details',
@@ -2413,13 +2366,13 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
@@ -2473,12 +2426,12 @@ describe('PersonalController', () => {
 
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2490,12 +2443,12 @@ describe('PersonalController', () => {
       it('Populates the reason for change radio from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2507,14 +2460,14 @@ describe('PersonalController', () => {
       it('Populates the text areas from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody'
               ? [JSON.stringify({ reasonForChange: 'Reason 1', reasonForChangeUnknown: 'Reason 2' })]
               : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2526,8 +2479,8 @@ describe('PersonalController', () => {
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.religion().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.religion().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -2535,7 +2488,7 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { religion: 'ZORO', reasonKnown: 'NO' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it.each([
@@ -2571,8 +2524,8 @@ describe('PersonalController', () => {
           reason: 'Some reason',
         },
       ])('Prisoner with existing religion - valid request: %s', async ({ body, updatedReligion, reason }) => {
-        const request = { ...validRequest, body }
-        await action(request, res)
+        const request = { ...validRequest, body } as Request
+        await action(request, res, next)
         expect(personalPageService.updateReligion).toHaveBeenCalledWith(
           expect.anything(),
           prisonUserMock,
@@ -2617,9 +2570,9 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body,
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(personalPageService.updateReligion).toHaveBeenCalledWith(
           expect.anything(),
@@ -2641,7 +2594,7 @@ describe('PersonalController', () => {
           ...validRequest,
           id: 1,
           body: { religion: 'ZORO', currentReligionCode: 'DRU', reasonKnown: 'NO' },
-        }
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2654,7 +2607,7 @@ describe('PersonalController', () => {
           },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -2664,9 +2617,9 @@ describe('PersonalController', () => {
           ...validRequest,
           id: 1,
           body: {},
-        }
+        } as unknown as Request
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
         expect(personalPageService.updateReligion).not.toHaveBeenCalled()
@@ -2677,7 +2630,7 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/religion')
@@ -2687,7 +2640,7 @@ describe('PersonalController', () => {
 
   describe('Sexual orientation', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.sexualOrientation().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.sexualOrientation().edit(req, response, next)
       const expectedOptions = [
         { text: 'Heterosexual or straight', value: 'HET', checked: true },
         { text: 'Gay or lesbian', value: 'HOM' },
@@ -2700,12 +2653,10 @@ describe('PersonalController', () => {
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Sexual orientation - Prisoner personal details',
@@ -2726,25 +2677,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2757,11 +2708,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2770,15 +2719,15 @@ describe('PersonalController', () => {
           page: Page.EditSexualOrientation,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.sexualOrientation().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.sexualOrientation().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -2787,11 +2736,11 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'HET' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the sexual orientation', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateSexualOrientation).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
@@ -2801,12 +2750,12 @@ describe('PersonalController', () => {
       })
 
       it('Redirects to the personal page #sexual-orientation on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#sexual-orientation')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Sexual orientation updated',
@@ -2820,14 +2769,14 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/sexual-orientation')
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } }
+        const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2836,7 +2785,7 @@ describe('PersonalController', () => {
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -2845,17 +2794,15 @@ describe('PersonalController', () => {
 
   describe('Number of children', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.numberOfChildren().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.numberOfChildren().edit(req, response, next)
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/children', {
           pageTitle: 'Children - Prisoner personal details',
@@ -2876,25 +2823,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field values from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -2908,11 +2855,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2921,15 +2866,15 @@ describe('PersonalController', () => {
           page: Page.EditNumberOfChildren,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.numberOfChildren().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.numberOfChildren().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -2938,13 +2883,13 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { hasChildren: 'YES', numberOfChildren: '5' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
         personalPageService.updateNumberOfChildren = jest.fn()
       })
 
       it('Updates the number of children', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 5)
       })
 
@@ -2953,19 +2898,20 @@ describe('PersonalController', () => {
           {
             ...validRequest,
             body: { hasChildren: 'NO' },
-          },
+          } as Request,
           res,
+          next,
         )
         expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
       })
 
       it('Redirects to the personal page #number-of-children on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#number-of-children')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Number of children updated',
@@ -2979,14 +2925,18 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/children')
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { hasChildren: 'YES', numberOfChildren: '5' } }
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { hasChildren: 'YES', numberOfChildren: '5' },
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2995,7 +2945,7 @@ describe('PersonalController', () => {
           details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -3004,7 +2954,7 @@ describe('PersonalController', () => {
 
   describe('Domestic status', () => {
     describe('Edit', () => {
-      const action = async (req: any, response: any) => controller.domesticStatus().edit(req, response, () => {})
+      const action: RequestHandler = async (req, response) => controller.domesticStatus().edit(req, response, next)
       const referenceData: ReferenceDataCodeDto[] = [
         {
           id: '1',
@@ -3043,12 +2993,10 @@ describe('PersonalController', () => {
 
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Marital or civil partnership status - Prisoner personal details',
@@ -3069,25 +3017,25 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
           },
           middleware: defaultMiddleware,
-        } as any
-        await action(req, res)
+        } as unknown as Request
+        await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
@@ -3100,11 +3048,9 @@ describe('PersonalController', () => {
         const req = {
           id: 1,
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -3113,15 +3059,15 @@ describe('PersonalController', () => {
           page: Page.EditDomesticStatus,
         }
 
-        await action(req, res)
+        await action(req, res, next)
 
         expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
     describe('submit', () => {
-      let validRequest: any
-      const action = async (req: any, response: any) => controller.domesticStatus().submit(req, response, () => {})
+      let validRequest: Request
+      const action: RequestHandler = async (req, response) => controller.domesticStatus().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
@@ -3130,21 +3076,21 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'A1234BC' },
           body: { radioField: 'M' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
       })
 
       it('Updates the domestic status', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'M')
       })
 
       it('Redirects to the personal page #marriage-or-civil-partnership-status on success', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#marriage-or-civil-partnership-status')
       })
 
       it('Adds the success message to the flash', async () => {
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Marital or civil partnership status updated',
@@ -3158,14 +3104,14 @@ describe('PersonalController', () => {
           throw new Error()
         }
 
-        await action(validRequest, res)
+        await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/marital-status')
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { radioField: 'M' } }
+        const request = { ...validRequest, id: 1, body: { radioField: 'M' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -3174,7 +3120,7 @@ describe('PersonalController', () => {
           details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
         }
 
-        await action(request, res)
+        await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
@@ -3184,7 +3130,7 @@ describe('PersonalController', () => {
   describe('Emails', () => {
     describe('Creating an email', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.globalEmails().add.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.globalEmails().add.edit(req, response, next)
 
         beforeEach(() => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
@@ -3193,12 +3139,10 @@ describe('PersonalController', () => {
         it('Renders the default edit page with the correct data', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/textFields/addEmail', {
             pageTitle: 'Add this person’s email address - Prisoner personal details',
@@ -3222,25 +3166,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ fieldValue: 'foo@bar.com' }),
@@ -3251,11 +3195,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3264,15 +3206,16 @@ describe('PersonalController', () => {
             page: Page.AddEmailAddress,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.globalEmails().add.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) =>
+          controller.globalEmails().add.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -3281,28 +3224,28 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
             body: { emailAddress: 'fOO@exaMple.com' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
 
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(personalPageService.createGlobalEmail).toHaveBeenCalledWith('token', 'A1234BC', 'foo@example.com')
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
         })
 
         it('Redirects back when add another is added as a query param', async () => {
-          await action({ ...validRequest, query: { addAnother: 'true' } }, res)
+          await action({ ...validRequest, query: { addAnother: 'true' } } as unknown as Request, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Email address updated',
@@ -3319,7 +3262,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { emailAddress: ' Foo@ eXAMplE.com' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
@@ -3342,14 +3285,14 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } }
+          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3358,7 +3301,7 @@ describe('PersonalController', () => {
             details: { fieldName: 'emailAddress', previous: '', updated: 'foo@bar.com' },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -3366,7 +3309,7 @@ describe('PersonalController', () => {
     })
     describe('Edit an email', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.globalEmails().edit.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.globalEmails().edit.edit(req, response, next)
 
         beforeEach(() => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
@@ -3375,12 +3318,10 @@ describe('PersonalController', () => {
         it('Renders the default edit page with the correct data', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
             pageTitle: 'Change this person’s email address - Prisoner personal details',
@@ -3404,25 +3345,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ fieldValue: 'foo@bar.com' }),
@@ -3433,11 +3374,9 @@ describe('PersonalController', () => {
           const req = {
             id: 1,
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
-            flash: (): any => {
-              return []
-            },
+            flash: (): string[] => [],
             middleware: defaultMiddleware,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3446,14 +3385,15 @@ describe('PersonalController', () => {
             page: Page.EditEmailAddress,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.globalEmails().edit.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) =>
+          controller.globalEmails().edit.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -3462,13 +3402,13 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
             body: { emailAddress: 'foo@example.com' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
 
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(personalPageService.updateGlobalEmail).toHaveBeenCalledWith(
             'token',
             'A1234BC',
@@ -3478,12 +3418,12 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Email address updated',
@@ -3497,7 +3437,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
@@ -3514,7 +3454,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { emailAddress: 'someThinG@exaM ple.com' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
@@ -3533,7 +3473,7 @@ describe('PersonalController', () => {
         })
 
         it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } }
+          const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3542,7 +3482,7 @@ describe('PersonalController', () => {
             details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -3553,17 +3493,15 @@ describe('PersonalController', () => {
   describe('Phone numbers', () => {
     describe('Add a phone number', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.globalNumbers().add.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) => controller.globalNumbers().add.edit(req, response, next)
         const defaultReq = {
           params: { prisonerNumber: 'A1234BC' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        }
+        } as unknown as Request
 
         it('Renders the default edit page with the correct data', async () => {
-          await action(defaultReq, res)
+          await action(defaultReq, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/phone', {
             pageTitle: 'Add this person’s phone number - Prisoner personal details',
@@ -3585,25 +3523,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             ...defaultReq,
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             ...defaultReq,
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody'
                 ? [JSON.stringify({ phoneNumberType: 'MOB', phoneNumber: '12345', phoneExtension: '123' })]
                 : []
             },
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
@@ -3618,7 +3556,7 @@ describe('PersonalController', () => {
           const req = {
             ...defaultReq,
             id: 1,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3627,15 +3565,16 @@ describe('PersonalController', () => {
             page: Page.AddPhoneNumber,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) => controller.globalNumbers().add.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) =>
+          controller.globalNumbers().add.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -3644,13 +3583,13 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC' },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
 
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
         it('Updates the phone number', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', {
             phoneNumberType: 'MOB',
             phoneNumber: '1234',
@@ -3659,17 +3598,17 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
         })
 
         it('Redirects to the add phone number page on success with add another specified', async () => {
-          await action({ ...validRequest, query: { addAnother: 'true' } }, res)
+          await action({ ...validRequest, query: { addAnother: 'true' } } as unknown as Request, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
@@ -3692,7 +3631,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
@@ -3717,7 +3656,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
@@ -3742,7 +3681,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4322' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
@@ -3756,7 +3695,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
@@ -3767,7 +3706,7 @@ describe('PersonalController', () => {
             ...validRequest,
             id: 1,
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
-          }
+          } as unknown as Request
 
           const expectedAuditEvent = {
             user: prisonUserMock,
@@ -3785,7 +3724,7 @@ describe('PersonalController', () => {
             },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
@@ -3794,21 +3733,20 @@ describe('PersonalController', () => {
 
     describe('Edit a phone number', () => {
       describe('edit', () => {
-        const action = async (req: any, response: any) => controller.globalNumbers().edit.edit(req, response, () => {})
+        const action: RequestHandler = async (req, response) =>
+          controller.globalNumbers().edit.edit(req, response, next)
         const defaultReq = {
           params: { prisonerNumber: 'A1234BC', phoneNumberId: '123' },
-          flash: (): any => {
-            return []
-          },
+          flash: (): string[] => [],
           middleware: defaultMiddleware,
-        }
+        } as unknown as Request
 
         beforeEach(() => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
         it('Renders the default edit page with the correct data', async () => {
-          await action(defaultReq, res)
+          await action(defaultReq, res, next)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/phone', {
             pageTitle: 'Change this person’s phone number - Prisoner personal details',
@@ -3829,25 +3767,25 @@ describe('PersonalController', () => {
         it('Populates the errors from the flash', async () => {
           const req = {
             ...defaultReq,
-            flash: (key: string): any => {
+            flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
             },
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
 
         it('Populates the field value from the flash', async () => {
           const req = {
             ...defaultReq,
-            flash: (key: string): any => {
+            flash: (key: string) => {
               return key === 'requestBody'
                 ? [JSON.stringify({ phoneNumberType: 'MOB', phoneNumber: '12345', phoneExtension: '123' })]
                 : []
             },
-          } as any
-          await action(req, res)
+          } as unknown as Request
+          await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
@@ -3862,7 +3800,7 @@ describe('PersonalController', () => {
           const req = {
             ...defaultReq,
             id: 1,
-          } as any
+          } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
             prisonerNumber: 'A1234BC',
@@ -3871,16 +3809,16 @@ describe('PersonalController', () => {
             page: Page.EditPhoneNumber,
           }
 
-          await action(req, res)
+          await action(req, res, next)
 
           expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
       describe('submit', () => {
-        let validRequest: any
-        const action = async (req: any, response: any) =>
-          controller.globalNumbers().edit.submit(req, response, () => {})
+        let validRequest: Request
+        const action: RequestHandler = async (req, response) =>
+          controller.globalNumbers().edit.submit(req, response, next)
 
         beforeEach(() => {
           validRequest = {
@@ -3889,13 +3827,13 @@ describe('PersonalController', () => {
             params: { prisonerNumber: 'A1234BC', phoneNumberId: '123' },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
-          } as any
+          } as unknown as Request
 
           personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(personalPageService.updateGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', '123', {
             phoneNumberType: 'MOB',
             phoneNumber: '1234',
@@ -3904,12 +3842,12 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
@@ -3939,7 +3877,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
@@ -3979,7 +3917,7 @@ describe('PersonalController', () => {
 
           validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '5555' }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
@@ -3993,7 +3931,7 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, res)
+          await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
@@ -4004,7 +3942,7 @@ describe('PersonalController', () => {
             ...validRequest,
             id: 1,
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
-          }
+          } as unknown as Request
 
           const expectedAuditEvent = {
             user: prisonUserMock,
@@ -4026,7 +3964,7 @@ describe('PersonalController', () => {
             },
           }
 
-          await action(request, res)
+          await action(request, res, next)
 
           expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })

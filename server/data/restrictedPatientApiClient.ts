@@ -8,8 +8,8 @@ export default class RestrictedPatientApiRestClient extends RestClient implement
     super('Restricted Patient API', config.apis.restrictedPatientApi, token)
   }
 
-  async getRestrictedPatient(prisonerNumber: string): Promise<RestrictedPatient> {
-    return this.getAndIgnore404<RestrictedPatient>({
+  async getRestrictedPatient(prisonerNumber: string): Promise<RestrictedPatient | null> {
+    return this.getAndIgnore404({
       path: `/restricted-patient/prison-number/${prisonerNumber}`,
     })
   }

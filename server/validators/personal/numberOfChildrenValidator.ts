@@ -23,3 +23,5 @@ export const numberOfChildrenValidator: Validator = (body: Record<string, string
 
   return errors
 }
+
+export default { numberOfChildrenValidator }

@@ -1,4 +1,5 @@
 import { Readable } from 'stream'
+import { Request, Response } from 'express'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import { FlashMessageType } from '../data/enums/flashMessageType'
@@ -18,7 +19,7 @@ describe('ImageController', () => {
   let metricsService: MetricsService
   let personIntegrationApi: PersonIntegrationApiClient
   let prisonerProfileApi: PrisonerProfileApiClient
-  let response: any
+  let response: Response
 
   const defaultMiddleware = {
     clientToken: 'token',
@@ -84,7 +85,7 @@ describe('ImageController', () => {
         },
         prisonId: 999,
       },
-    }
+    } as unknown as Response
   })
 
   describe('newImage', () => {
@@ -93,9 +94,9 @@ describe('ImageController', () => {
         const request = {
           middleware: defaultMiddleware,
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.get(request, response, () => {})
+        await controller.updateProfileImage().newImage.get(request, response)
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
           isDpsAppDeveloper: false,
           miniBannerData,
@@ -107,25 +108,21 @@ describe('ImageController', () => {
         const request = {
           middleware: defaultMiddleware,
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.get(
-          request,
-          {
-            ...response,
-            locals: {
-              user: { userRoles: [Role.DpsApplicationDeveloper] },
-              prisonerNumber: 'A1234BC',
-              prisonerName: {
-                firstLast: 'First Last',
-                lastCommaFirst: 'Last, First',
-                full: 'First Last',
-              },
-              prisonId: 999,
+        await controller.updateProfileImage().newImage.get(request, {
+          ...response,
+          locals: {
+            user: { userRoles: [Role.DpsApplicationDeveloper] },
+            prisonerNumber: 'A1234BC',
+            prisonerName: {
+              firstLast: 'First Last',
+              lastCommaFirst: 'Last, First',
+              full: 'First Last',
             },
+            prisonId: 999,
           },
-          () => {},
-        )
+        } as unknown as Response)
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
           isDpsAppDeveloper: true,
           miniBannerData,
@@ -140,9 +137,9 @@ describe('ImageController', () => {
             if (s === 'errors') return ['Error']
             return null
           }),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.get(request, response, () => {})
+        await controller.updateProfileImage().newImage.get(request, response)
         expect(response.locals.errors).toEqual(['Error'])
       })
 
@@ -153,9 +150,9 @@ describe('ImageController', () => {
             if (s === 'requestBody') return [JSON.stringify({ value: 'Example' })]
             return null
           }),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.get(request, response, () => {})
+        await controller.updateProfileImage().newImage.get(request, response)
         expect(response.locals.formValues).toEqual({ value: 'Example' })
       })
     })
@@ -167,9 +164,9 @@ describe('ImageController', () => {
           body: { photoType: 'new' },
           flash: jest.fn(),
           file,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.post(request, response, () => {})
+        await controller.updateProfileImage().newImage.post(request, response)
 
         const imgSrc = 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU='
 
@@ -188,9 +185,9 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
           body: { photoType: 'withheld' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.post(request, response, () => {})
+        await controller.updateProfileImage().newImage.post(request, response)
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld')
       })
@@ -201,9 +198,9 @@ describe('ImageController', () => {
           body: { photoType: 'withheld' },
           query: { referer: 'case-notes' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.post(request, response, () => {})
+        await controller.updateProfileImage().newImage.post(request, response)
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/new-withheld?referer=case-notes')
       })
@@ -213,9 +210,9 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
           body: { photoType: 'webcam' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.post(request, response, () => {})
+        await controller.updateProfileImage().newImage.post(request, response)
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/webcam')
       })
@@ -226,9 +223,9 @@ describe('ImageController', () => {
           body: { photoType: 'webcam' },
           query: { referer: 'case-notes' },
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newImage.post(request, response, () => {})
+        await controller.updateProfileImage().newImage.post(request, response)
 
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image/webcam?referer=case-notes')
       })
@@ -242,9 +239,9 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
-      } as any
+      } as unknown as Request
 
-      await controller.updateProfileImage().submitImage(request, response, () => {})
+      await controller.updateProfileImage().submitImage(request, response)
       expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file)
     })
 
@@ -254,9 +251,9 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
-      } as any
+      } as unknown as Request
 
-      await controller.updateProfileImage().submitImage(request, response, () => {})
+      await controller.updateProfileImage().submitImage(request, response)
       expect(request.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Profile image updated',
         type: FlashMessageType.success,
@@ -271,9 +268,9 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
-      } as any
+      } as unknown as Request
 
-      await controller.updateProfileImage().submitImage(request, response, () => {})
+      await controller.updateProfileImage().submitImage(request, response)
       expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image?referer=case-notes')
     })
 
@@ -283,9 +280,9 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
-      } as any
+      } as unknown as Request
 
-      await controller.updateProfileImage().submitImage(request, response, () => {})
+      await controller.updateProfileImage().submitImage(request, response)
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
         user: expect.anything(),
         fieldsUpdated: ['profile-image'],
@@ -301,9 +298,9 @@ describe('ImageController', () => {
         query: { referer: 'personal' },
         flash: jest.fn(),
         middleware: defaultMiddleware,
-      } as any
+      } as unknown as Request
 
-      await controller.updateProfileImage().submitImage(request, response, () => {})
+      await controller.updateProfileImage().submitImage(request, response)
       expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
       expect(response.render).toHaveBeenCalledWith(
         'pages/edit/photo/editPhoto',
@@ -326,9 +323,9 @@ describe('ImageController', () => {
         const request = {
           middleware: defaultMiddleware,
           flash: jest.fn(),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.get(request, response)
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWithheld', {
           miniBannerData,
           pageTitle: 'Confirm facial image',
@@ -345,9 +342,9 @@ describe('ImageController', () => {
             if (s === 'errors') return ['Error']
             return null
           }),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.get(request, response)
         expect(response.locals.errors).toEqual(['Error'])
       })
 
@@ -358,9 +355,9 @@ describe('ImageController', () => {
             if (s === 'requestBody') return [JSON.stringify({ value: 'Example' })]
             return null
           }),
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.get(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.get(request, response)
         expect(response.locals.formValues).toEqual({ value: 'Example' })
       })
     })
@@ -370,9 +367,9 @@ describe('ImageController', () => {
         const request = {
           flash: jest.fn(),
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile)
       })
 
@@ -382,9 +379,9 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Profile image updated',
           type: FlashMessageType.success,
@@ -399,9 +396,9 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image?referer=case-notes')
       })
 
@@ -411,9 +408,9 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
           user: expect.anything(),
           fieldsUpdated: ['withheld-profile-image'],
@@ -429,9 +426,9 @@ describe('ImageController', () => {
           query: { referer: 'personal' },
           flash: jest.fn(),
           middleware: defaultMiddleware,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().newWithheldImage.post(request, response, () => {})
+        await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(metricsService.trackPersonIntegrationUpdate).not.toHaveBeenCalled()
         expect(request.flash).toHaveBeenCalledWith('errors', [
           {
@@ -452,9 +449,9 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
           flash: jest.fn(),
           file,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().webcamImage.get(request, response, () => {})
+        await controller.updateProfileImage().webcamImage.get(request, response)
 
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addWebcam', {
           pageTitle: expect.anything(),
@@ -469,9 +466,9 @@ describe('ImageController', () => {
           middleware: defaultMiddleware,
           flash: jest.fn(),
           file,
-        } as any
+        } as unknown as Request
 
-        await controller.updateProfileImage().webcamImage.post(request, response, () => {})
+        await controller.updateProfileImage().webcamImage.post(request, response)
 
         const imgSrc = 'data:image/jpeg;base64,VG90YWxseSBhIGZpbGU='
 

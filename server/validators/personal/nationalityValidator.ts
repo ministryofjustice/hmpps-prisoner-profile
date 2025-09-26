@@ -18,3 +18,5 @@ export const nationalityValidator: Validator = (body: Record<string, string>) =>
 
   return errors
 }
+
+export default { nationalityValidator }

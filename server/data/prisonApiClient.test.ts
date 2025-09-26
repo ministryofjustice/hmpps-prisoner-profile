@@ -1,4 +1,4 @@
-import nock from 'nock'
+import nock, { RequestBodyMatcher } from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import dummyScheduledEvents from './localMockData/eventsForToday'
@@ -65,7 +65,7 @@ describe('prisonApiClient', () => {
   const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakePrisonApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
-  const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
+  const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: RequestBodyMatcher, returnData: TReturnData) => {
     fakePrisonApi.post(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 

@@ -15,3 +15,5 @@ const formatDateToTime = (dateString: string): string => {
 export const formatScheduledEventTime = (scheduledEvent: ScheduledEvent): { startTime: string; endTime: string } => {
   return { startTime: formatDateToTime(scheduledEvent.startTime), endTime: formatDateToTime(scheduledEvent.endTime) }
 }
+
+export default { formatScheduledEventTime }

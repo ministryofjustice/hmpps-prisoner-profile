@@ -75,3 +75,5 @@ export function changeEthnicBackground(options: { group: string; pageTitle: stri
     })
   })
 }
+
+export default { changeEthnicBackground }

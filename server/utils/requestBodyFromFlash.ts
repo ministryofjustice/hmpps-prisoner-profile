@@ -9,3 +9,5 @@ export function requestBodyFromFlash<T>(req: Request): T | null {
 
   return null
 }
+
+export default { requestBodyFromFlash }

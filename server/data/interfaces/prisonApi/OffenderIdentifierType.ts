@@ -18,3 +18,5 @@ export enum OffenderIdentifierType {
   UniqueLearnerNumber = 'ULN',
   YjafNumber = 'YJAF',
 }
+
+export default { OffenderIdentifierType }

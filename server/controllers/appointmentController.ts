@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler } from 'express'
 import { addMinutes, set, subMinutes } from 'date-fns'
 import AppointmentService from '../services/appointmentService'
 import {
@@ -48,7 +48,7 @@ const PRE_POST_APPOINTMENT_DURATION_MINS = 15
  */
 export default class AppointmentController {
   constructor(
-    private readonly appointmentService: AppointmentService,
+    readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly auditService: AuditService,
     private readonly locationDetailsService: LocationDetailsService,
@@ -128,7 +128,7 @@ export default class AppointmentController {
       return appointmentForm
     }
 
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       const { appointmentId } = req.params
       const { clientToken, miniBannerData } = getCommonRequestData(req, res)
       const { prisonerNumber } = req.params
@@ -180,7 +180,7 @@ export default class AppointmentController {
   }
 
   public post(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
 
@@ -308,7 +308,7 @@ export default class AppointmentController {
   }
 
   public displayAppointmentConfirmation(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
@@ -433,7 +433,7 @@ export default class AppointmentController {
       return { appointmentDefaults, appointmentForm, formValues: formValuesFromAppointment }
     }
 
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       const { appointmentId } = req.params
       const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const user = res.locals.user as PrisonUser
@@ -520,7 +520,7 @@ export default class AppointmentController {
   }
 
   public postVideoLinkBooking(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber, appointmentId } = req.params
       const { clientToken } = req.middleware
 
@@ -611,7 +611,7 @@ export default class AppointmentController {
   }
 
   public displayPrePostAppointmentConfirmation(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
@@ -726,7 +726,7 @@ export default class AppointmentController {
   }
 
   public displayPrisonerMovementSlips(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res) => {
       const { prisonerNumber, prisonId } = req.middleware.prisonerData
       const data = req.session.movementSlipData
       if (!data) {
@@ -753,7 +753,7 @@ export default class AppointmentController {
   /* JavaScript API route handlers ---------------------------------------------------------------------------------- */
 
   public getOffenderEvents(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
 
@@ -806,7 +806,7 @@ export default class AppointmentController {
   }
 
   public getLocationExistingEvents(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
 
@@ -901,7 +901,7 @@ export default class AppointmentController {
   }
 
   public getRecurringEndDate(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const date = parseDate(req.query.date as string)
       const repeats = req.query.repeats as string
       const times = +req.query.times

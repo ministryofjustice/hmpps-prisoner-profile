@@ -8,3 +8,5 @@ export enum ChargeResultCode {
   detention_and_training_order = '1081',
   detained_during_hm_pleasure = '1003',
 }
+
+export default { ChargeResultCode }

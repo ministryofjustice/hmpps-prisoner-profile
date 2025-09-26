@@ -10,3 +10,5 @@ export enum CsipStatus {
   csipOpen = 'CSIP_OPEN',
   csipClosed = 'CSIP_CLOSED',
 }
+
+export default { CsipStatus }

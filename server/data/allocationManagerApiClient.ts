@@ -8,7 +8,7 @@ export default class AllocationManagerApiClient extends RestClient implements Al
     super('Allocation Manager API', config.apis.allocationManager, token)
   }
 
-  async getPomByOffenderNo(offenderNumber: string): Promise<Pom> {
-    return this.getAndIgnore404<Pom>({ path: `/api/allocation/${offenderNumber}` })
+  async getPomByOffenderNo(offenderNumber: string): Promise<Pom | null> {
+    return this.getAndIgnore404({ path: `/api/allocation/${offenderNumber}` })
   }
 }

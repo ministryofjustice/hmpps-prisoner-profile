@@ -19,3 +19,5 @@ export const emailValidator = (body: Record<string, string>): HmppsError[] => {
 
   return errors
 }
+
+export default { emailValidator }

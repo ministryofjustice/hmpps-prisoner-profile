@@ -39,7 +39,7 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
       size: queryParams?.showAll ? 9999 : (queryParams?.size ?? 20),
       sort: queryParams?.sort,
     }
-    return this.post<FindCaseNotesResponse>(
+    return this.post(
       {
         path: `/search/case-notes/${prisonerNumber}`,
         data: request,
@@ -54,11 +54,11 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
       includeInactive: queryParams.includeInactive,
       includeRestricted: queryParams.includeRestricted,
     }
-    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) }, this.token)
+    return this.get({ path: `/case-notes/types`, query: mapToQueryString(params) }, this.token)
   }
 
   async addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote> {
-    return this.post<CaseNote>(
+    return this.post(
       {
         path: `/case-notes/${prisonerNumber}`,
         data: {
@@ -77,7 +77,7 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
     caseNoteId: string,
     text: string,
   ): Promise<CaseNote> {
-    return this.put<CaseNote>(
+    return this.put(
       {
         path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
         data: { text },
@@ -91,16 +91,30 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
     prisonerNumber: string,
     caseloadId: string,
     caseNoteId: string,
+    ignore404?: false,
+  ): Promise<CaseNote>
+
+  async getCaseNote(
+    prisonerNumber: string,
+    caseloadId: string,
+    caseNoteId: string,
+    ignore404: boolean,
+  ): Promise<CaseNote | null>
+
+  async getCaseNote(
+    prisonerNumber: string,
+    caseloadId: string,
+    caseNoteId: string,
     ignore404 = false,
-  ): Promise<CaseNote> {
+  ): Promise<CaseNote | null> {
     if (ignore404) {
-      return this.getAndIgnore404<CaseNote>({
+      return this.getAndIgnore404({
         path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
         headers: { caseloadId },
       })
     }
 
-    return this.get<CaseNote>(
+    return this.get(
       {
         path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
         headers: { caseloadId },
@@ -115,7 +129,7 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
     fromDateTime?: string,
     toDateTime?: string,
   ): Promise<CaseNoteUsageSummary> {
-    return this.post<CaseNoteUsageSummary>(
+    return this.post(
       {
         path: `/case-notes/usage`,
         data: {

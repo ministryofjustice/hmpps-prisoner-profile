@@ -1,4 +1,4 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { startOfToday, subDays } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -18,13 +18,14 @@ import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
 import { Alert, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatDateISO } from '../utils/dateHelpers'
+import { DataAccess } from '../data'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
 jest.mock('../data/alertsApiClient')
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 let services: Services
 let prisonApiClient: PrisonApiClient
@@ -41,7 +42,7 @@ describe('GetPrisonerDataMiddleware', () => {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
       },
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -52,7 +53,7 @@ describe('GetPrisonerDataMiddleware', () => {
         },
       },
       render: jest.fn(),
-    }
+    } as unknown as Response
     next = jest.fn()
     prisonerSearchApiClient = {
       getPrisonerDetails: jest.fn(async () => PrisonerMockDataA),
@@ -73,7 +74,7 @@ describe('GetPrisonerDataMiddleware', () => {
         prisonerSearchApiClientBuilder: jest.fn(() => prisonerSearchApiClient),
         prisonApiClientBuilder: jest.fn(() => prisonApiClient),
         alertsApiClientBuilder: jest.fn(() => alertsApiClient),
-      } as any,
+      } as unknown as DataAccess,
     } as Services
 
     featureToggleStoreMock = {
@@ -90,7 +91,7 @@ describe('GetPrisonerDataMiddleware', () => {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
       },
-    }
+    } as unknown as Request
 
     await getPrisonerData(services)(req, res, next)
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
@@ -102,7 +103,7 @@ describe('GetPrisonerDataMiddleware', () => {
       req = {
         ...req,
         params: { prisonerNumber },
-      }
+      } as unknown as Request
 
       await getPrisonerData(services)(req, res, next)
 

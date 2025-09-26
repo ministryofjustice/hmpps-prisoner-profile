@@ -5,3 +5,5 @@ export const prisonerScheduleServiceMock = (): Interface<PrisonerScheduleService
   getScheduleOverview: jest.fn(),
   getScheduledTransfers: jest.fn(),
 })
+
+export default { prisonerScheduleServiceMock }

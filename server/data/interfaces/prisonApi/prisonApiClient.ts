@@ -106,7 +106,7 @@ export interface PrisonApiClient {
 
   getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails>
 
-  getAddresses(prisonerNumber: string): Promise<Address[]>
+  getAddresses(prisonerNumber: string): Promise<Address[] | null>
 
   getAddressesForPerson(personId: number): Promise<Address[]>
 
@@ -132,15 +132,15 @@ export interface PrisonApiClient {
 
   getIdentifiers(prisonerNumber: string, includeAliases: boolean): Promise<OffenderIdentifier[]>
 
-  hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean>
+  hasStaffRole(staffId: number, agencyId: string, roleType: string): Promise<boolean | null>
 
-  getAgencyDetails(agencyId: string): Promise<AgencyDetails>
+  getAgencyDetails(agencyId: string): Promise<AgencyDetails | null>
 
   getOffenderCellHistory(bookingId: number, params: { page?: number; size?: number }): Promise<OffenderCellHistory>
 
   getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
 
-  getStaffDetails(username: string): Promise<StaffDetails>
+  getStaffDetails(username: string): Promise<StaffDetails | null>
 
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
 
@@ -207,7 +207,7 @@ export interface PrisonApiClient {
 
   getPersonPhones(personId: number): Promise<Telephone[]>
 
-  getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
+  getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null>
 
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
 

@@ -44,3 +44,5 @@ export const pluralise = (
   const pluralised = [1, -1].includes(count) ? word : options?.plural || notStandardPlurals[word] || `${word}s`
   return includeCount ? `${count} ${pluralised}` : pluralised
 }
+
+export default { pluralise }

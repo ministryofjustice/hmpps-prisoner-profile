@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
@@ -8,8 +9,8 @@ import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 import { prisonUserMock } from '../data/localMockData/user'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let addressService: AddressService
 let controller: AddressController
 
@@ -33,16 +34,16 @@ describe('Address controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
-      }
+      } as unknown as Request
       res = {
         locals: { user: prisonUserMock },
         render: jest.fn(),
-      }
+      } as unknown as Response
     })
 
     it('should render the addresses page', async () => {
       const getAddressesFromPrisonAPI = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesFromPrisonAPI')
+        .spyOn(controller.addressService, 'getAddressesFromPrisonAPI')
         .mockResolvedValue([...addressesPrimaryAndMailMock, ...addressesNoStartDateMock])
 
       await controller.displayAddresses(req, res)
@@ -69,16 +70,16 @@ describe('Address controller', () => {
         middleware: {
           clientToken: 'CLIENT_TOKEN',
         },
-      }
+      } as unknown as Request
       res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
-      }
+      } as unknown as Response
     })
 
     it('should render the correct json response', async () => {
       const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
+        .spyOn(controller.addressService, 'getAddressesMatchingQuery')
         .mockResolvedValue(mockOsAddresses)
 
       await controller.findAddressesByFreeTextQuery(req, res)
@@ -88,7 +89,7 @@ describe('Address controller', () => {
 
     it('should handle errors correctly', async () => {
       const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
+        .spyOn(controller.addressService, 'getAddressesMatchingQuery')
         .mockImplementation(() => {
           throw testError()
         })

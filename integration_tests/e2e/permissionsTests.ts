@@ -175,3 +175,5 @@ export function permissionsTests<TPage extends Page>({
     })
   })
 }
+
+export default { permissionsTests }

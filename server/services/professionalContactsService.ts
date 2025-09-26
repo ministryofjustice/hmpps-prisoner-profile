@@ -417,7 +417,7 @@ function mapAllocationsToPersonalOfficerContacts(
 }
 
 function mapPomToProfessionalContact(
-  pomResult: Result<Pom>,
+  pomResult: Result<Pom | null>,
 ): Result<ProfessionalContact, ProfessionalContactApiError>[] {
   if (pomResult.isFulfilled() && pomResult.getOrThrow() === null) return []
 

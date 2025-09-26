@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 import { addYears, isAfter, isBefore, isPast, isWeekend, subDays } from 'date-fns'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { Validator } from '../middleware/validationMiddleware'
@@ -140,7 +139,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
       })
     }
 
-    if (body.startTimeHours && isNaN(parseInt(body.startTimeHours, 10))) {
+    if (body.startTimeHours && Number.isNaN(parseInt(body.startTimeHours, 10))) {
       invalidStartTime = true
       errors.push({
         text: 'Enter an hour using numbers only',
@@ -148,7 +147,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
       })
     }
 
-    if (body.startTimeMinutes && isNaN(parseInt(body.startTimeMinutes, 10))) {
+    if (body.startTimeMinutes && Number.isNaN(parseInt(body.startTimeMinutes, 10))) {
       invalidStartTime = true
       errors.push({
         text: 'Enter the minutes using numbers only',
@@ -190,7 +189,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
       })
     }
 
-    if (body.endTimeHours && isNaN(parseInt(body.endTimeHours, 10))) {
+    if (body.endTimeHours && Number.isNaN(parseInt(body.endTimeHours, 10))) {
       invalidEndTime = true
       errors.push({
         text: 'Enter an hour using numbers only',
@@ -198,7 +197,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
       })
     }
 
-    if (body.endTimeMinutes && isNaN(parseInt(body.endTimeMinutes, 10))) {
+    if (body.endTimeMinutes && Number.isNaN(parseInt(body.endTimeMinutes, 10))) {
       invalidEndTime = true
       errors.push({
         text: 'Enter the minutes using numbers only',
@@ -247,14 +246,14 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
       })
     }
 
-    if (!body.times || isNaN(parseInt(body.times, 10))) {
+    if (!body.times || Number.isNaN(parseInt(body.times, 10))) {
       errors.push({
         text: 'Enter the number of appointments using numbers only',
         href: '#times',
       })
     }
 
-    if (body.date && body.repeats && body.times && !isNaN(parseInt(body.times, 10))) {
+    if (body.date && body.repeats && body.times && !Number.isNaN(parseInt(body.times, 10))) {
       const lastAppointmentDate = calculateEndDate(date, body.repeats, +body.times)
       const startDate = date
 
@@ -296,3 +295,5 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
 
   return errors
 }
+
+export default { AppointmentValidator }

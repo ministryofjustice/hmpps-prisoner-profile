@@ -3,3 +3,5 @@ export enum ProblemStatus {
   Recovered = 'I',
   ExpiredBodyScanEntry = 'EBS',
 }
+
+export default { ProblemStatus }

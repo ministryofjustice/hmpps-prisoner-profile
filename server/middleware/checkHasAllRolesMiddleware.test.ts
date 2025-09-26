@@ -1,11 +1,11 @@
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import checkHasAllRoles from './checkHasAllRolesMiddleware'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import RoleError from '../utils/roleError'
 
-let req: any
-let res: any
+let req: Request
+let res: Response
 let next: NextFunction
 
 describe('CheckHasAllRolesMiddleware', () => {
@@ -16,7 +16,7 @@ describe('CheckHasAllRolesMiddleware', () => {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
       },
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -26,7 +26,7 @@ describe('CheckHasAllRolesMiddleware', () => {
         },
       },
       render: jest.fn(),
-    }
+    } as unknown as Response
     next = jest.fn()
   })
 

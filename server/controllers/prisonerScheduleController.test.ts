@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import PrisonerScheduleController from './prisonerScheduleController'
@@ -11,8 +12,8 @@ describe('Prisoner schedule', () => {
   const offenderNo = 'A1234BC'
   let prisonApi: PrisonApiClient
 
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: PrisonerScheduleController
 
   beforeEach(() => {
@@ -26,8 +27,8 @@ describe('Prisoner schedule', () => {
       query: {},
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
-    res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() }
+    } as unknown as Request
+    res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() } as unknown as Response
 
     prisonApi = prisonApiClientMock()
     prisonApi.getScheduledEventsForThisWeek = jest.fn().mockResolvedValue(getEventsThisWeekMock)

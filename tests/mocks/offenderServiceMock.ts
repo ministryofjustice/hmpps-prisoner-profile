@@ -7,3 +7,5 @@ export const offenderServiceMock = (): Interface<OffenderService> => ({
   getPrisonerImage: jest.fn(),
   getPrisonerNonAssociationOverview: jest.fn(),
 })
+
+export default { offenderServiceMock }

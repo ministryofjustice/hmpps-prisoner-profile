@@ -19,3 +19,5 @@ export function addMiddlewareError(req: Request, next: NextFunction, error: Erro
   }
   return 'route'
 }
+
+export default { addMiddlewareError }

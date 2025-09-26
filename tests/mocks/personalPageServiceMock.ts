@@ -31,3 +31,5 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   createGlobalPhoneNumber: jest.fn(),
   updateGlobalPhoneNumber: jest.fn(),
 })
+
+export default { personalPageServiceMock }

@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import PrisonerLocationHistoryController from './prisonerLocationHistoryController'
@@ -18,8 +19,8 @@ import { caseNotesApiClientMock } from '../../tests/mocks/caseNotesApiClientMock
 
 describe('Specific Prisoner Location History', () => {
   const offenderNo = 'A1234BC'
-  let req: any
-  let res: any
+  let req: Request
+  let res: Response
   let controller: PrisonerLocationHistoryController
 
   beforeEach(() => {
@@ -31,10 +32,10 @@ describe('Specific Prisoner Location History', () => {
       },
       originalUrl: 'http://localhost',
       params: { offenderNo },
-      query: { agencyId: 'MDI', locationId: 25762, fromDate: '2023-07-11T14:56:16', toDate: '2023-08-17T12:00:00' },
+      query: { agencyId: 'MDI', locationId: '25762', fromDate: '2023-07-11T14:56:16', toDate: '2023-08-17T12:00:00' },
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-    }
+    } as unknown as Request
     res = {
       locals: {
         user: {
@@ -46,7 +47,7 @@ describe('Specific Prisoner Location History', () => {
       },
       render: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     const prisonApiClient = prisonApiClientMock()
     const locationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()

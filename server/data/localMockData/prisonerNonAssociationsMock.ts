@@ -99,3 +99,5 @@ export const prisonerNonAssociationsMock: PrisonerNonAssociations = {
     },
   ],
 }
+
+export default { prisonerNonAssociationsMock }

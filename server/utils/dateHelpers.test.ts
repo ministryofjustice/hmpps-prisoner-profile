@@ -80,8 +80,7 @@ describe('parseDate', () => {
     'For input %s return Invalid Date (NaN)',
     (date: string) => {
       const val = parseDate(date)
-      // eslint-disable-next-line no-restricted-globals
-      expect(isNaN(val.getTime())).toBeTruthy()
+      expect(Number.isNaN(val.getTime())).toBeTruthy()
     },
   )
 })

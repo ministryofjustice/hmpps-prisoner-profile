@@ -1,4 +1,4 @@
-import { CareNeed, CareNeedAdjustment } from '../../services/careNeedsService'
+import { CareNeed, CareNeedAdjustment, XrayBodyScan } from '../../services/careNeedsService'
 
 export const careNeedAdjustmentMock: CareNeedAdjustment = {
   type: 'ATYPE',
@@ -30,7 +30,7 @@ export const careNeedsMock: CareNeed[] = [
   },
 ]
 
-export const xrayBodyScansMock: CareNeed[] = [
+export const xrayBodyScanCareNeedsMock: CareNeed[] = [
   {
     type: 'BSCAN',
     description: 'Body scan',
@@ -39,5 +39,12 @@ export const xrayBodyScansMock: CareNeed[] = [
     endDate: undefined,
     isOngoing: true,
     reasonableAdjustments: [careNeedAdjustmentMock],
+  },
+]
+
+export const xrayBodyScansMock: XrayBodyScan[] = [
+  {
+    comment: 'Comment',
+    scanDate: '2024-06-06',
   },
 ]

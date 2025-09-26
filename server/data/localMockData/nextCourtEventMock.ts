@@ -7,3 +7,5 @@ export const nextCourtEventMock: CourtEvent = {
   courtEventType: 'Sentencing',
   caseReference: 'A1234BC',
 }
+
+export default { nextCourtEventMock }

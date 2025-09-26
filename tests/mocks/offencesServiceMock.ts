@@ -7,3 +7,5 @@ export const offencesServiceMock = (): Interface<OffencesService> => ({
   getLatestReleaseCalculation: jest.fn(),
   getOffencesOverview: jest.fn(),
 })
+
+export default { offencesServiceMock }

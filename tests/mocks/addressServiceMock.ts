@@ -17,3 +17,5 @@ export const addressServiceMock = (): Interface<AddressService> => ({
   sanitisePostcode: jest.fn(),
   transformAddresses: jest.fn(),
 })
+
+export default { addressServiceMock }

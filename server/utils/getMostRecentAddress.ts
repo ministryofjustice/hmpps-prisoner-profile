@@ -31,3 +31,5 @@ export const getMostRecentAddress = (addresses: Address[] = []): Address | undef
 
   return activeAddresses.sort(sortAddressesByStartDate)[0]
 }
+
+export default { getMostRecentAddress }

@@ -33,3 +33,5 @@ export const dischargeDetailsValidator: Validator = (body: Record<string, string
 
   return errors
 }
+
+export default { dischargeDetailsValidator }

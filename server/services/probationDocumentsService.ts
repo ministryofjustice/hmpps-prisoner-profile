@@ -4,7 +4,7 @@ import Conviction from '../data/interfaces/deliusApi/Conviction'
 import { ProbationDocument } from '../data/interfaces/deliusApi/ProbationDocuments'
 import { Result } from '../utils/result/result'
 
-interface GetCommunityDocumentsResponse {
+export interface GetCommunityDocumentsResponse {
   documents: {
     offenderDocuments: ProbationDocument[]
     convictions: Conviction[]

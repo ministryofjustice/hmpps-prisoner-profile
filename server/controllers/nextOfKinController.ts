@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler } from 'express'
 import { UUID } from 'crypto'
 import { apostrophe, formatName, mapRelationshipDescriptionByCode, objectToSelectOptions } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
@@ -88,7 +88,7 @@ export default class NextOfKinController {
   ) {}
 
   public displayNextOfKinEmergencyContact(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { naturalPrisonerName, prisonerNumber, prisonId, clientToken, miniBannerData } = getCommonRequestData(
         req,
         res,
@@ -157,7 +157,7 @@ export default class NextOfKinController {
   }
 
   public submitNextOfKinEmergencyContact(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const formValues = req.body
@@ -227,7 +227,7 @@ export default class NextOfKinController {
   }
 
   public displayWhereIsTheAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { name } = await this.getContactNameFromCache(req)
 
       return displayWhereIsTheAddressHandler(this.auditService, {
@@ -240,7 +240,7 @@ export default class NextOfKinController {
   }
 
   public submitWhereIsTheAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { contact: contactCacheId } = req.query
 
       return submitWhereIsTheAddressHandler(this.auditService, {
@@ -258,7 +258,7 @@ export default class NextOfKinController {
   }
 
   public displayFindUkAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { contact: contactCacheId } = req.query
       const { name } = await this.getContactNameFromCache(req)
 
@@ -277,7 +277,7 @@ export default class NextOfKinController {
   }
 
   public submitFindUkAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { contact: contactCacheId } = req.query
 
       return submitFindUkAddressHandler(this.addressService, this.ephemeralDataService, this.auditService, {
@@ -297,7 +297,7 @@ export default class NextOfKinController {
     formTitlePrefix: string
     auditPage: Page
   }): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { addressLocation, pageTitlePrefix, formTitlePrefix, auditPage } = options
       const { name } = await this.getContactNameFromCache(req)
       const { contact: contactCacheId } = req.query
@@ -322,7 +322,7 @@ export default class NextOfKinController {
     addressLocation: AddressLocation
     auditAction: PostAction
   }): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { contact: contactCacheId } = req.query
       return submitManualEditAddressHandler(this.addressService, this.ephemeralDataService, this.auditService, {
         addressLocation: options.addressLocation,
@@ -336,7 +336,7 @@ export default class NextOfKinController {
   }
 
   public displayConfirmAddress(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req, res, next) => {
       const { contact: contactCacheId } = req.query
       const { name } = await this.getContactNameFromCache(req)
       return displayConfirmAddressHandler(this.addressService, this.ephemeralDataService, this.auditService, {
@@ -351,7 +351,7 @@ export default class NextOfKinController {
   }
 
   public submitConfirmAddress(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
 
       const { address: addressCacheId, contact: contactCacheId } = req.query
@@ -402,6 +402,7 @@ export default class NextOfKinController {
         })
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#next-of-kin`)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_error) {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
@@ -412,7 +413,7 @@ export default class NextOfKinController {
     }
   }
 
-  private mapFormToRequest(
+  mapFormToRequest(
     formValues: PersonalRelationshipsContactForm,
     prisonerNumber: string,
     username: string,

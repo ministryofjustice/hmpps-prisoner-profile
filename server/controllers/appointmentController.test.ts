@@ -1,4 +1,5 @@
 import { addDays, addMinutes, set, subMinutes } from 'date-fns'
+import { NextFunction, Request, Response } from 'express'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import PrisonerSearchService from '../services/prisonerSearch'
@@ -43,17 +44,24 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 jest.mock('../services/locationDetailsService.ts')
 
-let req: any
-let res: any
-let controller: any
+let req: Request
+let res: Response
+const next: NextFunction = jest.fn()
+let controller: AppointmentController
+const flash: jest.MockedFn<Request['flash'] | { (key?: string): object[] }> = jest.fn()
 
-const user: Partial<HmppsUser> = {
+const activeCaseLoadId = CaseLoadsDummyDataA[0].caseLoadId
+const user: HmppsUser = {
+  authSource: 'nomis',
+  username: 'user487023',
+  name: 'A Name',
   displayName: 'A Name',
   userRoles: [Role.PrisonUser],
+  userId: '487023',
   staffId: 487023,
   caseLoads: CaseLoadsDummyDataA,
   token: 'USER_TOKEN',
-  activeCaseLoadId: 'MDI',
+  activeCaseLoadId,
 }
 
 const today = formatDateTimeISO(new Date(), { startOfDay: true })
@@ -137,8 +145,8 @@ describe('Appointment Controller', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
-      flash: jest.fn(),
-    }
+      flash,
+    } as unknown as Request
     res = {
       locals: {
         user,
@@ -152,7 +160,7 @@ describe('Appointment Controller', () => {
       render: jest.fn(),
       send: jest.fn(),
       redirect: jest.fn(),
-    }
+    } as unknown as Response
 
     controller = new AppointmentController(
       appointmentService,
@@ -210,11 +218,11 @@ describe('Appointment Controller', () => {
   })
 
   it('should display add appointment', async () => {
-    await controller.displayAddAppointment()(req, res)
+    await controller.displayAddAppointment()(req, res, next)
 
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getAddAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
 
     expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
@@ -242,19 +250,19 @@ describe('Appointment Controller', () => {
   })
 
   it('should display add appointment with data prepopulated when editing a VLB', async () => {
-    req.params.appointmentId = 1 // editing appointment with ID 1
+    req.params.appointmentId = '1' // editing appointment with ID 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
     appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
 
-    await controller.displayAddAppointment()(req, res)
+    await controller.displayAddAppointment()(req, res, next)
 
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getAddAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
 
     expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
-      appointmentId: 1,
+      appointmentId: '1',
       pageTitle: 'Change appointment details',
       miniBannerData: {
         prisonerName: 'Saunders, John',
@@ -288,19 +296,19 @@ describe('Appointment Controller', () => {
   })
 
   it('should display add appointment with data prepopulated when editing a VLPM', async () => {
-    req.params.appointmentId = 1 // editing appointment with ID 1
+    req.params.appointmentId = '1' // editing appointment with ID 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlpmAppointmentMock)
     appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(probationBookingMock)
 
-    await controller.displayAddAppointment()(req, res)
+    await controller.displayAddAppointment()(req, res, next)
 
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getAddAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
 
     expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
-      appointmentId: 1,
+      appointmentId: '1',
       pageTitle: 'Change appointment details',
       miniBannerData: {
         prisonerName: 'Saunders, John',
@@ -345,9 +353,6 @@ describe('Appointment Controller', () => {
         refererUrl: 'http://referer',
       }
     })
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
 
     it('should create new appointment', async () => {
       locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
@@ -356,14 +361,14 @@ describe('Appointment Controller', () => {
         key: 'ABC',
       }))
 
-      await controller.post()(req, res)
+      await controller.post()(req, res, next)
 
-      expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(req.middleware.clientToken, {
+      expect(controller.appointmentService.createAppointments).toHaveBeenCalledWith(req.middleware.clientToken, {
         ...appointmentsToCreate,
         locationId: 1234,
       })
 
-      expect(req.flash).toHaveBeenCalledWith('appointmentForm', formBody)
+      expect(flash).toHaveBeenCalledWith('appointmentForm', formBody)
 
       expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -398,9 +403,9 @@ describe('Appointment Controller', () => {
         localName: 'Local name one',
       }))
 
-      await controller.post()(req, res)
+      await controller.post()(req, res, next)
 
-      expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
+      expect(controller.appointmentService.addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
         bookingType: 'PROBATION',
         prisoners: [
           {
@@ -423,7 +428,7 @@ describe('Appointment Controller', () => {
         notesForStaff: 'staff notes',
       })
 
-      expect(req.flash).toHaveBeenCalledWith('appointmentForm', req.body)
+      expect(flash).toHaveBeenCalledWith('appointmentForm', req.body)
 
       expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -462,36 +467,32 @@ describe('Appointment Controller', () => {
         localName: 'Local name one',
       }))
 
-      await controller.post()(req, res)
+      await controller.post()(req, res, next)
 
-      expect(controller['appointmentService'].amendVideoLinkBooking).toHaveBeenCalledWith(
-        req.middleware.clientToken,
-        1,
-        {
-          bookingType: 'PROBATION',
-          prisoners: [
-            {
-              prisonerNumber: PrisonerMockDataA.prisonerNumber,
-              prisonCode: formBody.prisonId,
-              appointments: [
-                {
-                  type: 'VLB_PROBATION',
-                  locationKey: locationsApiMock[0].key,
-                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-                  startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
-                  endTime: timeFormat(appointmentsToCreate.endTime),
-                },
-              ],
-            },
-          ],
-          probationTeamCode: 'BLACKPP',
-          probationMeetingType: 'PSR',
-          notesForPrisoners: 'amended prisoner notes',
-          notesForStaff: 'amended staff notes',
-        },
-      )
+      expect(controller.appointmentService.amendVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, 1, {
+        bookingType: 'PROBATION',
+        prisoners: [
+          {
+            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+            prisonCode: formBody.prisonId,
+            appointments: [
+              {
+                type: 'VLB_PROBATION',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                endTime: timeFormat(appointmentsToCreate.endTime),
+              },
+            ],
+          },
+        ],
+        probationTeamCode: 'BLACKPP',
+        probationMeetingType: 'PSR',
+        notesForPrisoners: 'amended prisoner notes',
+        notesForStaff: 'amended staff notes',
+      })
 
-      expect(req.flash).toHaveBeenCalledWith('appointmentForm', req.body)
+      expect(flash).toHaveBeenCalledWith('appointmentForm', req.body)
 
       expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -516,11 +517,11 @@ describe('Appointment Controller', () => {
         key: 'ABC',
       }))
 
-      await controller.post()(req, res)
+      await controller.post()(req, res, next)
 
-      expect(controller['appointmentService'].createAppointments).not.toHaveBeenCalled()
+      expect(controller.appointmentService.createAppointments).not.toHaveBeenCalled()
 
-      expect(req.flash).toHaveBeenCalledWith('prePostAppointmentDetails', {
+      expect(flash).toHaveBeenCalledWith('prePostAppointmentDetails', {
         appointmentDefaults: { ...appointmentsToCreate, locationId: 1234, appointmentType: 'VLB' },
         appointmentForm: { ...formBody, appointmentType: 'VLB' },
       })
@@ -538,12 +539,12 @@ describe('Appointment Controller', () => {
       req.body.refererUrl = 'http://referer'
       req.errors = errors
 
-      await controller.post()(req, res)
+      await controller.post()(req, res, next)
 
-      expect(controller['appointmentService'].createAppointments).not.toHaveBeenCalled()
+      expect(controller.appointmentService.createAppointments).not.toHaveBeenCalled()
 
-      expect(req.flash).toHaveBeenCalledWith('errors', errors)
-      expect(req.flash).toHaveBeenCalledWith('refererUrl', 'http://referer')
+      expect(flash).toHaveBeenCalledWith('errors', errors)
+      expect(flash).toHaveBeenCalledWith('refererUrl', 'http://referer')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
     })
   })
@@ -551,7 +552,7 @@ describe('Appointment Controller', () => {
   it('should display appointment confirmation', async () => {
     const { prisonerNumber } = PrisonerMockDataA
 
-    req.flash = () => [formBody]
+    flash.mockImplementation(() => [formBody])
 
     const appointmentData = {
       heading: 'John Saunders’ appointments have been added',
@@ -570,11 +571,11 @@ describe('Appointment Controller', () => {
       comment: formBody.comments,
     }
 
-    await controller.displayAppointmentConfirmation()(req, res)
+    await controller.displayAppointmentConfirmation()(req, res, next)
 
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getAddAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/appointmentConfirmation', {
       pageTitle: 'Appointment confirmation',
@@ -589,7 +590,7 @@ describe('Appointment Controller', () => {
     const { prisonerNumber } = PrisonerMockDataA
 
     // For amendments an appointmentId will also be present
-    req.flash = () => [{ ...formBody, appointmentId: 1 }]
+    flash.mockImplementation(() => [{ ...formBody, appointmentId: 1 }])
 
     const appointmentData = {
       heading: 'John Saunders’ appointments have been updated',
@@ -608,11 +609,11 @@ describe('Appointment Controller', () => {
       comment: formBody.comments,
     }
 
-    await controller.displayAppointmentConfirmation()(req, res)
+    await controller.displayAppointmentConfirmation()(req, res, next)
 
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getAddAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
 
     expect(res.render).toHaveBeenCalledWith('pages/appointments/appointmentConfirmation', {
@@ -628,7 +629,7 @@ describe('Appointment Controller', () => {
     const { prisonerNumber, cellLocation } = PrisonerMockDataA
     formBody.location = locationsMock[0].locationId
 
-    const flash = {
+    const flashMessage = {
       appointmentDefaults: {
         locationId: formBody.location,
         startTime: formatDateTimeISO(
@@ -638,12 +639,12 @@ describe('Appointment Controller', () => {
       appointmentForm: formBody,
       formValues: {},
     }
-    req.flash = (key: string) => {
+    flash.mockImplementation(key => {
       if (key === 'prePostAppointmentDetails') {
-        return [flash]
+        return [flashMessage]
       }
       return []
-    }
+    })
 
     const appointmentData = {
       miniBannerData: {
@@ -667,11 +668,11 @@ describe('Appointment Controller', () => {
       key: 'ABC',
     }))
 
-    await controller.displayPrePostAppointments()(req, res)
+    await controller.displayPrePostAppointments()(req, res, next)
 
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
       pageTitle: 'Video link booking details',
@@ -685,14 +686,15 @@ describe('Appointment Controller', () => {
   })
 
   it('should display prepost appointment with data prepopulated when editing', async () => {
-    req.params.appointmentId = 1
+    req.params.appointmentId = '1'
+
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
     appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
 
     const { prisonerNumber, cellLocation } = PrisonerMockDataA
     formBody.location = locationsMock[0].locationId
 
-    const flash = {
+    const flashMessage = {
       appointmentDefaults: {
         locationId: formBody.location,
         startTime: formatDateTimeISO(
@@ -701,15 +703,15 @@ describe('Appointment Controller', () => {
       },
       appointmentForm: formBody,
     }
-    req.flash = (key: string) => {
+    flash.mockImplementation(key => {
       if (key === 'prePostAppointmentDetails') {
-        return [flash]
+        return [flashMessage]
       }
       return []
-    }
+    })
 
     const appointmentData = {
-      appointmentId: 1,
+      appointmentId: '1',
       miniBannerData: {
         prisonerName: 'Saunders, John',
         prisonerNumber,
@@ -742,11 +744,11 @@ describe('Appointment Controller', () => {
       key: 'ABC',
     }))
 
-    await controller.displayPrePostAppointments()(req, res)
+    await controller.displayPrePostAppointments()(req, res, next)
 
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
       pageTitle: 'Change appointment details',
@@ -766,12 +768,9 @@ describe('Appointment Controller', () => {
         refererUrl: 'http://referer',
       }
     })
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
 
     it('should create new video link booking appointment', async () => {
-      const flash = {
+      const flashMessage = {
         appointmentDefaults: {
           startTime: appointmentsToCreate.startTime,
           endTime: appointmentsToCreate.endTime,
@@ -784,12 +783,12 @@ describe('Appointment Controller', () => {
           notesForStaff: 'staff notes',
         },
       }
-      req.flash = (key: string) => {
+      flash.mockImplementation(key => {
         if (key === 'postVLBDetails') {
-          return [flash]
+          return [flashMessage]
         }
         return []
-      }
+      })
 
       locationDetailsService.getLocation = jest.fn(async () => ({
         id: 'location-1',
@@ -797,9 +796,9 @@ describe('Appointment Controller', () => {
         localName: 'Local name one',
       }))
 
-      await controller.postVideoLinkBooking()(req, res)
+      await controller.postVideoLinkBooking()(req, res, next)
 
-      expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
+      expect(controller.appointmentService.addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
         bookingType: 'COURT',
         prisoners: [
           {
@@ -843,7 +842,7 @@ describe('Appointment Controller', () => {
     })
 
     it('should amend the existing video link booking appointment', async () => {
-      const flash = {
+      const flashMessage = {
         appointmentDefaults: {
           startTime: appointmentsToCreate.startTime,
           endTime: appointmentsToCreate.endTime,
@@ -857,12 +856,12 @@ describe('Appointment Controller', () => {
           notesForStaff: 'ameneded staff notes',
         },
       }
-      req.flash = (key: string) => {
+      flash.mockImplementation(key => {
         if (key === 'postVLBDetails') {
-          return [flash]
+          return [flashMessage]
         }
         return []
-      }
+      })
 
       appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
       appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
@@ -873,49 +872,45 @@ describe('Appointment Controller', () => {
         localName: 'Local name one',
       }))
 
-      await controller.postVideoLinkBooking()(req, res)
+      await controller.postVideoLinkBooking()(req, res, next)
 
-      expect(controller['appointmentService'].amendVideoLinkBooking).toHaveBeenCalledWith(
-        req.middleware.clientToken,
-        1,
-        {
-          bookingType: 'COURT',
-          prisoners: [
-            {
-              prisonerNumber: PrisonerMockDataA.prisonerNumber,
-              prisonCode: formBody.prisonId,
-              appointments: [
-                {
-                  type: 'VLB_COURT_PRE',
-                  locationKey: locationsApiMock[0].key,
-                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-                  startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
-                  endTime: timeFormat(appointmentsToCreate.startTime),
-                },
-                {
-                  type: 'VLB_COURT_MAIN',
-                  locationKey: locationsApiMock[0].key,
-                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-                  startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
-                  endTime: timeFormat(appointmentsToCreate.endTime),
-                },
-                {
-                  type: 'VLB_COURT_POST',
-                  locationKey: locationsApiMock[1].key,
-                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-                  startTime: timeFormat(appointmentsToCreate.endTime),
-                  endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
-                },
-              ],
-            },
-          ],
-          courtCode: 'ABC',
-          courtHearingType: 'APPEAL',
-          videoLinkUrl: 'http://test.url',
-          notesForPrisoners: 'amended prisoner notes',
-          notesForStaff: 'ameneded staff notes',
-        },
-      )
+      expect(controller.appointmentService.amendVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, 1, {
+        bookingType: 'COURT',
+        prisoners: [
+          {
+            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+            prisonCode: formBody.prisonId,
+            appointments: [
+              {
+                type: 'VLB_COURT_PRE',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
+                endTime: timeFormat(appointmentsToCreate.startTime),
+              },
+              {
+                type: 'VLB_COURT_MAIN',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                endTime: timeFormat(appointmentsToCreate.endTime),
+              },
+              {
+                type: 'VLB_COURT_POST',
+                locationKey: locationsApiMock[1].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(appointmentsToCreate.endTime),
+                endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
+              },
+            ],
+          },
+        ],
+        courtCode: 'ABC',
+        courtHearingType: 'APPEAL',
+        videoLinkUrl: 'http://test.url',
+        notesForPrisoners: 'amended prisoner notes',
+        notesForStaff: 'ameneded staff notes',
+      })
 
       expect(res.redirect).toHaveBeenCalledWith(
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation`,
@@ -929,7 +924,7 @@ describe('Appointment Controller', () => {
           href: '#error',
         },
       ]
-      const flash = {
+      const flashMessage = {
         appointmentDefaults: {
           startTime: appointmentsToCreate.startTime,
           endTime: appointmentsToCreate.endTime,
@@ -938,19 +933,19 @@ describe('Appointment Controller', () => {
         },
         appointmentForm: formBody,
       }
-      req.flash = (key: string) => {
+      flash.mockImplementation(key => {
         if (key === 'postVLBDetails') {
-          return [flash]
+          return [flashMessage]
         }
         return []
-      }
+      })
 
       req.body.refererUrl = 'http://referer'
       req.errors = errors
 
-      await controller.postVideoLinkBooking()(req, res)
+      await controller.postVideoLinkBooking()(req, res, next)
 
-      expect(controller['appointmentService'].addVideoLinkBooking).not.toHaveBeenCalled()
+      expect(controller.appointmentService.addVideoLinkBooking).not.toHaveBeenCalled()
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments`)
     })
@@ -958,7 +953,7 @@ describe('Appointment Controller', () => {
 
   it('should display prepost appointment confirmation', async () => {
     const { prisonerNumber } = PrisonerMockDataA
-    const flash = {
+    const flashMessage = {
       appointmentDefaults: {
         startTime: appointmentsToCreate.startTime,
         endTime: appointmentsToCreate.endTime,
@@ -979,12 +974,13 @@ describe('Appointment Controller', () => {
       },
     }
 
-    req.flash = (key: string) => {
+    flash.mockImplementation(key => {
       if (key === 'prePostAppointmentDetails') {
-        return [flash]
+        return [flashMessage]
       }
       return []
-    }
+    })
+
     const appointmentData = {
       prisonName: 'Moorland (HMP & YOI)',
       appointmentType: 'Video Link - Court Hearing',
@@ -1006,13 +1002,13 @@ describe('Appointment Controller', () => {
       key: 'ABC',
     }))
 
-    await controller.displayPrePostAppointmentConfirmation()(req, res)
+    await controller.displayPrePostAppointmentConfirmation()(req, res, next)
 
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
-    expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
+    expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
       pageTitle: 'The video link has been booked',
       ...appointmentData,
@@ -1025,7 +1021,7 @@ describe('Appointment Controller', () => {
 
   it('should display prepost appointment confirmation when amending', async () => {
     const { prisonerNumber } = PrisonerMockDataA
-    const flash = {
+    const flashMessage = {
       appointmentId: 1,
       appointmentDefaults: {
         startTime: appointmentsToCreate.startTime,
@@ -1047,12 +1043,13 @@ describe('Appointment Controller', () => {
       },
     }
 
-    req.flash = (key: string) => {
+    flash.mockImplementation(key => {
       if (key === 'prePostAppointmentDetails') {
-        return [flash]
+        return [flashMessage]
       }
       return []
-    }
+    })
+
     const appointmentData = {
       appointmentType: 'Video Link - Court Hearing',
       appointmentTypeCode: 'VLB',
@@ -1074,13 +1071,13 @@ describe('Appointment Controller', () => {
       key: 'ABC',
     }))
 
-    await controller.displayPrePostAppointmentConfirmation()(req, res)
+    await controller.displayPrePostAppointmentConfirmation()(req, res, next)
 
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
       req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
+      activeCaseLoadId,
     )
-    expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
+    expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
       pageTitle: 'The video link has been updated',
       ...appointmentData,
@@ -1094,7 +1091,7 @@ describe('Appointment Controller', () => {
   it('should display movement slips', async () => {
     req.session.movementSlipData = { movement: 'data' }
 
-    await controller.displayPrisonerMovementSlips()(req, res)
+    await controller.displayPrisonerMovementSlips()(req, res, next)
 
     expect(req.session.movementSlipData).toBeUndefined()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/movementSlips', {
@@ -1106,7 +1103,7 @@ describe('Appointment Controller', () => {
     req.query.date = '01/01/2023'
     req.query.prisonerNumber = PrisonerMockDataA.prisonerNumber
 
-    await controller.getOffenderEvents()(req, res)
+    await controller.getOffenderEvents()(req, res, next)
 
     expect(res.render).toHaveBeenCalledWith('components/scheduledEvents/scheduledEvents.njk', {
       events: offenderEventsMock,
@@ -1126,7 +1123,7 @@ describe('Appointment Controller', () => {
       dpsLocationId: 'location-1',
     })
 
-    await controller.getLocationExistingEvents()(req, res)
+    await controller.getLocationExistingEvents()(req, res, next)
     expect(locationDetailsService.getLocation).toHaveBeenCalledWith(req.middleware.clientToken, req.query.locationId)
   })
 
@@ -1141,7 +1138,7 @@ describe('Appointment Controller', () => {
       dpsLocationId: 'location-1',
     })
 
-    await controller.getLocationExistingEvents()(req, res)
+    await controller.getLocationExistingEvents()(req, res, next)
 
     expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
       req.middleware.clientToken,
@@ -1159,10 +1156,10 @@ describe('Appointment Controller', () => {
   it('should get recurring end date', async () => {
     req.query.date = '02/01/2023'
     req.query.repeats = 'DAILY'
-    req.query.times = 5
+    req.query.times = '5'
     const endDate = formatDate(dateToIsoDate('06/01/2023'), 'full')
 
-    await controller.getRecurringEndDate()(req, res)
+    await controller.getRecurringEndDate()(req, res, next)
 
     expect(res.send).toHaveBeenCalledWith(endDate)
   })

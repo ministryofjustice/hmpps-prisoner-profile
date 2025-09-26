@@ -548,7 +548,7 @@ describe('Address Edit Controller', () => {
       it('selects options from the requestBody', async () => {
         req = {
           ...req,
-          flash: (key: string): any => {
+          flash: (key: string) => {
             return key === 'requestBody'
               ? [JSON.stringify({ townOrCity: 'TOWN1', county: 'COUNTY1', country: 'COUNTRY1' })]
               : []

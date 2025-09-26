@@ -11,3 +11,5 @@ export const aliasServiceMock = (): Interface<AliasService> => ({
   addNewAlias: jest.fn().mockImplementation(() => Promise.resolve(PseudonymResponseMock)),
   checkForDuplicateAlias: jest.fn().mockImplementation(() => Promise.resolve(false)),
 })
+
+export default { aliasServiceMock }

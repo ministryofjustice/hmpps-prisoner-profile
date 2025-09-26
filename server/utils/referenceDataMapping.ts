@@ -19,3 +19,5 @@ export const mapSexualOrientationText = (orientation: string): string => {
       return capitaliseFirstLetter(value)
   }
 }
+
+export default { mapSexualOrientationText }

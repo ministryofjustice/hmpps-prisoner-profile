@@ -8,14 +8,15 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { VisitsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import VisitsOverviewSummary from './interfaces/visitsService/VisitsOverviewSummary'
 
+export interface VisitorWithAge extends Visitor {
+  ageInYearsOr18IfNoDob: number
+}
+
 export class VisitsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  public sortVisitors(visitors: Visitor[]): (Visitor & { ageInYearsOr18IfNoDob: number })[] {
-    const sortFunc = (
-      left: Visitor & { ageInYearsOr18IfNoDob: number },
-      right: Visitor & { ageInYearsOr18IfNoDob: number },
-    ): number => {
+  public sortVisitors(visitors: Visitor[]): VisitorWithAge[] {
+    const sortFunc = (left: VisitorWithAge, right: VisitorWithAge): number => {
       if (right.leadVisitor && right.ageInYearsOr18IfNoDob >= 18) return 1
       if (left.leadVisitor && left.ageInYearsOr18IfNoDob >= 18) return -1
 

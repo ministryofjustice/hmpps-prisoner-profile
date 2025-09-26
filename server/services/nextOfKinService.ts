@@ -89,7 +89,7 @@ export default class NextOfKinService {
     return response
   }
 
-  private nextOfKinSorter(a: PersonalRelationshipsContact, b: PersonalRelationshipsContact): number {
+  nextOfKinSorter(a: PersonalRelationshipsContact, b: PersonalRelationshipsContact): number {
     const getPriority = (contact: PersonalRelationshipsContact): number => {
       if (contact.isNextOfKin && !contact.isEmergencyContact) return 1
       if (contact.isNextOfKin && contact.isEmergencyContact) return 2

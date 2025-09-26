@@ -6,7 +6,7 @@ import { getErrorStatus } from '../utils/errorHelpers'
 
 export default class AddressController {
   constructor(
-    private readonly addressService: AddressService,
+    readonly addressService: AddressService,
     private readonly auditService: AuditService,
   ) {}
 
