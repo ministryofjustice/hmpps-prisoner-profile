@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from 'express'
 import { getFrontendComponents } from '@ministryofjustice/hmpps-connect-dps-components'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
@@ -39,7 +38,6 @@ export default function imageRouter(services: Services): Router {
   )
   const getFeComponents = getFrontendComponents({
     logger,
-    authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, services.dataAccess.tokenStore),
     componentApiConfig: config.apis.componentApi,
     dpsUrl: config.serviceUrls.digitalPrison,
   })
