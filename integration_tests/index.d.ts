@@ -29,7 +29,6 @@ declare global {
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
         prisonId?: string
-        isAKeyWorker?: boolean
         complexityLevel?: ComplexityLevel
         failToLoadKeyWorker?: boolean
       }): Chainable<AUTWindow>

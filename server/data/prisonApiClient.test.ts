@@ -266,16 +266,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('hasStaffRole', () => {
-    it('Should return data from the API', async () => {
-      const staffNumber = 12345
-      const agencyId = 'Agency'
-      mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles/KW`, true)
-      const output = await prisonApiClient.hasStaffRole(staffNumber, agencyId, 'KW')
-      expect(output).toEqual(true)
-    })
-  })
-
   describe('getAgencyDetails', () => {
     it('Should return data from the API', async () => {
       const agencyId = 'Agency'
