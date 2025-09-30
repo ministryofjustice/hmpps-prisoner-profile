@@ -72,7 +72,7 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.read_photo] }),
     buildBreadcrumbsAndReferer(),
-    async (req, res, next) => {
+    async (req, res) => {
       const { prisonerNumber, miniBannerData, clientToken } = getCommonRequestData(req, res)
       const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { activeCaseLoadId } = res.locals.user as PrisonUser
