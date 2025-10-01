@@ -22,9 +22,9 @@
 {% endset %}
 {% macro photoInstructions() %}
   <div>
-    <p class="govuk-body">
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
       To capture a photo with a webcam:
-    </p>
+    </h2>
     <ul class="govuk-list govuk-list--bullet">
       <li>ask the person to stand in front of the board</li>
       <li>make sure the person is stood centrally within the webcam’s view and not to one side</li>
@@ -92,15 +92,22 @@
             id: "select-webcam",
             name: "select-webcam",
             label: {
-              text: "Select webcam"
+              html: "<h2 class='govuk-heading-s govuk-!-margin-bottom-0'>Check which webcam to use</h2>",
+              classes: "govuk-!-margin-bottom-2"
             },
+            hint: {
+              text: "Your computer has more than one webcam connected to it. You can change the webcam you use by selecting its name."
+            },
+            classes: "govuk-!-width-full",
             items: [],
             formGroup: {
+              classes: "govuk-!-margin-bottom-4",
               attributes: {
                 id: "webcam-select-form-group"
               }
             }
           }) }}
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3"/>
           {{ photoInstructions() }}
         </div>
       </div>
@@ -116,19 +123,6 @@
         <div class="hmpps-webcam-video-container">
           <div id="webcam-placeholder" class="hmpps-webcam-video-container__placeholder">
             <img src="/assets/images/imageEditing/no-camera.svg" role="presentation" alt=""/>
-          </div>
-          <div id="webcam-video">
-            <video id="webcam" autoplay playsinline></video>
-          </div>
-          <div class="hmpps-webcam-capture-photo-container__controls govuk-!-margin-bottom-0">
-            {{ govukButton({
-              id: "captureImageButton",
-              type: "button",
-              html: takePhotoHtml,
-              classes: "hmpps-button hmpps-webcam-capture-photo-container__controls__full-width govuk-button--secondary",
-              preventDoubleClick: true,
-              disabled: true
-            }) }}
           </div>
         </div>
       </div>
