@@ -116,12 +116,13 @@ export default class ImageController {
       submitImage: async (req: Request, res: Response) => {
         const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
         const file = req.file as MulterFile
+        const { photoType } = req.body
 
         try {
           await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
         } catch (error) {
           logger.error(error)
-          const { originalImgSrc, photoType } = req.body
+          const { originalImgSrc } = req.body
           const imgSrc = originalImgSrc || `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
           return res.render('pages/edit/photo/editPhoto', {
             miniBannerData,
@@ -150,10 +151,13 @@ export default class ImageController {
           })
           .catch(error => logger.error(error))
 
-        this.metricsService.trackPersonIntegrationUpdate({
+        this.metricsService.trackPersonIntegrationUpdate<{ photoType: string }>({
           prisonerNumber,
           fieldsUpdated: ['profile-image'],
           user: res.locals.user as PrisonUser,
+          additionalProperties: {
+            photoType,
+          },
         })
 
         return res.redirect(
