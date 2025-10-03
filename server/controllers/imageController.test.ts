@@ -287,6 +287,9 @@ describe('ImageController', () => {
         user: expect.anything(),
         fieldsUpdated: ['profile-image'],
         prisonerNumber: 'A1234BC',
+        additionalProperties: {
+          photoType: 'new',
+        },
       })
     })
 

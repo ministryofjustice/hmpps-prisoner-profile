@@ -118,4 +118,44 @@ describe('Metrics Service', () => {
       })
     })
   })
+
+  describe('trackPersonIntegrationUpdate', () => {
+    it('should call telemetry client', async () => {
+      metricsService.trackPersonIntegrationUpdate({
+        fieldsUpdated: ['field1', 'field2'],
+        prisonerNumber: 'A1234AA',
+        user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
+      })
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-person-integration-updated',
+        properties: {
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['field1', 'field2'],
+          username: 'USER1',
+          activeCaseLoad: 'MDI',
+        },
+      })
+    })
+
+    it('should call telemetry client with additional properties', async () => {
+      metricsService.trackPersonIntegrationUpdate({
+        fieldsUpdated: ['field1', 'field2'],
+        prisonerNumber: 'A1234AA',
+        user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
+        additionalProperties: { example: 'property' },
+      })
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-person-integration-updated',
+        properties: {
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['field1', 'field2'],
+          username: 'USER1',
+          activeCaseLoad: 'MDI',
+          example: 'property',
+        },
+      })
+    })
+  })
 })
