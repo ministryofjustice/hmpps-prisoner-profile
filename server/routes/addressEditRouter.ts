@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
-import { getRequest, postRequest } from './routerUtils'
 import AddressEditController from '../controllers/addressEditController'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { notEmptyValidator } from '../validators/general/notEmptyValidator'
@@ -13,8 +12,6 @@ import { editProfileEnabled } from '../utils/featureToggles'
 
 export default function addressEditRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const addressEditController = new AddressEditController(
@@ -30,8 +27,8 @@ export default function addressEditRouter(services: Services): Router {
     }),
   ]
 
-  get('/where-is-address', ...commonMiddleware, addressEditController.displayWhereIsTheAddress())
-  post(
+  router.get('/where-is-address', ...commonMiddleware, addressEditController.displayWhereIsTheAddress())
+  router.post(
     '/where-is-address',
     ...commonMiddleware,
     validationMiddleware(
@@ -41,8 +38,8 @@ export default function addressEditRouter(services: Services): Router {
     addressEditController.submitWhereIsTheAddress(),
   )
 
-  get('/find-uk-address', ...commonMiddleware, addressEditController.displayFindUkAddress())
-  post(
+  router.get('/find-uk-address', ...commonMiddleware, addressEditController.displayFindUkAddress())
+  router.post(
     '/find-uk-address',
     ...commonMiddleware,
     validationMiddleware(
@@ -59,10 +56,10 @@ export default function addressEditRouter(services: Services): Router {
     addressEditController.submitFindUkAddress(),
   )
 
-  get('/confirm-address', ...commonMiddleware, addressEditController.displayConfirmAddress())
+  router.get('/confirm-address', ...commonMiddleware, addressEditController.displayConfirmAddress())
 
-  get('/primary-or-postal-address', ...commonMiddleware, addressEditController.displayPrimaryOrPostalAddress())
-  post(
+  router.get('/primary-or-postal-address', ...commonMiddleware, addressEditController.displayPrimaryOrPostalAddress())
+  router.post(
     '/primary-or-postal-address',
     ...commonMiddleware,
     validationMiddleware(
@@ -78,7 +75,7 @@ export default function addressEditRouter(services: Services): Router {
     addressEditController.submitPrimaryOrPostalAddress(),
   )
 
-  get(
+  router.get(
     '/add-uk-address',
     ...commonMiddleware,
     addressEditController.displayManualEditAddress({
@@ -88,7 +85,7 @@ export default function addressEditRouter(services: Services): Router {
       auditPage: Page.EditAddressUkManual,
     }),
   )
-  post(
+  router.post(
     '/add-uk-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
@@ -98,7 +95,7 @@ export default function addressEditRouter(services: Services): Router {
     }),
   )
 
-  get(
+  router.get(
     '/add-overseas-address',
     ...commonMiddleware,
     addressEditController.displayManualEditAddress({
@@ -108,7 +105,7 @@ export default function addressEditRouter(services: Services): Router {
       auditPage: Page.EditAddressOverseasManual,
     }),
   )
-  post(
+  router.post(
     '/add-overseas-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: false })], { redirectBackOnError: true }),
@@ -118,7 +115,7 @@ export default function addressEditRouter(services: Services): Router {
     }),
   )
 
-  get(
+  router.get(
     '/add-uk-no-fixed-address',
     ...commonMiddleware,
     addressEditController.displayManualEditAddress({
@@ -128,7 +125,7 @@ export default function addressEditRouter(services: Services): Router {
       auditPage: Page.EditAddressNoFixedAddressManual,
     }),
   )
-  post(
+  router.post(
     '/add-uk-no-fixed-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),

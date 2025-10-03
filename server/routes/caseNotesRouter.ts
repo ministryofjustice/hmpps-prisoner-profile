@@ -6,20 +6,17 @@ import validationMiddleware from '../middleware/validationMiddleware'
 import { CaseNoteValidator } from '../validators/caseNoteValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
-import { getRequest, postRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { UpdateCaseNoteValidator } from '../validators/updateCaseNoteValidator'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
-  const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
   const caseNotesController = new CaseNotesController(services.caseNotesService, services.auditService)
 
-  get(
+  router.get(
     `${basePath}/case-notes`,
     auditPageAccessAttempt({ services, page: Page.CaseNotes }),
     getPrisonerData(services),
@@ -27,7 +24,7 @@ export default function caseNotesRouter(services: Services): Router {
     caseNotesController.displayCaseNotes(),
   )
 
-  get(
+  router.get(
     `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.AddCaseNote }),
     getPrisonerData(services),
@@ -35,7 +32,7 @@ export default function caseNotesRouter(services: Services): Router {
     caseNotesController.displayAddCaseNote(),
   )
 
-  post(
+  router.post(
     `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
     getPrisonerData(services),
@@ -44,7 +41,7 @@ export default function caseNotesRouter(services: Services): Router {
     caseNotesController.post(),
   )
 
-  get(
+  router.get(
     `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.UpdateCaseNote }),
     getPrisonerData(services),
@@ -52,7 +49,7 @@ export default function caseNotesRouter(services: Services): Router {
     caseNotesController.displayUpdateCaseNote(),
   )
 
-  post(
+  router.post(
     `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.PostUpdateCaseNote }),
     getPrisonerData(services),

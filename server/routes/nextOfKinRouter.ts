@@ -3,7 +3,6 @@ import {
   PersonalRelationshipsPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import NextOfKinController from '../controllers/nextOfKinController'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -17,8 +16,6 @@ import { editProfileEnabled } from '../utils/featureToggles'
 
 export default function nextOfKinRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const nextOfKinController = new NextOfKinController(
@@ -35,8 +32,12 @@ export default function nextOfKinRouter(services: Services): Router {
     }),
   ]
 
-  get('/next-of-kin-emergency-contacts', ...commonMiddleware, nextOfKinController.displayNextOfKinEmergencyContact())
-  post(
+  router.get(
+    '/next-of-kin-emergency-contacts',
+    ...commonMiddleware,
+    nextOfKinController.displayNextOfKinEmergencyContact(),
+  )
+  router.post(
     '/next-of-kin-emergency-contacts',
     ...commonMiddleware,
     validationMiddleware([nextOfKinValidator], {
@@ -45,8 +46,8 @@ export default function nextOfKinRouter(services: Services): Router {
     nextOfKinController.submitNextOfKinEmergencyContact(),
   )
 
-  get('/where-is-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayWhereIsTheAddress())
-  post(
+  router.get('/where-is-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayWhereIsTheAddress())
+  router.post(
     '/where-is-next-of-kin-address',
     ...commonMiddleware,
     validationMiddleware(
@@ -56,8 +57,8 @@ export default function nextOfKinRouter(services: Services): Router {
     nextOfKinController.submitWhereIsTheAddress(),
   )
 
-  get('/find-uk-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayFindUkAddress())
-  post(
+  router.get('/find-uk-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayFindUkAddress())
+  router.post(
     '/find-uk-next-of-kin-address',
     ...commonMiddleware,
     validationMiddleware(
@@ -74,7 +75,7 @@ export default function nextOfKinRouter(services: Services): Router {
     nextOfKinController.submitFindUkAddress(),
   )
 
-  get(
+  router.get(
     '/add-uk-next-of-kin-no-fixed-address',
     ...commonMiddleware,
     nextOfKinController.displayManualEditAddress({
@@ -84,7 +85,7 @@ export default function nextOfKinRouter(services: Services): Router {
       auditPage: Page.EditNextOfKinAddressNoFixedAddressManual,
     }),
   )
-  post(
+  router.post(
     '/add-uk-next-of-kin-no-fixed-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
@@ -94,7 +95,7 @@ export default function nextOfKinRouter(services: Services): Router {
     }),
   )
 
-  get(
+  router.get(
     '/add-uk-next-of-kin-address',
     ...commonMiddleware,
     nextOfKinController.displayManualEditAddress({
@@ -104,7 +105,7 @@ export default function nextOfKinRouter(services: Services): Router {
       auditPage: Page.EditNextOfKinAddressUkManual,
     }),
   )
-  post(
+  router.post(
     '/add-uk-next-of-kin-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: true })], { redirectBackOnError: true }),
@@ -114,7 +115,7 @@ export default function nextOfKinRouter(services: Services): Router {
     }),
   )
 
-  get(
+  router.get(
     '/add-next-of-kin-overseas-address',
     ...commonMiddleware,
     nextOfKinController.displayManualEditAddress({
@@ -124,7 +125,7 @@ export default function nextOfKinRouter(services: Services): Router {
       auditPage: Page.EditNextOfKinAddressOverseasManual,
     }),
   )
-  post(
+  router.post(
     '/add-next-of-kin-overseas-address',
     ...commonMiddleware,
     validationMiddleware([addressValidator({ ukAddress: false })], { redirectBackOnError: true }),
@@ -134,8 +135,8 @@ export default function nextOfKinRouter(services: Services): Router {
     }),
   )
 
-  get('/confirm-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayConfirmAddress())
-  post('/confirm-next-of-kin-address', ...commonMiddleware, nextOfKinController.submitConfirmAddress())
+  router.get('/confirm-next-of-kin-address', ...commonMiddleware, nextOfKinController.displayConfirmAddress())
+  router.post('/confirm-next-of-kin-address', ...commonMiddleware, nextOfKinController.submitConfirmAddress())
 
   return router
 }

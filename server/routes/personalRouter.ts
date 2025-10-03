@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest } from './routerUtils'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
@@ -11,7 +10,6 @@ export const personalPageBasePath = '/prisoner/:prisonerNumber/personal'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
   const { prisonPermissionsService } = services
 
   const personalController = new PersonalController(
@@ -20,7 +18,7 @@ export default function personalRouter(services: Services): Router {
     services.auditService,
   )
 
-  get(
+  router.get(
     personalPageBasePath,
     auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),

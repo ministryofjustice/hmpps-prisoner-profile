@@ -1,6 +1,5 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import AliasController from '../controllers/aliasController'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -13,8 +12,6 @@ import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const ethnicGroups = ['white', 'mixed', 'asian', 'black', 'other']
@@ -32,11 +29,11 @@ export default function aliasRouter(services: Services): Router {
     }),
   ]
 
-  get('/change-name', ...commonMiddleware, aliasController.displayChangeNamePurpose())
-  post('/change-name', ...commonMiddleware, aliasController.submitChangeNamePurpose())
+  router.get('/change-name', ...commonMiddleware, aliasController.displayChangeNamePurpose())
+  router.post('/change-name', ...commonMiddleware, aliasController.submitChangeNamePurpose())
 
-  get('/date-of-birth', ...commonMiddleware, aliasController.displayChangeDateOfBirth())
-  post(
+  router.get('/date-of-birth', ...commonMiddleware, aliasController.displayChangeDateOfBirth())
+  router.post(
     '/date-of-birth',
     ...commonMiddleware,
     validationMiddleware(
@@ -54,8 +51,8 @@ export default function aliasRouter(services: Services): Router {
     aliasController.submitChangeDateOfBirth(),
   )
 
-  get('/ethnic-group', ...commonMiddleware, aliasController.displayChangeEthnicGroup())
-  post(
+  router.get('/ethnic-group', ...commonMiddleware, aliasController.displayChangeEthnicGroup())
+  router.post(
     '/ethnic-group',
     ...commonMiddleware,
     validationMiddleware(
@@ -66,37 +63,37 @@ export default function aliasRouter(services: Services): Router {
     ),
     aliasController.submitChangeEthnicGroup(),
   )
-  get(
+  router.get(
     `/ethnic-group/:group`,
     parameterGuard('group', ethnicGroups),
     ...commonMiddleware,
     aliasController.displayChangeEthnicBackground(),
   )
-  post(
+  router.post(
     `/ethnic-group/:group`,
     parameterGuard('group', ethnicGroups),
     ...commonMiddleware,
     aliasController.submitChangeEthnicBackground(),
   )
 
-  get('/enter-corrected-name', ...commonMiddleware, aliasController.displayChangeNameCorrection())
-  post(
+  router.get('/enter-corrected-name', ...commonMiddleware, aliasController.displayChangeNameCorrection())
+  router.post(
     '/enter-corrected-name',
     ...commonMiddleware,
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameCorrection(),
   )
 
-  get('/enter-new-name', ...commonMiddleware, aliasController.displayChangeNameLegal())
-  post(
+  router.get('/enter-new-name', ...commonMiddleware, aliasController.displayChangeNameLegal())
+  router.post(
     '/enter-new-name',
     ...commonMiddleware,
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameLegal(),
   )
 
-  get('/enter-alias-details', ...commonMiddleware, aliasController.displayAddNewAlias())
-  post(
+  router.get('/enter-alias-details', ...commonMiddleware, aliasController.displayAddNewAlias())
+  router.post(
     '/enter-alias-details',
     ...commonMiddleware,
     validationMiddleware(

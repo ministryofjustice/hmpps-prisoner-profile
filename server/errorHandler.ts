@@ -13,7 +13,7 @@ export default function createErrorHandler(production: boolean) {
     error: HTTPError | NotFoundError | ServerError | RoleError | SanitisedError,
     req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ): void => {
     if (error instanceof NotFoundError && error.hmppsStatus !== HmppsStatusCode.NOT_FOUND) {
       logger.warn(`Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`, error.message)

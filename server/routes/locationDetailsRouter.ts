@@ -7,12 +7,10 @@ import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
-import { getRequest } from './routerUtils'
 import LocationDetailsController from '../controllers/locationDetailsController'
 
 export default function locationDetailsRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
@@ -21,7 +19,7 @@ export default function locationDetailsRouter(services: Services): Router {
     services.auditService,
   )
 
-  get(
+  router.get(
     `${basePath}/location-details`,
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services, { minimal: true }),
@@ -31,7 +29,7 @@ export default function locationDetailsRouter(services: Services): Router {
         PrisonerBaseLocationPermission.read_location_history,
       ],
     }),
-    async (req, res, next) => {
+    async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerLocationDetailsController.displayLocationDetails(req, res, prisonerData)
     },

@@ -1,6 +1,5 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
 import IdentityNumbersController from '../controllers/identityNumbersController'
@@ -14,8 +13,6 @@ import { editProfileEnabled } from '../utils/featureToggles'
 
 export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const identityNumberRoutes = Object.values(IdentifierMappings).map(mapping => `/${mapping.editPageUrl}/:compositeId`)
@@ -33,8 +30,8 @@ export default function identityNumbersRouter(services: Services): Router {
   ]
 
   // Add justice ID numbers
-  get('/justice-id-numbers', ...commonMiddleware, identityNumbersController.justiceIdNumbers().edit)
-  post(
+  router.get('/justice-id-numbers', ...commonMiddleware, identityNumbersController.justiceIdNumbers().edit)
+  router.post(
     '/justice-id-numbers',
     ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
@@ -44,8 +41,8 @@ export default function identityNumbersRouter(services: Services): Router {
   )
 
   // Add personal ID numbers
-  get('/personal-id-numbers', ...commonMiddleware, identityNumbersController.personalIdNumbers().edit)
-  post(
+  router.get('/personal-id-numbers', ...commonMiddleware, identityNumbersController.personalIdNumbers().edit)
+  router.post(
     '/personal-id-numbers',
     ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
@@ -55,8 +52,8 @@ export default function identityNumbersRouter(services: Services): Router {
   )
 
   // Add Home Office ID numbers
-  get('/home-office-id-numbers', ...commonMiddleware, identityNumbersController.homeOfficeIdNumbers().edit)
-  post(
+  router.get('/home-office-id-numbers', ...commonMiddleware, identityNumbersController.homeOfficeIdNumbers().edit)
+  router.post(
     '/home-office-id-numbers',
     ...commonMiddleware,
     validationMiddleware([addIdentityNumbersValidator], {
@@ -66,8 +63,8 @@ export default function identityNumbersRouter(services: Services): Router {
   )
 
   // Edit individual existing ID numbers
-  get(identityNumberRoutes, ...commonMiddleware, identityNumbersController.idNumber().edit)
-  post(
+  router.get(identityNumberRoutes, ...commonMiddleware, identityNumbersController.idNumber().edit)
+  router.post(
     identityNumberRoutes,
     ...commonMiddleware,
     validationMiddleware([editIdentityNumberValidator], {

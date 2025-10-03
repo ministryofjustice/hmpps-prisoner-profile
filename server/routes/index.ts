@@ -28,7 +28,6 @@ import { ApiAction, Page } from '../services/auditService'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import BeliefHistoryController from '../controllers/beliefHistoryController'
 import locationDetailsRouter from './locationDetailsRouter'
-import { getRequest } from './routerUtils'
 import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
@@ -44,7 +43,6 @@ export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
 export default function routes(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
 
   router.use(basePath, prisonerNumberGuard())
@@ -83,7 +81,7 @@ export default function routes(services: Services): Router {
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
   const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
 
-  get(
+  router.get(
     `/api${basePath}/image`,
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
@@ -91,35 +89,35 @@ export default function routes(services: Services): Router {
     services.commonApiRoutes.prisonerImage,
   )
 
-  get(
+  router.get(
     '/api/image/:imageId',
     auditPageAccessAttempt({ services, page: ApiAction.Image }),
     services.commonApiRoutes.image,
   )
 
-  get(
+  router.get(
     '/api/distinguishing-mark-image/:imageId',
     auditPageAccessAttempt({ services, page: ApiAction.Image }),
     services.commonApiRoutes.distinguishingMarkImage,
   )
 
-  get(
+  router.get(
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       return overviewController.displayOverview(req, res)
     },
   )
 
-  get(
+  router.get(
     `${basePath}/work-and-skills`,
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     retrieveCuriousInPrisonCourses(services.curiousService),
-    async (req, res, next) => {
+    async (req, res) => {
       const { prisonerPermissions } = res.locals
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -186,12 +184,12 @@ export default function routes(services: Services): Router {
     },
   )
 
-  get(
+  router.get(
     `${basePath}/offences`,
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
@@ -230,34 +228,34 @@ export default function routes(services: Services): Router {
   router.use(editRouter(services))
   router.use(imageRouter(services))
 
-  get(
+  router.get(
     `${basePath}/schedule`,
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
     },
   )
 
-  get(
+  router.get(
     `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       return careNeedsController.displayXrayBodyScans(req, res)
     },
   )
 
-  get(
+  router.get(
     `${basePath}/location-history`,
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerBaseLocationPermission.read_location_history],
     }),
-    async (req, res, next) => {
+    async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(
         services.prisonerLocationHistoryService,
@@ -273,31 +271,31 @@ export default function routes(services: Services): Router {
     moneyRouter(services),
   )
 
-  get(
+  router.get(
     `${basePath}/religion-belief-history`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
     },
   )
 
-  get(
+  router.get(
     `${basePath}/past-care-needs`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res, next) => {
+    async (req, res) => {
       return careNeedsController.displayPastCareNeeds(req, res)
     },
   )
 
-  get('/', (req, res, next) => {
+  router.get('/', (_req, res) => {
     res.redirect(`${config.serviceUrls.digitalPrison}`)
   })
 
-  get('/save-backlink', saveBackLink())
+  router.get('/save-backlink', saveBackLink())
 
   return router
 }
