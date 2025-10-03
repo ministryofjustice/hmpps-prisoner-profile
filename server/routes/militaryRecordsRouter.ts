@@ -1,6 +1,5 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import MilitaryRecordsController from '../controllers/militaryRecordsController'
 import { militaryServiceInformationValidator } from '../validators/personal/militaryServiceInformationValidator'
@@ -11,8 +10,6 @@ import { militaryHistoryEnabled } from '../utils/featureToggles'
 
 export default function militaryRecordsRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const militaryRecordsController = new MilitaryRecordsController(
@@ -28,12 +25,12 @@ export default function militaryRecordsRouter(services: Services): Router {
   ]
 
   // Create Military Service Information
-  get(
+  router.get(
     '/military-service-information',
     ...commonMiddleware,
     militaryRecordsController.displayMilitaryServiceInformation(),
   )
-  post(
+  router.post(
     '/military-service-information',
     ...commonMiddleware,
     validationMiddleware([militaryServiceInformationValidator], {
@@ -43,12 +40,12 @@ export default function militaryRecordsRouter(services: Services): Router {
   )
 
   // Update Military Service Information
-  get(
+  router.get(
     '/military-service-information/:militarySeq',
     ...commonMiddleware,
     militaryRecordsController.displayMilitaryServiceInformation(),
   )
-  post(
+  router.post(
     '/military-service-information/:militarySeq',
     ...commonMiddleware,
     validationMiddleware([militaryServiceInformationValidator], {
@@ -58,16 +55,28 @@ export default function militaryRecordsRouter(services: Services): Router {
   )
 
   // Update Conflicts
-  get('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.displayConflicts())
-  post('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.postConflicts())
+  router.get('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.displayConflicts())
+  router.post('/conflicts/:militarySeq', ...commonMiddleware, militaryRecordsController.postConflicts())
 
   // Update Disciplinary Action
-  get('/disciplinary-action/:militarySeq', ...commonMiddleware, militaryRecordsController.displayDisciplinaryAction())
-  post('/disciplinary-action/:militarySeq', ...commonMiddleware, militaryRecordsController.postDisciplinaryAction())
+  router.get(
+    '/disciplinary-action/:militarySeq',
+    ...commonMiddleware,
+    militaryRecordsController.displayDisciplinaryAction(),
+  )
+  router.post(
+    '/disciplinary-action/:militarySeq',
+    ...commonMiddleware,
+    militaryRecordsController.postDisciplinaryAction(),
+  )
 
   // Update Discharge Details
-  get('/discharge-details/:militarySeq', ...commonMiddleware, militaryRecordsController.displayDischargeDetails())
-  post(
+  router.get(
+    '/discharge-details/:militarySeq',
+    ...commonMiddleware,
+    militaryRecordsController.displayDischargeDetails(),
+  )
+  router.post(
     '/discharge-details/:militarySeq',
     ...commonMiddleware,
     validationMiddleware([dischargeDetailsValidator], {

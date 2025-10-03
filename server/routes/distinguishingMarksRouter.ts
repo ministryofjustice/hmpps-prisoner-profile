@@ -1,7 +1,6 @@
 import multer from 'multer'
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import DistinguishingMarksController from '../controllers/distinguishingMarksController'
 import { Services } from '../services'
 import validationMiddleware from '../middleware/validationMiddleware'
@@ -46,8 +45,6 @@ export function distinguishingMarksMulterExceptions(path: string): boolean {
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const commonMiddleware: RequestHandler[] = [
@@ -68,8 +65,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add distinguishing mark
-  get('/', ...commonMiddleware, distinguishingMarksController.newDistinguishingMark)
-  post(
+  router.get('/', ...commonMiddleware, distinguishingMarksController.newDistinguishingMark)
+  router.post(
     '/',
     ...commonMiddleware,
     validationMiddleware([newDistinguishingMarkValidator], {
@@ -79,14 +76,14 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add distinguishing mark with detail
-  get(
+  router.get(
     `/:bodyPart/detail`,
     parameterGuard('bodyPart', validBodyParts),
     ...commonMiddleware,
     setUpCsrf(),
     distinguishingMarksController.newDistinguishingMarkWithDetail,
   )
-  post(
+  router.post(
     `/:bodyPart/detail`,
     parameterGuard('bodyPart', validBodyParts),
     ...commonMiddleware,
@@ -100,12 +97,12 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Edit distinguishing mark
-  get('/profile-redirect', ...commonMiddleware, distinguishingMarksController.returnToPrisonerProfileAfterUpdate)
-  get('/:markId', ...commonMiddleware, distinguishingMarksController.changeDistinguishingMark)
+  router.get('/profile-redirect', ...commonMiddleware, distinguishingMarksController.returnToPrisonerProfileAfterUpdate)
+  router.get('/:markId', ...commonMiddleware, distinguishingMarksController.changeDistinguishingMark)
 
   // Change body part
-  get('/:markId/body-part', ...commonMiddleware, distinguishingMarksController.changeBodyPart)
-  post(
+  router.get('/:markId/body-part', ...commonMiddleware, distinguishingMarksController.changeBodyPart)
+  router.post(
     '/:markId/body-part',
     ...commonMiddleware,
     validationMiddleware([newDistinguishingMarkValidator], {
@@ -115,8 +112,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change location
-  get('/:markId/location', ...commonMiddleware, distinguishingMarksController.changeLocation)
-  post(
+  router.get('/:markId/location', ...commonMiddleware, distinguishingMarksController.changeLocation)
+  router.post(
     '/:markId/location',
     ...commonMiddleware,
     validationMiddleware([updateLocationValidator], {
@@ -126,8 +123,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change description
-  get('/:markId/description', ...commonMiddleware, distinguishingMarksController.changeDescription)
-  post(
+  router.get('/:markId/description', ...commonMiddleware, distinguishingMarksController.changeDescription)
+  router.post(
     '/:markId/description',
     ...commonMiddleware,
     validationMiddleware([updateDescriptionValidator], {
@@ -137,8 +134,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change photo
-  get('/:markId/photo/:photoId', ...commonMiddleware, distinguishingMarksController.changePhoto)
-  post(
+  router.get('/:markId/photo/:photoId', ...commonMiddleware, distinguishingMarksController.changePhoto)
+  router.post(
     '/:markId/photo/:photoId',
     ...commonMiddleware,
     validationMiddleware([updatePhotoValidator], {
@@ -149,8 +146,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Add photo
-  get('/:markId/photo', ...commonMiddleware, distinguishingMarksController.addNewPhoto)
-  post(
+  router.get('/:markId/photo', ...commonMiddleware, distinguishingMarksController.addNewPhoto)
+  router.post(
     '/:markId/photo',
     ...commonMiddleware,
     validationMiddleware([updatePhotoValidator], {
@@ -161,7 +158,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // View all images for a mark
-  get(
+  router.get(
     '/:markId/all-photos',
     featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {

@@ -7,7 +7,6 @@ import {
   PrisonerPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
@@ -51,8 +50,6 @@ import { parameterGuard } from '../middleware/parameterGuard'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const personalController = new PersonalController(
@@ -108,7 +105,7 @@ export default function editRouter(services: Services): Router {
   }) => {
     const routePath = `${personalPageBasePath}/${path}`
 
-    get(
+    router.get(
       routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
@@ -128,7 +125,7 @@ export default function editRouter(services: Services): Router {
         validationOptions.redirectTo = `personal/${path}`
       }
 
-      post(
+      router.post(
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
@@ -138,7 +135,7 @@ export default function editRouter(services: Services): Router {
         submit.method,
       )
     } else {
-      post(
+      router.post(
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),

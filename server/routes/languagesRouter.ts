@@ -3,7 +3,6 @@ import {
   PersonCommunicationNeedsPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { getRequest, postRequest } from './routerUtils'
 import { Services } from '../services'
 import LanguagesController from '../controllers/languagesController'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
@@ -14,8 +13,6 @@ import { otherLanguageValidator } from '../validators/personal/otherLanguageVali
 
 export default function languagesRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
-  const get = getRequest(router)
-  const post = postRequest(router)
   const { prisonPermissionsService } = services
 
   const languagesController = new LanguagesController(services.languagesService, services.auditService)
@@ -26,24 +23,24 @@ export default function languagesRouter(services: Services): Router {
     }),
   ]
 
-  get('/main-language', ...commonMiddleware, languagesController.displayUpdateMainLanguage())
-  post(
+  router.get('/main-language', ...commonMiddleware, languagesController.displayUpdateMainLanguage())
+  router.post(
     '/main-language',
     ...commonMiddleware,
     validationMiddleware([mainLanguageValidator], { redirectBackOnError: true }),
     languagesController.submitUpdateMainLanguage(),
   )
 
-  get('/other-languages', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
-  post(
+  router.get('/other-languages', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
+  router.post(
     '/other-languages',
     ...commonMiddleware,
     validationMiddleware([otherLanguageValidator], { redirectBackOnError: true }),
     languagesController.submitUpdateOtherLanguages(),
   )
 
-  get('/other-languages/:languageCode', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
-  post(
+  router.get('/other-languages/:languageCode', ...commonMiddleware, languagesController.displayUpdateOtherLanguages())
+  router.post(
     '/other-languages/:languageCode',
     ...commonMiddleware,
     validationMiddleware([otherLanguageValidator], { redirectBackOnError: true }),

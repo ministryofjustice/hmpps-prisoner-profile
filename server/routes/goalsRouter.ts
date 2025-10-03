@@ -5,22 +5,20 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import GoalsController from '../controllers/goalsController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
-import { getRequest } from './routerUtils'
 
 export default function goalsRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
   const goalsController = new GoalsController(services.workAndSkillsPageService, services.auditService)
 
-  get(
+  router.get(
     `${basePath}/vc2-goals`,
     auditPageAccessAttempt({ services, page: Page.VirtualCampusGoals }),
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    (req, res, next) => goalsController.displayGoals(req, res),
+    (req, res) => goalsController.displayGoals(req, res),
   )
 
   return router

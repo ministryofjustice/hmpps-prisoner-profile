@@ -10,13 +10,10 @@ import config from '../config'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
-import { getRequest, postRequest } from './routerUtils'
 import NotFoundError from '../utils/notFoundError'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
-  const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
 
@@ -36,7 +33,7 @@ export default function appointmentRouter(services: Services): Router {
     }
   }
 
-  const isEditAppointmentEnabled = async (req: Request, res: Response, next: NextFunction) => {
+  const isEditAppointmentEnabled = async (req: Request, _res: Response, next: NextFunction) => {
     const { appointmentId, prisonerNumber } = req.params
     const { clientToken } = req.middleware
     const appointment = await services.appointmentService.getAppointment(clientToken, +appointmentId)
@@ -50,7 +47,7 @@ export default function appointmentRouter(services: Services): Router {
     return next(new NotFoundError())
   }
 
-  get(
+  router.get(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
@@ -61,14 +58,14 @@ export default function appointmentRouter(services: Services): Router {
     appointmentController.displayAddAppointment(),
   )
 
-  post(
+  router.post(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
     validationMiddleware([AppointmentValidator]),
     appointmentController.post(),
   )
 
-  get(
+  router.get(
     `${basePath}/edit-appointment/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.EditAppointment }),
     isEditAppointmentEnabled,
@@ -79,14 +76,14 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayAddAppointment(),
   )
-  post(
+  router.post(
     `${basePath}/edit-appointment/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.PostEditAppointment }),
     isEditAppointmentEnabled,
     validationMiddleware([AppointmentValidator]),
     appointmentController.post(),
   )
-  get(
+  router.get(
     `${basePath}/appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
@@ -96,7 +93,7 @@ export default function appointmentRouter(services: Services): Router {
     appointmentController.displayAppointmentConfirmation(),
   )
 
-  get(
+  router.get(
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
@@ -105,13 +102,13 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayPrePostAppointments(),
   )
-  post(
+  router.post(
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
     validationMiddleware([PrePostAppointmentValidator]),
     appointmentController.postVideoLinkBooking(),
   )
-  get(
+  router.get(
     `${basePath}/edit-prepost-appointments/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.EditPrePostAppointments }),
     isEditAppointmentEnabled,
@@ -121,14 +118,14 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayPrePostAppointments(),
   )
-  post(
+  router.post(
     `${basePath}/edit-prepost-appointments/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.PostEditPrePostAppointments }),
     isEditAppointmentEnabled,
     validationMiddleware([PrePostAppointmentValidator]),
     appointmentController.postVideoLinkBooking(),
   )
-  get(
+  router.get(
     `${basePath}/prepost-appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
@@ -138,7 +135,7 @@ export default function appointmentRouter(services: Services): Router {
     appointmentController.displayPrePostAppointmentConfirmation(),
   )
 
-  get(
+  router.get(
     `${basePath}/movement-slips`,
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
@@ -151,7 +148,7 @@ export default function appointmentRouter(services: Services): Router {
   /**
    * API Routes - called from JavaScript on page
    */
-  get(
+  router.get(
     '/api/get-offender-events',
     auditPageAccessAttempt({ services, page: ApiAction.OffenderEvents }),
     isCreateIndividualAppointmentRolledOut,
@@ -162,14 +159,14 @@ export default function appointmentRouter(services: Services): Router {
     appointmentController.getOffenderEvents(),
   )
 
-  get(
+  router.get(
     '/api/get-location-events',
     auditPageAccessAttempt({ services, page: ApiAction.LocationEvents }),
     isCreateIndividualAppointmentRolledOut,
     appointmentController.getLocationExistingEvents(),
   )
 
-  get('/api/get-recurring-end-date', appointmentController.getRecurringEndDate())
+  router.get('/api/get-recurring-end-date', appointmentController.getRecurringEndDate())
 
   return router
 }

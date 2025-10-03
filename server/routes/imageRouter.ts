@@ -5,7 +5,6 @@ import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
-import { getRequest, postRequest } from './routerUtils'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -26,8 +25,6 @@ import { Role } from '../data/enums/role'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
-  const get = getRequest(router)
-  const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber'
   const { prisonPermissionsService } = services
   const imageController = new ImageController(
@@ -66,7 +63,7 @@ export default function imageRouter(services: Services): Router {
     }
   }
 
-  get(
+  router.get(
     `${basePath}/image`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
@@ -104,7 +101,7 @@ export default function imageRouter(services: Services): Router {
     },
   )
 
-  get(
+  router.get(
     `${basePath}/image/all`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
@@ -145,7 +142,7 @@ export default function imageRouter(services: Services): Router {
     },
   )
 
-  get(
+  router.get(
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
     getPrisonerData(services),
@@ -155,7 +152,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().newImage.get,
   )
 
-  post(
+  router.post(
     `${basePath}/image/new`,
     auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
     getPrisonerData(services),
@@ -170,7 +167,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().newImage.post,
   )
 
-  get(
+  router.get(
     `${basePath}/image/webcam`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
     getPrisonerData(services),
@@ -181,7 +178,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().webcamImage.get,
   )
 
-  post(
+  router.post(
     `${basePath}/image/webcam`,
     auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
     getPrisonerData(services),
@@ -193,7 +190,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().webcamImage.post,
   )
 
-  post(
+  router.post(
     `${basePath}/image/submit`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
@@ -204,7 +201,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().submitImage,
   )
 
-  get(
+  router.get(
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.EditProfileImageWithheld }),
     getPrisonerData(services),
@@ -214,7 +211,7 @@ export default function imageRouter(services: Services): Router {
     imageController.updateProfileImage().newWithheldImage.get,
   )
 
-  post(
+  router.post(
     `${basePath}/image/new-withheld`,
     auditPageAccessAttempt({ services, page: Page.PostEditProfileImageWithheld }),
     getPrisonerData(services),
