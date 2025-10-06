@@ -1,6 +1,4 @@
 generic-service:
-  replicaCount: 4
-
   ingress:
     host: prisoner.digital.prison.service.justice.gov.uk
     modsecurity_enabled: false
