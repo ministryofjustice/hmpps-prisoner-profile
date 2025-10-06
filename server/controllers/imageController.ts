@@ -119,7 +119,11 @@ export default class ImageController {
         const { photoType } = req.body
 
         try {
-          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(
+            prisonerNumber,
+            file,
+            photoType === 'webcam' ? 'DPS_WEBCAM' : 'GEN',
+          )
         } catch (error) {
           logger.error(error)
           const { originalImgSrc } = req.body
@@ -200,7 +204,7 @@ export default class ImageController {
           }
 
           try {
-            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file, 'GEN')
           } catch (error) {
             logger.error(error)
             req.flash('errors', [{ html: photoErrorHtml(`/prisoner/${prisonerNumber}/image/new`) }])
