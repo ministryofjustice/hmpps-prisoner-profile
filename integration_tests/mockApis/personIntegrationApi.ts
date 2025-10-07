@@ -1,4 +1,10 @@
-import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
+import {
+  loadFileAsBase64,
+  stubGetWithBody,
+  stubPatchWithResponse,
+  stubPostWithResponse,
+  stubPutWithResponse,
+} from './utils'
 import {
   AddressResponseDto,
   ContactsResponseDto,
@@ -109,7 +115,7 @@ export default {
         headers: {
           'Content-Type': 'image/jpeg',
         },
-        bodyFileName: placeHolderImagePath,
+        base64Body: loadFileAsBase64(placeHolderImagePath),
       },
     })
   },

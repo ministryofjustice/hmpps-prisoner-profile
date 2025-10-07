@@ -87,7 +87,7 @@ import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
 import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
 import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
-import { stubGetWithBody } from './utils'
+import { loadFileAsBase64, stubGetWithBody } from './utils'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -219,7 +219,7 @@ export default {
         headers: {
           'Content-Type': 'image/png',
         },
-        bodyFileName: placeHolderImagePath,
+        base64Body: loadFileAsBase64(placeHolderImagePath),
       },
     })
   },
@@ -347,7 +347,7 @@ export default {
         headers: {
           'Content-Type': 'image/png',
         },
-        bodyFileName: placeHolderImagePath,
+        base64Body: loadFileAsBase64(placeHolderImagePath),
       },
     })
   },
