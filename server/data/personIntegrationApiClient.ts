@@ -11,6 +11,7 @@ import {
   CorePersonRecordReferenceDataCodeDto,
   CorePersonRecordReferenceDataDomain,
   DistinguishingMarkRequest,
+  ImageSource,
   MilitaryRecord,
   PersonIntegrationApiClient,
   PersonIntegrationDistinguishingMark,
@@ -353,14 +354,17 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
   updateProfileImage(
     prisonerNumber: string,
     image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+    imageSource: ImageSource,
   ): Promise<void> {
     const request = config.featureToggles.personEndpointsEnabled
       ? {
           path: `/v2/person/${prisonerNumber}/profile-image`,
+          data: { imageSource },
           files: { imageFile: image },
         }
       : {
           path: `/v1/core-person-record/profile-image`,
+          data: { imageSource },
           query: { prisonerNumber },
           files: { imageFile: image },
         }

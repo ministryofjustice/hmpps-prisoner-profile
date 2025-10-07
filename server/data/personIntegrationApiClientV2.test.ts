@@ -223,7 +223,9 @@ describe('personIntegrationApiClient (v2)', () => {
   describe('updateProfileImage', () => {
     it('Should upload the image and return the response', async () => {
       fakePersonIntegrationApi.put('/v2/person/A1234AA/profile-image').reply(200)
-      await expect(async () => personIntegrationApiClient.updateProfileImage('A1234AA', image)).resolves.not.toThrow()
+      await expect(async () =>
+        personIntegrationApiClient.updateProfileImage('A1234AA', image, 'DPS_WEBCAM'),
+      ).resolves.not.toThrow()
     })
   })
 
