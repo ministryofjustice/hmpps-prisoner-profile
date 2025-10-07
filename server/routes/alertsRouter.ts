@@ -56,6 +56,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/add-alert`,
     auditPageAccessAttempt({ services, page: Page.PostAddAlert }),
     validationMiddleware([AlertValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerAlertsPermission.edit] }),
     alertsController.post(),
   )
 
@@ -78,6 +79,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/alerts/:alertId/add-more-details`,
     auditPageAccessAttempt({ services, page: Page.PostAlertAddMoreDetails }),
     validationMiddleware([AlertAddMoreDetailsValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerAlertsPermission.edit] }),
     alertsController.postAddMoreDetails(),
   )
 
@@ -93,6 +95,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/alerts/:alertId/close`,
     auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
     validationMiddleware([AlertCloseValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerAlertsPermission.edit] }),
     alertsController.postCloseAlert(),
   )
 
@@ -108,6 +111,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/alerts/:alertId/change-end-date`,
     auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
     validationMiddleware([AlertChangeEndDateValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerAlertsPermission.edit] }),
     alertsController.postChangeEndDate(),
   )
 

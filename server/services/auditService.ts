@@ -139,7 +139,6 @@ export enum Page {
 }
 
 export enum ApiAction {
-  AddressLookup = 'ADDRESS_LOOKUP',
   Image = 'IMAGE',
   LocationEvents = 'LOCATION_EVENTS',
   OffenderEvents = 'OFFENDER_EVENTS',

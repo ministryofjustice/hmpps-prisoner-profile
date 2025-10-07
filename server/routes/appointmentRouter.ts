@@ -62,6 +62,9 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
     validationMiddleware([AppointmentValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.post(),
   )
 
@@ -76,13 +79,18 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayAddAppointment(),
   )
+
   router.post(
     `${basePath}/edit-appointment/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.PostEditAppointment }),
     isEditAppointmentEnabled,
     validationMiddleware([AppointmentValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.post(),
   )
+
   router.get(
     `${basePath}/appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
@@ -102,12 +110,17 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayPrePostAppointments(),
   )
+
   router.post(
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
     validationMiddleware([PrePostAppointmentValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.postVideoLinkBooking(),
   )
+
   router.get(
     `${basePath}/edit-prepost-appointments/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.EditPrePostAppointments }),
@@ -118,13 +131,18 @@ export default function appointmentRouter(services: Services): Router {
     }),
     appointmentController.displayPrePostAppointments(),
   )
+
   router.post(
     `${basePath}/edit-prepost-appointments/:appointmentId`,
     auditPageAccessAttempt({ services, page: Page.PostEditPrePostAppointments }),
     isEditAppointmentEnabled,
     validationMiddleware([PrePostAppointmentValidator]),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
+    }),
     appointmentController.postVideoLinkBooking(),
   )
+
   router.get(
     `${basePath}/prepost-appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
