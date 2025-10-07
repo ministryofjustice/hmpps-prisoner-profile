@@ -3,7 +3,7 @@ import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjus
 import AddressController from '../controllers/addressController'
 import { Services } from '../services'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { ApiAction, Page } from '../services/auditService'
+import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 
 export default function addressRouter(services: Services): Router {
@@ -21,11 +21,8 @@ export default function addressRouter(services: Services): Router {
     (req, res) => addressController.displayAddresses(req, res),
   )
 
-  router.get(
-    '/api/addresses/find/:query',
-    auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
-    (req, res) => addressController.findAddressesByFreeTextQuery(req, res),
-  )
+  // Not audited or requiring a permission since this just returns publicly accessible data:
+  router.get('/api/addresses/find/:query', (req, res) => addressController.findAddressesByFreeTextQuery(req, res))
 
   return router
 }
