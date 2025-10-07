@@ -46,7 +46,7 @@ export const alertTypesMock: AlertType[] = [
         description: 'OCG Nominal - Do not share',
         isActive: true,
         alertTypeCode: 'C',
-        canBeAdministered: false,
+        canBeAdministered: true,
       },
       {
         code: 'DRONE',
@@ -54,6 +54,30 @@ export const alertTypesMock: AlertType[] = [
         isActive: true,
         alertTypeCode: 'C',
         canBeAdministered: false,
+      },
+    ],
+  },
+]
+
+export const excludedAlertsMock: AlertType[] = [
+  {
+    code: 'C',
+    description: 'CCC',
+    isActive: true,
+    alertCodes: [
+      {
+        code: 'C1',
+        description: 'CCC111',
+        isActive: true,
+        alertTypeCode: 'C',
+        canBeAdministered: true,
+      },
+      {
+        code: 'DOCGM',
+        description: 'OCG Nominal - Do not share',
+        isActive: true,
+        alertTypeCode: 'C',
+        canBeAdministered: true,
       },
     ],
   },

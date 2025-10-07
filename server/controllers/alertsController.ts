@@ -16,6 +16,13 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 
+// Some alert codes cannot be added or made inactive via the Prisoner Profile
+// The Alerts API now supports limiting alert administration to a list of named users so if a user list can be sourced
+// for these alerts then we can remove this check
+const excludedAlertCodes: string[] = [
+  'DOCGM', // OCG Nominal - Do not share
+]
+
 /**
  * Parse request for alerts page and orchestrate response
  */
@@ -67,7 +74,11 @@ export default class AlertsController {
 
     // Insert correct links into alerts
     const alertsList = pagedAlerts?.content.map<AlertView>((alert: Alert) => {
-      const alertUpdatable = canUpdateAlert && alert.isActive && alert.alertCode.canBeAdministered
+      const alertUpdatable =
+        canUpdateAlert &&
+        alert.isActive &&
+        alert.alertCode.canBeAdministered &&
+        !excludedAlertCodes.includes(alert.alertCode.code)
       return {
         ...alert,
         addMoreDetailsLinkUrl: alertUpdatable
@@ -546,7 +557,9 @@ export default class AlertsController {
     existingAlertCodes?: string,
   ): { text: string; value: string }[] {
     return alertCodes
-      ?.filter(alertCode => alertCode.isActive && alertCode.canBeAdministered)
+      ?.filter(
+        alertCode => alertCode.isActive && alertCode.canBeAdministered && !excludedAlertCodes.includes(alertCode.code),
+      )
       .map(alertType => {
         return {
           value: alertType.code,

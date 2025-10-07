@@ -14,7 +14,7 @@ import { Role } from '../data/enums/role'
 import AlertsPageData from '../services/interfaces/alertsService/AlertsPageData'
 import AlertsService from '../services/alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { alertTypesMock } from '../data/localMockData/alertTypesMock'
+import { alertTypesMock, excludedAlertsMock } from '../data/localMockData/alertTypesMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
@@ -256,6 +256,21 @@ describe('Alerts Controller', () => {
 
       expect(getAlertTypes).toHaveBeenCalled()
       expect(res.render).toHaveBeenCalled()
+    })
+
+    it('should filter out "OCG Nominal - Do not share" subtype"', async () => {
+      jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(excludedAlertsMock)
+
+      await controller.displayAddAlert(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          typeCodeMap: {
+            C: [{ text: 'CCC111', value: 'C1', attributes: undefined }],
+          },
+        }),
+      )
     })
 
     it('should filter out alert codes which the user does not have permission to administer', async () => {
