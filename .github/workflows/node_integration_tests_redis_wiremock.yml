@@ -1,0 +1,97 @@
+# Generated from
+# https://github.com/ministryofjustice/hmpps-github-actions/blob/v2.5.0/.github/workflows/node_integration_tests.yml
+# by their migration script, but manually edited to support specifying script name and redis & wiremock services.
+
+# ** It will need to be manually updated when upstream changes **
+
+name: Integration tests
+
+on:
+  workflow_call:
+    inputs:
+      node_version_file:
+        description: "Passed to setup-node action to specify where to source the version of node from"
+        required: false
+        type: string
+        default: ".nvmrc"
+      script_name:
+        description: "Name of script to run, ie. `npm run ???`"
+        required: true
+        type: string
+        default: "int-test"
+
+permissions:
+  contents: read
+
+jobs:
+  integration_test:
+    name: Run the integration tests – ${{ inputs.script_name }}
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      wiremock:
+        image: wiremock/wiremock:3x
+        ports:
+          - 9091:8080
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ inputs.node_version_file }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.node_version_file }}
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: npm_build_artifacts
+      - name: restore cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        env:
+          cache-name: node-modules
+        with:
+          path: |
+            ./node_modules
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json', '!**/node_modules/**') }}
+      - name: Init testing framework if necessary
+        run: npm run int-test-init:ci --if-present
+      - name: Prepare and run integration tests
+        id: integration-tests
+        shell: bash
+        run: |
+          nohup npm run start-feature &
+          sleep 5
+          npm run ${{ inputs.script_name }}
+      - name: upload results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm_test_artifacts_${{ inputs.script_name }}
+          path: |
+            integration_tests/videos/
+            integration_tests/screenshots/
+            coverage/
+            test_results/
+            ctrf/
+      - name: publish test report
+        if: ${{ !cancelled() && github.event.repository.visibility == 'public' }}
+        uses: dorny/test-reporter@v2
+        with:
+          artifact: npm_test_artifacts_${{ inputs.script_name }}
+          name: Test Report
+          path: 'test_results/**/*.xml'
+          reporter: java-junit
+          fail-on-empty: false
+          fail-on-error: false
+          list-suites: 'failed'
+          list-tests: 'failed'
+      - name: fail the action if the tests failed
+        if: ${{ steps.integration-tests.outcome == 'failure' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.setFailed('Integration tests failed')
