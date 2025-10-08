@@ -11,7 +11,6 @@ import MulterFile from './interfaces/MulterFile'
 import MetricsService from '../services/metrics/metricsService'
 import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { Role } from '../data/enums/role'
 
 describe('ImageController', () => {
   let controller: ImageController
@@ -98,33 +97,6 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().newImage.get(request, response)
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
-          isDpsAppDeveloper: false,
-          miniBannerData,
-          pageTitle: 'Add a new facial image',
-        })
-      })
-
-      it('DPS App Developer: Loads the page with the correct information', async () => {
-        const request = {
-          middleware: defaultMiddleware,
-          flash: jest.fn(),
-        } as unknown as Request
-
-        await controller.updateProfileImage().newImage.get(request, {
-          ...response,
-          locals: {
-            user: { userRoles: [Role.DpsApplicationDeveloper] },
-            prisonerNumber: 'A1234BC',
-            prisonerName: {
-              firstLast: 'First Last',
-              lastCommaFirst: 'Last, First',
-              full: 'First Last',
-            },
-            prisonId: 999,
-          },
-        } as unknown as Response)
-        expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
-          isDpsAppDeveloper: true,
           miniBannerData,
           pageTitle: 'Add a new facial image',
         })

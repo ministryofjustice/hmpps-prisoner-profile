@@ -20,8 +20,6 @@ import ImageController from '../controllers/imageController'
 import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import getCommonRequestData from '../utils/getCommonRequestData'
-import checkHasAllRoles from '../middleware/checkHasAllRolesMiddleware'
-import { Role } from '../data/enums/role'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -173,7 +171,6 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
-    checkHasAllRoles([Role.DpsApplicationDeveloper]),
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().webcamImage.get,
   )
@@ -184,7 +181,6 @@ export default function imageRouter(services: Services): Router {
     getPrisonerData(services),
     featureFlagGuard('Profile Photo Edit', editProfilePhotoEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.edit_photo] }),
-    checkHasAllRoles([Role.DpsApplicationDeveloper]),
     getFeComponents,
     buildBreadcrumbsAndReferer(true),
     imageController.updateProfileImage().webcamImage.post,
