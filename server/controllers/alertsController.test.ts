@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
 import { addDays } from 'date-fns'
+import {
+  isGranted,
+  PrisonerAlertsPermission,
+  PrisonerPermission,
+  PrisonerPermissions,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -8,22 +14,30 @@ import { Role } from '../data/enums/role'
 import AlertsPageData from '../services/interfaces/alertsService/AlertsPageData'
 import AlertsService from '../services/alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { alertTypesMock } from '../data/localMockData/alertTypesMock'
+import { alertTypesMock, excludedAlertsMock } from '../data/localMockData/alertTypesMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
 import { formatLocation, formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
-import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import {
+  pagedActiveAlertsMock,
+  pagedInactiveAlertsMock,
+  pagedRestrictedAlertsMock,
+} from '../data/localMockData/pagedAlertsMock'
 
 let req: Request
 let res: Response
 let next: NextFunction
 let controller: AlertsController
 
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsService.ts')
+
+const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
+const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Alerts Controller', () => {
   describe('Alerts page', () => {
@@ -55,11 +69,13 @@ describe('Alerts Controller', () => {
             full: 'John Middle Names Saunders',
           },
           prisonId: PrisonerMockDataA.prisonId,
+          prisonerPermissions,
         },
         render: jest.fn(),
       } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
+      mockPermissionCheck(PrisonerAlertsPermission.edit, true)
     })
 
     it('should get active alerts', async () => {
@@ -89,6 +105,62 @@ describe('Alerts Controller', () => {
         req.middleware.alertSummaryData,
         res.locals.user,
         'alerts',
+      )
+    })
+
+    it('should not add update links to alerts the user cannot administer', async () => {
+      const getAlertsSpy = jest
+        .spyOn(controller.alertsService, 'get')
+        .mockResolvedValue({ pagedAlerts: pagedRestrictedAlertsMock } as AlertsPageData)
+
+      await controller.displayAlerts(req, res, next, true)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        PrisonerMockDataA,
+        req.middleware.alertSummaryData,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+      )
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/alerts/alertsPage',
+        expect.objectContaining({
+          addAlertLinkUrl: '/prisoner/G6123VU/add-alert',
+          alertsList: [
+            expect.objectContaining({
+              alertCode: {
+                alertTypeCode: 'A',
+                alertTypeDescription: 'Social Care',
+                canBeAdministered: true,
+                code: 'AS',
+                description: 'Social Care',
+              },
+              isActive: true,
+              addMoreDetailsLinkUrl: '/prisoner/G6123VU/alerts/2113/add-more-details',
+              changeEndDateLinkUrl: null,
+              closeAlertLinkUrl: '/prisoner/G6123VU/alerts/2113/close',
+            }),
+            expect.objectContaining({
+              alertCode: {
+                alertTypeCode: 'P',
+                alertTypeDescription: 'Restricted - MAPPP Case',
+                canBeAdministered: false,
+                code: 'PVN',
+                description: 'ViSOR Nominal',
+              },
+              isActive: true,
+              addMoreDetailsLinkUrl: null,
+              changeEndDateLinkUrl: null,
+              closeAlertLinkUrl: null,
+            }),
+          ],
+        }),
       )
     })
 
@@ -186,7 +258,22 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalled()
     })
 
-    it('should filter out excluded alert codes (DOCGM and DRONE)', async () => {
+    it('should filter out "OCG Nominal - Do not share" subtype"', async () => {
+      jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(excludedAlertsMock)
+
+      await controller.displayAddAlert(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          typeCodeMap: {
+            C: [{ text: 'CCC111', value: 'C1', attributes: undefined }],
+          },
+        }),
+      )
+    })
+
+    it('should filter out alert codes which the user does not have permission to administer', async () => {
       jest.spyOn(controller.alertsService, 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.displayAddAlert(req, res, next)
@@ -717,3 +804,7 @@ describe('Alerts Controller', () => {
     })
   })
 })
+
+function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
+  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
+}

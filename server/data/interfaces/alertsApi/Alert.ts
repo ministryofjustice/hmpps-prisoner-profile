@@ -11,6 +11,7 @@ export interface Alert extends PagedListItem {
     alertTypeDescription: string
     code: string
     description: string
+    canBeAdministered: boolean
   }
   description: string
   authorisedBy?: string
@@ -51,6 +52,7 @@ export interface AlertCode {
   description: string
   listSequence?: number
   isActive: boolean
+  canBeAdministered: boolean
   createdAt?: string
   createdBy?: string
   modifiedAt?: string
