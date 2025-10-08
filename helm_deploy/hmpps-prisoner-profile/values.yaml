@@ -7,7 +7,7 @@ generic-service:
   replicaCount: 4
 
   image:
-    repository: quay.io/hmpps/hmpps-prisoner-profile
+    repository: ghcr.io/ministryofjustice/hmpps-prisoner-profile
     tag: app_version    # override at deployment time
     port: 3000
 
@@ -32,7 +32,6 @@ generic-service:
     REDIS_ENABLED: "true"
     REDIS_TLS_ENABLED: "true"
     TOKEN_VERIFICATION_ENABLED: "true"
-    APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
     OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
@@ -44,26 +43,28 @@ generic-service:
 
   namespace_secrets:
     hmpps-prisoner-profile:
-      APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
-      API_CLIENT_ID: "API_CLIENT_ID"
-      API_CLIENT_SECRET: "API_CLIENT_SECRET"
-      SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
-      SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SYSTEM_CLIENT_ID_CURIOUS: "SYSTEM_CLIENT_ID_CURIOUS"
       SYSTEM_CLIENT_SECRET_CURIOUS: "SYSTEM_CLIENT_SECRET_CURIOUS"
-      SESSION_SECRET: "SESSION_SECRET"
       TAG_MANAGER_CONTAINER_ID: "TAG_MANAGER_CONTAINER_ID"
       CONTENTFUL_SPACE_ID: "CONTENTFUL_SPACE_ID"
       CONTENTFUL_ACCESS_TOKEN: "CONTENTFUL_ACCESS_TOKEN"
       OS_PLACES_API_KEY: "OS_PLACES_API_KEY"
-
+    hmpps-prisoner-profile-application-insights:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
+    hmpps-prisoner-profile-auth-code:
+      API_CLIENT_ID: "AUTH_CODE_CLIENT_ID"
+      API_CLIENT_SECRET: "AUTH_CODE_CLIENT_SECRET"
+    hmpps-prisoner-profile-client-creds:
+      SYSTEM_CLIENT_ID: "CLIENT_CREDS_CLIENT_ID"
+      SYSTEM_CLIENT_SECRET: "CLIENT_CREDS_CLIENT_SECRET"
+    hmpps-prisoner-profile-session-secret:
+      SESSION_SECRET: "SESSION_SECRET"
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
       AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
-
 
 generic-prometheus-alerts:
   targetApplication: hmpps-prisoner-profile
