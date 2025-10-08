@@ -1,4 +1,11 @@
+# Generated from
+# https://github.com/ministryofjustice/hmpps-github-actions/blob/v2.5.0/.github/workflows/node_integration_tests.yml
+# by their migration script, but manually edited to support specifying script name and redis & wiremock services.
+
+# ** It will need to be manually updated when upstream changes **
+
 name: Integration tests
+
 on:
   workflow_call:
     inputs:
@@ -7,10 +14,18 @@ on:
         required: false
         type: string
         default: ".nvmrc"
+      script_name:
+        description: "Name of script to run, ie. `npm run ???`"
+        required: true
+        type: string
+        default: "int-test"
+
 permissions:
   contents: read
+
 jobs:
   integration_test:
+    name: Run the integration tests – ${{ inputs.script_name }}
     runs-on: ubuntu-latest
     services:
       redis:
@@ -18,6 +33,10 @@ jobs:
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      wiremock:
+        image: wiremock/wiremock:3x
+        ports:
+          - 9091:8080
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ inputs.node_version_file }}
@@ -40,23 +59,18 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json', '!**/node_modules/**') }}
       - name: Init testing framework if necessary
         run: npm run int-test-init:ci --if-present
-      - name: Get wiremock
-        shell: bash
-        run: |
-          curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
       - name: Prepare and run integration tests
         id: integration-tests
         shell: bash
         run: |
-          nohup java -jar wiremock.jar --port 9091 &
           nohup npm run start-feature &
           sleep 5
-          npm run int-test
+          npm run ${{ inputs.script_name }}
       - name: upload results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: npm_integration_test_artifacts
+          name: npm_test_artifacts_${{ inputs.script_name }}
           path: |
             integration_tests/videos/
             integration_tests/screenshots/
@@ -67,7 +81,7 @@ jobs:
         if: ${{ !cancelled() && github.event.repository.visibility == 'public' }}
         uses: dorny/test-reporter@v2
         with:
-          artifact: npm_integration_test_artifacts
+          artifact: npm_test_artifacts_${{ inputs.script_name }}
           name: Test Report
           path: 'test_results/**/*.xml'
           reporter: java-junit

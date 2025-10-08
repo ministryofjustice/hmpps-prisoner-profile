@@ -9,9 +9,9 @@ services:
       - '6379:6379'
 
   wiremock:
-    image: wiremock/wiremock
+    image: wiremock/wiremock:3x
     networks:
-    - hmpps
+      - hmpps
     container_name: wiremock
     restart: always
     ports:

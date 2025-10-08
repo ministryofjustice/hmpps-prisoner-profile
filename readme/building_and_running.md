@@ -118,7 +118,7 @@ kubectl get secret <INSERT_SECRET_NAME> -n hmpps-prisoner-profile-dev -o json | 
 2/ Run a local version of Redis:
 
 ```
-docker-compose up redis
+docker compose up redis
 ```
 
 3/ And then, to build the assets and start the app with esbuild:
@@ -141,8 +141,8 @@ To do this:
 1/ Run dependencies in docker:
 
 ```
-docker-compose -f docker-compose-local-wiremock.yml pull
-docker-compose -f docker-compose-local-wiremock.yml up
+docker compose -f docker-compose-local-wiremock.yml pull
+docker compose -f docker-compose-local-wiremock.yml up
 ```
 
 2/ Run the service using the local wiremock env file:
