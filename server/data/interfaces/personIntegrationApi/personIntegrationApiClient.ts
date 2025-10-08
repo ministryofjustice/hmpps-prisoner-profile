@@ -145,6 +145,7 @@ export type BodyPartId =
 export type MarkTypeId = 'MARK' | 'SCAR' | 'TAT' | 'OTH'
 export type BodyPartSideId = 'B' | 'F' | 'L' | 'R' | 'S'
 export type PartOrientationId = 'CENTR' | 'FACE' | 'LOW' | 'UPP'
+export type ImageSource = 'GEN' | 'DPS_WEBCAM'
 
 export interface PersonIntegrationDistinguishingMark {
   id: number
@@ -341,6 +342,7 @@ export interface PersonIntegrationApiClient {
   updateProfileImage(
     prisonerNumber: string,
     image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+    imageSource: ImageSource,
   ): Promise<void>
 
   getAddresses(prisonerNumber: string): Promise<AddressResponseDto[]>

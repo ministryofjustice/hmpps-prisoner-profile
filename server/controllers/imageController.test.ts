@@ -233,16 +233,19 @@ describe('ImageController', () => {
   })
 
   describe('Submit image', () => {
-    it('Updates the image on the API', async () => {
+    it.each([
+      { photoType: 'upload', imageSource: 'GEN' },
+      { photoType: 'webcam', imageSource: 'DPS_WEBCAM' },
+    ])('Updates the image on the API', async ({ photoType, imageSource }) => {
       const request = {
-        body: { photoType: 'new' },
+        body: { photoType },
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
-      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file)
+      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file, imageSource)
     })
 
     it('Populates the flash and redirects', async () => {
@@ -373,7 +376,7 @@ describe('ImageController', () => {
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
-        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile)
+        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile, 'GEN')
       })
 
       it('Populates the flash and redirects', async () => {
