@@ -8,7 +8,6 @@ export const alertDetailsMock: Alert = {
     alertTypeDescription: 'Security',
     code: 'XA',
     description: 'Arsonist',
-    canBeAdministered: true,
   },
   description: 'Set fire to his cell while in a double cell',
   activeFrom: '2011-08-22',
@@ -25,7 +24,6 @@ export const alertDetailsExpiresMock: Alert = {
     alertTypeDescription: 'Security',
     code: 'XA',
     description: 'Arsonist',
-    canBeAdministered: true,
   },
   description: 'Set fire to his cell while in a double cell',
   activeFrom: '2011-08-22',
@@ -47,7 +45,6 @@ export const alertDetailsCreatedMock: Alert = {
     alertTypeDescription: 'Security',
     code: 'XA',
     description: 'Arsonist',
-    canBeAdministered: true,
   },
   description: 'Set fire to his cell while in a double cell',
   activeFrom: '2011-08-22',
@@ -57,14 +54,13 @@ export const alertDetailsCreatedMock: Alert = {
   isActive: true,
 }
 
-export const nonAdministrableAlertDetailsMock: Alert = {
+export const alertDetailsCreatedViaMapperMock: Alert = {
   alertUuid: '7',
   alertCode: {
     alertTypeCode: 'X',
     alertTypeDescription: 'Security',
-    code: 'XX',
-    description: 'Restricted - Arsonist',
-    canBeAdministered: true,
+    code: 'XA',
+    description: 'Arsonist',
   },
   description: 'Set fire to his cell while in a double cell',
   activeFrom: '2011-08-22',
