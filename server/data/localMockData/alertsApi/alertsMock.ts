@@ -9,7 +9,6 @@ export const alertsMock: Alert[] = [
       alertTypeDescription: 'Alert type description',
       code: 'ABC',
       description: 'Alert code description',
-      canBeAdministered: true,
     },
     description: 'Alert description',
     authorisedBy: 'A. Nurse, An Agency',
