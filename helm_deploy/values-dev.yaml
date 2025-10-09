@@ -24,6 +24,7 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
+    SENTRY_ENVIRONMENT: "dev"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"

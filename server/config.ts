@@ -375,4 +375,8 @@ export default {
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
+  sentry: {
+    dsn: get('SENTRY_DSN', null, requiredInProduction),
+    environment: get('SENTRY_ENVIRONMENT', 'local'),
+  },
 }
