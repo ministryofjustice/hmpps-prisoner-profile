@@ -1,6 +1,11 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import { dietAndAllergyEnabled, editProfilePhotoEnabled, externalContactsEnabled } from './featureToggles'
+import {
+  dietAndAllergyEnabled,
+  editProfilePhotoEnabled,
+  editProfileSimulateFetch,
+  externalContactsEnabled,
+} from './featureToggles'
 
 describe('featureToggles', () => {
   describe('dietAndAllergyEnabled', () => {
@@ -113,6 +118,32 @@ describe('featureToggles', () => {
       config.featureToggles.editProfileEnabledPrisons = ['MDI']
 
       expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
+    })
+  })
+
+  describe('editProfileSimulateFetch', () => {
+    afterEach(() => {
+      // reset to defaults:
+      config.featureToggles.editProfileEnabledPrisons = []
+      config.featureToggles.editProfileEnabled = false
+      config.featureToggles.editProfileSimulateFetch = false
+    })
+
+    it('is not enabled by default', () => {
+      expect(editProfileSimulateFetch('MDI')).toBeFalsy()
+    })
+
+    it('is enabled by config property', () => {
+      config.featureToggles.editProfileSimulateFetch = true
+      expect(editProfileSimulateFetch('MDI')).toBeTruthy()
+    })
+
+    it('is disabled when profile edit is enabled', () => {
+      config.featureToggles.editProfileEnabled = true
+      config.featureToggles.editProfileEnabledPrisons = ['MDI']
+      config.featureToggles.editProfileSimulateFetch = true
+
+      expect(editProfileSimulateFetch('MDI')).toBeFalsy()
     })
   })
 })
