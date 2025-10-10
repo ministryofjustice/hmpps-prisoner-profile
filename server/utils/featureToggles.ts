@@ -2,6 +2,9 @@ import { isAfter } from 'date-fns'
 import config from '../config'
 import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
 
+export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
+
 export const editProfileEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
 
