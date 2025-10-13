@@ -216,7 +216,7 @@
                     anchor: "religion-faith-or-belief",
                     dataQa: "religion-or-belief",
                     html: true,
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions),
                     changeHref: "personal/religion",
                     changeLinkEnabled: editReligionEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_religion_and_belief, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'religion'
