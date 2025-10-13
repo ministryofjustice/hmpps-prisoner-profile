@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   isGranted,
+  PersonProtectedCharacteristicsPermission,
   PrisonerBaseLocationPermission,
   PrisonerBasePermission,
   PrisonerMoneyPermission,
@@ -166,7 +167,15 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'work-and-skills'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          res.locals.user,
+          'work-and-skills',
+          undefined,
+          prisonerPermissions,
+        ),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
@@ -206,7 +215,15 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'offences'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          res.locals.user,
+          'offences',
+          undefined,
+          res.locals.prisonerPermissions,
+        ),
         courtCaseData,
         releaseDates,
         activeTab: true,
@@ -275,15 +292,17 @@ export default function routes(services: Services): Router {
     `${basePath}/religion-belief-history`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    async (req, res) => {
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PersonProtectedCharacteristicsPermission.read_religion_and_belief],
+    }),
+    async (req, res, next) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
     },
   )
 
   router.get(
     `${basePath}/past-care-needs`,
-    auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
+    auditPageAccessAttempt({ services, page: Page.PastCareNeeds }),
     getPrisonerData(services, { minimal: true }),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {

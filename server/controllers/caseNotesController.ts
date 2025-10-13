@@ -2,7 +2,6 @@ import { RequestHandler } from 'express'
 import { CaseNotesPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
-import { canAddCaseNotes } from '../utils/roleHelpers'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
@@ -43,7 +42,7 @@ export default class CaseNotesController {
       if (req.query.endDate) queryParams.endDate = req.query.endDate as string
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
-      const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
+      const addCaseNoteLinkUrl = isGranted(CaseNotesPermission.edit, prisonerPermissions)
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
         : undefined
 
@@ -61,7 +60,15 @@ export default class CaseNotesController {
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
-          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+          ...mapHeaderData(
+            prisonerData,
+            inmateDetail,
+            alertSummaryData,
+            res.locals.user,
+            'case-notes',
+            undefined,
+            prisonerPermissions,
+          ),
           caseNotesApiUnavailable: true,
         })
       }
@@ -86,7 +93,15 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          res.locals.user,
+          'case-notes',
+          undefined,
+          prisonerPermissions,
+        ),
         ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,
