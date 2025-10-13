@@ -16,6 +16,7 @@ const comments = document.querySelector('.js-comments')
 const courtHintText = document.getElementById('court-hint-text')
 const probationHintText = document.getElementById('probation-hint-text')
 const optionalVideoLabel = document.getElementById('optional-video-label')
+const optionalStandardLabel = document.getElementById('optional-standard-label')
 
 async function getEventsForLocation() {
   const date = appointmentDateInput.value
@@ -98,8 +99,10 @@ function showHideVideoLabel() {
 
   if (appointmentType && ['VLOO', 'VLLA', 'VLPA', 'VLAP'].includes(appointmentType)) {
     optionalVideoLabel.style.display = 'block'
+    optionalStandardLabel.style.display = 'none'
   } else {
     optionalVideoLabel.style.display = 'none'
+    optionalStandardLabel.style.display = 'block'
   }
 }
 
