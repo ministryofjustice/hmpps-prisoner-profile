@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { resolve as resolvePath } from 'node:path'
+
 import { stubFor } from './wiremock'
 
 export function stubGetWithBody<T>({ path, body }: { path: string; body: T }) {
@@ -78,4 +81,8 @@ export function stubDeleteWithResponse<TResponse>({ path, responseBody }: { path
       jsonBody: responseBody,
     },
   })
+}
+
+export function loadFileAsBase64(path: string): string {
+  return readFileSync(resolvePath(__dirname, path), { encoding: 'base64' })
 }

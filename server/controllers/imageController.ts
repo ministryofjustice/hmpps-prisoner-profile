@@ -10,8 +10,6 @@ import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import getCommonRequestData from '../utils/getCommonRequestData'
-import { userHasAllRoles } from '../utils/utils'
-import { Role } from '../data/enums/role'
 
 const photoErrorHtml = (backLinkHref: string) => `
 <p>There was an issue saving the photo. Your internet connection might be slow or there might be a problem with the file.</p>
@@ -46,12 +44,10 @@ export default class ImageController {
           const requestBodyFlash = requestBodyFromFlash<{ photoType?: string }>(req)
           const photoType = requestBodyFlash?.photoType
           res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
-          const isDpsAppDeveloper = userHasAllRoles([Role.DpsApplicationDeveloper], res.locals.user.userRoles)
 
           return res.render('pages/edit/photo/addNew', {
             pageTitle: 'Add a new facial image',
             miniBannerData,
-            isDpsAppDeveloper,
             photoType,
           })
         },
@@ -119,7 +115,11 @@ export default class ImageController {
         const { photoType } = req.body
 
         try {
-          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+          await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(
+            prisonerNumber,
+            file,
+            photoType === 'webcam' ? 'DPS_WEBCAM' : 'GEN',
+          )
         } catch (error) {
           logger.error(error)
           const { originalImgSrc } = req.body
@@ -200,7 +200,7 @@ export default class ImageController {
           }
 
           try {
-            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file)
+            await this.personIntegrationApiClientBuilder(clientToken).updateProfileImage(prisonerNumber, file, 'GEN')
           } catch (error) {
             logger.error(error)
             req.flash('errors', [{ html: photoErrorHtml(`/prisoner/${prisonerNumber}/image/new`) }])

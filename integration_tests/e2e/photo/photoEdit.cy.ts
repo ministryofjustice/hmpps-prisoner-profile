@@ -16,7 +16,7 @@ context('Editing the photo', () => {
   context('New image page', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit, Role.DpsApplicationDeveloper] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubImageDetails')

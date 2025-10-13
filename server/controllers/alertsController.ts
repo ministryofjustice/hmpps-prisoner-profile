@@ -16,10 +16,11 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 
-// Some alert codes cannot be added or made inactive via the Prisoner Profile:
+// Some alert codes cannot be added or made inactive via the Prisoner Profile
+// The Alerts API now supports limiting alert administration to a list of named users so if a user list can be sourced
+// for these alerts then we can remove this check
 const excludedAlertCodes: string[] = [
   'DOCGM', // OCG Nominal - Do not share
-  'DRONE', // Drone Nominal - Do not share
 ]
 
 /**
@@ -73,7 +74,11 @@ export default class AlertsController {
 
     // Insert correct links into alerts
     const alertsList = pagedAlerts?.content.map<AlertView>((alert: Alert) => {
-      const alertUpdatable = canUpdateAlert && alert.isActive && !excludedAlertCodes.includes(alert.alertCode.code)
+      const alertUpdatable =
+        canUpdateAlert &&
+        alert.isActive &&
+        alert.alertCode.canBeAdministered &&
+        !excludedAlertCodes.includes(alert.alertCode.code)
       return {
         ...alert,
         addMoreDetailsLinkUrl: alertUpdatable
@@ -528,7 +533,7 @@ export default class AlertsController {
     const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
       (ts, t) => ({
         ...ts,
-        [t.code]: this.mapActiveSortedAlertTypes(t.alertCodes, existingAlertCodes),
+        [t.code]: this.mapActiveSortedAlertCodes(t.alertCodes, existingAlertCodes),
       }),
       {},
     )
@@ -537,18 +542,32 @@ export default class AlertsController {
     if (type) {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
-        alertCodes = this.mapActiveSortedAlertTypes(selectedType.alertCodes, existingAlertCodes)
+        alertCodes = this.mapActiveSortedAlertCodes(selectedType.alertCodes, existingAlertCodes)
       }
     }
     return { alertTypes, alertCodes, typeCodeMap }
   }
 
-  private mapActiveSortedAlertTypes(
-    alertTypes: (AlertType | AlertCode)[],
+  private mapActiveSortedAlertTypes(alertTypes: AlertType[]): { text: string; value: string }[] {
+    return alertTypes
+      ?.filter(alertType => alertType.isActive)
+      .map(alertType => {
+        return {
+          value: alertType.code,
+          text: alertType.description,
+        }
+      })
+      .sort((a, b) => a.text.localeCompare(b.text))
+  }
+
+  private mapActiveSortedAlertCodes(
+    alertCodes: AlertCode[],
     existingAlertCodes?: string,
   ): { text: string; value: string }[] {
-    return alertTypes
-      ?.filter(alertType => alertType.isActive && !excludedAlertCodes.includes(alertType.code))
+    return alertCodes
+      ?.filter(
+        alertCode => alertCode.isActive && alertCode.canBeAdministered && !excludedAlertCodes.includes(alertCode.code),
+      )
       .map(alertType => {
         return {
           value: alertType.code,

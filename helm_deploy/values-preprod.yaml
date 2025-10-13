@@ -23,6 +23,7 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
+    SENTRY_ENVIRONMENT: "preprod"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-preprod.hmpps.service.justice.gov.uk"
@@ -89,7 +90,7 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
     EDIT_PROFILE_ENABLED: "true"
-    EDIT_PROFILE_ENABLED_PRISONS: "KMI,HEI,NMI"
+    EDIT_PROFILE_ENABLED_PRISONS: "KMI,HEI,NMI,LCI"
     EDIT_PROFILE_PHOTO_ENABLED_PRISONS: "***"
     DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
     DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"

@@ -11,7 +11,6 @@ import MulterFile from './interfaces/MulterFile'
 import MetricsService from '../services/metrics/metricsService'
 import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { Role } from '../data/enums/role'
 
 describe('ImageController', () => {
   let controller: ImageController
@@ -98,33 +97,6 @@ describe('ImageController', () => {
 
         await controller.updateProfileImage().newImage.get(request, response)
         expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
-          isDpsAppDeveloper: false,
-          miniBannerData,
-          pageTitle: 'Add a new facial image',
-        })
-      })
-
-      it('DPS App Developer: Loads the page with the correct information', async () => {
-        const request = {
-          middleware: defaultMiddleware,
-          flash: jest.fn(),
-        } as unknown as Request
-
-        await controller.updateProfileImage().newImage.get(request, {
-          ...response,
-          locals: {
-            user: { userRoles: [Role.DpsApplicationDeveloper] },
-            prisonerNumber: 'A1234BC',
-            prisonerName: {
-              firstLast: 'First Last',
-              lastCommaFirst: 'Last, First',
-              full: 'First Last',
-            },
-            prisonId: 999,
-          },
-        } as unknown as Response)
-        expect(response.render).toHaveBeenCalledWith('pages/edit/photo/addNew', {
-          isDpsAppDeveloper: true,
           miniBannerData,
           pageTitle: 'Add a new facial image',
         })
@@ -233,16 +205,19 @@ describe('ImageController', () => {
   })
 
   describe('Submit image', () => {
-    it('Updates the image on the API', async () => {
+    it.each([
+      { photoType: 'upload', imageSource: 'GEN' },
+      { photoType: 'webcam', imageSource: 'DPS_WEBCAM' },
+    ])('Updates the image on the API', async ({ photoType, imageSource }) => {
       const request = {
-        body: { photoType: 'new' },
+        body: { photoType },
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
-      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file)
+      expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', file, imageSource)
     })
 
     it('Populates the flash and redirects', async () => {
@@ -373,7 +348,7 @@ describe('ImageController', () => {
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
-        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile)
+        expect(personIntegrationApi.updateProfileImage).toHaveBeenCalledWith('A1234BC', withheldFile, 'GEN')
       })
 
       it('Populates the flash and redirects', async () => {
