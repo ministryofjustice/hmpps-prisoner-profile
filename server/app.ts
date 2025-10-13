@@ -29,6 +29,7 @@ import config from './config'
 import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './middleware/nomisLockedMiddleware'
 import { distinguishingMarksMulterExceptions } from './routes/distinguishingMarksRouter'
 import unless from './utils/unless'
+import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -37,6 +38,7 @@ export default function createApp(services: Services): express.Application {
   app.set('trust proxy', true)
   app.set('port', process.env.PORT || 3000)
 
+  setUpSentry()
   app.use(appInsightsMiddleware())
   app.use(setUpHealthChecks(services.dataAccess.applicationInfo))
   app.use(setUpWebSecurity())
@@ -94,6 +96,7 @@ export default function createApp(services: Services): express.Application {
   app.use(nomisLockedMiddleware(services.metricsService))
 
   app.use(setUpPageNotFound)
+  setUpSentryErrorHandler(app)
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 
   return app

@@ -49,6 +49,7 @@ generic-service:
       CONTENTFUL_SPACE_ID: "CONTENTFUL_SPACE_ID"
       CONTENTFUL_ACCESS_TOKEN: "CONTENTFUL_ACCESS_TOKEN"
       OS_PLACES_API_KEY: "OS_PLACES_API_KEY"
+      SENTRY_DSN: 'SENTRY_DSN'
     hmpps-prisoner-profile-application-insights:
       APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
     hmpps-prisoner-profile-auth-code:
