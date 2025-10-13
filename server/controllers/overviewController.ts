@@ -149,7 +149,15 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'overview'),
+      ...mapHeaderData(
+        prisonerData,
+        inmateDetail,
+        alertSummaryData,
+        res.locals.user,
+        'overview',
+        undefined,
+        prisonerPermissions,
+      ),
       moneySummary,
       adjudicationSummary,
       visitsSummary,

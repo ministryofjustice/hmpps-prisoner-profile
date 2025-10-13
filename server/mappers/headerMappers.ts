@@ -1,3 +1,4 @@
+import { CaseNotesPermission, isGranted, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
@@ -9,7 +10,6 @@ import {
 } from '../utils/utils'
 import config from '../config'
 import { Role } from '../data/enums/role'
-import { canViewCaseNotes } from '../utils/roleHelpers'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
@@ -90,8 +90,9 @@ export function mapHeaderData(
   user?: HmppsUser,
   pageId?: string,
   hideBanner?: boolean,
+  prisonerPermissions?: PrisonerPermissions,
 ) {
-  const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
+  const tabs = tabLinks(prisonerData.prisonerNumber, isGranted(CaseNotesPermission.read, prisonerPermissions))
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true
