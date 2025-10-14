@@ -21,7 +21,12 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
+import {
+  dietAndAllergyEnabled,
+  editProfileEnabled,
+  editProfileSimulateFetch,
+  editReligionEnabled,
+} from '../../utils/featureToggles'
 import {
   addEmailAddressTextFieldData,
   addPhoneNumberFieldData,
@@ -99,6 +104,7 @@ export default class PersonalController {
       const { user, apiErrorCallback, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
+      const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
         config.featureToggles
 
@@ -106,6 +112,7 @@ export default class PersonalController {
         this.personalPageService.get(clientToken, prisonerData, {
           dietAndAllergyIsEnabled: dietAndAllergyEnabled(activeCaseLoadId),
           editProfileEnabled: editEnabled,
+          simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           healthAndMedicationApiReadEnabled,
