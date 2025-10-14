@@ -7,6 +7,7 @@ export const metricsServiceMock = (): MetricsService => ({
   trackPersonCommunicationNeedsUpdate: jest.fn(),
   trackPersonalRelationshipsUpdate: jest.fn(),
   trackNomisLockedWarning: jest.fn(),
+  trackFrontendError: jest.fn(),
 })
 
 export default { metricsServiceMock }

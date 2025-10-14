@@ -5,6 +5,8 @@ import { ApiAction, AuditService, SubjectType } from '../../services/auditServic
 import logger from '../../../logger'
 import PhotoService from '../../services/photoService'
 import DistinguishingMarksService from '../../services/distinguishingMarksService'
+import MetricsService from '../../services/metrics/metricsService'
+import { PrisonUser } from '../../interfaces/HmppsUser'
 
 const placeHolderImage = '/assets/images/prisoner-profile-image.png'
 
@@ -18,6 +20,7 @@ export default class CommonApiRoutes {
     private readonly auditService: AuditService,
     private readonly distinguishingMarksService: DistinguishingMarksService,
     private readonly photoService: PhotoService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   public prisonerImage: RequestHandler = (req: Request, res: Response) => {
@@ -99,5 +102,19 @@ export default class CommonApiRoutes {
       .catch(_error => {
         res.redirect(placeHolderImage)
       })
+  }
+
+  public errorReporting: RequestHandler = (req, res) => {
+    const { prisonerNumber } = req.params
+    const user = res.locals.user as PrisonUser
+
+    this.metricsService.trackFrontendError(
+      prisonerNumber,
+      req.query?.pageUrl as string,
+      req.query?.error as string,
+      user,
+    )
+
+    res.send('ok')
   }
 }

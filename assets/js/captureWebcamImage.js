@@ -60,9 +60,12 @@ async function getWebcamList() {
       }
     })
   } catch (e) {
-    console.error(e)
     photoCaptureContainer.style.display = 'none'
     photoCaptureErrorContainer.style.display = 'block'
+
+    await fetch(`/api/report-error?pageUrl=${encodeURIComponent(location.href)}&error=${e.name}`, {
+      method: 'GET',
+    })
   }
 }
 

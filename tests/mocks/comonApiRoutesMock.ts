@@ -5,6 +5,7 @@ export const commonApiRoutesMock = () =>
     distinguishingMarkImage: jest.fn(),
     image: jest.fn(),
     prisonerImage: jest.fn(),
+    errorReporting: jest.fn(),
   }) as unknown as CommonApiRoutes
 
 export default { commonApiRoutesMock }
