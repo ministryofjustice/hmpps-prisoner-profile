@@ -1318,4 +1318,33 @@ describe('PersonalPageService', () => {
       })
     })
   })
+
+  describe('Edit profile disabled - simulate fetch', () => {
+    it('Does not fetch all data when simulate fetch is disabled', async () => {
+      const service = constructService()
+      const { prisonerNumber } = PrisonerMockDataA
+
+      await service.get('token', PrisonerMockDataA, { editProfileEnabled: false, simulateFetchEnabled: false })
+
+      expect(prisonApiClient.getIdentifiers).toHaveBeenCalledWith(prisonerNumber, false)
+      expect(addressService.getAddressesForDisplay).not.toHaveBeenCalled()
+      expect(personIntegrationApiClient.getDistinguishingMarks).not.toHaveBeenCalled()
+      expect(globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber).not.toHaveBeenCalled()
+    })
+
+    it('Fetches all data when simulate fetch is enabled', async () => {
+      const service = constructService()
+      const { prisonerNumber } = PrisonerMockDataA
+
+      await service.get('token', PrisonerMockDataA, { editProfileEnabled: false, simulateFetchEnabled: true })
+
+      expect(prisonApiClient.getIdentifiers).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber, true)
+      expect(addressService.getAddressesForDisplay).toHaveBeenCalledWith('token', prisonerNumber)
+      expect(personIntegrationApiClient.getDistinguishingMarks).toHaveBeenCalledWith(prisonerNumber)
+      expect(globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber).toHaveBeenCalledWith(
+        'token',
+        prisonerNumber,
+      )
+    })
+  })
 })

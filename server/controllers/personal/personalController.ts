@@ -21,7 +21,12 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
+import {
+  dietAndAllergyEnabled,
+  editProfileEnabled,
+  editProfileSimulateFetch,
+  editReligionEnabled,
+} from '../../utils/featureToggles'
 import {
   addEmailAddressTextFieldData,
   addPhoneNumberFieldData,
@@ -96,9 +101,10 @@ export default class PersonalController {
     return async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
-      const { user, apiErrorCallback } = res.locals
+      const { user, apiErrorCallback, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
+      const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
         config.featureToggles
 
@@ -106,6 +112,7 @@ export default class PersonalController {
         this.personalPageService.get(clientToken, prisonerData, {
           dietAndAllergyIsEnabled: dietAndAllergyEnabled(activeCaseLoadId),
           editProfileEnabled: editEnabled,
+          simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           healthAndMedicationApiReadEnabled,
@@ -128,7 +135,15 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          res.locals.user,
+          'personal',
+          undefined,
+          prisonerPermissions,
+        ),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===
