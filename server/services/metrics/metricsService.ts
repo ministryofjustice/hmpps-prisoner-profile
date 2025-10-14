@@ -119,4 +119,17 @@ export default class MetricsService {
       },
     })
   }
+
+  trackFrontendError(prisonerNumber: string, pageUrl: string, error: string, user: PrisonUser) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-frontend-error-shown',
+      properties: {
+        prisonerNumber,
+        pageUrl,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+        error,
+      },
+    })
+  }
 }

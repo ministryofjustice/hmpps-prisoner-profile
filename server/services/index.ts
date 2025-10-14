@@ -177,7 +177,13 @@ export const services = () => {
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
   const aliasService = new AliasService(personIntegrationApiClientBuilder, metricsService)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
+  const commonApiRoutes = new CommonApiRoutes(
+    offenderService,
+    auditService,
+    distinguishingMarksService,
+    photoService,
+    metricsService,
+  )
   const languagesService = new LanguagesService(
     personCommunicationNeedsApiClientBuilder,
     referenceDataService,
