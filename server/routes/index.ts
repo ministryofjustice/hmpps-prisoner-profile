@@ -103,6 +103,12 @@ export default function routes(services: Services): Router {
   )
 
   router.get(
+    '/api/report-error',
+    auditPageAccessAttempt({ services, page: ApiAction.ReportError }),
+    services.commonApiRoutes.errorReporting,
+  )
+
+  router.get(
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),

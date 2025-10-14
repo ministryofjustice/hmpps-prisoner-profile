@@ -119,6 +119,28 @@ describe('Metrics Service', () => {
     })
   })
 
+  describe('trackFrontendError', () => {
+    it('should send correct telemetry event', () => {
+      const prisonerNumber = 'A1234BC'
+      const pageUrl = '/somePage'
+      const error = 'Some Error'
+      const user = { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser
+
+      metricsService.trackFrontendError(prisonerNumber, pageUrl, error, user)
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-frontend-error-shown',
+        properties: {
+          prisonerNumber,
+          pageUrl,
+          error,
+          username: user.username,
+          activeCaseLoad: user.activeCaseLoadId,
+        },
+      })
+    })
+  })
+
   describe('trackPersonIntegrationUpdate', () => {
     it('should call telemetry client', async () => {
       metricsService.trackPersonIntegrationUpdate({
