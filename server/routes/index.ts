@@ -102,11 +102,7 @@ export default function routes(services: Services): Router {
     services.commonApiRoutes.distinguishingMarkImage,
   )
 
-  router.get(
-    '/api/report-error',
-    auditPageAccessAttempt({ services, page: ApiAction.ReportError }),
-    services.commonApiRoutes.errorReporting,
-  )
+  router.get('/api/report-error', services.commonApiRoutes.errorReporting)
 
   router.get(
     `${basePath}`,

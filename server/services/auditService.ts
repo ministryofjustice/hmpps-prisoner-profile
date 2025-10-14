@@ -143,7 +143,6 @@ export enum ApiAction {
   LocationEvents = 'LOCATION_EVENTS',
   OffenderEvents = 'OFFENDER_EVENTS',
   PrisonerImage = 'PRISONER_IMAGE',
-  ReportError = 'REPORT_ERROR',
 }
 
 export enum PostAction {
