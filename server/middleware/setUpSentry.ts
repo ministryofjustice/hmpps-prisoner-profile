@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 import * as Sentry from '@sentry/node'
 import express from 'express'
 import config from '../config'
@@ -17,9 +19,11 @@ export function setUpSentry() {
 
       beforeSend(event) {
         if (event.user) {
-          // Don't send username
-          // eslint-disable-next-line no-param-reassign
+          // Don't send PII:
           delete event.user.username
+          delete event.request.data
+          delete event.request.cookies
+          delete event.request.headers
         }
         return event
       },
