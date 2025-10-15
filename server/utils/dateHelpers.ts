@@ -22,9 +22,12 @@ import { pluralise } from './pluralise'
  *
  * @param date
  */
-export const formatDateISO = (date: Date): string => {
+export const formatDateISO = (date: Date): string | undefined => {
   let dateStr
   try {
+    if (!(date instanceof Date)) {
+      throw new Error('value is not a Date object')
+    }
     dateStr = formatISO(date, { representation: 'date' })
   } catch (error) {
     logger.error(`Error: formatDateISO - ${error.message}`)
@@ -38,19 +41,25 @@ export const formatDateISO = (date: Date): string => {
  * @param date
  * @param options
  */
-export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; endOfDay?: boolean }): string => {
+export const formatDateTimeISO = (
+  date: Date,
+  options?: { startOfDay?: boolean; endOfDay?: boolean },
+): string | undefined => {
   let dateStr
   const adjustedDate = date
-  if (options?.startOfDay) {
-    adjustedDate.setHours(0)
-    adjustedDate.setMinutes(0)
-    adjustedDate.setSeconds(0)
-  } else if (options?.endOfDay) {
-    adjustedDate.setHours(23)
-    adjustedDate.setMinutes(59)
-    adjustedDate.setSeconds(59)
-  }
   try {
+    if (!(adjustedDate instanceof Date)) {
+      throw new Error('value is not a Date object')
+    }
+    if (options?.startOfDay) {
+      adjustedDate.setHours(0)
+      adjustedDate.setMinutes(0)
+      adjustedDate.setSeconds(0)
+    } else if (options?.endOfDay) {
+      adjustedDate.setHours(23)
+      adjustedDate.setMinutes(59)
+      adjustedDate.setSeconds(59)
+    }
     dateStr = format(adjustedDate, "yyyy-MM-dd'T'HH:mm:ss")
   } catch (error) {
     logger.error(`Error: formatDateTimeISO - ${error.message}`)
