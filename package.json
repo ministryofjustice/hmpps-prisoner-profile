@@ -36,55 +36,6 @@
     "node": "^22",
     "npm": "^11"
   },
-  "jest": {
-    "coverageReporters": [
-      "lcov"
-    ],
-    "coverageDirectory": "coverage",
-    "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest"
-      ]
-    },
-    "collectCoverageFrom": [
-      "server/**/*.{ts,js,jsx,mjs}"
-    ],
-    "testMatch": [
-      "<rootDir>/(server|job)/**/?(*.)(cy|test).{ts,js,jsx,mjs}"
-    ],
-    "testEnvironment": "node",
-    "reporters": [
-      "default",
-      [
-        "jest-junit",
-        {
-          "outputDirectory": "test_results/jest/"
-        }
-      ],
-      [
-        "./node_modules/jest-html-reporter",
-        {
-          "outputPath": "test_results/unit-test-reports.html"
-        }
-      ]
-    ],
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "json",
-      "node",
-      "ts"
-    ]
-  },
-  "lint-staged": {
-    "*.{ts,js,css}": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@apollo/client": "^4.0.5",
     "@aws-sdk/client-sqs": "^3.896.0",
@@ -162,7 +113,6 @@
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
     "esbuild-sass-plugin": "^3.3.1",
-    "glob": "^10.4.5",
     "jest": "^30.1.3",
     "jest-html-reporter": "^4.3.0",
     "jest-junit": "^16.0.0",

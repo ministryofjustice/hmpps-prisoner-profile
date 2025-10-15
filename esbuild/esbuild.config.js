@@ -1,7 +1,7 @@
 const childProcess = require('node:child_process')
+const { globSync } = require('node:fs')
 const path = require('node:path')
 
-const { glob } = require('glob')
 const chokidar = require('chokidar')
 const buildAssets = require('./assets.config')
 const buildApp = require('./app.config')
@@ -32,9 +32,9 @@ const buildConfig = {
 
   app: {
     outDir: path.join(cwd, 'dist'),
-    entryPoints: glob
-      .sync([path.join(cwd, '*.ts'), path.join(cwd, 'server/**/*.ts')])
-      .filter(file => !file.endsWith('.test.ts')),
+    entryPoints: globSync([path.join(cwd, '*.ts'), path.join(cwd, 'server/**/*.ts')]).filter(
+      file => !file.endsWith('.test.ts'),
+    ),
     copy: [
       {
         from: path.join(cwd, 'server/views/**/*'),
@@ -45,7 +45,7 @@ const buildConfig = {
 
   assets: {
     outDir: path.join(cwd, 'dist/assets'),
-    entryPoints: glob.sync([
+    entryPoints: globSync([
       path.join(cwd, 'assets/js/shared/index.js'),
       path.join(cwd, 'assets/js/*.js'),
       path.join(cwd, 'assets/scss/*.scss'),
@@ -56,7 +56,7 @@ const buildConfig = {
         to: path.join(cwd, 'dist/assets/images'),
       },
     ],
-    clear: glob.sync([path.join(cwd, 'dist/assets/{css,js}')]),
+    clear: globSync([path.join(cwd, 'dist/assets/{css,js}')]),
   },
 }
 
