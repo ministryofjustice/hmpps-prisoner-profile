@@ -1644,11 +1644,16 @@ export default class PersonalController {
             res,
             prisonerNumber,
             submit: async () => {
-              await this.personalPageService.createGlobalPhoneNumber(clientToken, prisonerNumber, {
-                phoneNumber,
-                phoneNumberType,
-                phoneExtension,
-              })
+              await this.personalPageService.createGlobalPhoneNumber(
+                clientToken,
+                res.locals.user as PrisonUser,
+                prisonerNumber,
+                {
+                  phoneNumber,
+                  phoneNumberType,
+                  phoneExtension,
+                },
+              )
             },
             fieldData,
             auditDetails: {
@@ -1739,11 +1744,17 @@ export default class PersonalController {
             res,
             prisonerNumber,
             submit: async () => {
-              await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
-                phoneNumber,
-                phoneNumberType,
-                phoneExtension,
-              })
+              await this.personalPageService.updateGlobalPhoneNumber(
+                clientToken,
+                res.locals.user as PrisonUser,
+                prisonerNumber,
+                phoneNumberId,
+                {
+                  phoneNumber,
+                  phoneNumberType,
+                  phoneExtension,
+                },
+              )
             },
             fieldData,
             auditDetails: {
@@ -1783,7 +1794,7 @@ export default class PersonalController {
         return addEmailAddressTextFieldData({ name: { firstName, lastName } })
       }
 
-    const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
+    const globalEmailSetter: TextFieldSetter = async (req, res, _fieldData, value) => {
       const { prisonerNumber, emailAddressId } = req.params
       const { clientToken } = req.middleware
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
@@ -1797,11 +1808,17 @@ export default class PersonalController {
         return SetterOutcome.DUPLICATE
       }
 
-      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailUpdateValue)
+      await this.personalPageService.updateGlobalEmail(
+        clientToken,
+        res.locals.user as PrisonUser,
+        prisonerNumber,
+        emailAddressId,
+        emailUpdateValue,
+      )
       return SetterOutcome.SUCCESS
     }
 
-    const globalEmailCreator: TextFieldSetter = async (req, _res, _fieldData, value) => {
+    const globalEmailCreator: TextFieldSetter = async (req, res, _fieldData, value) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
@@ -1813,7 +1830,12 @@ export default class PersonalController {
         return SetterOutcome.DUPLICATE
       }
 
-      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailUpdateValue)
+      await this.personalPageService.createGlobalEmail(
+        clientToken,
+        res.locals.user as PrisonUser,
+        prisonerNumber,
+        emailUpdateValue,
+      )
       return SetterOutcome.SUCCESS
     }
 

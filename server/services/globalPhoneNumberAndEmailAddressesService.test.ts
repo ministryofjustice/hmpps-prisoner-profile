@@ -7,10 +7,17 @@ import {
 import { ContactsResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import { GlobalEmail, GlobalNumbersAndEmails, PhoneNumber } from './interfaces/personalPageService/PersonalPage'
+import MetricsService from './metrics/metricsService'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 
 describe('GlobalPhoneNumberAndEmailAddressesService', () => {
   let personIntegrationApiClient: PersonIntegrationApiClient
   let service: GlobalPhoneNumberAndEmailAddressesService
+  let metricsService: MetricsService
+  let user: PrisonUser
+
+  const prisonerNumber = 'A1234BC'
 
   const contact = (
     contactId: number,
@@ -42,10 +49,13 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
 
   beforeEach(() => {
     personIntegrationApiClient = personIntegrationApiClientMock()
+    metricsService = metricsServiceMock()
     service = new GlobalPhoneNumberAndEmailAddressesService(
       () => personIntegrationApiClient,
       referenceDataServiceMock(),
+      metricsService,
     )
+    user = { username: 'testuser' } as PrisonUser
   })
 
   it.each([
@@ -80,47 +90,58 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
     'Gets contacts correctly - %s',
     async (_, contactsResponse: ContactsResponseDto[], expected: GlobalNumbersAndEmails) => {
       personIntegrationApiClient.getContacts = jest.fn(async () => contactsResponse)
-      const result = await service.getForPrisonerNumber('token', 'A1234BC')
+      const result = await service.getForPrisonerNumber('token', prisonerNumber)
       expect(result).toEqual(expected)
     },
   )
 
   it('Creates emails correctly', async () => {
     personIntegrationApiClient.createContact = jest.fn(async () => ContactsResponseMock[1])
-    const result = await service.createEmailForPrisonerNumber('token', 'A1234BC', 'foo@example.com')
+    const result = await service.createEmailForPrisonerNumber('token', user, prisonerNumber, 'foo@example.com')
 
-    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith('A1234BC', {
+    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith(prisonerNumber, {
       contactType: 'EMAIL',
       contactValue: 'foo@example.com',
     })
     expect(result).toEqual(email(ContactsResponseMock[1].contactId, ContactsResponseMock[1].contactValue))
+
+    expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+      fieldsUpdated: ['emailAddress'],
+      prisonerNumber,
+      user,
+    })
   })
 
   it('Updates emails correctly', async () => {
     personIntegrationApiClient.updateContact = jest.fn(async () => ContactsResponseMock[1])
-    const result = await service.updateEmailForPrisonerNumber('token', 'A1234BC', '123', 'foo@example.com')
+    const result = await service.updateEmailForPrisonerNumber('token', user, prisonerNumber, '123', 'foo@example.com')
 
-    expect(personIntegrationApiClient.updateContact).toHaveBeenCalledWith('A1234BC', '123', {
+    expect(personIntegrationApiClient.updateContact).toHaveBeenCalledWith(prisonerNumber, '123', {
       contactType: 'EMAIL',
       contactValue: 'foo@example.com',
     })
     expect(result).toEqual(email(ContactsResponseMock[1].contactId, ContactsResponseMock[1].contactValue))
+
+    expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+      fieldsUpdated: ['emailAddress'],
+      prisonerNumber,
+      user,
+    })
   })
 
   it('Creates phones correctly', async () => {
     personIntegrationApiClient.createContact = jest.fn(async () => ContactsResponseMock[0])
-    const result = await service.createPhoneNumberForPrisonerNumber('token', 'A1234BC', {
+    const result = await service.createPhoneNumberForPrisonerNumber('token', user, prisonerNumber, {
       phoneNumber: '123',
       phoneNumberType: 'MOB',
       phoneExtension: '1234',
     })
 
-    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith('A1234BC', {
+    expect(personIntegrationApiClient.createContact).toHaveBeenCalledWith(prisonerNumber, {
       contactType: 'MOB',
       contactValue: '123',
       contactPhoneExtension: '1234',
     })
-
     expect(result).toEqual(
       phone(
         ContactsResponseMock[0].contactId,
@@ -130,22 +151,27 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
         ContactsResponseMock[0].contactPhoneExtension,
       ),
     )
+
+    expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+      fieldsUpdated: ['phoneNumber'],
+      prisonerNumber,
+      user,
+    })
   })
 
   it('Updates phones correctly', async () => {
     personIntegrationApiClient.updateContact = jest.fn(async () => ContactsResponseMock[0])
-    const result = await service.updatePhoneNumberForPrisonerNumber('token', 'A1234BC', '123', {
+    const result = await service.updatePhoneNumberForPrisonerNumber('token', user, prisonerNumber, '123', {
       phoneNumber: '123',
       phoneNumberType: 'MOB',
       phoneExtension: '1234',
     })
 
-    expect(personIntegrationApiClient.updateContact).toHaveBeenCalledWith('A1234BC', '123', {
+    expect(personIntegrationApiClient.updateContact).toHaveBeenCalledWith(prisonerNumber, '123', {
       contactType: 'MOB',
       contactValue: '123',
       contactPhoneExtension: '1234',
     })
-
     expect(result).toEqual(
       phone(
         ContactsResponseMock[0].contactId,
@@ -155,5 +181,11 @@ describe('GlobalPhoneNumberAndEmailAddressesService', () => {
         ContactsResponseMock[0].contactPhoneExtension,
       ),
     )
+
+    expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+      fieldsUpdated: ['phoneNumber'],
+      prisonerNumber,
+      user,
+    })
   })
 })

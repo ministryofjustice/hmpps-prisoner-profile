@@ -121,18 +121,30 @@ export default class PersonalPageService {
     return this.globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber(token, prisonerNumber)
   }
 
-  async createGlobalEmail(token: string, prisonerNumber: string, value: string): Promise<GlobalEmail> {
-    return this.globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber(token, prisonerNumber, value)
+  async createGlobalEmail(
+    token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    value: string,
+  ): Promise<GlobalEmail> {
+    return this.globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber(
+      token,
+      user,
+      prisonerNumber,
+      value,
+    )
   }
 
   async updateGlobalEmail(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     emailAddressId: string,
     value: string,
   ): Promise<GlobalEmail> {
     return this.globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       emailAddressId,
       value,
@@ -141,11 +153,13 @@ export default class PersonalPageService {
 
   async createGlobalPhoneNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
   ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       values,
     )
@@ -153,12 +167,14 @@ export default class PersonalPageService {
 
   async updateGlobalPhoneNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     phoneNumberId: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
   ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       phoneNumberId,
       values,

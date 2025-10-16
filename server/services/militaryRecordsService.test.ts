@@ -14,6 +14,7 @@ import {
   MilitaryRecordsMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
+import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 
 jest.mock('../data')
 jest.mock('./referenceData/referenceDataService')
@@ -40,9 +41,7 @@ describe('MilitaryRecordsService', () => {
         return []
       }),
     } as unknown as ReferenceDataService
-    metricsService = {
-      trackPersonIntegrationUpdate: jest.fn(),
-    } as unknown as MetricsService
+    metricsService = metricsServiceMock()
 
     const personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient> = jest.fn(
       () => personIntegrationApiClient,
