@@ -29,8 +29,8 @@ describe('formatDateISO', () => {
     expect(dateStr).toEqual('2023-01-01')
   })
 
-  it('should return undefined given an invalid date', () => {
-    const dateStr = formatDateISO(null)
+  it.each([undefined, null])('should return undefined given an invalid date (%j)', date => {
+    const dateStr = formatDateISO(date)
     expect(dateStr).toBeUndefined()
   })
 })
@@ -56,8 +56,8 @@ describe('formatDateTimeISO', () => {
     expect(dateStr).toEqual('2023-01-01T23:59:59')
   })
 
-  it('should return undefined given an invalid date', () => {
-    const dateStr = formatDateTimeISO(undefined)
+  it.each([undefined, null])('should return undefined given an invalid date (%j)', date => {
+    const dateStr = formatDateTimeISO(date)
     expect(dateStr).toBeUndefined()
   })
 })
@@ -77,7 +77,7 @@ describe('parseDate', () => {
   })
 
   it.each([[null], [''], ['33/11/2001'], ['30/14/2001'], ['30/11/01'], ['Tuesday']])(
-    'For input %s return Invalid Date (NaN)',
+    'For input %j return Invalid Date (NaN)',
     (date: string) => {
       const val = parseDate(date)
       expect(Number.isNaN(val.getTime())).toBeTruthy()
@@ -100,7 +100,7 @@ describe('isRealDate', () => {
   })
 
   it.each([[null], [''], ['33/11/2001'], ['30/14/2001'], ['30/11/01'], ['Tuesday']])(
-    'For input %s expect not real date',
+    'For input %j expect not real date',
     (date: string) => {
       expect(isRealDate(date)).toBeFalsy()
     },
@@ -118,7 +118,7 @@ describe('format date', () => {
     ['full', '2023-01-20', 'full', undefined, 'Friday 20 January 2023'],
     ['medium', '2023-01-20', 'medium', undefined, '20 Jan 2023'],
   ])(
-    '%s: formatDate(%s, %s)',
+    '%s: formatDate(%j, %j)',
     (
       _: string,
       isoDate: string,
@@ -140,7 +140,7 @@ describe('format datetime', () => {
     ['full', '2023-01-20T12:13:14', 'full', 'Friday 20 January 2023 at 12:13'],
     ['medium', '2023-01-20T12:13:14', 'medium', '20 Jan 2023 at 12:13'],
   ])(
-    '%s: formatDateTime(%s, %s)',
+    '%s: formatDateTime(%j, %j)',
     (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
       expect(formatDateTime(a, b)).toEqual(expected)
     },
@@ -215,7 +215,7 @@ describe('formatDateToPattern', () => {
     ['2023-01-20', 'dd/MM/yyyy', '', '20/01/2023'],
     ['2023-01-20', 'MMMM yyyy', '', 'January 2023'],
     [null, 'dd/MM/yyyy', 'Not entered', 'Not entered'],
-  ])('should format %s with pattern %s and return %s', (isoDate, pattern, emptyReturnValue, expected) => {
+  ])('should format %s with pattern %s and return %j', (isoDate, pattern, emptyReturnValue, expected) => {
     expect(formatDateToPattern(isoDate, pattern, emptyReturnValue)).toEqual(expected)
   })
 })
@@ -230,7 +230,7 @@ describe('formatDateWithAge', () => {
     [null, 'long', 'Not entered', 'Not entered'],
     [undefined, 'long', 'Not entered', 'Not entered'],
   ])(
-    'should format %s with style %s and emptyReturnValue %s, expect %s',
+    'should format %j with style %s and emptyReturnValue %j, expect %j',
     (isoDate: string, style: 'short' | 'full' | 'long' | 'medium', emptyReturnValue: string, expected: string) => {
       expect(formatDateWithAge(isoDate, style, emptyReturnValue)).toEqual(expected)
     },
