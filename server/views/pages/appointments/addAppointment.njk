@@ -310,21 +310,39 @@
                         ]
                     }) }}
 
-                  <div id="optional-video-label" class="govuk-label">
-                    <p>For confidentiality reasons, comments for some video appointments will not appear on prisoner movement slips.</p>
-                  </div>
+                    {# The comments hint text is altered slightly (using JS) depending on the type of appointment #}
+                    {% set commentsHintHtml %}
+                       <div id="optional-video-label" class="govuk-label">
+                           <p class="govuk-hint">
+                             Comments can include attendee details or other information relevant to the video appointment.
+                             They will appear on unlock lists and on the prisoner’s schedule. For confidentiality
+                             reasons, comments will not appear on prisoner movement slips.
+                           </p>
+                       </div>
+                       <div id="optional-standard-label" class="govuk-label">
+                           <p class="govuk-hint">
+                             Do not add anything that should not be seen by or shared with a prisoner. Comments will
+                             appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
+                           </p>
+                       </div>
+                    {% endset %}
 
                     <div class="js-comments">
-                    {{ govukTextarea({
-                        name: "comments",
-                        id: "comments",
-                        value: formValues.comments,
-                        errorMessage: errors | findError('comments'),
-                        classes: 'govuk-!-width-one-half',
-                        label: {
-                            text: "Comments (optional)"
-                        }
-                    }) }}
+                        {{ govukTextarea({
+                            name: "comments",
+                            id: "comments",
+                            value: formValues.comments,
+                            errorMessage: errors | findError('comments'),
+                            classes: 'govuk-!-width-one-half',
+                            label: {
+                                text: "Comments (optional)",
+                                classes: "govuk-fieldset__legend--s"
+                            },
+                            hint: {
+                                html: commentsHintHtml,
+                                classes: "govuk-caption--s"
+                            }
+                        }) }}
                     </div>
 
                     <div class="js-public-private-notes">
