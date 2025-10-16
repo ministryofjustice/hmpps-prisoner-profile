@@ -16,6 +16,8 @@ import {
   DistinguishingMarkRequest,
   PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import MetricsService from './metrics/metricsService'
 
 const bodyPartConfig: Record<
   AllBodyPartSelection,
@@ -84,10 +86,14 @@ export const findBodyPartByCodeAndSideAndOrientation = (
 }
 
 export default class DistinguishingMarksService {
-  constructor(private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>) {}
+  constructor(
+    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly metricsService: MetricsService,
+  ) {}
 
   postNewDistinguishingMark(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     markType: MarkTypeSelection,
     bodyPart: AllBodyPartSelection,
@@ -103,11 +109,18 @@ export default class DistinguishingMarksService {
       comment: description,
     }
 
-    return this.personIntegrationApiClientBuilder(token).createDistinguishingMark(
+    const response = this.personIntegrationApiClientBuilder(token).createDistinguishingMark(
       prisonerNumber,
       filterEmptyFieldsFromObject(distinguishingMarkRequest),
       photograph,
     )
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['distinguishing-marks'],
+      prisonerNumber,
+      user,
+    })
+    return response
   }
 
   getDistinguishingMark(
@@ -120,6 +133,7 @@ export default class DistinguishingMarksService {
 
   updateDistinguishingMarkLocation(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     sequenceId: string,
     existing: PersonIntegrationDistinguishingMark,
@@ -135,15 +149,23 @@ export default class DistinguishingMarksService {
       comment: existing.comment,
     }
 
-    return this.personIntegrationApiClientBuilder(token).updateDistinguishingMark(
+    const response = this.personIntegrationApiClientBuilder(token).updateDistinguishingMark(
       prisonerNumber,
       sequenceId,
       distinguishingMarkRequest,
     )
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['distinguishing-marks'],
+      prisonerNumber,
+      user,
+    })
+    return response
   }
 
   updateDistinguishingMarkDescription(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     sequenceId: string,
     existing: PersonIntegrationDistinguishingMark,
@@ -158,28 +180,56 @@ export default class DistinguishingMarksService {
       comment,
     }
 
-    return this.personIntegrationApiClientBuilder(token).updateDistinguishingMark(
+    const response = this.personIntegrationApiClientBuilder(token).updateDistinguishingMark(
       prisonerNumber,
       sequenceId,
       distinguishingMarkRequest,
     )
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['distinguishing-marks'],
+      prisonerNumber,
+      user,
+    })
+    return response
   }
 
   updateDistinguishingMarkPhoto(
     token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
     photoId: string,
     file?: MulterFile,
   ): Promise<PersonIntegrationDistinguishingMark> {
-    return this.personIntegrationApiClientBuilder(token).updateDistinguishingMarkImage(photoId, file)
+    const response = this.personIntegrationApiClientBuilder(token).updateDistinguishingMarkImage(photoId, file)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['distinguishing-marks'],
+      prisonerNumber,
+      user,
+    })
+    return response
   }
 
   addDistinguishingMarkPhoto(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     sequenceId: string,
     file?: MulterFile,
   ): Promise<PersonIntegrationDistinguishingMark> {
-    return this.personIntegrationApiClientBuilder(token).addDistinguishingMarkImage(prisonerNumber, sequenceId, file)
+    const response = this.personIntegrationApiClientBuilder(token).addDistinguishingMarkImage(
+      prisonerNumber,
+      sequenceId,
+      file,
+    )
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['distinguishing-marks'],
+      prisonerNumber,
+      user,
+    })
+    return response
   }
 
   getImage(token: string, imageId: string): Promise<Readable> {

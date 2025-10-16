@@ -146,6 +146,7 @@ describe('PersonalPageService', () => {
     globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
       null,
       null,
+      null,
     ) as jest.Mocked<GlobalPhoneNumberAndEmailAddressesService>
 
     globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber = jest.fn(async () => globalPhonesAndEmailsMock)
@@ -1235,10 +1236,11 @@ describe('PersonalPageService', () => {
           async () => globalEmailsMock[0],
         )
 
-        const result = await service.createGlobalEmail('token', 'A1234BC', 'email@email.com')
+        const result = await service.createGlobalEmail('token', prisonUserMock, 'A1234BC', 'email@email.com')
 
         expect(globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber).toHaveBeenCalledWith(
           'token',
+          prisonUserMock,
           'A1234BC',
           'email@email.com',
         )
@@ -1253,10 +1255,11 @@ describe('PersonalPageService', () => {
           async () => globalEmailsMock[0],
         )
 
-        const result = await service.updateGlobalEmail('token', 'A1234BC', '123', 'email@email.com')
+        const result = await service.updateGlobalEmail('token', prisonUserMock, 'A1234BC', '123', 'email@email.com')
 
         expect(globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber).toHaveBeenCalledWith(
           'token',
+          prisonUserMock,
           'A1234BC',
           '123',
           'email@email.com',
@@ -1272,7 +1275,7 @@ describe('PersonalPageService', () => {
           async () => globalPhonesMock[0],
         )
 
-        const result = await service.createGlobalPhoneNumber('token', 'A1234BC', {
+        const result = await service.createGlobalPhoneNumber('token', prisonUserMock, 'A1234BC', {
           phoneNumber: '123',
           phoneNumberType: 'MOB',
           phoneExtension: '1234',
@@ -1280,6 +1283,7 @@ describe('PersonalPageService', () => {
 
         expect(globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
           'token',
+          prisonUserMock,
           'A1234BC',
           {
             phoneNumber: '123',
@@ -1298,7 +1302,7 @@ describe('PersonalPageService', () => {
           async () => globalPhonesMock[0],
         )
 
-        const result = await service.updateGlobalPhoneNumber('token', 'A1234BC', '123', {
+        const result = await service.updateGlobalPhoneNumber('token', prisonUserMock, 'A1234BC', '123', {
           phoneNumber: '123',
           phoneNumberType: 'MOB',
           phoneExtension: '1234',
@@ -1306,6 +1310,7 @@ describe('PersonalPageService', () => {
 
         expect(globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber).toHaveBeenCalledWith(
           'token',
+          prisonUserMock,
           'A1234BC',
           '123',
           {

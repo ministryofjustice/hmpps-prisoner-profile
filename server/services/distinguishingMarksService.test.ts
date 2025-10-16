@@ -2,6 +2,9 @@ import DistinguishingMarksService from './distinguishingMarksService'
 import MulterFile from '../controllers/interfaces/MulterFile'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { DistinguishingMarksMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
+import MetricsService from './metrics/metricsService'
+import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 const personIntegrationApiClient = {
   getDistinguishingMark: jest.fn(),
@@ -14,9 +17,16 @@ const personIntegrationApiClient = {
 } as undefined as PersonIntegrationApiClient
 
 describe('distinguishingMarksService', () => {
+  const prisonerNumber = 'A12345'
+
   let service: DistinguishingMarksService
+  let metricsService: MetricsService
+  let user: PrisonUser
+
   beforeEach(() => {
-    service = new DistinguishingMarksService(() => personIntegrationApiClient)
+    metricsService = metricsServiceMock()
+    service = new DistinguishingMarksService(() => personIntegrationApiClient, metricsService)
+    user = { username: 'testuser' } as PrisonUser
   })
 
   afterEach(() => {
@@ -69,24 +79,29 @@ describe('distinguishingMarksService', () => {
     `(
       'should call post with $distinguishingMarkRequest when bodyPart is $bodyPart',
       ({ bodyPart, distinguishingMarkRequest }) => {
-        service.postNewDistinguishingMark('token', 'A12345', 'tattoo', bodyPart)
+        service.postNewDistinguishingMark('token', user, prisonerNumber, 'tattoo', bodyPart)
 
         expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
-          'A12345',
+          prisonerNumber,
           {
             markType: 'TAT',
             ...distinguishingMarkRequest,
           },
           undefined,
         )
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+          fieldsUpdated: ['distinguishing-marks'],
+          prisonerNumber,
+          user,
+        })
       },
     )
 
     it('should include comment if provided', () => {
-      service.postNewDistinguishingMark('token', 'A12345', 'tattoo', 'neck', 'comment')
+      service.postNewDistinguishingMark('token', user, prisonerNumber, 'tattoo', 'neck', 'comment')
 
       expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
-        'A12345',
+        prisonerNumber,
         {
           markType: 'TAT',
           bodyPart: 'NECK',
@@ -94,6 +109,11 @@ describe('distinguishingMarksService', () => {
         },
         undefined,
       )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['distinguishing-marks'],
+        prisonerNumber,
+        user,
+      })
     })
 
     it('should include image if provided', () => {
@@ -109,10 +129,10 @@ describe('distinguishingMarksService', () => {
         destination: 'destination',
         encoding: 'utf-8',
       }
-      service.postNewDistinguishingMark('token', 'A12345', 'tattoo', 'neck', 'comment', image)
+      service.postNewDistinguishingMark('token', user, prisonerNumber, 'tattoo', 'neck', 'comment', image)
 
       expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
-        'A12345',
+        prisonerNumber,
         {
           markType: 'TAT',
           bodyPart: 'NECK',
@@ -120,14 +140,19 @@ describe('distinguishingMarksService', () => {
         },
         image,
       )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['distinguishing-marks'],
+        prisonerNumber,
+        user,
+      })
     })
   })
 
   describe('getDistinguishingMark', () => {
     it('should call getDistinguishingMark', () => {
-      service.getDistinguishingMark('token', 'A12345', '1')
+      service.getDistinguishingMark('token', prisonerNumber, '1')
 
-      expect(personIntegrationApiClient.getDistinguishingMark).toHaveBeenCalledWith('A12345', '1')
+      expect(personIntegrationApiClient.getDistinguishingMark).toHaveBeenCalledWith(prisonerNumber, '1')
     })
   })
 
@@ -179,7 +204,8 @@ describe('distinguishingMarksService', () => {
       ({ bodyPartName, distinguishingMarkRequest }) => {
         service.updateDistinguishingMarkLocation(
           'token',
-          'A12345',
+          user,
+          prisonerNumber,
           '1',
           DistinguishingMarksMock[0],
           'tattoo',
@@ -187,12 +213,17 @@ describe('distinguishingMarksService', () => {
         )
 
         const { bodyPart, side, partOrientation } = distinguishingMarkRequest
-        expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith('A12345', '1', {
+        expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith(prisonerNumber, '1', {
           markType: 'TAT',
           bodyPart,
           side,
           partOrientation,
           comment: 'Some comment',
+        })
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+          fieldsUpdated: ['distinguishing-marks'],
+          prisonerNumber,
+          user,
         })
       },
     )
@@ -202,43 +233,59 @@ describe('distinguishingMarksService', () => {
     it('should include comment if provided', () => {
       service.updateDistinguishingMarkDescription(
         'token',
-        'A12345',
+        user,
+        prisonerNumber,
         '1',
         DistinguishingMarksMock[0],
         'tattoo',
         'comment',
       )
 
-      expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith('A12345', '1', {
+      expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith(prisonerNumber, '1', {
         markType: 'TAT',
         bodyPart: 'HEAD',
         side: 'L',
         partOrientation: 'UPP',
         comment: 'comment',
       })
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['distinguishing-marks'],
+        prisonerNumber,
+        user,
+      })
     })
   })
 
   describe('updateDistinguishingMarkPhoto', () => {
     it('should update correct photo', () => {
-      service.updateDistinguishingMarkPhoto('token', '123', {
+      service.updateDistinguishingMarkPhoto('token', user, prisonerNumber, '123', {
         originalname: 'photo',
       } as MulterFile)
 
       expect(personIntegrationApiClient.updateDistinguishingMarkImage).toHaveBeenCalledWith('123', {
         originalname: 'photo',
       })
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['distinguishing-marks'],
+        prisonerNumber,
+        user,
+      })
     })
   })
 
   describe('addDistinguishingMarkPhoto', () => {
     it('should add correct photo', () => {
-      service.addDistinguishingMarkPhoto('token', 'A12345', '1', {
+      service.addDistinguishingMarkPhoto('token', user, prisonerNumber, '1', {
         originalname: 'photo',
       } as MulterFile)
 
-      expect(personIntegrationApiClient.addDistinguishingMarkImage).toHaveBeenCalledWith('A12345', '1', {
+      expect(personIntegrationApiClient.addDistinguishingMarkImage).toHaveBeenCalledWith(prisonerNumber, '1', {
         originalname: 'photo',
+      })
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['distinguishing-marks'],
+        prisonerNumber,
+        user,
       })
     })
   })
