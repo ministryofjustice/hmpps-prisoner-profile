@@ -1,11 +1,9 @@
 import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import {
   CaseNotesPermission,
-  isGranted,
   PathfinderPermission,
   PersonInterventionsPermission,
   PersonPrisonCategoryPermission,
-  PrisonerPermission,
   PrisonerPermissions,
   PrisonerSchedulePermission,
   SOCPermission,
@@ -15,18 +13,18 @@ import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
+import mockPermissions from '../../../../tests/mocks/mockPermissions'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }
 const permissions = {} as PrisonerPermissions
-const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 
 describe('buildOverviewActions', () => {
   describe('Add case notes', () => {
     it.each([true, false])(`User with permission can see 'add case notes' link: %s`, (permissionGranted: boolean) => {
-      mockPermissionCheck(CaseNotesPermission.edit, permissionGranted)
+      mockPermissions({ [CaseNotesPermission.edit]: permissionGranted })
 
       const resp = buildOverviewActions(
         PrisonerMockDataA,
@@ -93,7 +91,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see Log an activity application: $visible',
       ({ permissionGranted, availableServices, visible }) => {
-        mockPermissionCheck(PrisonerSchedulePermission.edit_activity, permissionGranted)
+        mockPermissions({ [PrisonerSchedulePermission.edit_activity]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -116,7 +114,7 @@ describe('buildOverviewActions', () => {
 
   describe('Add appointment', () => {
     it.each([true, false])(`User with permission can see 'add appointment' link: %s`, (permissionGranted: boolean) => {
-      mockPermissionCheck(PrisonerSchedulePermission.edit_appointment, permissionGranted)
+      mockPermissions({ [PrisonerSchedulePermission.edit_appointment]: permissionGranted })
 
       const resp = buildOverviewActions(
         PrisonerMockDataA,
@@ -140,7 +138,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted and disabledPrison: $disabledPrisons can see add appointment: $visible',
       ({ permissionGranted, disabledPrisons, visible }) => {
-        mockPermissionCheck(UseOfForcePermission.edit, permissionGranted)
+        mockPermissions({ [UseOfForcePermission.edit]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -174,7 +172,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted with pathfinderNominal: $pathfinderNominalToUse can see refer to pathfinder: $visible',
       ({ permissionGranted, pathfinderNominalToUse, visible }) => {
-        mockPermissionCheck(PathfinderPermission.edit, permissionGranted)
+        mockPermissions({ [PathfinderPermission.edit]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -204,7 +202,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted with socNominal: socNominalToUse can see add to soc: $visible',
       ({ permissionGranted, socNominalToUse, visible }) => {
-        mockPermissionCheck(SOCPermission.edit, permissionGranted)
+        mockPermissions({ [SOCPermission.edit]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -227,7 +225,7 @@ describe('buildOverviewActions', () => {
 
   describe('Manage category', () => {
     it.each([true, false])(`User with permission can see 'Manage category' link: %s`, (permissionGranted: boolean) => {
-      mockPermissionCheck(PersonPrisonCategoryPermission.edit, permissionGranted)
+      mockPermissions({ [PersonPrisonCategoryPermission.edit]: permissionGranted })
 
       const resp = buildOverviewActions(
         PrisonerMockDataA,
@@ -256,7 +254,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see Make CSIP referral: $visible',
       ({ permissionGranted, availableServices, visible }) => {
-        mockPermissionCheck(PersonInterventionsPermission.read_csip, permissionGranted)
+        mockPermissions({ [PersonInterventionsPermission.read_csip]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -288,7 +286,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see Log an activity application: $visible',
       ({ manageAllocationsEnabled, permissionGranted, availableServices, visible }) => {
-        mockPermissionCheck(PrisonerSchedulePermission.edit_activity, permissionGranted)
+        mockPermissions({ [PrisonerSchedulePermission.edit_activity]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
@@ -316,7 +314,3 @@ describe('buildOverviewActions', () => {
     )
   })
 })
-
-function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
-  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === permissions && granted)
-}
