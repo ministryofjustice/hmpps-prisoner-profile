@@ -1,12 +1,10 @@
 import { Request, Response } from 'express'
 import {
-  isGranted,
   PersonalRelationshipsPermission,
   PersonPrisonCategoryPermission,
   PrisonerAdjudicationsPermission,
   PrisonerIncentivesPermission,
   PrisonerMoneyPermission,
-  PrisonerPermission,
   PrisonerPermissions,
   PrisonerVisitsAndVisitorsPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
@@ -57,10 +55,10 @@ import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSch
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import config from '../config'
+import mockPermissions from '../../tests/mocks/mockPermissions'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
-const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 const prisonerPermissions = {} as PrisonerPermissions
 
 const getResLocals = ({
@@ -160,7 +158,7 @@ describe('overviewController', () => {
 
   describe('moneySummary', () => {
     it('should call moneyService.getMoneySummary and include response', async () => {
-      mockPermissionCheck(PrisonerMoneyPermission.read, true)
+      mockPermissions({ [PrisonerMoneyPermission.read]: true })
 
       moneyService.getAccountBalances = jest
         .fn()
@@ -176,7 +174,7 @@ describe('overviewController', () => {
     })
 
     it('should not call moneyService.getMoneySummary if user doesnt have permission', async () => {
-      mockPermissionCheck(PrisonerMoneyPermission.read, false)
+      mockPermissions({ [PrisonerMoneyPermission.read]: false })
 
       moneyService.getAccountBalances = jest
         .fn()
@@ -194,7 +192,7 @@ describe('overviewController', () => {
 
   describe('adjudicationsSummary', () => {
     it('should call adjudicationsService.getAdjudicationsOverview and include response', async () => {
-      mockPermissionCheck(PrisonerAdjudicationsPermission.read, true)
+      mockPermissions({ [PrisonerAdjudicationsPermission.read]: true })
 
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
@@ -210,7 +208,7 @@ describe('overviewController', () => {
     })
 
     it('should not call adjudicationsService.getAdjudicationsOverview if user doesnt have permission', async () => {
-      mockPermissionCheck(PrisonerAdjudicationsPermission.read, false)
+      mockPermissions({ [PrisonerAdjudicationsPermission.read]: false })
 
       const resNotInCaseload = {
         ...res,
@@ -252,7 +250,7 @@ describe('overviewController', () => {
 
   describe('visitsSummary', () => {
     it('should call visitsService.getVisitsOverview and include response', async () => {
-      mockPermissionCheck(PrisonerVisitsAndVisitorsPermission.read, true)
+      mockPermissions({ [PrisonerVisitsAndVisitorsPermission.read]: true })
 
       visitsService.getVisitsOverview = jest
         .fn()
@@ -268,7 +266,7 @@ describe('overviewController', () => {
     })
 
     it('should not call visitsService.getVisitsOverview if prisoner is not in caseload', async () => {
-      mockPermissionCheck(PrisonerVisitsAndVisitorsPermission.read, false)
+      mockPermissions({ [PrisonerVisitsAndVisitorsPermission.read]: false })
 
       const resNotInCaseload = {
         ...res,
@@ -307,7 +305,7 @@ describe('overviewController', () => {
 
   describe('categorySummary', () => {
     it('should get data and map category summary data', async () => {
-      mockPermissionCheck(PersonPrisonCategoryPermission.edit, false)
+      mockPermissions({ [PersonPrisonCategoryPermission.edit]: false })
 
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
@@ -332,7 +330,7 @@ describe('overviewController', () => {
     })
 
     it('should set userCanManage to true when user has permission', async () => {
-      mockPermissionCheck(PersonPrisonCategoryPermission.edit, true)
+      mockPermissions({ [PersonPrisonCategoryPermission.edit]: true })
 
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
@@ -386,7 +384,7 @@ describe('overviewController', () => {
 
   describe('incentiveSummary', () => {
     it('should call incentiveService.getIncentiveOverview and include response', async () => {
-      mockPermissionCheck(PrisonerIncentivesPermission.read, true)
+      mockPermissions({ [PrisonerIncentivesPermission.read]: true })
 
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
@@ -410,7 +408,7 @@ describe('overviewController', () => {
     })
 
     it('should not call incentiveService.getIncentiveOverview if user does not have permission', async () => {
-      mockPermissionCheck(PrisonerIncentivesPermission.read, false)
+      mockPermissions({ [PrisonerIncentivesPermission.read]: false })
 
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
@@ -734,7 +732,7 @@ describe('overviewController', () => {
     })
 
     it('Returns the external contacts counts from the contacts service', async () => {
-      mockPermissionCheck(PersonalRelationshipsPermission.read_contacts, true)
+      mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: true })
       config.featureToggles.externalContactsEnabledPrisons = ['MDI']
       contactsService.getExternalContactsCount = jest.fn().mockResolvedValue({
         official: 1,
@@ -759,7 +757,7 @@ describe('overviewController', () => {
 
     it('Does not request the external contacts count when toggled off', async () => {
       config.featureToggles.externalContactsEnabledPrisons = []
-      mockPermissionCheck(PersonalRelationshipsPermission.read_contacts, true)
+      mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: true })
       contactsService.getExternalContactsCount = jest.fn()
 
       await controller.displayOverview(req, res)
@@ -774,7 +772,7 @@ describe('overviewController', () => {
     })
 
     it('Does not request the external contacts count if permission not granted', async () => {
-      mockPermissionCheck(PersonalRelationshipsPermission.read_contacts, false)
+      mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: false })
       config.featureToggles.externalContactsEnabledPrisons = ['MDI']
       contactsService.getExternalContactsCount = jest.fn()
 
@@ -815,7 +813,3 @@ describe('overviewController', () => {
     })
   })
 })
-
-function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
-  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
-}
