@@ -6,5 +6,5 @@
     "types": ["cypress", "cypress-file-upload"],
     "esModuleInterop": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../cypress.config.ts"]
 }

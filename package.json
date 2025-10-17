@@ -80,6 +80,7 @@
     "url-value-parser": "^2.2.0"
   },
   "devDependencies": {
+    "@cypress/webpack-batteries-included-preprocessor": "^4.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.5",
     "@ministryofjustice/hmpps-precommit-hooks": "^0.0.4",
@@ -105,7 +106,7 @@
     "chokidar": "^4.0.3",
     "concurrently": "^9.2.1",
     "cookie-session": "^2.1.1",
-    "cypress": "^14.5.4",
+    "cypress": "^15.4.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
     "esbuild": "^0.25.10",
