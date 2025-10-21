@@ -31,7 +31,7 @@ export default class CsraController {
       })
 
     const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
-    const filteredAsessments = await this.csraService.getDetailsForAssessments(clientToken, filteredSummaries)
+    const filteredAssessments = await this.csraService.getDetailsForAssessments(clientToken, filteredSummaries)
 
     this.auditService
       .sendPageView({
@@ -45,7 +45,7 @@ export default class CsraController {
 
     return res.render('pages/csra/prisonerCsraHistoryPage', {
       pageTitle: 'CSRA history',
-      csraAssessments: filteredAsessments,
+      csraAssessments: filteredAssessments,
       filterValues,
       errors: undefined,
     })
