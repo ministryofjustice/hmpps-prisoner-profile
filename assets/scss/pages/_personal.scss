@@ -103,8 +103,12 @@
 
     h3 {
       display: table-cell;
-      padding-top: 10px;
+      padding-top: 30px;
       padding-bottom: 10px;
+    }
+
+    &:first-of-type  h3 {
+      padding-top: 10px;
     }
 
     a {
@@ -139,12 +143,6 @@
 
 .additional-identity-numbers-row {
   margin-bottom: 15px;
-
-  h3 {
-    margin: 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
 
   a {
     display: inline-block;
@@ -366,4 +364,3 @@
     color: #AA2A16;
   }
 }
-
