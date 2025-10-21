@@ -40,25 +40,25 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
 
     if (!isUnknownSelected && !hasOfficerDetails) {
       errors.push({
-        text: "Enter the probation officer's details",
+        text: 'Enter the probation officer’s details',
         href: '#officerDetailsOrUnknown',
       })
     } else if (isUnknownSelected === hasOfficerDetails) {
       errors.push({
-        text: "Enter either the probation officer's details, or select 'Not yet known'",
+        text: "Enter either the probation officer’s details, or select 'Not yet known'",
         href: '#officerDetailsOrUnknown',
       })
     } else if (!isUnknownSelected) {
       if (!body.officerFullName) {
         errors.push({
-          text: "Enter the probation officer's full name",
+          text: 'Enter the probation officer’s full name',
           href: '#officerFullName',
         })
       }
 
       if (!body.officerEmail) {
         errors.push({
-          text: "Enter the probation officer's email address",
+          text: 'Enter the probation officer’s email address',
           href: '#officerEmail',
         })
       } else if (!emailRegex.test(body.officerEmail)) {

@@ -30,25 +30,25 @@ describe('Religion validators', () => {
     })
 
     it.each([
-      [{ reasonKnown: 'NO' }, `Select this person's religion, faith or belief`, '#religion'],
+      [{ reasonKnown: 'NO' }, 'Select this person’s religion, faith or belief', '#religion'],
       [
         { religion: 'ZORO' },
-        `Select yes if you know why this person's religion, faith or belief has changed`,
+        'Select yes if you know why this person’s religion, faith or belief has changed',
         '#reasonKnown',
       ],
       [
         { religion: 'ZORO', reasonKnown: 'YES' },
-        `Enter why this person's religion, faith or belief has changed`,
+        'Enter why this person’s religion, faith or belief has changed',
         '#reasonForChange',
       ],
       [
         { religion: 'ZORO', reasonKnown: 'YES', reasonForChange: messageExceedingMaxLength },
-        `The reason why this person's religion, faith or belief has changed must be 4,000 characters or less`,
+        'The reason why this person’s religion, faith or belief has changed must be 4,000 characters or less',
         '#reasonForChange',
       ],
       [
         { religion: 'ZORO', reasonKnown: 'NO', reasonForChangeUnknown: messageExceedingMaxLength },
-        `The details about this change must be 4,000 characters or less`,
+        'The details about this change must be 4,000 characters or less',
         '#reasonForChange',
       ],
     ])(

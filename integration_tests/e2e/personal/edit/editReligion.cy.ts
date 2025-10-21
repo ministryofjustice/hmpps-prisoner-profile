@@ -41,8 +41,8 @@ context('Edit religion, faith or belief', () => {
           testDescription: 'Nothing selected',
           input: {},
           errorMessages: [
-            `Select this person's religion, faith or belief`,
-            `Select yes if you know why this person's religion, faith or belief has changed`,
+            'Select this person’s religion, faith or belief',
+            'Select yes if you know why this person’s religion, faith or belief has changed',
           ],
         },
         {
@@ -50,7 +50,7 @@ context('Edit religion, faith or belief', () => {
           input: {
             radioInputs: { religion: 'ZORO', reasonKnown: 'YES' },
           },
-          errorMessages: [`Enter why this person's religion, faith or belief has changed`],
+          errorMessages: ['Enter why this person’s religion, faith or belief has changed'],
         },
         {
           testDescription: 'Text is too long when reason change is known',
@@ -59,7 +59,7 @@ context('Edit religion, faith or belief', () => {
             textAreaInputs: { reasonForChange: 'a'.repeat(4001) },
           },
           errorMessages: [
-            `The reason why this person's religion, faith or belief has changed must be 4,000 characters or less`,
+            'The reason why this person’s religion, faith or belief has changed must be 4,000 characters or less',
           ],
         },
         {

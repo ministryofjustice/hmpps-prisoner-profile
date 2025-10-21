@@ -156,7 +156,7 @@
 
                     <div class="govuk-form-group js-probation-officer {{ 'govuk-form-group--error' if errors | findError("officerDetailsOrUnknown") }}">
                         <fieldset class="govuk-fieldset">
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Enter the probation officer's details</legend>
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Enter the probation officer’s details</legend>
                             <p id="officerDetailsOrUnknown" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span>{{ (errors | findError("officerDetailsOrUnknown")).text }}</p>
                             <p class="govuk-body">You can enter the details later if not yet known</p>
                             {{ govukCheckboxes({
@@ -356,7 +356,7 @@
                               classes: 'govuk-fieldset__legend--s'
                             },
                             hint: {
-                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor's details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
+                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
                             },
                             maxlength: "400"
                         }) }}
