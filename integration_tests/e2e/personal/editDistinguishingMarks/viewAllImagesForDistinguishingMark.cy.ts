@@ -69,7 +69,7 @@ context('View all images for a distinguishing mark', () => {
       page
         .prisonerProfileLink()
         .should('be.visible')
-        .and('contain.text', `Return to the prisoner's profile`)
+        .and('contain.text', 'Return to the prisoner’s profile')
         .and('have.attr', 'href')
         .and('include', '/personal#marks')
     })

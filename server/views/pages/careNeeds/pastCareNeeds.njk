@@ -23,7 +23,7 @@
 {% block body %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName.firstLast | apostrophe }} past care needs</h1>
+            <h1 class="govuk-heading-l govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName.firstLast | apostrophe }} past care needs</h1>
         </div>
     </div>
 
@@ -37,5 +37,5 @@
     <p>{{ prisonerName.firstLast }} has no past care needs.</p>
     {% endif %}
 
-    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}" data-qa="care-need-history-back-link">Return to the prisoner's profile</a>
+    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}" data-qa="care-need-history-back-link">Return to the prisoner’s profile</a>
 {% endblock %}

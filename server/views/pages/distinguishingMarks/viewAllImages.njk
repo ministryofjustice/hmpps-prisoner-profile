@@ -31,7 +31,7 @@
 {% endif %}
 
 <div class="mark-images__header-container">
-    <h1>{{ prisonerName.firstLast | apostrophe }} {{ mark | toBodyPartDescription | lower }} {{ markType }} photos</h1>
+    <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} {{ mark | toBodyPartDescription | lower }} {{ markType }} photos</h1>
     <div class="print-link">
         <a href="#"
            class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print"
@@ -63,7 +63,7 @@
 <div class="govuk-!-margin-top-4">
     <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
        href="{{ refererUrl }}"
-       data-qa="mark-images-back-link">Return to the prisoner's profile</a>
+       data-qa="mark-images-back-link">Return to the prisoner’s profile</a>
 </div>
 
 {% endblock %}
