@@ -14,14 +14,9 @@
     flex-wrap: nowrap;
     align-items: center;
 
-    h2 {
-      font-size: 24px;
-    }
-
     .govuk-tag {
       margin-left: 17px;
-      font-size: 16px;
-      font-weight: 700;
+      @include govuk-font($size: 16, $weight: 'bold');
     }
   }
 

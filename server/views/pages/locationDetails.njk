@@ -23,7 +23,7 @@
   {% block content %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-        <h1 class="govuk-!-font-size-36">{{prisonerName.firstLast |  apostrophe}} location details</h1>
+        <h1 class="govuk-heading-l govuk-!-margin-top-5 govuk-!-margin-bottom-8">{{prisonerName.firstLast |  apostrophe}} location details</h1>
       </div>
     </div>
 
@@ -39,7 +39,7 @@
       }) }}
     {% else %}
       <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter hmpps-full-width-print"><h2 class="govuk-!-font-size-36">Current location</h2></div>
+        <div class="govuk-grid-column-one-quarter hmpps-full-width-print"><h2 class="govuk-heading-l">Current location</h2></div>
         <div class="location-actions govuk-grid-column-three-quarters govuk-!-display-none-print">
           {% if canViewMoveToReceptionButton %}
             <div class="hmpps-action-header">
@@ -93,7 +93,7 @@
       </div>
     {% endif %}
 
-    <h2 class="govuk-!-font-size-36">Previous locations</h2>
+    <h2 class="govuk-heading-l">Previous locations</h2>
     <div data-qa="previous-locations">
       {% for agency in locationDetailsGroupedByAgency %}
         {% set agencyDatePeriod = "from " + agency.fromDate + " to " + agency.toDate %}

@@ -94,7 +94,7 @@
         {% if showAdditionalIdRow and identityNumberEditEnabled %}
           <div class="govuk-summary-list__row additional-identity-numbers-row" data-qa="additional-identity-numbers-section-heading">
             <div>
-              <h3>Additional identity numbers</h3>
+              <h3 class="govuk-heading-s">Additional identity numbers</h3>
               {% if not hasPersonalId %}
                 <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/personal-id-numbers">Add personal ID numbers</a><br />
               {% endif %}
