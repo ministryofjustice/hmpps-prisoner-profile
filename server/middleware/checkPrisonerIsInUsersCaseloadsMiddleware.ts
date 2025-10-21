@@ -6,13 +6,13 @@ import { addMiddlewareError } from './middlewareHelpers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import ServerError from '../utils/serverError'
 
-export default function checkCsraAccess(): RequestHandler {
+export default function checkPrisonerIsInUsersCaseloads(): RequestHandler {
   return async (req, res, next) => {
     const prisonerData: Prisoner = req.middleware?.prisonerData
     const { userRoles }: { userRoles: string[] } = res.locals.user
     // This function requires prisoner data - so ensure that's present before continuing
     if (!prisonerData) {
-      return next(new ServerError('CheckCsraAccessMiddleware: No PrisonerData found in middleware'))
+      return next(new ServerError('CheckPrisonerIsInUsersCaseloadsMiddleware: No PrisonerData found in middleware'))
     }
     const { prisonId } = prisonerData
 
@@ -22,7 +22,11 @@ export default function checkCsraAccess(): RequestHandler {
 
     if (!canAccessCsra) {
       return next(
-        addMiddlewareError(req, next, new RoleError(`CheckCsraAccessMiddleware: not authorised for ${req.path}`)),
+        addMiddlewareError(
+          req,
+          next,
+          new RoleError(`CheckPrisonerIsInUsersCaseloadsMiddleware: not authorised for ${req.path}`),
+        ),
       )
     }
 

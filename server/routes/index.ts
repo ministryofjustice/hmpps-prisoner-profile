@@ -38,6 +38,7 @@ import imageRouter from './imageRouter'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import editRouter from './editRouter'
 import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
+import checkPrisonerIsInUsersCaseloads from '../middleware/checkPrisonerIsInUsersCaseloadsMiddleware'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -234,6 +235,7 @@ export default function routes(services: Services): Router {
     `${basePath}/schedule`,
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
+    checkPrisonerIsInUsersCaseloads(),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
