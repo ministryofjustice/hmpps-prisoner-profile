@@ -487,7 +487,7 @@ export default class PersonalPageService {
       : null
 
     return {
-      age: calculateAge(prisonerData.dateOfBirth),
+      age: calculateAge(inmateDetail.dateOfBirth),
       aliases,
       dateOfBirth: formatDate(inmateDetail.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(
