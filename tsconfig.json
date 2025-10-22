@@ -22,7 +22,6 @@
     "dist/",
     "cypress.config.ts",
     "coverage/",
-    "server/views/components/",
     "esbuild/",
     "eslint.config.mjs"
   ],
