@@ -23,6 +23,7 @@ export default {
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
   branchName: get('GIT_BRANCH', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
+  appInsightsConnectionString: get('APPLICATIONINSIGHTS_CONNECTION_STRING', '', requiredInProduction),
   production,
   https: production,
   staticResourceCacheDuration: '1h',
@@ -343,7 +344,8 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   featureToggles: {
-    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || ['BLI', 'NHI', 'LII', 'SLI'],
+    appInsightsWebAnalyticsEnabledPrisons: get('APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS', []),
+    neurodiversityEnabledPrisons: get('NEURODIVERSITY_ENABLED_PRISONS', ['BLI', 'NHI', 'LII', 'SLI']),
     complexityEnabledPrisons: get(
       'PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS',
       ['AGI', 'BZI', 'DHI', 'DWI', 'ESI', 'EWI', 'FHI', 'LNI', 'NHI', 'PFI', 'SDI', 'STI'],

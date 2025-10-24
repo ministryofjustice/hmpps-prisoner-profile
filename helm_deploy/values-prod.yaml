@@ -25,6 +25,7 @@ generic-service:
     TOKEN_VERIFICATION_API_URL: 'https://token-verification-api.prison.service.justice.gov.uk'
     CONTENTFUL_ENVIRONMENT: 'master'
     SENTRY_ENVIRONMENT: "prod"
+    APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS: "HEI"
 
     # UI Service urls
     ASSESS_FOR_EARLY_RELEASE_UI_URL: 'https://assess-for-early-release.hmpps.service.justice.gov.uk'
