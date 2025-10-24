@@ -32,7 +32,7 @@ export default class CaseNotesController {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
       const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
-      const { prisonerPermissions } = res.locals
+      const { user, prisonerPermissions } = res.locals
 
       queryParams.sort = (req.query.sort as string) || 'createdAt,DESC'
       if (req.query.page) queryParams.page = +req.query.page
@@ -49,14 +49,14 @@ export default class CaseNotesController {
           queryParams,
           canViewSensitiveCaseNotes: isGranted(CaseNotesPermission.read_sensitive, prisonerPermissions),
           canDeleteSensitiveCaseNotes: isGranted(CaseNotesPermission.delete_sensitive, prisonerPermissions),
-          currentUserDetails: res.locals.user,
+          currentUserDetails: user,
         }),
       )
 
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
-          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'case-notes'),
           caseNotesApiUnavailable: true,
         })
       }
@@ -69,7 +69,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendSearch({
-          user: res.locals.user,
+          user,
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
@@ -81,7 +81,7 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'case-notes'),
         ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,
