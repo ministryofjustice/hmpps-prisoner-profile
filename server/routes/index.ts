@@ -121,7 +121,7 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     retrieveCuriousInPrisonCourses(services.curiousService),
     async (req, res) => {
-      const { prisonerPermissions } = res.locals
+      const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
@@ -129,7 +129,7 @@ export default function routes(services: Services): Router {
       const workAndSkillsPageData = await workAndSkillsPageService.get(
         req.middleware.clientToken,
         prisonerData,
-        res.locals.apiErrorCallback,
+        apiErrorCallback,
       )
 
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
@@ -161,7 +161,7 @@ export default function routes(services: Services): Router {
         !curiousGoals.isFulfilled() || workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -169,7 +169,7 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'work-and-skills'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'work-and-skills'),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
@@ -196,11 +196,12 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
+      const { user, prisonerPermissions } = res.locals
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -209,7 +210,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'offences'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'offences'),
         courtCaseData,
         releaseDates,
         activeTab: true,

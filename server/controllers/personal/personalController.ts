@@ -101,7 +101,7 @@ export default class PersonalController {
     return async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
-      const { user, apiErrorCallback } = res.locals
+      const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
@@ -123,7 +123,7 @@ export default class PersonalController {
       ])
 
       await this.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -135,7 +135,7 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===

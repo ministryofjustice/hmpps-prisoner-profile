@@ -66,11 +66,11 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
-    const { apiErrorCallback, prisonerPermissions } = res.locals
+    const { apiErrorCallback, user, prisonerPermissions } = res.locals
     const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
-    const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, res.locals.user)
+    const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, user)
     const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
@@ -139,7 +139,7 @@ export default class OverviewController {
       prisonerData,
       pathfinderNominal,
       socNominal,
-      res.locals.user,
+      user,
       config,
       res.locals.feComponents?.sharedData,
       prisonerPermissions,
@@ -149,7 +149,7 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'overview'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'overview'),
       moneySummary,
       adjudicationSummary,
       visitsSummary,

@@ -70,7 +70,8 @@ export default function imageRouter(services: Services): Router {
     async (req, res) => {
       const { prisonerNumber, miniBannerData, clientToken } = getCommonRequestData(req, res)
       const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
-      const { activeCaseLoadId } = res.locals.user as PrisonUser
+      const { user, prisonerPermissions } = res.locals
+      const { activeCaseLoadId } = user as PrisonUser
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
       let imageUploadedDate = ''
 
@@ -81,7 +82,7 @@ export default function imageRouter(services: Services): Router {
       }
 
       await services.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -90,7 +91,7 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions),
         miniBannerData,
         imageUploadedDate,
         photoStatus,
@@ -107,7 +108,8 @@ export default function imageRouter(services: Services): Router {
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {
       const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
-      const { activeCaseLoadId } = res.locals.user as PrisonUser
+      const { user, prisonerPermissions } = res.locals
+      const { activeCaseLoadId } = user as PrisonUser
       const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
@@ -123,7 +125,7 @@ export default function imageRouter(services: Services): Router {
       )
 
       await services.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -132,7 +134,7 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions),
         miniBannerData,
         facialImages,
         editEnabled: editProfilePhotoEnabled(activeCaseLoadId),

@@ -39,7 +39,7 @@
         <div class="govuk-grid-row govuk-!-display-none-print">
             <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
             <div class="govuk-grid-column-three-quarters">
-                {% if addCaseNoteLinkUrl %}
+                {% if isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
                 <div class="hmpps-action-header">
                     {{ hmppsActionButton({ text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl }) }}
                 </div>

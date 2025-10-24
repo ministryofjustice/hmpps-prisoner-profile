@@ -4,8 +4,6 @@ import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfac
 import { SortOption } from '../interfaces/SortParams'
 import HmppsError from '../interfaces/HmppsError'
 import ListMetadata from '../interfaces/ListMetadata'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { Role } from '../data/enums/role'
 import config from '../config'
 import OverviewNonAssociation from '../services/interfaces/overviewPageService/OverviewNonAssociation'
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
@@ -413,20 +411,6 @@ export const userHasRoles = (rolesToCheck: string[], userRoles: string[]): boole
  */
 export const userHasAllRoles = (rolesToCheck: string[], userRoles: string[]): boolean => {
   return rolesToCheck.every(role => userRoles.includes(role))
-}
-
-/**
- * Enable the `userCanEdit` flag based on user roles/flags and prisoner location/flags
- *
- * @param user
- * @param prisoner
- */
-export const userCanEdit = (user: HmppsUser, prisoner: Partial<Prisoner>): boolean => {
-  return (
-    (user.authSource === 'nomis' && user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId)) ||
-    (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
-    (prisoner.restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
-  )
 }
 
 export const prisonerIsOut = (prisonId: string): boolean => {
