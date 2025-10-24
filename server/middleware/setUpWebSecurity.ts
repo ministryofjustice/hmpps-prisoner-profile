@@ -19,6 +19,7 @@ export default function setUpWebSecurity(): Router {
     '*.google-analytics.com',
     '*.analytics.google.com',
     '*.googletagmanager.com',
+    'https://northeurope-0.in.applicationinsights.azure.com',
     (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
   ]
   const styleSrc = [

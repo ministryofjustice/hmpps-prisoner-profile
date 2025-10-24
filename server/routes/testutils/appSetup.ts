@@ -8,6 +8,7 @@ import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import { Services } from '../../services'
 import { HmppsUser } from '../../interfaces/HmppsUser'
+import { ApplicationInfo } from '../../applicationInfo'
 
 export const flashProvider = jest.fn()
 
@@ -16,7 +17,8 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app)
+  nunjucksSetup(app, {} as ApplicationInfo)
+
   app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
     req.user = userSupplier()

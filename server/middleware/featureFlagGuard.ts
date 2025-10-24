@@ -6,7 +6,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 export type FeatureFlagMethod = (activeCaseLoadId?: string) => boolean
 
 export function featureFlagGuard(featureName: string, featureFlagMethod: FeatureFlagMethod) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (_req: Request, res: Response, next: NextFunction) => {
     const { activeCaseLoadId } = res.locals.user as PrisonUser
     if (featureFlagMethod(activeCaseLoadId)) {
       return next()
