@@ -1,3 +1,5 @@
+import CircuitBreaker from 'opossum'
+
 const production = process.env.NODE_ENV === 'production'
 
 const toBoolean = (value: unknown): boolean => {
@@ -25,6 +27,14 @@ export class AgentConfig {
   }
 }
 
+const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
+  timeout: 60000, // the rest client already implements a shorter timeout, hence 60s
+  errorThresholdPercentage: 80, // % of failures before opening the circuit
+  resetTimeout: 120000, // time to wait before attempting to half-open the circuit
+  rollingCountTimeout: 300000, // the time window to consider requests over
+  volumeThreshold: 5, // circuit will stay closed regardless of failures if there is less than this many requests in the window
+}
+
 export default {
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
@@ -44,6 +54,7 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
+  defaultCircuitBreakerOptions,
   apis: {
     audit: {
       queueUrl: get('AUDIT_SQS_QUEUE_URL', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
@@ -373,6 +384,7 @@ export default {
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
+    circuitBreakerEnabled: true,
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

@@ -1,6 +1,7 @@
 import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
 import { Readable } from 'stream'
+import CircuitBreaker from 'opossum'
 import appConfig from '../config'
 import logger, { warnLevelLogger } from '../../logger'
 
@@ -48,18 +49,30 @@ interface PutRequest {
   files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
 
+// To allow circuit breaker options in config
+interface CustomApiConfig extends ApiConfig {
+  circuitBreakerOptions?: CircuitBreaker.Options<[request: Request<unknown, unknown>, token: string]>
+}
+
 export default abstract class RestClient extends HmppsRestClient {
+  private readonly breaker: CircuitBreaker
+
   protected constructor(
     protected readonly name: string,
-    protected readonly config: ApiConfig,
+    protected readonly config: CustomApiConfig,
     protected readonly token: string,
   ) {
     // only log warn level and above in production for API clients to reduce app insights usage
     // (dependencies are separately tracked):
     super(name, config, appConfig.production ? warnLevelLogger : logger)
+
+    this.breaker = new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
+      async (request, tokenString) => super.get<unknown, unknown>(request, tokenString),
+      config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions,
+    )
   }
 
-  // Overridden get function to enforce use of token
+  // Overridden get function to enforce use of token and the circuit breaker
   async get<Response = unknown, ErrorData = unknown>(
     {
       path,
@@ -72,7 +85,10 @@ export default abstract class RestClient extends HmppsRestClient {
     }: Request<Response, ErrorData>,
     token: string,
   ): Promise<Response> {
-    return super.get<Response, ErrorData>({ path, query, headers, responseType, raw, retries, errorHandler }, token)
+    const request = { path, query, headers, responseType, raw, retries, errorHandler }
+    return appConfig.featureToggles.circuitBreakerEnabled
+      ? (this.breaker.fire(request, token) as Response)
+      : super.get<Response, ErrorData>(request, token)
   }
 
   // Overridden patch function to enforce use of token
