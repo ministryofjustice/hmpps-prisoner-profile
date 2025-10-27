@@ -41,7 +41,7 @@ export default class AlertsController {
       // Render banner
       return res.render('pages/alerts/alertsPage', {
         pageTitle: 'Alerts',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, 'alerts'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'alerts'),
       })
     }
 
@@ -111,7 +111,7 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, prisonerPermissions, 'alerts'),
       ...alertsPageData,
       alertsList,
       showingAll,
