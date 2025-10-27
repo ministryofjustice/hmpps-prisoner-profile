@@ -12,7 +12,7 @@
 {% block body %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ pageHeading }}</h1>
+            <h1 class="govuk-heading-l govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ pageHeading }}</h1>
         </div>
     </div>
 
@@ -20,7 +20,7 @@
         {% for belief in beliefs %}
         <div class="belief-card">
             <header>
-                <h2>
+                <h2 class="govuk-heading-m govuk-!-margin-top-4">
                     {{ belief.beliefDescription }}
                 </h2>
                 {% if not belief.endDate %}

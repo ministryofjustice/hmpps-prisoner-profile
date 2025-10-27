@@ -13,6 +13,7 @@ import {
   CommunicationNeedsDtoMock,
   LanguageRefDataMock,
 } from '../data/localMockData/personCommunicationNeedsApiRefDataMock'
+import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
 
 describe('LanguagesService', () => {
   let clientToken: string
@@ -44,14 +45,7 @@ describe('LanguagesService', () => {
       getReferenceData: jest.fn(),
     } as Partial<ReferenceDataService> as ReferenceDataService
 
-    metricsService = {
-      trackPersonCommunicationNeedsUpdate: jest.fn(),
-      trackHealthAndMedicationUpdate: jest.fn(),
-      trackPersonIntegrationUpdate: jest.fn(),
-      trackPrisonPersonUpdate: jest.fn(),
-      trackPersonalRelationshipsUpdate: jest.fn(),
-      trackNomisLockedWarning: jest.fn(),
-    } as jest.Mocked<MetricsService>
+    metricsService = metricsServiceMock()
 
     languagesService = new LanguagesService(
       personCommunicationNeedsApiClientBuilder,

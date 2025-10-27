@@ -1,5 +1,5 @@
+import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
 import { serviceCheckFactory } from '../data/healthCheck'
-import type { AgentConfig } from '../config'
 import config from '../config'
 import type { ApplicationInfo } from '../applicationInfo'
 

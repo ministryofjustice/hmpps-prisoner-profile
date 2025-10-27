@@ -9,16 +9,14 @@
 {% endif %}
 
 <div class="{{ accordionClass }}">
-    <h3 class="hmpps-border-top govuk-!-margin-top-2">
-    <span class="govuk-!-display-block govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-3">
+    <h3 class="govuk-heading-l hmpps-border-top govuk-!-margin-top-2 govuk-!-padding-top-5">
       <span class="hmpps-display-block govuk-accordion__section-heading-text" data-qa="accordion-section-header" id="accordion-with-summary-sections-heading-{{index}}">Court case {{index}}</span>
-    </span>
     </h3>
     <div data-qa="accordion-section-summary" class="govuk-accordion__section-summaryX" id="accordion-with-summary-sections-summaryX-{{index}}">
         <div class="hmpps-grid-container">
-            <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Court case number</h4></div>
+            <div class="grid-item"><h4 class="govuk-heading-s govuk-!-static-margin-0">Court case number</h4></div>
             <div class="grid-item">
-                <p class="govuk-!-font-size-19">
+                <p>
                     {% if courtCase.caseInfoNumber %}
                         {{ courtCase.caseInfoNumber }}
                     {% elseif courtCase.charge.courtCaseRef %}
@@ -30,18 +28,18 @@
             </div>
 
             {% if courtCase.sentenced == false and  courtCase.nextCourtAppearance.dateTime %}
-                <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Next court appearance</h4></div>
+                <div class="grid-item"><h4 class="govuk-heading-s govuk-!-static-margin-0">Next court appearance</h4></div>
                 <div class="grid-item">
-                    <p class="govuk-!-font-size-19">
+                    <p>
                         {{ courtCase.nextCourtAppearance.dateTime | formatDate }}
                     </p>
                 </div>
             {% endif %}
         </div>
         <div class="hmpps-grid-container">
-            <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Court name</h4></div>
+            <div class="grid-item"><h4 class="govuk-heading-s govuk-!-static-margin-0">Court name</h4></div>
             <div class="grid-item">
-                <p class="govuk-!-font-size-19">
+                <p>
                     {% if courtCase.court.description %}
                         {{ courtCase.court.description }}
                     {% elseif courtCase.courtName %}
@@ -88,7 +86,7 @@
                                     <dd class="govuk-summary-list__value">
                                         {{ offence.statuteCode }}
                                     </dd>
-                                </div>                        
+                                </div>
                                 <div class="govuk-summary-list__row">
                                     <dt class="govuk-summary-list__key">
                                         Type
@@ -113,7 +111,7 @@
                                         {{ sentence.sentenceLength }}
                                     </dd>
                                 </div>
-                                
+
                                 {% if (sentence.concurrentConsecutive) and (sentence.concurrentConsecutive !== null) %}
                                     <div class="govuk-summary-list__row">
                                         <dt class="govuk-summary-list__key">
@@ -142,13 +140,13 @@
                                         <dd class="govuk-summary-list__value">
                                             {{ sentence.sentenceLicence }}
                                         </dd>
-                                    </div>   
-                                {% endif %}                
+                                    </div>
+                                {% endif %}
                             </dl>
                         </div>
                     </div>
                 {% endfor %}
-            {% endif %}   
+            {% endif %}
         {% endfor %}
 
     {% endif %}
@@ -175,7 +173,7 @@
                             <dd class="govuk-summary-list__value">
                             {{count.charge.resultDescription}}
                             </dd>
-                        </div>                        
+                        </div>
                     </dl>
                 </div>
             </div>

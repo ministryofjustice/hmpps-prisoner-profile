@@ -7,6 +7,8 @@ import {
 import { GlobalEmail, GlobalNumbersAndEmails, PhoneNumber } from './interfaces/personalPageService/PersonalPage'
 import ReferenceDataService from './referenceData/referenceDataService'
 import { transformPhones } from '../utils/transformPhones'
+import MetricsService from './metrics/metricsService'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 /*
  * Service for getting a prisoners "global" numbers and email addresess.
@@ -18,6 +20,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
   constructor(
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   async transformContacts(token: string, contacts: ContactsResponseDto[]): Promise<GlobalNumbersAndEmails> {
@@ -40,11 +43,21 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
     return this.transformContacts(token, contacts)
   }
 
-  async createEmailForPrisonerNumber(token: string, prisonerNumber: string, value: string): Promise<GlobalEmail> {
+  async createEmailForPrisonerNumber(
+    token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    value: string,
+  ): Promise<GlobalEmail> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const resp = await apiClient.createContact(prisonerNumber, {
       contactType: 'EMAIL',
       contactValue: value,
+    })
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['emailAddress'],
+      prisonerNumber,
+      user,
     })
 
     return { id: resp.contactId, email: resp.contactValue }
@@ -52,6 +65,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
 
   async updateEmailForPrisonerNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     emailAddressId: string,
     value: string,
@@ -61,12 +75,18 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
       contactType: 'EMAIL',
       contactValue: value,
     })
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['emailAddress'],
+      prisonerNumber,
+      user,
+    })
 
     return { id: resp.contactId, email: resp.contactValue }
   }
 
   async createPhoneNumberForPrisonerNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     {
       phoneNumber,
@@ -83,6 +103,11 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
         contactPhoneExtension: phoneExtension,
       },
     )
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['phoneNumber'],
+      prisonerNumber,
+      user,
+    })
 
     return {
       id: contactId,
@@ -95,6 +120,7 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
 
   async updatePhoneNumberForPrisonerNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     phoneNumberId: string,
     {
@@ -113,6 +139,11 @@ export default class GlobalPhoneNumberAndEmailAddressesService {
         contactPhoneExtension: phoneExtension,
       },
     )
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['phoneNumber'],
+      prisonerNumber,
+      user,
+    })
 
     return {
       id: contactId,

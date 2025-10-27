@@ -168,7 +168,7 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(caseNotesApiClientBuilder, incentivesApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
-  const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
+  const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder, metricsService)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
     personIntegrationApiClientBuilder,
@@ -177,7 +177,13 @@ export const services = () => {
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
   const aliasService = new AliasService(personIntegrationApiClientBuilder, metricsService)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
+  const commonApiRoutes = new CommonApiRoutes(
+    offenderService,
+    auditService,
+    distinguishingMarksService,
+    photoService,
+    metricsService,
+  )
   const languagesService = new LanguagesService(
     personCommunicationNeedsApiClientBuilder,
     referenceDataService,
@@ -197,6 +203,7 @@ export const services = () => {
   const globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
     personIntegrationApiClientBuilder,
     referenceDataService,
+    metricsService,
   )
 
   const identityNumbersService = new IdentityNumbersService(

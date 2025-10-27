@@ -25,7 +25,7 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <h2>Appointment details</h2>
+                <h2 class="govuk-heading-m">Appointment details</h2>
 
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border appointment-details-list',
@@ -58,7 +58,7 @@
                         },
                         {
                             key: {
-                                text: "Probation officer's full name"
+                                text: "Probation officer’s full name"
                             },
                             value: {
                                 text: "Not yet known" if officerDetailsNotKnown else officerFullName
@@ -201,7 +201,7 @@
 
                 <div class="govuk-button-group">
                     {{ govukButton({ text: "Add more appointments", href: addMoreUrl }) }}
-                    <a href="{{ profileUrl }}" class="govuk-link govuk-link--no-visited-state">Back to prisoner's profile</a>
+                    <a href="{{ profileUrl }}" class="govuk-link govuk-link--no-visited-state">Back to prisoner’s profile</a>
                 </div>
             </div>
         </div>

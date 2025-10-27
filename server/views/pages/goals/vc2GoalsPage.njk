@@ -17,7 +17,7 @@
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <h1>{{ prisonerName.firstLast | apostrophe }} goals in Virtual Campus (VC2)</h1>
+      <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} goals in Virtual Campus (VC2)</h1>
     </div>
   </div>
   <div id="vc2-goals-summary" class="govuk-grid-row">
@@ -99,7 +99,7 @@
       {% endif %}
 
       <p class="govuk-body">
-        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/work-and-skills" data-qa="back-link">Return to the prisoner's profile</a>
+        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/work-and-skills" data-qa="back-link">Return to the prisoner’s profile</a>
       </p>
     </div>
   </div>

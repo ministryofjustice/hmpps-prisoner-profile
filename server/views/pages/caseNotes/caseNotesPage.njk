@@ -12,7 +12,7 @@
     {% if caseNotesApiUnavailable %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h1 id="caseNotes">Case notes</h1>
+                <h1 id="caseNotes" class="govuk-heading-l govuk-!-margin-top-5">Case notes</h1>
             </div>
         </div>
 
@@ -32,14 +32,14 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h1 id="caseNotes">Case notes</h1>
+                <h1 id="caseNotes" class="govuk-heading-l govuk-!-margin-top-5">Case notes</h1>
             </div>
         </div>
 
         <div class="govuk-grid-row govuk-!-display-none-print">
             <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
             <div class="govuk-grid-column-three-quarters">
-                {% if addCaseNoteLinkUrl %}
+                {% if isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
                 <div class="hmpps-action-header">
                     {{ hmppsActionButton({ text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl }) }}
                 </div>

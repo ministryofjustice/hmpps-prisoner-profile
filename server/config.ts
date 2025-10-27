@@ -1,4 +1,5 @@
 import CircuitBreaker from 'opossum'
+import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -18,15 +19,6 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 
 const requiredInProduction = { requireInProduction: true }
 
-export class AgentConfig {
-  // Sets the working socket to timeout after timeout milliseconds of inactivity on the working socket.
-  timeout: number
-
-  constructor(timeout = 8000) {
-    this.timeout = timeout
-  }
-}
-
 const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
   timeout: 60000, // the rest client already implements a shorter timeout, hence 60s
   errorThresholdPercentage: 80, // % of failures before opening the circuit
@@ -40,6 +32,7 @@ export default {
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
   branchName: get('GIT_BRANCH', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
+  appInsightsConnectionString: get('APPLICATIONINSIGHTS_CONNECTION_STRING', '', requiredInProduction),
   production,
   https: production,
   staticResourceCacheDuration: '1h',
@@ -361,7 +354,8 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   featureToggles: {
-    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || ['BLI', 'NHI', 'LII', 'SLI'],
+    appInsightsWebAnalyticsEnabledPrisons: get('APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS', []),
+    neurodiversityEnabledPrisons: get('NEURODIVERSITY_ENABLED_PRISONS', ['BLI', 'NHI', 'LII', 'SLI']),
     complexityEnabledPrisons: get(
       'PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS',
       ['AGI', 'BZI', 'DHI', 'DWI', 'ESI', 'EWI', 'FHI', 'LNI', 'NHI', 'PFI', 'SDI', 'STI'],
@@ -372,6 +366,7 @@ export default {
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
     editProfilePhotoEnabledPrisons: get('EDIT_PROFILE_PHOTO_ENABLED_PRISONS', []),
+    editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 

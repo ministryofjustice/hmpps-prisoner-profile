@@ -4,7 +4,7 @@
 {%- call summaryCard() -%}
   <div class="govuk-grid-row hmpps-more-info-block">
     <div class="govuk-grid-column-full">
-      <h2>More information</h2>
+      <h2 class="govuk-heading-s">More information</h2>
       <ul>
         {% for link in overviewInfoLinks %}
         <li><a href="{{ link.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ link.dataQA }}">{{ link.text }}</a></li>

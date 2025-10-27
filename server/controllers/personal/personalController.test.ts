@@ -52,13 +52,15 @@ describe('PersonalController', () => {
   let res: Response
   const next: NextFunction = jest.fn()
 
+  const prisonerNumber = 'A1234BC'
+
   const defaultMiddleware = {
     clientToken: 'token',
     prisonerData: {
       firstName: 'First',
       lastName: 'Last',
       cellLocation: '2-3-001',
-      prisonerNumber: 'A1234BC',
+      prisonerNumber,
       prisonId: 999,
     },
     inmateDetail: {
@@ -85,7 +87,7 @@ describe('PersonalController', () => {
 
   const defaultLocals = {
     user: prisonUserMock,
-    prisonerNumber: 'A1234BC',
+    prisonerNumber,
     prisonerName: {
       firstLast: 'First Last',
       lastCommaFirst: 'Last, First',
@@ -120,13 +122,13 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           await action(req, res, next)
 
-          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightMetric', {
             pageTitle: expect.anything(),
             errors: [],
@@ -134,15 +136,15 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -155,7 +157,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
@@ -168,13 +170,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditHeight,
@@ -193,7 +195,7 @@ describe('PersonalController', () => {
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             body: { editField: '123' },
             flash: jest.fn(),
           } as unknown as Request
@@ -211,7 +213,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#height')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#height`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
             type: FlashMessageType.success,
@@ -227,14 +229,14 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/height')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/height`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { editField: 157 } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
@@ -253,7 +255,7 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -267,15 +269,15 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -288,7 +290,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
@@ -310,7 +312,7 @@ describe('PersonalController', () => {
             }),
           )
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -324,13 +326,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditHeight,
@@ -349,7 +351,7 @@ describe('PersonalController', () => {
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             body: { feet: '5', inches: '10' },
             flash: jest.fn(),
           } as unknown as Request
@@ -368,7 +370,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#height')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#height`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
             type: FlashMessageType.success,
@@ -385,14 +387,14 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/height/imperial')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/height/imperial`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
@@ -413,29 +415,29 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           await action(req, res, next)
 
-          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightMetric', {
             pageTitle: 'Weight - Prisoner personal details',
             errors: [],
             fieldValue: 100,
             miniBannerData: {
-              prisonerNumber: 'A1234BC',
+              prisonerNumber,
               prisonerName: 'Last, First',
               cellLocation: '2-3-001',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -448,7 +450,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
@@ -461,13 +463,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
@@ -486,7 +488,7 @@ describe('PersonalController', () => {
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             body: { kilograms: '80' },
             flash: jest.fn(),
           } as unknown as Request
@@ -506,7 +508,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#weight')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#weight`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
             type: FlashMessageType.success,
@@ -523,14 +525,14 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/weight')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/weight`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { kilograms: '96' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
@@ -549,7 +551,7 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -561,17 +563,17 @@ describe('PersonalController', () => {
             stoneValue: 15,
             poundsValue: 10,
             miniBannerData: {
-              prisonerNumber: 'A1234BC',
+              prisonerNumber,
               prisonerName: 'Last, First',
               cellLocation: '2-3-001',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -584,7 +586,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
             },
@@ -606,7 +608,7 @@ describe('PersonalController', () => {
             }),
           )
           const req = {
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -620,13 +622,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
@@ -645,7 +647,7 @@ describe('PersonalController', () => {
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             body: { stone: '10', pounds: '12' },
             flash: jest.fn(),
           } as unknown as Request
@@ -664,7 +666,7 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#weight')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#weight`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
             type: FlashMessageType.success,
@@ -681,14 +683,14 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/weight/imperial')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/weight/imperial`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
@@ -725,7 +727,7 @@ describe('PersonalController', () => {
       it('Renders the radios edit page with the field data config supplied', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -736,7 +738,7 @@ describe('PersonalController', () => {
           'token',
           CorePersonRecordReferenceDataDomain.build,
         )
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Build - Prisoner personal details',
           formTitle: 'Build',
@@ -746,9 +748,9 @@ describe('PersonalController', () => {
           redirectAnchor: 'appearance',
           miniBannerData: {
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             cellLocation: '2-3-001',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
@@ -756,7 +758,7 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -770,7 +772,7 @@ describe('PersonalController', () => {
       it('Selects the correct radio using field value from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ radioField: 'MEDIUM' })]
             return []
@@ -789,13 +791,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: fieldData.auditEditPageLoad,
@@ -816,7 +818,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'MEDIUM' },
           flash: jest.fn(),
         } as unknown as Request
@@ -824,14 +826,19 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          buildCode: 'MEDIUM',
-        })
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          {
+            buildCode: 'MEDIUM',
+          },
+        )
       })
 
       it('Redirects to the personal page #appearance on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#appearance`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -852,13 +859,13 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/build')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/build`)
       })
 
       it('Sends a post success audit event', async () => {
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: validRequest.id,
           action: 'ACTION',
           details: {
@@ -881,7 +888,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -901,15 +908,15 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -922,7 +929,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
@@ -940,13 +947,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSmokerOrVaper,
@@ -966,7 +973,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
         } as unknown as Request
@@ -977,14 +984,14 @@ describe('PersonalController', () => {
         expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
-          'A1234BC',
+          prisonerNumber,
           'SMOKE_NO',
         )
       })
 
       it('Redirects to the personal page #smoking-and-vaping on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#smoking-and-vaping')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#smoking-and-vaping`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1005,14 +1012,14 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/smoker-or-vaper')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/smoker-or-vaper`)
       })
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSmokerOrVaper,
           details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKER_YES', updated: 'SMOKER_NO' },
@@ -1031,7 +1038,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -1053,15 +1060,15 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1074,7 +1081,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the radio field using the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
           },
@@ -1091,7 +1098,7 @@ describe('PersonalController', () => {
 
       it('Populates the autocompleteSelected value from the flash when no autocomplete option is chosen', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
@@ -1109,7 +1116,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the autocomplete field using the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
           },
@@ -1131,7 +1138,7 @@ describe('PersonalController', () => {
 
       it('Populates the additional nationalities value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
           },
@@ -1149,13 +1156,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditNationality,
@@ -1175,7 +1182,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'BRIT' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1186,7 +1193,7 @@ describe('PersonalController', () => {
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
-          'A1234BC',
+          prisonerNumber,
           'BRIT',
           null,
         )
@@ -1201,7 +1208,7 @@ describe('PersonalController', () => {
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
-          'A1234BC',
+          prisonerNumber,
           'FREN',
           null,
         )
@@ -1216,7 +1223,7 @@ describe('PersonalController', () => {
         expect(personalPageService.updateNationality).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
-          'A1234BC',
+          prisonerNumber,
           'BRIT',
           'Updated nationalities',
         )
@@ -1224,7 +1231,7 @@ describe('PersonalController', () => {
 
       it('Redirects to the personal page #nationality on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#nationality')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#nationality`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1245,7 +1252,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/nationality')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/nationality`)
       })
 
       it('Sends a post success audit event', async () => {
@@ -1256,7 +1263,7 @@ describe('PersonalController', () => {
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditNationality,
           details: [
@@ -1279,13 +1286,13 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         await action(req, res, next)
 
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'Shoe size - Prisoner personal details',
           formTitle: 'Shoe size',
@@ -1297,8 +1304,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           redirectAnchor: shoeSizeFieldData.redirectAnchor,
         })
@@ -1306,7 +1313,7 @@ describe('PersonalController', () => {
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1319,7 +1326,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
           },
@@ -1338,7 +1345,7 @@ describe('PersonalController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { shoeSize: '10' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1357,7 +1364,7 @@ describe('PersonalController', () => {
           expect.anything(),
           expect.objectContaining(updateRequest),
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#shoe-size')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#shoe-size`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Shoe size updated',
           type: FlashMessageType.success,
@@ -1373,7 +1380,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/shoe-size')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/shoe-size`)
       })
     })
   })
@@ -1385,7 +1392,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -1402,8 +1409,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           redirectAnchor: 'city-or-town-of-birth',
         })
@@ -1411,7 +1418,7 @@ describe('PersonalController', () => {
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1424,7 +1431,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
           },
@@ -1443,7 +1450,7 @@ describe('PersonalController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { cityOrTownOfBirth: 'Sheffield' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1461,7 +1468,7 @@ describe('PersonalController', () => {
           expect.anything(),
           updateRequest,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#city-or-town-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#city-or-town-of-birth`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'City or town of birth updated',
           type: FlashMessageType.success,
@@ -1477,7 +1484,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/city-or-town-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/city-or-town-of-birth`)
       })
     })
   })
@@ -1488,7 +1495,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -1506,8 +1513,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           redirectAnchor: 'country-of-birth',
         })
@@ -1515,7 +1522,7 @@ describe('PersonalController', () => {
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1528,7 +1535,7 @@ describe('PersonalController', () => {
 
       it('Populates the radio buttons from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'ENG' })] : []
           },
@@ -1546,7 +1553,7 @@ describe('PersonalController', () => {
 
       it('Populates the autocomplete from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ autocompleteField: 'FRA' })] : []
           },
@@ -1563,7 +1570,7 @@ describe('PersonalController', () => {
 
       it('Selects the autocomplete radio when the flash indicates an empty autocomplete field', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
@@ -1584,7 +1591,7 @@ describe('PersonalController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'ENG' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1602,7 +1609,7 @@ describe('PersonalController', () => {
           expect.anything(),
           updateRequest,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#country-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#country-of-birth`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Country of birth updated',
           type: FlashMessageType.success,
@@ -1618,7 +1625,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/country-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/country-of-birth`)
       })
     })
   })
@@ -1633,7 +1640,7 @@ describe('PersonalController', () => {
       it('Renders the eye colour edit page', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -1644,7 +1651,7 @@ describe('PersonalController', () => {
           'token',
           CorePersonRecordReferenceDataDomain.leftEyeColour,
         )
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColour', {
           pageTitle: 'Eye colour - Prisoner personal details',
           formTitle: 'Eye colour',
@@ -1657,9 +1664,9 @@ describe('PersonalController', () => {
           ),
           miniBannerData: {
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             cellLocation: '2-3-001',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
@@ -1667,7 +1674,7 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1681,7 +1688,7 @@ describe('PersonalController', () => {
       it('Selects the correct radio using field value from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ eyeColour: 'GREEN' })]
             return []
@@ -1700,13 +1707,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
@@ -1726,7 +1733,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { eyeColour: 'GREEN' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1734,15 +1741,20 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          leftEyeColourCode: 'GREEN',
-          rightEyeColourCode: 'GREEN',
-        })
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          {
+            leftEyeColourCode: 'GREEN',
+            rightEyeColourCode: 'GREEN',
+          },
+        )
       })
 
       it('Redirects to the personal page #eye-colour on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#eye-colour`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1763,13 +1775,13 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/eye-colour`)
       })
 
       it('Sends a post success audit event', async () => {
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: validRequest.id,
           action: PostAction.EditEyeColour,
           details: {
@@ -1796,7 +1808,7 @@ describe('PersonalController', () => {
       it('Renders the eye colour edit page', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -1811,7 +1823,7 @@ describe('PersonalController', () => {
           'token',
           CorePersonRecordReferenceDataDomain.rightEyeColour,
         )
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColourIndividual', {
           pageTitle: 'Left and right eye colours - Prisoner personal details',
           formTitle: 'Left and right eye colours',
@@ -1830,9 +1842,9 @@ describe('PersonalController', () => {
           ),
           miniBannerData: {
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             cellLocation: '2-3-001',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
@@ -1840,7 +1852,7 @@ describe('PersonalController', () => {
       it('Populates the errors from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -1854,7 +1866,7 @@ describe('PersonalController', () => {
       it('Selects the correct radio using field value from the flash', async () => {
         const req = {
           id: '1',
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'requestBody') return [JSON.stringify({ leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' })]
             return []
@@ -1874,13 +1886,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
@@ -1901,7 +1913,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
           flash: jest.fn(),
         } as unknown as Request
@@ -1909,15 +1921,20 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          leftEyeColourCode: 'BROWN',
-          rightEyeColourCode: 'GREEN',
-        })
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          {
+            leftEyeColourCode: 'BROWN',
+            rightEyeColourCode: 'GREEN',
+          },
+        )
       })
 
       it('Redirects to the personal page #eye-colour on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#eye-colour')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#eye-colour`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -1938,7 +1955,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour-individual')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/eye-colour-individual`)
       })
 
       it('Sends a post success audit event', async () => {
@@ -1949,7 +1966,7 @@ describe('PersonalController', () => {
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditEyeColour,
           details: {
@@ -2037,7 +2054,7 @@ describe('PersonalController', () => {
         personalPageService.getHealthAndMedication = jest.fn(async () => null as HealthAndMedication)
 
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -2048,8 +2065,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           errors: [],
           ...editOptions({ selections: [] }),
@@ -2058,13 +2075,13 @@ describe('PersonalController', () => {
 
       it('Renders the edit page with the correct data from the health and medications api when data is present', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         await action(req, res, next)
 
-        expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), 'A1234BC', {
+        expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), prisonerNumber, {
           dietAndAllergiesEnabled: true,
           healthAndMedicationApiReadEnabled: true,
         })
@@ -2074,8 +2091,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           errors: [],
           ...editOptions({
@@ -2091,7 +2108,7 @@ describe('PersonalController', () => {
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -2104,7 +2121,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody'
               ? [
@@ -2147,13 +2164,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDietAndFoodAllergies,
@@ -2174,7 +2191,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: {
             medical: [{ value: medicalDietCodesMock[0].id }, { value: 'MEDICAL_DIET_OTHER', comment: 'abc' }],
             allergy: [{ value: foodAllergyCodesMock[0].id }, { value: 'FOOD_ALLERGY_OTHER', comment: 'def' }],
@@ -2193,7 +2210,7 @@ describe('PersonalController', () => {
 
       it('Redirects to the personal page #diet-and-food-allergies on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#diet-and-food-allergies')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#diet-and-food-allergies`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -2211,7 +2228,7 @@ describe('PersonalController', () => {
         expect(personalPageService.updateDietAndFoodAllergies).toHaveBeenCalledWith(
           expect.anything(),
           expect.anything(),
-          'A1234BC',
+          prisonerNumber,
           {
             medicalDietaryRequirements: [
               { value: medicalDietCodesMock[0].id },
@@ -2238,13 +2255,13 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/diet-and-food-allergies')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/diet-and-food-allergies`)
       })
 
       it('Sends a post success audit event', async () => {
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: validRequest.id,
           action: PostAction.EditDietAndFoodAllergies,
           details: {
@@ -2332,7 +2349,7 @@ describe('PersonalController', () => {
           { text: 'They prefer not to say', value: 'TPRNTS' },
         ]
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -2357,15 +2374,15 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -2425,7 +2442,7 @@ describe('PersonalController', () => {
         ]
 
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
           },
@@ -2442,7 +2459,7 @@ describe('PersonalController', () => {
 
       it('Populates the reason for change radio from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
           },
@@ -2459,7 +2476,7 @@ describe('PersonalController', () => {
 
       it('Populates the text areas from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody'
               ? [JSON.stringify({ reasonForChange: 'Reason 1', reasonForChangeUnknown: 'Reason 2' })]
@@ -2485,7 +2502,7 @@ describe('PersonalController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { religion: 'ZORO', reasonKnown: 'NO' },
           flash: jest.fn(),
         } as unknown as Request
@@ -2533,7 +2550,7 @@ describe('PersonalController', () => {
           updatedReligion,
           reason,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#religion-faith-or-belief')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#religion-faith-or-belief`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
           type: FlashMessageType.success,
@@ -2559,7 +2576,7 @@ describe('PersonalController', () => {
               firstName: 'First',
               lastName: 'Last',
               cellLocation: '2-3-001',
-              prisonerNumber: 'A1234BC',
+              prisonerNumber,
               prisonId: 999,
             },
             inmateDetail: {
@@ -2567,7 +2584,7 @@ describe('PersonalController', () => {
               profileInformation: [],
             } as InmateDetail,
           },
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body,
           flash: jest.fn(),
         } as unknown as Request
@@ -2581,7 +2598,7 @@ describe('PersonalController', () => {
           updatedReligion,
           reason,
         )
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#religion-faith-or-belief')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#religion-faith-or-belief`)
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
           type: FlashMessageType.success,
@@ -2597,7 +2614,7 @@ describe('PersonalController', () => {
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditReligion,
           details: {
@@ -2633,7 +2650,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/religion')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/religion`)
       })
     })
   })
@@ -2652,7 +2669,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -2668,15 +2685,15 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -2689,7 +2706,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
           },
@@ -2707,13 +2724,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSexualOrientation,
@@ -2733,7 +2750,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'HET' },
           flash: jest.fn(),
         } as unknown as Request
@@ -2744,14 +2761,14 @@ describe('PersonalController', () => {
         expect(personalPageService.updateSexualOrientation).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
-          'A1234BC',
+          prisonerNumber,
           'HET',
         )
       })
 
       it('Redirects to the personal page #sexual-orientation on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#sexual-orientation')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#sexual-orientation`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -2772,14 +2789,14 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/sexual-orientation')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/sexual-orientation`)
       })
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSexualOrientation,
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
@@ -2798,7 +2815,7 @@ describe('PersonalController', () => {
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -2812,8 +2829,8 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
           radioFieldValue: 'YES',
           currentNumberOfChildren: '2',
@@ -2822,7 +2839,7 @@ describe('PersonalController', () => {
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -2835,7 +2852,7 @@ describe('PersonalController', () => {
 
       it('Populates the field values from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
           },
@@ -2854,13 +2871,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditNumberOfChildren,
@@ -2880,7 +2897,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { hasChildren: 'YES', numberOfChildren: '5' },
           flash: jest.fn(),
         } as unknown as Request
@@ -2890,7 +2907,12 @@ describe('PersonalController', () => {
 
       it('Updates the number of children', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 5)
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          5,
+        )
       })
 
       it(`Updates the number of children to 0 if 'NO' selected as answer`, async () => {
@@ -2902,12 +2924,17 @@ describe('PersonalController', () => {
           res,
           next,
         )
-        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          0,
+        )
       })
 
       it('Redirects to the personal page #number-of-children on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#number-of-children')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#number-of-children`)
       })
 
       it('Adds the success message to the flash', async () => {
@@ -2928,7 +2955,7 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/children')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/children`)
       })
 
       it('Sends a post success audit event', async () => {
@@ -2939,7 +2966,7 @@ describe('PersonalController', () => {
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditNumberOfChildren,
           details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
@@ -2992,7 +3019,7 @@ describe('PersonalController', () => {
         ]
 
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -3008,15 +3035,15 @@ describe('PersonalController', () => {
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
-            prisonerNumber: 'A1234BC',
-            prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+            prisonerNumber,
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
           },
         })
       })
 
       it('Populates the errors from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             if (key === 'errors') return ['error']
             return []
@@ -3029,7 +3056,7 @@ describe('PersonalController', () => {
 
       it('Populates the field value from the flash', async () => {
         const req = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (key: string) => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
           },
@@ -3047,13 +3074,13 @@ describe('PersonalController', () => {
       it('Sends a page view audit event', async () => {
         const req = {
           id: 1,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDomesticStatus,
@@ -3073,7 +3100,7 @@ describe('PersonalController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           body: { radioField: 'M' },
           flash: jest.fn(),
         } as unknown as Request
@@ -3081,12 +3108,19 @@ describe('PersonalController', () => {
 
       it('Updates the domestic status', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'M')
+        expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          'M',
+        )
       })
 
       it('Redirects to the personal page #marriage-or-civil-partnership-status on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#marriage-or-civil-partnership-status')
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/prisoner/${prisonerNumber}/personal#marriage-or-civil-partnership-status`,
+        )
       })
 
       it('Adds the success message to the flash', async () => {
@@ -3107,14 +3141,14 @@ describe('PersonalController', () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/marital-status')
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/marital-status`)
       })
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'M' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
-          prisonerNumber: 'A1234BC',
+          prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditDomesticStatus,
           details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
@@ -3138,7 +3172,7 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -3157,15 +3191,15 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -3178,7 +3212,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
@@ -3194,13 +3228,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.AddEmailAddress,
@@ -3221,7 +3255,7 @@ describe('PersonalController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'fOO@exaMple.com' },
             flash: jest.fn(),
           } as unknown as Request
@@ -3231,17 +3265,22 @@ describe('PersonalController', () => {
 
         it('Updates the email', async () => {
           await action(validRequest, res, next)
-          expect(personalPageService.createGlobalEmail).toHaveBeenCalledWith('token', 'A1234BC', 'foo@example.com')
+          expect(personalPageService.createGlobalEmail).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            'foo@example.com',
+          )
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
         })
 
         it('Redirects back when add another is added as a query param', async () => {
           await action({ ...validRequest, query: { addAnother: 'true' } } as unknown as Request, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-email-address`)
         })
 
         it('Adds the success message to the flash', async () => {
@@ -3277,7 +3316,7 @@ describe('PersonalController', () => {
             },
           ])
 
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-email-address`)
         })
 
         it('Handles API errors', async () => {
@@ -3288,14 +3327,14 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-email-address')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-email-address`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.AddEmailAddress,
             details: { fieldName: 'emailAddress', previous: '', updated: 'foo@bar.com' },
@@ -3317,7 +3356,7 @@ describe('PersonalController', () => {
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
@@ -3336,15 +3375,15 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
 
         it('Populates the errors from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (key: string) => {
               if (key === 'errors') return ['error']
               return []
@@ -3357,7 +3396,7 @@ describe('PersonalController', () => {
 
         it('Populates the field value from the flash', async () => {
           const req = {
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (key: string) => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
@@ -3373,13 +3412,13 @@ describe('PersonalController', () => {
         it('Sends a page view audit event', async () => {
           const req = {
             id: 1,
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditEmailAddress,
@@ -3399,7 +3438,7 @@ describe('PersonalController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC', emailAddressId: '234' },
+            params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'foo@example.com' },
             flash: jest.fn(),
           } as unknown as Request
@@ -3411,7 +3450,8 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
           expect(personalPageService.updateGlobalEmail).toHaveBeenCalledWith(
             'token',
-            'A1234BC',
+            prisonUserMock,
+            prisonerNumber,
             '234',
             'foo@example.com',
           )
@@ -3419,7 +3459,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
         })
 
         it('Adds the success message to the flash', async () => {
@@ -3440,7 +3480,7 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/change-email-address/234`)
         })
 
         it('Handles duplicate emails', async () => {
@@ -3469,14 +3509,14 @@ describe('PersonalController', () => {
             },
           ])
 
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-email-address/234')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/change-email-address/234`)
         })
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditEmailAddress,
             details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
@@ -3495,7 +3535,7 @@ describe('PersonalController', () => {
       describe('edit', () => {
         const action: RequestHandler = async (req, response) => controller.globalNumbers().add.edit(req, response, next)
         const defaultReq = {
-          params: { prisonerNumber: 'A1234BC' },
+          params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -3514,8 +3554,8 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
@@ -3559,7 +3599,7 @@ describe('PersonalController', () => {
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.AddPhoneNumber,
@@ -3580,7 +3620,7 @@ describe('PersonalController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC' },
+            params: { prisonerNumber },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
           } as unknown as Request
@@ -3590,21 +3630,26 @@ describe('PersonalController', () => {
 
         it('Updates the phone number', async () => {
           await action(validRequest, res, next)
-          expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', {
-            phoneNumberType: 'MOB',
-            phoneNumber: '1234',
-            phoneExtension: '4321',
-          })
+          expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            {
+              phoneNumberType: 'MOB',
+              phoneNumber: '1234',
+              phoneExtension: '4321',
+            },
+          )
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
         })
 
         it('Redirects to the add phone number page on success with add another specified', async () => {
           await action({ ...validRequest, query: { addAnother: 'true' } } as unknown as Request, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
         })
 
         it('Adds the success message to the flash', async () => {
@@ -3639,7 +3684,7 @@ describe('PersonalController', () => {
               text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
         })
 
         it('Handles duplicate phone numbers without extensions', async () => {
@@ -3664,7 +3709,7 @@ describe('PersonalController', () => {
               text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
         })
 
         it('Allows duplicate phone number if the extention differs', async () => {
@@ -3698,7 +3743,7 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/add-phone-number')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
         })
 
         it('Sends a post success audit event', async () => {
@@ -3710,7 +3755,7 @@ describe('PersonalController', () => {
 
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.AddPhoneNumber,
             details: {
@@ -3736,7 +3781,7 @@ describe('PersonalController', () => {
         const action: RequestHandler = async (req, response) =>
           controller.globalNumbers().edit.edit(req, response, next)
         const defaultReq = {
-          params: { prisonerNumber: 'A1234BC', phoneNumberId: '123' },
+          params: { prisonerNumber, phoneNumberId: '123' },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
         } as unknown as Request
@@ -3758,8 +3803,8 @@ describe('PersonalController', () => {
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
-              prisonerNumber: 'A1234BC',
-              prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=undefined&fullSizeImage=false',
+              prisonerNumber,
+              prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
             },
           })
         })
@@ -3803,7 +3848,7 @@ describe('PersonalController', () => {
           } as unknown as Request
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditPhoneNumber,
@@ -3824,7 +3869,7 @@ describe('PersonalController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            params: { prisonerNumber: 'A1234BC', phoneNumberId: '123' },
+            params: { prisonerNumber, phoneNumberId: '123' },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
           } as unknown as Request
@@ -3834,16 +3879,22 @@ describe('PersonalController', () => {
 
         it('Updates the email', async () => {
           await action(validRequest, res, next)
-          expect(personalPageService.updateGlobalPhoneNumber).toHaveBeenCalledWith('token', 'A1234BC', '123', {
-            phoneNumberType: 'MOB',
-            phoneNumber: '1234',
-            phoneExtension: '4321',
-          })
+          expect(personalPageService.updateGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            '123',
+            {
+              phoneNumberType: 'MOB',
+              phoneNumber: '1234',
+              phoneExtension: '4321',
+            },
+          )
         })
 
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res, next)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#phones-and-emails')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
         })
 
         it('Adds the success message to the flash', async () => {
@@ -3893,7 +3944,7 @@ describe('PersonalController', () => {
           ])
           expect(validRequest.flash).not.toHaveBeenCalledTimes(3)
 
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/change-phone-number/123`)
         })
 
         it('Allows duplicate phone number if the extention differs', async () => {
@@ -3934,7 +3985,7 @@ describe('PersonalController', () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/change-phone-number/123')
+          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/change-phone-number/123`)
         })
 
         it('Sends a post success audit event', async () => {
@@ -3946,7 +3997,7 @@ describe('PersonalController', () => {
 
           const expectedAuditEvent = {
             user: prisonUserMock,
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditPhoneNumber,
             details: {

@@ -2,6 +2,9 @@ import { isAfter } from 'date-fns'
 import config from '../config'
 import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
 
+export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
+
 export const editProfileEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
 
@@ -22,3 +25,7 @@ export const editReligionEnabled: FeatureFlagMethod = () => true
 export const externalContactsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.externalContactsEnabledPrisons.includes('***') ||
   config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
+
+export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes('***') ||
+  config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes(activeCaseLoadId)

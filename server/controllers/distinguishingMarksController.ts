@@ -20,6 +20,7 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -119,6 +120,7 @@ export default class DistinguishingMarksController {
     try {
       const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
         clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
         verifiedMarkType,
         bodyPartMap[bodyPart] as BodyPartSelection,
@@ -179,6 +181,7 @@ export default class DistinguishingMarksController {
     try {
       const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
         clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
         verifiedMarkType,
         specificBodyPart as AllBodyPartSelection,
@@ -304,6 +307,7 @@ export default class DistinguishingMarksController {
       const verifiedBodyPart = bodyPartMap[bodyPart] as BodyPartSelection
       await this.distinguishingMarksService.updateDistinguishingMarkLocation(
         clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
         markId,
         mark,
@@ -385,6 +389,7 @@ export default class DistinguishingMarksController {
     )
     await this.distinguishingMarksService.updateDistinguishingMarkLocation(
       clientToken,
+      res.locals.user as PrisonUser,
       prisonerNumber,
       markId,
       mark,
@@ -446,6 +451,7 @@ export default class DistinguishingMarksController {
     const currentDescription = mark.comment
     await this.distinguishingMarksService.updateDistinguishingMarkDescription(
       clientToken,
+      res.locals.user as PrisonUser,
       prisonerNumber,
       markId,
       mark,
@@ -540,7 +546,13 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     try {
-      await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
+      await this.distinguishingMarksService.updateDistinguishingMarkPhoto(
+        clientToken,
+        res.locals.user as PrisonUser,
+        prisonerNumber,
+        photoId,
+        file,
+      )
 
       this.auditService
         .sendPostSuccess({
@@ -577,6 +589,7 @@ export default class DistinguishingMarksController {
     try {
       const updatedMark = await this.distinguishingMarksService.addDistinguishingMarkPhoto(
         clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
         markId,
         file,

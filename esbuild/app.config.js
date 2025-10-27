@@ -1,7 +1,7 @@
+const { globSync } = require('node:fs')
 const { copy } = require('esbuild-plugin-copy')
 const { typecheckPlugin } = require('@jgoz/esbuild-plugin-typecheck')
 const esbuild = require('esbuild')
-const glob = require('glob')
 
 /**
  * Build typescript application into CommonJS
@@ -9,7 +9,7 @@ const glob = require('glob')
  */
 const buildApp = buildConfig => {
   return esbuild.build({
-    entryPoints: glob.sync(buildConfig.app.entryPoints),
+    entryPoints: globSync(buildConfig.app.entryPoints),
     outdir: buildConfig.app.outDir,
     bundle: false,
     sourcemap: true,

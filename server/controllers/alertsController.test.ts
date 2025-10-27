@@ -1,11 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { addDays } from 'date-fns'
-import {
-  isGranted,
-  PrisonerAlertsPermission,
-  PrisonerPermission,
-  PrisonerPermissions,
-} from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { PrisonerAlertsPermission, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -26,6 +21,7 @@ import {
   pagedInactiveAlertsMock,
   pagedRestrictedAlertsMock,
 } from '../data/localMockData/pagedAlertsMock'
+import mockPermissions from '../../tests/mocks/mockPermissions'
 
 let req: Request
 let res: Response
@@ -36,7 +32,6 @@ jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsService.ts')
 
-const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 const prisonerPermissions = {} as PrisonerPermissions
 
 describe('Alerts Controller', () => {
@@ -75,7 +70,7 @@ describe('Alerts Controller', () => {
       } as unknown as Response
       next = jest.fn()
       controller = new AlertsController(new AlertsService(null), auditServiceMock())
-      mockPermissionCheck(PrisonerAlertsPermission.edit, true)
+      mockPermissions({ [PrisonerAlertsPermission.edit]: true })
     })
 
     it('should get active alerts', async () => {
@@ -104,6 +99,7 @@ describe('Alerts Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'alerts',
       )
     })
@@ -211,6 +207,7 @@ describe('Alerts Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'alerts',
       )
     })
@@ -804,7 +801,3 @@ describe('Alerts Controller', () => {
     })
   })
 })
-
-function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
-  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
-}

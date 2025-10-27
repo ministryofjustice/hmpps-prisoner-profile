@@ -202,7 +202,7 @@ describe('CSRA Controller', () => {
             filterValues: {
               establishments: [{ checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' }],
               from: undefined,
-              incentiveLevels: [
+              csraLevels: [
                 { checked: false, text: 'Medium', value: 'MED' },
                 { checked: true, text: 'Standard', value: 'STANDARD' },
               ],

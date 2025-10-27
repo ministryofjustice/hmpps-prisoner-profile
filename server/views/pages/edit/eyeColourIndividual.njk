@@ -4,7 +4,7 @@
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% from "../../macros/nomisLockedWarning.njk" import nomisLockedWarning %}
 {% block form %}
-  <h1 class="govuk-!-margin-top-0">{{ formTitle }}</h1>
+  <h1 class="govuk-heading-l">{{ formTitle }}</h1>
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
     <div class="govuk-form-group">

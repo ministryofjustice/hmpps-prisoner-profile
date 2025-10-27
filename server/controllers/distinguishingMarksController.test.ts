@@ -15,6 +15,8 @@ const getResLocals = () => ({
 })
 
 describe('Distinguishing Marks Controller', () => {
+  const prisonerNumber = 'A12345'
+
   let req: Request
   let res: Response
   let controller: DistinguishingMarksController
@@ -34,18 +36,18 @@ describe('Distinguishing Marks Controller', () => {
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response
-    distinguishingMarksService = new DistinguishingMarksService(null)
+    distinguishingMarksService = new DistinguishingMarksService(null, null)
     auditService = auditServiceMock() as AuditService
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)
   })
 
   describe('newDistinguishingMark', () => {
     it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
-      const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType }, query: {} } as unknown as Request
+      const typeReq = { ...req, params: { prisonerNumber, markType }, query: {} } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
-        backLinkUrl: '/prisoner/A12345/personal#marks',
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType,
         selected: undefined,
       })
@@ -54,25 +56,25 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType' },
+        params: { prisonerNumber, markType: 'invalidType' },
         query: {},
       } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it.each(Object.keys(bodyPartMap))('should add a valid selection (%s)', async bodyPart => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         query: { selected: bodyPart },
       } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
-        backLinkUrl: '/prisoner/A12345/personal#marks',
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType: 'tattoo',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
@@ -82,13 +84,13 @@ describe('Distinguishing Marks Controller', () => {
     it('ignore the selection if invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         query: { selected: 'invalidSelection' },
       } as unknown as Request
       await controller.newDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
-        backLinkUrl: '/prisoner/A12345/personal#marks',
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType: 'tattoo',
         selected: 'invalidSelection',
         verifiedSelection: undefined,
@@ -98,7 +100,7 @@ describe('Distinguishing Marks Controller', () => {
     it('sends a page view audit event', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
@@ -121,7 +123,7 @@ describe('Distinguishing Marks Controller', () => {
       async bodyPart => {
         const submissionReq = {
           ...req,
-          params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+          params: { prisonerNumber, markType: 'tattoo' },
           body: { bodyPart },
           flash: jest.fn(),
         } as unknown as Request
@@ -132,18 +134,19 @@ describe('Distinguishing Marks Controller', () => {
 
         expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
           'token',
-          'A12345',
+          prisonUserMock,
+          prisonerNumber,
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#tattoos`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#tattoos`)
       },
     )
 
     it.each(markTypeSelections)('should add a new distinguishing mark with valid mark type (%s)', async markType => {
       const submissionReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType },
+        params: { prisonerNumber, markType },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
       } as unknown as Request
@@ -154,17 +157,18 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
-        'A12345',
+        prisonUserMock,
+        prisonerNumber,
         markType,
         'leftLeg',
       )
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#${getRedirectAnchor(markType)}`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#${getRedirectAnchor(markType)}`)
     })
 
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoos' },
+        params: { prisonerNumber, markType: 'tattoos' },
         body: { bodyPart: 'somethingInvalid' },
       } as unknown as Request
 
@@ -172,20 +176,20 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.postNewDistinguishingMark(typeReq, res)
       expect(distinguishingMarksService.postNewDistinguishingMark).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('Sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMark,
         details: { markId: 1 },
@@ -199,7 +203,7 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back and shows an error if the upload fails', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
         flash: jest.fn(),
       } as unknown as Request
@@ -214,7 +218,7 @@ describe('Distinguishing Marks Controller', () => {
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/A12345/personal/distinguishing-marks/tattoo?selected=left-leg`,
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo?selected=left-leg`,
       )
     })
 
@@ -236,13 +240,13 @@ describe('Distinguishing Marks Controller', () => {
     it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType, bodyPart: 'left-leg' },
+        params: { prisonerNumber, markType, bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
-        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}?selected=left-leg`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}?selected=left-leg`,
         markType,
         bodyPart: 'leftLeg',
       })
@@ -251,13 +255,13 @@ describe('Distinguishing Marks Controller', () => {
     it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart },
         query: {},
       } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
-        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo?selected=${bodyPart}`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo?selected=${bodyPart}`,
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
       })
@@ -266,25 +270,25 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'left-leg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('redirects back if the body part is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'invalidPart' },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart: 'invalidPart' },
         query: {},
       } as unknown as Request
       await controller.newDistinguishingMarkWithDetail(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
   })
 
@@ -292,7 +296,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should add a new distinguishing mark with valid bodyPart and description', async () => {
       const partReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         body: {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
@@ -307,7 +311,8 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
-        'A12345',
+        prisonUserMock,
+        prisonerNumber,
         'tattoo',
         'lowerLeftArm',
         'A tattoo',
@@ -318,7 +323,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should use first file for body part', async () => {
       const partReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         body: {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
@@ -334,7 +339,8 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
-        'A12345',
+        prisonUserMock,
+        prisonerNumber,
         'tattoo',
         'lowerLeftArm',
         'A tattoo',
@@ -346,7 +352,7 @@ describe('Distinguishing Marks Controller', () => {
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       const partReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        params: { prisonerNumber, markType: 'tattoo' },
         body: {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
@@ -357,7 +363,7 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMark,
         details: { markId: 1, photoId: 100 },
@@ -378,7 +384,7 @@ describe('Distinguishing Marks Controller', () => {
       const files = fileUploaded ? { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] } : undefined
       const partReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-arm' },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart: 'left-arm' },
         body: {
           specificBodyPart: 'lowerLeftArm',
           'description-lowerLeftArm': 'A tattoo',
@@ -397,7 +403,9 @@ describe('Distinguishing Marks Controller', () => {
         }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/left-arm/detail`)
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/left-arm/detail`,
+      )
     })
   })
 
@@ -406,14 +414,14 @@ describe('Distinguishing Marks Controller', () => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType, markId: distinguishingMarkMock.id },
+        params: { prisonerNumber, markType, markId: distinguishingMarkMock.id },
         query: {},
       } as unknown as Request
 
       await controller.changeDistinguishingMark(typeReq, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDistinguishingMark', {
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         markType,
         mark: distinguishingMarkMock,
         updated: false,
@@ -424,7 +432,7 @@ describe('Distinguishing Marks Controller', () => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: distinguishingMarkMock.id },
+        params: { prisonerNumber, markType: 'tattoo', markId: distinguishingMarkMock.id },
         query: { updated: 'true' },
       } as unknown as Request
 
@@ -442,7 +450,7 @@ describe('Distinguishing Marks Controller', () => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: distinguishingMarkMock.id },
+        params: { prisonerNumber, markType: 'tattoo', markId: distinguishingMarkMock.id },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
@@ -467,7 +475,7 @@ describe('Distinguishing Marks Controller', () => {
     ])(
       'creates a flashMessage and redirects to the profile for type: %s',
       async (markType, flashMessage, redirectAnchor) => {
-        const typeReq = { ...req, params: { prisonerNumber: 'A12345', markType } } as unknown as Request
+        const typeReq = { ...req, params: { prisonerNumber, markType } } as unknown as Request
 
         await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
 
@@ -477,7 +485,7 @@ describe('Distinguishing Marks Controller', () => {
           fieldName: `distinguishing-marks-${markType}`,
         })
 
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#${redirectAnchor}`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
       },
     )
   })
@@ -487,7 +495,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType,
           markId: '100',
         },
@@ -500,7 +508,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType,
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         selected: 'left-leg',
         verifiedSelection: 'leftLeg',
       })
@@ -509,7 +517,7 @@ describe('Distinguishing Marks Controller', () => {
     it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         query: { selected: bodyPart },
       } as unknown as Request
 
@@ -519,7 +527,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType: 'tattoo',
-        cancelUrl: '/prisoner/A12345/personal/distinguishing-marks/tattoo/100',
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
       })
@@ -528,7 +536,7 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
       } as unknown as Request
 
@@ -537,7 +545,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeBodyPart(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
   })
 
@@ -547,7 +555,7 @@ describe('Distinguishing Marks Controller', () => {
       async bodyPart => {
         const submissionReq = {
           ...req,
-          params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+          params: { prisonerNumber, markType: 'tattoo', markId: '100' },
           body: { bodyPart },
         } as unknown as Request
 
@@ -560,14 +568,15 @@ describe('Distinguishing Marks Controller', () => {
 
         expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
           'token',
-          'A12345',
+          prisonUserMock,
+          prisonerNumber,
           '100',
           distinguishingMarkMock,
           'tattoo',
           bodyPartMap[bodyPart],
         )
         expect(res.redirect).toHaveBeenCalledWith(
-          `/prisoner/A12345/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
+          `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
         )
       },
     )
@@ -577,7 +586,7 @@ describe('Distinguishing Marks Controller', () => {
       async bodyPart => {
         const submissionReq = {
           ...req,
-          params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+          params: { prisonerNumber, markType: 'tattoo', markId: '100' },
           body: { bodyPart },
         } as unknown as Request
 
@@ -590,14 +599,15 @@ describe('Distinguishing Marks Controller', () => {
 
         expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
           'token',
-          'A12345',
+          prisonUserMock,
+          prisonerNumber,
           '100',
           distinguishingMarkMock,
           'tattoo',
           bodyPartMap[bodyPart],
         )
         expect(res.redirect).toHaveBeenCalledWith(
-          `/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true`,
+          `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100?updated=true`,
         )
       },
     )
@@ -605,7 +615,7 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoos' },
+        params: { prisonerNumber, markType: 'tattoos' },
         body: { bodyPart: 'somethingInvalid' },
       } as unknown as Request
 
@@ -615,7 +625,7 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.updateBodyPart(typeReq, res)
       expect(distinguishingMarksService.updateDistinguishingMarkLocation).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('Sends a post success audit event', async () => {
@@ -625,12 +635,12 @@ describe('Distinguishing Marks Controller', () => {
         .mockResolvedValue(distinguishingMarkMock)
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: { bodyPart: 'left-leg' },
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMark,
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'leftLeg' },
@@ -647,7 +657,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType,
           markId: '100',
         },
@@ -663,15 +673,15 @@ describe('Distinguishing Marks Controller', () => {
         markType,
         bodyPart: 'leftLeg',
         specificBodyPart: 'leftLeg',
-        backLinkUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100/body-part?selected=left-leg`,
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
+        backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100/body-part?selected=left-leg`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
       })
     })
 
     it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         query: { bodyPart, bodyPartChanged: 'true' },
       } as unknown as Request
 
@@ -683,14 +693,14 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
       })
     })
 
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
       } as unknown as Request
 
@@ -699,13 +709,13 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeLocation(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('redirects back if the body part is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'invalidPart' },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart: 'invalidPart' },
         query: {},
       } as unknown as Request
 
@@ -714,7 +724,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeLocation(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
   })
 
@@ -722,7 +732,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should update distinguishing mark with valid location', async () => {
       const markReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: {
           specificBodyPart: 'lowerLeftArm',
         },
@@ -738,7 +748,8 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
         'token',
-        'A12345',
+        prisonUserMock,
+        prisonerNumber,
         '100',
         distinguishingMarkMock,
         'tattoo',
@@ -753,7 +764,7 @@ describe('Distinguishing Marks Controller', () => {
         .mockResolvedValue(distinguishingMarkMock)
       const markReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', fieldName: 'location', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, fieldName: 'location', markType: 'tattoo', markId: '100' },
         body: {
           specificBodyPart: 'lowerLeftArm',
         },
@@ -761,7 +772,7 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMark,
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'lowerLeftArm' },
@@ -778,7 +789,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType,
           markId: '100',
         },
@@ -793,14 +804,14 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType,
         formValues: { description: 'Comment' },
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
       })
     })
 
     it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         query: {},
       } as unknown as Request
 
@@ -812,14 +823,14 @@ describe('Distinguishing Marks Controller', () => {
         markId: '100',
         markType: 'tattoo',
         formValues: { description: 'Horrible arm scar' },
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
       })
     })
 
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
       } as unknown as Request
 
@@ -828,7 +839,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeDescription(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
   })
 
@@ -836,7 +847,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should update distinguishing mark with description', async () => {
       const markReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: {
           description: 'description',
         },
@@ -852,7 +863,8 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(distinguishingMarksService.updateDistinguishingMarkDescription).toHaveBeenCalledWith(
         'token',
-        'A12345',
+        prisonUserMock,
+        prisonerNumber,
         '100',
         distinguishingMarkMock,
         'tattoo',
@@ -867,7 +879,7 @@ describe('Distinguishing Marks Controller', () => {
         .mockResolvedValue(distinguishingMarkMock)
       const markReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: {
           description: 'updated description',
         },
@@ -875,7 +887,7 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMark,
         details: {
@@ -897,7 +909,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType,
           markId: '100',
           photoId: leftLegMarkMock.photographUuids[0].id,
@@ -917,7 +929,7 @@ describe('Distinguishing Marks Controller', () => {
           url: `/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345`,
           alt: `Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}`,
         },
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         upload: false,
       })
     })
@@ -926,7 +938,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType: 'tattoo',
           markId: '100',
           photoId: distinguishingMarkMock.photographUuids[0].id,
@@ -946,7 +958,7 @@ describe('Distinguishing Marks Controller', () => {
           url: `/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345`,
           alt: `Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}`,
         },
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         upload: false,
       })
     })
@@ -954,7 +966,7 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
       } as unknown as Request
 
@@ -963,13 +975,13 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changePhoto(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('sends a page view audit event', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-leg' },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
@@ -992,7 +1004,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should update an existing distinguishing mark photo', async () => {
       const photoReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100', photoId: '123' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100', photoId: '123' },
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
@@ -1002,23 +1014,29 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.updatePhoto(photoReq, res)
 
-      expect(distinguishingMarksService.updateDistinguishingMarkPhoto).toHaveBeenCalledWith('token', '123', {
-        originalname: 'file.jpg',
-      })
+      expect(distinguishingMarksService.updateDistinguishingMarkPhoto).toHaveBeenCalledWith(
+        'token',
+        prisonUserMock,
+        prisonerNumber,
+        '123',
+        {
+          originalname: 'file.jpg',
+        },
+      )
     })
 
     it('sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
       const photoReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100', photoId: '123' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100', photoId: '123' },
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMarkPhoto,
         details: {
@@ -1035,7 +1053,7 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back and shows an error if the upload fails', async () => {
       const photoReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100', photoId: '123' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100', photoId: '123' },
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
@@ -1052,7 +1070,9 @@ describe('Distinguishing Marks Controller', () => {
         }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/100/photo/123`)
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/photo/123`,
+      )
     })
   })
 
@@ -1061,7 +1081,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType,
           markId: '100',
           photoId: leftLegMarkMock.photographUuids[0].id,
@@ -1074,7 +1094,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType,
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/${markType}/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         upload: false,
       })
     })
@@ -1083,7 +1103,7 @@ describe('Distinguishing Marks Controller', () => {
       const typeReq = {
         ...req,
         params: {
-          prisonerNumber: 'A12345',
+          prisonerNumber,
           markType: 'tattoo',
           markId: '100',
           photoId: distinguishingMarkMock.photographUuids[0].id,
@@ -1096,7 +1116,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType: 'tattoo',
-        cancelUrl: `/prisoner/A12345/personal/distinguishing-marks/tattoo/100`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         upload: false,
       })
     })
@@ -1104,20 +1124,20 @@ describe('Distinguishing Marks Controller', () => {
     it('redirects back if the mark type is invalid', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        params: { prisonerNumber, markType: 'invalidType', bodyPart: 'leftLeg' },
         query: {},
       } as unknown as Request
 
       await controller.addNewPhoto(typeReq, res)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('sends a page view audit event', async () => {
       const typeReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'left-leg' },
+        params: { prisonerNumber, markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
@@ -1136,15 +1156,15 @@ describe('Distinguishing Marks Controller', () => {
 
   describe('addPhoto', () => {
     it.each([
-      [undefined, '/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true'],
-      ['returnToMarkSummary', '/prisoner/A12345/personal/distinguishing-marks/tattoo/100?updated=true'],
-      ['addAnotherPhoto', '/prisoner/A12345/personal/distinguishing-marks/tattoo/100/photo?updated=true'],
+      [undefined, `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100?updated=true`],
+      ['returnToMarkSummary', `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100?updated=true`],
+      ['addAnotherPhoto', `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/photo?updated=true`],
     ])(
       'should add a new distinguishing mark photo and redirect correctly',
       async (action: string | undefined, redirectUrl: string) => {
         const photoReq = {
           ...req,
-          params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+          params: { prisonerNumber, markType: 'tattoo', markId: '100' },
           body: { action },
           file: { originalname: 'file.jpg' },
           query: {},
@@ -1154,9 +1174,15 @@ describe('Distinguishing Marks Controller', () => {
 
         await controller.addPhoto(photoReq, res)
 
-        expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith('token', 'A12345', '100', {
-          originalname: 'file.jpg',
-        })
+        expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          prisonerNumber,
+          '100',
+          {
+            originalname: 'file.jpg',
+          },
+        )
         expect(res.redirect).toHaveBeenCalledWith(redirectUrl)
       },
     )
@@ -1165,14 +1191,14 @@ describe('Distinguishing Marks Controller', () => {
       jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
       const photoReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '101' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '101' },
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'A12345',
+        prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMarkPhoto,
         details: { markId: '101', photoId: 100 },
@@ -1186,7 +1212,7 @@ describe('Distinguishing Marks Controller', () => {
     it('Redirects back and shows an error if the upload fails', async () => {
       const photoReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '101' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '101' },
         body: {},
         file: { originalname: 'file.jpg' },
         query: {},
@@ -1202,7 +1228,9 @@ describe('Distinguishing Marks Controller', () => {
         }),
       ])
       expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal/distinguishing-marks/tattoo/101/photo`)
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/101/photo`,
+      )
     })
   })
 
@@ -1210,7 +1238,7 @@ describe('Distinguishing Marks Controller', () => {
     it('should display all images for a distinguishing mark', async () => {
       const imagesReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: {},
         query: {},
       } as unknown as Request
@@ -1228,7 +1256,7 @@ describe('Distinguishing Marks Controller', () => {
     it('sends a page view audit event', async () => {
       const imagesReq = {
         ...req,
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: {},
         query: {},
       } as unknown as Request

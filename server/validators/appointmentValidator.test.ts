@@ -137,7 +137,7 @@ describe('Validation middleware - VLPM appointment', () => {
       },
       {
         href: '#officerDetailsOrUnknown',
-        text: "Enter the probation officer's details",
+        text: 'Enter the probation officer’s details',
       },
       {
         href: '#meetingType',
@@ -171,7 +171,7 @@ describe('Validation middleware - VLPM appointment', () => {
     expect(result).toEqual([
       {
         href: '#officerDetailsOrUnknown',
-        text: "Enter either the probation officer's details, or select 'Not yet known'",
+        text: "Enter either the probation officer’s details, or select 'Not yet known'",
       },
     ])
   })
@@ -201,11 +201,11 @@ describe('Validation middleware - VLPM appointment', () => {
     expect(result).toEqual([
       {
         href: '#officerFullName',
-        text: "Enter the probation officer's full name",
+        text: 'Enter the probation officer’s full name',
       },
       {
         href: '#officerEmail',
-        text: "Enter the probation officer's email address",
+        text: 'Enter the probation officer’s email address',
       },
     ])
   })

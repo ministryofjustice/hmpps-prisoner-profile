@@ -64,18 +64,22 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
+import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
+import { ApplicationInfo } from '../applicationInfo'
 
-export default function nunjucksSetup(app: express.Express): void {
+export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'DPS'
   app.locals.config = config
+  app.locals.appInsightsConnectionString = config.appInsightsConnectionString
+  app.locals.appInsightsApplicationName = applicationInfo.applicationName
+  app.locals.buildNumber = config.buildNumber
 
   let assetManifest: Record<string, string> = {}
 
@@ -124,6 +128,7 @@ export default function nunjucksSetup(app: express.Express): void {
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
+  njkEnv.addGlobal('appInsightsWebAnalyticsEnabled', appInsightsWebAnalyticsEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)

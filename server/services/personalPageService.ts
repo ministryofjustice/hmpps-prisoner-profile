@@ -77,6 +77,7 @@ import AddressService from './addressService'
 interface PersonalPageGetOptions {
   dietAndAllergyIsEnabled: boolean
   editProfileEnabled: boolean
+  simulateFetchEnabled: boolean
   personalRelationshipsApiReadEnabled: boolean
   healthAndMedicationApiReadEnabled: boolean
   personEndpointsEnabled: boolean
@@ -120,18 +121,30 @@ export default class PersonalPageService {
     return this.globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber(token, prisonerNumber)
   }
 
-  async createGlobalEmail(token: string, prisonerNumber: string, value: string): Promise<GlobalEmail> {
-    return this.globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber(token, prisonerNumber, value)
+  async createGlobalEmail(
+    token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    value: string,
+  ): Promise<GlobalEmail> {
+    return this.globalPhoneNumberAndEmailAddressesService.createEmailForPrisonerNumber(
+      token,
+      user,
+      prisonerNumber,
+      value,
+    )
   }
 
   async updateGlobalEmail(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     emailAddressId: string,
     value: string,
   ): Promise<GlobalEmail> {
     return this.globalPhoneNumberAndEmailAddressesService.updateEmailForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       emailAddressId,
       value,
@@ -140,11 +153,13 @@ export default class PersonalPageService {
 
   async createGlobalPhoneNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
   ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.createPhoneNumberForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       values,
     )
@@ -152,12 +167,14 @@ export default class PersonalPageService {
 
   async updateGlobalPhoneNumber(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     phoneNumberId: string,
     values: { phoneNumber: string; phoneNumberType: string; phoneExtension: string },
   ): Promise<PhoneNumber> {
     return this.globalPhoneNumberAndEmailAddressesService.updatePhoneNumberForPrisonerNumber(
       token,
+      user,
       prisonerNumber,
       phoneNumberId,
       values,
@@ -187,7 +204,7 @@ export default class PersonalPageService {
     return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
-  private transformPhyscialAttributes(
+  private transformPhysicalAttributes(
     physicalAttributesDto: CorePersonPhysicalAttributesDto,
   ): CorePersonPhysicalAttributes {
     return {
@@ -212,7 +229,7 @@ export default class PersonalPageService {
   async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
-    return this.transformPhyscialAttributes(physicalAttributesDto)
+    return this.transformPhysicalAttributes(physicalAttributesDto)
   }
 
   async updatePhysicalAttributes(
@@ -249,6 +266,7 @@ export default class PersonalPageService {
     const defaultOptions: PersonalPageGetOptions = {
       dietAndAllergyIsEnabled: false,
       editProfileEnabled: false,
+      simulateFetchEnabled: false,
       personalRelationshipsApiReadEnabled: true,
       healthAndMedicationApiReadEnabled: false,
       personEndpointsEnabled: false,
@@ -305,6 +323,17 @@ export default class PersonalPageService {
         : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
     ])
 
+    // When enabled, call the services required for edit profile without blocking for load testing purposes
+    // Does not use the person endpoints (which are not active in prod 10/10/25) - this should result in a worst case test
+    if (options.simulateFetchEnabled) {
+      Promise.all([
+        prisonApiClient.getIdentifiers(prisonerNumber, true),
+        this.addressService.getAddressesForDisplay(token, prisonerNumber),
+        this.getDistinguishingMarks(token, prisonerNumber),
+        this.getGlobalPhonesAndEmails(token, prisonerNumber),
+      ])
+    }
+
     let profileSummary
     let addresses
     let distinguishingMarks
@@ -318,7 +347,7 @@ export default class PersonalPageService {
         : null
       distinguishingMarks = getOptions.editProfileEnabled ? profileSummary.distinguishingMarks : null
       militaryRecords = militaryHistoryEnabled() ? profileSummary.militaryRecords : null
-      physicalAttributes = this.transformPhyscialAttributes(profileSummary.physicalAttributes)
+      physicalAttributes = this.transformPhysicalAttributes(profileSummary.physicalAttributes)
       globalNumbersAndEmails = getOptions.editProfileEnabled
         ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
         : null
@@ -458,7 +487,7 @@ export default class PersonalPageService {
       : null
 
     return {
-      age: calculateAge(prisonerData.dateOfBirth),
+      age: calculateAge(inmateDetail.dateOfBirth),
       aliases,
       dateOfBirth: formatDate(inmateDetail.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(

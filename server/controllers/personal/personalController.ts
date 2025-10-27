@@ -21,7 +21,12 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, editProfileEnabled, editReligionEnabled } from '../../utils/featureToggles'
+import {
+  dietAndAllergyEnabled,
+  editProfileEnabled,
+  editProfileSimulateFetch,
+  editReligionEnabled,
+} from '../../utils/featureToggles'
 import {
   addEmailAddressTextFieldData,
   addPhoneNumberFieldData,
@@ -96,9 +101,10 @@ export default class PersonalController {
     return async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
-      const { user, apiErrorCallback } = res.locals
+      const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
+      const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
         config.featureToggles
 
@@ -106,6 +112,7 @@ export default class PersonalController {
         this.personalPageService.get(clientToken, prisonerData, {
           dietAndAllergyIsEnabled: dietAndAllergyEnabled(activeCaseLoadId),
           editProfileEnabled: editEnabled,
+          simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           healthAndMedicationApiReadEnabled,
@@ -116,7 +123,7 @@ export default class PersonalController {
       ])
 
       await this.auditService.sendPageView({
-        user: res.locals.user,
+        user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -128,7 +135,7 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===
@@ -1637,11 +1644,16 @@ export default class PersonalController {
             res,
             prisonerNumber,
             submit: async () => {
-              await this.personalPageService.createGlobalPhoneNumber(clientToken, prisonerNumber, {
-                phoneNumber,
-                phoneNumberType,
-                phoneExtension,
-              })
+              await this.personalPageService.createGlobalPhoneNumber(
+                clientToken,
+                res.locals.user as PrisonUser,
+                prisonerNumber,
+                {
+                  phoneNumber,
+                  phoneNumberType,
+                  phoneExtension,
+                },
+              )
             },
             fieldData,
             auditDetails: {
@@ -1732,11 +1744,17 @@ export default class PersonalController {
             res,
             prisonerNumber,
             submit: async () => {
-              await this.personalPageService.updateGlobalPhoneNumber(clientToken, prisonerNumber, phoneNumberId, {
-                phoneNumber,
-                phoneNumberType,
-                phoneExtension,
-              })
+              await this.personalPageService.updateGlobalPhoneNumber(
+                clientToken,
+                res.locals.user as PrisonUser,
+                prisonerNumber,
+                phoneNumberId,
+                {
+                  phoneNumber,
+                  phoneNumberType,
+                  phoneExtension,
+                },
+              )
             },
             fieldData,
             auditDetails: {
@@ -1776,7 +1794,7 @@ export default class PersonalController {
         return addEmailAddressTextFieldData({ name: { firstName, lastName } })
       }
 
-    const globalEmailSetter: TextFieldSetter = async (req, _res, _fieldData, value) => {
+    const globalEmailSetter: TextFieldSetter = async (req, res, _fieldData, value) => {
       const { prisonerNumber, emailAddressId } = req.params
       const { clientToken } = req.middleware
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
@@ -1790,11 +1808,17 @@ export default class PersonalController {
         return SetterOutcome.DUPLICATE
       }
 
-      await this.personalPageService.updateGlobalEmail(clientToken, prisonerNumber, emailAddressId, emailUpdateValue)
+      await this.personalPageService.updateGlobalEmail(
+        clientToken,
+        res.locals.user as PrisonUser,
+        prisonerNumber,
+        emailAddressId,
+        emailUpdateValue,
+      )
       return SetterOutcome.SUCCESS
     }
 
-    const globalEmailCreator: TextFieldSetter = async (req, _res, _fieldData, value) => {
+    const globalEmailCreator: TextFieldSetter = async (req, res, _fieldData, value) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const { emails } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
@@ -1806,7 +1830,12 @@ export default class PersonalController {
         return SetterOutcome.DUPLICATE
       }
 
-      await this.personalPageService.createGlobalEmail(clientToken, prisonerNumber, emailUpdateValue)
+      await this.personalPageService.createGlobalEmail(
+        clientToken,
+        res.locals.user as PrisonUser,
+        prisonerNumber,
+        emailUpdateValue,
+      )
       return SetterOutcome.SUCCESS
     }
 

@@ -1,10 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import {
-  CaseNotesPermission,
-  isGranted,
-  PrisonerPermission,
-  PrisonerPermissions,
-} from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { CaseNotesPermission, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
@@ -20,6 +15,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import CaseNotesPageData from '../services/interfaces/caseNotesService/CaseNotesPageData'
+import mockPermissions from '../../tests/mocks/mockPermissions'
 
 let req: Request
 let res: Response
@@ -30,7 +26,6 @@ jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/caseNotesService.ts')
 jest.mock('../data/prisonApiClient.ts')
 
-const isGrantedMock = isGranted as jest.MockedFunction<typeof isGranted>
 const prisonerPermissions = {} as PrisonerPermissions
 
 const { prisonerNumber } = PrisonerMockDataA
@@ -89,8 +84,10 @@ describe('Case Notes Controller', () => {
     next = jest.fn()
 
     controller = new CaseNotesController(new CaseNotesService(null), auditServiceMock())
-    mockPermissionCheck(CaseNotesPermission.read_sensitive, false)
-    mockPermissionCheck(CaseNotesPermission.edit_sensitive, false)
+    mockPermissions({
+      [CaseNotesPermission.read_sensitive]: false,
+      [CaseNotesPermission.edit_sensitive]: false,
+    })
   })
 
   describe('displayCaseNotes', () => {
@@ -125,6 +122,7 @@ describe('Case Notes Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'case-notes',
       )
     })
@@ -150,7 +148,7 @@ describe('Case Notes Controller', () => {
         fullName: 'John Middle Names Saunders',
       } as CaseNotesPageData)
       jest.spyOn(headerMappers, 'mapHeaderData')
-      mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
+      mockPermissions({ [CaseNotesPermission.read_sensitive]: true })
 
       await controller.displayCaseNotes()(req, res, next)
 
@@ -279,7 +277,7 @@ describe('Case Notes Controller', () => {
     })
 
     it('should not permit creation of a case note with wrong type', async () => {
-      mockPermissionCheck(CaseNotesPermission.read_sensitive, true)
+      mockPermissions({ [CaseNotesPermission.read_sensitive]: true })
 
       const caseNoteForm = {
         type: 'REPORTS',
@@ -349,7 +347,7 @@ describe('Case Notes Controller', () => {
     it('should display update page for a sensitive case note for the appropriate permissions', async () => {
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
       jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(currentCaseNote)
-      mockPermissionCheck(CaseNotesPermission.edit_sensitive, true)
+      mockPermissions({ [CaseNotesPermission.edit_sensitive]: true })
 
       await controller.displayUpdateCaseNote()(req, res, next)
 
@@ -404,7 +402,7 @@ describe('Case Notes Controller', () => {
     })
 
     it('should permit update of a sensitive case note for the appropriate permissions', async () => {
-      mockPermissionCheck(CaseNotesPermission.edit_sensitive, true)
+      mockPermissions({ [CaseNotesPermission.edit_sensitive]: true })
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
       const reqWithBody = {
         ...req,
@@ -446,7 +444,3 @@ describe('Case Notes Controller', () => {
     })
   })
 })
-
-function mockPermissionCheck(permission: PrisonerPermission, granted: boolean) {
-  isGrantedMock.mockImplementation((perm, perms) => perm === permission && perms === prisonerPermissions && granted)
-}

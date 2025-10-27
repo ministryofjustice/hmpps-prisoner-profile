@@ -75,7 +75,7 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ pageTitle }}</h1>
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-3">{{ pageTitle }}</h1>
             </div>
         </div>
 
@@ -156,7 +156,7 @@
 
                     <div class="govuk-form-group js-probation-officer {{ 'govuk-form-group--error' if errors | findError("officerDetailsOrUnknown") }}">
                         <fieldset class="govuk-fieldset">
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Enter the probation officer's details</legend>
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Enter the probation officer’s details</legend>
                             <p id="officerDetailsOrUnknown" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span>{{ (errors | findError("officerDetailsOrUnknown")).text }}</p>
                             <p class="govuk-body">You can enter the details later if not yet known</p>
                             {{ govukCheckboxes({
@@ -310,21 +310,39 @@
                         ]
                     }) }}
 
-                  <div id="optional-video-label" class="govuk-label">
-                    <p>For confidentiality reasons, comments for some video appointments will not appear on prisoner movement slips.</p>
-                  </div>
+                    {# The comments hint text is altered slightly (using JS) depending on the type of appointment #}
+                    {% set commentsHintHtml %}
+                       <div id="optional-video-label" class="govuk-label">
+                           <p class="govuk-hint">
+                             Comments can include attendee details or other information relevant to the video appointment.
+                             They will appear on unlock lists and on the prisoner’s schedule. For confidentiality
+                             reasons, comments will not appear on prisoner movement slips.
+                           </p>
+                       </div>
+                       <div id="optional-standard-label" class="govuk-label">
+                           <p class="govuk-hint">
+                             Do not add anything that should not be seen by or shared with a prisoner. Comments will
+                             appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
+                           </p>
+                       </div>
+                    {% endset %}
 
                     <div class="js-comments">
-                    {{ govukTextarea({
-                        name: "comments",
-                        id: "comments",
-                        value: formValues.comments,
-                        errorMessage: errors | findError('comments'),
-                        classes: 'govuk-!-width-one-half',
-                        label: {
-                            text: "Comments (optional)"
-                        }
-                    }) }}
+                        {{ govukTextarea({
+                            name: "comments",
+                            id: "comments",
+                            value: formValues.comments,
+                            errorMessage: errors | findError('comments'),
+                            classes: 'govuk-!-width-one-half',
+                            label: {
+                                text: "Comments (optional)",
+                                classes: "govuk-fieldset__legend--s"
+                            },
+                            hint: {
+                                html: commentsHintHtml,
+                                classes: "govuk-caption--s"
+                            }
+                        }) }}
                     </div>
 
                     <div class="js-public-private-notes">
@@ -338,7 +356,7 @@
                               classes: 'govuk-fieldset__legend--s'
                             },
                             hint: {
-                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor's details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
+                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
                             },
                             maxlength: "400"
                         }) }}
