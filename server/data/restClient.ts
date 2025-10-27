@@ -87,7 +87,7 @@ export default abstract class RestClient extends HmppsRestClient {
   ): Promise<Response> {
     const request = { path, query, headers, responseType, raw, retries, errorHandler }
     return appConfig.featureToggles.circuitBreakerEnabled
-      ? (this.breaker.fire(request, token) as Response)
+      ? (this.breaker.fire(request, token) as Promise<Response>)
       : super.get<Response, ErrorData>(request, token)
   }
 
