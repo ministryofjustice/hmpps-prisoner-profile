@@ -50,12 +50,12 @@ interface PutRequest {
 }
 
 // To allow circuit breaker options in config
-interface CustomApiConfig extends ApiConfig {
+export interface CustomApiConfig extends ApiConfig {
   circuitBreakerOptions?: CircuitBreaker.Options<[request: Request<unknown, unknown>, token: string]>
 }
 
 export default abstract class RestClient extends HmppsRestClient {
-  private readonly breaker: CircuitBreaker
+  private breaker: CircuitBreaker
 
   protected constructor(
     protected readonly name: string,
@@ -66,6 +66,7 @@ export default abstract class RestClient extends HmppsRestClient {
     // (dependencies are separately tracked):
     super(name, config, appConfig.production ? warnLevelLogger : logger)
 
+    // Unknown types as they're specified in this.get
     this.breaker = new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
       async (request, tokenString) => super.get<unknown, unknown>(request, tokenString),
       config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions,
