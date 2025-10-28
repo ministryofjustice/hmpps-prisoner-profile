@@ -69,7 +69,13 @@ export default abstract class RestClient extends HmppsRestClient {
     // Unknown types as they're specified in this.get
     this.breaker = new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
       async (request, tokenString) => super.get<unknown, unknown>(request, tokenString),
-      config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions,
+      {
+        ...(config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions),
+        errorFilter: (error: SanitisedError<unknown>) => {
+          logger.error(error)
+          return error?.responseStatus === 404
+        },
+      },
     )
   }
 
