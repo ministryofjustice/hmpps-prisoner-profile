@@ -99,6 +99,7 @@ describe('Alerts Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'alerts',
       )
     })
@@ -206,6 +207,7 @@ describe('Alerts Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'alerts',
       )
     })

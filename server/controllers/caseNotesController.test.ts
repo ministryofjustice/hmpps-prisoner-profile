@@ -122,6 +122,7 @@ describe('Case Notes Controller', () => {
         inmateDetailMock,
         req.middleware.alertSummaryData,
         res.locals.user,
+        res.locals.prisonerPermissions,
         'case-notes',
       )
     })

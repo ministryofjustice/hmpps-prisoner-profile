@@ -328,7 +328,7 @@ context('When signed in', () => {
         thirdContact.relationship().should('include.text', 'Brother')
         thirdContact.phoneNumber().should('include.text', '01234 567890')
         thirdContact.additionalDetails().click()
-        thirdContact.dateOfBirth().should('include.text', '25 October 1987 (37 years old)')
+        thirdContact.dateOfBirth().should('include.text', '25 October 1987 (38 years old)')
         thirdContact.address().should('include.text', '99 Acacia Avenue')
         thirdContact.address().should('include.text', 'Newcastle Upon Tyne')
         thirdContact.address().should('include.text', 'S13 4FH')
