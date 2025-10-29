@@ -3,6 +3,9 @@ import express, { NextFunction, Request, Response, Router } from 'express'
 import helmet from 'helmet'
 import config from '../config'
 
+const googleDomains = ['*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com']
+const azureDomains = ['https://northeurope-0.in.applicationinsights.azure.com', '*.monitor.azure.com']
+
 export default function setUpWebSecurity(): Router {
   const router = express.Router()
 
@@ -16,22 +19,27 @@ export default function setUpWebSecurity(): Router {
 
   const scriptSrc = [
     "'self'",
-    '*.google-analytics.com',
-    '*.analytics.google.com',
-    '*.googletagmanager.com',
-    'https://northeurope-0.in.applicationinsights.azure.com',
+    ...googleDomains,
+    ...azureDomains,
     (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
   ]
+
   const styleSrc = [
     "'self'",
-    '*.google-analytics.com',
-    '*.analytics.google.com',
-    '*.googletagmanager.com',
+    ...googleDomains,
     'fonts.googleapis.com',
     (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
   ]
+
+  const connectSrc = [
+    "'self'",
+    ...googleDomains,
+    ...azureDomains,
+    (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
+  ]
+
   const formAction = [`'self' ${config.apis.hmppsAuth.externalUrl} ${config.serviceUrls.digitalPrison}`]
-  const imgSrc = ["'self'", 'data:', '*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com']
+  const imgSrc = ["'self'", 'data:', ...googleDomains]
   const fontSrc = ["'self'"]
 
   router.use(
@@ -39,16 +47,10 @@ export default function setUpWebSecurity(): Router {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          connectSrc: [
-            "'self'",
-            '*.google-analytics.com',
-            '*.analytics.google.com',
-            '*.googletagmanager.com',
-            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
-          ],
-          formAction,
           scriptSrc,
           styleSrc,
+          connectSrc,
+          formAction,
           imgSrc,
           fontSrc,
         },
