@@ -28,7 +28,7 @@
     "clean": "rm -rf dist test_results",
     "rebuild": "npm run clean && npm i && npm run build",
     "postinstall": "npx patch-package",
-    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml",
+    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml --gitleaks-ignore-path .gitleaks/.gitleaksignore",
     "precommit:lint": "lint-staged",
     "precommit:verify": "npm run typecheck && npm test"
   },
