@@ -19,7 +19,8 @@
         extensionConfig: {
           [clickPluginInstance.identifier] : clickPluginConfig
         },
-        autoTrackPageVisitTime: true
+        autoTrackPageVisitTime: true,
+        disableFetchTracking: true, // otherwise we get spammed with GA fetch requests being incorrectly reported as failing
       }
     }
     var init = new Microsoft.ApplicationInsights.ApplicationInsights(snippet)
