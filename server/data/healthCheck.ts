@@ -1,5 +1,5 @@
 import superagent from 'superagent'
-import Agent, { HttpsAgent } from 'agentkeepalive'
+import { HttpAgent, HttpsAgent } from 'agentkeepalive'
 import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../logger'
 
@@ -17,14 +17,14 @@ export function serviceCheckFactory(
   agentOptions: AgentConfig,
   serviceTimeout: ServiceTimeout = new ServiceTimeout(),
 ): ServiceCheck {
-  const keepaliveAgent = url.startsWith('https') ? new HttpsAgent(agentOptions) : new Agent(agentOptions)
+  const keepaliveAgent = url.startsWith('https') ? new HttpsAgent(agentOptions) : new HttpAgent(agentOptions)
 
   return () =>
     new Promise((resolve, reject) => {
       superagent
         .get(url)
         .agent(keepaliveAgent)
-        .retry(2, (err, res) => {
+        .retry(2, (err, _res) => {
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message} when calling ${name}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })

@@ -1,7 +1,8 @@
-import type { BuildResult } from 'esbuild'
+import type { BuildOptions } from 'esbuild'
 
 export interface BuildConfig {
   isProduction: boolean
+  isWatchMode: boolean
 
   app: {
     outDir: string
@@ -17,4 +18,4 @@ export interface BuildConfig {
   }
 }
 
-export type BuildStep = (BuildConfig) => Promise<BuildResult>
+export type BuildStep = (buildConfig: BuildConfig) => BuildOptions
