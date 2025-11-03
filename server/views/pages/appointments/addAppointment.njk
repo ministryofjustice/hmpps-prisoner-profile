@@ -227,6 +227,9 @@
                         label: {
                           text: "Select meeting type"
                         },
+                        formGroup : {
+                          classes: "js-meeting-type"
+                        },
                         items: meetingTypes | addDefaultSelectedValue('Select meeting type') | setSelected([formValues.meetingType]),
                         errorMessage: errors | findError("meetingType"),
                         classes: "govuk-!-width-one-half"
