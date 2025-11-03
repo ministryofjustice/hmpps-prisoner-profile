@@ -220,28 +220,38 @@
                         </fieldset>
                     </div>
 
-                    {# Replace OTHER to the end of the list #}
-                    {% set meetingTypes = meetingTypes | filterNot('value', 'OTHER') %}
-                    {% set meetingTypes = (meetingTypes.push({
-                        value: 'OTHER',
-                        text: 'Other'
-                    }), meetingTypes) %}
-
-                    {{ govukRadios({
+                    {% if meetingTypes.length > 3 %}
+                      {{ govukSelect({
+                        idPrefix: "meetingType",
+                        name: "meetingType",
+                        label: {
+                          text: "Select meeting type",
+                          classes: "govuk-fieldset__legend--s"
+                        },
+                        formGroup : {
+                          classes: "js-meeting-type"
+                        },
+                        items: meetingTypes | addDefaultSelectedValue('Select meeting type') | setSelected([formValues.meetingType]),
+                        errorMessage: errors | findError("meetingType"),
+                        classes: "govuk-!-width-one-half"
+                      }) }}
+                    {%  else %}
+                      {{ govukRadios({
                         idPrefix: "meetingType",
                         name: "meetingType",
                         fieldset: {
-                            legend: {
-                                text: "Select meeting type",
-                                classes: "govuk-fieldset__legend--s"
-                            }
+                          legend: {
+                            text: "Select meeting type",
+                            classes: "govuk-fieldset__legend--s"
+                          }
                         },
                         formGroup : {
-                            classes: "js-meeting-type"
+                          classes: "js-meeting-type"
                         },
                         items: meetingTypes | setChecked([formValues.meetingType]),
                         errorMessage: errors | findError("meetingType")
-                    }) }}
+                      }) }}
+                    {% endif %}
 
                     {{ hmppsDatepicker({
                         id: "date",
