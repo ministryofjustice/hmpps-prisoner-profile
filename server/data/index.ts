@@ -48,7 +48,6 @@ import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
 import { ApiConfig } from '@ministryofjustice/hmpps-rest-client'
-import CircuitBreaker from 'opossum'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
