@@ -1,5 +1,5 @@
 import CircuitBreaker from 'opossum'
-import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
+import { AgentConfig, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -25,6 +25,7 @@ const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
   resetTimeout: 120000, // time to wait before attempting to half-open the circuit
   rollingCountTimeout: 300000, // the time window to consider requests over
   volumeThreshold: 5, // circuit will stay closed regardless of failures if there is less than this many requests in the window
+  errorFilter: (error: SanitisedError<unknown>) => error?.responseStatus === 404,
 }
 
 export default {

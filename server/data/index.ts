@@ -46,6 +46,7 @@ import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
+import { circuitBreakerBuilder } from './restClient'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -55,9 +56,14 @@ type CuriousRestClientBuilder<T> = (token: CuriousApiToken) => T
 
 const tokenStore = config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore()
 
+const circuitBreakers = {
+  allocationManager: circuitBreakerBuilder(config.apis.allocationManager),
+}
+
 export const dataAccess = {
   applicationInfo: applicationInfo(),
-  allocationManagerApiClientBuilder: (token: string) => new AllocationManagerApiClient(token),
+  allocationManagerApiClientBuilder: (token: string) =>
+    new AllocationManagerApiClient(token, circuitBreakers.allocationManager),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
   curiousApiClientBuilder: (token: CuriousApiToken) => new CuriousRestApiClient(token),
   incentivesApiClientBuilder: (token: string) => new IncentivesApiRestClient(token),
