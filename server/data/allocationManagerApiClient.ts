@@ -5,7 +5,7 @@ import AllocationManagerClient from './interfaces/allocationManagerApi/allocatio
 import Pom from './interfaces/allocationManagerApi/Pom'
 
 export default class AllocationManagerApiClient extends RestClient implements AllocationManagerClient {
-  constructor(token: string, circuitBreaker: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
     super('Allocation Manager API', config.apis.allocationManager, token, circuitBreaker)
   }
 

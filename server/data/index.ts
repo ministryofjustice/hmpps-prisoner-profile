@@ -47,6 +47,8 @@ import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestCl
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
+import { ApiConfig } from '@ministryofjustice/hmpps-rest-client'
+import CircuitBreaker from 'opossum'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -58,49 +60,92 @@ const tokenStore = config.redis.enabled ? new RedisTokenStore(createRedisClient(
 
 const circuitBreakers = {
   allocationManager: circuitBreakerBuilder(config.apis.allocationManager),
+  caseNotes: circuitBreakerBuilder(config.apis.caseNotesApi),
+  curious: circuitBreakerBuilder(config.apis.curiousApiUrl),
+  incentives: circuitBreakerBuilder(config.apis.incentivesApi),
+  keyworker: circuitBreakerBuilder(config.apis.keyworker),
+  manageSocCases: circuitBreakerBuilder(config.apis.manageSocCasesApi),
+  pathfinder: circuitBreakerBuilder(config.apis.pathfinderApi),
+  adjudications: circuitBreakerBuilder(config.apis.adjudicationsApi),
+  prisonApi: circuitBreakerBuilder(config.apis.prisonApi),
+  locationsInsidePrison: circuitBreakerBuilder(config.apis.locationsInsidePrisonApi),
+  nomisSyncPrisonMapping: circuitBreakerBuilder(config.apis.nomisSyncPrisonerMappingApi),
+  prisonerSearch: circuitBreakerBuilder(config.apis.prisonerSearchApi),
+  nonAssociations: circuitBreakerBuilder(config.apis.nonAssociationsApi),
+  whereabouts: circuitBreakerBuilder(config.apis.whereaboutsApi),
+  bookAVideoLink: circuitBreakerBuilder(config.apis.bookAVideoLinkApi),
+  prisonerProfileDelius: circuitBreakerBuilder(config.apis.prisonerProfileDeliusApi),
+  complexity: circuitBreakerBuilder(config.apis.complexityApi),
+  educationAndWorkPlan: circuitBreakerBuilder(config.apis.educationAndWorkPlanApi),
+  restrictedPatient: circuitBreakerBuilder(config.apis.restrictedPatientApi),
+  prisonRegister: circuitBreakerBuilder(config.apis.prisonRegisterApi),
+  calculateReleaseDates: circuitBreakerBuilder(config.apis.calculateReleaseDatesApi),
+  alerts: circuitBreakerBuilder(config.apis.alertsApi),
+  personIntegration: circuitBreakerBuilder(config.apis.personIntegrationApi),
+  csip: circuitBreakerBuilder(config.apis.csipApi),
+  healthAndMedication: circuitBreakerBuilder(config.apis.healthAndMedicationApi),
+  personCommunicationNeeds: circuitBreakerBuilder(config.apis.personCommunicationNeedsApi),
+  prisonerProfile: circuitBreakerBuilder({} as ApiConfig),
+  personalRelationships: circuitBreakerBuilder(config.apis.personalRelationshipsApi),
 }
 
 export const dataAccess = {
   applicationInfo: applicationInfo(),
   allocationManagerApiClientBuilder: (token: string) =>
     new AllocationManagerApiClient(token, circuitBreakers.allocationManager),
-  caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
-  curiousApiClientBuilder: (token: CuriousApiToken) => new CuriousRestApiClient(token),
-  incentivesApiClientBuilder: (token: string) => new IncentivesApiRestClient(token),
-  keyworkerApiClientBuilder: (token: string) => new KeyWorkerRestClient(token),
-  manageSocCasesApiClientBuilder: (token: string) => new ManageSocCasesApiRestClient(token),
-  pathfinderApiClientBuilder: (token: string) => new PathfinderApiRestClient(token),
-  adjudicationsApiClientBuilder: (token: string) => new AdjudicationsApiRestClient(token),
-  prisonApiClientBuilder: (token: string) => new PrisonApiRestClient(token),
-  locationsInsidePrisonApiClientBuilder: (token: string) => new LocationsInsidePrisonApiRestClient(token),
-  nomisSyncPrisonMappingClientBuilder: (token: string) => new NomisSyncPrisonMappingRestClient(token),
-  prisonerSearchApiClientBuilder: (token: string) => new PrisonerSearchClient(token),
+  caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token, circuitBreakers.caseNotes),
+  curiousApiClientBuilder: (token: CuriousApiToken) => new CuriousRestApiClient(token, circuitBreakers.curious),
+  incentivesApiClientBuilder: (token: string) => new IncentivesApiRestClient(token, circuitBreakers.incentives),
+  keyworkerApiClientBuilder: (token: string) => new KeyWorkerRestClient(token, circuitBreakers.keyworker),
+  manageSocCasesApiClientBuilder: (token: string) =>
+    new ManageSocCasesApiRestClient(token, circuitBreakers.manageSocCases),
+  pathfinderApiClientBuilder: (token: string) => new PathfinderApiRestClient(token, circuitBreakers.pathfinder),
+  adjudicationsApiClientBuilder: (token: string) =>
+    new AdjudicationsApiRestClient(token, circuitBreakers.adjudications),
+  prisonApiClientBuilder: (token: string) => new PrisonApiRestClient(token, circuitBreakers.prisonApi),
+  locationsInsidePrisonApiClientBuilder: (token: string) =>
+    new LocationsInsidePrisonApiRestClient(token, circuitBreakers.locationsInsidePrison),
+  nomisSyncPrisonMappingClientBuilder: (token: string) =>
+    new NomisSyncPrisonMappingRestClient(token, circuitBreakers.nomisSyncPrisonMapping),
+  prisonerSearchApiClientBuilder: (token: string) => new PrisonerSearchClient(token, circuitBreakers.prisonerSearch),
   systemToken: systemTokenBuilder(tokenStore),
   curiousApiToken: curiousApiTokenBuilder(tokenStore),
-  nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
-  whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),
-  bookAVideoLinkApiClientBuilder: (token: string) => new BookAVideoLinkRestApiClient(token),
-  prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
-  complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token),
-  educationAndWorkPlanApiClientBuilder: (token: string) => new EducationAndWorkPlanApiRestClient(token),
-  restrictedPatientApiClientBuilder: (token: string) => new RestrictedPatientApiRestClient(token),
-  prisonRegisterApiClientBuilder: (token: string) => new PrisonRegisterApiRestClient(token),
+  nonAssociationsApiClientBuilder: (token: string) =>
+    new NonAssociationsApiRestClient(token, circuitBreakers.nonAssociations),
+  whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token, circuitBreakers.whereabouts),
+  bookAVideoLinkApiClientBuilder: (token: string) =>
+    new BookAVideoLinkRestApiClient(token, circuitBreakers.bookAVideoLink),
+  prisonerProfileDeliusApiClientBuilder: (token: string) =>
+    new PrisonerProfileDeliusApiRestClient(token, circuitBreakers.prisonerProfileDelius),
+  complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token, circuitBreakers.complexity),
+  educationAndWorkPlanApiClientBuilder: (token: string) =>
+    new EducationAndWorkPlanApiRestClient(token, circuitBreakers.educationAndWorkPlan),
+  restrictedPatientApiClientBuilder: (token: string) =>
+    new RestrictedPatientApiRestClient(token, circuitBreakers.restrictedPatient),
+  prisonRegisterApiClientBuilder: (token: string) =>
+    new PrisonRegisterApiRestClient(token, circuitBreakers.prisonRegister),
   prisonRegisterStore: new PrisonRegisterStore(createRedisClient()),
   referenceDataStore: new ReferenceDataStore(createRedisClient()),
-  calculateReleaseDatesApiClientBuilder: (token: string) => new CalculateReleaseDatesApiClient(token),
-  alertsApiClientBuilder: (token: string) => new AlertsApiRestClient(token),
+  calculateReleaseDatesApiClientBuilder: (token: string) =>
+    new CalculateReleaseDatesApiClient(token, circuitBreakers.calculateReleaseDates),
+  alertsApiClientBuilder: (token: string) => new AlertsApiRestClient(token, circuitBreakers.alerts),
   featureToggleStore: config.redis.enabled
     ? new RedisFeatureToggleStore(createRedisClient())
     : new InMemoryFeatureToggleStore(),
   ephemeralDataStore: new EphemeralDataStore(createRedisClient()),
-  personIntegrationApiClientBuilder: (token: string) => new PersonIntegrationApiRestClient(token),
-  csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
-  healthAndMedicationApiClientBuilder: (token: string) => new HealthAndMedicationApiRestClient(token),
+  personIntegrationApiClientBuilder: (token: string) =>
+    new PersonIntegrationApiRestClient(token, circuitBreakers.personIntegration),
+  csipApiClientBuilder: (token: string) => new CsipApiRestClient(token, circuitBreakers.csip),
+  healthAndMedicationApiClientBuilder: (token: string) =>
+    new HealthAndMedicationApiRestClient(token, circuitBreakers.healthAndMedication),
   telemetryClient,
   osPlacesApiClient: new OsPlacesApiClient(logger, config.apis.osPlacesApi),
-  personCommunicationNeedsApiClientBuilder: (token: string) => new PersonCommunicationNeedsApiRestClient(token),
-  prisonerProfileApiClientBuilder: (token: string) => new PrisonerProfileApiRestClient(token),
-  personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
+  personCommunicationNeedsApiClientBuilder: (token: string) =>
+    new PersonCommunicationNeedsApiRestClient(token, circuitBreakers.personCommunicationNeeds),
+  prisonerProfileApiClientBuilder: (token: string) =>
+    new PrisonerProfileApiRestClient(token, circuitBreakers.prisonerProfile),
+  personalRelationshipsApiClientBuilder: (token: string) =>
+    new PersonalRelationshipsApiRestClient(token, circuitBreakers.personalRelationships),
   tokenStore,
 }
 

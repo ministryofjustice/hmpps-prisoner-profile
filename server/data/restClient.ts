@@ -66,7 +66,7 @@ export default abstract class RestClient extends HmppsRestClient {
     protected readonly name: string,
     protected readonly config: CustomApiConfig,
     protected readonly token: string,
-    protected readonly circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown> | null, // Unknown types as they're specified in this.get
+    protected readonly circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>, // Unknown types as they're specified in this.get
   ) {
     // only log warn level and above in production for API clients to reduce app insights usage
     // (dependencies are separately tracked):

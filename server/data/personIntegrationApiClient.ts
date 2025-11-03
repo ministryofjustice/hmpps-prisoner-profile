@@ -1,5 +1,6 @@
 import { Readable } from 'stream'
-import RestClient from './restClient'
+import CircuitBreaker from 'opossum'
+import RestClient, { Request } from './restClient'
 import {
   AddIdentifierRequestDto,
   AddressRequestDto,
@@ -25,8 +26,8 @@ import MulterFile from '../controllers/interfaces/MulterFile'
 import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class PersonIntegrationApiRestClient extends RestClient implements PersonIntegrationApiClient {
-  constructor(token: string) {
-    super('Person Integration API', config.apis.personIntegrationApi, token)
+  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+    super('Person Integration API', config.apis.personIntegrationApi, token, circuitBreaker)
   }
 
   getPrisonerProfileSummary(prisonerNumber: string): Promise<PrisonerProfileSummary> {

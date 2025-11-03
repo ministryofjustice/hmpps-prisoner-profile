@@ -1,4 +1,5 @@
-import RestClient from './restClient'
+import CircuitBreaker from 'opossum'
+import RestClient, { Request } from './restClient'
 import config from '../config'
 import {
   CommunicationNeedsDto,
@@ -14,8 +15,8 @@ export default class PersonCommunicationNeedsApiRestClient
   extends RestClient
   implements PersonCommunicationNeedsApiClient
 {
-  constructor(token: string) {
-    super('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token)
+  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+    super('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token, circuitBreaker)
   }
 
   getReferenceDataCodes(domain: PersonCommunicationNeedsReferenceDataDomain): Promise<ReferenceDataCode[]> {

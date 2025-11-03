@@ -1,11 +1,12 @@
-import RestClient from './restClient'
+import CircuitBreaker from 'opossum'
+import RestClient, { Request } from './restClient'
 import config from '../config'
 import KeyWorkerClient from './interfaces/keyWorkerApi/keyWorkerClient'
 import StaffAllocation from './interfaces/keyWorkerApi/StaffAllocation'
 
 export default class KeyWorkerRestClient extends RestClient implements KeyWorkerClient {
-  constructor(token: string) {
-    super('KeyWorkers API', config.apis.keyworker, token)
+  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+    super('KeyWorkers API', config.apis.keyworker, token, circuitBreaker)
   }
 
   async getCurrentAllocations(
