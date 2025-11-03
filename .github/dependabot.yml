@@ -5,7 +5,7 @@ updates:
     ignore:
       - dependency-name: "@types/node"
         versions:
-          - ">=23"
+          - ">=25"
     schedule:
       interval: weekly
       day: wednesday
