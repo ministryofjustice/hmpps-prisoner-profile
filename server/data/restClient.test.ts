@@ -62,8 +62,8 @@ describe('RestClient', () => {
   it('uses the provided circuit breaker', async () => {
     appConfig.featureToggles.circuitBreakerEnabled = true
 
-    const circuitToBreak = circuitBreakerBuilder(testClientConfig)
-    const circuitNotToBreak = circuitBreakerBuilder(testClientConfig)
+    const circuitToBreak = circuitBreakerBuilder('test', testClientConfig)
+    const circuitNotToBreak = circuitBreakerBuilder('test', testClientConfig)
 
     await simulateFailures(circuitToBreak)
     expect(superGet).toHaveBeenCalledTimes(defaultVolumeThreshold)
@@ -78,7 +78,7 @@ describe('RestClient', () => {
   it('uses the provided circuit breaker with custom config', async () => {
     appConfig.featureToggles.circuitBreakerEnabled = true
 
-    const circuitToBreak = circuitBreakerBuilder(customTestClientConfig)
+    const circuitToBreak = circuitBreakerBuilder('test', customTestClientConfig)
 
     await simulateFailures(circuitToBreak, customVolumeThreshold)
     expect(superGet).toHaveBeenCalledTimes(customVolumeThreshold)
@@ -91,7 +91,7 @@ describe('RestClient', () => {
   it('404 errors do not trip the circuit breaker', async () => {
     appConfig.featureToggles.circuitBreakerEnabled = true
 
-    const circuitNotToBreak = circuitBreakerBuilder(testClientConfig)
+    const circuitNotToBreak = circuitBreakerBuilder('test', testClientConfig)
 
     const notFoundError = { responseStatus: 404 } as SanitisedError
     await simulateFailures(circuitNotToBreak, defaultVolumeThreshold, notFoundError)
@@ -105,7 +105,7 @@ describe('RestClient', () => {
   it('does not use the circuit breaker when featureToggle is false or a breaker is not provided', async () => {
     appConfig.featureToggles.circuitBreakerEnabled = false
 
-    const unusedCircuitbreaker = circuitBreakerBuilder(testClientConfig)
+    const unusedCircuitbreaker = circuitBreakerBuilder('test', testClientConfig)
     await simulateFailures(unusedCircuitbreaker)
     expect(superGet).toHaveBeenCalledTimes(defaultVolumeThreshold)
 

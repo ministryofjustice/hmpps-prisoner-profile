@@ -54,11 +54,14 @@ export interface CustomApiConfig extends ApiConfig {
   circuitBreakerOptions?: CircuitBreaker.Options<[request: Request<unknown, unknown>, token: string]>
 }
 
-export function circuitBreakerBuilder(config: CustomApiConfig) {
-  return new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
+export function circuitBreakerBuilder(name: string, config: CustomApiConfig) {
+  const breaker = new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
     () => undefined, // action to apply circuit breaker to is undefined as it's set at call time
     config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions,
   )
+  breaker.on('open', () => logger.warn(`Circuit breaker opened for API: ${name}`))
+  breaker.on('close', () => logger.info(`Circuit breaker closed for API: ${name}`))
+  return breaker
 }
 
 export default abstract class RestClient extends HmppsRestClient {
