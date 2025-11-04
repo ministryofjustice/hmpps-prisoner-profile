@@ -1,13 +1,14 @@
+import CircuitBreaker from 'opossum'
 import { mapToQueryString } from '../utils/utils'
 import PagedList from './interfaces/prisonApi/PagedList'
 import { AlertsApiClient } from './interfaces/alertsApi/alertsApiClient'
 import { Alert, AlertChanges, AlertsApiQueryParams, AlertType, CreateAlert } from './interfaces/alertsApi/Alert'
 import config from '../config'
-import RestClient from './restClient'
+import RestClient, { Request } from './restClient'
 
 export default class AlertsApiRestClient extends RestClient implements AlertsApiClient {
-  constructor(token: string) {
-    super('Alerts API', config.apis.alertsApi, token)
+  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+    super('Alerts API', config.apis.alertsApi, token, circuitBreaker)
   }
 
   async getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>> {

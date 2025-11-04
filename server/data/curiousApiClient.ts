@@ -1,4 +1,5 @@
-import RestClient from './restClient'
+import CircuitBreaker from 'opossum'
+import RestClient, { Request } from './restClient'
 import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
 import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
@@ -10,8 +11,8 @@ import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergen
 import { CuriousApiToken } from './hmppsAuthClient'
 
 export default class CuriousRestApiClient extends RestClient implements CuriousApiClient {
-  constructor(token: CuriousApiToken) {
-    super('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
+  constructor(token: CuriousApiToken, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
+    super('Curious API', config.apis.curiousApiUrl, token.curiousApiToken, circuitBreaker)
   }
 
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills | null> {
