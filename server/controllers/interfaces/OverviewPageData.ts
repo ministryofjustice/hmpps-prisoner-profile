@@ -46,6 +46,7 @@ export default interface OverviewPageData {
   options: {
     showCourtCaseSummary: boolean
   }
+  actionsMayBeMissing: boolean
 }
 
 export interface CourtCaseSummary {

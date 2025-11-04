@@ -97,8 +97,8 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
     ] = await Promise.all([
-      pathfinderApiClient.getNominal(prisonerNumber),
-      manageSocCasesApiClient.getNominal(prisonerNumber),
+      Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
+      Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
       showCourtCaseSummary
@@ -137,8 +137,8 @@ export default class OverviewController {
 
     const overviewActions = buildOverviewActions(
       prisonerData,
-      pathfinderNominal,
-      socNominal,
+      pathfinderNominal.getOrNull(),
+      socNominal.getOrNull(),
       user,
       config,
       res.locals.feComponents?.sharedData,
@@ -163,7 +163,7 @@ export default class OverviewController {
       schedule,
       incentiveSummary,
       overviewActions,
-      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, prisonerPermissions),
+      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal.getOrNull(), socNominal.getOrNull(), prisonerPermissions),
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
@@ -190,6 +190,7 @@ export default class OverviewController {
       options: {
         showCourtCaseSummary,
       },
+      actionsMayBeMissing: !(socNominal.isFulfilled() && pathfinderNominal.isFulfilled()),
     }
 
     res.render('pages/overviewPage', viewData)

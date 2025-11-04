@@ -10,6 +10,6 @@ export default class ManageSocCasesApiRestClient extends RestClient implements M
   }
 
   async getNominal(offenderNumber: string): Promise<Nominal | null> {
-    return this.getAndIgnore404({ path: `/soc/nominal/nomsId/${offenderNumber}` })
+    return Promise.reject("error")
   }
 }

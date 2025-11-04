@@ -20,3 +20,10 @@
     margin-top: 0;
   }
 }
+
+.hmpps-api-error-inset {
+  padding: 0px 8px 0px 8px;
+  border-left: 5px solid govuk-colour('red');
+  margin: 16px;
+  font-size: 16px !important;
+}
