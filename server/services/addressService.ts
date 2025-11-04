@@ -119,8 +119,8 @@ export default class AddressService {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
   }
 
-  public async getAddressesMatchingQuery(searchQuery: string, sanitisePostcode: boolean = true): Promise<OsAddress[]> {
-    return this.osPlacesAddressService.getAddressesMatchingQuery(searchQuery, sanitisePostcode)
+  public async getAddressesMatchingQuery(searchQuery: string): Promise<OsAddress[]> {
+    return this.osPlacesAddressService.getAddressesMatchingQuery(searchQuery)
   }
 
   public async getAddressByUprn(uprn: string, token: string): Promise<AddressRequestDto> {
