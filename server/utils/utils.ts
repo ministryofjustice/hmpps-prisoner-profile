@@ -723,6 +723,8 @@ export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
 }
 
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'
+export const unavailableApiErrorMessage = 'This information is currently unavailable. Try again later.'
+export const unavailablePlaceholder = 'Unavailable'
 
 export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
 
