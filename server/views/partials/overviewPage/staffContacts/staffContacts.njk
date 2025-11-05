@@ -78,7 +78,7 @@
             {% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}
 
             {% if staffContactsMissing %}
-                <p class="hmpps-api-error-inset" data-qa="actions-unavailable">
+                <p class="hmpps-api-error-inset" data-qa="staff-contacts-unavailable">
                     {{ unavailableApiErrorText }}
                 </p>
             {% endif %}
