@@ -62,7 +62,7 @@
     {% endif %}
     {% if incentiveSummary %}
         <div class="govuk-grid-column-one-half">
-            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives') }}
+            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives', incentiveSummary | isIncentiveSummaryError) }}
         </div>
     {% endif %}
 </div>

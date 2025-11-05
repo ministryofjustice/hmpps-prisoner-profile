@@ -3,6 +3,7 @@ import { formatDate } from '../../utils/dateHelpers'
 import { pluralise } from '../../utils/pluralise'
 import IncentiveSummary, { isIncentiveSummaryError } from '../../services/interfaces/incentivesService/IncentiveSummary'
 import { MiniCardData } from '../components/miniCard/miniCardData'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 export default (
   incentiveSummary: IncentiveSummary | { error: true } | undefined,
@@ -30,7 +31,7 @@ export default (
       label: 'Since last review',
       items: [
         {
-          text: 'We cannot show these details right now',
+          text: unavailablePlaceholder,
         },
       ],
       linkLabel: 'Incentive level details',
