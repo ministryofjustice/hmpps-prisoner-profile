@@ -1,9 +1,11 @@
 import { Request, RequestHandler } from 'express'
 import { addMinutes, set, subMinutes } from 'date-fns'
+import { UUID } from 'crypto'
 import AppointmentService from '../services/appointmentService'
 import {
   apostrophe,
   formatLocation,
+  mapToQueryString,
   objectToRadioOptions,
   objectToSelectOptions,
   refDataToSelectOptions,
@@ -25,9 +27,7 @@ import {
   parseDate,
   timeFormat,
 } from '../utils/dateHelpers'
-import { PrisonerSearchService } from '../services'
 import { pluralise } from '../utils/pluralise'
-import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
 import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
 import logger from '../../logger'
@@ -40,6 +40,7 @@ import CreateVideoBookingRequest, {
 import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
+import EphemeralDataService from '../services/ephemeralDataService'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -49,9 +50,9 @@ const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 export default class AppointmentController {
   constructor(
     readonly appointmentService: AppointmentService,
-    private readonly prisonerSearchService: PrisonerSearchService,
-    private readonly auditService: AuditService,
     private readonly locationDetailsService: LocationDetailsService,
+    private readonly ephemeralDataService: EphemeralDataService,
+    private readonly auditService: AuditService,
   ) {}
 
   public displayAddAppointment(): RequestHandler {
@@ -264,14 +265,15 @@ export default class AppointmentController {
         }
 
         if (appointmentType === 'VLB') {
-          req.flash('prePostAppointmentDetails', {
+          const cacheId = await this.ephemeralDataService.cacheData({
             appointmentDefaults: appointmentsToCreate,
             appointmentForm,
           })
+          const queryString = mapToQueryString({ appointmentData: cacheId })
 
           return appointmentId
-            ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}`)
-            : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
+            ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}?${queryString}`)
+            : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments?${queryString}`)
         }
 
         try {
@@ -367,6 +369,7 @@ export default class AppointmentController {
       req.session.movementSlipData = {
         ...appointmentData,
         prisonerNumber,
+        prisonerName,
         cellLocation: formatLocation(cellLocation),
         createdBy: res.locals.user.displayName,
       }
@@ -394,11 +397,10 @@ export default class AppointmentController {
   public displayPrePostAppointments(): RequestHandler {
     const buildPrePostAppointmentDetails = async (
       clientToken: string,
-      appointmentFromFlash: string[],
+      appointmentFromCache: PrePostAppointmentDetails,
       appointment: AppointmentDetails,
     ): Promise<PrePostAppointmentDetails> => {
-      const { appointmentDefaults, appointmentForm, formValues } =
-        appointmentFromFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentDefaults, appointmentForm, formValues } = appointmentFromCache
 
       if (formValues) {
         return { appointmentDefaults, appointmentForm, formValues }
@@ -435,13 +437,15 @@ export default class AppointmentController {
 
     return async (req, res) => {
       const { appointmentId } = req.params
+      const { appointmentData: cacheId } = req.query
       const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const user = res.locals.user as PrisonUser
-      const appointmentFlash = req.flash('prePostAppointmentDetails')
+      const cachedAppointmentData = await this.ephemeralDataService.getData<PrePostAppointmentDetails>(cacheId as UUID)
 
-      // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
-      if (!appointmentFlash?.length) {
-        throw new ServerError('PrePostAppointmentDetails not found in request')
+      // Handle no appointment data in cache, e.g. users coming to confirmation page from a bookmarked link
+      if (!cachedAppointmentData?.value) {
+        logger.info(`PrePostAppointmentDetails not found in cache. Redirecting to add appointment page.`)
+        return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
 
       // Get the list values for courts, hearings, and locations
@@ -458,7 +462,7 @@ export default class AppointmentController {
       // Build the form details - either from flash provider for a new booking, or from APIs when editing
       const { appointmentDefaults, appointmentForm, formValues } = await buildPrePostAppointmentDetails(
         clientToken,
-        appointmentFlash,
+        cachedAppointmentData.value,
         appointment,
       )
 
@@ -488,12 +492,9 @@ export default class AppointmentController {
 
       const errors = req.flash('errors')
 
-      // If redirected here from a submission error we need to clear down any flash contents for 'postVLBDetails'
-      // as it may contain values from a previously failed post in this session.
-      this.clearStoredFlashMessages(req, 'postVLBDetails')
-
-      // Store the current details for use on the next page - there can be only 1 entry in this flash key
-      req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
+      // If redirected here from a submission error we need to clear down any cached appointments data
+      // as it may contain values from a previously failed post in this session. So we overwrite the cached data.
+      await this.ephemeralDataService.cacheData({ appointmentDefaults, appointmentForm, formValues }, cacheId as UUID)
 
       // Audit the access to the pre-post appointments form
       this.auditService
@@ -515,6 +516,7 @@ export default class AppointmentController {
         errors,
         hearingTypes: objectToSelectOptions(hearingTypes, 'code', 'description'),
         appointmentId,
+        cacheId,
       })
     }
   }
@@ -537,15 +539,17 @@ export default class AppointmentController {
         hmctsNumber,
         guestPinRequired,
         guestPin,
+        cacheId,
       } = req.body
 
-      // Use the values provided from the previous page - it has already ensured there will be only 1 entry
-      const appointmentFlash = req.flash('postVLBDetails')
-      if (!appointmentFlash?.length) {
-        throw new ServerError('PostVideoLinkBooking: Appointment data not found in request')
+      // Use the values cached from the previous page
+      const cachedAppointmentData = await this.ephemeralDataService.getData<PrePostAppointmentDetails>(cacheId as UUID)
+      if (!cachedAppointmentData?.value) {
+        logger.info(`PostVideoLinkBooking data not found in cache. Redirecting to add appointment page.`)
+        return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
 
-      const { appointmentDefaults, appointmentForm } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentDefaults, appointmentForm } = cachedAppointmentData.value
 
       const prePostAppointmentDetails = {
         appointmentId: +appointmentId,
@@ -587,13 +591,16 @@ export default class AppointmentController {
         }
       }
 
-      req.flash('prePostAppointmentDetails', prePostAppointmentDetails)
+      // Overwrite the cache with the latest details before any redirects occur
+      await this.ephemeralDataService.cacheData(prePostAppointmentDetails, cacheId as UUID)
+
+      const queryString = mapToQueryString({ appointmentData: cacheId as UUID })
 
       if (errors.length) {
         req.flash('errors', errors)
         return appointmentId
-          ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}`)
-          : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
+          ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}?${queryString}`)
+          : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments?${queryString}`)
       }
 
       this.auditService
@@ -606,23 +613,25 @@ export default class AppointmentController {
         })
         .catch(error => logger.error(error))
 
-      return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointment-confirmation`)
+      return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointment-confirmation?${queryString}`)
     }
   }
 
   public displayPrePostAppointmentConfirmation(): RequestHandler {
     return async (req, res) => {
       const { prisonerNumber } = req.params
+      const prisonerName = res.locals.prisonerName?.firstLast
+      const { appointmentData: cacheId } = req.query
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId } = user
 
-      const appointmentFlash = req.flash('prePostAppointmentDetails')
-      if (!appointmentFlash?.length) {
-        throw new ServerError('PrePostAppointmentDetails not found in request')
+      const cachedAppointmentData = await this.ephemeralDataService.getData<PrePostAppointmentDetails>(cacheId as UUID)
+      if (!cachedAppointmentData?.value) {
+        logger.info(`PrePostAppointmentDetails not found in cache. Redirecting to add appointment page.`)
+        return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
-      const { appointmentId, appointmentDefaults, formValues, appointmentForm } =
-        appointmentFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentId, appointmentDefaults, formValues, appointmentForm } = cachedAppointmentData.value
 
       const { cellLocation, prisonId } = req.middleware.prisonerData
 
@@ -702,6 +711,7 @@ export default class AppointmentController {
         ...appointmentData,
         comment: appointmentData.comments,
         prisonerNumber,
+        prisonerName,
         cellLocation: formatLocation(cellLocation),
         createdBy: res.locals.user.displayName,
       }
@@ -988,7 +998,7 @@ export default class AppointmentController {
       courtCode: prePostAppointmentForm?.formValues?.court,
       probationTeamCode: appointmentForm.probationTeam,
       courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
-      probationMeetingType: appointmentForm.meetingType,
+      probationMeetingType: appointmentForm.meetingType || undefined,
       videoLinkUrl:
         prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
         prePostAppointmentForm.formValues?.videoLinkUrl &&

@@ -1,4 +1,4 @@
-import { randomUUID, UUID } from 'crypto'
+import { UUID } from 'crypto'
 import type { RedisClient } from '../redisClient'
 
 import logger from '../../../logger'
@@ -15,13 +15,11 @@ export class EphemeralDataStore {
     })
   }
 
-  async cacheData<T>(value: T, ttlMinutes: number): Promise<UUID> {
-    const key = randomUUID()
+  async cacheData<T>(key: UUID, value: T, ttlMinutes: number) {
     await this.ensureConnected()
     await this.client.set(`ephemeral:${key}`, JSON.stringify(value), {
       EX: ttlMinutes * 60,
     })
-    return key
   }
 
   async getData<T>(key: UUID): Promise<EphemeralDataStoreResponse<T>> {
