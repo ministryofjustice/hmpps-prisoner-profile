@@ -17,10 +17,9 @@ export default class ContactsService {
 
     const { social, official } = await personalRelationshipsApi.getContactCount(prisonerNumber)
 
-    // return {
-    //   official,
-    //   social,
-    // } OLDCODE
-    return Promise.reject('err')
+    return {
+      official,
+      social,
+    }
   }
 }

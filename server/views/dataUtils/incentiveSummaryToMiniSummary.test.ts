@@ -1,5 +1,6 @@
 import incentiveSummaryToMiniSummary from './incentiveSummaryToMiniSummary'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 describe('incentiveSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
@@ -76,7 +77,7 @@ describe('incentiveSummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
-      items: [{ text: 'We cannot show these details right now' }],
+      items: [{ text: unavailablePlaceholder }],
       linkLabel: 'Incentive level details',
       linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
     })

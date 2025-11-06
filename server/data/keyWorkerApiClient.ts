@@ -13,13 +13,11 @@ export default class KeyWorkerRestClient extends RestClient implements KeyWorker
     offenderNumber: string,
     includeContactDetails: boolean = false,
   ): Promise<StaffAllocation> {
-    return Promise.reject('fail')
-
-    // return this.get(
-    //   {
-    //     path: `/prisoners/${offenderNumber}/allocations/current?includeContactDetails=${includeContactDetails}`,
-    //   },
-    //   this.token,
-    // ) OLDCODE
+    return this.get(
+      {
+        path: `/prisoners/${offenderNumber}/allocations/current?includeContactDetails=${includeContactDetails}`,
+      },
+      this.token,
+    )
   }
 }

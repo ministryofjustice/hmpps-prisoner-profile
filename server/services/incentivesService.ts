@@ -12,9 +12,6 @@ export default class IncentivesService {
   ) {}
 
   async getIncentiveOverview(clientToken: string, prisonerNumber: string): Promise<IncentiveSummary | { error: true }> {
-
-    return { error: true }
-    // OLDCODE
     const caseNotesApiClient = this.caseNotesApiClientBuilder(clientToken)
     const incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
 

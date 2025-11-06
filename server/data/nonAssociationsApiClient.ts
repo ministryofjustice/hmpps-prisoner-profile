@@ -18,13 +18,12 @@ export default class NonAssociationsApiRestClient extends RestClient implements 
       includeOtherPrisons?: 'true' | 'false'
     },
   ): Promise<PrisonerNonAssociations> {
-    return Promise.reject('err')
-    // return this.get(
-    //   {
-    //     path: `/prisoner/${prisonerNumber}/non-associations`,
-    //     query: mapToQueryString(params),
-    //   },
-    //   this.token,
-    // ) OLDCODE
+    return this.get(
+      {
+        path: `/prisoner/${prisonerNumber}/non-associations`,
+        query: mapToQueryString(params),
+      },
+      this.token,
+    )
   }
 }
