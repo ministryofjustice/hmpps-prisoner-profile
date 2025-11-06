@@ -3,86 +3,96 @@
 {% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {% set aliases = [] %}
 {% for alias in personalDetails.aliases %}
   {% set aliases = (aliases.push([{text: alias.alias}, {text: alias.dateOfBirth}, {text: alias.sex}]), aliases) %}
 {% endfor %}
+
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
   ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
 {% endset %}
+
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
-{% macro dietAndFoodAllergiesHtml(personalDetails) %}
-  {%
-    if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0
-    or personalDetails.dietAndAllergy.foodAllergies.length > 0
-    or personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0
-    or personalDetails.dietAndAllergy.cateringInstructions.length > 0
-  %}
-    {% if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.dietAndAllergy.medicalDietaryRequirements %}
-          <span class="govuk-!-display-block">
-              {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
-                  {{ requirement.description }}: {{ requirement.comment }}
-              {% else %}
-                  {{ requirement.description }}
-              {% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
 
-    {% if personalDetails.dietAndAllergy.foodAllergies.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for allergy in personalDetails.dietAndAllergy.foodAllergies %}
-          <span class="govuk-!-display-block">
-            {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.dietAndAllergy.personalisedDietaryRequirements %}
-          <span class="govuk-!-display-block">
-            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if personalDetails.dietAndAllergy.cateringInstructions.length > 0 %}
-        <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+{% macro dietAndFoodAllergiesHtml(dietAndAllergyResult) %}
+  {% if dietAndAllergyResult.status === 'fulfilled' %}
+    {% set dietAndAllergy = dietAndAllergyResult.value %}
+    {%
+      if dietAndAllergy.medicalDietaryRequirements.length > 0
+      or dietAndAllergy.foodAllergies.length > 0
+      or dietAndAllergy.personalisedDietaryRequirements.length > 0
+      or dietAndAllergy.cateringInstructions.length > 0
+    %}
+      {% if dietAndAllergy.medicalDietaryRequirements.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
         <div class="govuk-!-margin-bottom-2">
-            <span class="govuk-!-display-block">{{ personalDetails.dietAndAllergy.cateringInstructions }}</span>
+          {% for requirement in dietAndAllergy.medicalDietaryRequirements %}
+            <span class="govuk-!-display-block">
+                {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
+                    {{ requirement.description }}: {{ requirement.comment }}
+                {% else %}
+                    {{ requirement.description }}
+                {% endif %}
+            </span>
+          {% endfor %}
         </div>
+      {% endif %}
+
+      {% if dietAndAllergy.foodAllergies.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
+        <div class="govuk-!-margin-bottom-2">
+          {% for allergy in dietAndAllergy.foodAllergies %}
+            <span class="govuk-!-display-block">
+              {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
+        <div class="govuk-!-margin-bottom-2">
+          {% for requirement in dietAndAllergy.personalisedDietaryRequirements %}
+            <span class="govuk-!-display-block">
+              {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if dietAndAllergy.cateringInstructions.length > 0 %}
+          <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+          <div class="govuk-!-margin-bottom-2">
+              <span class="govuk-!-display-block">{{ dietAndAllergy.cateringInstructions }}</span>
+          </div>
+      {% endif %}
+
+      <span class="govuk-hint last-updated-summary">
+          {% set dietAndAllergyUpdateDate %}
+              {% if dietAndAllergy.lastModifiedAt.length > 0 %}
+                  on {{ dietAndAllergy.lastModifiedAt }}
+              {% endif %}
+          {% endset %}
+
+          {% set dietAndAllergyUpdateLocation %}
+              {% if dietAndAllergy.lastModifiedPrison.length > 0 %}
+                  {{ dietAndAllergy.lastModifiedPrison }}
+              {% else %}
+                  Unknown
+              {% endif %}
+          {% endset %}
+
+          Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
+      </span>
+    {% else %}
+      <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
-
-    <span class="govuk-hint last-updated-summary">
-        {% set dietAndAllergyUpdateDate %}
-            {% if personalDetails.dietAndAllergy.lastModifiedAt.length > 0 %}
-                on {{ personalDetails.dietAndAllergy.lastModifiedAt }}
-            {% endif %}
-        {% endset %}
-
-        {% set dietAndAllergyUpdateLocation %}
-            {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0 %}
-                {{ personalDetails.dietAndAllergy.lastModifiedPrison }}
-            {% else %}
-                Unknown
-            {% endif %}
-        {% endset %}
-
-        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
-    </span>
   {% else %}
-    <span class="govuk-!-margin-top-1">Not entered</span>
+    <span class="govuk-!-margin-top-1" data-qa="health-and-medication-api-error">{{ standardApiErrorText }}</span>
   {% endif %}
+
 {% endmacro %}
 
 {% macro nationalitiesHtml(personalDetails) %}
@@ -279,12 +289,15 @@
                 {
                   key: "Diet and food allergies",
                   value:
-                  dietAndFoodAllergiesHtml(personalDetails),
+                  dietAndFoodAllergiesHtml(personalDetails.dietAndAllergy),
                   options: {
                     anchor: "diet-and-food-allergies",
                     dataQa: "diet-and-food-allergies",
                     visible: dietAndAllergiesEnabled,
-                    changeLinkEnabled: dietAndAllergiesEnabled and isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
+                    changeLinkEnabled:
+                      dietAndAllergiesEnabled and
+                      personalDetails.dietAndAllergy.status == "fulfilled" and
+                      isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
                     changeHref: 'personal/diet-and-food-allergies',
                     rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies'
                   }
