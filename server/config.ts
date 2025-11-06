@@ -128,7 +128,7 @@ export default {
       url: get('KEYWORKER_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('KEYWORKER_API_TIMEOUT_SECONDS', 3000)),
-        deadline: Number(get('AKEYWORKER_API_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('KEYWORKER_API_TIMEOUT_SECONDS', 3000)),
       },
       agent: new AgentConfig(Number(get('KEYWORKER_API_TIMEOUT_DEADLINE', 3000))),
     },
