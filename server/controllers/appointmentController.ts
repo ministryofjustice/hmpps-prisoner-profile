@@ -591,6 +591,9 @@ export default class AppointmentController {
         }
       }
 
+      // Overwrite the cache with the latest details before any redirects occur
+      await this.ephemeralDataService.cacheData(prePostAppointmentDetails, cacheId as UUID)
+
       const queryString = mapToQueryString({ appointmentData: cacheId as UUID })
 
       if (errors.length) {
@@ -599,9 +602,6 @@ export default class AppointmentController {
           ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}?${queryString}`)
           : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments?${queryString}`)
       }
-
-      // Overwrite the cache with the latest details before proceeding to the next page
-      await this.ephemeralDataService.cacheData(prePostAppointmentDetails, cacheId as UUID)
 
       this.auditService
         .sendPostSuccess({
