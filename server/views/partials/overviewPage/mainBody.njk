@@ -57,7 +57,7 @@
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
     {% if adjudicationSummary %}
         <div class="govuk-grid-column-one-half" data-qa="adjudications-summary">
-            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber)) }}
+            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber), adjudicationSummary.status != 'fulfilled') }}
         </div>
     {% endif %}
     {% if incentiveSummary %}
