@@ -1,3 +1,5 @@
+import { Result } from "../../utils/result/result"
+
 interface Options {
   changeLinkEnabled?: boolean
   changeText?: string
@@ -24,7 +26,7 @@ const defaultOptions: Options = {
 export const listToSummaryListRows = (
   items: {
     key: string
-    value: string
+    value: string | Result<string>
     options?: Options
   }[],
 ) => {
@@ -33,7 +35,7 @@ export const listToSummaryListRows = (
 
 const summaryListRowWithOptionalChangeLink = (
   key: string,
-  value: string,
+  value: string | Result<string>,
   opts: Options = {},
 ): {
   key: { html?: string; text?: string }
@@ -41,19 +43,35 @@ const summaryListRowWithOptionalChangeLink = (
   actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
   classes: string
 } => {
+
+  const resolvedValue = typeof value === 'string'
+    ? value
+    : (value as Result<string>).getOrNull()
+    
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
   const valueResult = (): { text?: string; html?: string } => {
-    const isNotEntered = typeof value === 'string' && value.includes('Not entered')
+
+    if (value && typeof value !== 'string' && !(value as Result<string>).isFulfilled()) {
+      const errorHtml = "something went wrong"
+      if (options.dataQa) {
+        return {
+          html: `<span data-qa="${options.dataQa}">${errorHtml}</span>`,
+        }
+      }
+      return { html: errorHtml }
+    }
+
+    const isNotEntered = typeof resolvedValue === 'string' && resolvedValue.includes('Not entered')
 
     if (options.dataQa) {
       return {
-        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${value}</span>`,
+        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${resolvedValue}</span>`,
       }
     }
 
-    return options.html ? { html: value } : { text: value }
+    return options.html ? { html: resolvedValue } : { text: resolvedValue }
   }
 
   const items = [

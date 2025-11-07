@@ -38,7 +38,7 @@ export interface PersonalDetails {
   domesticAbusePerpetrator: string
   domesticAbuseVictim: string
   cityOrTownOfBirth: string
-  countryOfBirth: string
+  countryOfBirth: Result<string>
   ethnicGroup: string
   fullName: string
   languages: {

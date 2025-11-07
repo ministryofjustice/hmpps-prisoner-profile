@@ -398,10 +398,11 @@ export default class PersonalPageService {
       }}
     )
 
-    const countryOfBirth =
-      inmateDetail.birthCountryCode &&
-      (await this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode))
-        .description
+    let countryOfBirth: Result<string, Error> = Result.fulfilled(null)
+    if (inmateDetail.birthCountryCode) {
+      const refData = await Result.wrap(this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode), getOptions.apiErrorCallback)
+      countryOfBirth = refData.map(data => data.description)
+    }
 
     return {
       personalDetails: await this.personalDetails(
@@ -484,7 +485,7 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
-    countryOfBirth: string,
+    countryOfBirth: Result<string>,
     healthAndMedication: Result<HealthAndMedication>,
     numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
     domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
@@ -525,7 +526,7 @@ export default class PersonalPageService {
       ),
       domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
       cityOrTownOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
-      countryOfBirth: countryOfBirth ? convertToTitleCase(countryOfBirth) : 'Not entered',
+      countryOfBirth: countryOfBirth.map(country => country ? convertToTitleCase(country) : 'Not entered'),
       ethnicGroup,
       fullName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName),
       languages: {
