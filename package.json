@@ -49,7 +49,7 @@
     "@ministryofjustice/hmpps-connect-dps-shared-items": "^3.0.1",
     "@ministryofjustice/hmpps-prison-permissions-lib": "^0.2.1",
     "@ministryofjustice/hmpps-rest-client": "^0.0.3",
-    "@sentry/node": "^10.17.0",
+    "@sentry/node": "^10.23.0",
     "@types/multer": "^1.4.13",
     "accessible-autocomplete": "^3.0.1",
     "agentkeepalive": "^4.6.0",
