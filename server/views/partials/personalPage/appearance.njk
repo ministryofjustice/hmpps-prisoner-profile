@@ -175,7 +175,7 @@
                     }
                 ])
             }) }}
-            {% if distinguishingMarks %}
+            {% if distinguishingMarks.getOrNull() %}
                 {% include "./distinguishingMarks.njk" %}
             {% elseif physicalCharacteristics.distinguishingMarks.length > 0 %}
                 <h3 class="govuk-heading-m">Distinguishing marks</h3>

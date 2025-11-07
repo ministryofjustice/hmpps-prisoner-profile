@@ -6,7 +6,7 @@
 {% endset %}
 {% set phonesHtml %}
 <div class="hmpps-global-numbers-and-emails__phones__list">
-  {% for x in globalNumbersAndEmails.phones %}
+  {% for x in globalNumbersAndEmails.getOrNull().phones %}
     <div class="hmpps-global-numbers-and-emails__phone">
       <div class="hmpps-global-numbers-and-emails__phone__details">
         <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ x.typeDescription }}</p>
@@ -28,7 +28,7 @@
 {% endset %}
 {% set emailsHtml %}
 <div class="hmpps-global-numbers-and-emails__phones__list">
-  {% for x in globalNumbersAndEmails.emails %}
+  {% for x in globalNumbersAndEmails.getOrNull().emails %}
     <div class="hmpps-global-numbers-and-emails__email">
       <div class="hmpps-global-numbers-and-emails__email__details">
         <p class="govuk-body govuk-!-margin-0">{{ x.email }}</p>
@@ -48,16 +48,24 @@
   title: "Phone numbers and email addresses", 
   id: "phones-and-emails", 
   actions: [
-    { href: 'personal/add-phone-number', text: 'Add a phone number' } if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions),
-    { href: 'personal/add-email-address', text: 'Add an email address' } if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions)
+    { href: 'personal/add-phone-number', text: 'Add a phone number' } if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions) and globalNumbersAndEmails.status === 'fulfilled',
+    { href: 'personal/add-email-address', text: 'Add an email address' } if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions) and globalNumbersAndEmails.status === 'fulfilled'
   ]
 }) -%}
-<div class="govuk-grid-row" data-qa="addresses">
-  <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
-    <dl class="govuk-summary-list govuk-summary-list--no-border">
-      {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true, classes: "row-updated" if flashMessage.fieldName === "phoneNumber" else "" }) }}
-      {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.emails.length > 0 else notEnteredTag, "email-addresses", { html: true, classes: "row-updated" if flashMessage.fieldName === "emailAddress" else "" }) }}
-    </dl>
+
+{% if globalNumbersAndEmails.status === 'fulfilled' %}
+  <div class="govuk-grid-row" data-qa="addresses">
+    <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.getOrNull().phones.length > 0 else notEnteredTag, "phone-numbers", { html: true, classes: "row-updated" if flashMessage.fieldName === "phoneNumber" else "" }) }}
+        {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.getOrNull().emails.length > 0 else notEnteredTag, "email-addresses", { html: true, classes: "row-updated" if flashMessage.fieldName === "emailAddress" else "" }) }}
+      </dl>
+    </div>
   </div>
-</div>
+{% else %}
+  <p class="govuk-body govuk-!-margin-bottom-4">
+    {{ standardApiErrorText }}
+  </p>
+{% endif %}
+
 {%- endcall -%}
