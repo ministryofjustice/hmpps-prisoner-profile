@@ -90,7 +90,9 @@
       <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
   {% else %}
-    <span class="govuk-!-margin-top-1" data-qa="health-and-medication-api-error">{{ standardApiErrorText }}</span>
+    <p class="hmpps-api-error-inset" data-qa="health-and-medication-api-error">
+        {{ unavailableApiErrorText }}
+    </p>
   {% endif %}
 
 {% endmacro %}
