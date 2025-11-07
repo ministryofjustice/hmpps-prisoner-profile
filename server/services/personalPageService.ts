@@ -376,7 +376,6 @@ export default class PersonalPageService {
           profileSummary.map(summary => getOptions.editProfileEnabled ? summary.distinguishingMarks : null),
           profileSummary.map(summary => militaryHistoryEnabled() ? summary.militaryRecords : null),
           profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
-          profileSummary.map(async summary => getOptions.editProfileEnabled ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts) : null),
         ])
 
     } else {
