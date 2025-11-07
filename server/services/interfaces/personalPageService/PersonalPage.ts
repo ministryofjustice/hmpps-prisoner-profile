@@ -13,21 +13,18 @@ export default interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
-  addresses: {
-    primaryOrPostal: AddressResponseDto[]
-    totalActive: number
-  }
+  addresses: Result<SummarisedAddresses>
   oldAddresses: OldAddresses // TODO remove after edit profile is rolled out
   oldAddressSummary: GovSummaryItem[] // TODO remove after edit profile is rolled out
   nextOfKin: NextOfKin[]
   nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
-  physicalCharacteristics: PhysicalCharacteristics
+  physicalCharacteristics: Result<PhysicalCharacteristics>
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
-  distinguishingMarks: PersonIntegrationDistinguishingMark[] | null
-  militaryRecords: MilitaryRecord[] | null
-  globalNumbersAndEmails: GlobalNumbersAndEmails
+  distinguishingMarks: Result<PersonIntegrationDistinguishingMark[]> | null
+  militaryRecords: Result<MilitaryRecord[]> | null
+  globalNumbersAndEmails: Result<GlobalNumbersAndEmails>
 }
 
 export interface PersonalDetails {
@@ -196,4 +193,9 @@ export interface GlobalNumbersAndEmails {
 
 export interface AddressForDisplay extends AddressResponseDto {
   addressPhoneNumbersForDisplay?: PhoneNumber[]
+}
+
+export interface SummarisedAddresses {
+  primaryOrPostal: AddressResponseDto[]
+  totalActive: number
 }

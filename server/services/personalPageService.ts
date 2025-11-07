@@ -1,5 +1,6 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
+  AddressForDisplay,
   GlobalEmail,
   GlobalNumbersAndEmails,
   IdentityNumbers,
@@ -9,6 +10,7 @@ import PersonalPage, {
   PhoneNumber,
   PhysicalCharacteristics,
   PropertyItem,
+  SummarisedAddresses,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
@@ -40,6 +42,7 @@ import {
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
+  MilitaryRecord,
   PersonIntegrationApiClient,
   PersonIntegrationDistinguishingMark,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -337,36 +340,63 @@ export default class PersonalPageService {
       ])
     }
 
-    let profileSummary
-    let addresses
-    let distinguishingMarks
-    let militaryRecords
-    let physicalAttributes
-    let globalNumbersAndEmails
+    let addresses: Result<AddressForDisplay[], Error>
+    let distinguishingMarks: Result<PersonIntegrationDistinguishingMark[], Error>
+    let militaryRecords: Result<MilitaryRecord[], Error>
+    let globalNumbersAndEmails: Result<GlobalNumbersAndEmails, Error>
+    let physicalAttributes: Result<CorePersonPhysicalAttributes, Error>
     if (getOptions.personEndpointsEnabled) {
-      profileSummary = await personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber)
-      addresses = getOptions.editProfileEnabled
-        ? await this.addressService.transformAddresses(token, profileSummary.addresses)
-        : null
-      distinguishingMarks = getOptions.editProfileEnabled ? profileSummary.distinguishingMarks : null
-      militaryRecords = militaryHistoryEnabled() ? profileSummary.militaryRecords : null
-      physicalAttributes = this.transformPhysicalAttributes(profileSummary.physicalAttributes)
-      globalNumbersAndEmails = getOptions.editProfileEnabled
-        ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, profileSummary.contacts)
-        : null
+
+      const profileSummary = await Result.wrap(personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber), getOptions.apiErrorCallback)
+
+      addresses = await profileSummary.handle({
+        fulfilled: async summary =>
+          Result.wrap(
+            getOptions.editProfileEnabled
+              ? this.addressService.transformAddresses(token, summary.addresses)
+              : null,
+            getOptions.apiErrorCallback,
+          ),
+        rejected: async err => Result.rejected<AddressForDisplay[], Error>(err),
+      })
+
+      globalNumbersAndEmails = await profileSummary.handle({
+        fulfilled: async summary =>
+          Result.wrap(
+            getOptions.editProfileEnabled
+              ? this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts)
+              : null,
+            getOptions.apiErrorCallback,
+          ),
+        rejected: async err => Result.rejected<GlobalNumbersAndEmails, Error>(err),
+      })
+
+      ;[distinguishingMarks, militaryRecords, physicalAttributes] =
+        await Promise.all([
+          profileSummary.map(summary => getOptions.editProfileEnabled ? summary.distinguishingMarks : null),
+          profileSummary.map(summary => militaryHistoryEnabled() ? summary.militaryRecords : null),
+          profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
+          profileSummary.map(async summary => getOptions.editProfileEnabled ? await this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts) : null),
+        ])
+
     } else {
       ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
         await Promise.all([
-          getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
-          getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
-          militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
-          this.getPhysicalAttributes(token, prisonerNumber),
-          getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
+          Result.wrap(getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null, getOptions.apiErrorCallback),
+          Result.wrap(getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null, getOptions.apiErrorCallback),
+          Result.wrap(militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null, getOptions.apiErrorCallback),
+          Result.wrap(this.getPhysicalAttributes(token, prisonerNumber), getOptions.apiErrorCallback),
+          Result.wrap(getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null, getOptions.apiErrorCallback),
         ])
     }
 
     const oldAddresses: OldAddresses = !getOptions.editProfileEnabled && this.oldAddresses(oldAddressList)
-    const primaryOrPostalAddresses = addresses?.filter(address => address.primaryAddress || address.postalAddress)
+
+    const addressResponseResult: Result<SummarisedAddresses, Error> = addresses.map( addressesForDisplay => { return {
+        primaryOrPostal: addressesForDisplay?.filter(address => address.primaryAddress || address.postalAddress),
+        totalActive: addressesForDisplay?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
+      }}
+    )
 
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
@@ -389,11 +419,7 @@ export default class PersonalPageService {
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
-      addresses: {
-        primaryOrPostal: primaryOrPostalAddresses,
-        totalActive:
-          addresses?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
-      },
+      addresses: addressResponseResult,
       oldAddresses,
       oldAddressSummary: this.addressSummary(oldAddresses),
       nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),
@@ -416,7 +442,7 @@ export default class PersonalPageService {
       learnerNeurodivergence,
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       distinguishingMarks,
-      militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
+      militaryRecords: militaryRecords.map(records => records?.filter(record => record.militarySeq === 1)), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
     }
   }
@@ -748,36 +774,38 @@ export default class PersonalPageService {
 
   private physicalCharacteristics(
     inmateDetail: InmateDetail,
-    physicalAttributes: CorePersonPhysicalAttributes,
-  ): PhysicalCharacteristics {
-    return {
-      height: formatHeight(physicalAttributes.height),
-      weight: formatWeight(physicalAttributes.weight),
-      build: physicalAttributes.buildDescription || 'Not entered',
-      distinguishingMarks:
-        inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
-          bodyPart,
-          comment,
-          imageId,
-          side,
-          orientation: orentiation,
-          type,
-        })) || [],
-      facialHair: physicalAttributes.facialHairDescription || 'Not entered',
-      hairColour: physicalAttributes.hairDescription || 'Not entered',
-      leftEyeColour: physicalAttributes.leftEyeColourDescription || 'Not entered',
-      rightEyeColour: physicalAttributes.rightEyeColourDescription || 'Not entered',
-      shapeOfFace: physicalAttributes.faceDescription || 'Not entered',
-      shoeSize: physicalAttributes.shoeSize || 'Not entered',
-      warnedAboutTattooing:
-        getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
-        'Needs to be warned',
-      warnedNotToChangeAppearance:
-        getProfileInformationValue(
-          ProfileInformationType.WarnedNotToChangeAppearance,
-          inmateDetail.profileInformation,
-        ) || 'Needs to be warned',
-    }
+    physicalAttributesResult: Result<CorePersonPhysicalAttributes>,
+  ): Result<PhysicalCharacteristics> {
+    return physicalAttributesResult.map(physicalAttributes => { 
+      return {
+        height: formatHeight(physicalAttributes.height),
+        weight: formatWeight(physicalAttributes.weight),
+        build: physicalAttributes.buildDescription || 'Not entered',
+        distinguishingMarks:
+          inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
+            bodyPart,
+            comment,
+            imageId,
+            side,
+            orientation: orentiation,
+            type,
+          })) || [],
+        facialHair: physicalAttributes.facialHairDescription || 'Not entered',
+        hairColour: physicalAttributes.hairDescription || 'Not entered',
+        leftEyeColour: physicalAttributes.leftEyeColourDescription || 'Not entered',
+        rightEyeColour: physicalAttributes.rightEyeColourDescription || 'Not entered',
+        shapeOfFace: physicalAttributes.faceDescription || 'Not entered',
+        shoeSize: physicalAttributes.shoeSize || 'Not entered',
+        warnedAboutTattooing:
+          getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
+          'Needs to be warned',
+        warnedNotToChangeAppearance:
+          getProfileInformationValue(
+            ProfileInformationType.WarnedNotToChangeAppearance,
+            inmateDetail.profileInformation,
+          ) || 'Needs to be warned',
+      }
+    })
   }
 
   async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[] | null> {
