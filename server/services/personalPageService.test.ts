@@ -71,6 +71,7 @@ import { mockAddressResponseDto } from '../data/localMockData/personIntegrationA
 import AddressService from './addressService'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
+import { Result } from '../utils/result/result'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -550,7 +551,7 @@ describe('PersonalPageService', () => {
         )
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
         expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
-        expect(personalDetails.countryOfBirth).toEqual(EnglandCountryReferenceDataCodeMock.description)
+        expect(personalDetails.countryOfBirth.getOrNull()).toEqual(EnglandCountryReferenceDataCodeMock.description)
         expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
         expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
         expect(personalDetails.socialCareNeeded).toEqual('No')
@@ -758,12 +759,10 @@ describe('PersonalPageService', () => {
           { ...mockAddressResponseDto, primaryAddress: false, postalAddress: false },
         ])
 
-      const {
-        addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, {
+      const { primaryOrPostal, totalActive } = (await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: false,
         editProfileEnabled: true,
-      })
+      })).addresses.getOrNull()
 
       expect(totalActive).toEqual(2)
       expect(primaryOrPostal).toHaveLength(1)
@@ -774,13 +773,11 @@ describe('PersonalPageService', () => {
       addressService.getAddressesForDisplay = jest
         .fn()
         .mockResolvedValue([{ ...mockAddressResponseDto, toDate: undefined }])
-
-      const {
-        addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, {
+      
+      const { primaryOrPostal, totalActive } = (await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: false,
         editProfileEnabled: true,
-      })
+      })).addresses.getOrNull()
 
       expect(totalActive).toEqual(1)
       expect(primaryOrPostal).toHaveLength(1)
@@ -824,7 +821,7 @@ describe('PersonalPageService', () => {
 
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
-      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
+      const physicalCharacteristics = (await constructService().get('token', PrisonerMockDataA)).physicalCharacteristics.getOrNull()
       expect(physicalCharacteristics.height).toEqual('1m')
       expect(physicalCharacteristics.weight).toEqual('100kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
@@ -860,7 +857,7 @@ describe('PersonalPageService', () => {
       const inmateDetail = { ...inmateDetailMock }
       inmateDetail.physicalMarks = []
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
-      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
+      const physicalCharacteristics = (await constructService().get('token', PrisonerMockDataA)).physicalCharacteristics.getOrNull()
       expect(physicalCharacteristics.distinguishingMarks.length).toEqual(0)
     })
   })
@@ -931,9 +928,9 @@ describe('PersonalPageService', () => {
 
   describe('Prison Person API Enabled', () => {
     it('Gets the height and weight from the prison person API', async () => {
-      const data = await constructService().get('token', PrisonerMockDataA, { dietAndAllergyIsEnabled: true })
-      expect(data.physicalCharacteristics.height).toBe('1m')
-      expect(data.physicalCharacteristics.weight).toBe('100kg')
+      const physicalCharacteristics = (await constructService().get('token', PrisonerMockDataA, { dietAndAllergyIsEnabled: true })).physicalCharacteristics.getOrNull()
+      expect(physicalCharacteristics.height).toBe('1m')
+      expect(physicalCharacteristics.weight).toBe('100kg')
     })
   })
 
@@ -1237,7 +1234,7 @@ describe('PersonalPageService', () => {
               editProfileEnabled: true,
               personEndpointsEnabled,
             })
-            expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
+            expect(result.globalNumbersAndEmails.getOrNull()).toEqual(globalPhonesAndEmailsMock)
           })
         })
       })
@@ -1248,7 +1245,7 @@ describe('PersonalPageService', () => {
             dietAndAllergyIsEnabled: true,
             editProfileEnabled: false,
           })
-          expect(result.globalNumbersAndEmails).toEqual(null)
+          expect(result.globalNumbersAndEmails.getOrNull()).toEqual(null)
         })
       })
     })

@@ -32,8 +32,7 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
   }
 
   getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication | null> {
-    return Promise.reject("err")
-    // return this.getAndIgnore404({ path: `/prisoners/${prisonerNumber}` }) OLDCODE
+    return this.getAndIgnore404({ path: `/prisoners/${prisonerNumber}` })
   }
 
   updateDietAndAllergyData(

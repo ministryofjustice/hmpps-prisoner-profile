@@ -820,7 +820,7 @@ export default class PersonalPageService {
   }
 
   async getReferenceData(clientToken: string, domain: CorePersonRecordReferenceDataDomain, code: string) {
-    return Promise.reject('err')
+    return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
   }
 
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {

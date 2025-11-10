@@ -31,8 +31,7 @@ export default class PersonIntegrationApiRestClient extends RestClient implement
   }
 
   getPrisonerProfileSummary(prisonerNumber: string): Promise<PrisonerProfileSummary> {
-    return Promise.reject("err")
-    // return this.get({ path: `/v2/person/${prisonerNumber}` }, this.token) OLDCODE
+    return this.get({ path: `/v2/person/${prisonerNumber}` }, this.token)
   }
 
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void> {
