@@ -359,7 +359,7 @@
         })
       }}
 
-      {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
+      {% if militaryHistoryEnabled and militaryRecords.getOrNull().length > 0 %}
           <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
               data-qa="military-records">
               <div class="govuk-summary-list__row govuk-!-border-none">
@@ -369,25 +369,25 @@
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
                       <div class="govuk-!-margin-bottom-2">
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
-                              {{ summaryListRow("Service number", militaryRecords[0].serviceNumber | d('Not entered'), "service-number") }}
-                              {{ summaryListRow("Branch", militaryRecords[0].militaryBranchDescription | d('Not entered'), "branch") }}
-                              {{ summaryListRow("Unit", militaryRecords[0].unitNumber | d('Not entered'), "unit-number") }}
-                              {{ summaryListRow("Rank at discharge", militaryRecords[0].militaryRankDescription | d('Not entered'), "rank") }}
-                              {{ summaryListRow("Comments", militaryRecords[0].description | d('Not entered'), "comments") }}
+                              {{ summaryListRow("Service number", militaryRecords.getOrNull()[0].serviceNumber | d('Not entered'), "service-number") }}
+                              {{ summaryListRow("Branch", militaryRecords.getOrNull()[0].militaryBranchDescription | d('Not entered'), "branch") }}
+                              {{ summaryListRow("Unit", militaryRecords.getOrNull()[0].unitNumber | d('Not entered'), "unit-number") }}
+                              {{ summaryListRow("Rank at discharge", militaryRecords.getOrNull()[0].militaryRankDescription | d('Not entered'), "rank") }}
+                              {{ summaryListRow("Comments", militaryRecords.getOrNull()[0].description | d('Not entered'), "comments") }}
                           </dl>
                       </div>
                       <span class="anchor-center" id="military-enlistment"></span>
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list">
-                              {{ summaryListRow("Date", militaryRecords[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
-                              {{ summaryListRow("Location", militaryRecords[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
+                              {{ summaryListRow("Date", militaryRecords.getOrNull()[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
+                              {{ summaryListRow("Location", militaryRecords.getOrNull()[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
                           </dl>
                       </div>
                   </dd>
                   <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
                       <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords[0].militarySeq }}">
+                         href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.getOrNull()[0].militarySeq }}">
                           Change<span class="govuk-visually-hidden"> service information</span>
                       </a>
                   </dd>
@@ -401,13 +401,13 @@
                       <div>
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
                               data-qa="conflict">
-                              {{ militaryRecords[0].warZoneDescription | d('Not entered') }}
+                              {{ militaryRecords.getOrNull()[0].warZoneDescription | d('Not entered') }}
                           </dl>
                       </div>
                   </dd>
                   <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
                       <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords[0].militarySeq }}">Change<span
+                         href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.getOrNull()[0].militarySeq }}">Change<span
                                   class="govuk-visually-hidden"> conflict</span></a>
                   </dd>
               </div>
@@ -419,13 +419,13 @@
                       <div>
                           <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
                               data-qa="disciplinary-action">
-                              {{ militaryRecords[0].disciplinaryActionDescription | d('Not entered') }}
+                              {{ militaryRecords.getOrNull()[0].disciplinaryActionDescription | d('Not entered') }}
                           </dl>
                       </div>
                   </dd>
                   <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
                       <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords[0].militarySeq }}">Change<span
+                         href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.getOrNull()[0].militarySeq }}">Change<span
                                   class="govuk-visually-hidden"> disciplinary action</span></a>
                   </dd>
               </div>
@@ -436,26 +436,40 @@
                       <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
                       <div>
                           <dl class="govuk-summary-list--sub-list">
-                              {{ summaryListRow("Date", militaryRecords[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
-                              {{ summaryListRow("Location", militaryRecords[0].dischargeLocation | d('Not entered'), "discharge-location") }}
-                              {{ summaryListRow("Type", militaryRecords[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
-                              {% if militaryRecords[0].endDate %}
-                                  {{ summaryListRow("Length of service", militaryRecords[0].startDate | lengthOfService(militaryRecords[0].endDate), "length-of-service") }}
+                              {{ summaryListRow("Date", militaryRecords.getOrNull()[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
+                              {{ summaryListRow("Location", militaryRecords.getOrNull()[0].dischargeLocation | d('Not entered'), "discharge-location") }}
+                              {{ summaryListRow("Type", militaryRecords.getOrNull()[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
+                              {% if militaryRecords.getOrNull()[0].endDate %}
+                                  {{ summaryListRow("Length of service", militaryRecords.getOrNull()[0].startDate | lengthOfService(militaryRecords.getOrNull()[0].endDate), "length-of-service") }}
                               {% endif %}
                           </dl>
                       </div>
                   </dd>
                   <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
                       <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords[0].militarySeq }}">Change<span
+                         href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.getOrNull()[0].militarySeq }}">Change<span
                                   class="govuk-visually-hidden"> discharge</span></a>
                   </dd>
               </div>
           </dl>
       {% endif %}
 
+      {% if militaryHistoryEnabled and militaryRecords.status === 'rejected' %}
+          <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
+              data-qa="military-records">
+              <div class="govuk-summary-list__row govuk-!-border-none">
+                  <dt class="govuk-summary-list__key">UK military service record</dt>
+                  <dd class="govuk-summary-list__value govuk-!-padding-bottom-0">
+                      <p class="hmpps-api-error-inset" data-qa="health-and-medication-api-error">
+                          {{ unavailableApiErrorText }}
+                      </p>
+                  </dd>
+              </div>
+          </dl>
+      {% endif %}
+
       {% if militaryHistoryEnabled
-        and militaryRecords.length === 0
+        and militaryRecords.getOrNull().length === 0
         and isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
         <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
         <div class="govuk-!-margin-bottom-4">

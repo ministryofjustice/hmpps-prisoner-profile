@@ -115,8 +115,8 @@
             No active primary or postal addresses entered{% if not newArrival72 %}.{% endif %}
           </p>
         {% else %}
-          <p class="govuk-body govuk-!-margin-bottom-4">
-            {{ standardApiErrorText }}
+          <p class="hmpps-api-error-inset govuk-!-margin-bottom-3" data-qa="addresses-api-error">
+            {{ unavailableApiErrorText }}
           </p>
         {% endif %}
       {% endif %}

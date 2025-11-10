@@ -1,4 +1,6 @@
+import logger from "../../../logger"
 import { Result } from "../../utils/result/result"
+import { unavailableApiErrorMessage } from "../../utils/utils"
 
 interface Options {
   changeLinkEnabled?: boolean
@@ -33,6 +35,9 @@ export const listToSummaryListRows = (
   return items.map(i => summaryListRowWithOptionalChangeLink(i.key, i.value, i.options))
 }
 
+const isResult = (value: unknown): value is Result<string> =>
+  typeof value === 'object' && value !== null && 'isFulfilled' in value;
+
 const summaryListRowWithOptionalChangeLink = (
   key: string,
   value: string | Result<string>,
@@ -43,39 +48,36 @@ const summaryListRowWithOptionalChangeLink = (
   actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
   classes: string
 } => {
-
-  const resolvedValue = typeof value === 'string'
-    ? value
-    : (value as Result<string>).getOrNull()
-    
+  
+  const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string);
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
   const valueResult = (): { text?: string; html?: string } => {
 
-    if (value && typeof value !== 'string' && !(value as Result<string>).isFulfilled()) {
-      const errorHtml = "something went wrong"
+    if (!valueAsResult.isFulfilled()) {
+      const errorHtml = `<p class="hmpps-api-error-inset">${unavailableApiErrorMessage}</p>`
       if (options.dataQa) {
         return {
-          html: `<span data-qa="${options.dataQa}">${errorHtml}</span>`,
+          html: `<span data-qa="${options.dataQa}-error">${errorHtml}</span>`,
         }
       }
       return { html: errorHtml }
     }
 
-    const isNotEntered = typeof resolvedValue === 'string' && resolvedValue.includes('Not entered')
+    const isNotEntered = valueAsResult.getOrNull().includes('Not entered')
 
     if (options.dataQa) {
       return {
-        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${resolvedValue}</span>`,
+        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${valueAsResult.getOrNull()}</span>`,
       }
     }
 
-    return options.html ? { html: resolvedValue } : { text: resolvedValue }
+    return options.html ? { html: valueAsResult.getOrNull() } : { text: valueAsResult.getOrNull() }
   }
 
   const items = [
-    ...(options.changeLinkEnabled
+    ...(options.changeLinkEnabled && valueAsResult.isFulfilled()
       ? [
           {
             href: options.changeHref,

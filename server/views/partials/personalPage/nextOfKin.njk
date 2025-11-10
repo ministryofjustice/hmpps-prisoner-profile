@@ -117,7 +117,9 @@
   {% else %}
     <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-api-error">
       <div class="govuk-grid-column-full">
-        <p class="govuk-!-margin-bottom-5">{{ standardApiErrorText }}</p>
+        <p class="hmpps-api-error-inset govuk-!-margin-bottom-3">
+          {{ unavailableApiErrorText }}
+        </p>
       </div>
     </div>
   {% endif %}

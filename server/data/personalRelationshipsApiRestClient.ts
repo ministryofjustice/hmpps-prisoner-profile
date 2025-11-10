@@ -27,7 +27,8 @@ export default class PersonalRelationshipsApiRestClient extends RestClient imple
     prisonerNumber: string,
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto> {
-    return this.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) }, this.token)
+    return Promise.reject('err')
+    // return this.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) }, this.token) oldcode
   }
 
   getContactCount(prisonerNumber: string): Promise<PersonalRelationshipsContactCount> {
