@@ -67,7 +67,7 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
-  dietAndAllergy: Result<DietAndAllergyDetails>
+  dietAndAllergy: DietAndAllergyDetails
 }
 
 export interface NextOfKinAndEmergencyContactsDetails {
