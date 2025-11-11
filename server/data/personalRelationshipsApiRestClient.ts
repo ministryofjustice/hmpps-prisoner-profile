@@ -1,5 +1,4 @@
-import CircuitBreaker from 'opossum'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import config from '../config'
 import {
   PersonalRelationshipsApiClient,
@@ -19,8 +18,8 @@ import {
 import { mapToQueryString } from '../utils/utils'
 
 export default class PersonalRelationshipsApiRestClient extends RestClient implements PersonalRelationshipsApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Personal Relationships API', config.apis.personalRelationshipsApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Personal Relationships API', config.apis.personalRelationshipsApi, token)
   }
 
   getContacts(

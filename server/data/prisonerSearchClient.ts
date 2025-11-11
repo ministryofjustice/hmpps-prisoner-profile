@@ -1,12 +1,11 @@
-import CircuitBreaker from 'opossum'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import Prisoner from './interfaces/prisonerSearchApi/Prisoner'
 import { PrisonerSearchClient } from './interfaces/prisonerSearchApi/prisonerSearchClient'
 import config from '../config'
 
 export default class PrisonerSearchRestClient extends RestClient implements PrisonerSearchClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Prison Offender Search API', config.apis.prisonerSearchApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Prison Offender Search API', config.apis.prisonerSearchApi, token)
   }
 
   async getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {

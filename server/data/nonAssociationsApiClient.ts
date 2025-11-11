@@ -1,13 +1,12 @@
-import CircuitBreaker from 'opossum'
 import config from '../config'
 import { NonAssociationsApiClient } from './interfaces/nonAssociationsApi/nonAssociationsApiClient'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
 import PrisonerNonAssociations from './interfaces/nonAssociationsApi/PrisonerNonAssociations'
 
 export default class NonAssociationsApiRestClient extends RestClient implements NonAssociationsApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Non associations API', config.apis.nonAssociationsApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Non associations API', config.apis.nonAssociationsApi, token)
   }
 
   getPrisonerNonAssociations(

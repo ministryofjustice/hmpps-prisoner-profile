@@ -1,5 +1,4 @@
-import CircuitBreaker from 'opossum'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import UnacceptableAbsences from './interfaces/whereaboutsApi/UnacceptableAbsences'
 import PageableQuery from './interfaces/whereaboutsApi/PageableQuery'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
@@ -8,8 +7,8 @@ import config from '../config'
 import CellMoveReason from './interfaces/whereaboutsApi/CellMoveReason'
 
 export default class WhereaboutsRestApiClient extends RestClient implements WhereaboutsApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Whereabouts API', config.apis.whereaboutsApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Whereabouts API', config.apis.whereaboutsApi, token)
   }
 
   async getAppointment(appointmentId: number): Promise<AppointmentDetails> {

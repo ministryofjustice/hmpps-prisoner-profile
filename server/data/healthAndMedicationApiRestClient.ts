@@ -1,6 +1,5 @@
-import CircuitBreaker from 'opossum'
 import config from '../config'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import {
   DietAndAllergy,
   DietAndAllergyUpdate,
@@ -14,8 +13,8 @@ import { mapToQueryString } from '../utils/utils'
 import { handleNomisLockedError } from '../utils/nomisLockedError'
 
 export default class HealthAndMedicationApiRestClient extends RestClient implements HealthAndMedicationApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Health and medication API', config.apis.healthAndMedicationApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Health and medication API', config.apis.healthAndMedicationApi, token)
   }
 
   async getReferenceDataCodes(

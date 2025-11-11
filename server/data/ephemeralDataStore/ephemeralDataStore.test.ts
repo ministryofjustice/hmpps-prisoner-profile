@@ -29,8 +29,7 @@ describe('Ephemeral Data Store', () => {
     it('should cache data', async () => {
       redisClient.set.mockResolvedValue(null)
 
-      const uuid = randomUUID()
-      await dataStore.cacheData(uuid, dataObject, ttlMinutes)
+      const uuid = await dataStore.cacheData(dataObject, ttlMinutes)
 
       expect(uuid).toBeDefined()
       expect(redisClient.set).toHaveBeenCalledWith(
@@ -43,8 +42,7 @@ describe('Ephemeral Data Store', () => {
     it('handles caching null data', async () => {
       redisClient.set.mockResolvedValue(null)
 
-      const uuid = randomUUID()
-      await dataStore.cacheData(uuid, null, ttlMinutes)
+      const uuid = await dataStore.cacheData(null, ttlMinutes)
 
       expect(uuid).toBeDefined()
       expect(redisClient.set).toHaveBeenCalledWith(

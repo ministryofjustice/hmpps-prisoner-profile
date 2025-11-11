@@ -1,5 +1,4 @@
 import { Readable } from 'stream'
-import CircuitBreaker from 'opossum'
 import config from '../config'
 import CaseLoad from './interfaces/prisonApi/CaseLoad'
 import { PrisonApiClient, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
@@ -52,11 +51,11 @@ import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
 import ImageDetails from './interfaces/prisonApi/ImageDetails'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 
 export default class PrisonApiRestClient extends RestClient implements PrisonApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Prison API', config.apis.prisonApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Prison API', config.apis.prisonApi, token)
   }
 
   async getOffenderAttendanceHistory(

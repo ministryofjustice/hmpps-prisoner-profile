@@ -1,12 +1,11 @@
-import CircuitBreaker from 'opossum'
 import config from '../config'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import { RestrictedPatientApiClient } from './interfaces/restrictedPatientApi/restrictedPatientApiClient'
 import RestrictedPatient from './interfaces/restrictedPatientApi/RestrictedPatient'
 
 export default class RestrictedPatientApiRestClient extends RestClient implements RestrictedPatientApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Restricted Patient API', config.apis.restrictedPatientApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Restricted Patient API', config.apis.restrictedPatientApi, token)
   }
 
   async getRestrictedPatient(prisonerNumber: string): Promise<RestrictedPatient | null> {

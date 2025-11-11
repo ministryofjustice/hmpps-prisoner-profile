@@ -1,8 +1,8 @@
 import { addDays, addMinutes, set, subMinutes } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
-import { randomUUID } from 'crypto'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
+import PrisonerSearchService from '../services/prisonerSearch'
 import AppointmentService, { AddAppointmentRefData, PrePostAppointmentRefData } from '../services/appointmentService'
 import LocationDetailsService from '../services/locationDetailsService'
 import AppointmentController from './appointmentController'
@@ -41,7 +41,6 @@ import {
 import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 import { courtBookingMock, probationBookingMock } from '../data/localMockData/videoLinkBookingMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import EphemeralDataService from '../services/ephemeralDataService'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -50,8 +49,6 @@ let res: Response
 const next: NextFunction = jest.fn()
 let controller: AppointmentController
 const flash: jest.MockedFn<Request['flash'] | { (key?: string): object[] }> = jest.fn()
-
-const cacheId = randomUUID()
 
 const activeCaseLoadId = CaseLoadsDummyDataA[0].caseLoadId
 const user: HmppsUser = {
@@ -113,9 +110,9 @@ const formBodyVLB = {
   videoLinkUrl: 'http://test.url',
 }
 
+jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
 jest.mock('../services/locationDetailsService.ts')
-jest.mock('../services/ephemeralDataService.ts')
 
 describe('Appointment Controller', () => {
   const locationDetailsService: LocationDetailsService = new LocationDetailsService(
@@ -131,7 +128,9 @@ describe('Appointment Controller', () => {
     null,
   ) as jest.Mocked<AppointmentService>
 
-  const ephemeralDataService: EphemeralDataService = new EphemeralDataService(null) as jest.Mocked<EphemeralDataService>
+  const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
+    null,
+  ) as jest.Mocked<PrisonerSearchService>
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -165,9 +164,9 @@ describe('Appointment Controller', () => {
 
     controller = new AppointmentController(
       appointmentService,
-      locationDetailsService,
-      ephemeralDataService,
+      prisonerSearchService,
       auditServiceMock(),
+      locationDetailsService,
     )
 
     appointmentService.getAddAppointmentRefData = jest.fn(
@@ -190,6 +189,7 @@ describe('Appointment Controller', () => {
     appointmentService.getAgencyDetails = jest.fn(async () => AgenciesMock)
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
+    prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
     locationDetailsService.getLocationByNomisLocationId = jest.fn(
       async (_, locationId) =>
         ({
@@ -215,8 +215,6 @@ describe('Appointment Controller', () => {
           key: 'ABC',
         }) as LocationsApiLocation,
     )
-
-    ephemeralDataService.cacheData = jest.fn(async () => cacheId)
   })
 
   it('should display add appointment', async () => {
@@ -506,7 +504,7 @@ describe('Appointment Controller', () => {
       )
     })
 
-    it('should redirect to VLB page with cacheId', async () => {
+    it('should redirect to VLB page', async () => {
       req.body = {
         ...formBody,
         appointmentType: 'VLB',
@@ -523,13 +521,11 @@ describe('Appointment Controller', () => {
 
       expect(controller.appointmentService.createAppointments).not.toHaveBeenCalled()
 
-      expect(ephemeralDataService.cacheData).toHaveBeenCalledWith({
+      expect(flash).toHaveBeenCalledWith('prePostAppointmentDetails', {
         appointmentDefaults: { ...appointmentsToCreate, locationId: 1234, appointmentType: 'VLB' },
         appointmentForm: { ...formBody, appointmentType: 'VLB' },
       })
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments?appointmentData=${cacheId}`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments`)
     })
 
     it('should redirect back to form if errors', async () => {
@@ -633,21 +629,21 @@ describe('Appointment Controller', () => {
     const { prisonerNumber, cellLocation } = PrisonerMockDataA
     formBody.location = locationsMock[0].locationId
 
-    req.query.appointmentData = cacheId
-
-    flash.mockImplementation(() => [])
-    ephemeralDataService.getData = jest.fn().mockResolvedValue({
-      key: cacheId,
-      value: {
-        appointmentDefaults: {
-          locationId: formBody.location,
-          startTime: formatDateTimeISO(
-            set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
-          ),
-        },
-        appointmentForm: formBody,
-        formValues: {},
+    const flashMessage = {
+      appointmentDefaults: {
+        locationId: formBody.location,
+        startTime: formatDateTimeISO(
+          set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
+        ),
       },
+      appointmentForm: formBody,
+      formValues: {},
+    }
+    flash.mockImplementation(key => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flashMessage]
+      }
+      return []
     })
 
     const appointmentData = {
@@ -686,13 +682,11 @@ describe('Appointment Controller', () => {
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
-      cacheId,
     })
   })
 
   it('should display prepost appointment with data prepopulated when editing', async () => {
     req.params.appointmentId = '1'
-    req.query.appointmentData = cacheId
 
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
     appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
@@ -700,18 +694,20 @@ describe('Appointment Controller', () => {
     const { prisonerNumber, cellLocation } = PrisonerMockDataA
     formBody.location = locationsMock[0].locationId
 
-    flash.mockImplementation(() => [])
-    ephemeralDataService.getData = jest.fn().mockResolvedValue({
-      key: cacheId,
-      value: {
-        appointmentDefaults: {
-          locationId: formBody.location,
-          startTime: formatDateTimeISO(
-            set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
-          ),
-        },
-        appointmentForm: formBody,
+    const flashMessage = {
+      appointmentDefaults: {
+        locationId: formBody.location,
+        startTime: formatDateTimeISO(
+          set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
+        ),
       },
+      appointmentForm: formBody,
+    }
+    flash.mockImplementation(key => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flashMessage]
+      }
+      return []
     })
 
     const appointmentData = {
@@ -762,44 +758,36 @@ describe('Appointment Controller', () => {
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
-      cacheId,
     })
-  })
-
-  it('should redirect if no cached prepost appointment data is found', async () => {
-    ephemeralDataService.getData = jest.fn().mockImplementation(() => undefined)
-
-    await controller.displayPrePostAppointments()(req, res, next)
-
-    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
   })
 
   describe('POST Video Link Booking', () => {
     beforeEach(() => {
       req.body = {
         ...formBodyVLB,
-        cacheId,
         refererUrl: 'http://referer',
       }
-      flash.mockImplementation(() => [])
     })
 
     it('should create new video link booking appointment', async () => {
-      ephemeralDataService.getData = jest.fn().mockResolvedValue({
-        key: cacheId,
-        value: {
-          appointmentDefaults: {
-            startTime: appointmentsToCreate.startTime,
-            endTime: appointmentsToCreate.endTime,
-            locationId: appointmentsToCreate.locationId,
-          },
-          appointmentForm: {
-            ...formBody,
-            appointmentType: 'VLB',
-            notesForPrisoners: 'prisoner notes',
-            notesForStaff: 'staff notes',
-          },
+      const flashMessage = {
+        appointmentDefaults: {
+          startTime: appointmentsToCreate.startTime,
+          endTime: appointmentsToCreate.endTime,
+          locationId: appointmentsToCreate.locationId,
         },
+        appointmentForm: {
+          ...formBody,
+          appointmentType: 'VLB',
+          notesForPrisoners: 'prisoner notes',
+          notesForStaff: 'staff notes',
+        },
+      }
+      flash.mockImplementation(key => {
+        if (key === 'postVLBDetails') {
+          return [flashMessage]
+        }
+        return []
       })
 
       locationDetailsService.getLocation = jest.fn(async () => ({
@@ -849,27 +837,30 @@ describe('Appointment Controller', () => {
       })
 
       expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation?appointmentData=${cacheId}`,
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation`,
       )
     })
 
     it('should amend the existing video link booking appointment', async () => {
-      ephemeralDataService.getData = jest.fn().mockResolvedValue({
-        key: cacheId,
-        value: {
-          appointmentDefaults: {
-            startTime: appointmentsToCreate.startTime,
-            endTime: appointmentsToCreate.endTime,
-            locationId: appointmentsToCreate.locationId,
-          },
-          appointmentForm: {
-            ...formBody,
-            appointmentId: 1,
-            appointmentType: 'VLB',
-            notesForPrisoners: 'amended prisoner notes',
-            notesForStaff: 'ameneded staff notes',
-          },
+      const flashMessage = {
+        appointmentDefaults: {
+          startTime: appointmentsToCreate.startTime,
+          endTime: appointmentsToCreate.endTime,
+          locationId: appointmentsToCreate.locationId,
         },
+        appointmentForm: {
+          ...formBody,
+          appointmentId: 1,
+          appointmentType: 'VLB',
+          notesForPrisoners: 'amended prisoner notes',
+          notesForStaff: 'ameneded staff notes',
+        },
+      }
+      flash.mockImplementation(key => {
+        if (key === 'postVLBDetails') {
+          return [flashMessage]
+        }
+        return []
       })
 
       appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
@@ -922,7 +913,7 @@ describe('Appointment Controller', () => {
       })
 
       expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation?appointmentData=${cacheId}`,
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation`,
       )
     })
 
@@ -933,18 +924,20 @@ describe('Appointment Controller', () => {
           href: '#error',
         },
       ]
-
-      ephemeralDataService.getData = jest.fn().mockResolvedValue({
-        key: cacheId,
-        value: {
-          appointmentDefaults: {
-            startTime: appointmentsToCreate.startTime,
-            endTime: appointmentsToCreate.endTime,
-            locationId: appointmentsToCreate.locationId,
-            comment: appointmentsToCreate.comment,
-          },
-          appointmentForm: formBody,
+      const flashMessage = {
+        appointmentDefaults: {
+          startTime: appointmentsToCreate.startTime,
+          endTime: appointmentsToCreate.endTime,
+          locationId: appointmentsToCreate.locationId,
+          comment: appointmentsToCreate.comment,
         },
+        appointmentForm: formBody,
+      }
+      flash.mockImplementation(key => {
+        if (key === 'postVLBDetails') {
+          return [flashMessage]
+        }
+        return []
       })
 
       req.body.refererUrl = 'http://referer'
@@ -954,163 +947,144 @@ describe('Appointment Controller', () => {
 
       expect(controller.appointmentService.addVideoLinkBooking).not.toHaveBeenCalled()
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments?appointmentData=${cacheId}`,
-      )
-    })
-
-    it('should redirect back to add appointments page if no cached appointment data exists', async () => {
-      ephemeralDataService.getData = jest.fn().mockImplementation(() => undefined)
-
-      await controller.postVideoLinkBooking()(req, res, next)
-
-      expect(controller.appointmentService.addVideoLinkBooking).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments`)
     })
   })
 
-  describe('Display prepost appointment confirmation', () => {
-    beforeEach(() => {
-      flash.mockImplementation(() => [])
-    })
-
-    it('should display confirmation', async () => {
-      const { prisonerNumber } = PrisonerMockDataA
-
-      ephemeralDataService.getData = jest.fn().mockResolvedValue({
-        key: cacheId,
-        value: {
-          appointmentDefaults: {
-            startTime: appointmentsToCreate.startTime,
-            endTime: appointmentsToCreate.endTime,
-            locationId: appointmentsToCreate.locationId,
-            comment: appointmentsToCreate.comment,
-          },
-          appointmentForm: {
-            location: locationsMock[0].locationId,
-          },
-          formValues: {
-            hearingType: courtHearingTypes[0].code,
-            court: courtLocationsMock[2].code,
-            cvpRequired: 'yes',
-            videoLinkUrl: 'http://bvls.test.url',
-            guestPinRequired: 'no',
-            preAppointment: 'no',
-            postAppointment: 'no',
-          },
-        },
-      })
-
-      const appointmentData = {
-        prisonName: 'Moorland (HMP & YOI)',
-        appointmentType: 'Video Link - Court Hearing',
-        appointmentTypeCode: 'VLB',
-        location: locationsApiMock[0].localName,
-        date: formatDate(dateToIsoDate(formBody.date), 'long'),
-        startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
-        endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
-        comments: formBody.comments,
-        pre: undefined as string,
-        post: undefined as string,
-        court: courtLocationsMock[2].description,
-        hearingType: courtHearingTypes[0].description,
-      }
-
-      locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
-        nomisLocationId: 1234,
-        dpsLocationId: 'location-1',
-        key: 'ABC',
-      }))
-
-      await controller.displayPrePostAppointmentConfirmation()(req, res, next)
-
-      expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
-        req.middleware.clientToken,
-        activeCaseLoadId,
-      )
-      expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
-      expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
-        pageTitle: 'The video link has been booked',
-        ...appointmentData,
-        profileUrl: `/prisoner/${prisonerNumber}`,
-        movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
+  it('should display prepost appointment confirmation', async () => {
+    const { prisonerNumber } = PrisonerMockDataA
+    const flashMessage = {
+      appointmentDefaults: {
+        startTime: appointmentsToCreate.startTime,
+        endTime: appointmentsToCreate.endTime,
+        locationId: appointmentsToCreate.locationId,
+        comment: appointmentsToCreate.comment,
+      },
+      appointmentForm: {
+        location: locationsMock[0].locationId,
+      },
+      formValues: {
+        hearingType: courtHearingTypes[0].code,
+        court: courtLocationsMock[2].code,
+        cvpRequired: 'yes',
         videoLinkUrl: 'http://bvls.test.url',
-        mustContactTheCourt: true,
-      })
-    })
+        guestPinRequired: 'no',
+        preAppointment: 'no',
+        postAppointment: 'no',
+      },
+    }
 
-    it('should display confirmation when amending', async () => {
-      const { prisonerNumber } = PrisonerMockDataA
-
-      ephemeralDataService.getData = jest.fn().mockResolvedValue({
-        key: cacheId,
-        value: {
-          appointmentId: 1,
-          appointmentDefaults: {
-            startTime: appointmentsToCreate.startTime,
-            endTime: appointmentsToCreate.endTime,
-            locationId: appointmentsToCreate.locationId,
-            comment: appointmentsToCreate.comment,
-          },
-          appointmentForm: {
-            location: locationsMock[0].locationId,
-          },
-          formValues: {
-            hearingType: courtHearingTypes[0].code,
-            court: courtLocationsMock[2].code,
-            cvpRequired: 'yes',
-            videoLinkUrl: 'http://bvls.test.url',
-            guestPinRequired: 'no',
-            preAppointment: 'no',
-            postAppointment: 'no',
-          },
-        },
-      })
-
-      const appointmentData = {
-        appointmentType: 'Video Link - Court Hearing',
-        appointmentTypeCode: 'VLB',
-        prisonName: 'Moorland (HMP & YOI)',
-        location: locationsApiMock[0].localName,
-        date: formatDate(dateToIsoDate(formBody.date), 'long'),
-        startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
-        endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
-        comments: formBody.comments,
-        pre: undefined as string,
-        post: undefined as string,
-        court: courtLocationsMock[2].description,
-        hearingType: courtHearingTypes[0].description,
+    flash.mockImplementation(key => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flashMessage]
       }
-
-      locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
-        nomisLocationId: 1234,
-        dpsLocationId: 'location-1',
-        key: 'ABC',
-      }))
-
-      await controller.displayPrePostAppointmentConfirmation()(req, res, next)
-
-      expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
-        req.middleware.clientToken,
-        activeCaseLoadId,
-      )
-      expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
-      expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
-        pageTitle: 'The video link has been updated',
-        ...appointmentData,
-        profileUrl: `/prisoner/${prisonerNumber}`,
-        movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
-        videoLinkUrl: 'http://bvls.test.url',
-        mustContactTheCourt: true,
-      })
+      return []
     })
 
-    it('should redirect to add appointment page if no cached appointment data exists', async () => {
-      ephemeralDataService.getData = jest.fn().mockImplementation(() => undefined)
+    const appointmentData = {
+      prisonName: 'Moorland (HMP & YOI)',
+      appointmentType: 'Video Link - Court Hearing',
+      appointmentTypeCode: 'VLB',
+      location: locationsApiMock[0].localName,
+      date: formatDate(dateToIsoDate(formBody.date), 'long'),
+      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+      comments: formBody.comments,
+      pre: undefined as string,
+      post: undefined as string,
+      court: courtLocationsMock[2].description,
+      hearingType: courtHearingTypes[0].description,
+    }
 
-      await controller.displayPrePostAppointmentConfirmation()(req, res, next)
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
 
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
+    await controller.displayPrePostAppointmentConfirmation()(req, res, next)
+
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      activeCaseLoadId,
+    )
+    expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
+      pageTitle: 'The video link has been booked',
+      ...appointmentData,
+      profileUrl: `/prisoner/${prisonerNumber}`,
+      movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
+      videoLinkUrl: 'http://bvls.test.url',
+      mustContactTheCourt: true,
+    })
+  })
+
+  it('should display prepost appointment confirmation when amending', async () => {
+    const { prisonerNumber } = PrisonerMockDataA
+    const flashMessage = {
+      appointmentId: 1,
+      appointmentDefaults: {
+        startTime: appointmentsToCreate.startTime,
+        endTime: appointmentsToCreate.endTime,
+        locationId: appointmentsToCreate.locationId,
+        comment: appointmentsToCreate.comment,
+      },
+      appointmentForm: {
+        location: locationsMock[0].locationId,
+      },
+      formValues: {
+        hearingType: courtHearingTypes[0].code,
+        court: courtLocationsMock[2].code,
+        cvpRequired: 'yes',
+        videoLinkUrl: 'http://bvls.test.url',
+        guestPinRequired: 'no',
+        preAppointment: 'no',
+        postAppointment: 'no',
+      },
+    }
+
+    flash.mockImplementation(key => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flashMessage]
+      }
+      return []
+    })
+
+    const appointmentData = {
+      appointmentType: 'Video Link - Court Hearing',
+      appointmentTypeCode: 'VLB',
+      prisonName: 'Moorland (HMP & YOI)',
+      location: locationsApiMock[0].localName,
+      date: formatDate(dateToIsoDate(formBody.date), 'long'),
+      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+      comments: formBody.comments,
+      pre: undefined as string,
+      post: undefined as string,
+      court: courtLocationsMock[2].description,
+      hearingType: courtHearingTypes[0].description,
+    }
+
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
+
+    await controller.displayPrePostAppointmentConfirmation()(req, res, next)
+
+    expect(controller.appointmentService.getPrePostAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      activeCaseLoadId,
+    )
+    expect(controller.appointmentService.getAgencyDetails).toHaveBeenCalled()
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
+      pageTitle: 'The video link has been updated',
+      ...appointmentData,
+      profileUrl: `/prisoner/${prisonerNumber}`,
+      movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
+      videoLinkUrl: 'http://bvls.test.url',
+      mustContactTheCourt: true,
     })
   })
 

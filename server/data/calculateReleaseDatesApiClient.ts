@@ -1,12 +1,11 @@
-import CircuitBreaker from 'opossum'
 import CalculateReleaseDatesApiClient from './interfaces/calculateReleaseDatesApi/calculateReleaseDatesApiClient'
 import LatestCalculation from './interfaces/calculateReleaseDatesApi/LatestCalculation'
 import config from '../config'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 
 export default class calculateReleaseDatesApiClient extends RestClient implements CalculateReleaseDatesApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Calculate Release Dates API', config.apis.calculateReleaseDatesApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Calculate Release Dates API', config.apis.calculateReleaseDatesApi, token)
   }
 
   getLatestCalculation(prisonNumber: string): Promise<LatestCalculation | null> {

@@ -2,15 +2,15 @@
   <script type="text/javascript" src="/assets/applicationinsights-web.min.js"  nonce="{{ cspNonce }}"></script>
   <script type="text/javascript" src="/assets/applicationinsights-clickanalytics-js.min.js"  nonce="{{ cspNonce }}"></script>
   <script type="text/javascript" nonce="{{ cspNonce }}">
-    const clickPluginInstance = new Microsoft.ApplicationInsights.ClickAnalyticsPlugin();
+    var clickPluginInstance = new Microsoft.ApplicationInsights.ClickAnalyticsPlugin();
     // Click Analytics configuration
-    const clickPluginConfig = {
+    var clickPluginConfig = {
       autoCapture : true,
       dataTags: {
         useDefaultContentNameOrId: true
       }
     }
-    const snippet = {
+    var snippet = {
       config: {
         connectionString: "{{ appInsightsConnectionString }}",
         extensions: [
@@ -23,39 +23,12 @@
         disableFetchTracking: true, // otherwise we get spammed with GA fetch requests being incorrectly reported as failing
       }
     }
-    const init = new Microsoft.ApplicationInsights.ApplicationInsights(snippet)
-    const appInsights = init.loadAppInsights();
-
+    var init = new Microsoft.ApplicationInsights.ApplicationInsights(snippet)
+    var appInsights = init.loadAppInsights();
     appInsights.addTelemetryInitializer(function (envelope) {
       envelope.tags["ai.cloud.role"] = "{{ appInsightsApplicationName }}"
       envelope.tags["ai.application.ver"] = "{{ buildNumber }}"
-
-      if (envelope.name.includes("Pageview") || envelope.name.includes("PageviewPerformance")) {
-        envelope.baseData.name = envelope.baseData.name.replace(/[a-zA-Z][0-9]{4}[a-zA-Z]{2}/, 'PRISONER_NUMBER')
-      }
-
-      // Prevent PII leaking into logs:
-      if (envelope.data.baseTypeSource === "ClickEvent"
-        && (
-          envelope.data.targetUri.endsWith("/prisoner/{{ prisonerNumber }}")
-          || envelope.baseData.name.includes("{{ prisonerName?.firstLast }}")
-          || envelope.baseData.name.includes("{{ prisonerName?.lastCommaFirst }}")
-          || envelope.baseData.name.includes("{{ prisonerName?.full }}")
-        )
-      ) {
-        const contentArray = JSON.parse(envelope.data.content);
-        for (let content of contentArray) {
-          if (content.contentName) {
-            let redactedStr = "Prisoner Link (Prisoner Name Redacted)";
-            content.contentName = redactedStr;
-            envelope.baseData.name = redactedStr;
-          }
-        }
-        envelope.data.content = JSON.stringify(contentArray);
-        envelope.data.pageName = envelope.data.pageName.replace(/[a-zA-Z][0-9]{4}[a-zA-Z]{2}/, 'PRISONER_NUMBER')
-      }
     });
-
     appInsights.trackPageView();
   </script>
 {% endif %}

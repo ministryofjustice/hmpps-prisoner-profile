@@ -1,6 +1,5 @@
-import CircuitBreaker from 'opossum'
 import config from '../config'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 
 import { LocationsInsidePrisonApiClient } from './interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
 
@@ -8,8 +7,8 @@ import LocationsApiLocation from './interfaces/locationsInsidePrisonApi/Location
 import LocationsAttributes from './interfaces/locationsInsidePrisonApi/LocationsAttributes'
 
 export default class LocationsInsidePrisonApiRestClient extends RestClient implements LocationsInsidePrisonApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Locations inside prison API', config.apis.locationsInsidePrisonApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Locations inside prison API', config.apis.locationsInsidePrisonApi, token)
   }
 
   async getLocation(id: string): Promise<LocationsApiLocation> {
