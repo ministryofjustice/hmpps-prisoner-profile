@@ -7,7 +7,6 @@ import {
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
 
-import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import WorkAndSkillsPageService, { WorkAndSkillsData } from './workAndSkillsPageService'
@@ -39,7 +38,6 @@ describe('WorkAndSkillsService', () => {
   prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
   prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
   prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-  prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
   prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
   prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
 

@@ -1,7 +1,6 @@
 import { Readable } from 'stream'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApi/nonAssociationsApiClient'
 import NonAssociationSummary from './interfaces/offenderService/NonAssociationSummary'
 
@@ -17,10 +16,6 @@ export default class OffenderService {
 
   getImage(token: string, imageId: string): Promise<Readable> {
     return this.prisonClientBuilder(token).getImage(imageId, true)
-  }
-
-  getPrisoner(token: string, prisonerNumber: string): Promise<PrisonerDetail> {
-    return this.prisonClientBuilder(token).getPrisoner(prisonerNumber)
   }
 
   async getPrisonerNonAssociationOverview(clientToken: string, prisonerNumber: string): Promise<NonAssociationSummary> {

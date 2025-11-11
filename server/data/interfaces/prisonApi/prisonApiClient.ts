@@ -6,7 +6,6 @@ import VisitBalances from './VisitBalances'
 import Assessment from './Assessment'
 import { ContactDetail } from './StaffContacts'
 import ScheduledEvent from './ScheduledEvent'
-import PrisonerDetail from './PrisonerDetail'
 import InmateDetail from './InmateDetail'
 import PersonalCareNeeds from './PersonalCareNeeds'
 import OffenderActivitiesHistory from './OffenderActivitiesHistory'
@@ -78,8 +77,6 @@ export interface PrisonApiClient {
   getBookingContacts(bookingId: number): Promise<ContactDetail>
 
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
-
-  getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
 
   getInmateDetail(bookingId: number): Promise<InmateDetail>
 

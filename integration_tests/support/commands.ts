@@ -82,7 +82,6 @@ Cypress.Commands.add(
     cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
-    cy.task('stubPrisonerDetail', prisonerNumber)
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
@@ -166,7 +165,6 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
   cy.task('stubInmateDetail', { bookingId })
-  cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
   cy.task('stubOffenderContacts', prisonerNumber)
