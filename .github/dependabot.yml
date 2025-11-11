@@ -6,6 +6,9 @@ updates:
       - dependency-name: "@types/node"
         versions:
           - ">=25"
+      - dependency-name: "applicationinsights"
+        versions:
+          - ">=3"
     schedule:
       interval: weekly
       day: wednesday
