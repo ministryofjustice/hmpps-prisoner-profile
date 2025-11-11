@@ -1,5 +1,4 @@
-import CircuitBreaker from 'opossum'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
 import config from '../config'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
@@ -26,8 +25,8 @@ const incentiveTypeSubTypes: CaseNoteTypeSubTypeRequest[] = [
 ]
 
 export default class CaseNotesApiRestClient extends RestClient implements CaseNotesApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Case Notes API', config.apis.caseNotesApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Case Notes API', config.apis.caseNotesApi, token)
   }
 
   async getCaseNotes(prisonerNumber: string, queryParams?: CaseNotesListQueryParams): Promise<FindCaseNotesResponse> {

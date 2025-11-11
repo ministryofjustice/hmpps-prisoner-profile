@@ -1,15 +1,14 @@
-import CircuitBreaker from 'opossum'
 import PrisonRegisterApiClient from './interfaces/prisonRegisterApi/PrisonRegisterApiClient'
 import { PrisonDto } from './interfaces/prisonRegisterApi/prisonRegisterApiTypes'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 import config from '../config'
 
 /**
  * REST API client implementation of [PrisonRegisterApiClient]
  */
 export default class PrisonRegisterApiRestClient extends RestClient implements PrisonRegisterApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Prison Register API', config.apis.prisonRegisterApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Prison Register API', config.apis.prisonRegisterApi, token)
   }
 
   getPrisonByPrisonId(prisonId: string): Promise<PrisonDto> {

@@ -1,7 +1,6 @@
 import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
 import { Readable } from 'stream'
-import CircuitBreaker from 'opossum'
 import appConfig from '../config'
 import logger, { warnLevelLogger } from '../../logger'
 
@@ -9,7 +8,7 @@ interface ErrorHandler<Response, ErrorData> {
   (path: string, method: string, error: SanitisedError<ErrorData>): Response
 }
 
-export interface Request<Response, ErrorData> {
+interface Request<Response, ErrorData> {
   path: string
   query?: object | string
   headers?: Record<string, string>
@@ -49,39 +48,18 @@ interface PutRequest {
   files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
 
-// To allow circuit breaker options in config
-export interface CustomApiConfig extends ApiConfig {
-  circuitBreakerOptions?: CircuitBreaker.Options<[request: Request<unknown, unknown>, token: string]>
-}
-
-export function circuitBreakerBuilder(config: CustomApiConfig) {
-  return new CircuitBreaker<[Request<unknown, unknown>, string], unknown>(
-    () => undefined, // action to apply circuit breaker to is undefined as it's set at call time
-    config.circuitBreakerOptions || appConfig.defaultCircuitBreakerOptions,
-  )
-}
-
 export default abstract class RestClient extends HmppsRestClient {
   protected constructor(
     protected readonly name: string,
-    protected readonly config: CustomApiConfig,
+    protected readonly config: ApiConfig,
     protected readonly token: string,
-    protected readonly circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>, // Unknown types as they're specified in this.get
   ) {
     // only log warn level and above in production for API clients to reduce app insights usage
     // (dependencies are separately tracked):
     super(name, config, appConfig.production ? warnLevelLogger : logger)
-
-    // Set the circuitBreaker's action
-    if (this.circuitBreaker) {
-      ;(this.circuitBreaker as unknown as { action: (...args: unknown[]) => Promise<unknown> }).action = async (
-        request: Request<unknown, unknown>,
-        tokenString: string,
-      ) => super.get<unknown, unknown>(request, tokenString)
-    }
   }
 
-  // Overridden get function to enforce use of token and the circuit breaker
+  // Overridden get function to enforce use of token
   async get<Response = unknown, ErrorData = unknown>(
     {
       path,
@@ -94,10 +72,7 @@ export default abstract class RestClient extends HmppsRestClient {
     }: Request<Response, ErrorData>,
     token: string,
   ): Promise<Response> {
-    const request = { path, query, headers, responseType, raw, retries, errorHandler }
-    return appConfig.featureToggles.circuitBreakerEnabled && this.circuitBreaker
-      ? (this.circuitBreaker.fire(request, token) as Promise<Response>)
-      : super.get<Response, ErrorData>(request, token)
+    return super.get<Response, ErrorData>({ path, query, headers, responseType, raw, retries, errorHandler }, token)
   }
 
   // Overridden patch function to enforce use of token

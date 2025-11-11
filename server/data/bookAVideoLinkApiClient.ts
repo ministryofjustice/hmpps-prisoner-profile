@@ -1,4 +1,3 @@
-import CircuitBreaker from 'opossum'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import CreateVideoBookingRequest, {
@@ -9,11 +8,11 @@ import CreateVideoBookingRequest, {
 import { mapToQueryString } from '../utils/utils'
 import Court, { ProbationTeam } from './interfaces/bookAVideoLinkApi/Court'
 import ReferenceCode from './interfaces/bookAVideoLinkApi/ReferenceCode'
-import RestClient, { Request } from './restClient'
+import RestClient from './restClient'
 
 export default class BookAVideoLinkRestApiClient extends RestClient implements BookAVideoLinkApiClient {
-  constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Book A Video Link API', config.apis.bookAVideoLinkApi, token, circuitBreaker)
+  constructor(token: string) {
+    super('Book A Video Link API', config.apis.bookAVideoLinkApi, token)
   }
 
   async addVideoLinkBooking(videoLinkBooking: CreateVideoBookingRequest): Promise<number> {
