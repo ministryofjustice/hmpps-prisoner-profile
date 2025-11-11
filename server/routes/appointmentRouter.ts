@@ -19,9 +19,9 @@ export default function appointmentRouter(services: Services): Router {
 
   const appointmentController = new AppointmentController(
     services.appointmentService,
-    services.locationDetailsService,
-    services.ephemeralDataService,
+    services.prisonerSearchService,
     services.auditService,
+    services.locationDetailsService,
   )
 
   const isCreateIndividualAppointmentRolledOut = (req: Request, res: Response, next: NextFunction) => {
