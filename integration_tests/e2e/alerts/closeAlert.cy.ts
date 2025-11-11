@@ -133,7 +133,6 @@ context('Close Alert Page', () => {
         beforeEach(() => {
           cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
           cy.task('stubInmateDetail', { bookingId: 1102484 })
-          cy.task('stubPrisonerDetail', 'G6123VU')
         })
 
         it('Displays Page Not Found', () => {

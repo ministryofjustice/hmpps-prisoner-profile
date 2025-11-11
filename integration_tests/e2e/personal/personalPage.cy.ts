@@ -58,7 +58,6 @@ context('When signed in', () => {
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubSecondaryLanguages', 1102484)
       cy.task('stubProperty', 1102484)
       cy.task('stubAddresses', { prisonerNumber: 'G6123VU' })

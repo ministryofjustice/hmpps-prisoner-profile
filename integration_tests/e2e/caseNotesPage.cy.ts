@@ -28,7 +28,6 @@ context('Case Notes Page', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       caseNotesPage = visitCaseNotesPage()
     })
@@ -101,7 +100,6 @@ context('Case Notes Page', () => {
           inactiveAlertCount: 0,
         } as Partial<InmateDetail>,
       })
-      cy.task('stubPrisonerDetail', 'A1234BC')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'A1234BC' })
       caseNotesPage = visitEmptyCaseNotesPage()
     })
@@ -126,7 +124,6 @@ context('Case Notes Page', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesPage2', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
@@ -150,7 +147,6 @@ context('Case Notes Page', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesSorted', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
@@ -175,7 +171,6 @@ context('Case Notes Page', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetCaseNotesFiltered', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
@@ -203,7 +198,6 @@ context('Sensitive Case Notes', () => {
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
@@ -228,7 +222,6 @@ context('Sensitive Case Notes', () => {
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
@@ -254,7 +247,6 @@ context('Incentive slips', () => {
     cy.task('stubGetCaseNoteTypes')
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.task('stubInmateDetail', { bookingId: 1102484 })
-    cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
   })
 
@@ -307,7 +299,6 @@ context('Case Notes Page Not Found', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     })
 
@@ -327,7 +318,6 @@ context('Case Notes API Unavailable', () => {
     cy.task('stubGetCaseNoteTypes')
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.task('stubInmateDetail', { bookingId: 1102484 })
-    cy.task('stubPrisonerDetail', 'G6123VU')
     caseNotesPage = visitCaseNotesPage()
   })
 

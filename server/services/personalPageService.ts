@@ -26,7 +26,6 @@ import OffenderIdentifier, { getOffenderIdentifierValue } from '../data/interfac
 import Address from '../data/interfaces/prisonApi/Address'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
-import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
 import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
@@ -280,7 +279,6 @@ export default class PersonalPageService {
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
       inmateDetail,
-      prisonerDetail,
       secondaryLanguages,
       property,
       oldAddressList,
@@ -294,7 +292,6 @@ export default class PersonalPageService {
       personalRelationshipsDomesticStatus,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
-      prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
@@ -377,7 +374,6 @@ export default class PersonalPageService {
         personIntegrationApiClient,
         prisonerData,
         inmateDetail,
-        prisonerDetail,
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
@@ -453,22 +449,22 @@ export default class PersonalPageService {
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
-    prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
     numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
     domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
   ): Promise<PersonalDetails> {
-    const { profileInformation } = inmateDetail
+    const { profileInformation, physicalAttributes } = inmateDetail
+    const { ethnicity, raceCode: ethnicityCode } = physicalAttributes
 
     const aliases = await this.aliases(personIntegrationApiClient, prisonerData)
 
     let ethnicGroup = 'Not entered'
-    if (prisonerDetail?.ethnicity) {
-      ethnicGroup = `${prisonerDetail.ethnicity}`
-      if (prisonerDetail?.ethnicityCode) {
-        ethnicGroup += ` (${prisonerDetail.ethnicityCode})`
+    if (ethnicity) {
+      ethnicGroup = `${ethnicity}`
+      if (ethnicityCode) {
+        ethnicGroup += ` (${ethnicityCode})`
       }
     }
 

@@ -8,7 +8,6 @@ import {
 } from '../../server/data/localMockData/miniSummaryMock'
 import dummyScheduledEvents from '../../server/data/localMockData/eventsForToday'
 import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
-import { prisonerDetailMock } from '../../server/data/localMockData/prisonerDetailMock'
 import { secondaryLanguagesMock } from '../../server/data/localMockData/secondaryLanguages'
 import { propertyMock } from '../../server/data/localMockData/property'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
@@ -220,22 +219,6 @@ export default {
           'Content-Type': 'image/png',
         },
         base64Body: loadFileAsBase64(placeHolderImagePath),
-      },
-    })
-  },
-
-  stubPrisonerDetail: (prisonerNumber: string) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/prisoners/${prisonerNumber}`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: prisonerDetailMock,
       },
     })
   },
