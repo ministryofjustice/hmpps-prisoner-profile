@@ -998,7 +998,7 @@ export default class AppointmentController {
       courtCode: prePostAppointmentForm?.formValues?.court,
       probationTeamCode: appointmentForm.probationTeam,
       courtHearingType: prePostAppointmentForm?.formValues?.hearingType,
-      probationMeetingType: appointmentForm.meetingType || undefined,
+      probationMeetingType: appointmentForm.meetingType === '' ? undefined : appointmentForm.meetingType,
       videoLinkUrl:
         prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
         prePostAppointmentForm.formValues?.videoLinkUrl &&

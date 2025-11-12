@@ -10,7 +10,6 @@ import Assessment from './interfaces/prisonApi/Assessment'
 import { ContactDetail } from './interfaces/prisonApi/StaffContacts'
 import { mapToQueryString } from '../utils/utils'
 import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
-import PrisonerDetail from './interfaces/prisonApi/PrisonerDetail'
 import InmateDetail from './interfaces/prisonApi/InmateDetail'
 import PersonalCareNeeds from './interfaces/prisonApi/PersonalCareNeeds'
 import OffenderActivitiesHistory from './interfaces/prisonApi/OffenderActivitiesHistory'
@@ -123,15 +122,6 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     } catch (error) {
       return error
     }
-  }
-
-  async getPrisoner(prisonerNumber: string): Promise<PrisonerDetail> {
-    const prisoner = await this.get<PrisonerDetail[]>({ path: `/api/prisoners/${prisonerNumber}` }, this.token)
-    // API returns array with one entry, so extract this to return a single object
-    if (Array.isArray(prisoner)) {
-      return prisoner[0]
-    }
-    return prisoner
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {

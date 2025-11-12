@@ -2,7 +2,6 @@ import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { convertToTitleCase, formatName } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
@@ -92,7 +91,6 @@ describe('PersonalPageService', () => {
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
     prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
     prisonApiClient.getSecondaryLanguages = jest.fn(async () => secondaryLanguagesMock)
     prisonApiClient.getProperty = jest.fn(async () => propertyMock)
@@ -189,7 +187,6 @@ describe('PersonalPageService', () => {
     it('Gets prisoner detail from the api', async () => {
       const service = constructService()
       await service.get('token', PrisonerMockDataA)
-      expect(prisonApiClient.getPrisoner).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
     })
   })
 
@@ -541,7 +538,7 @@ describe('PersonalPageService', () => {
         const { personalDetails } = await constructService().get('token', PrisonerMockDataA)
         expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
         expect(personalDetails.ethnicGroup).toEqual(
-          `${PrisonerMockDataA.ethnicity} (${prisonerDetailMock.ethnicityCode})`,
+          `${inmateDetailMock.physicalAttributes.ethnicity} (${inmateDetailMock.physicalAttributes.raceCode})`,
         )
         expect(personalDetails.fullName).toEqual(
           formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),

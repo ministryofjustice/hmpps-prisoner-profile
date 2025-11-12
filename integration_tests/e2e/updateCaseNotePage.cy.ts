@@ -26,7 +26,6 @@ context('Update Case Note Page', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
-      cy.task('stubPrisonerDetail', 'G6123VU')
     })
 
     context('Update a case note', () => {
@@ -122,7 +121,6 @@ context('Update Case Note Page', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
         cy.task('stubInmateDetail', { bookingId: 1102484 })
-        cy.task('stubPrisonerDetail', 'G6123VU')
         cy.task('stubGetCaseNotes', 'G6123VU')
         cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       })

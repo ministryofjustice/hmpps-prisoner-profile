@@ -9,7 +9,6 @@ import {
   visitBalancesMock,
   visitSummaryMock,
 } from './localMockData/miniSummaryMock'
-import { prisonerDetailMock } from './localMockData/prisonerDetailMock'
 import { mapToQueryString } from '../utils/utils'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
@@ -136,16 +135,6 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getEventsScheduledForToday(bookingId)
       expect(output).toEqual(dummyScheduledEvents)
-    })
-  })
-
-  describe('getPrisoner', () => {
-    it('Should return data from the API', async () => {
-      const prisonerNumber = 'A1234BC'
-      mockSuccessfulPrisonApiCall(`/api/prisoners/${prisonerNumber}`, prisonerDetailMock)
-
-      const output = await prisonApiClient.getPrisoner(prisonerNumber)
-      expect(output).toEqual(prisonerDetailMock)
     })
   })
 

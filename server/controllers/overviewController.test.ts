@@ -152,8 +152,6 @@ describe('overviewController', () => {
       csipService,
       contactsService,
     )
-
-    offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
   })
 
   describe('moneySummary', () => {
@@ -432,7 +430,6 @@ describe('overviewController', () => {
 
   describe('statuses', () => {
     it('should get statuses for Current Location, Recognised Listener and Neurodiversity', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
 
       await controller.displayOverview(
@@ -456,7 +453,6 @@ describe('overviewController', () => {
     })
 
     it('should not return Neurodiversity if not at supported prison', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue([])
 
       await controller.displayOverview(req, res)
@@ -470,7 +466,6 @@ describe('overviewController', () => {
     })
 
     it('should indicate an error with neurodiversity support status when API fails', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockRejectedValue('ERROR')
 
       await controller.displayOverview(
@@ -494,8 +489,6 @@ describe('overviewController', () => {
     })
 
     it('should display out location of temporarily out of prison', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
-
       await controller.displayOverview(
         {
           ...req,
@@ -516,8 +509,6 @@ describe('overviewController', () => {
     })
 
     it('should display out location if released from prison', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
-
       await controller.displayOverview(
         {
           ...req,
@@ -544,8 +535,6 @@ describe('overviewController', () => {
     })
 
     it('should display "Being transferred" if TRN', async () => {
-      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
-
       await controller.displayOverview(
         {
           ...req,
@@ -583,7 +572,6 @@ describe('overviewController', () => {
       'given %s should show correct suitable and/or recognised listener statuses',
       async (_, suitableListener, recognisedListener, displaySuitable, displayRecognised) => {
         const profileInformation = [suitableListener, recognisedListener].filter(Boolean)
-        offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
         await controller.displayOverview(
           {
@@ -623,7 +611,6 @@ describe('overviewController', () => {
 
       describe('Given a scheduled transfer for the prisoner', () => {
         it('Adds a status', async () => {
-          offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
           prisonerScheduleService.getScheduledTransfers = jest.fn(async () => scheduledTransfersMock)
 
           await controller.displayOverview(req, res)
@@ -639,7 +626,6 @@ describe('overviewController', () => {
 
       describe('Given no scheduled transfers', () => {
         it('Adds a status', async () => {
-          offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
           prisonerScheduleService.getScheduledTransfers = jest.fn(async (): Promise<PrisonerPrisonSchedule[]> => [])
 
           await controller.displayOverview(req, res)

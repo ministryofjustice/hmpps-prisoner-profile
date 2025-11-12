@@ -19,7 +19,6 @@ describe('Military Records - Conflicts Page', () => {
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.task('stubInmateDetail', { bookingId: 1102484 })
-    cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubPersonIntegrationGetReferenceData', {
       domain: 'MLTY_WZONE',
       referenceData: MilitaryWarZoneRefDataMock,
