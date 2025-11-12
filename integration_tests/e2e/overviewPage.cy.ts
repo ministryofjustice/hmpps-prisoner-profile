@@ -923,7 +923,7 @@ context('Overview Page', () => {
 
   context('Given API call for SOC nominal fails', () => {
     beforeEach(() => {
-      cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
       cy.task('stubGetSocNominalError')
       visitOverviewPage()
     })
@@ -937,7 +937,7 @@ context('Overview Page', () => {
 
   context('Given API call for Pathfinder nominal fails', () => {
     beforeEach(() => {
-      cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
       cy.task('stubGetPathfinderNominalError')
       visitOverviewPage()
     })
