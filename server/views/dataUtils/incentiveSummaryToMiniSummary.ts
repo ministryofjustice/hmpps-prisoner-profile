@@ -7,23 +7,10 @@ import { unavailablePlaceholder } from '../../utils/utils'
 import { Result } from '../../utils/result/result'
 
 export default (
-  incentiveSummary: Result<IncentiveSummary>,
+  incentiveSummary: Result<IncentiveSummary, Error>,
   prisonerNumber: string,
   prisonerDisplayName: string,
 ): MiniCardData => {
-  // if all values of incentiveSummary object are null return no data message
-  if (!Object.values(incentiveSummary).some(value => value !== null))
-    return {
-      heading: 'Incentives',
-      label: 'Since last review',
-      items: [
-        {
-          text: `${prisonerDisplayName} has no incentive level history`,
-        },
-      ],
-      linkLabel: 'Incentive level details',
-      linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
-    }
 
   // if api call failed.
   if (incentiveSummary.status === 'rejected')
@@ -35,6 +22,20 @@ export default (
           text: unavailablePlaceholder,
         },
       ],
+    }
+
+    // if all values of incentiveSummary object are null return no data message
+  if (!Object.values(incentiveSummary.getOrNull() || {}).some(value => value !== null))
+    return {
+      heading: 'Incentives',
+      label: 'Since last review',
+      items: [
+        {
+          text: `${prisonerDisplayName} has no incentive level history`,
+        },
+      ],
+      linkLabel: 'Incentive level details',
+      linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
     }
 
   const { positiveBehaviourCount, negativeBehaviourCount, nextReviewDate, daysOverdue } = incentiveSummary.getOrNull()
