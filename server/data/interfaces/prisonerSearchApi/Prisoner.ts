@@ -23,6 +23,8 @@ export default interface Prisoner {
   lastMovementReasonCode?: string
   inOutStatus?: 'IN' | 'OUT' | 'TRN'
   prisonId?: string
+  previousPrisonId?: string
+  previousPrisonLeavingDate?: string
   prisonName?: string
   cellLocation?: string
   aliases?: Alias[]
