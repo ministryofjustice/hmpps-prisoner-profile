@@ -138,8 +138,8 @@ export default class PersonalController {
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
-          personalPageData.physicalCharacteristics.leftEyeColour ===
-          personalPageData.physicalCharacteristics.rightEyeColour
+          personalPageData.physicalCharacteristics.getOrNull()?.leftEyeColour ===
+          personalPageData.physicalCharacteristics.getOrNull()?.rightEyeColour
             ? 'personal/eye-colour'
             : 'personal/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),

@@ -11,7 +11,6 @@ export default (
   prisonerNumber: string,
   prisonerDisplayName: string,
 ): MiniCardData => {
-
   // if api call failed.
   if (incentiveSummary.status === 'rejected')
     return {
@@ -24,7 +23,7 @@ export default (
       ],
     }
 
-    // if all values of incentiveSummary object are null return no data message
+  // if all values of incentiveSummary object are null return no data message
   if (!Object.values(incentiveSummary.getOrNull() || {}).some(value => value !== null))
     return {
       heading: 'Incentives',
