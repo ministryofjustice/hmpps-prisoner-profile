@@ -299,10 +299,13 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
-      this.getHealthAndMedication(token, prisonerNumber, {
-        dietAndAllergiesEnabled: getOptions.dietAndAllergyIsEnabled,
-        healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
-      }),
+      Result.wrap(
+        this.getHealthAndMedication(token, prisonerNumber, {
+          dietAndAllergiesEnabled: getOptions.dietAndAllergyIsEnabled,
+          healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
+        }),
+        getOptions.apiErrorCallback,
+      ),
       getOptions.personalRelationshipsApiReadEnabled
         ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback)
         : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
@@ -451,7 +454,7 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
-    healthAndMedication: HealthAndMedication,
+    healthAndMedication: Result<HealthAndMedication>,
     numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
     domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
   ): Promise<PersonalDetails> {
@@ -477,8 +480,8 @@ export default class PersonalPageService {
       return count
     }
 
-    const foodAllergyAndDietLatestUpdate = this.latestModificationDetails(healthAndMedication)
-    const lastUpdatedAgency = foodAllergyAndDietLatestUpdate.lastModifiedPrisonId
+    const foodAllergyAndDietLatestUpdate = healthAndMedication.map(this.latestModificationDetails).getOrNull()
+    const lastUpdatedAgency = foodAllergyAndDietLatestUpdate?.lastModifiedPrisonId
       ? await prison(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
       : null
 
@@ -534,14 +537,14 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      dietAndAllergy: {
-        foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
-        medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
-        personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
-        cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
-        lastModifiedAt: formatDate(foodAllergyAndDietLatestUpdate.lastModifiedAt),
+      dietAndAllergy: healthAndMedication.map(result => ({
+        foodAllergies: this.mapDietAndAllergy(result, 'foodAllergies'),
+        medicalDietaryRequirements: this.mapDietAndAllergy(result, 'medicalDietaryRequirements'),
+        personalisedDietaryRequirements: this.mapDietAndAllergy(result, 'personalisedDietaryRequirements'),
+        cateringInstructions: result?.dietAndAllergy?.cateringInstructions?.value ?? '',
+        lastModifiedAt: formatDate(foodAllergyAndDietLatestUpdate?.lastModifiedAt),
         lastModifiedPrison: lastUpdatedAgency?.prisonName ?? '',
-      },
+      })),
     }
   }
 
