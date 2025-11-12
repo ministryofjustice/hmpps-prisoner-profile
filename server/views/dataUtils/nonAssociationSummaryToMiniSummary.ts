@@ -5,7 +5,7 @@ import { unavailablePlaceholder } from '../../utils/utils'
 import config from '../../config'
 
 export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNumber: string): MiniSummaryData => {
-  if (nonAssociationSummary.status === 'fulfilled') {
+  if (nonAssociationSummary.isFulfilled()) {
     const { prisonName, prisonCount, otherPrisonsCount } = nonAssociationSummary.getOrNull()
     return {
       heading: 'Non-associations',

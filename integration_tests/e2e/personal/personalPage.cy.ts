@@ -805,7 +805,7 @@ context('When signed in', () => {
       page
         .contacts()
         .apiErrorMessage()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
+        .should('contain.text', 'This information is currently unavailable. Try again later.')
     })
   })
 })

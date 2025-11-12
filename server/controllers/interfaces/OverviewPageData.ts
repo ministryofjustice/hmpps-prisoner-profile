@@ -27,7 +27,7 @@ export default interface OverviewPageData {
   schedule: OverviewSchedule
   csraSummary: CsraSummary
   categorySummary: CategorySummary
-  incentiveSummary: IncentiveSummary | { error: true } | null
+  incentiveSummary: Result<IncentiveSummary>
   currentCsipDetail: Result<CurrentCsipDetail>
   statuses: OverviewStatus[]
   personalDetails: PersonalDetails

@@ -72,7 +72,6 @@ import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
 import { ApplicationInfo } from '../applicationInfo'
-import { isIncentiveSummaryError } from '../services/interfaces/incentivesService/IncentiveSummary'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
@@ -215,7 +214,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
-  njkEnv.addFilter('isIncentiveSummaryError', isIncentiveSummaryError)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)

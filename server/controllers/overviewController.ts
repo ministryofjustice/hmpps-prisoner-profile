@@ -115,7 +115,7 @@ export default class OverviewController {
         : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       isGranted(PrisonerIncentivesPermission.read, prisonerPermissions)
-        ? this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber)
+        ? Result.wrap(this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
