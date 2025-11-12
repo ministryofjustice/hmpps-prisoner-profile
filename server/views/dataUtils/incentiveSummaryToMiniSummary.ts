@@ -35,8 +35,6 @@ export default (
           text: unavailablePlaceholder,
         },
       ],
-      linkLabel: 'Incentive level details',
-      linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
     }
 
   const { positiveBehaviourCount, negativeBehaviourCount, nextReviewDate, daysOverdue } = incentiveSummary.getOrNull()

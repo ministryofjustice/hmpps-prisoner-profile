@@ -356,4 +356,24 @@ export default {
       path: `${baseUrl}/v2/person/${prisonerNumber}`,
       body: response,
     }),
+
+  stubGetPrisonerProfileSummaryError: ({
+    prisonerNumber,
+  }: {
+    prisonerNumber: string
+  }) => stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}/v2/person/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          error: 'Something went wrong',
+        },
+      },
+    }),
 }

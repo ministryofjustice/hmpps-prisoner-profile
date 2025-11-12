@@ -808,4 +808,67 @@ context('When signed in', () => {
         .should('contain.text', 'This information is currently unavailable. Try again later.')
     })
   })
+
+  context('Given API call to get prisoner summary from CPR proxy fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubGetPrisonerProfileSummaryError', { prisonerNumber })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays a page error banner and error message for appearance', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      page
+        .appearance()
+        .apiErrorMessage()
+        .should('contain.text', 'This information is currently unavailable. Try again later.')
+    })
+
+    it('Displays a page error banner and error message for addresses', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      page
+        .addresses()
+        .apiErrorMessage()
+        .should('contain.text', 'This information is currently unavailable. Try again later.')
+    })
+
+    it('Displays a page error banner and error message for global numbers and emails', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      cy.get('[data-qa=visible-global-numbers-and-email-addresses]')
+        .should('contain.text', 'This information is currently unavailable. Try again later.')
+    })
+
+    it('Displays an error message in place of the military history value', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      cy.get('[data-qa=military-records-api-error]').should('exist')
+    })
+    
+  })
+
+  context('Given API call to health and medication fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubHealthAndMedicationError', { prisonerNumber })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays an error message in place of the diet and allergy value', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      cy.get('[data-qa=health-and-medication-api-error]').should('exist')
+    })
+
+  })
 })
