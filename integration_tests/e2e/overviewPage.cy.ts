@@ -3,7 +3,7 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { calculateAge } from '../../server/utils/utils'
+import { calculateAge, unavailableApiErrorMessage } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import {
   mockContactDetailStaffContacts,
@@ -899,9 +899,8 @@ context('Overview Page', () => {
 
       overviewPage.offencesHeader().should('not.exist')
       nextCourtAppearance.location().should('contain.text', 'Test court location')
-      latestCalculation
-        .placeHolderText()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
+      cy.get('[data-qa=release-dates-unavailable]').should('exist')
+      latestCalculation.placeHolderText().should('contain.text', unavailableApiErrorMessage)
     })
   })
 

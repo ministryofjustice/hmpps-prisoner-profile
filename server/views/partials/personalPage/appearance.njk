@@ -61,6 +61,7 @@
 
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
     {% if physicalCharacteristics.isFulfilled() %}
+      {% set physicalCharacteristics = physicalCharacteristics.getOrNull() %}
       {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length or distinguishingMarks %}
       <div class="govuk-grid-row" data-qa="appearance">
           <div class="govuk-grid-column-full" data-qa="physical-characteristics">
