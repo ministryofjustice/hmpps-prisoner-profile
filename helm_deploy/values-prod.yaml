@@ -20,6 +20,7 @@ generic-service:
     targetCPUUtilizationPercentage: 1600
 
   env:
+    ENVIRONMENT: prod # k8s namespace suffix & github environment
     INGRESS_URL: 'https://prisoner.digital.prison.service.justice.gov.uk'
     HMPPS_AUTH_URL: 'https://sign-in.hmpps.service.justice.gov.uk/auth'
     TOKEN_VERIFICATION_API_URL: 'https://token-verification-api.prison.service.justice.gov.uk'

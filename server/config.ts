@@ -1,6 +1,7 @@
 import CircuitBreaker from 'opossum'
 import { AgentConfig, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 
+/** true in all k8s namespaces and in docker image */
 const production = process.env.NODE_ENV === 'production'
 
 const toBoolean = (value: unknown): boolean => {
@@ -353,6 +354,9 @@ export default {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  /** k8s namespace suffix & github environment or "local" */
+  environment: get('ENVIRONMENT', 'local', requiredInProduction) as 'local' | 'dev' | 'preprod' | 'prod',
+  /** Phase banner tag label (blank in prod namespace) */
   environmentName: get('ENVIRONMENT_NAME', ''),
   featureToggles: {
     appInsightsWebAnalyticsEnabledPrisons: get('APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS', []),

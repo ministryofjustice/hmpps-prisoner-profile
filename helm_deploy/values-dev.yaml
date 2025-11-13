@@ -19,7 +19,8 @@ generic-service:
       SecAction "id:900000,phase:1,nolog,pass,t:none,setvar:tx.paranoia_level=2"
 
   env:
-    ENVIRONMENT_NAME: "DEV"
+    ENVIRONMENT: dev        # k8s namespace suffix & github environment
+    ENVIRONMENT_NAME: "DEV" # Phase banner tag label
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
