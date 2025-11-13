@@ -848,8 +848,8 @@ context('Overview Page', () => {
     it('Displays a page error banner and highlights the failure in the card', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
-      // overviewPage.apiErrorBanner().should('exist') Why doesn't the banner show?
-      // overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
       cy.get('[data-qa=incentives-unavailable]').should('exist')
       overviewPage.incentivesCard().should('contain.text', 'Unavailable')
     })
