@@ -20,20 +20,6 @@
   }
 }
 
-.external-contacts-summary-2 {
-  height: calc(100% - 15px);
-
-  div.govuk-summary-list__row--no-border {
-    height: 100%;
-
-    & > div {
-      display: flex;
-      flex-direction: column;
-      height: calc(100% - 23px);
-    }
-  }
-}
-
 .mini-card-wrapper {
   display: flex;
   align-items: stretch;
