@@ -1,3 +1,4 @@
+import { ApolloClient, gql } from '@apollo/client'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   GlobalEmail,
@@ -72,6 +73,7 @@ import { religionFieldData } from '../controllers/personal/fieldData'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import AddressService from './addressService'
+import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 
 interface PersonalPageGetOptions {
   dietAndAllergyIsEnabled: boolean
@@ -81,6 +83,57 @@ interface PersonalPageGetOptions {
   healthAndMedicationApiReadEnabled: boolean
   personEndpointsEnabled: boolean
   apiErrorCallback: (error: Error) => void
+}
+
+interface ProfileGql {
+  offenderByPrisonerNumber: {
+    personalDetails: {
+      dateOfBirth: string
+      cityOrTownOfBirth?: string
+      nationality?: string
+      additionalNationalities?: string
+      sex?: string
+      sexualOrientation?: string
+      marriageOrCivilPartnershipStatus?: string
+      numberOfChildren?: string
+      typeOfDiet?: string
+      smokerOrVaper?: string
+      socialCareNeeded?: string
+      name: { firstName: string; middleNames?: string; lastName: string }
+      languages: {
+        interpreterRequired: boolean
+        written: string
+        spoken: string
+        secondary: {
+          code: string
+          description: string
+          canRead: boolean
+          canWrite: boolean
+          canSpeak: boolean
+        }[]
+      }
+      ethnicity: {
+        code: string
+        description: string
+      }
+      pseudonyms: {
+        personId: string
+        sourceSystemId: number
+        sourceSystem: string
+        prisonerNumber: string
+        firstName: string
+        middleName1?: string
+        middleName2?: string
+        lastName: string
+        dateOfBirth: string
+        sex: ReferenceDataValue
+        nameType: ReferenceDataValue
+        title: ReferenceDataValue
+        ethnicity: ReferenceDataValue
+        isWorkingName: boolean
+      }[]
+    }
+  }
 }
 
 export default class PersonalPageService {
@@ -98,6 +151,7 @@ export default class PersonalPageService {
     private readonly domesticStatusService: DomesticStatusService,
     private readonly globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService,
     private readonly addressService: AddressService,
+    private readonly profileGqlClientBuilder: (token: string) => ApolloClient,
   ) {}
 
   async getHealthAndMedication(
@@ -275,9 +329,11 @@ export default class PersonalPageService {
 
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
+    const profileGqlClient = this.profileGqlClientBuilder(token)
 
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
+      profileGql,
       inmateDetail,
       secondaryLanguages,
       property,
@@ -291,6 +347,68 @@ export default class PersonalPageService {
       personalRelationshipsNumberOfChildren,
       personalRelationshipsDomesticStatus,
     ] = await Promise.all([
+      profileGqlClient.query<ProfileGql, { prisonerNumber: string }>({
+        query: gql`
+          query ($prisonerNumber: String!) {
+            offenderByPrisonerNumber(id: $prisonerNumber) {
+              personalDetails {
+                additionalNationalities
+                cityOrTownOfBirth
+                dateOfBirth
+                marriageOrCivilPartnershipStatus
+                nationality
+                numberOfChildren
+                sex
+                sexualOrientation
+                smokerOrVaper
+                socialCareNeeded
+                typeOfDiet
+                name {
+                  firstName
+                  middleNames
+                  lastName
+                }
+                pseudonyms(includeWorkingName: false) {
+                  firstName
+                  lastName
+                  sex {
+                    description
+                  }
+                }
+                ethnicity {
+                  code
+                  description
+                }
+                languages {
+                  written
+                  spoken
+                  interpreterRequired
+                  secondary {
+                    code
+                    description
+                    canRead
+                    canSpeak
+                    canWrite
+                  }
+                }
+              }
+              contacts {
+                emails {
+                  id
+                  value
+                }
+                phones {
+                  id
+                  type
+                  value
+                  extension
+                }
+              }
+            }
+          }
+        `,
+        variables: { prisonerNumber },
+      }),
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
@@ -377,11 +495,11 @@ export default class PersonalPageService {
         personIntegrationApiClient,
         prisonerData,
         inmateDetail,
-        secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
         personalRelationshipsNumberOfChildren,
         personalRelationshipsDomesticStatus,
+        profileGql.data,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -452,27 +570,13 @@ export default class PersonalPageService {
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
-    secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: Result<HealthAndMedication>,
     numberOfChildren: Result<PersonalRelationshipsNumberOfChildrenDto>,
     domesticStatus: Result<PersonalRelationshipsDomesticStatusDto>,
+    profileGql: ProfileGql,
   ): Promise<PersonalDetails> {
-    const { profileInformation, physicalAttributes } = inmateDetail
-    const { ethnicity, raceCode: ethnicityCode } = physicalAttributes
-
-    const aliases = await this.aliases(personIntegrationApiClient, prisonerData)
-
-    let ethnicGroup = 'Not entered'
-    if (ethnicity) {
-      ethnicGroup = `${ethnicity}`
-      if (ethnicityCode) {
-        ethnicGroup += ` (${ethnicityCode})`
-      }
-    }
-
-    const nationality =
-      getProfileInformationValue(ProfileInformationType.Nationality, profileInformation) || 'Not entered'
+    const { profileInformation } = inmateDetail
 
     const formatNumberOfChildren = (count: string) => {
       if (count === null || count === undefined) return 'Not entered'
@@ -485,57 +589,73 @@ export default class PersonalPageService {
       ? await prison(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
       : null
 
+    const { personalDetails } = profileGql.offenderByPrisonerNumber
+
+    let ethnicGroup = 'Not entered'
+    if (personalDetails.ethnicity.description) {
+      ethnicGroup = `${personalDetails.ethnicity.description}`
+      if (personalDetails.ethnicity.code) {
+        ethnicGroup += ` (${personalDetails.ethnicity.code})`
+      }
+    }
+
     return {
-      age: calculateAge(inmateDetail.dateOfBirth),
-      aliases,
-      dateOfBirth: formatDate(inmateDetail.dateOfBirth, 'short'),
-      domesticAbusePerpetrator: getProfileInformationValue(
-        ProfileInformationType.DomesticAbusePerpetrator,
-        profileInformation,
-      ),
-      domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
-      cityOrTownOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
-      countryOfBirth: countryOfBirth ? convertToTitleCase(countryOfBirth) : 'Not entered',
-      ethnicGroup,
-      fullName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName),
-      languages: {
-        interpreterRequired: inmateDetail.interpreterRequired,
-        spoken: inmateDetail.language,
-        written: inmateDetail.writtenLanguage,
-      },
+      // START - GQL Spike data
+
+      age: calculateAge(personalDetails.dateOfBirth),
+      dateOfBirth: formatDate(personalDetails.dateOfBirth, 'short'),
+      cityOrTownOfBirth: personalDetails.cityOrTownOfBirth
+        ? convertToTitleCase(personalDetails.cityOrTownOfBirth)
+        : 'Not entered',
       marriageOrCivilPartnership:
+        // This could be handled in the API
         domesticStatus
           .map(status => status?.domesticStatusDescription)
           .getOrHandle(_e => {
-            // revert back to using Prisoner Search sourced data:
-            return prisonerData.maritalStatus
+            return personalDetails.marriageOrCivilPartnershipStatus
           }) || 'Not entered',
-      nationality,
+      fullName: formatName(
+        personalDetails.name.firstName,
+        personalDetails.name.middleNames,
+        personalDetails.name.lastName,
+      ),
+      nationality: personalDetails.nationality,
       numberOfChildren: formatNumberOfChildren(
         numberOfChildren
           .map(dto => dto?.numberOfChildren)
           .getOrHandle(_e => {
-            // revert back to using Prison API sourced data:
-            return getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation)
+            return personalDetails.numberOfChildren
           }),
       ),
-      otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
+      sex: personalDetails.sex,
+      sexualOrientation: personalDetails.sexualOrientation,
+      languages: {
+        interpreterRequired: personalDetails.languages.interpreterRequired,
+        spoken: personalDetails.languages.spoken,
+        written: personalDetails.languages.written,
+      },
+      otherLanguages: personalDetails.languages.secondary.map(({ description, canRead, canSpeak, canWrite, code }) => ({
         language: description,
         code,
         canRead,
         canSpeak,
         canWrite,
       })),
-      otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
+      aliases: this.aliases(profileGql),
+      otherNationalities: personalDetails.additionalNationalities,
+      typeOfDiet: personalDetails.typeOfDiet,
+      smokerOrVaper: this.mapSmokerVaper(personalDetails.smokerOrVaper) || 'Not entered',
+      socialCareNeeded: personalDetails.socialCareNeeded,
+      // END - GQL Spike data
+
+      domesticAbusePerpetrator: getProfileInformationValue(
+        ProfileInformationType.DomesticAbusePerpetrator,
+        profileInformation,
+      ),
+      domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
+      countryOfBirth: countryOfBirth ? convertToTitleCase(countryOfBirth) : 'Not entered',
+      ethnicGroup,
       religionOrBelief: await this.formatReligion(token, inmateDetail.religion),
-      sex: prisonerData.gender,
-      sexualOrientation:
-        getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
-      smokerOrVaper:
-        this.mapSmokerVaper(getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation)) ||
-        'Not entered',
-      socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
-      typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
       dietAndAllergy: healthAndMedication.map(result => ({
         foodAllergies: this.mapDietAndAllergy(result, 'foodAllergies'),
@@ -560,9 +680,8 @@ export default class PersonalPageService {
     return override ? (override.description ?? religion) : religion
   }
 
-  private aliases = async (personIntegrationApiClient: PersonIntegrationApiClient, prisonerData: Prisoner) => {
-    const pseudonyms = await personIntegrationApiClient.getPseudonyms(prisonerData.prisonerNumber)
-    return pseudonyms
+  private aliases = (profileGql: ProfileGql) => {
+    return profileGql.offenderByPrisonerNumber.personalDetails.pseudonyms
       .filter(pseudonym => !pseudonym.isWorkingName)
       .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth, sex }) => ({
         alias: formatName(firstName, [middleName1, middleName2].join(' ').trim(), lastName),

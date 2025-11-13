@@ -168,6 +168,7 @@ describe('PersonalPageService', () => {
       domesticStatusService,
       globalPhoneNumberAndEmailAddressesService,
       addressService,
+      () => null
     )
 
   describe('Getting information from the Prison API', () => {

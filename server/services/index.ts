@@ -211,6 +211,24 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     metricsService,
   )
+
+  const profileGqlCache = new InMemoryCache()
+  const profileGqlClient = (token: string) =>
+    new ApolloClient({
+      cache: profileGqlCache,
+      link: new HttpLink({
+        uri: `http://localhost:8080/graphql`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      ssrMode: true,
+      defaultOptions: {
+        watchQuery: {
+          fetchPolicy: 'network-only',
+        },
+      },
+    })
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
@@ -225,6 +243,7 @@ export const services = () => {
     domesticStatusService,
     globalPhoneNumberAndEmailAddressesService,
     addressService,
+    profileGqlClient,
   )
 
   const apolloClient = new ApolloClient({
@@ -243,6 +262,7 @@ export const services = () => {
     },
   })
   const contentfulService = new ContentfulService(apolloClient)
+
 
   return {
     dataAccess,
