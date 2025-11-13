@@ -153,6 +153,7 @@ export default class PersonalController {
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
+        useCustomErrorBanner: true,
       })
     }
   }

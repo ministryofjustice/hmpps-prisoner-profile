@@ -196,7 +196,7 @@ export default class OverviewController {
       actionsMayBeMissing: !(socNominal.isFulfilled() && pathfinderNominal.isFulfilled()),
     }
 
-    res.render('pages/overviewPage', viewData)
+    res.render('pages/overviewPage', { ...viewData, useCustomErrorBanner: true })
   }
 
   private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
