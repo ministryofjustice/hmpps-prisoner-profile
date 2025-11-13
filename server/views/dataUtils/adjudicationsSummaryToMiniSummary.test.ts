@@ -1,7 +1,7 @@
 import adjudicationsSummaryToMiniSummary from './adjudicationsSummaryToMiniSummary'
 import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 import { Result } from '../../utils/result/result'
-import { apiErrorMessage, unavailablePlaceholder } from '../../utils/utils'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 describe('adjudicationsSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {

@@ -1,6 +1,6 @@
 import nonAssociationSummaryToMiniSummary from './nonAssociationSummaryToMiniSummary'
 import { Result } from '../../utils/result/result'
-import { apiErrorMessage, unavailablePlaceholder } from '../../utils/utils'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 describe('nonAssociationSummaryToMiniSummary', () => {
   const prisonerNumber = 'A1234BC'

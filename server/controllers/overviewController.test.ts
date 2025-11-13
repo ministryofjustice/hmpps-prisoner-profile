@@ -397,7 +397,7 @@ describe('overviewController', () => {
         expect.objectContaining({
           incentiveSummary: expect.objectContaining({
             status: 'fulfilled',
-            value:  {
+            value: {
               positiveBehaviourCount: 1,
               negativeBehaviourCount: 1,
               nextReviewDate: '2026-01-01',

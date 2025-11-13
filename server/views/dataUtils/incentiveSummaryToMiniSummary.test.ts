@@ -13,7 +13,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(Result.fulfilled(incentiveSummary), prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -37,7 +41,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(Result.fulfilled(incentiveSummary), prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -61,7 +69,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(Result.fulfilled(incentiveSummary), prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -74,7 +86,11 @@ describe('incentiveSummaryToMiniSummary', () => {
   it('should return a mini summary object with error message if incentiveSummary is an error', () => {
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(Result.rejected(new Error('error')), prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.rejected(new Error('error')),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',

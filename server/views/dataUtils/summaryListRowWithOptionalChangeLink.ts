@@ -1,6 +1,5 @@
-import logger from "../../../logger"
-import { Result } from "../../utils/result/result"
-import { unavailableApiErrorMessage } from "../../utils/utils"
+import { Result } from '../../utils/result/result'
+import { unavailableApiErrorMessage } from '../../utils/utils'
 
 interface Options {
   changeLinkEnabled?: boolean
@@ -36,7 +35,7 @@ export const listToSummaryListRows = (
 }
 
 const isResult = (value: unknown): value is Result<string> =>
-  typeof value === 'object' && value !== null && 'isFulfilled' in value;
+  typeof value === 'object' && value !== null && 'isFulfilled' in value
 
 const summaryListRowWithOptionalChangeLink = (
   key: string,
@@ -48,13 +47,11 @@ const summaryListRowWithOptionalChangeLink = (
   actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
   classes: string
 } => {
-  
-  const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string);
+  const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string)
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
   const valueResult = (): { text?: string; html?: string } => {
-
     if (!valueAsResult.isFulfilled()) {
       const errorHtml = `<p class="hmpps-api-error-inset">${unavailableApiErrorMessage}</p>`
       if (options.dataQa) {

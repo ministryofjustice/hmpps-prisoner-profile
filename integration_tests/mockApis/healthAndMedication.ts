@@ -78,11 +78,7 @@ export default {
       },
     }),
 
-  stubHealthAndMedicationError: ({
-    prisonerNumber,
-  }: {
-    prisonerNumber: string
-  }) =>
+  stubHealthAndMedicationError: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubFor({
       request: {
         method: 'GET',

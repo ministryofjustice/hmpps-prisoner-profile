@@ -357,11 +357,8 @@ export default {
       body: response,
     }),
 
-  stubGetPrisonerProfileSummaryError: ({
-    prisonerNumber,
-  }: {
-    prisonerNumber: string
-  }) => stubFor({
+  stubGetPrisonerProfileSummaryError: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubFor({
       request: {
         method: 'GET',
         urlPattern: `${baseUrl}/v2/person/${prisonerNumber}`,

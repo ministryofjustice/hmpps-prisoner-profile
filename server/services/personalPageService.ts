@@ -343,15 +343,15 @@ export default class PersonalPageService {
     let globalNumbersAndEmails: Result<GlobalNumbersAndEmails, Error>
     let physicalAttributes: Result<CorePersonPhysicalAttributes, Error>
     if (getOptions.personEndpointsEnabled) {
-
-      const profileSummary = await Result.wrap(personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber), getOptions.apiErrorCallback)
+      const profileSummary = await Result.wrap(
+        personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber),
+        getOptions.apiErrorCallback,
+      )
 
       addresses = await profileSummary.handle({
         fulfilled: async summary =>
           Result.wrap(
-            getOptions.editProfileEnabled
-              ? this.addressService.transformAddresses(token, summary.addresses)
-              : null,
+            getOptions.editProfileEnabled ? this.addressService.transformAddresses(token, summary.addresses) : null,
             getOptions.apiErrorCallback,
           ),
         rejected: async err => Result.rejected<AddressForDisplay[], Error>(err),
@@ -367,36 +367,50 @@ export default class PersonalPageService {
           ),
         rejected: async err => Result.rejected<GlobalNumbersAndEmails, Error>(err),
       })
-
-      ;[distinguishingMarks, militaryRecords, physicalAttributes] =
-        await Promise.all([
-          profileSummary.map(summary => getOptions.editProfileEnabled ? summary.distinguishingMarks : null),
-          profileSummary.map(summary => militaryHistoryEnabled() ? summary.militaryRecords : null),
-          profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
-        ])
-
+      ;[distinguishingMarks, militaryRecords, physicalAttributes] = await Promise.all([
+        profileSummary.map(summary => (getOptions.editProfileEnabled ? summary.distinguishingMarks : null)),
+        profileSummary.map(summary => (militaryHistoryEnabled() ? summary.militaryRecords : null)),
+        profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
+      ])
     } else {
       ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
         await Promise.all([
-          Result.wrap(getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null, getOptions.apiErrorCallback),
-          Result.wrap(getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null, getOptions.apiErrorCallback),
-          Result.wrap(militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null, getOptions.apiErrorCallback),
+          Result.wrap(
+            getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
+            getOptions.apiErrorCallback,
+          ),
+          Result.wrap(
+            getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
+            getOptions.apiErrorCallback,
+          ),
+          Result.wrap(
+            militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
+            getOptions.apiErrorCallback,
+          ),
           Result.wrap(this.getPhysicalAttributes(token, prisonerNumber), getOptions.apiErrorCallback),
-          Result.wrap(getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null, getOptions.apiErrorCallback),
+          Result.wrap(
+            getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
+            getOptions.apiErrorCallback,
+          ),
         ])
     }
 
     const oldAddresses: OldAddresses = !getOptions.editProfileEnabled && this.oldAddresses(oldAddressList)
 
-    const addressResponseResult: Result<SummarisedAddresses, Error> = addresses.map( addressesForDisplay => { return {
+    const addressResponseResult: Result<SummarisedAddresses, Error> = addresses.map(addressesForDisplay => {
+      return {
         primaryOrPostal: addressesForDisplay?.filter(address => address.primaryAddress || address.postalAddress),
-        totalActive: addressesForDisplay?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
-      }}
-    )
+        totalActive:
+          addressesForDisplay?.filter(address => !address.toDate || new Date(address.toDate) > new Date())?.length || 0,
+      }
+    })
 
     let countryOfBirth: Result<string, Error> = Result.fulfilled(null)
     if (inmateDetail.birthCountryCode) {
-      const refData = await Result.wrap(this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode), getOptions.apiErrorCallback)
+      const refData = await Result.wrap(
+        this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode),
+        getOptions.apiErrorCallback,
+      )
       countryOfBirth = refData.map(data => data.description)
     }
 
@@ -521,7 +535,7 @@ export default class PersonalPageService {
       ),
       domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
       cityOrTownOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
-      countryOfBirth: countryOfBirth.map(country => country ? convertToTitleCase(country) : 'Not entered'),
+      countryOfBirth: countryOfBirth.map(country => (country ? convertToTitleCase(country) : 'Not entered')),
       ethnicGroup,
       fullName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName),
       languages: {
@@ -772,7 +786,7 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     physicalAttributesResult: Result<CorePersonPhysicalAttributes>,
   ): Result<PhysicalCharacteristics> {
-    return physicalAttributesResult.map(physicalAttributes => { 
+    return physicalAttributesResult.map(physicalAttributes => {
       return {
         height: formatHeight(physicalAttributes.height),
         weight: formatWeight(physicalAttributes.weight),

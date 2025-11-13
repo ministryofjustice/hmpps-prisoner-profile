@@ -161,7 +161,12 @@ export default class OverviewController {
       schedule,
       incentiveSummary,
       overviewActions,
-      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal.getOrNull(), socNominal.getOrNull(), prisonerPermissions),
+      overviewInfoLinks: buildOverviewInfoLinks(
+        prisonerData,
+        pathfinderNominal.getOrNull(),
+        socNominal.getOrNull(),
+        prisonerPermissions,
+      ),
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,

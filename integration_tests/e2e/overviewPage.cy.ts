@@ -771,11 +771,7 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
       cy.get('[data-qa=staff-contacts-unavailable]').should('exist')
-      overviewPage
-        .staffContacts()
-        .contains('dt', 'Key worker')
-        .next()
-        .should('contain.text', 'Unavailable')
+      overviewPage.staffContacts().contains('dt', 'Key worker').next().should('contain.text', 'Unavailable')
     })
   })
 
@@ -794,15 +790,10 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage
-        .nonAssociationsCard()
-        .should('contain.text', 'Unavailable')
+      overviewPage.nonAssociationsCard().should('contain.text', 'Unavailable')
 
       cy.get('[data-qa=mini-summary-unavailable]').should('exist')
-      overviewPage.nonAssociationsCard()
-        .find('a')
-        .contains('Non-associations')
-        .should('not.exist');
+      overviewPage.nonAssociationsCard().find('a').contains('Non-associations').should('not.exist')
     })
   })
 
@@ -841,10 +832,7 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
       cy.get('[data-qa=external-contacts-unavailable]').should('exist')
-      overviewPage
-        .externalContacts()
-        .card()
-        .should('contain.text', 'Unavailable')
+      overviewPage.externalContacts().card().should('contain.text', 'Unavailable')
     })
   })
 
@@ -863,9 +851,7 @@ context('Overview Page', () => {
       // overviewPage.apiErrorBanner().should('exist') Why doesn't the banner show?
       // overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
       cy.get('[data-qa=incentives-unavailable]').should('exist')
-      overviewPage
-        .incentivesCard()
-        .should('contain.text', 'Unavailable')
+      overviewPage.incentivesCard().should('contain.text', 'Unavailable')
     })
   })
 
@@ -874,7 +860,7 @@ context('Overview Page', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      cy.task('stubAdjudicationsError', 1102484 )
+      cy.task('stubAdjudicationsError', 1102484)
       visitOverviewPage()
     })
 
@@ -884,9 +870,7 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
       cy.get('[data-qa=mini-summary-unavailable]').should('exist')
-      overviewPage
-        .adjudicationsSummary()
-        .should('contain.text', 'Unavailable')
+      overviewPage.adjudicationsSummary().should('contain.text', 'Unavailable')
     })
   })
 
