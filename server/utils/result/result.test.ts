@@ -156,4 +156,31 @@ describe('result', () => {
       ).toEqual({ mapped: error })
     })
   })
+
+  describe('Result.mapAsync', () => {
+    describe('mapping a fulfilled result', () => {
+      it('handles a fulfilled promise', async () => {
+        const result = await Result.fulfilled(1).mapAsync(value => Promise.resolve(value + 1))
+
+        expect(result.getOrThrow()).toEqual(2)
+      })
+
+      it('handles a rejected promise', async () => {
+        const result = await Result.fulfilled(1).mapAsync(_ => Promise.reject(error))
+
+        expect(result.getOrThrow).toThrow(error)
+      })
+    })
+
+    describe('mapping a rejected result', () => {
+      it('does not call the async method', async () => {
+        const someFunction: (n: number) => Promise<number> = jest.fn()
+
+        const result = await Result.rejected(error).mapAsync(someFunction)
+
+        expect(result.getOrThrow).toThrow(error)
+        expect(someFunction).not.toHaveBeenCalled()
+      })
+    })
+  })
 })
