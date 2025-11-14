@@ -20,4 +20,21 @@ export default {
       },
     })
   },
+  stubGetReviewsError: ({ prisonerNumber }: { prisonerNumber: string }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/incentives/incentive-reviews/prisoner/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          error: 'Something went wrong',
+        },
+      },
+    })
+  },
 }

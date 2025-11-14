@@ -1,5 +1,7 @@
 import incentiveSummaryToMiniSummary from './incentiveSummaryToMiniSummary'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
+import { unavailablePlaceholder } from '../../utils/utils'
+import { Result } from '../../utils/result/result'
 
 describe('incentiveSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
@@ -11,7 +13,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -35,7 +41,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -59,7 +69,11 @@ describe('incentiveSummaryToMiniSummary', () => {
     }
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled(incentiveSummary),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
@@ -72,13 +86,19 @@ describe('incentiveSummaryToMiniSummary', () => {
   it('should return a mini summary object with error message if incentiveSummary is an error', () => {
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
-    const miniSummary = incentiveSummaryToMiniSummary({ error: true }, prisonerNumber, prisonerDisplayName)
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.rejected(new Error('error')),
+      prisonerNumber,
+      prisonerDisplayName,
+    )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
       label: 'Since last review',
-      items: [{ text: 'We cannot show these details right now' }],
-      linkLabel: 'Incentive level details',
-      linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
+      items: [
+        {
+          text: unavailablePlaceholder,
+        },
+      ],
     })
   })
 })

@@ -11,38 +11,31 @@ export default class IncentivesService {
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
   ) {}
 
-  async getIncentiveOverview(clientToken: string, prisonerNumber: string): Promise<IncentiveSummary | { error: true }> {
+  async getIncentiveOverview(clientToken: string, prisonerNumber: string): Promise<IncentiveSummary> {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(clientToken)
     const incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
+    const incentiveReviews = await incentivesApiClient.getReviews(prisonerNumber)
 
-    // TODO use the RESULT type for this
-    try {
-      const incentiveReviews = await incentivesApiClient.getReviews(prisonerNumber)
+    if (!incentiveReviews)
+      return { positiveBehaviourCount: null, negativeBehaviourCount: null, nextReviewDate: null, daysOverdue: null }
 
-      if (!incentiveReviews)
-        return { positiveBehaviourCount: null, negativeBehaviourCount: null, nextReviewDate: null, daysOverdue: null }
+    const startDate = incentiveReviews?.iepDate
+      ? formatDateTimeISO(new Date(incentiveReviews?.iepDate), { startOfDay: true })
+      : undefined
 
-      const startDate = incentiveReviews?.iepDate
-        ? formatDateTimeISO(new Date(incentiveReviews?.iepDate), { startOfDay: true })
-        : undefined
+    const { positiveBehaviourCount, negativeBehaviourCount } = await caseNotesApiClient.getIncentivesCaseNoteCount(
+      prisonerNumber,
+      startDate,
+      formatDateTimeISO(new Date(), { endOfDay: true }),
+    )
 
-      const { positiveBehaviourCount, negativeBehaviourCount } = await caseNotesApiClient.getIncentivesCaseNoteCount(
-        prisonerNumber,
-        startDate,
-        formatDateTimeISO(new Date(), { endOfDay: true }),
-      )
-
-      return {
-        positiveBehaviourCount,
-        negativeBehaviourCount,
-        nextReviewDate: incentiveReviews?.nextReviewDate,
-        daysOverdue: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-          ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
-          : undefined,
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_error) {
-      return { error: true }
+    return {
+      positiveBehaviourCount,
+      negativeBehaviourCount,
+      nextReviewDate: incentiveReviews?.nextReviewDate,
+      daysOverdue: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+        ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
+        : undefined,
     }
   }
 }

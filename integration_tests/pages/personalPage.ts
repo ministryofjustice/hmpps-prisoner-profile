@@ -96,6 +96,7 @@ export default class PersonalPage extends Page {
     const primaryAndPostalAddress = () => cy.get('#hmpps-address-primary-and-postal')
     const summaryListValues = () => primaryAndPostalAddress().find('.govuk-summary-list__value')
     return {
+      apiErrorMessage: () => cy.get('[data-qa=addresses-api-error]'),
       addressHeading: () => primaryAndPostalAddress().get('span'),
       address: () => primaryAndPostalAddress().get('p'),
       addressTypes: () => summaryListValues().eq(0),
@@ -147,6 +148,7 @@ export default class PersonalPage extends Page {
     const physicalCharacteristic = (row: number) =>
       cardData().getDataQa('physical-characteristics').find('.govuk-summary-list__value').eq(row)
     return {
+      apiErrorMessage: () => cy.get('[data-qa=appearance-api-error]'),
       height: () => physicalCharacteristic(0),
       weight: () => physicalCharacteristic(1),
       hairColour: () => physicalCharacteristic(2),

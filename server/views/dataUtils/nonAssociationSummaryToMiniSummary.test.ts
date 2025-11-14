@@ -1,6 +1,6 @@
 import nonAssociationSummaryToMiniSummary from './nonAssociationSummaryToMiniSummary'
 import { Result } from '../../utils/result/result'
-import { apiErrorMessage } from '../../utils/utils'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 describe('nonAssociationSummaryToMiniSummary', () => {
   const prisonerNumber = 'A1234BC'
@@ -33,11 +33,12 @@ describe('nonAssociationSummaryToMiniSummary', () => {
     const miniSummary = nonAssociationSummaryToMiniSummary(Result.rejected(error), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Non-associations',
-      bottomLabel: null,
-      bottomContentLine1: apiErrorMessage,
+      topLabel: `In establishment`,
+      topContent: unavailablePlaceholder,
+      topClass: 'small',
+      bottomLabel: 'In other establishments',
+      bottomContentLine1: unavailablePlaceholder,
       bottomClass: 'small',
-      linkLabel: 'Non-associations',
-      linkHref: `http://localhost:3001/prisoner/A1234BC/non-associations`,
     })
   })
 })

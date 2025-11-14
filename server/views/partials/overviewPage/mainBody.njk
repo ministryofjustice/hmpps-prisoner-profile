@@ -32,7 +32,7 @@
       {% endif %}
       {% if nonAssociationSummary %}
         <div class="govuk-grid-column-one-third">
-          {{ miniSummaryMacro(nonAssociationSummary | toNonAssociationSummaryDisplay(prisonerNumber)) }}
+          {{ miniSummaryMacro(nonAssociationSummary | toNonAssociationSummaryDisplay(prisonerNumber), nonAssociationSummary.status != 'fulfilled') }}
         </div>
       {% endif %}
     </div>
@@ -57,12 +57,12 @@
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
     {% if adjudicationSummary %}
         <div class="govuk-grid-column-one-half" data-qa="adjudications-summary">
-            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber)) }}
+            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber), adjudicationSummary.status != 'fulfilled') }}
         </div>
     {% endif %}
     {% if incentiveSummary %}
         <div class="govuk-grid-column-one-half">
-            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives') }}
+            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
         </div>
     {% endif %}
 </div>

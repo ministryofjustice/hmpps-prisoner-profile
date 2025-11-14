@@ -1,6 +1,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+{% set distinguishingMarks = distinguishingMarks.getOrNull() %}
+
 {% set groupedDistinguishingMarks = distinguishingMarks | groupDistinguishingMarks %}
 {% set highlightConfig = groupedDistinguishingMarks.highlights %}
 

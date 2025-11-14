@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block beforeContent %}
-  {% if pageHasApiErrors %}
+  {% if pageHasApiErrors and not useCustomErrorBanner %}
     <div class="hmpps-api-error-banner">
       <p>Sorry, there is a problem with the service</p>
       <p>Some information on this page may be unavailable. Try again later.</p>

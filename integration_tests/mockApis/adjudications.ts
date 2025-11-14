@@ -35,4 +35,21 @@ export default {
       },
     })
   },
+  stubAdjudicationsError: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/adjudications/adjudications/by-booking-id/${bookingId}`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          error: 'Something went wrong',
+        },
+      },
+    })
+  },
 }

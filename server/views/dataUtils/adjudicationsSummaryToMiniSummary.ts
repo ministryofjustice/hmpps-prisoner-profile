@@ -3,7 +3,7 @@ import { pluralise } from '../../utils/pluralise'
 import config from '../../config'
 import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 import { Result } from '../../utils/result/result'
-import { apiErrorMessage } from '../../utils/utils'
+import { unavailablePlaceholder } from '../../utils/utils'
 
 export default (adjudicationSummary: Result<AdjudicationsOverviewSummary>, prisonerNumber: string): MiniSummaryData => {
   if (adjudicationSummary.status === 'fulfilled') {
@@ -28,10 +28,11 @@ export default (adjudicationSummary: Result<AdjudicationsOverviewSummary>, priso
 
   return {
     heading: 'Adjudications',
-    bottomLabel: null,
-    bottomContentLine1: apiErrorMessage,
+    topLabel: 'Proven in last 3 months',
+    topContent: unavailablePlaceholder,
+    topClass: 'small',
+    bottomLabel: 'Active',
+    bottomContentLine1: unavailablePlaceholder,
     bottomClass: 'small',
-    linkLabel: 'Adjudication history',
-    linkHref: `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`,
   }
 }

@@ -70,12 +70,5 @@ describe('prisonerScheduleService', () => {
         positiveBehaviourCount: 2,
       })
     })
-
-    it('should return error object if api errors', async () => {
-      incentivesApiClient.getReviews = jest.fn().mockRejectedValue('error')
-
-      const result = await service.getIncentiveOverview('token', 'A1234AB')
-      expect(result).toEqual({ error: true })
-    })
   })
 })

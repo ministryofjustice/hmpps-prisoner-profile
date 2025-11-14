@@ -610,6 +610,7 @@ describe('professionalContactsService', () => {
       })
 
       expect(result).toEqual({
+        callFailed: false,
         cuspOfficer: 'Mike Tester',
         cuspOfficerBackup: 'Katie Testing',
         youthJusticeWorker: 'Emma Justice',

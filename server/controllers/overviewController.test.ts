@@ -395,12 +395,15 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          incentiveSummary: {
-            positiveBehaviourCount: 1,
-            negativeBehaviourCount: 1,
-            nextReviewDate: '2026-01-01',
-            daysOverdue: undefined,
-          },
+          incentiveSummary: expect.objectContaining({
+            status: 'fulfilled',
+            value: {
+              positiveBehaviourCount: 1,
+              negativeBehaviourCount: 1,
+              nextReviewDate: '2026-01-01',
+              daysOverdue: undefined,
+            },
+          }),
         }),
       )
     })

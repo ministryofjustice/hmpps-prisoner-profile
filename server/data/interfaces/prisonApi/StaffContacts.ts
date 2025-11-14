@@ -13,6 +13,7 @@ export default interface StaffContacts {
 }
 
 export interface YouthStaffContacts {
+  callFailed: boolean
   cuspOfficer: string | null
   cuspOfficerBackup: string | null
   youthJusticeWorker: string | null

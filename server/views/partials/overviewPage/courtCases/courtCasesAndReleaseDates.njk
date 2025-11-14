@@ -64,7 +64,9 @@
           <p>There are no release dates calculated for {{ prisonerDisplayName }}</p>
         {% endif %}
       {% else %}
-        <p>{{ standardApiErrorText }}</p>
+        <p class="hmpps-api-error-inset" data-qa="release-dates-unavailable">
+            {{ unavailableApiErrorText }}
+        </p>
       {% endif %}
     </div>
 

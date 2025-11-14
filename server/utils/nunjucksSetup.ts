@@ -31,6 +31,8 @@ import {
   summaryListOneHalfWidth,
   toFullCourtLink,
   toNonAssociationRows,
+  unavailableApiErrorMessage,
+  unavailablePlaceholder,
   userHasRoles,
 } from './utils'
 import { pluralise } from './pluralise'
@@ -124,6 +126,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
   njkEnv.addGlobal('standardApiErrorText', apiErrorMessage)
+  njkEnv.addGlobal('unavailableApiErrorText', unavailableApiErrorMessage)
+  njkEnv.addGlobal('unavailablePlaceholderText', unavailablePlaceholder)
   njkEnv.addGlobal('placeholderPrisonerImageUrl', '/assets/images/prisoner-profile-image.png')
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
