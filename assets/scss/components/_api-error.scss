@@ -20,3 +20,18 @@
     margin-top: 0;
   }
 }
+
+.hmpps-action-api-error-inset {
+  padding: 4px 8px 4px 8px;
+  border-left: 5px solid govuk-colour('red');
+  margin: 16px;
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.hmpps-api-error-inset {
+  padding: 4px 8px 4px 8px;
+  border-left: 5px solid govuk-colour('red');
+  margin-bottom: 4px;
+  font-size: 16px;
+}

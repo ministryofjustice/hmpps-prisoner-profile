@@ -1,11 +1,11 @@
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import { Result } from '../../utils/result/result'
-import { apiErrorMessage } from '../../utils/utils'
+import { unavailablePlaceholder } from '../../utils/utils'
 import config from '../../config'
 
 export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNumber: string): MiniSummaryData => {
-  if (nonAssociationSummary.status === 'fulfilled') {
+  if (nonAssociationSummary.isFulfilled()) {
     const { prisonName, prisonCount, otherPrisonsCount } = nonAssociationSummary.getOrNull()
     return {
       heading: 'Non-associations',
@@ -22,10 +22,11 @@ export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNu
 
   return {
     heading: 'Non-associations',
-    bottomLabel: null,
-    bottomContentLine1: apiErrorMessage,
+    topLabel: `In establishment`,
+    topContent: unavailablePlaceholder,
+    topClass: 'small',
+    bottomLabel: 'In other establishments',
+    bottomContentLine1: unavailablePlaceholder,
     bottomClass: 'small',
-    linkLabel: 'Non-associations',
-    linkHref: `${config.serviceUrls.nonAssociations}/prisoner/${prisonerNumber}/non-associations`,
   }
 }

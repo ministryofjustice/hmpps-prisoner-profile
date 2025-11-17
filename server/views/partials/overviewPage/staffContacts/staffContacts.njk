@@ -5,6 +5,8 @@
     <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
         <div class="govuk-grid-column-full">
 
+            {% set staffContactsMissing = false %}
+
             {% set keyWorkerHtml %}
                 <p class="govuk-body" data-qa="keyworker-details">
                     {% if staffContacts.keyWorker.status === 'fulfilled' %}
@@ -16,7 +18,8 @@
                             - No previous session
                         {% endif %}
                     {% else %}
-                        {{ standardApiErrorText }}
+                        {{ unavailablePlaceholderText }}
+                        {% set staffContactsMissing = true %}
                     {% endif %}
                 </p>
             {% endset %}
@@ -27,45 +30,58 @@
           {% else %}
             {% set keyWorkerEnabled = true %}
             {% set personalOfficerEnabled = true %}
+            {% set staffContactsMissing = true %}
           {% endif %}
 
           {% if staffContacts.keyWorker.status === 'fulfilled' %}
             {% set keyWorker = staffContacts.keyWorker.value %}
           {% else %}
-            {% set keyWorker = standardApiErrorText %}
+            {% set keyWorker = unavailablePlaceholderText %}
+            {% set staffContactsMissing = true %}
           {% endif %}
 
           {% if staffContacts.personalOfficer.status === 'fulfilled' %}
             {% set personalOfficer = staffContacts.personalOfficer.value %}
           {% else %}
-            {% set personalOfficer = standardApiErrorText %}
+            {% set personalOfficer = unavailablePlaceholderText %}
+            {% set staffContactsMissing = true %}
           {% endif %}
 
           {% if staffContacts.lastSession.status === 'fulfilled' %}
             {% set lastSession = staffContacts.lastSession.value %}
           {% else %}
-            {% set lastSession = standardApiErrorText %}
+            {% set lastSession = unavailablePlaceholderText %}
+            {% set staffContactsMissing = true %}
           {% endif %}
 
           {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
                 {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
             {% else %}
-                {% set communityOffenderManager = standardApiErrorText %}
+                {% set communityOffenderManager = unavailablePlaceholderText %}
+                {% set staffContactsMissing = true %}
             {% endif %}
 
             {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
                 {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
             {% else %}
-                {% set prisonOffenderManager = standardApiErrorText %}
+                {% set prisonOffenderManager = unavailablePlaceholderText %}
+                {% set staffContactsMissing = true %}
             {% endif %}
 
             {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
                 {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
             {% else %}
-                {% set coworkingPrisonOffenderManager = standardApiErrorText %}
+                {% set coworkingPrisonOffenderManager = unavailablePlaceholderText %}
+                {% set staffContactsMissing = true %}
             {% endif %}
 
             {% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}
+
+            {% if staffContactsMissing %}
+                <p class="hmpps-api-error-inset" data-qa="staff-contacts-unavailable">
+                    {{ unavailableApiErrorText }}
+                </p>
+            {% endif %}
 
             {{ govukSummaryList({
                 classes: 'govuk-summary-list--no-border',

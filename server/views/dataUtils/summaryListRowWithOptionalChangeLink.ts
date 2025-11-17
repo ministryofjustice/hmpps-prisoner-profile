@@ -1,3 +1,6 @@
+import { isResult, Result } from '../../utils/result/result'
+import { unavailableApiErrorMessage } from '../../utils/utils'
+
 interface Options {
   changeLinkEnabled?: boolean
   changeText?: string
@@ -24,7 +27,7 @@ const defaultOptions: Options = {
 export const listToSummaryListRows = (
   items: {
     key: string
-    value: string
+    value: string | Result<string>
     options?: Options
   }[],
 ) => {
@@ -33,7 +36,7 @@ export const listToSummaryListRows = (
 
 const summaryListRowWithOptionalChangeLink = (
   key: string,
-  value: string,
+  value: string | Result<string>,
   opts: Options = {},
 ): {
   key: { html?: string; text?: string }
@@ -41,23 +44,34 @@ const summaryListRowWithOptionalChangeLink = (
   actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
   classes: string
 } => {
+  const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string)
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
   const valueResult = (): { text?: string; html?: string } => {
-    const isNotEntered = typeof value === 'string' && value.includes('Not entered')
+    if (!valueAsResult.isFulfilled()) {
+      const errorHtml = `<p class="hmpps-api-error-inset">${unavailableApiErrorMessage}</p>`
+      if (options.dataQa) {
+        return {
+          html: `<span data-qa="${options.dataQa}-error">${errorHtml}</span>`,
+        }
+      }
+      return { html: errorHtml }
+    }
+
+    const isNotEntered = valueAsResult.getOrNull().includes('Not entered')
 
     if (options.dataQa) {
       return {
-        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${value}</span>`,
+        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${valueAsResult.getOrNull()}</span>`,
       }
     }
 
-    return options.html ? { html: value } : { text: value }
+    return options.html ? { html: valueAsResult.getOrNull() } : { text: valueAsResult.getOrNull() }
   }
 
   const items = [
-    ...(options.changeLinkEnabled
+    ...(options.changeLinkEnabled && valueAsResult.isFulfilled()
       ? [
           {
             href: options.changeHref,

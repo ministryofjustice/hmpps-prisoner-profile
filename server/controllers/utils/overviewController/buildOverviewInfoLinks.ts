@@ -11,8 +11,8 @@ import config from '../../../config'
 
 export default function buildOverviewInfoLinks(
   prisonerData: Prisoner,
-  pathfinderNominal: Nominal,
-  socNominal: Nominal,
+  pathfinderNominal: Nominal | null,
+  socNominal: Nominal | null,
   permissions: PrisonerPermissions,
 ): { text: string; url: string; dataQA: string }[] {
   const links: { text: string; url: string; dataQA: string }[] = []

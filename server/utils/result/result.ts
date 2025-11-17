@@ -98,3 +98,6 @@ export const Result = {
 }
 
 export const noCallbackOnErrorBecause = (_explanation: string) => (_error: Error) => {}
+
+export const isResult = <T>(value: unknown): value is Result<T> =>
+  typeof value === 'object' && value !== null && 'status' in value && 'isFulfilled' in value

@@ -1,6 +1,11 @@
-{% macro actionsBlock(actions) %}
+{% macro actionsBlock(actions, actionsMayBeMissing) %}
   <div class="hmpps-actions-block govuk-!-margin-bottom-5">
     <h2 class="govuk-heading-m">Actions</h2>
+    {% if actionsMayBeMissing %}
+      <p class="hmpps-action-api-error-inset" data-qa="actions-unavailable">
+        Some actions are currently unavailable. Try again later.
+      </p>
+    {% endif %}
     <ul class="hmpps-actions-block__list">
       {% for action in actions %}
       <li>

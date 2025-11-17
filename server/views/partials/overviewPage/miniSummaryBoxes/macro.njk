@@ -1,8 +1,13 @@
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
-{% macro miniSummaryMacro(miniSummary) %}
+{% macro miniSummaryMacro(miniSummary, errored) %}
   {%- call summaryCard({title: miniSummary.heading}) -%}
     <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not miniSummary.heading }}">
       <div class="govuk-grid-column-full">
+      {% if errored %}
+          <p class="hmpps-api-error-inset" data-qa="mini-summary-unavailable">
+              {{ unavailableApiErrorText }}
+          </p>
+      {% endif %}
         {% if miniSummary.topLabel %}
           <p class="govuk-body card-label">
             {{ miniSummary.topLabel }}
