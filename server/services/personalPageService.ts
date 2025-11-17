@@ -335,7 +335,6 @@ export default class PersonalPageService {
     const [
       profileGql,
       inmateDetail,
-      secondaryLanguages,
       property,
       oldAddressList,
       offenderContacts,
@@ -410,7 +409,6 @@ export default class PersonalPageService {
         variables: { prisonerNumber },
       }),
       prisonApiClient.getInmateDetail(bookingId),
-      prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
