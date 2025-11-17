@@ -1,4 +1,4 @@
-import { Result } from '../../utils/result/result'
+import { isResult, Result } from '../../utils/result/result'
 import { unavailableApiErrorMessage } from '../../utils/utils'
 
 interface Options {
@@ -33,9 +33,6 @@ export const listToSummaryListRows = (
 ) => {
   return items.map(i => summaryListRowWithOptionalChangeLink(i.key, i.value, i.options))
 }
-
-const isResult = (value: unknown): value is Result<string> =>
-  typeof value === 'object' && value !== null && 'isFulfilled' in value
 
 const summaryListRowWithOptionalChangeLink = (
   key: string,

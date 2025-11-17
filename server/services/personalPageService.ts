@@ -347,31 +347,20 @@ export default class PersonalPageService {
         personIntegrationApiClient.getPrisonerProfileSummary(prisonerData.prisonerNumber),
         getOptions.apiErrorCallback,
       )
-
-      addresses = await profileSummary.handle({
-        fulfilled: async summary =>
-          Result.wrap(
+      ;[addresses, globalNumbersAndEmails, distinguishingMarks, militaryRecords, physicalAttributes] =
+        await Promise.all([
+          profileSummary.mapAsync(summary =>
             getOptions.editProfileEnabled ? this.addressService.transformAddresses(token, summary.addresses) : null,
-            getOptions.apiErrorCallback,
           ),
-        rejected: async err => Result.rejected<AddressForDisplay[], Error>(err),
-      })
-
-      globalNumbersAndEmails = await profileSummary.handle({
-        fulfilled: async summary =>
-          Result.wrap(
+          profileSummary.mapAsync(summary =>
             getOptions.editProfileEnabled
               ? this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts)
               : null,
-            getOptions.apiErrorCallback,
           ),
-        rejected: async err => Result.rejected<GlobalNumbersAndEmails, Error>(err),
-      })
-      ;[distinguishingMarks, militaryRecords, physicalAttributes] = await Promise.all([
-        profileSummary.map(summary => (getOptions.editProfileEnabled ? summary.distinguishingMarks : null)),
-        profileSummary.map(summary => (militaryHistoryEnabled() ? summary.militaryRecords : null)),
-        profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
-      ])
+          profileSummary.map(summary => (getOptions.editProfileEnabled ? summary.distinguishingMarks : null)),
+          profileSummary.map(summary => (militaryHistoryEnabled() ? summary.militaryRecords : null)),
+          profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
+        ])
     } else {
       ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
         await Promise.all([
