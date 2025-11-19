@@ -19,6 +19,7 @@ import { pluralise } from './pluralise'
 import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
+import { Role } from '../data/enums/role'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -419,6 +420,12 @@ export const prisonerIsOut = (prisonId: string): boolean => {
 
 export const prisonerIsTRN = (prisonId: string): boolean => {
   return ['TRN'].includes(prisonId)
+}
+
+export const canViewCsraHistory = (prisonId: string, user: HmppsUser): boolean => {
+  return (
+    isInUsersCaseLoad(prisonId, user) || (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], user.userRoles))
+  )
 }
 
 export const apostrophe = (word: string): string => {
