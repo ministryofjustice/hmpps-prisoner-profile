@@ -4,7 +4,9 @@
     "noEmit": true,
     "moduleResolution": "node",
     "types": ["cypress", "cypress-file-upload"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "typeRoots": ["../server/@types", "../node_modules"]
   },
   "include": ["**/*.ts", "../cypress.config.ts"]
 }

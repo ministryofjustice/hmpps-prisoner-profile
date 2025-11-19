@@ -1,5 +1,5 @@
 import { AssessmentQualificationType } from '../enums/dpsCore'
-import LearnerLatestAssessment from '../interfaces/curiousApi/LearnerLatestAssessment'
+import { LearnerLatestAssessment } from '../interfaces/curiousApi/LearnerLatestAssessment'
 
 export const LearnerLatestAssessmentsMock: LearnerLatestAssessment[] = [
   {
