@@ -385,6 +385,7 @@ export default {
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
+    useCurious2Api: toBoolean(get('USE_CURIOUS2_API', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
