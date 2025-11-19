@@ -75,6 +75,11 @@ context('Overview Page', () => {
         overviewPage.externalContacts().card().should('not.exist')
         cy.getDataQa('hidden-external-contacts').should('exist')
       })
+
+      it('Does not display the CSRA history link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.csraCard().find('a').should('not.exist')
+      })
     })
   })
 

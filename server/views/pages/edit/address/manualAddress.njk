@@ -60,6 +60,9 @@
         id: "town-or-city",
         name: "townOrCity",
         label: { text: "Town or city (optional)" },
+        hint: {
+          text: 'Start typing to select town or city.'
+        },
         items: [{ value: '', text: 'Please select a town or city' }].concat(townOrCityOptions),
         errorMessage: errors | findError("town-or-city"),
         classes: "hmpps-address-field js-autocomplete-select",
@@ -73,6 +76,9 @@
         id: "county",
         name: "county",
         label: { text: "County (optional)" },
+        hint: {
+          text: 'Start typing to select county.'
+        },
         items: [{ value: '', text: 'Please select a county' }].concat(countyOptions),
         errorMessage: errors | findError("county"),
         classes: "hmpps-address-field js-autocomplete-select",
@@ -95,6 +101,9 @@
       id: "country",
       name: "country",
       label: { text: "Country" },
+      hint: {
+        text: 'Start typing to select country.'
+      },
       items: [{ value: '', text: 'Please select a country' }].concat(countryOptions),
       errorMessage: errors | findError("country"),
       classes: "hmpps-address-field js-autocomplete-select",

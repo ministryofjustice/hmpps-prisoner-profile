@@ -22,6 +22,9 @@
         text: mainLanguageLabel,
         classes: 'govuk-label--s'
       },
+      hint: {
+        text: autocompleteOptionHint
+      },
       items: preferredSpokenLanguageOptions,
       errorMessage: errors | findError("preferred-spoken-language-code"),
       classes: "js-autocomplete-select",
@@ -60,6 +63,9 @@
       label: {
         text: 'What is their main written language?',
         classes: 'govuk-label--s'
+      },
+      hint: {
+        text: autocompleteOptionHint
       },
       items: preferredWrittenLanguageOptions,
       errorMessage: errors | findError("preferred-written-language-code"),

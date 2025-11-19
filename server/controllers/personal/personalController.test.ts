@@ -1055,8 +1055,9 @@ describe('PersonalController', () => {
           ]),
           additionalNationalitiesValue: 'Some other nationality',
           autocompleteSelected: false,
-          autocompleteOptionTitle: 'A different nationality',
-          autocompleteOptionLabel: 'Select nationality',
+          autocompleteOptionTitle: 'Citizen of a country outside the UK',
+          autocompleteOptionLabel: 'Nationality',
+          autocompleteOptionHint: 'Start typing to select nationality.',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -1507,8 +1508,9 @@ describe('PersonalController', () => {
           errors: [],
           radioOptions: [{ value: 'ENG', text: 'England' }],
           autocompleteOptions: [{ value: 'FRA', text: 'France' }],
-          autocompleteOptionTitle: 'A different country',
-          autocompleteOptionLabel: 'Country name',
+          autocompleteOptionTitle: 'A country outside the UK',
+          autocompleteOptionLabel: 'Country',
+          autocompleteOptionHint: 'Start typing to select country.',
           autocompleteSelected: false,
           miniBannerData: {
             cellLocation: '2-3-001',

@@ -18,11 +18,14 @@
         label: {
             text: autocompleteOptionLabel
         },
+        hint: {
+          text: autocompleteOptionHint
+        },
         items: autocompleteOptions,
         errorMessage: errors | findError("autocomplete"),
         classes: "js-autocomplete-select",
         formGroup: {
-            classes: "govuk-!-width-one-third"
+            classes: "govuk-!-width-one-half"
         },
         attributes: {
             "data-test": "select-autocomplete-input",
