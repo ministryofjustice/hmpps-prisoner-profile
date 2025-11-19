@@ -46,8 +46,21 @@ describe('featureToggles', () => {
       expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
     })
 
+    it('enabled if wildcard used in list of permanently enabled', () => {
+      config.featureToggles.dietAndAllergyEnabledPrisons = ['***']
+
+      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
+    })
+
     it('enabled if active case load is listed as enabled after date', () => {
       config.featureToggles.dietAndAllergyEnabledPrisonsByDate = ['MDI']
+      config.featureToggles.dietAndAllergyEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if wildcard is listed as enabled after date', () => {
+      config.featureToggles.dietAndAllergyEnabledPrisonsByDate = ['***']
       config.featureToggles.dietAndAllergyEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
 
       expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
