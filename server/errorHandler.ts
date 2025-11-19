@@ -33,10 +33,9 @@ export default function createErrorHandler(production: boolean) {
       return res.render('notFound', { url: req.headers.referer || '/' })
     }
 
-    res.locals.message = production
-      ? 'Something went wrong. The error has been logged. Please try again'
-      : error.message
-    res.locals.status = getErrorStatus(error)
+    res.locals.message = production ? 'Sorry, there is a problem with the service' : error.message
+    res.locals.paraContent = production ? 'Try again later.' : null
+    res.locals.status = production ? null : getErrorStatus(error)
     res.locals.stack = production ? null : error.stack
 
     res.status(getErrorStatus(error) || 500)
