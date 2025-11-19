@@ -4,7 +4,7 @@ import { MiniCardData } from '../components/miniCard/miniCardData'
 
 export default (
   csraSummary: OverviewPageData['csraSummary'],
-  prisonerInCaseLoad: boolean,
+  showCsraHistoryLink: boolean,
   prisonerNumber: string,
 ): MiniCardData => {
   const { classification, assessmentDate } = csraSummary
@@ -24,7 +24,7 @@ export default (
           ]
         : []),
     ],
-    ...(prisonerInCaseLoad
+    ...(showCsraHistoryLink
       ? {
           linkHref: `/prisoner/${prisonerNumber}/csra-history`,
           linkLabel: 'CSRA history',
