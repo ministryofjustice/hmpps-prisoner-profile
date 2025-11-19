@@ -2,10 +2,10 @@ import { CaseNotesPermission, isGranted, PrisonerPermissions } from '@ministryof
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
+  canViewCsraHistory,
   formatCategoryALabel,
   formatCategoryCodeDescription,
   isInUsersCaseLoad,
-  prisonerIsTRN,
   userHasRoles,
 } from '../utils/utils'
 import config from '../config'
@@ -18,8 +18,6 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
   const { userRoles } = user
   const { prisonId } = prisonerData
   const profileBannerTopLinks = []
-  const canViewCsraHistory =
-    isInUsersCaseLoad(prisonId, user) || (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], userRoles))
 
   if (isInUsersCaseLoad(prisonId, user)) {
     const location = `${prisonerData.cellLocation}${prisonerData.inOutStatus === 'OUT' ? ' (Outside)' : ''}`
@@ -71,7 +69,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     hiddenLabel: 'View CSRA history',
     info: prisonerData.csra ? prisonerData.csra : 'Not entered',
     classes: '',
-    url: canViewCsraHistory ? `/prisoner/${prisonerData.prisonerNumber}/csra-history` : undefined,
+    url: canViewCsraHistory(prisonId, user) ? `/prisoner/${prisonerData.prisonerNumber}/csra-history` : undefined,
   })
   profileBannerTopLinks.push({
     heading: 'Incentive level',
