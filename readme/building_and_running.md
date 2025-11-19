@@ -172,6 +172,8 @@ npm run lint
 
 Features can be toggled by setting the relevant environment variable.
 
-| Name                | Default Value | Type    | Description                                         |
-|---------------------|---------------|---------|-----------------------------------------------------|
-| SOME_TOGGLE_ENABLED | false         | Boolean | Example feature toggle, for demonstration purposes. |
+| Name                | Default Value | Type    | Description                                                                                               |
+|---------------------|---------------|---------|-----------------------------------------------------------------------------------------------------------|
+| SOME_TOGGLE_ENABLED | false         | Boolean | Example feature toggle, for demonstration purposes.                                                       |
+| USE_CURIOUS2_API    | false         | Boolean | Set to true to use the Curious 2 API endpoints for Functional Skills & In Prison Courses & Qualifications |
+
