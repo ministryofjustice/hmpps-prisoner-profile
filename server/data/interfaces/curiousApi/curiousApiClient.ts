@@ -1,7 +1,7 @@
 import LearnerEmployabilitySkills from './LearnerEmployabilitySkills'
 import LearnerProfile from './LearnerProfile'
 import { LearnerEductionPagedResponse } from './LearnerEducation'
-import LearnerLatestAssessment from './LearnerLatestAssessment'
+import { LearnerLatestAssessment } from './LearnerLatestAssessment'
 import LearnerGoals from './LearnerGoals'
 import LearnerNeurodivergence from './LearnerNeurodivergence'
 

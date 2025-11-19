@@ -1,23 +1,11 @@
-import { AssessmentQualificationType } from '../../enums/dpsCore'
+/**
+ * Curious API types representing the data returned from the `/learnerProfile` API. This is a Curious 1 API
+ *
+ * The types in the Curious API do not have the most descriptive names. To facilitate future maintenance and syncing with
+ * changes in the Curious API swagger spec, the types have been exported with names that make more sense to their use case.
+ */
 
-export default interface LearnerProfile {
-  prn: string
-  establishmentId: string
-  establishmentName: string
-  uln: string
-  lddHealthProblem: string
-  priorAttainment: string
-  qualifications: [
-    {
-      qualificationType: AssessmentQualificationType
-      qualificationGrade: string
-      assessmentDate: string
-    },
-  ]
-  languageStatus: string
-  plannedHours: number
-  rapidAssessmentDate: string | null
-  inDepthAssessmentDate: string | null
-  primaryLDDAndHealthProblem: string
-  additionalLDDAndHealthProblems: string[]
-}
+import type { LearnerProfileDTO } from 'curiousApiClient'
+
+type LearnerProfile = LearnerProfileDTO
+export default LearnerProfile

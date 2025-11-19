@@ -1,7 +1,11 @@
-export default interface LearnerGoals {
-  prn?: string
-  employmentGoals: string[]
-  personalGoals: string[]
-  longTermGoals: string[]
-  shortTermGoals: string[]
-}
+/**
+ * Curious API types representing the data returned from the `/learnerGoals` API. This is a Curious 1 API
+ *
+ * The types in the Curious API do not have the most descriptive names. To facilitate future maintenance and syncing with
+ * changes in the Curious API swagger spec, the types have been exported with names that make more sense to their use case.
+ */
+
+import type { LearnerGoalsDTO } from 'curiousApiClient'
+
+type LearnerGoals = LearnerGoalsDTO
+export default LearnerGoals
