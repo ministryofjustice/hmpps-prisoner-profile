@@ -32,6 +32,7 @@ const templateParams = {
     hasCoursesCompletedMoreThan12MonthsAgo: jest.fn(),
     hasWithdrawnOrInProgressCourses: jest.fn(),
   }),
+  prisonNamesById: { MDI: 'Moorland (HMP & YOI)' },
 }
 const template = 'index.njk'
 
@@ -81,11 +82,50 @@ describe('Work and Skills Page - In prison courses and qualifications panel test
     expect(completedCoursesInLast12MonthsTable.find('tbody tr').length).toEqual(1)
     expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(0).text().trim()).toEqual('English')
     expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(1).text().trim()).toEqual('Non-accredited')
-    expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(2).text().trim()).toEqual('MDI')
+    expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(2).text().trim()).toEqual('Moorland (HMP & YOI)')
     expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(3).text().trim()).toEqual(
       expectedCourseCompletionDate,
     )
     expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(4).text().trim()).toEqual('Achieved at Level 2')
+    expect($('[data-qa=link-to-view-all-in-prison-courses]').length).toEqual(1)
+    expect($('[data-qa=curious-unavailable-message]').length).toEqual(0)
+  })
+
+  it('should render given given prison name lookup does not resolve prisons', () => {
+    // Given
+    const courseCompletedInLast12Months = {
+      ...aValidEnglishInPrisonCourseCompletedWithinLast12Months(),
+      prisonId: 'MDI',
+    }
+    const params = {
+      ...templateParams,
+      prisonNamesById: {},
+      inPrisonCourses: Result.fulfilled({
+        totalRecords: 2,
+        coursesByStatus: {
+          COMPLETED: [courseCompletedInLast12Months, aValidMathsInPrisonCourse()],
+          IN_PROGRESS: [],
+          WITHDRAWN: [aValidWoodWorkingInPrisonCourse()],
+          TEMPORARILY_WITHDRAWN: [],
+        },
+        coursesCompletedInLast12Months: [courseCompletedInLast12Months],
+        hasCoursesCompletedMoreThan12MonthsAgo: jest.fn(),
+        hasWithdrawnOrInProgressCourses: jest.fn(),
+      }),
+    }
+
+    // When
+    const content = njkEnv.render(template, params)
+    const $ = cheerio.load(content)
+
+    // Then
+    expect($('[data-qa=no-in-prison-courses-message]').length).toEqual(0)
+    expect($('[data-qa=no-completed-in-prison-courses-message]').length).toEqual(0)
+    expect($('[data-qa=no-completed-in-prison-courses-in-last-12-months-message]').length).toEqual(0)
+    const completedCoursesInLast12MonthsTable = $('#completed-in-prison-courses-in-last-12-months-table')
+    expect(completedCoursesInLast12MonthsTable.length).toEqual(1)
+    expect(completedCoursesInLast12MonthsTable.find('tbody tr').length).toEqual(1)
+    expect(completedCoursesInLast12MonthsTable.find('tbody tr td').eq(2).text().trim()).toEqual('MDI')
     expect($('[data-qa=link-to-view-all-in-prison-courses]').length).toEqual(1)
     expect($('[data-qa=curious-unavailable-message]').length).toEqual(0)
   })

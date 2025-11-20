@@ -18,6 +18,25 @@ export default class PrisonService {
   ) {}
 
   /**
+   * Returns a simple object of prison id to prison name
+   */
+  async getAllPrisonNamesById(token: string): Promise<Record<string, string>> {
+    try {
+      const prisons = (await this.getCachedPrisons()) || (await this.retrieveAndCacheActivePrisons(token))
+      return prisons.reduce(
+        (acc, prison) => {
+          acc[prison.prisonId] = prison.prisonName
+          return acc
+        },
+        {} as Record<string, string>,
+      )
+    } catch (e) {
+      logger.error(`Error looking up prisons`, e)
+      return {}
+    }
+  }
+
+  /**
    * Returns a [Prison] identified by the specified `prisonId`
    */
   async getPrisonByPrisonId(prisonId: string, token: string): Promise<Prison> {
@@ -55,12 +74,26 @@ export default class PrisonService {
 
   private async getCachedPrison(prisonId: string): Promise<PrisonDto> {
     try {
-      const allActivePrisons = await this.prisonRegisterStore.getActivePrisons()
+      const allActivePrisons = (await this.getCachedPrisons()) || []
       const cachedPrison = allActivePrisons.find(prisonResponse => prisonResponse.prisonId === prisonId)
       if (cachedPrison) {
         return cachedPrison
       }
       logger.debug(`Prison ${prisonId} not found in cache`)
+    } catch (ex) {
+      // Looking up the prisons from the cached data store failed for some reason. Return undefined.
+      logger.error('Error retrieving cached prisons', ex)
+    }
+    return undefined
+  }
+
+  private async getCachedPrisons(): Promise<Array<PrisonDto>> {
+    try {
+      const allActivePrisons = await this.prisonRegisterStore.getActivePrisons()
+      if (allActivePrisons && allActivePrisons.length > 0) {
+        return allActivePrisons
+      }
+      logger.debug(`Prisons not found in cache`)
     } catch (ex) {
       // Looking up the prisons from the cached data store failed for some reason. Return undefined.
       logger.error('Error retrieving cached prisons', ex)

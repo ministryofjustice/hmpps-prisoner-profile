@@ -40,6 +40,7 @@ import isServiceNavEnabled from '../utils/isServiceEnabled'
 import editRouter from './editRouter'
 import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
 import checkPrisonerIsInUsersCaseloads from '../middleware/checkPrisonerIsInUsersCaseloadsMiddleware'
+import { Result } from '../utils/result/result'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -171,9 +172,15 @@ export default function routes(services: Services): Router {
         page: Page.WorkAndSkills,
       })
 
+      const prisonNamesById = await Result.wrap(
+        services.prisonService.getAllPrisonNamesById(req.middleware.clientToken),
+        apiErrorCallback,
+      )
+
       res.render('pages/workAndSkills', {
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'work-and-skills'),
         ...workAndSkillsPageData,
+        prisonNamesById,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
