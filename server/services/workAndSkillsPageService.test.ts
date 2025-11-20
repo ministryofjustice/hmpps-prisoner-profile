@@ -51,11 +51,12 @@ describe('WorkAndSkillsService', () => {
     })
     return {
       getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
-      getLearnerProfile: jest.fn(),
       getLearnerEducationPage: jest.fn(),
       getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
       getLearnerGoals: jest.fn(async () => learnerGoals),
       getLearnerNeurodivergence: jest.fn(),
+      getLearnerAssessments: jest.fn(),
+      getLearnerQualifications: jest.fn(),
     }
   }
 

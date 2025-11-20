@@ -6,6 +6,8 @@ export const curiousApiClientMock = (): CuriousApiClient => ({
   getLearnerLatestAssessments: jest.fn(),
   getLearnerGoals: jest.fn(),
   getLearnerNeurodivergence: jest.fn(),
+  getLearnerAssessments: jest.fn(),
+  getLearnerQualifications: jest.fn(),
 })
 
 export default { curiousApiClientMock }
