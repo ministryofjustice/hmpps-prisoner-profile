@@ -1,4 +1,5 @@
 import CircuitBreaker from 'opossum'
+import type { AllAssessmentDTO, AllQualificationsDTO } from 'curiousApiClient'
 import RestClient, { Request } from './restClient'
 import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
@@ -44,6 +45,18 @@ export default class CuriousRestApiClient extends RestClient implements CuriousA
   async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[] | null> {
     return this.getAndIgnore404({
       path: `/learnerNeurodivergence/${offenderNumber}`,
+    })
+  }
+
+  async getLearnerAssessments(offenderNumber: string): Promise<AllAssessmentDTO> {
+    return this.getAndIgnore404({
+      path: `/learnerAssessments/v2/${offenderNumber}`,
+    })
+  }
+
+  async getLearnerQualifications(offenderNumber: string): Promise<AllQualificationsDTO> {
+    return this.getAndIgnore404({
+      path: `/learnerQualifications/v2/${offenderNumber}`,
     })
   }
 }
