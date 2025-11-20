@@ -3,7 +3,6 @@ import RestClient, { Request } from './restClient'
 import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
 import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
-import LearnerProfile from './interfaces/curiousApi/LearnerProfile'
 import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
 import { LearnerLatestAssessment } from './interfaces/curiousApi/LearnerLatestAssessment'
 import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
@@ -18,12 +17,6 @@ export default class CuriousRestApiClient extends RestClient implements CuriousA
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills | null> {
     return this.getAndIgnore404({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
-    })
-  }
-
-  async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[] | null> {
-    return this.getAndIgnore404({
-      path: `/learnerProfile/${offenderNumber}`,
     })
   }
 
