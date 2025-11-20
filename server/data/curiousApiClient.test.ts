@@ -5,7 +5,6 @@ import { learnerEmployabilitySkills } from './localMockData/learnerEmployability
 import aValidLearnerGoals from './localMockData/learnerGoalsMock'
 import { LearnerLatestAssessmentsMock } from './localMockData/learnerLatestAssessmentsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
-import { LearnerProfiles } from './localMockData/learnerProfiles'
 import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
 import { learnerEducationPagedResponsePage1Of1 } from './localMockData/learnerEducationPagedResponse'
 
@@ -34,18 +33,6 @@ describe('curiousApiClient', () => {
 
       const output = await curiousApiClient.getLearnerEmployabilitySkills('G6123VU')
       expect(output).toEqual(learnerEmployabilitySkills)
-    })
-  })
-
-  describe('getLearnerProfiles', () => {
-    it('should return data from api', async () => {
-      fakeCuriousApi
-        .get('/learnerProfile/G6123VU')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LearnerProfiles)
-
-      const output = await curiousApiClient.getLearnerProfile('G6123VU')
-      expect(output).toEqual(LearnerProfiles)
     })
   })
 

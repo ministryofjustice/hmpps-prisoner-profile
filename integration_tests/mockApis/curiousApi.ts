@@ -1,7 +1,6 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
-import { LearnerProfiles } from '../../server/data/localMockData/learnerProfiles'
 import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../../server/data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../../server/data/localMockData/learnerNeurodivergenceMock'
@@ -151,21 +150,6 @@ export default {
           errorMessage: 'Invalid token',
           httpStatusCode: 401,
         },
-      },
-    })
-  },
-  stubGetLearnerProfile: (prisonerNumber: string) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/curiousApi/learnerProfile/${prisonerNumber}`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: LearnerProfiles,
       },
     })
   },
