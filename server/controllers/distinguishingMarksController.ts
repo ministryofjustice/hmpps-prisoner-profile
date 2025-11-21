@@ -21,7 +21,7 @@ import {
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { ProblemSavingError } from '../utils/problemSavingError'
+import ProblemSavingError from '../utils/problemSavingError'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -146,7 +146,7 @@ export default class DistinguishingMarksController {
       })
     } catch (error) {
       logger.error(error)
-      throw new ProblemSavingError("Error while saving new distinguishing mark")
+      throw new ProblemSavingError('Error while saving new distinguishing mark')
     }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
@@ -293,7 +293,7 @@ export default class DistinguishingMarksController {
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
-    
+
     let bodyPartChanged
     try {
       const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
@@ -325,11 +325,11 @@ export default class DistinguishingMarksController {
             previous: currentSpecificBodyPart,
             updated: verifiedBodyPart,
           },
-      })
-      .catch(error => logger.error(error))
+        })
+        .catch(error => logger.error(error))
     } catch (error) {
       logger.error(error)
-      throw new ProblemSavingError("Error updating distinguishing mark body part")
+      throw new ProblemSavingError('Error updating distinguishing mark body part')
     }
 
     // Neck and back have no specific locations to choose from, so return to the change summary screen
@@ -415,7 +415,7 @@ export default class DistinguishingMarksController {
         .catch(error => logger.error(error))
     } catch (error) {
       logger.error(error)
-      throw new ProblemSavingError("Error updating distinguishing mark location")
+      throw new ProblemSavingError('Error updating distinguishing mark location')
     }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
@@ -452,7 +452,7 @@ export default class DistinguishingMarksController {
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
-    
+
     try {
       const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
       const currentDescription = mark.comment
@@ -482,7 +482,7 @@ export default class DistinguishingMarksController {
         .catch(error => logger.error(error))
     } catch (error) {
       logger.error(error)
-      throw new ProblemSavingError("Error updating distinguishing mark description")
+      throw new ProblemSavingError('Error updating distinguishing mark description')
     }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)

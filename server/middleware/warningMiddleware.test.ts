@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { warningMiddleware, warningRenderMiddleware } from './warningMiddleware'
 import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
-import { ProblemSavingError } from '../utils/problemSavingError'
+import ProblemSavingError from '../utils/problemSavingError'
 
 describe('nomisLockedMiddleware', () => {
   it('should flash isLocked, call the metricsService, and redirect when NomisLockedError happens', () => {
@@ -57,7 +57,7 @@ describe('nomisLockedMiddleware', () => {
 
     warningMiddleware(null)(err, req, res, next)
 
-    expect(req.flash).toHaveBeenCalledWith('isLocked', 'true')
+    expect(req.flash).toHaveBeenCalledWith('problemSaving', 'true')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
     expect(res.redirect).toHaveBeenCalledWith('/somePage')
     expect(next).not.toHaveBeenCalled()
@@ -90,7 +90,7 @@ describe('nomisLockedMiddleware', () => {
 })
 
 describe('warningRenderMiddleware', () => {
-  it('should patch res.render to include isLocked flag', () => {
+  it('should patch res.render to include isLocked and problemSaving flags', () => {
     const req = {
       flash: jest.fn().mockReturnValue(['true']),
     } as unknown as Request
@@ -111,30 +111,11 @@ describe('warningRenderMiddleware', () => {
 
     patchedRender('someView', options, callback)
 
-    expect(originalRender).toHaveBeenCalledWith('someView', { ...options, isLocked: true }, callback)
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('should not patch res.render if isLocked flag is not set', () => {
-    const req = {
-      flash: jest.fn().mockReturnValue(['false']),
-    } as unknown as Request
-
-    const originalRender = jest.fn()
-    const res = {
-      render: originalRender,
-    } as unknown as Response
-
-    const next = jest.fn()
-
-    warningRenderMiddleware(req, res, next)
-
-    const options = { a: 1 }
-    const callback = jest.fn()
-
-    res.render('someView', options, callback)
-
-    expect(originalRender).toHaveBeenCalledWith('someView', options, callback)
+    expect(originalRender).toHaveBeenCalledWith(
+      'someView',
+      { ...options, isLocked: true, problemSaving: true },
+      callback,
+    )
     expect(next).toHaveBeenCalled()
   })
 })

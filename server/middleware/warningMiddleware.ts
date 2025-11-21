@@ -2,11 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { ProblemSavingError } from '../utils/problemSavingError'
+import ProblemSavingError from '../utils/problemSavingError'
 
 export function warningMiddleware(metricsService: MetricsService) {
   return (err: unknown, req: Request, res: Response, next: NextFunction) => {
-    
     if (err instanceof NomisLockedError) {
       const { prisonerNumber } = req.middleware.prisonerData
       metricsService.trackNomisLockedWarning(
@@ -35,7 +34,7 @@ export function warningRenderMiddleware(req: Request, res: Response, next: NextF
   const problemSaving = req.flash('problemSaving')[0] === 'true'
   const originalRender = res.render.bind(res)
   res.render = (view: string, options?: object, callback?: (err: Error, html: string) => void) => {
-    return originalRender(view, { ...options, isLocked, problemSaving}, callback)
+    return originalRender(view, { ...options, isLocked, problemSaving }, callback)
   }
   next()
 }
