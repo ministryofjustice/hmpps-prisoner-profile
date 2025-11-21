@@ -21,6 +21,7 @@ import {
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import { ProblemSavingError } from '../utils/problemSavingError'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -144,11 +145,8 @@ export default class DistinguishingMarksController {
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
     } catch (error) {
-      req.flash('errors', [{ text: 'There was an error please try again' }])
       logger.error(error)
-      return res.redirect(
-        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}?selected=${bodyPart}`,
-      )
+      throw new ProblemSavingError("Error while saving new distinguishing mark")
     }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
@@ -290,14 +288,14 @@ export default class DistinguishingMarksController {
 
   public async updateBodyPart(req: Request, res: Response) {
     const { markId, markType, prisonerNumber } = req.params
-    const { bodyPart, initialBodyPart } = req.body
+    const { bodyPart } = req.body
     const { clientToken } = req.middleware
-    const bodyPartChanged = bodyPartMap[bodyPart] !== initialBodyPart
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
-
-    if (bodyPartChanged) {
+    
+    let bodyPartChanged
+    try {
       const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
       const currentSpecificBodyPart = findBodyPartByCodeAndSideAndOrientation(
         mark.bodyPart?.code,
@@ -305,6 +303,7 @@ export default class DistinguishingMarksController {
         mark?.partOrientation?.code,
       )
       const verifiedBodyPart = bodyPartMap[bodyPart] as BodyPartSelection
+      bodyPartChanged = currentSpecificBodyPart !== verifiedBodyPart
       await this.distinguishingMarksService.updateDistinguishingMarkLocation(
         clientToken,
         res.locals.user as PrisonUser,
@@ -314,7 +313,6 @@ export default class DistinguishingMarksController {
         verifiedMarkType,
         verifiedBodyPart,
       )
-
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -327,8 +325,11 @@ export default class DistinguishingMarksController {
             previous: currentSpecificBodyPart,
             updated: verifiedBodyPart,
           },
-        })
-        .catch(error => logger.error(error))
+      })
+      .catch(error => logger.error(error))
+    } catch (error) {
+      logger.error(error)
+      throw new ProblemSavingError("Error updating distinguishing mark body part")
     }
 
     // Neck and back have no specific locations to choose from, so return to the change summary screen
@@ -381,36 +382,41 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
-    const currentSpecificBodyPart = findBodyPartByCodeAndSideAndOrientation(
-      mark.bodyPart?.code,
-      mark.side?.code,
-      mark.partOrientation?.code,
-    )
-    await this.distinguishingMarksService.updateDistinguishingMarkLocation(
-      clientToken,
-      res.locals.user as PrisonUser,
-      prisonerNumber,
-      markId,
-      mark,
-      verifiedMarkType,
-      specificBodyPart as AllBodyPartSelection,
-    )
-
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
+    try {
+      const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+      const currentSpecificBodyPart = findBodyPartByCodeAndSideAndOrientation(
+        mark.bodyPart?.code,
+        mark.side?.code,
+        mark.partOrientation?.code,
+      )
+      await this.distinguishingMarksService.updateDistinguishingMarkLocation(
+        clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.EditDistinguishingMark,
-        details: {
-          markId,
-          fieldName: 'location',
-          previous: currentSpecificBodyPart,
-          updated: specificBodyPart,
-        },
-      })
-      .catch(error => logger.error(error))
+        markId,
+        mark,
+        verifiedMarkType,
+        specificBodyPart as AllBodyPartSelection,
+      )
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDistinguishingMark,
+          details: {
+            markId,
+            fieldName: 'location',
+            previous: currentSpecificBodyPart,
+            updated: specificBodyPart,
+          },
+        })
+        .catch(error => logger.error(error))
+    } catch (error) {
+      logger.error(error)
+      throw new ProblemSavingError("Error updating distinguishing mark location")
+    }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
@@ -446,33 +452,38 @@ export default class DistinguishingMarksController {
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
-
-    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
-    const currentDescription = mark.comment
-    await this.distinguishingMarksService.updateDistinguishingMarkDescription(
-      clientToken,
-      res.locals.user as PrisonUser,
-      prisonerNumber,
-      markId,
-      mark,
-      verifiedMarkType,
-      description,
-    )
-
-    this.auditService
-      .sendPostSuccess({
-        user: res.locals.user,
+    
+    try {
+      const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+      const currentDescription = mark.comment
+      await this.distinguishingMarksService.updateDistinguishingMarkDescription(
+        clientToken,
+        res.locals.user as PrisonUser,
         prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.EditDistinguishingMark,
-        details: {
-          markId,
-          fieldName: 'description',
-          previous: currentDescription,
-          updated: description,
-        },
-      })
-      .catch(error => logger.error(error))
+        markId,
+        mark,
+        verifiedMarkType,
+        description,
+      )
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDistinguishingMark,
+          details: {
+            markId,
+            fieldName: 'description',
+            previous: currentDescription,
+            updated: description,
+          },
+        })
+        .catch(error => logger.error(error))
+    } catch (error) {
+      logger.error(error)
+      throw new ProblemSavingError("Error updating distinguishing mark description")
+    }
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
