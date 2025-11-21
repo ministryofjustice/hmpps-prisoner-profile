@@ -13,4 +13,5 @@ declare module 'curiousApiClient' {
   // Curious 2 data types
   export type AllAssessmentDTO = components['schemas']['AllAssessmentDTO']
   export type AllQualificationsDTO = components['schemas']['AllQualificationsDTO']
+  export type LearnerQualificationsDTO = components['schemas']['LearnerQualificationsDTO']
 }

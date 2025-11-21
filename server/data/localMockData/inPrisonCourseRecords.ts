@@ -12,6 +12,8 @@ const aPopulatedInPrisonCourseRecords = (prisonNumber = 'A1234'): InPrisonCourse
     TEMPORARILY_WITHDRAWN: [],
   },
   coursesCompletedInLast12Months: [],
+  hasWithdrawnOrInProgressCourses: jest.fn(),
+  hasCoursesCompletedMoreThan12MonthsAgo: jest.fn(),
 })
 
 const anEmptyInPrisonCourseRecords = (prisonNumber = 'A1234'): InPrisonCourseRecords => ({
@@ -25,6 +27,8 @@ const anEmptyInPrisonCourseRecords = (prisonNumber = 'A1234'): InPrisonCourseRec
     TEMPORARILY_WITHDRAWN: [],
   },
   coursesCompletedInLast12Months: [],
+  hasWithdrawnOrInProgressCourses: jest.fn(),
+  hasCoursesCompletedMoreThan12MonthsAgo: jest.fn(),
 })
 
 const aFailureInPrisonCourseRecords = (prisonNumber = 'A1234'): InPrisonCourseRecords =>
