@@ -8,6 +8,8 @@ import { toInPrisonCourse } from './mappers/inPrisonCourseMapper'
 import dateComparator from '../utils/dateComparator'
 import { CuriousRestClientBuilder } from '../data'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
+import config from '../config'
+import toInPrisonCourseRecords from './mappers/inPrisonCourseRecordsMapper'
 
 export default class CuriousService {
   constructor(
@@ -18,17 +20,36 @@ export default class CuriousService {
 
   /**
    * Returns the specified prisoner's In Prison Course Records
-   *
-   * The Curious `learnerEducation` API is a paged API. This function calls the API starting from page 0 until there are no
-   * more pages remaining. The cumulative array of Curious `LearnerEducation` records from all API calls are mapped and
-   * grouped into arrays of `InPrisonCourse` within the returned `InPrisonCourseRecords` object.
    */
   async getPrisonerInPrisonCourses(prisonNumber: string, token: string): Promise<InPrisonCourseRecords> {
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+
+    if (config.featureToggles.useCurious2Api) {
+      try {
+        const allPrisonerQualifications =
+          await this.curiousApiClientBuilder(curiousApiToken).getLearnerQualifications(prisonNumber)
+        return toInPrisonCourseRecords(allPrisonerQualifications)
+      } catch (error) {
+        logger.error('Error retrieving learner education data from Curious', error)
+        throw error
+      }
+    }
+
+    /*
+      @deprecated - the following is the old behaviour/approach of getting In Prison Qualifications
+      It retrieves Curious 1 only courses, from the Curious 1 endpoint
+
+      The Curious `learnerEducation` API is a paged API. This function calls the API starting from page 0 until there are no
+      more pages remaining. The cumulative array of Curious `LearnerEducation` records from all API calls are mapped and
+      grouped into arrays of `InPrisonCourse` within the returned `InPrisonCourseRecords` object.
+
+      TODO - remove this code and all supporting code/functions when In Prison Courses are retrieved from the Curious 2
+      endpoint via the useCurious2Api feature toggle.
+     */
     try {
       let page = 0
       let apiPagedResponse = { last: false } as LearnerEductionPagedResponse
       const apiLearnerEducation: Array<LearnerEducation> = []
-      const curiousApiToken = await this.curiousApiTokenBuilder()
 
       // loop until the API response's `last` field is `true`
       while (apiPagedResponse.last === false) {
@@ -71,6 +92,8 @@ export default class CuriousService {
         },
         coursesCompletedInLast12Months,
         prisonNumber,
+        hasCoursesCompletedMoreThan12MonthsAgo: null,
+        hasWithdrawnOrInProgressCourses: null,
       }
     } catch (error) {
       logger.error('Error retrieving learner education data from Curious', error)
@@ -118,6 +141,8 @@ export default class CuriousService {
       },
       coursesCompletedInLast12Months: [],
       prisonNumber,
+      hasCoursesCompletedMoreThan12MonthsAgo: null,
+      hasWithdrawnOrInProgressCourses: null,
     }
   }
 }
