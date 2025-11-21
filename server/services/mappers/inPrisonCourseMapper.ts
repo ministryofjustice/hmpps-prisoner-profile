@@ -1,7 +1,12 @@
 import { parseISO, startOfDay } from 'date-fns'
+import type { LearnerEducationDTO, LearnerQualificationsDTO } from 'curiousApiClient'
 import { LearnerEducation } from '../../data/interfaces/curiousApi/LearnerEducation'
 import { InPrisonCourse } from '../interfaces/curiousService/CuriousInPrisonCourses'
 
+/**
+ * @deprecated This mapper method maps from the Curious 1 data type and will be replaced by calls to toInPrisonCourseFromLearnerEducationDTO
+ * TODO - remove this mapper method
+ */
 const toInPrisonCourse = (apiLearnerEducation: LearnerEducation): InPrisonCourse => {
   return {
     prisonId: apiLearnerEducation.establishmentId,
@@ -22,6 +27,46 @@ const toInPrisonCourse = (apiLearnerEducation: LearnerEducation): InPrisonCourse
     source: 'CURIOUS',
   }
 }
+
+const toInPrisonCourseFromLearnerEducationDTO = (apiLearnerEducation: LearnerEducationDTO): InPrisonCourse => ({
+  prisonId: apiLearnerEducation.establishmentId,
+  prisonName: null, // TODO - remove
+  courseCode: apiLearnerEducation.courseCode,
+  courseName: apiLearnerEducation.courseName,
+  courseStartDate: startOfDay(parseISO(apiLearnerEducation.learningStartDate)),
+  courseStatus: toCourseStatus(apiLearnerEducation.completionStatus),
+  courseCompletionDate: apiLearnerEducation.learningActualEndDate
+    ? startOfDay(parseISO(apiLearnerEducation.learningActualEndDate))
+    : null,
+  coursePlannedEndDate: apiLearnerEducation.learningPlannedEndDate
+    ? startOfDay(parseISO(apiLearnerEducation.learningPlannedEndDate))
+    : null,
+  isAccredited: apiLearnerEducation.isAccredited,
+  grade: apiLearnerEducation.outcomeGrade || apiLearnerEducation.outcome || null,
+  withdrawalReason: apiLearnerEducation.prisonWithdrawalReason,
+  source: 'CURIOUS1',
+})
+
+const toInPrisonCourseFromLearnerQualificationsDTO = (
+  apiLearnerQualification: LearnerQualificationsDTO,
+): InPrisonCourse => ({
+  prisonId: apiLearnerQualification.establishmentId,
+  prisonName: null, // TODO - remove
+  courseCode: apiLearnerQualification.qualificationCode,
+  courseName: apiLearnerQualification.qualificationName,
+  courseStartDate: startOfDay(parseISO(apiLearnerQualification.learningStartDate)),
+  courseStatus: toCourseStatus(apiLearnerQualification.completionStatus),
+  courseCompletionDate: apiLearnerQualification.learningActualEndDate
+    ? startOfDay(parseISO(apiLearnerQualification.learningActualEndDate))
+    : null,
+  coursePlannedEndDate: apiLearnerQualification.learningPlannedEndDate
+    ? startOfDay(parseISO(apiLearnerQualification.learningPlannedEndDate))
+    : null,
+  isAccredited: apiLearnerQualification.isAccredited,
+  grade: apiLearnerQualification.outcomeGrade || apiLearnerQualification.outcome || null,
+  withdrawalReason: apiLearnerQualification.withdrawalReason,
+  source: 'CURIOUS2',
+})
 
 /**
  * Returns one of 'COMPLETED' | 'IN_PROGRESS' | 'WITHDRAWN' | 'TEMPORARILY_WITHDRAWN' to represent the course status.
@@ -59,4 +104,9 @@ const toCourseStatus = (
   return 'IN_PROGRESS'
 }
 
-export { toInPrisonCourse, toCourseStatus }
+export {
+  toInPrisonCourse,
+  toInPrisonCourseFromLearnerEducationDTO,
+  toInPrisonCourseFromLearnerQualificationsDTO,
+  toCourseStatus,
+}
