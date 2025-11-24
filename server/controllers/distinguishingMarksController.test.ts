@@ -9,6 +9,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
 import { FlashMessageType } from '../data/enums/flashMessageType'
+import ProblemSavingError from '../utils/problemSavingError'
 
 const getResLocals = () => ({
   user: prisonUserMock,
@@ -200,7 +201,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
 
-    it('redirects back and shows an error if the upload fails', async () => {
+    it('throws ProblemSavingError for middleware to handle if the upload fails', async () => {
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo' },
@@ -210,15 +211,8 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
 
-      await controller.postNewDistinguishingMark(typeReq, res)
-      expect(typeReq.flash).toHaveBeenCalledWith('errors', [
-        {
-          text: 'There was an error please try again',
-        },
-      ])
-      expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo?selected=left-leg`,
+      await expect(controller.postNewDistinguishingMark(typeReq, res)).rejects.toThrow(
+        new ProblemSavingError('Error while saving new distinguishing mark'),
       )
     })
 
@@ -575,9 +569,15 @@ describe('Distinguishing Marks Controller', () => {
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(
-          `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
-        )
+        if (bodyPart === 'left-arm') {
+          expect(res.redirect).toHaveBeenCalledWith(
+            `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=false&referer=body-part`,
+          )
+        } else {
+          expect(res.redirect).toHaveBeenCalledWith(
+            `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100/location?bodyPart=${bodyPart}&bodyPartChanged=true&referer=body-part`,
+          )
+        }
       },
     )
 

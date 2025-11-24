@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
-import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './nomisLockedMiddleware'
+import { warningMiddleware, warningRenderMiddleware } from './warningMiddleware'
 import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
+import ProblemSavingError from '../utils/problemSavingError'
 
 describe('nomisLockedMiddleware', () => {
   it('should flash isLocked, call the metricsService, and redirect when NomisLockedError happens', () => {
@@ -24,7 +25,7 @@ describe('nomisLockedMiddleware', () => {
       trackNomisLockedWarning: jest.fn(),
     } as unknown as MetricsService
 
-    nomisLockedMiddleware(metricsService)(err, req, res, next)
+    warningMiddleware(metricsService)(err, req, res, next)
 
     expect(req.flash).toHaveBeenCalledWith('isLocked', 'true')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
@@ -38,7 +39,31 @@ describe('nomisLockedMiddleware', () => {
     )
   })
 
-  it('should call next with error if not a NomisLockedError', () => {
+  it('should flash problemSaving and the request body then redirect when ProblemSavingError happens', () => {
+    const req = {
+      flash: jest.fn(),
+      body: { foo: 'bar' },
+      originalUrl: '/somePage',
+      middleware: { prisonerData: { prisonerNumber: 'A1234BC' } },
+    } as unknown as Request
+
+    const res = {
+      redirect: jest.fn(),
+      locals: { user: {} },
+    } as unknown as Response
+
+    const err = new ProblemSavingError('Issue making call to save user input')
+    const next = jest.fn()
+
+    warningMiddleware(null)(err, req, res, next)
+
+    expect(req.flash).toHaveBeenCalledWith('problemSaving', 'true')
+    expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
+    expect(res.redirect).toHaveBeenCalledWith('/somePage')
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('should call next with the error for arbitrary errors', () => {
     const req = {
       flash: jest.fn(),
       body: {},
@@ -55,7 +80,7 @@ describe('nomisLockedMiddleware', () => {
       trackNomisLockedWarning: jest.fn(),
     } as unknown as MetricsService
 
-    nomisLockedMiddleware(metricsService)(err, req, res, next)
+    warningMiddleware(metricsService)(err, req, res, next)
 
     expect(req.flash).not.toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()
@@ -64,8 +89,8 @@ describe('nomisLockedMiddleware', () => {
   })
 })
 
-describe('nomisLockedRenderMiddleware', () => {
-  it('should patch res.render to include isLocked flag', () => {
+describe('warningRenderMiddleware', () => {
+  it('should patch res.render to include isLocked and problemSaving flags', () => {
     const req = {
       flash: jest.fn().mockReturnValue(['true']),
     } as unknown as Request
@@ -77,7 +102,7 @@ describe('nomisLockedRenderMiddleware', () => {
 
     const next = jest.fn()
 
-    nomisLockedRenderMiddleware(req, res, next)
+    warningRenderMiddleware(req, res, next)
 
     const patchedRender = res.render as jest.Mock
 
@@ -86,30 +111,11 @@ describe('nomisLockedRenderMiddleware', () => {
 
     patchedRender('someView', options, callback)
 
-    expect(originalRender).toHaveBeenCalledWith('someView', { ...options, isLocked: true }, callback)
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('should not patch res.render if isLocked flag is not set', () => {
-    const req = {
-      flash: jest.fn().mockReturnValue(['false']),
-    } as unknown as Request
-
-    const originalRender = jest.fn()
-    const res = {
-      render: originalRender,
-    } as unknown as Response
-
-    const next = jest.fn()
-
-    nomisLockedRenderMiddleware(req, res, next)
-
-    const options = { a: 1 }
-    const callback = jest.fn()
-
-    res.render('someView', options, callback)
-
-    expect(originalRender).toHaveBeenCalledWith('someView', options, callback)
+    expect(originalRender).toHaveBeenCalledWith(
+      'someView',
+      { ...options, isLocked: true, problemSaving: true },
+      callback,
+    )
     expect(next).toHaveBeenCalled()
   })
 })

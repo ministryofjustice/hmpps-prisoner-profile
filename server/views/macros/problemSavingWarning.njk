@@ -1,0 +1,28 @@
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+
+{% macro problemSavingWarning(problemSaving) %}
+    {% if problemSaving %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                {{ mojAlert({
+                    variant: "warning",
+                    title: "There was a technical problem saving your changes",
+                    showTitleAsHeading: true,
+                    dismissible: false,
+                    html: '
+                        <div class="govuk-width-container govuk-!-margin-bottom-3">
+                            There was a network issue or a temporary problem with DPS. 
+                            Your changes have not been saved. Please try again.
+                        </div>
+                        <div class="govuk-width-container">
+                            <strong>If you cannot resolve the issue</strong>
+                        </div>
+                        <div class="govuk-width-container">
+                            Call the helpdesk. If you are inside an establishment, dial #6598. 
+                            If you are working externally, call 0800 917 5148.
+                        </div>'
+                }) }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
