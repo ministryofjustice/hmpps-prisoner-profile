@@ -60,7 +60,7 @@ const aValidEnglishInPrisonCourseCompletedWithinLast12Months = (): InPrisonCours
     courseStatus: 'COMPLETED',
     courseCompletionDate: subMonths(new Date(), 3),
     isAccredited: true,
-    grade: null,
+    grade: 'Achieved at Level 2',
     source: 'CURIOUS',
   }
 }

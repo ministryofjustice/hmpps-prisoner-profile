@@ -132,7 +132,9 @@ export default function routes(services: Services): Router {
         apiErrorCallback,
       )
 
-      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
+      const fullCourseHistoryLinkUrl = config.featureToggles.useCurious2Api
+        ? `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/in-prison-courses-and-qualifications`
+        : `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const manageAllocationsLinkUrl = `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`
