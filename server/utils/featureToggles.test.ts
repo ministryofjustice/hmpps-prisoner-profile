@@ -40,6 +40,13 @@ describe('featureToggles', () => {
       expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
     })
 
+    it('is not enabled if now is before the from datetime, even when wildcard used', () => {
+      config.featureToggles.dietAndAllergyEnabledPrisonsByDate = ['***']
+      config.featureToggles.dietAndAllergyEnabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
+    })
+
     it('enabled if active case load is listed as permanently enabled', () => {
       config.featureToggles.dietAndAllergyEnabledPrisons = ['MDI']
 
