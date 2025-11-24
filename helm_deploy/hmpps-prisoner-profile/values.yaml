@@ -37,6 +37,7 @@ generic-service:
     OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
     APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS: "***"
     USE_CURIOUS2_API: "false"
+    HEALTH_AND_MEDICATION_API_READ_ENABLED: "false"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
