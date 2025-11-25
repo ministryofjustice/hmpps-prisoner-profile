@@ -29,7 +29,11 @@
       </div>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/inPrisonQualificationsCompletedInLast12Months.njk" %}
+          {% if useCurious2Api() %}
+            {% include "../partials/workAndSkillsPage/inPrisonCoursesAndQualifications/index.njk" %}
+          {% else %}
+            {% include "../partials/workAndSkillsPage/inPrisonCoursesAndQualifications/curious1_index.njk" %}
+          {% endif %}
         </div>
       </div>
       <div class="govuk-grid-row">
