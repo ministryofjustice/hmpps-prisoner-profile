@@ -4,9 +4,3 @@ export default interface IncentiveSummary {
   nextReviewDate: string
   daysOverdue: number | undefined
 }
-
-export const isIncentiveSummaryError = (
-  incentiveSummary: IncentiveSummary | { error: true },
-): incentiveSummary is { error: true } => {
-  return 'error' in incentiveSummary
-}

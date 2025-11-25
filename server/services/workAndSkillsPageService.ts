@@ -14,7 +14,7 @@ import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmployabilitySkills'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
-import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
+import { Assessment, LearnerLatestAssessment } from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import { Result } from '../utils/result/result'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 
@@ -159,7 +159,7 @@ export default class WorkAndSkillsPageService {
 
     if (learnerLatestAssessments) {
       const list: GovSummaryGroup[] = []
-      learnerLatestAssessments[0]?.qualifications?.forEach(content => {
+      ;((learnerLatestAssessments?.at(0)?.qualifications || []) as Array<Assessment>).forEach(content => {
         const type = {
           key: { text: content.qualification.qualificationType },
           value: { text: content.qualification.qualificationGrade },

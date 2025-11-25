@@ -3,7 +3,7 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { calculateAge } from '../../server/utils/utils'
+import { calculateAge, unavailableApiErrorMessage } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import {
   mockContactDetailStaffContacts,
@@ -74,6 +74,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.externalContacts().card().should('not.exist')
         cy.getDataQa('hidden-external-contacts').should('exist')
+      })
+
+      it('Does not display the CSRA history link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.csraCard().find('a').should('not.exist')
       })
     })
   })
@@ -770,12 +775,8 @@ context('Overview Page', () => {
 
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
-
-      overviewPage
-        .staffContacts()
-        .contains('dt', 'Key worker')
-        .next()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
+      cy.get('[data-qa=staff-contacts-unavailable]').should('exist')
+      overviewPage.staffContacts().contains('dt', 'Key worker').next().should('contain.text', 'Unavailable')
     })
   })
 
@@ -794,10 +795,10 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage
-        .nonAssociationsCard()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
-      overviewPage.nonAssociationsCard().contains('a', 'Non-associations')
+      overviewPage.nonAssociationsCard().should('contain.text', 'Unavailable')
+
+      cy.get('[data-qa=mini-summary-unavailable]').should('exist')
+      overviewPage.nonAssociationsCard().find('a').contains('Non-associations').should('not.exist')
     })
   })
 
@@ -815,9 +816,9 @@ context('Overview Page', () => {
 
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
-
-      overviewPage.primaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
-      overviewPage.secondaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
+      cy.get('[data-qa=staff-contacts-unavailable]').should('exist')
+      overviewPage.primaryPomName().should('contain.text', 'Unavailable')
+      overviewPage.secondaryPomName().should('contain.text', 'Unavailable')
     })
   })
 
@@ -835,11 +836,46 @@ context('Overview Page', () => {
 
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+      cy.get('[data-qa=external-contacts-unavailable]').should('exist')
+      overviewPage.externalContacts().card().should('contain.text', 'Unavailable')
+    })
+  })
 
-      overviewPage
-        .externalContacts()
-        .card()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
+  context('Given API call to get incentives fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubGetReviewsError', { prisonerNumber: 'G6123VU' })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the card', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+      cy.get('[data-qa=incentives-unavailable]').should('exist')
+      overviewPage.incentivesCard().should('contain.text', 'Unavailable')
+    })
+  })
+
+  context('Given API call to get adjudications fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubAdjudicationsError', 1102484)
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the card', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+      cy.get('[data-qa=mini-summary-unavailable]').should('exist')
+      overviewPage.adjudicationsSummary().should('contain.text', 'Unavailable')
     })
   })
 
@@ -868,9 +904,36 @@ context('Overview Page', () => {
 
       overviewPage.offencesHeader().should('not.exist')
       nextCourtAppearance.location().should('contain.text', 'Test court location')
-      latestCalculation
-        .placeHolderText()
-        .should('contain.text', 'We cannot show these details right now. Try again later.')
+      cy.get('[data-qa=release-dates-unavailable]').should('exist')
+      latestCalculation.placeHolderText().should('contain.text', unavailableApiErrorMessage)
+    })
+  })
+
+  context('Given API call for SOC nominal fails', () => {
+    beforeEach(() => {
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
+      cy.task('stubGetSocNominalError')
+      visitOverviewPage()
+    })
+
+    it('should not show the soc action and should show error detail', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.addToSocActionLink().should('not.exist')
+      cy.get('[data-qa=actions-unavailable]').should('exist')
+    })
+  })
+
+  context('Given API call for Pathfinder nominal fails', () => {
+    beforeEach(() => {
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
+      cy.task('stubGetPathfinderNominalError')
+      visitOverviewPage()
+    })
+
+    it('should not show the soc action and should show error detail', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.referToPathfinderActionLink().should('not.exist')
+      cy.get('[data-qa=actions-unavailable]').should('exist')
     })
   })
 

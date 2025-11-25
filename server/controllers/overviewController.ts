@@ -14,7 +14,7 @@ import {
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { formatName, isInUsersCaseLoad } from '../utils/utils'
+import { canViewCsraHistory, formatName, isInUsersCaseLoad } from '../utils/utils'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
@@ -96,8 +96,8 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
     ] = await Promise.all([
-      pathfinderApiClient.getNominal(prisonerNumber),
-      manageSocCasesApiClient.getNominal(prisonerNumber),
+      Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
+      Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
       showCourtCaseSummary
@@ -114,7 +114,7 @@ export default class OverviewController {
         : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       isGranted(PrisonerIncentivesPermission.read, prisonerPermissions)
-        ? this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber)
+        ? Result.wrap(this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
@@ -135,8 +135,8 @@ export default class OverviewController {
 
     const overviewActions = buildOverviewActions(
       prisonerData,
-      pathfinderNominal,
-      socNominal,
+      pathfinderNominal.getOrNull(),
+      socNominal.getOrNull(),
       user,
       config,
       res.locals.feComponents?.sharedData,
@@ -161,7 +161,12 @@ export default class OverviewController {
       schedule,
       incentiveSummary,
       overviewActions,
-      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, prisonerPermissions),
+      overviewInfoLinks: buildOverviewInfoLinks(
+        prisonerData,
+        pathfinderNominal.getOrNull(),
+        socNominal.getOrNull(),
+        prisonerPermissions,
+      ),
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
@@ -188,9 +193,11 @@ export default class OverviewController {
       options: {
         showCourtCaseSummary,
       },
+      actionsMayBeMissing: !(socNominal.isFulfilled() && pathfinderNominal.isFulfilled()),
+      showCsraHistoryLink: canViewCsraHistory(prisonId, user),
     }
 
-    res.render('pages/overviewPage', viewData)
+    res.render('pages/overviewPage', { ...viewData, useCustomErrorBanner: true })
   }
 
   private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {

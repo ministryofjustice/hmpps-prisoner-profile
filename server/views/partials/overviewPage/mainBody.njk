@@ -32,7 +32,7 @@
       {% endif %}
       {% if nonAssociationSummary %}
         <div class="govuk-grid-column-one-third">
-          {{ miniSummaryMacro(nonAssociationSummary | toNonAssociationSummaryDisplay(prisonerNumber)) }}
+          {{ miniSummaryMacro(nonAssociationSummary | toNonAssociationSummaryDisplay(prisonerNumber), nonAssociationSummary.status != 'fulfilled') }}
         </div>
       {% endif %}
     </div>
@@ -57,12 +57,12 @@
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
     {% if adjudicationSummary %}
         <div class="govuk-grid-column-one-half" data-qa="adjudications-summary">
-            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber)) }}
+            {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber), adjudicationSummary.status != 'fulfilled') }}
         </div>
     {% endif %}
     {% if incentiveSummary %}
         <div class="govuk-grid-column-one-half">
-            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives') }}
+            {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
         </div>
     {% endif %}
 </div>
@@ -70,7 +70,7 @@
     <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
         <div class="mini-card-wrapper" data-qa="mini-summary-list-macro">
             {{ miniCard(categorySummary | toCategorySummaryDisplay(prisonerInCaseLoad, bookingId), 'mini-card--categories') }}
-            {{ miniCard(csraSummary | toCsraSummaryDisplay(prisonerInCaseLoad, prisonerNumber), 'mini-card--csra') }}
+            {{ miniCard(csraSummary | toCsraSummaryDisplay(showCsraHistoryLink, prisonerNumber), 'mini-card--csra') }}
             {% if currentCsipDetail %}
                 {{ miniCard(currentCsipDetail | toCsipMiniCardContent(prisonerNumber), 'mini-card--csip') }}
             {% endif %}

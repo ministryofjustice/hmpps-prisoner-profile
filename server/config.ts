@@ -1,5 +1,7 @@
-import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
+import CircuitBreaker from 'opossum'
+import { AgentConfig, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 
+/** true in all k8s namespaces and in docker image */
 const production = process.env.NODE_ENV === 'production'
 
 const toBoolean = (value: unknown): boolean => {
@@ -17,6 +19,15 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 }
 
 const requiredInProduction = { requireInProduction: true }
+
+const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
+  timeout: 60000, // the rest client already implements a shorter timeout, hence 60s
+  errorThresholdPercentage: 80, // % of failures before opening the circuit
+  resetTimeout: 120000, // time to wait before attempting to half-open the circuit
+  rollingCountTimeout: 300000, // the time window to consider requests over
+  volumeThreshold: 5, // circuit will stay closed regardless of failures if there is less than this many requests in the window
+  errorFilter: (error: SanitisedError<unknown>) => error?.responseStatus === 404,
+}
 
 export default {
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
@@ -38,6 +49,7 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
+  defaultCircuitBreakerOptions,
   apis: {
     audit: {
       queueUrl: get('AUDIT_SQS_QUEUE_URL', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
@@ -117,7 +129,7 @@ export default {
       url: get('KEYWORKER_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('KEYWORKER_API_TIMEOUT_SECONDS', 3000)),
-        deadline: Number(get('AKEYWORKER_API_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('KEYWORKER_API_TIMEOUT_SECONDS', 3000)),
       },
       agent: new AgentConfig(Number(get('KEYWORKER_API_TIMEOUT_DEADLINE', 3000))),
     },
@@ -342,6 +354,9 @@ export default {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  /** k8s namespace suffix & github environment or "local" */
+  environment: get('ENVIRONMENT', 'local', requiredInProduction) as 'local' | 'dev' | 'preprod' | 'prod',
+  /** Phase banner tag label (blank in prod namespace) */
   environmentName: get('ENVIRONMENT_NAME', ''),
   featureToggles: {
     appInsightsWebAnalyticsEnabledPrisons: get('APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS', []),
@@ -369,6 +384,8 @@ export default {
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
+    circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
+    useCurious2Api: toBoolean(get('USE_CURIOUS2_API', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

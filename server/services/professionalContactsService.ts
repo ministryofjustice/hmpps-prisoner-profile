@@ -199,11 +199,17 @@ export default class ProfessionalContactsService {
       : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, apiErrorCallback)
   }
 
-  private async getYouthStaffContactsOverview(clientToken: string, bookingId: number) {
+  private async getYouthStaffContactsOverview(
+    clientToken: string,
+    bookingId: number,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ) {
     const prisonApi = this.prisonApiClientBuilder(clientToken)
-    const contacts = await prisonApi.getBookingContacts(bookingId)
+    const contactsResult = await Result.wrap(prisonApi.getBookingContacts(bookingId), apiErrorCallback)
+    const contacts: { otherContacts: Contact[] } = contactsResult.getOrNull() || { otherContacts: [] }
 
     const youthStaffContacts: YouthStaffContacts = {
+      callFailed: !contactsResult.isFulfilled(),
       cuspOfficer: null,
       cuspOfficerBackup: null,
       youthJusticeWorker: null,

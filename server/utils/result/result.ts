@@ -6,6 +6,7 @@
 export type Result<T, E = Error> = PromiseSettledResult<T> & {
   isFulfilled: () => boolean
   map: <R, E2>(map: (value: T) => R, mapError?: (error: E) => E2) => Result<R, E2>
+  mapAsync: <R>(map: (value: T) => Promise<R>) => Promise<Result<R>>
   handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => R1 | R2
   getOrThrow: () => T
   getOrHandle: <R>(handler: (e: E) => R) => T | R
@@ -41,7 +42,7 @@ export const Result = {
    */
   wrap: async <T>(promise: Promise<T>, onError: (e: Error) => void = () => null): Promise<Result<T>> => {
     try {
-      return Result.fulfilled(await promise)
+      return Result.fulfilled(await promise, onError)
     } catch (e) {
       onError(e)
       return Result.rejected(e)
@@ -63,11 +64,12 @@ export const Result = {
   /**
    * `Result.fulfilled` takes a value and produces a 'fulfilled' `Result`
    */
-  fulfilled: <T, E>(value: T): Result<T, E> => ({
+  fulfilled: <T, E>(value: T, onMappingError: (e: Error) => void = () => null): Result<T, E> => ({
     status: 'fulfilled',
     value,
     isFulfilled: () => true,
     map: <R, E2>(map: (v: T) => R, _: (e: E) => E2) => Result.fulfilled<R, E2>(map(value)),
+    mapAsync: async <R>(map: (v: T) => Promise<R>) => Result.wrap(map(value), onMappingError),
     handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => handler.fulfilled(value),
     getOrThrow: () => value,
     getOrHandle: () => value,
@@ -76,7 +78,7 @@ export const Result = {
   }),
 
   /**
-   * `Result.rejected` takes a value and produces an 'rejected' `Result`
+   * `Result.rejected` takes a value and produces a 'rejected' `Result`
    */
   rejected: <T, E>(error: E): Result<T, E> => ({
     status: 'rejected',
@@ -84,6 +86,7 @@ export const Result = {
     isFulfilled: () => false,
     map: <R, E2>(_m: (v: T) => R, mapError: (e: E) => E2 = e => e as unknown as E2) =>
       Result.rejected<R, E2>(mapError(error)),
+    mapAsync: <R>(_m: (v: T) => Promise<R>) => Promise.resolve(Result.rejected<R, Error>(error as Error)),
     handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => handler.rejected(error),
     getOrThrow: () => {
       throw error
@@ -95,3 +98,6 @@ export const Result = {
 }
 
 export const noCallbackOnErrorBecause = (_explanation: string) => (_error: Error) => {}
+
+export const isResult = <T>(value: unknown): value is Result<T> =>
+  typeof value === 'object' && value !== null && 'status' in value && 'isFulfilled' in value

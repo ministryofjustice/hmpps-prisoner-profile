@@ -33,4 +33,22 @@ export default {
       },
     })
   },
+
+  stubGetSocNominalError: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/soc/soc/nominal/nomsId/G6123VU`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          error: 'Something went wrong',
+        },
+      },
+    })
+  },
 }

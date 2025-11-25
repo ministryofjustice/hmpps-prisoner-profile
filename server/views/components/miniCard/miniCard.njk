@@ -1,4 +1,4 @@
-{% macro miniCard(content, classes) %}
+{% macro miniCard(content, classes, errored) %}
 <div class="mini-card {{ 'mini-card__no-header' if not content.heading }} {{ classes }}">
     {% if content.heading %}
         <div class="mini-card__heading">
@@ -6,6 +6,11 @@
         </div>
     {% endif %}
     <div class="mini-card__body card-body">
+        {% if errored %}
+            <p class="hmpps-api-error-inset" data-qa="incentives-unavailable">
+                {{ unavailableApiErrorText }}
+            </p>
+        {% endif %}
         {% if content.label %}
             <p class="mini-card__label">{{ content.label }}</p>
         {% endif %}

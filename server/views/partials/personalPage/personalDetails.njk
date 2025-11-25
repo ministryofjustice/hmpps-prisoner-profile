@@ -3,86 +3,98 @@
 {% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {% set aliases = [] %}
 {% for alias in personalDetails.aliases %}
   {% set aliases = (aliases.push([{text: alias.alias}, {text: alias.dateOfBirth}, {text: alias.sex}]), aliases) %}
 {% endfor %}
+
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
   ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
 {% endset %}
+
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
-{% macro dietAndFoodAllergiesHtml(personalDetails) %}
-  {%
-    if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0
-    or personalDetails.dietAndAllergy.foodAllergies.length > 0
-    or personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0
-    or personalDetails.dietAndAllergy.cateringInstructions.length > 0
-  %}
-    {% if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.dietAndAllergy.medicalDietaryRequirements %}
-          <span class="govuk-!-display-block">
-              {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
-                  {{ requirement.description }}: {{ requirement.comment }}
-              {% else %}
-                  {{ requirement.description }}
-              {% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
 
-    {% if personalDetails.dietAndAllergy.foodAllergies.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for allergy in personalDetails.dietAndAllergy.foodAllergies %}
-          <span class="govuk-!-display-block">
-            {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
-      <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
-      <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.dietAndAllergy.personalisedDietaryRequirements %}
-          <span class="govuk-!-display-block">
-            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
-          </span>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if personalDetails.dietAndAllergy.cateringInstructions.length > 0 %}
-        <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+{% macro dietAndFoodAllergiesHtml(dietAndAllergyResult) %}
+  {% if dietAndAllergyResult.status === 'fulfilled' %}
+    {% set dietAndAllergy = dietAndAllergyResult.value %}
+    {%
+      if dietAndAllergy.medicalDietaryRequirements.length > 0
+      or dietAndAllergy.foodAllergies.length > 0
+      or dietAndAllergy.personalisedDietaryRequirements.length > 0
+      or dietAndAllergy.cateringInstructions.length > 0
+    %}
+      {% if dietAndAllergy.medicalDietaryRequirements.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
         <div class="govuk-!-margin-bottom-2">
-            <span class="govuk-!-display-block">{{ personalDetails.dietAndAllergy.cateringInstructions }}</span>
+          {% for requirement in dietAndAllergy.medicalDietaryRequirements %}
+            <span class="govuk-!-display-block">
+                {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
+                    {{ requirement.description }}: {{ requirement.comment }}
+                {% else %}
+                    {{ requirement.description }}
+                {% endif %}
+            </span>
+          {% endfor %}
         </div>
+      {% endif %}
+
+      {% if dietAndAllergy.foodAllergies.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
+        <div class="govuk-!-margin-bottom-2">
+          {% for allergy in dietAndAllergy.foodAllergies %}
+            <span class="govuk-!-display-block">
+              {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
+        <div class="govuk-!-margin-bottom-2">
+          {% for requirement in dietAndAllergy.personalisedDietaryRequirements %}
+            <span class="govuk-!-display-block">
+              {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if dietAndAllergy.cateringInstructions.length > 0 %}
+          <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+          <div class="govuk-!-margin-bottom-2">
+              <span class="govuk-!-display-block">{{ dietAndAllergy.cateringInstructions }}</span>
+          </div>
+      {% endif %}
+
+      <span class="govuk-hint last-updated-summary">
+          {% set dietAndAllergyUpdateDate %}
+              {% if dietAndAllergy.lastModifiedAt.length > 0 %}
+                  on {{ dietAndAllergy.lastModifiedAt }}
+              {% endif %}
+          {% endset %}
+
+          {% set dietAndAllergyUpdateLocation %}
+              {% if dietAndAllergy.lastModifiedPrison.length > 0 %}
+                  {{ dietAndAllergy.lastModifiedPrison }}
+              {% else %}
+                  Unknown
+              {% endif %}
+          {% endset %}
+
+          Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
+      </span>
+    {% else %}
+      <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
-
-    <span class="govuk-hint last-updated-summary">
-        {% set dietAndAllergyUpdateDate %}
-            {% if personalDetails.dietAndAllergy.lastModifiedAt.length > 0 %}
-                on {{ personalDetails.dietAndAllergy.lastModifiedAt }}
-            {% endif %}
-        {% endset %}
-
-        {% set dietAndAllergyUpdateLocation %}
-            {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0 %}
-                {{ personalDetails.dietAndAllergy.lastModifiedPrison }}
-            {% else %}
-                Unknown
-            {% endif %}
-        {% endset %}
-
-        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
-    </span>
   {% else %}
-    <span class="govuk-!-margin-top-1">Not entered</span>
+    <p class="hmpps-api-error-inset" data-qa="health-and-medication-api-error">
+        {{ unavailableApiErrorText }}
+    </p>
   {% endif %}
+
 {% endmacro %}
 
 {% macro nationalitiesHtml(personalDetails) %}
@@ -279,12 +291,15 @@
                 {
                   key: "Diet and food allergies",
                   value:
-                  dietAndFoodAllergiesHtml(personalDetails),
+                  dietAndFoodAllergiesHtml(personalDetails.dietAndAllergy),
                   options: {
                     anchor: "diet-and-food-allergies",
                     dataQa: "diet-and-food-allergies",
                     visible: dietAndAllergiesEnabled,
-                    changeLinkEnabled: dietAndAllergiesEnabled and isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
+                    changeLinkEnabled:
+                      dietAndAllergiesEnabled and
+                      personalDetails.dietAndAllergy.status == "fulfilled" and
+                      isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
                     changeHref: 'personal/diet-and-food-allergies',
                     rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies'
                   }
@@ -344,110 +359,124 @@
         })
       }}
 
-      {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
+      {% if militaryHistoryEnabled %}
+        {% if militaryRecords.status === 'fulfilled' %}
+          {% if militaryRecords.value.length > 0 %}
+            <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
+                data-qa="military-records">
+                <div class="govuk-summary-list__row govuk-!-border-none">
+                    <dt class="govuk-summary-list__key">UK military service record</dt>
+                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border govuk-!-padding-bottom-0">
+                        <span class="anchor-center" id="military-service-information"></span>
+                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
+                        <div class="govuk-!-margin-bottom-2">
+                            <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
+                                {{ summaryListRow("Service number", militaryRecords.value[0].serviceNumber | d('Not entered'), "service-number") }}
+                                {{ summaryListRow("Branch", militaryRecords.value[0].militaryBranchDescription | d('Not entered'), "branch") }}
+                                {{ summaryListRow("Unit", militaryRecords.value[0].unitNumber | d('Not entered'), "unit-number") }}
+                                {{ summaryListRow("Rank at discharge", militaryRecords.value[0].militaryRankDescription | d('Not entered'), "rank") }}
+                                {{ summaryListRow("Comments", militaryRecords.value[0].description | d('Not entered'), "comments") }}
+                            </dl>
+                        </div>
+                        <span class="anchor-center" id="military-enlistment"></span>
+                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
+                        <div>
+                            <dl class="govuk-summary-list--sub-list">
+                                {{ summaryListRow("Date", militaryRecords.value[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
+                                {{ summaryListRow("Location", militaryRecords.value[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
+                            </dl>
+                        </div>
+                    </dd>
+                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                        <a class="govuk-link govuk-link--no-visited-state"
+                          href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.value[0].militarySeq }}">
+                            Change<span class="govuk-visually-hidden"> service information</span>
+                        </a>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row govuk-!-border-none">
+                    <dt class="govuk-summary-list__key"></dt>
+                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                        <span class="anchor-center" id="military-conflict"></span>
+                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
+                        <div>
+                            <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                                data-qa="conflict">
+                                {{ militaryRecords.value[0].warZoneDescription | d('Not entered') }}
+                            </dl>
+                        </div>
+                    </dd>
+                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                        <a class="govuk-link govuk-link--no-visited-state"
+                          href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                    class="govuk-visually-hidden"> conflict</span></a>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row  govuk-!-border-none">
+                    <dt class="govuk-summary-list__key"></dt>
+                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                        <span class="anchor-center" id="military-disciplinary-action"></span>
+                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
+                        <div>
+                            <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                                data-qa="disciplinary-action">
+                                {{ militaryRecords.value[0].disciplinaryActionDescription | d('Not entered') }}
+                            </dl>
+                        </div>
+                    </dd>
+                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                        <a class="govuk-link govuk-link--no-visited-state"
+                          href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                    class="govuk-visually-hidden"> disciplinary action</span></a>
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row govuk-!-border-none">
+                    <dt class="govuk-summary-list__key"></dt>
+                    <dd class="govuk-summary-list__value">
+                        <span class="anchor-center" id="military-discharge"></span>
+                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
+                        <div>
+                            <dl class="govuk-summary-list--sub-list">
+                                {{ summaryListRow("Date", militaryRecords.value[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
+                                {{ summaryListRow("Location", militaryRecords.value[0].dischargeLocation | d('Not entered'), "discharge-location") }}
+                                {{ summaryListRow("Type", militaryRecords.value[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
+                                {% if militaryRecords.value[0].endDate %}
+                                    {{ summaryListRow("Length of service", militaryRecords.value[0].startDate | lengthOfService(militaryRecords.value[0].endDate), "length-of-service") }}
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </dd>
+                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
+                        <a class="govuk-link govuk-link--no-visited-state"
+                          href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                    class="govuk-visually-hidden"> discharge</span></a>
+                    </dd>
+                </div>
+            </dl>
+          {% endif %}
+          {% if militaryRecords.value.length === 0
+            and isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+            <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
+            <div class="govuk-!-margin-bottom-4">
+              <a href="/prisoner/{{ prisonerNumber }}/personal/military-service-information" class="govuk-link govuk-link--no-visited-state"
+                >Add UK military service details</a
+              >
+            </div>
+          {% endif %}
+        {% else %}
           <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
-              data-qa="military-records">
-              <div class="govuk-summary-list__row govuk-!-border-none">
-                  <dt class="govuk-summary-list__key">UK military service record</dt>
-                  <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border govuk-!-padding-bottom-0">
-                      <span class="anchor-center" id="military-service-information"></span>
-                      <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
-                      <div class="govuk-!-margin-bottom-2">
-                          <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
-                              {{ summaryListRow("Service number", militaryRecords[0].serviceNumber | d('Not entered'), "service-number") }}
-                              {{ summaryListRow("Branch", militaryRecords[0].militaryBranchDescription | d('Not entered'), "branch") }}
-                              {{ summaryListRow("Unit", militaryRecords[0].unitNumber | d('Not entered'), "unit-number") }}
-                              {{ summaryListRow("Rank at discharge", militaryRecords[0].militaryRankDescription | d('Not entered'), "rank") }}
-                              {{ summaryListRow("Comments", militaryRecords[0].description | d('Not entered'), "comments") }}
-                          </dl>
-                      </div>
-                      <span class="anchor-center" id="military-enlistment"></span>
-                      <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
-                      <div>
-                          <dl class="govuk-summary-list--sub-list">
-                              {{ summaryListRow("Date", militaryRecords[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
-                              {{ summaryListRow("Location", militaryRecords[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
-                          </dl>
-                      </div>
-                  </dd>
-                  <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                      <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords[0].militarySeq }}">
-                          Change<span class="govuk-visually-hidden"> service information</span>
-                      </a>
-                  </dd>
-              </div>
-
-              <div class="govuk-summary-list__row govuk-!-border-none">
-                  <dt class="govuk-summary-list__key"></dt>
-                  <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                      <span class="anchor-center" id="military-conflict"></span>
-                      <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
-                      <div>
-                          <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
-                              data-qa="conflict">
-                              {{ militaryRecords[0].warZoneDescription | d('Not entered') }}
-                          </dl>
-                      </div>
-                  </dd>
-                  <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                      <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords[0].militarySeq }}">Change<span
-                                  class="govuk-visually-hidden"> conflict</span></a>
-                  </dd>
-              </div>
-              <div class="govuk-summary-list__row  govuk-!-border-none">
-                  <dt class="govuk-summary-list__key"></dt>
-                  <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                      <span class="anchor-center" id="military-disciplinary-action"></span>
-                      <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
-                      <div>
-                          <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
-                              data-qa="disciplinary-action">
-                              {{ militaryRecords[0].disciplinaryActionDescription | d('Not entered') }}
-                          </dl>
-                      </div>
-                  </dd>
-                  <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                      <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords[0].militarySeq }}">Change<span
-                                  class="govuk-visually-hidden"> disciplinary action</span></a>
-                  </dd>
-              </div>
-              <div class="govuk-summary-list__row govuk-!-border-none">
-                  <dt class="govuk-summary-list__key"></dt>
-                  <dd class="govuk-summary-list__value">
-                      <span class="anchor-center" id="military-discharge"></span>
-                      <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
-                      <div>
-                          <dl class="govuk-summary-list--sub-list">
-                              {{ summaryListRow("Date", militaryRecords[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
-                              {{ summaryListRow("Location", militaryRecords[0].dischargeLocation | d('Not entered'), "discharge-location") }}
-                              {{ summaryListRow("Type", militaryRecords[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
-                              {% if militaryRecords[0].endDate %}
-                                  {{ summaryListRow("Length of service", militaryRecords[0].startDate | lengthOfService(militaryRecords[0].endDate), "length-of-service") }}
-                              {% endif %}
-                          </dl>
-                      </div>
-                  </dd>
-                  <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
-                      <a class="govuk-link govuk-link--no-visited-state"
-                         href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords[0].militarySeq }}">Change<span
-                                  class="govuk-visually-hidden"> discharge</span></a>
-                  </dd>
-              </div>
+            data-qa="military-records">
+            <div class="govuk-summary-list__row govuk-!-border-none">
+              <dt class="govuk-summary-list__key">UK military service record</dt>
+              <dd class="govuk-summary-list__value govuk-!-padding-bottom-0">
+                <p class="hmpps-api-error-inset" data-qa="military-records-api-error">
+                  {{ unavailableApiErrorText }}
+                </p>
+              </dd>
+            </div>
           </dl>
-      {% endif %}
-
-      {% if militaryHistoryEnabled
-        and militaryRecords.length === 0
-        and isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
-        <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
-        <div class="govuk-!-margin-bottom-4">
-          <a href="/prisoner/{{ prisonerNumber }}/personal/military-service-information" class="govuk-link govuk-link--no-visited-state"
-            >Add UK military service details</a
-          >
-        </div>
+        {% endif %}
       {% endif %}
     </div>
   </div>

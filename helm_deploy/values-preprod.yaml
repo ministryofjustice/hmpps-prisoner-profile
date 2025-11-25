@@ -18,7 +18,8 @@ generic-service:
       SecAction "id:900000,phase:1,nolog,pass,t:none,setvar:tx.paranoia_level=2"
 
   env:
-    ENVIRONMENT_NAME: "PRE-PRODUCTION"
+    ENVIRONMENT: preprod               # k8s namespace suffix & github environment
+    ENVIRONMENT_NAME: "PRE-PRODUCTION" # Phase banner tag label
     INGRESS_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
@@ -90,13 +91,10 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
     EDIT_PROFILE_ENABLED: "true"
-    EDIT_PROFILE_ENABLED_PRISONS: "KMI,HEI,NMI,LCI"
+    EDIT_PROFILE_ENABLED_PRISONS: "KMI,HEI,NMI,LCI,RNI,MHI"
     EDIT_PROFILE_PHOTO_ENABLED_PRISONS: "***"
     EDIT_PROFILE_SIMULATE_FETCH: 'false'
-    DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
-    DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"
-    DIET_AND_ALLERGY_ENABLED_FROM: "2025-04-14T02:00:00"
-    HEALTH_AND_MEDICATION_API_READ_ENABLED: "true"
+    DIET_AND_ALLERGY_ENABLED_PRISONS: "***"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-17T12:00:00"
     EXTERNAL_CONTACTS_ENABLED_PRISONS: "***"
     MANAGE_ALLOCATIONS_ENABLED: "true"

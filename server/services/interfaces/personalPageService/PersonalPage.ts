@@ -13,21 +13,18 @@ export default interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
-  addresses: {
-    primaryOrPostal: AddressResponseDto[]
-    totalActive: number
-  }
+  addresses: Result<SummarisedAddresses>
   oldAddresses: OldAddresses // TODO remove after edit profile is rolled out
   oldAddressSummary: GovSummaryItem[] // TODO remove after edit profile is rolled out
   nextOfKin: NextOfKin[]
   nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
-  physicalCharacteristics: PhysicalCharacteristics
+  physicalCharacteristics: Result<PhysicalCharacteristics>
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
-  distinguishingMarks: PersonIntegrationDistinguishingMark[] | null
-  militaryRecords: MilitaryRecord[] | null
-  globalNumbersAndEmails: GlobalNumbersAndEmails
+  distinguishingMarks: Result<PersonIntegrationDistinguishingMark[]> | null
+  militaryRecords: Result<MilitaryRecord[]> | null
+  globalNumbersAndEmails: Result<GlobalNumbersAndEmails>
 }
 
 export interface PersonalDetails {
@@ -41,7 +38,7 @@ export interface PersonalDetails {
   domesticAbusePerpetrator: string
   domesticAbuseVictim: string
   cityOrTownOfBirth: string
-  countryOfBirth: string
+  countryOfBirth: Result<string>
   ethnicGroup: string
   fullName: string
   languages: {
@@ -67,7 +64,7 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
-  dietAndAllergy: DietAndAllergyDetails
+  dietAndAllergy: Result<DietAndAllergyDetails>
 }
 
 export interface NextOfKinAndEmergencyContactsDetails {
@@ -196,4 +193,9 @@ export interface GlobalNumbersAndEmails {
 
 export interface AddressForDisplay extends AddressResponseDto {
   addressPhoneNumbersForDisplay?: PhoneNumber[]
+}
+
+export interface SummarisedAddresses {
+  primaryOrPostal: AddressResponseDto[]
+  totalActive: number
 }

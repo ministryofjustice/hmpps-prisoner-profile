@@ -4,6 +4,7 @@ import {
   ReferenceDataCode,
 } from '../../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { stubGetWithBody, stubPutWithResponse } from './utils'
+import { stubFor } from './wiremock'
 
 const mockDietAndAllergy = (): DietAndAllergy => ({
   foodAllergies: {
@@ -74,6 +75,23 @@ export default {
       body: {
         ...mockHealthAndMedication(),
         ...overrides,
+      },
+    }),
+
+  stubHealthAndMedicationError: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}/prisoners/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          error: 'Something went wrong',
+        },
       },
     }),
 

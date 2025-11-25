@@ -8,8 +8,6 @@
   height: calc(100% - 15px);
 
   div.govuk-summary-list__row--no-border {
-    height: 100%;
-
     & > div {
       display: flex;
       flex-direction: column;

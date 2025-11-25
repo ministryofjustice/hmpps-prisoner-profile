@@ -6,7 +6,17 @@
 {% block content %}
 
   <h1 class="govuk-heading-l">{{ message }}</h1>
-  <h2 class="govuk-heading-m">{{ status }}</h2>
-  <pre>{{ stack }}</pre>
+
+  {% if paraContent %}
+    <p class="govuk-body">{{ paraContent }}</p>
+  {% endif %}
+
+  {% if status %}
+    <h2 class="govuk-heading-m">{{ status }}</h2>
+  {% endif %}
+
+  {% if stack %}
+    <pre>{{ stack }}</pre>
+  {% endif %}
 
 {% endblock %}

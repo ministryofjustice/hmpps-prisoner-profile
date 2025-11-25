@@ -27,7 +27,7 @@ export default interface OverviewPageData {
   schedule: OverviewSchedule
   csraSummary: CsraSummary
   categorySummary: CategorySummary
-  incentiveSummary: IncentiveSummary | { error: true } | null
+  incentiveSummary: Result<IncentiveSummary>
   currentCsipDetail: Result<CurrentCsipDetail>
   statuses: OverviewStatus[]
   personalDetails: PersonalDetails
@@ -46,6 +46,8 @@ export default interface OverviewPageData {
   options: {
     showCourtCaseSummary: boolean
   }
+  actionsMayBeMissing: boolean
+  showCsraHistoryLink: boolean
 }
 
 export interface CourtCaseSummary {

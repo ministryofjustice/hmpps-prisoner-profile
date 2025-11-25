@@ -22,6 +22,9 @@
 				text: languageLabel,
 				classes: 'govuk-label--s'
 			},
+      hint: {
+        text: autocompleteOptionHint
+      },
 			items: languageOptions,
 			errorMessage: errors | findError("language"),
 			classes: "js-autocomplete-select",

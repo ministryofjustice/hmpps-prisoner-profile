@@ -324,7 +324,9 @@ describe('PersonalPageService', () => {
           expect(response.personalDetails.smokerOrVaper).toEqual(output)
         })
       })
+    })
 
+    describe('Diet and food allergies', () => {
       describe('Food allergies', () => {
         it.each([
           [true, [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg' }]],
@@ -336,7 +338,8 @@ describe('PersonalPageService', () => {
               dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
               editProfileEnabled: false,
             })
-            expect(response.personalDetails.dietAndAllergy.foodAllergies).toEqual(expectedValue)
+
+            expect(response.personalDetails.dietAndAllergy.getOrThrow().foodAllergies).toEqual(expectedValue)
           },
         )
       })
@@ -352,7 +355,9 @@ describe('PersonalPageService', () => {
               dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
               editProfileEnabled: false,
             })
-            expect(response.personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.getOrThrow().medicalDietaryRequirements).toEqual(
+              expectedValue,
+            )
           },
         )
       })
@@ -368,7 +373,9 @@ describe('PersonalPageService', () => {
               dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
               editProfileEnabled: false,
             })
-            expect(response.personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.getOrThrow().personalisedDietaryRequirements).toEqual(
+              expectedValue,
+            )
           },
         )
       })
@@ -385,7 +392,7 @@ describe('PersonalPageService', () => {
               dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
               editProfileEnabled: false,
             })
-            expect(response.personalDetails.dietAndAllergy.lastModifiedAt).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.getOrThrow().lastModifiedAt).toEqual(expectedValue)
           },
         )
 
@@ -400,14 +407,22 @@ describe('PersonalPageService', () => {
               dietAndAllergyIsEnabled: dietAndAllergiesEnabled,
               editProfileEnabled: false,
             })
-            expect(response.personalDetails.dietAndAllergy.lastModifiedPrison).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.getOrThrow().lastModifiedPrison).toEqual(expectedValue)
           },
         )
       })
 
-      it('Maps the social care needed field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.socialCareNeeded).toEqual('No')
+      it('Handles failed health-and-medication-api call', async () => {
+        healthAndMedicationApiClient.getHealthAndMedication = jest.fn(async () => {
+          throw new Error()
+        })
+
+        const response = await constructService().get('token', PrisonerMockDataA, {
+          dietAndAllergyIsEnabled: true,
+          editProfileEnabled: false,
+        })
+
+        expect(response.personalDetails.dietAndAllergy.isFulfilled()).toEqual(false)
       })
 
       it('Maps the type of diet field', async () => {
@@ -532,9 +547,10 @@ describe('PersonalPageService', () => {
         )
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
         expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
-        expect(personalDetails.countryOfBirth).toEqual(EnglandCountryReferenceDataCodeMock.description)
+        expect(personalDetails.countryOfBirth.getOrNull()).toEqual(EnglandCountryReferenceDataCodeMock.description)
         expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
         expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
+        expect(personalDetails.socialCareNeeded).toEqual('No')
       })
     })
   })
@@ -739,12 +755,12 @@ describe('PersonalPageService', () => {
           { ...mockAddressResponseDto, primaryAddress: false, postalAddress: false },
         ])
 
-      const {
-        addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, {
-        dietAndAllergyIsEnabled: false,
-        editProfileEnabled: true,
-      })
+      const { primaryOrPostal, totalActive } = (
+        await constructService().get('token', PrisonerMockDataA, {
+          dietAndAllergyIsEnabled: false,
+          editProfileEnabled: true,
+        })
+      ).addresses.getOrNull()
 
       expect(totalActive).toEqual(2)
       expect(primaryOrPostal).toHaveLength(1)
@@ -756,12 +772,12 @@ describe('PersonalPageService', () => {
         .fn()
         .mockResolvedValue([{ ...mockAddressResponseDto, toDate: undefined }])
 
-      const {
-        addresses: { primaryOrPostal, totalActive },
-      } = await constructService().get('token', PrisonerMockDataA, {
-        dietAndAllergyIsEnabled: false,
-        editProfileEnabled: true,
-      })
+      const { primaryOrPostal, totalActive } = (
+        await constructService().get('token', PrisonerMockDataA, {
+          dietAndAllergyIsEnabled: false,
+          editProfileEnabled: true,
+        })
+      ).addresses.getOrNull()
 
       expect(totalActive).toEqual(1)
       expect(primaryOrPostal).toHaveLength(1)
@@ -805,7 +821,9 @@ describe('PersonalPageService', () => {
 
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
-      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
+      const physicalCharacteristics = (
+        await constructService().get('token', PrisonerMockDataA)
+      ).physicalCharacteristics.getOrNull()
       expect(physicalCharacteristics.height).toEqual('1m')
       expect(physicalCharacteristics.weight).toEqual('100kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
@@ -841,7 +859,9 @@ describe('PersonalPageService', () => {
       const inmateDetail = { ...inmateDetailMock }
       inmateDetail.physicalMarks = []
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
-      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
+      const physicalCharacteristics = (
+        await constructService().get('token', PrisonerMockDataA)
+      ).physicalCharacteristics.getOrNull()
       expect(physicalCharacteristics.distinguishingMarks.length).toEqual(0)
     })
   })
@@ -912,9 +932,11 @@ describe('PersonalPageService', () => {
 
   describe('Prison Person API Enabled', () => {
     it('Gets the height and weight from the prison person API', async () => {
-      const data = await constructService().get('token', PrisonerMockDataA, { dietAndAllergyIsEnabled: true })
-      expect(data.physicalCharacteristics.height).toBe('1m')
-      expect(data.physicalCharacteristics.weight).toBe('100kg')
+      const physicalCharacteristics = (
+        await constructService().get('token', PrisonerMockDataA, { dietAndAllergyIsEnabled: true })
+      ).physicalCharacteristics.getOrNull()
+      expect(physicalCharacteristics.height).toBe('1m')
+      expect(physicalCharacteristics.weight).toBe('100kg')
     })
   })
 
@@ -950,23 +972,27 @@ describe('PersonalPageService', () => {
 
   describe('Get diet and allergy data', () => {
     it('Gets the data from the API when diet and allergy is enabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+      const {
+        personalDetails: { dietAndAllergy },
+      } = await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: true,
         editProfileEnabled: false,
       })
 
+      const dietAndAllergyData = dietAndAllergy.getOrThrow()
+
       expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
-      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
-      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([
+      expect(dietAndAllergyData.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
+      expect(dietAndAllergyData.medicalDietaryRequirements).toEqual([
         { description: 'Coeliac', id: 'MEDICAL_DIET_COELIAC' },
       ])
-      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([
+      expect(dietAndAllergyData.personalisedDietaryRequirements).toEqual([
         { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
       ])
-      expect(personalDetails.dietAndAllergy.cateringInstructions).toEqual('Some catering instructions.')
-      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('2 July 2024')
-      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
+      expect(dietAndAllergyData.cateringInstructions).toEqual('Some catering instructions.')
+      expect(dietAndAllergyData.lastModifiedAt).toEqual('2 July 2024')
+      expect(dietAndAllergyData.lastModifiedPrison).toEqual('Styal (HMP)')
     })
 
     it('Handles missing dietAndAllergy fields', async () => {
@@ -977,43 +1003,55 @@ describe('PersonalPageService', () => {
         },
       }))
 
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+      const {
+        personalDetails: { dietAndAllergy },
+      } = await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: true,
         editProfileEnabled: false,
       })
 
-      expect(personalDetails.dietAndAllergy.cateringInstructions).toBeFalsy()
-      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('1 July 2024')
-      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
+      const dietAndAllergyData = dietAndAllergy.getOrThrow()
+
+      expect(dietAndAllergyData.cateringInstructions).toBeFalsy()
+      expect(dietAndAllergyData.lastModifiedAt).toEqual('1 July 2024')
+      expect(dietAndAllergyData.lastModifiedPrison).toEqual('Styal (HMP)')
     })
 
     it('Does not get the data from the API when diet and allergy is disabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+      const {
+        personalDetails: { dietAndAllergy },
+      } = await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: false,
         editProfileEnabled: false,
       })
+
+      const dietAndAllergyData = dietAndAllergy.getOrThrow()
 
       expect(healthAndMedicationApiClient.getHealthAndMedication).not.toHaveBeenCalledWith(
         PrisonerMockDataA.prisonerNumber,
       )
 
-      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
-      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
-      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([])
+      expect(dietAndAllergyData.foodAllergies).toEqual([])
+      expect(dietAndAllergyData.medicalDietaryRequirements).toEqual([])
+      expect(dietAndAllergyData.personalisedDietaryRequirements).toEqual([])
     })
 
-    it('Reads the data from the API but does not dislay it when configured to do so', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, {
+    it('Reads the data from the API but does not display it when configured to do so', async () => {
+      const {
+        personalDetails: { dietAndAllergy },
+      } = await constructService().get('token', PrisonerMockDataA, {
         dietAndAllergyIsEnabled: false,
         editProfileEnabled: false,
         healthAndMedicationApiReadEnabled: true,
       })
 
+      const dietAndAllergyData = dietAndAllergy.getOrThrow()
+
       expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
-      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
-      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
-      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([])
+      expect(dietAndAllergyData.foodAllergies).toEqual([])
+      expect(dietAndAllergyData.medicalDietaryRequirements).toEqual([])
+      expect(dietAndAllergyData.personalisedDietaryRequirements).toEqual([])
     })
   })
 
@@ -1202,7 +1240,7 @@ describe('PersonalPageService', () => {
               editProfileEnabled: true,
               personEndpointsEnabled,
             })
-            expect(result.globalNumbersAndEmails).toEqual(globalPhonesAndEmailsMock)
+            expect(result.globalNumbersAndEmails.getOrNull()).toEqual(globalPhonesAndEmailsMock)
           })
         })
       })
@@ -1213,7 +1251,7 @@ describe('PersonalPageService', () => {
             dietAndAllergyIsEnabled: true,
             editProfileEnabled: false,
           })
-          expect(result.globalNumbersAndEmails).toEqual(null)
+          expect(result.globalNumbersAndEmails.getOrNull()).toEqual(null)
         })
       })
     })

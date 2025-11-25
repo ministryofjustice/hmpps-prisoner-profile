@@ -138,8 +138,8 @@ export default class PersonalController {
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
-          personalPageData.physicalCharacteristics.leftEyeColour ===
-          personalPageData.physicalCharacteristics.rightEyeColour
+          personalPageData.physicalCharacteristics.getOrNull()?.leftEyeColour ===
+          personalPageData.physicalCharacteristics.getOrNull()?.rightEyeColour
             ? 'personal/eye-colour'
             : 'personal/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
@@ -153,6 +153,7 @@ export default class PersonalController {
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
+        useCustomErrorBanner: true,
       })
     }
   }
@@ -564,6 +565,7 @@ export default class PersonalController {
     autocompleteSelected,
     autocompleteOptionTitle,
     autocompleteOptionLabel,
+    autocompleteOptionHint,
     autocompleteError,
   }: {
     formTitle: string
@@ -573,6 +575,7 @@ export default class PersonalController {
     autocompleteSelected: boolean
     autocompleteOptionTitle: string
     autocompleteOptionLabel: string
+    autocompleteOptionHint: string
     autocompleteError: string
   }): RequestHandler {
     return async (req, res) => {
@@ -598,6 +601,7 @@ export default class PersonalController {
         autocompleteSelected,
         autocompleteOptionTitle,
         autocompleteOptionLabel,
+        autocompleteOptionHint,
         autocompleteError,
         redirectAnchor,
         miniBannerData,
@@ -710,8 +714,9 @@ export default class PersonalController {
           ),
           additionalNationalitiesValue,
           autocompleteSelected: fieldValue === 'OTHER',
-          autocompleteOptionTitle: 'A different nationality',
-          autocompleteOptionLabel: 'Select nationality',
+          autocompleteOptionTitle: 'Citizen of a country outside the UK',
+          autocompleteOptionLabel: 'Nationality',
+          autocompleteOptionHint: 'Start typing to select nationality.',
           autocompleteError: requestBodyFlash?.autocompleteError,
           miniBannerData,
         })
@@ -1144,8 +1149,9 @@ export default class PersonalController {
           radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
           autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
           autocompleteSelected: fieldValue === 'OTHER',
-          autocompleteOptionTitle: 'A different country',
-          autocompleteOptionLabel: 'Country name',
+          autocompleteOptionTitle: 'A country outside the UK',
+          autocompleteOptionLabel: 'Country',
+          autocompleteOptionHint: 'Start typing to select country.',
           autocompleteError,
         })(req, res, next)
       },

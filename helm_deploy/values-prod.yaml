@@ -20,6 +20,7 @@ generic-service:
     targetCPUUtilizationPercentage: 1600
 
   env:
+    ENVIRONMENT: prod # k8s namespace suffix & github environment
     INGRESS_URL: 'https://prisoner.digital.prison.service.justice.gov.uk'
     HMPPS_AUTH_URL: 'https://sign-in.hmpps.service.justice.gov.uk/auth'
     TOKEN_VERIFICATION_API_URL: 'https://token-verification-api.prison.service.justice.gov.uk'
@@ -92,11 +93,12 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: 'true'
     USE_OF_FORCE_DISABLED_PRISONS: 'FYI,WNI,WYI'
     EDIT_PROFILE_ENABLED: 'true'
-    EDIT_PROFILE_ENABLED_PRISONS: 'HEI,NMI,LCI'
+    EDIT_PROFILE_ENABLED_PRISONS: 'HEI,NMI,LCI,RNI,MHI'
     EDIT_PROFILE_PHOTO_ENABLED_PRISONS: '***'
     EDIT_PROFILE_SIMULATE_FETCH: 'false'
     DIET_AND_ALLERGY_ENABLED_PRISONS: 'STI,DHI,NMI,RNI,WYI,HEI'
-    HEALTH_AND_MEDICATION_API_READ_ENABLED: 'false'
+    DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "***"
+    DIET_AND_ALLERGY_ENABLED_FROM: "2025-11-25T09:00:00"
     MILITARY_HISTORY_ENABLED_FROM: '2025-03-18T00:00:00'
     EXTERNAL_CONTACTS_ENABLED_PRISONS: '***'
     MANAGE_ALLOCATIONS_ENABLED: 'true'

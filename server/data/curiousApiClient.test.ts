@@ -5,9 +5,10 @@ import { learnerEmployabilitySkills } from './localMockData/learnerEmployability
 import aValidLearnerGoals from './localMockData/learnerGoalsMock'
 import { LearnerLatestAssessmentsMock } from './localMockData/learnerLatestAssessmentsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
-import { LearnerProfiles } from './localMockData/learnerProfiles'
 import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
 import { learnerEducationPagedResponsePage1Of1 } from './localMockData/learnerEducationPagedResponse'
+import { LearnerAssessmentsMock } from './localMockData/learnerAssessmentsMock'
+import { LearnerQualificationsMock } from './localMockData/learnerQualificationsMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -34,18 +35,6 @@ describe('curiousApiClient', () => {
 
       const output = await curiousApiClient.getLearnerEmployabilitySkills('G6123VU')
       expect(output).toEqual(learnerEmployabilitySkills)
-    })
-  })
-
-  describe('getLearnerProfiles', () => {
-    it('should return data from api', async () => {
-      fakeCuriousApi
-        .get('/learnerProfile/G6123VU')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LearnerProfiles)
-
-      const output = await curiousApiClient.getLearnerProfile('G6123VU')
-      expect(output).toEqual(LearnerProfiles)
     })
   })
 
@@ -148,6 +137,50 @@ describe('curiousApiClient', () => {
 
       const output = await curiousApiClient.getLearnerNeurodivergence('G6123VU')
       expect(output).toEqual(LearnerNeurodivergenceMock)
+    })
+  })
+
+  describe('getLearnerAssessments', () => {
+    it('should return data from api', async () => {
+      fakeCuriousApi
+        .get('/learnerAssessments/v2/G6123VU')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, LearnerAssessmentsMock)
+
+      const output = await curiousApiClient.getLearnerAssessments('G6123VU')
+      expect(output).toEqual(LearnerAssessmentsMock)
+    })
+
+    it('should return null given api returns 404', async () => {
+      fakeCuriousApi
+        .get('/learnerAssessments/v2/G6123VU')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await curiousApiClient.getLearnerAssessments('G6123VU')
+      expect(output).toBeNull()
+    })
+  })
+
+  describe('getLearnerQualifications', () => {
+    it('should return data from api', async () => {
+      fakeCuriousApi
+        .get('/learnerQualifications/v2/G6123VU')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, LearnerQualificationsMock)
+
+      const output = await curiousApiClient.getLearnerQualifications('G6123VU')
+      expect(output).toEqual(LearnerQualificationsMock)
+    })
+
+    it('should return null given api returns 404', async () => {
+      fakeCuriousApi
+        .get('/learnerQualifications/v2/G6123VU')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await curiousApiClient.getLearnerQualifications('G6123VU')
+      expect(output).toBeNull()
     })
   })
 })

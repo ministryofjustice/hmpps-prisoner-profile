@@ -93,33 +93,39 @@
 }) %}
   <div class="govuk-grid-row" data-qa="addresses">
     <div class="govuk-grid-column-full">
-      {% if addresses.primaryOrPostal | length %}
-        {% for address in addresses.primaryOrPostal %}
-          {% if address.primaryAddress and address.postalAddress %}
-            {% call addressSummary(address, 'primary-and-postal') %}
-              <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary and postal address</span>
-            {% endcall %}
-          {% elseif address.primaryAddress %}
-            {% call addressSummary(address, 'primary') %}
-              <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary address</span>
-            {% endcall %}
-          {% elseif address.postalAddress %}
-            {% call addressSummary(address, 'postal') %}
-              <span class="govuk-caption-m govuk-!-margin-bottom-2">Postal address</span>
-            {% endcall %}
-          {% endif %}
-        {% endfor %}
+      {% if addresses.status === 'fulfilled' %}
+        {% if addresses.value.primaryOrPostal | length %}
+          {% for address in addresses.value.primaryOrPostal %}
+            {% if address.primaryAddress and address.postalAddress %}
+              {% call addressSummary(address, 'primary-and-postal') %}
+                <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary and postal address</span>
+              {% endcall %}
+            {% elseif address.primaryAddress %}
+              {% call addressSummary(address, 'primary') %}
+                <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary address</span>
+              {% endcall %}
+            {% elseif address.postalAddress %}
+              {% call addressSummary(address, 'postal') %}
+                <span class="govuk-caption-m govuk-!-margin-bottom-2">Postal address</span>
+              {% endcall %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p class="govuk-body govuk-!-margin-bottom-4 {% if newArrival72 %}not-entered-tag not-entered-tag--wide{% endif %}">
+            No active primary or postal addresses entered{% if not newArrival72 %}.{% endif %}
+          </p>
+        {% endif %}
+        {% if addresses.value.totalActive > 0 %}
+          <div class="govuk-!-padding-bottom-4">
+            <a href="/prisoner/{{ prisonerNumber }}/addresses" class="govuk-link govuk-link--no-visited-state" data-qa="all-addresses-link">
+              View all addresses ({{ addresses.value.totalActive }})
+            </a>
+          </div>
+        {% endif %}
       {% else %}
-        <p class="govuk-body govuk-!-margin-bottom-4 {% if newArrival72 %}not-entered-tag not-entered-tag--wide{% endif %}">
-          No active primary or postal addresses entered{% if not newArrival72 %}.{% endif %}
+        <p class="hmpps-api-error-inset govuk-!-margin-bottom-3" data-qa="addresses-api-error">
+          {{ unavailableApiErrorText }}
         </p>
-      {% endif %}
-      {% if addresses.totalActive > 0 %}
-        <div class="govuk-!-padding-bottom-4">
-          <a href="/prisoner/{{ prisonerNumber }}/addresses" class="govuk-link govuk-link--no-visited-state" data-qa="all-addresses-link">
-            View all addresses ({{ addresses.totalActive }})
-          </a>
-        </div>
       {% endif %}
     </div>
   </div>

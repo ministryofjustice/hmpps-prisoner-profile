@@ -26,7 +26,7 @@ import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 import bannerMiddleware from './middleware/bannerMiddleware'
 import logger from '../logger'
 import config from './config'
-import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './middleware/nomisLockedMiddleware'
+import { warningMiddleware, warningRenderMiddleware } from './middleware/warningMiddleware'
 import { distinguishingMarksMulterExceptions } from './routes/distinguishingMarksRouter'
 import unless from './utils/unless'
 import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
@@ -66,7 +66,10 @@ export default function createApp(services: Services): express.Application {
       multer({
         storage: multer.memoryStorage(),
         limits: {
-          fieldSize: 10 * 1024 * 1024,
+          // File size limits are 200MB
+          // Setting this to 300MB because of overhead when encoding as base64 in imgSrc field in imageController
+          // Though these limits feel extreme
+          fieldSize: 300 * 1024 * 1024,
         },
       }).single('file'),
     ),
@@ -91,9 +94,9 @@ export default function createApp(services: Services): express.Application {
   )
 
   app.use(retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }))
-  app.use(nomisLockedRenderMiddleware)
+  app.use(warningRenderMiddleware)
   app.use(routes(services))
-  app.use(nomisLockedMiddleware(services.metricsService))
+  app.use(warningMiddleware(services.metricsService))
 
   app.use(setUpPageNotFound)
   setUpSentryErrorHandler(app)
