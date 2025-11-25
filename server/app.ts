@@ -26,7 +26,7 @@ import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 import bannerMiddleware from './middleware/bannerMiddleware'
 import logger from '../logger'
 import config from './config'
-import { nomisLockedMiddleware, nomisLockedRenderMiddleware } from './middleware/nomisLockedMiddleware'
+import { warningMiddleware, warningRenderMiddleware } from './middleware/warningMiddleware'
 import { distinguishingMarksMulterExceptions } from './routes/distinguishingMarksRouter'
 import unless from './utils/unless'
 import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
@@ -94,9 +94,9 @@ export default function createApp(services: Services): express.Application {
   )
 
   app.use(retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }))
-  app.use(nomisLockedRenderMiddleware)
+  app.use(warningRenderMiddleware)
   app.use(routes(services))
-  app.use(nomisLockedMiddleware(services.metricsService))
+  app.use(warningMiddleware(services.metricsService))
 
   app.use(setUpPageNotFound)
   setUpSentryErrorHandler(app)

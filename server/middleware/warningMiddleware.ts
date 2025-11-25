@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import ProblemSavingError from '../utils/problemSavingError'
 
-export function nomisLockedMiddleware(metricsService: MetricsService) {
+export function warningMiddleware(metricsService: MetricsService) {
   return (err: unknown, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof NomisLockedError) {
       const { prisonerNumber } = req.middleware.prisonerData
@@ -17,17 +18,23 @@ export function nomisLockedMiddleware(metricsService: MetricsService) {
       req.flash('requestBody', JSON.stringify(req.body))
       return res.redirect(req.originalUrl)
     }
+
+    if (err instanceof ProblemSavingError) {
+      req.flash('problemSaving', 'true')
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(req.originalUrl)
+    }
+
     return next(err)
   }
 }
 
-export function nomisLockedRenderMiddleware(req: Request, res: Response, next: NextFunction) {
+export function warningRenderMiddleware(req: Request, res: Response, next: NextFunction) {
   const isLocked = req.flash('isLocked')[0] === 'true'
-  if (isLocked) {
-    const originalRender = res.render.bind(res)
-    res.render = (view: string, options?: object, callback?: (err: Error, html: string) => void) => {
-      return originalRender(view, { ...options, isLocked }, callback)
-    }
+  const problemSaving = req.flash('problemSaving')[0] === 'true'
+  const originalRender = res.render.bind(res)
+  res.render = (view: string, options?: object, callback?: (err: Error, html: string) => void) => {
+    return originalRender(view, { ...options, isLocked, problemSaving }, callback)
   }
   next()
 }

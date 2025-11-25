@@ -17,8 +17,8 @@ export const dietAndAllergyEnabled: FeatureFlagMethod = (activeCaseLoadId: strin
   config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId) ||
   config.featureToggles.dietAndAllergyEnabledPrisons.includes('***') ||
   (isAfter(Date.now(), config.featureToggles.dietAndAllergyEnabledPrisonsFrom) &&
-    config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes(activeCaseLoadId)) ||
-  config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes('***')
+    (config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes(activeCaseLoadId) ||
+      config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes('***')))
 
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 
