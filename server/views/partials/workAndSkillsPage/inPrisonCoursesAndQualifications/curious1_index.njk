@@ -1,4 +1,8 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{#
+Deprecated - this is the summary card for In Prison Courses & Qualifications from Curious 1
+This will be replaced by the Curious 2 equivalent
+#}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "In-prison courses and qualifications", id: "courses-and-qualifications"}) -%}
 
@@ -64,6 +68,6 @@
     {% endif %}
 
   {% else %}
-    {% include './curiousApiError.njk' %}
+    {% include '../curiousApiError.njk' %}
   {% endif %}
 {%- endcall -%}

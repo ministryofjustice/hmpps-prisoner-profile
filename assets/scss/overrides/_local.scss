@@ -45,6 +45,9 @@ a.govuk-tabs__tab {
 .app-u-multiline-text {
   white-space: pre-line;
 }
+.app-u-nowrap-content {
+  white-space: nowrap;
+}
 
 // Override govuk accordion styling to support only having toggle as link
 .govuk-frontend-supported .govuk-accordion__section-button {

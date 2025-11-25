@@ -66,7 +66,12 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
+import {
+  appInsightsWebAnalyticsEnabled,
+  externalContactsEnabled,
+  militaryHistoryEnabled,
+  useCurious2Api,
+} from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
@@ -133,6 +138,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('appInsightsWebAnalyticsEnabled', appInsightsWebAnalyticsEnabled)
+  njkEnv.addGlobal('useCurious2Api', useCurious2Api)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
