@@ -77,6 +77,7 @@ import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
 import { ApplicationInfo } from '../applicationInfo'
+import filterArrayOnPropertyFilter from './filterArrayOnPropertyFilter'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
@@ -237,6 +238,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
   njkEnv.addFilter('sexualOrientationText', mapSexualOrientationText)
   njkEnv.addFilter('sentenceCase', sentenceCase)
+  njkEnv.addFilter('filterArrayOnProperty', filterArrayOnPropertyFilter)
 
   // BVLS specific filter
   njkEnv.addFilter('toFullCourtLink', toFullCourtLink)

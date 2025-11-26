@@ -10,6 +10,8 @@ import { CuriousRestClientBuilder } from '../data'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 import config from '../config'
 import toInPrisonCourseRecords from './mappers/inPrisonCourseRecordsMapper'
+import { FunctionalSkills } from './interfaces/curiousService/CuriousFunctionalSkillsAssessments'
+import toFunctionalSkills from './mappers/functionalSkillsMapper'
 
 export default class CuriousService {
   constructor(
@@ -98,6 +100,19 @@ export default class CuriousService {
     } catch (error) {
       logger.error('Error retrieving learner education data from Curious', error)
       return { problemRetrievingData: true } as InPrisonCourseRecords
+    }
+  }
+
+  async getPrisonerFunctionalSkills(prisonNumber: string): Promise<FunctionalSkills> {
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+
+    try {
+      const allPrisonerAssessments =
+        await this.curiousApiClientBuilder(curiousApiToken).getLearnerAssessments(prisonNumber)
+      return toFunctionalSkills(allPrisonerAssessments)
+    } catch (error) {
+      logger.error('Error retrieving functional skills data from Curious', error)
+      throw error
     }
   }
 

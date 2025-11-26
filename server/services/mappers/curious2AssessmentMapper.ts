@@ -77,7 +77,9 @@ const toBasicAssessment = (assessment: LearnerAssessmentsFunctionalSkillsDTO | L
   ({
     prisonId: assessment.establishmentId,
     assessmentDate: startOfDay(assessment.assessmentDate),
-    referral: assessment.stakeholderReferral,
+    referral: assessment.stakeholderReferral
+      ? (assessment.stakeholderReferral as string).split(',').map(referral => referral.trim())
+      : null,
     nextStep: assessment.assessmentNextStep,
     source: 'CURIOUS2',
   }) as Assessment

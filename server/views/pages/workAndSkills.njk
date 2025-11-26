@@ -17,7 +17,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
       <ul class="govuk-list hmpps-sidebar">
-        <li><a class="govuk-link" href="#functional-skills-level">Functional skills level</a></li>
+        <li><a class="govuk-link" href="#functional-skills-level">Functional skills{{ ' level' if not useCurious2Api() }}</a></li>
         <li><a class="govuk-link" href="#courses-and-qualifications">Courses and qualifications</a></li>
         <li><a class="govuk-link" href="#work-and-activities">Work and activities</a></li>
         <li><a class="govuk-link" href="#goals">Goals</a></li>
@@ -27,7 +27,11 @@
     <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
       <div class="govuk-grid-row" data-qa="courses-and-qualifications">
         <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/functionalSkillsLevel.njk" %}
+          {% if useCurious2Api() %}
+            {% include "../partials/workAndSkillsPage/functionalSkills/index.njk" %}
+          {% else %}
+            {% include "../partials/workAndSkillsPage/functionalSkills/curious1_index.njk" %}
+          {% endif %}
         </div>
       </div>
       <div class="govuk-grid-row">

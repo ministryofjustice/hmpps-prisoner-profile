@@ -17,10 +17,11 @@ import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { Assessment, LearnerLatestAssessment } from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import { Result } from '../utils/result/result'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
+import config from '../config'
 
 export interface WorkAndSkillsData {
   learnerEmployabilitySkills: Result<LearnerEmployabilitySkills>
-  learnerLatestAssessments: Result<Array<Array<GovSummaryGroup>>>
+  learnerLatestAssessments: Result<Array<Array<GovSummaryGroup>>> | undefined // TODO - Deprecated property. Remove when Functional Skills are retrieved from the Curious 2 endpoint via the useCurious2Api feature toggle.
   curiousGoals: Result<CuriousGoals>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
@@ -65,7 +66,9 @@ export default class WorkAndSkillsPageService {
       personalLearningPlanActionPlan,
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient, apiErrorCallback),
-      this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient, apiErrorCallback),
+      !config.featureToggles.useCurious2Api
+        ? this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient, apiErrorCallback)
+        : undefined, // undefined if the useCurious2Api feature flag is set - we get Functional Skills from Curious 2 via a middleware call in this case
       this.getCuriousGoals(prisonerNumber, curiousApiClient, apiErrorCallback),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
       this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
@@ -144,6 +147,13 @@ export default class WorkAndSkillsPageService {
     return Result.wrap(curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber), apiErrorCallback)
   }
 
+  /*
+    @deprecated - the following is the old behaviour/approach of getting Functional Skills
+    It retrieves Curious 1 only Functional Skills, from the Curious 1 endpoint
+
+    TODO - remove this code and all supporting code/functions when Functional Skills are retrieved from the Curious 2
+      endpoint via the useCurious2Api feature toggle.
+   */
   private async getLearnerLatestAssessments(
     prisonerNumber: string,
     curiousApiClient: CuriousApiClient,

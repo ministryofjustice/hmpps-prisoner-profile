@@ -1,0 +1,90 @@
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Functional skills initial assessment results", id: "functional-skills-level", classes: "hmpps-functional-skills-card"}) -%}
+
+  {% if prisonerFunctionalSkills.isFulfilled() %}
+    {% set prisonerFunctionalSkills = prisonerFunctionalSkills.value %}
+    {% set mostRecentEnglishAssessment = prisonerFunctionalSkills.assessments | filterArrayOnProperty('type', 'ENGLISH') | sort(attribute = 'assessmentDate', reverse = true) | first %}
+    {% set mostRecentMathsAssessment = prisonerFunctionalSkills.assessments | filterArrayOnProperty('type', 'MATHS') | sort(attribute = 'assessmentDate', reverse = true) | first %}
+    {% set mostRecentDigitalSkillsAssessment = prisonerFunctionalSkills.assessments | filterArrayOnProperty('type', 'DIGITAL_LITERACY') | sort(attribute = 'assessmentDate', reverse = true) | first %}
+    {% set mostRecentReadingAssessment = prisonerFunctionalSkills.assessments | filterArrayOnProperty('type', 'READING') | sort(attribute = 'assessmentDate', reverse = true) | first %}
+    {% set mostRecentEsolAssessment = prisonerFunctionalSkills.assessments | filterArrayOnProperty('type', 'ESOL') | sort(attribute = 'assessmentDate', reverse = true) | first %}
+    {% set mostRecentAssessmentsOfType = [] %}
+    {% if mostRecentEnglishAssessment %}
+      {% set mostRecentAssessmentsOfType = (mostRecentAssessmentsOfType.push(mostRecentEnglishAssessment), mostRecentAssessmentsOfType) %}
+    {% endif %}
+    {% if mostRecentMathsAssessment %}
+      {% set mostRecentAssessmentsOfType = (mostRecentAssessmentsOfType.push(mostRecentMathsAssessment), mostRecentAssessmentsOfType) %}
+    {% endif %}
+    {% if mostRecentDigitalSkillsAssessment %}
+      {% set mostRecentAssessmentsOfType = (mostRecentAssessmentsOfType.push(mostRecentDigitalSkillsAssessment), mostRecentAssessmentsOfType) %}
+    {% endif %}
+    {% if mostRecentReadingAssessment %}
+      {% set mostRecentAssessmentsOfType = (mostRecentAssessmentsOfType.push(mostRecentReadingAssessment), mostRecentAssessmentsOfType) %}
+    {% endif %}
+    {% if mostRecentEsolAssessment %}
+      {% set mostRecentAssessmentsOfType = (mostRecentAssessmentsOfType.push(mostRecentEsolAssessment), mostRecentAssessmentsOfType) %}
+    {% endif %}
+
+    <p class="govuk-hint">Information from Curious. These results are from a person's induction assessment. For recent functional skills qualification, go to in-prison courses and qualifications.</p>
+
+    {% if mostRecentAssessmentsOfType.length %}
+      <section data-qa="functional-skills-assessment-results">
+        {% for assessment in mostRecentAssessmentsOfType %}
+          <dl class="govuk-summary-list" data-qa="{{ assessment.type }}-assessment-result">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key" data-qa="assessment-type">
+                {{ 'English' if assessment.type == 'ENGLISH' }}
+                {{ 'Maths' if assessment.type == 'MATHS' }}
+                {{ 'Digital skills' if assessment.type == 'DIGITAL_LITERACY' }}
+                {{ 'Reading' if assessment.type == 'READING' }}
+                {{ 'ESOL' if assessment.type == 'ESOL' }}
+              </dt>
+              <dd class="govuk-summary-list__value" data-qa="assessment-level">{{ assessment.level }}{{ ' (' + assessment.levelBanding + ')' if assessment.levelBanding }}</td></dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Assessment date</dt>
+              <dd class="govuk-summary-list__value" data-qa="assessment-date">{{ assessment.assessmentDate | formatDate('medium') }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Assessment location</dt>
+              {% set prisonName = prisonNamesById[assessment.prisonId] | default(assessment.prisonId) %}
+              <dd class="govuk-summary-list__value" data-qa="assessment-location">{{ prisonName }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Next steps</dt>
+              <dd class="govuk-summary-list__value" data-qa="assessment-next-steps">{{ assessment.nextStep if assessment.nextStep else 'N/A' }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Referral</dt>
+              <dd class="govuk-summary-list__value" data-qa="assessment-referral">
+                {% if assessment.referral | length %}
+                  <ul class="govuk-list">
+                    {% for referral in assessment.referral %}
+                      <li>{{ referral }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  N/A
+                {% endif %}
+            </div>
+          </dl>
+        {% endfor %}
+      </section>
+
+      <p class="govuk-body">
+        <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="{{ allFunctionalSkillsLinkUrl }}" data-qa="link-to-view-all-functional-skills">
+          View all functional skills initial assessment results
+        </a>
+      </p>
+
+    {% else %}
+      <p class="govuk-body" data-qa="no-functional-skills-assessment-results-message">
+        No functional skills assessment results recorded in Curious.
+      </p>
+    {% endif %}
+
+  {% else %}
+    {% include '../curiousApiError.njk' %}
+  {% endif %}
+{%- endcall -%}

@@ -21,7 +21,7 @@ export interface Assessment {
   assessmentDate: Date
   level: string
   levelBanding: string | null
-  referral: string | null
+  referral: Array<string> | null
   nextStep: string | null
   source: 'CURIOUS1' | 'CURIOUS2'
 }
