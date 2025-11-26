@@ -50,7 +50,8 @@ This will be replaced by the Curious 2 equivalent
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell" data-qa="completed-course-name">{{ completedCourse.courseName }}</td>
                   <td class="govuk-table__cell app-u-nowrap-content">{{ "Accredited" if completedCourse.isAccredited else "Non-accredited" }}</td>
-                  <td class="govuk-table__cell">{{ completedCourse.prisonId }}{# TODO - lookup prison name here #}</td>
+                  {% set prisonName = prisonNamesById[completedCourse.prisonId] | default(completedCourse.prisonId) %}
+                  <td class="govuk-table__cell">{{ prisonName }}
                   <td class="govuk-table__cell">{{ completedCourse.courseCompletionDate | formatDate('medium') }}</td>
                   <td class="govuk-table__cell">{{ completedCourse.grade }}</td>
                 </tr>
