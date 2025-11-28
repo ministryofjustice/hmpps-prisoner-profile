@@ -47,6 +47,7 @@ export default {
     })
   },
 
+  // @deprecated
   stubGetLearnerLatestAssessments: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
     const response = error
       ? {
@@ -220,24 +221,38 @@ export default {
     })
   },
 
-  stubGetLearnerAssessments: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
-    const response = error
-      ? {
-          status: 500,
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-          jsonBody: {
-            errorCode: 'VC5001',
-            errorMessage: 'Service unavailable',
-            httpStatusCode: 500,
-          },
-        }
-      : {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          jsonBody: LearnerAssessmentsMock,
-        }
+  stubGetLearnerAssessments: ({ prisonerNumber, error = undefined }: { prisonerNumber: string; error: 404 | 500 }) => {
+    let response
+    if (!error) {
+      response = {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: LearnerAssessmentsMock,
+      }
+    } else {
+      response =
+        error === 404
+          ? {
+              status: 404,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC4004',
+                errorMessage: 'Not found',
+                httpStatusCode: 404,
+              },
+            }
+          : {
+              status: 500,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC5001',
+                errorMessage: 'Service unavailable',
+                httpStatusCode: 500,
+              },
+            }
+    }
     return stubFor({
       request: {
         method: 'GET',
