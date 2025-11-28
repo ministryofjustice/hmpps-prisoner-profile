@@ -1,4 +1,8 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{#
+Deprecated - this is the summary card for Functional Skills from Curious 1
+This will be replaced by the Curious 2 equivalent
+#}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Functional skills level", id: "functional-skills-level"}) -%}
     {% if learnerLatestAssessments.status === 'fulfilled' %}
@@ -18,6 +22,6 @@
             <p>The prisoner does not have any assessments.</p>
         {% endif %}
     {% else %}
-        {% include './curiousApiError.njk' %}
+        {% include '../curiousApiError.njk' %}
     {% endif %}
 {%- endcall -%}

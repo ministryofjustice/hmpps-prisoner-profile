@@ -34,7 +34,7 @@ describe('curious2AssessmentMapper', () => {
         workingTowardsLevel: 'Level 3',
         levelBanding: '3.3',
         assessmentNextStep: 'Progress to higher level based on evidence of prior attainment',
-        stakeholderReferral: 'Psychology',
+        stakeholderReferral: 'Psychology, NSM, Other',
       },
     ],
     digitalSkillsFunctionalSkills: [
@@ -99,7 +99,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'Pre-Entry',
           levelBanding: '0.3',
           nextStep: 'Progress to course at level consistent with assessment result',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -109,7 +109,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'Level 1',
           levelBanding: '1.4',
           nextStep: 'Progress to higher level based on evidence of prior attainment',
-          referral: 'NSM',
+          referral: ['NSM'],
           source: 'CURIOUS2',
         },
         {
@@ -119,7 +119,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'Level 3',
           levelBanding: '3.3',
           nextStep: 'Progress to higher level based on evidence of prior attainment',
-          referral: 'Psychology',
+          referral: ['Psychology', 'NSM', 'Other'],
           source: 'CURIOUS2',
         },
         {
@@ -129,7 +129,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'Entry Level',
           levelBanding: '0.6',
           nextStep: undefined,
-          referral: undefined,
+          referral: null,
           source: 'CURIOUS2',
         },
         {
@@ -139,7 +139,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'Level 1',
           levelBanding: '1.2',
           nextStep: undefined,
-          referral: undefined,
+          referral: null,
           source: 'CURIOUS2',
         },
       ]
@@ -216,7 +216,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'non-reader',
           levelBanding: null,
           nextStep: 'Refer for reading support level.',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -226,7 +226,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'emerging reader',
           levelBanding: null,
           nextStep: 'Reading support not required at this time.',
-          referral: 'Other',
+          referral: ['Other'],
           source: 'CURIOUS2',
         },
       ]
@@ -299,7 +299,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'ESOL Pathway',
           levelBanding: null,
           nextStep: 'English Language Support Level 1',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -309,7 +309,7 @@ describe('curious2AssessmentMapper', () => {
           level: 'ESOL Pathway',
           levelBanding: null,
           nextStep: 'English Language Support Level 2',
-          referral: 'Substance Misuse Team',
+          referral: ['Substance Misuse Team'],
           source: 'CURIOUS2',
         },
       ]

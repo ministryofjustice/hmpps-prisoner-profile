@@ -29,3 +29,17 @@
     margin-bottom: 10px;
   }
 }
+
+.hmpps-functional-skills-card {
+  dl.govuk-summary-list {
+    @include govuk-responsive-padding(3, 'bottom');
+    border-bottom: 1px solid $govuk-border-colour;
+
+    div.govuk-summary-list__row {
+      border-bottom: none;
+    }
+  }
+  dl.govuk-summary-list:last-of-type {
+    border-bottom: none;
+  }
+}

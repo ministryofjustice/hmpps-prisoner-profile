@@ -86,7 +86,7 @@ describe('functionalSkillsMapper', () => {
           level: 'Entry Level 2',
           levelBanding: '2.1',
           nextStep: 'Progress to course at level consistent with assessment result',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -96,7 +96,7 @@ describe('functionalSkillsMapper', () => {
           level: 'Level 2',
           levelBanding: '2.1',
           nextStep: 'Progress to course at level consistent with assessment result',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -116,7 +116,7 @@ describe('functionalSkillsMapper', () => {
           level: 'non-reader',
           levelBanding: null,
           nextStep: 'Refer for reading support level.',
-          referral: 'Education Specialist',
+          referral: ['Education Specialist'],
           source: 'CURIOUS2',
         },
         {
@@ -126,7 +126,7 @@ describe('functionalSkillsMapper', () => {
           level: 'ESOL Pathway',
           levelBanding: null,
           nextStep: 'English Language Support Level 2',
-          referral: 'Substance Misuse Team',
+          referral: ['Substance Misuse Team'],
           source: 'CURIOUS2',
         },
         {

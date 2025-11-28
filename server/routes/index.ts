@@ -40,7 +40,8 @@ import isServiceNavEnabled from '../utils/isServiceEnabled'
 import editRouter from './editRouter'
 import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
 import checkPrisonerIsInUsersCaseloads from '../middleware/checkPrisonerIsInUsersCaseloadsMiddleware'
-import { Result } from '../utils/result/result'
+import retrievePrisonNamesById from '../middleware/retrievePrisonNamesById'
+import retrieveCuriousFunctionalSkills from '../middleware/retrieveCuriousFunctionalSkills'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -121,7 +122,11 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),
+    config.featureToggles.useCurious2Api
+      ? retrieveCuriousFunctionalSkills(services.curiousService)
+      : (req, res, next) => next(),
     async (req, res) => {
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const prisonerData = req.middleware?.prisonerData
@@ -134,6 +139,7 @@ export default function routes(services: Services): Router {
         apiErrorCallback,
       )
 
+      const allFunctionalSkillsLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/functional-skills`
       const fullCourseHistoryLinkUrl = config.featureToggles.useCurious2Api
         ? `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/in-prison-courses-and-qualifications`
         : `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
@@ -172,16 +178,11 @@ export default function routes(services: Services): Router {
         page: Page.WorkAndSkills,
       })
 
-      const prisonNamesById = await Result.wrap(
-        services.prisonService.getAllPrisonNamesById(req.middleware.clientToken),
-        apiErrorCallback,
-      )
-
       res.render('pages/workAndSkills', {
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'work-and-skills'),
         ...workAndSkillsPageData,
-        prisonNamesById,
         pageTitle: 'Work and skills',
+        allFunctionalSkillsLinkUrl,
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
