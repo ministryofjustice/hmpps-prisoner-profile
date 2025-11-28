@@ -1055,7 +1055,7 @@ describe('PersonalController', () => {
           ]),
           additionalNationalitiesValue: 'Some other nationality',
           autocompleteSelected: false,
-          autocompleteOptionTitle: 'Citizen of a country outside the UK',
+          autocompleteOptionTitle: 'A different nationality',
           autocompleteOptionLabel: 'Nationality',
           autocompleteOptionHint: 'Start typing to select nationality.',
           miniBannerData: {
