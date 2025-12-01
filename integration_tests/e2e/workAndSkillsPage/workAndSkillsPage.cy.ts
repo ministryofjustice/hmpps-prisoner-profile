@@ -91,7 +91,7 @@ context('Work and skills page', () => {
           workAndSkillsPage.sidebar().contains('a', 'Work and activities')
           workAndSkillsPage.sidebar().contains('a', 'Employability skills')
           workAndSkillsPage.sidebar().contains('a', 'Goals')
-          workAndSkillsPage.sidebar().contains('a', 'Functional skills level')
+          workAndSkillsPage.sidebar().contains('a', 'Functional skills')
         })
       })
 
