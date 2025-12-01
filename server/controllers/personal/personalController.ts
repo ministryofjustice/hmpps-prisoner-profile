@@ -714,7 +714,7 @@ export default class PersonalController {
           ),
           additionalNationalitiesValue,
           autocompleteSelected: fieldValue === 'OTHER',
-          autocompleteOptionTitle: 'Citizen of a country outside the UK',
+          autocompleteOptionTitle: 'A different nationality',
           autocompleteOptionLabel: 'Nationality',
           autocompleteOptionHint: 'Start typing to select nationality.',
           autocompleteError: requestBodyFlash?.autocompleteError,
