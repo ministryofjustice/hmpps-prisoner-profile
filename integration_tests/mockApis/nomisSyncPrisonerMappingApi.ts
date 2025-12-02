@@ -29,4 +29,22 @@ export default {
         },
       },
     }),
+
+  stubGetMappingUsingDpsLocationId: (dpsLocationId: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/nomissyncprisonermapping/api/locations/dps/${dpsLocationId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          dpsLocationId,
+          nomisLocationId: 25762,
+        },
+      },
+    }),
 }

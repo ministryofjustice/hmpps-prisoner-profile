@@ -219,7 +219,7 @@
 
                     {% if meetingTypes.length > 3 %}
                       {{ govukSelect({
-                        idPrefix: "meetingType",
+                        id: "meetingType",
                         name: "meetingType",
                         label: {
                           text: "Select meeting type",
@@ -349,6 +349,15 @@
                     </div>
 
                     <div class="js-public-private-notes">
+                        {% set hintText %}
+                          <span id="court-hint-text">
+                            This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.
+                          </span>
+                          <span id="probation-hint-text">
+                            This can include any additional information the prison staff need to know about the booking.
+                            For example, interpreter details if required.
+                          </span>
+                        {% endset %}
                         {{ govukCharacterCount({
                             id: "notesForStaff",
                             name: "notesForStaff",
@@ -358,11 +367,17 @@
                               text: "Notes for prison staff (optional)",
                               classes: 'govuk-fieldset__legend--s'
                             },
-                            hint: {
-                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
-                            },
+                            hint: { html: hintText },
                             maxlength: "400"
                         }) }}
+
+                        {% set hintText %}
+                          <p class="govuk-hint">
+                            Add information the prisoner needs to know about their video link booking.
+                            This will appear on movement slips and will be seen by the prisoner.
+                          </p>
+                          Do not add anything that should not be seen by or shared with a prisoner.
+                        {% endset %}
                         {{ govukCharacterCount({
                             id: "notesForPrisoners",
                             name: "notesForPrisoners",
@@ -372,7 +387,7 @@
                               text: "Notes for prisoner (optional)",
                               classes: 'govuk-fieldset__legend--s'
                             },
-                            hint: { html: "<p class='govuk-hint'>Add information the prisoner needs to know about their video link booking. This will appear on movement slips and will be seen by the prisoner.</p><p class='govuk-hint'>Do not add anything that should not be seen by or shared with a prisoner.</p>" },
+                            hint: { html: hintText },
                             maxlength: "400"
                         }) }}
                     </div>
