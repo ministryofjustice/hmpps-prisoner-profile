@@ -7,7 +7,7 @@ To use the same version of NodeJS locally as is used in CI and production, follo
 
 First, build the project by running:
 
-`npm install` and then `npm run build`
+`npm run setup` and then `npm run build`
 
 The Prisoner Profile service pulls data from a large number of sources and
 therefore has a number of dependencies:
