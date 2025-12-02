@@ -1,17 +1,13 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
-{% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
 {% from "components/timePicker/timePicker.njk" import timePicker %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
@@ -53,7 +49,7 @@
             </div>
         </div>
     </div>
-{% endset -%}
+{% endset %}
 
 {% set mainClasses = "govuk-body" %}
 {% block content %}
@@ -305,13 +301,13 @@
                             }
                         },
                         items: [{
-                            value: "yes",
-                            text: "Yes",
-                            checked: formValues.recurring == 'yes',
-                            conditional: {
-                                html: recurringHtml
-                            }
-                        },
+                              value: "yes",
+                              text: "Yes",
+                              checked: formValues.recurring == 'yes',
+                              conditional: {
+                                  html: recurringHtml
+                              }
+                            },
                             {
                                 value: "no",
                                 text: "No",
@@ -322,18 +318,14 @@
 
                     {# The comments hint text is altered slightly (using JS) depending on the type of appointment #}
                     {% set commentsHintHtml %}
-                       <div id="optional-video-label" class="govuk-label">
-                           <p class="govuk-hint">
-                             Comments can include attendee details or other information relevant to the video appointment.
-                             They will appear on unlock lists and on the prisoner’s schedule. For confidentiality
-                             reasons, comments will not appear on prisoner movement slips.
-                           </p>
+                       <div id="optional-video-label">
+                           Comments can include attendee details or other information relevant to the video appointment.
+                           They will appear on unlock lists and on the prisoner’s schedule.
+                           For confidentiality reasons, comments will not appear on prisoner movement slips.
                        </div>
-                       <div id="optional-standard-label" class="govuk-label">
-                           <p class="govuk-hint">
-                             Do not add anything that should not be seen by or shared with a prisoner. Comments will
-                             appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
-                           </p>
+                       <div id="optional-standard-label">
+                           Do not add anything that should not be seen by or shared with a prisoner.
+                           Comments will appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
                        </div>
                     {% endset %}
 
