@@ -6,7 +6,7 @@ const stubGetAllPrisons = (): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/prisons',
+      urlPattern: '/prisonRegister/prisons',
     },
     response: {
       status: 200,
@@ -19,7 +19,7 @@ const getPrisonById = (prisonId = 'MDI'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/prisons/id/${prisonId}`,
+      urlPattern: `/prisonRegister/prisons/id/${prisonId}`,
     },
     response: {
       status: 200,
@@ -34,7 +34,7 @@ const stubPrisonById404Error = (prisonId = 'MDI'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/prisons/id/${prisonId}`,
+      urlPattern: `/prisonRegister/prisons/id/${prisonId}`,
     },
     response: {
       status: 404,

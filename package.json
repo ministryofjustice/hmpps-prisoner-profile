@@ -27,10 +27,10 @@
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
     "clean": "rm -rf dist test_results",
     "rebuild": "npm run clean && npm i && npm run build",
-    "postinstall": "npx patch-package",
     "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml",
     "precommit:lint": "lint-staged",
-    "precommit:verify": "npm run typecheck && npm test"
+    "precommit:verify": "npm run typecheck && npm test",
+    "setup": "npm ci && hmpps-npm-script-run-allowlist"
   },
   "engines": {
     "node": "^22",
@@ -46,7 +46,8 @@
     "@ministryofjustice/frontend": "^3.7.2",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.3",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.0.0",
-    "@ministryofjustice/hmpps-connect-dps-shared-items": "^3.0.1",
+    "@ministryofjustice/hmpps-connect-dps-shared-items": "3.2.0",
+    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.3",
     "@ministryofjustice/hmpps-prison-permissions-lib": "^0.4.0",
     "@ministryofjustice/hmpps-rest-client": "^0.0.3",
     "@sentry/node": "^10.17.0",

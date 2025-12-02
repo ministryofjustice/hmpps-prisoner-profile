@@ -28,51 +28,53 @@ context('Work and skills page - Functional Skills Card', () => {
         visitWorkAndSkillsPage()
         const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
         workAndSkillsPage.FSL_header().should('exist')
-        workAndSkillsPage.FSL_header().contains('Functional skills level')
+        workAndSkillsPage.FSL_header().contains('Functional skills initial assessment results')
 
-        workAndSkillsPage.FSL_listKey().should('exist')
-        workAndSkillsPage.FSL_listKey().contains('English')
+        // Assert English assessment
+        workAndSkillsPage.FSL_result(0).should('have.attr', 'data-qa', 'ENGLISH-assessment-result')
+        workAndSkillsPage.FSL_result(0).find('[data-qa=assessment-level]').contains('Entry Level 2 (2.4)')
+        workAndSkillsPage.FSL_result(0).find('[data-qa=assessment-date]').contains('9 Oct 2025')
+        workAndSkillsPage.FSL_result(0).find('[data-qa=assessment-location]').contains('Moorland (HMP & YOI)')
+        workAndSkillsPage
+          .FSL_result(0)
+          .find('[data-qa=assessment-next-steps]')
+          .contains('Progress to course at level consistent with assessment result')
+        workAndSkillsPage.FSL_result(0).find('[data-qa=assessment-referral] li').eq(0).contains('Education Specialist')
 
-        workAndSkillsPage.FSL_listValue().should('exist')
-        workAndSkillsPage.FSL_listValue().contains('string')
+        // Assert Maths assessment
+        workAndSkillsPage.FSL_result(1).should('have.attr', 'data-qa', 'MATHS-assessment-result')
+        workAndSkillsPage.FSL_result(1).find('[data-qa=assessment-level]').contains('Entry Level 1')
+        workAndSkillsPage.FSL_result(1).find('[data-qa=assessment-date]').contains('1 Jul 2021')
+        workAndSkillsPage.FSL_result(1).find('[data-qa=assessment-location]').contains('Moorland (HMP & YOI)')
+        workAndSkillsPage.FSL_result(1).find('[data-qa=assessment-next-steps]').contains('N/A')
+        workAndSkillsPage.FSL_result(1).find('[data-qa=assessment-referral]').contains('N/A')
 
-        workAndSkillsPage.FSL_listKey2().should('exist')
-        workAndSkillsPage.FSL_listKey2().contains('Assessment date')
+        // Assert Digital Skills assessment
+        workAndSkillsPage.FSL_result(2).should('have.attr', 'data-qa', 'DIGITAL_LITERACY-assessment-result')
+        workAndSkillsPage.FSL_result(2).find('[data-qa=assessment-level]').contains('Entry Level 3')
+        workAndSkillsPage.FSL_result(2).find('[data-qa=assessment-date]').contains('1 Jul 2021')
+        workAndSkillsPage.FSL_result(2).find('[data-qa=assessment-location]').contains('Moorland (HMP & YOI)')
+        workAndSkillsPage.FSL_result(2).find('[data-qa=assessment-next-steps]').contains('N/A')
+        workAndSkillsPage.FSL_result(2).find('[data-qa=assessment-referral]').contains('N/A')
 
-        workAndSkillsPage.FSL_listValue2().should('exist')
-        workAndSkillsPage.FSL_listValue2().contains('1 March 2023')
-
-        workAndSkillsPage.FSL_listKey3().should('exist')
-        workAndSkillsPage.FSL_listKey3().contains('Assessment location')
-
-        workAndSkillsPage.FSL_listValue3().should('exist')
-        workAndSkillsPage.FSL_listValue3().contains('string')
-
-        workAndSkillsPage.FSL_listKey4().should('exist')
-        workAndSkillsPage.FSL_listKey4().contains('Maths')
-
-        workAndSkillsPage.FSL_listValue4().should('exist')
-        workAndSkillsPage.FSL_listValue4().contains('string')
-
-        workAndSkillsPage.FSL_listKey5().should('exist')
-        workAndSkillsPage.FSL_listKey5().contains('Assessment date')
-
-        workAndSkillsPage.FSL_listValue5().should('exist')
-        workAndSkillsPage.FSL_listValue5().contains('1 March 2023')
-
-        workAndSkillsPage.FSL_listKey6().should('exist')
-        workAndSkillsPage.FSL_listKey6().contains('Assessment location')
-
-        workAndSkillsPage.FSL_listValue6().should('exist')
-        workAndSkillsPage.FSL_listValue6().contains('string')
+        // Assert ESOL assessment
+        workAndSkillsPage.FSL_result(3).should('have.attr', 'data-qa', 'ESOL-assessment-result')
+        workAndSkillsPage.FSL_result(3).find('[data-qa=assessment-level]').contains('ESOL Pathway')
+        workAndSkillsPage.FSL_result(3).find('[data-qa=assessment-date]').contains('5 Oct 2025')
+        workAndSkillsPage.FSL_result(3).find('[data-qa=assessment-location]').contains('Moorland (HMP & YOI)')
+        workAndSkillsPage
+          .FSL_result(3)
+          .find('[data-qa=assessment-next-steps]')
+          .contains('English Language Support Level 2')
+        workAndSkillsPage.FSL_result(3).find('[data-qa=assessment-referral] li').eq(0).contains('NSM')
       })
 
       it('should display curious unavailable message given curious returns error response', () => {
-        cy.task('stubGetLearnerLatestAssessments', { prisonerNumber, error: true })
+        cy.task('stubGetLearnerAssessments', { prisonerNumber, error: 500 })
         visitWorkAndSkillsPage()
         const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
         workAndSkillsPage.FSL_header().should('exist')
-        workAndSkillsPage.FSL_header().contains('Functional skills level')
+        workAndSkillsPage.FSL_header().contains('Functional skills initial assessment results')
         workAndSkillsPage.FSL_curious_unavailable_message().should('be.visible')
       })
     })

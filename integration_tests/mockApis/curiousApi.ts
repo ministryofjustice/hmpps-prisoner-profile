@@ -1,4 +1,5 @@
 import { format, startOfToday, sub } from 'date-fns'
+import type { AllQualificationsDTO } from 'curiousApiClient'
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
 import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/learnerLatestAssessmentsMock'
@@ -9,12 +10,6 @@ import {
   OffenderActivitiesEmptyMock,
   OffenderActivitiesMock,
 } from '../../server/data/localMockData/offenderActivitiesMock'
-import {
-  learnerEducationPagedResponse,
-  learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months,
-  learnerEducationPagedResponseContainingNoCourses,
-  learnerEducationPagedResponsePage1Of1,
-} from '../../server/data/localMockData/learnerEducationPagedResponse'
 import { LearnerAssessmentsMock } from '../../server/data/localMockData/learnerAssessmentsMock'
 import { LearnerQualificationsMock } from '../../server/data/localMockData/learnerQualificationsMock'
 
@@ -51,110 +46,8 @@ export default {
       response,
     })
   },
-  stubGetLearnerEducation: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: learnerEducationPagedResponse(prisonerNumber),
-      },
-    })
-  },
-  stubGetLearnerEducationForPrisonWithCoursesButNoneCompleteInTheLast12Months: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months(prisonerNumber),
-      },
-    })
-  },
-  stubGetLearnerEducationForPrisonWithCoursesButNoneComplete: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: learnerEducationPagedResponsePage1Of1(prisonerNumber),
-      },
-    })
-  },
-  stubGetLearnerEducationForPrisonerWithNoCourses: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: learnerEducationPagedResponseContainingNoCourses(),
-      },
-    })
-  },
-  stubGetLearnerEducation404Error: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 404,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
-          errorCode: 'VC4004',
-          errorMessage: 'Resource not found',
-          httpStatusCode: 404,
-        },
-      },
-    })
-  },
-  stubGetLearnerEducation401Error: (prisonerNumber: string, page = 0) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
-        queryParameters: {
-          page: { equalTo: `${page}` },
-        },
-      },
-      response: {
-        status: 401,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
-          errorCode: 'VC4001',
-          errorMessage: 'Invalid token',
-          httpStatusCode: 401,
-        },
-      },
-    })
-  },
+
+  // @deprecated
   stubGetLearnerLatestAssessments: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
     const response = error
       ? {
@@ -328,24 +221,38 @@ export default {
     })
   },
 
-  stubGetLearnerAssessments: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
-    const response = error
-      ? {
-          status: 500,
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-          jsonBody: {
-            errorCode: 'VC5001',
-            errorMessage: 'Service unavailable',
-            httpStatusCode: 500,
-          },
-        }
-      : {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          jsonBody: LearnerAssessmentsMock,
-        }
+  stubGetLearnerAssessments: ({ prisonerNumber, error = undefined }: { prisonerNumber: string; error: 404 | 500 }) => {
+    let response
+    if (!error) {
+      response = {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: LearnerAssessmentsMock,
+      }
+    } else {
+      response =
+        error === 404
+          ? {
+              status: 404,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC4004',
+                errorMessage: 'Not found',
+                httpStatusCode: 404,
+              },
+            }
+          : {
+              status: 500,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC5001',
+                errorMessage: 'Service unavailable',
+                httpStatusCode: 500,
+              },
+            }
+    }
     return stubFor({
       request: {
         method: 'GET',
@@ -355,24 +262,46 @@ export default {
     })
   },
 
-  stubGetLearnerQualifications: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
-    const response = error
-      ? {
-          status: 500,
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-          jsonBody: {
-            errorCode: 'VC5001',
-            errorMessage: 'Service unavailable',
-            httpStatusCode: 500,
-          },
-        }
-      : {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          jsonBody: LearnerQualificationsMock,
-        }
+  stubGetLearnerQualifications: ({
+    prisonerNumber,
+    error = undefined,
+    qualifications = undefined,
+  }: {
+    prisonerNumber: string
+    error: 404 | 500
+    qualifications: AllQualificationsDTO
+  }) => {
+    let response
+    if (!error) {
+      response = {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: qualifications || LearnerQualificationsMock,
+      }
+    } else {
+      response =
+        error === 404
+          ? {
+              status: 404,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC4004',
+                errorMessage: 'Not found',
+                httpStatusCode: 404,
+              },
+            }
+          : {
+              status: 500,
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+              jsonBody: {
+                errorCode: 'VC5001',
+                errorMessage: 'Service unavailable',
+                httpStatusCode: 500,
+              },
+            }
+    }
     return stubFor({
       request: {
         method: 'GET',

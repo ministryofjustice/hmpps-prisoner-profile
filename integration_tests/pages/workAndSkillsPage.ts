@@ -100,47 +100,9 @@ export default class WorkAndSkillsPage extends Page {
 
   FSL_header = (): PageElement => cy.get('#functional-skills-level > [data-qa="summary-header"] > h2')
 
-  FSL_listKey = (): PageElement => cy.get(':nth-child(2) > :nth-child(1) > .govuk-summary-list__key')
+  FSL_results = (): PageElement => this.FSL_card().find('section[data-qa=functional-skills-assessment-results]')
 
-  FSL_listValue = (): PageElement => cy.get(':nth-child(2) > :nth-child(1) > .govuk-summary-list__value')
-
-  FSL_listKey2 = (): PageElement => cy.get(':nth-child(2) > :nth-child(2) > .govuk-summary-list__key')
-
-  FSL_listValue2 = (): PageElement => cy.get(':nth-child(2) > :nth-child(2) > .govuk-summary-list__value')
-
-  FSL_listKey3 = (): PageElement => cy.get(':nth-child(2) > :nth-child(3) > .govuk-summary-list__key')
-
-  FSL_listValue3 = (): PageElement => cy.get(':nth-child(2) > :nth-child(3) > .govuk-summary-list__value')
-
-  FSL_listKey4 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(1) > .govuk-summary-list__key',
-    )
-
-  FSL_listValue4 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(1) > .govuk-summary-list__value',
-    )
-
-  FSL_listKey5 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(2) > .govuk-summary-list__key',
-    )
-
-  FSL_listValue5 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(2) > .govuk-summary-list__value',
-    )
-
-  FSL_listKey6 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(3) > .govuk-summary-list__key',
-    )
-
-  FSL_listValue6 = (): PageElement =>
-    cy.get(
-      '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(3) > .govuk-summary-list__value',
-    )
+  FSL_result = (idx: number): PageElement => this.FSL_results().find('dl.govuk-summary-list').eq(idx)
 
   FSL_curious_unavailable_message = (): PageElement =>
     cy.get('#functional-skills-level [data-qa=curious-unavailable-message]')

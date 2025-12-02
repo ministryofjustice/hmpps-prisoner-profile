@@ -118,63 +118,9 @@ const learnerEducationPagedResponsePage2Of2 = (prisonNumber = 'A1234BC'): Learne
   }
 }
 
-const learnerEducationPagedResponseContainingNoCourses = (): LearnerEductionPagedResponse => {
-  return {
-    content: [],
-    empty: true,
-    first: true,
-    last: true,
-    number: 0,
-    numberOfElements: 0,
-    pageable: {
-      sort: {},
-      pageNumber: 1,
-      pageSize: 2,
-      offset: 0,
-      unpaged: false,
-      paged: true,
-    },
-    size: 0,
-    sort: {},
-    totalElements: 0,
-    totalPages: 1,
-  }
-}
-
-const learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months = (
-  prisonNumber = 'A1234BC',
-): LearnerEductionPagedResponse => {
-  const completedEnglishCourse = aValidEnglishLearnerEducation(prisonNumber)
-  completedEnglishCourse.completionStatus =
-    'The learner has completed the learning activities leading to the learning aim'
-  completedEnglishCourse.learningActualEndDate = '2021-12-13'
-  return {
-    content: [completedEnglishCourse],
-    empty: true,
-    first: true,
-    last: true,
-    number: 0,
-    numberOfElements: 1,
-    pageable: {
-      sort: {},
-      pageNumber: 1,
-      pageSize: 2,
-      offset: 0,
-      unpaged: false,
-      paged: true,
-    },
-    size: 1,
-    sort: {},
-    totalElements: 1,
-    totalPages: 1,
-  }
-}
-
 export {
   learnerEducationPagedResponse,
   learnerEducationPagedResponsePage1Of1,
   learnerEducationPagedResponsePage1Of2,
   learnerEducationPagedResponsePage2Of2,
-  learnerEducationPagedResponseContainingNoCourses,
-  learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months,
 }
