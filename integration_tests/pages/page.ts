@@ -1,4 +1,4 @@
-export type PageElement = Cypress.Chainable<JQuery>
+export type PageElement<Element = HTMLElement> = Cypress.Chainable<JQuery<Element>>
 
 export default abstract class Page {
   static verifyOnPage<T>(constructor: new () => T): T {
@@ -27,9 +27,9 @@ export default abstract class Page {
 
   manageDetails = (): PageElement => cy.get('[data-qa=manageDetails]')
 
-  apiErrorBanner = (): PageElement => cy.get('.hmpps-api-error-banner')
+  apiErrorBanner = (): PageElement<HTMLDivElement> => cy.get('.hmpps-api-error-banner')
 
-  flashMessage = (): PageElement => cy.get('.hmpps-flash-message')
+  flashMessage = (): PageElement<HTMLDivElement> => cy.get('.hmpps-flash-message')
 
-  errorMessage = (): PageElement => cy.get('.govuk-error-summary')
+  errorMessage = (): PageElement<HTMLDivElement> => cy.get('.govuk-error-summary')
 }
