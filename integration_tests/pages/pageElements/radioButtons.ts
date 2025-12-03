@@ -1,7 +1,7 @@
 import type { PageElement } from '../page'
 
 export class RadioButtons {
-  constructor(private name: string) {}
+  constructor(private readonly name: string) {}
 
   get inputElements(): PageElement<HTMLInputElement> {
     return cy.get(`input[name="${this.name}"]`)
@@ -23,6 +23,10 @@ export class RadioButtons {
         })
         .toArray(),
     )
+  }
+
+  get value(): Cypress.Chainable<string> {
+    return this.inputElements.invoke('val')
   }
 }
 

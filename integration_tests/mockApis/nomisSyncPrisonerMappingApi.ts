@@ -1,4 +1,5 @@
 import { stubFor } from './wiremock'
+import type NomisSyncLocation from '../../server/data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 
 export default {
   stubNomisSyncPrisonerMappingApiPing: (httpStatus: number) =>
@@ -12,11 +13,17 @@ export default {
       },
     }),
 
-  stubGetMappingUsingNomisLocationId: (nomisLocationId: number) =>
+  stubGetMappingUsingNomisLocationId: ({
+    nomisLocationId,
+    dpsLocationId,
+  }: {
+    nomisLocationId: number
+    dpsLocationId?: string
+  }) =>
     stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/nomissyncprisonermapping/api/locations/nomis/${nomisLocationId}`,
+        urlPath: `/nomissyncprisonermapping/api/locations/nomis/${nomisLocationId}`,
       },
       response: {
         status: 200,
@@ -24,13 +31,19 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: {
-          dpsLocationId: 'abcde',
+          dpsLocationId: dpsLocationId ?? 'abcde',
           nomisLocationId,
-        },
+        } satisfies NomisSyncLocation,
       },
     }),
 
-  stubGetMappingUsingDpsLocationId: (dpsLocationId: number) =>
+  stubGetMappingUsingDpsLocationId: ({
+    dpsLocationId,
+    nomisLocationId,
+  }: {
+    dpsLocationId: string
+    nomisLocationId?: number
+  }) =>
     stubFor({
       request: {
         method: 'GET',
@@ -43,8 +56,8 @@ export default {
         },
         jsonBody: {
           dpsLocationId,
-          nomisLocationId: 25762,
-        },
+          nomisLocationId: nomisLocationId ?? 25762,
+        } satisfies NomisSyncLocation,
       },
     }),
 }

@@ -266,7 +266,7 @@ Cypress.Commands.add(
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubGetDetails', prisonerNumber)
     cy.task('stubGetAttributesForLocation', dpsLocationId)
-    cy.task('stubGetMappingUsingNomisLocationId', nomisLocationId)
+    cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId })
     cy.task('stubGetLocation', { dpsLocationId })
 
     cy.task('stubGetHistoryForLocation', {

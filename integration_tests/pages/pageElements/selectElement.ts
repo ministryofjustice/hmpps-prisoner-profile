@@ -1,7 +1,7 @@
 import type { PageElement } from '../page'
 
 export class SelectElement {
-  constructor(private selector: string) {}
+  constructor(private readonly selector: string) {}
 
   get element(): PageElement<HTMLSelectElement> {
     return cy.get(this.selector)

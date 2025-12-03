@@ -28,7 +28,7 @@ export interface AppointmentDetails {
   }
   recurring?: {
     id: number
-    repeatPeriod: string
+    repeatPeriod: RepeatPeriod
     count: number
     startTime: string
   }

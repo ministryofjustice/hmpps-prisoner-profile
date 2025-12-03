@@ -1,5 +1,5 @@
 import Page from '../pages/page'
-import { AddAppointmentPage } from '../pages/addAppointmentPage'
+import { AppointmentPage } from '../pages/appointmentPage'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import type PrisonerSchedule from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
@@ -9,13 +9,18 @@ import {
   prisonerSchedulesMock,
 } from '../../server/data/localMockData/prisonerSchedulesMock'
 import { probationMeetingTypes } from '../../server/data/localMockData/courtHearingsMock'
+import { probationBookingMock } from '../../server/data/localMockData/videoLinkBookingMock'
 
-const visitAddAppointmentPage = () => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/add-appointment' })
-  return Page.verifyOnPage(AddAppointmentPage)
+const visitAppointmentPage = (appointmentId?: number) => {
+  cy.signIn({
+    redirectPath: appointmentId
+      ? `/prisoner/G6123VU/edit-appointment/${appointmentId}`
+      : '/prisoner/G6123VU/add-appointment',
+  })
+  return Page.verifyOnPage(AppointmentPage, appointmentId)
 }
 
-context('Add an appointment', () => {
+context('Appointment page', () => {
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const todayDisplay = today.split('-').reverse().join('/')
@@ -29,6 +34,7 @@ context('Add an appointment', () => {
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber, bookingId })
 
+    cy.task('stubBanner')
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubBookAVideoLinkProbationTeams')
     cy.task('stubBookAVideoLinkReferenceCodes', { group: 'PROBATION_MEETING_TYPE', response: meetingTypes })
@@ -44,7 +50,7 @@ context('Add an appointment', () => {
   })
 
   it('should display different sections depending on appointment type', () => {
-    const page = visitAddAppointmentPage()
+    const page = visitAppointmentPage()
 
     // no appointment type is selected
 
@@ -70,6 +76,8 @@ context('Add an appointment', () => {
 
     page.probationMeetingFieldsShouldBeHiden()
     page.meetingTypeSelect.element.should('not.exist')
+
+    page.appointmentSummary.element.should('not.exist')
 
     page.dateField.should('have.value', todayDisplay)
 
@@ -168,6 +176,95 @@ context('Add an appointment', () => {
       { label: 'HDC (home detention curfew)', value: 'HDC', selected: false },
     ])
   })
+
+  it('should show probation meeting types as a drop-down when there are more than 3', () => {
+    cy.task('stubBookAVideoLinkReferenceCodes', {
+      group: 'PROBATION_MEETING_TYPE',
+      response: [
+        ...meetingTypes,
+        {
+          referenceCodeId: 4,
+          groupCode: 'PROBATION_MEETING_TYPE',
+          code: 'PRP',
+          description: 'Pre-release planning',
+        },
+      ],
+    })
+
+    const page = visitAppointmentPage()
+
+    page.meetingTypeRadioButtons.inputElements.should('not.exist')
+    page.meetingTypeSelect.element.should('be.hidden')
+
+    page.typeOfAppointmentField.select('Video Link - Probation Meeting')
+    page.meetingTypeSelect.element.should('be.visible')
+    page.meetingTypeSelect.options.should('deep.equal', [
+      { label: 'Select meeting type', value: '', selected: true },
+      { label: 'Post-sentence report', value: 'PSR', selected: false },
+      { label: 'Parole Report', value: 'PR', selected: false },
+      { label: 'HDC (home detention curfew)', value: 'HDC', selected: false },
+      { label: 'Pre-release planning', value: 'PRP', selected: false },
+    ])
+  })
+
+  it('should pre-fill details of an existing appointment', () => {
+    cy.task('stubGetAppointment', {
+      appointment: {
+        appointment: {
+          id: 81,
+          agencyId: 'MDI',
+          locationId: 25762,
+          appointmentTypeCode: 'VLPM',
+          offenderNo: prisonerNumber,
+          startTime: `${today}T12:00:00`,
+          endTime: `${today}T13:30:00`,
+          comment: 'Comment',
+        },
+      },
+    })
+    cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+    stubLocation(today)
+    cy.task('stubBookAVideoLinkBooking', {
+      searchRequest: {
+        prisonerNumber: 'G6123VU',
+        locationKey: 'ABC',
+        date: today,
+        startTime: '12:00',
+        endTime: '13:30',
+      },
+      response: {
+        ...probationBookingMock,
+        probationTeamCode: 'ABC',
+        prisonAppointments: [
+          {
+            ...probationBookingMock.prisonAppointments[0],
+            appointmentDate: today,
+            startTime: '12:00',
+            endTime: '13:30',
+          },
+        ],
+      },
+    })
+    cy.task('stubGetLocationByKey', {
+      key: 'ABC',
+      response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
+    })
+
+    const page = visitAppointmentPage(81)
+    page.appointmentSummary.rows.then(rows => {
+      expect(rows).to.have.length(2)
+      expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
+      expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+    })
+    page.locationField.value.should('contain', 'location-2')
+    page.officerFullNameInput.should('have.value', 'Test name')
+    page.officerEmailInput.should('have.value', 'Test email')
+    page.officerTelephoneInput.should('have.value', 'Test number')
+    page.meetingTypeRadioButtons.value.should('equal', 'PSR')
+    page.dateField.should('have.value', todayDisplay)
+    page.startTime.should('equal', '12:00')
+    page.endTime.should('equal', '13:30')
+  })
 })
 
 const meetingTypes: VideoLinkReferenceCode[] = [
@@ -263,7 +360,7 @@ function stubSchedules({
 }
 
 function stubLocation(date: string) {
-  cy.task('stubGetMappingUsingDpsLocationId', 'location-2')
+  cy.task('stubGetMappingUsingDpsLocationId', { dpsLocationId: 'location-2' })
   cy.task('stubGetLocation', {
     dpsLocationId: 'location-2',
     response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },

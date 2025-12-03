@@ -1,13 +1,7 @@
 import type { PageElement } from '../page'
 
-export interface CheckboxOption {
-  value: string
-  label: string
-  selected: boolean
-}
-
 export class Checkboxes {
-  constructor(private name: string) {}
+  constructor(private readonly name: string) {}
 
   get inputElements(): PageElement<HTMLInputElement> {
     return cy.get(`input[name="${this.name}"]`)
@@ -17,10 +11,10 @@ export class Checkboxes {
     return this.inputElements.parents('.govuk-checkboxes')
   }
 
-  get options(): Cypress.Chainable<CheckboxOption[]> {
+  get options(): Cypress.Chainable<Option[]> {
     return this.inputElements.then($inputs =>
       $inputs
-        .map<CheckboxOption>((_index, input) => {
+        .map<Option>((_index, input) => {
           return {
             value: input.value,
             label: Cypress.$(`[for="${input.id}"]`).text().trim(),
@@ -30,4 +24,14 @@ export class Checkboxes {
         .toArray(),
     )
   }
+
+  get value(): Cypress.Chainable<string> {
+    return this.inputElements.invoke('val')
+  }
+}
+
+export interface Option {
+  value: string
+  label: string
+  selected: boolean
 }

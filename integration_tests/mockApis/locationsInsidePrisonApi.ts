@@ -36,6 +36,25 @@ export default {
       },
     }),
 
+  stubGetLocationByKey: ({ key, response }: { key: string; response?: LocationsApiLocation }) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/locationsinsideprison/locations/key/${key}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response ?? {
+          id: 'location-1',
+          key,
+          localName: 'A special cell',
+        },
+      },
+    }),
+
   stubGetLocationsForAppointments: ({ prisonId, response }: { prisonId: string; response?: LocationsApiLocation[] }) =>
     stubFor({
       request: {

@@ -1,10 +1,37 @@
 import { stubFor } from './wiremock'
 import type ReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
+import type { ProbationTeam } from '../../server/data/interfaces/bookAVideoLinkApi/Court'
+import type {
+  VideoBookingSearchRequest,
+  VideoLinkBooking,
+} from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import { courtHearingTypes, probationMeetingTypes } from '../../server/data/localMockData/courtHearingsMock'
 import { probationTeamsMock } from '../../server/data/localMockData/courtLocationsMock'
 
 export default {
-  stubBookAVideoLinkProbationTeams: () =>
+  stubBookAVideoLinkBooking: ({
+    searchRequest,
+    response,
+  }: {
+    searchRequest: VideoBookingSearchRequest
+    response: VideoLinkBooking
+  }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPath: '/bookavideolink/video-link-booking/search',
+        bodyPatterns: [{ equalToJson: searchRequest }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    }),
+
+  stubBookAVideoLinkProbationTeams: (response?: ProbationTeam[]) =>
     stubFor({
       request: {
         method: 'GET',
@@ -15,7 +42,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: probationTeamsMock,
+        jsonBody: response ?? probationTeamsMock,
       },
     }),
 

@@ -1,17 +1,20 @@
 import Page, { type PageElement } from './page'
-import { SelectElement } from './pageElements/selectElement'
-import { ScheduledEventsTable } from './pageElements/scheduledEventsTable'
-import { RadioButtons } from './pageElements/radioButtons'
 import { Checkboxes } from './pageElements/checkboxes'
+import { RadioButtons } from './pageElements/radioButtons'
+import { ScheduledEventsTable } from './pageElements/scheduledEventsTable'
+import { SelectElement } from './pageElements/selectElement'
+import { SummaryList } from './pageElements/summaryList'
 
-export class AddAppointmentPage extends Page {
-  constructor() {
-    super('Add an appointment')
+export class AppointmentPage extends Page {
+  constructor(readonly appointmentId?: number) {
+    super(appointmentId ? 'Change appointment details' : 'Add an appointment')
   }
 
   typeOfAppointmentField = new SelectElement('#appointmentType')
 
   probationTeamField = new SelectElement('#probationTeam')
+
+  appointmentSummary = new SummaryList('[data-qa=appointment-summary]')
 
   locationField = new SelectElement('#location')
 
@@ -48,7 +51,7 @@ export class AddAppointmentPage extends Page {
 
   startTimeHoursField = new SelectElement('#startTime-hours')
 
-  startTimeMinutesField = new SelectElement('#startTime-hours')
+  startTimeMinutesField = new SelectElement('#startTime-minutes')
 
   get startTime(): Cypress.Chainable<string> {
     return this.startTimeHoursField.value.then(hours =>
@@ -58,7 +61,7 @@ export class AddAppointmentPage extends Page {
 
   endTimeHoursField = new SelectElement('#endTime-hours')
 
-  endTimeMinutesField = new SelectElement('#endTime-hours')
+  endTimeMinutesField = new SelectElement('#endTime-minutes')
 
   get endTime(): Cypress.Chainable<string> {
     return this.endTimeHoursField.value.then(hours =>
@@ -97,4 +100,4 @@ export class AddAppointmentPage extends Page {
   }
 }
 
-export default { AddAppointmentPage }
+export default { AppointmentPage }

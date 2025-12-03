@@ -6,7 +6,7 @@ export interface Event {
 }
 
 export class ScheduledEventsTable {
-  constructor(private selector: string) {}
+  constructor(private readonly selector: string) {}
 
   get container(): PageElement<HTMLDivElement> {
     return cy.get(this.selector)
