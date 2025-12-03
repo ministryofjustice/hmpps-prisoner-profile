@@ -165,9 +165,8 @@ export default class AppointmentService {
 
     const isReleaseDate = sentenceData.length && sentenceData[0].sentenceDetail.releaseDate === date
 
-    const otherEvents = rest.reduce((flattenedEvents: object[], event: object[]) => flattenedEvents.concat(event), [])
-
-    const formattedEvents: OffenderEvent[] = otherEvents
+    const formattedEvents: OffenderEvent[] = rest
+      .flat()
       .sort((left: GenericEvent, right: GenericEvent) => sortByDateTime(left.startTime, right.startTime))
       .map(toEvent)
 
@@ -188,7 +187,7 @@ export default class AppointmentService {
       this.prisonApiClientBuilder(token).getActivitiesAtLocation(locationId, date),
       this.prisonApiClientBuilder(token).getActivityList(agencyId, locationId, 'VISIT', date),
       this.prisonApiClientBuilder(token).getActivityList(agencyId, locationId, 'APP', date),
-    ]).then(events => events.reduce((flattenedEvents, event) => flattenedEvents.concat(event), []))
+    ]).then(events => events.flat())
 
     return eventsAtLocationByUsage.sort((left, right) => sortByDateTime(left.startTime, right.startTime)).map(toEvent)
   }
