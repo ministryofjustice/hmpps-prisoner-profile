@@ -5,8 +5,9 @@ export class MovementSlip extends Page {
     super('Movement authorisation')
   }
 
-  shouldHaveNoHeaderOrFooter(): Cypress.Chainable {
+  shouldNotShowPageChrome(): Cypress.Chainable {
     cy.get('header').should('not.exist')
+    cy.get('.dps-banner').should('not.exist')
     cy.get('footer').should('not.exist')
     return cy.end()
   }

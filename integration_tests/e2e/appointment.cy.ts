@@ -398,7 +398,7 @@ context('Appointment page', () => {
       })
 
       const movementSlip = Page.verifyOnPage(MovementSlip)
-      movementSlip.shouldHaveNoHeaderOrFooter()
+      movementSlip.shouldNotShowPageChrome()
       movementSlip.labels
         .should('deep.equal', [
           { title: 'Name', description: 'John Saunders' },
