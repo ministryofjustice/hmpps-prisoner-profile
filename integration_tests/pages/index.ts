@@ -7,9 +7,9 @@ export default class IndexPage extends Page {
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
-  prisonerOUTBanner = (): PageElement => cy.get('[data-qa="OUT-establishment-banner"]')
+  prisonerOUTBanner = (): PageElement<HTMLDivElement> => cy.get('[data-qa="OUT-establishment-banner"]')
 
-  prisonerTRNBanner = (): PageElement => cy.get('[data-qa="TRN-establishment-banner"]')
+  prisonerTRNBanner = (): PageElement<HTMLDivElement> => cy.get('[data-qa="TRN-establishment-banner"]')
 
-  banner = (): PageElement => cy.get('.dps-banner')
+  banner = (): PageElement<HTMLDivElement> => cy.get('.dps-banner')
 }

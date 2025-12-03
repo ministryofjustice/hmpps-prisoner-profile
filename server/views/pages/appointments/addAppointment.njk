@@ -1,17 +1,13 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
-{% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
 {% from "components/timePicker/timePicker.njk" import timePicker %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
@@ -49,11 +45,12 @@
         <div class="govuk-form-group js-appointment-last-appointment">
             <span class="govuk-body">Last appointment on</span>
             <div id="last-appointment-date" class=" govuk-body govuk-!-font-weight-bold last-appointment">
+                {# TODO: `endOfPeriod` is never set anywhere? #}
                 {{ endOfPeriod }}
             </div>
         </div>
     </div>
-{% endset -%}
+{% endset %}
 
 {% set mainClasses = "govuk-body" %}
 {% block content %}
@@ -114,7 +111,8 @@
                                     },
                                     classes: 'js-probation-team'
                                 }
-                            ]
+                            ],
+                            attributes: {"data-qa": "appointment-summary"}
                         }) }}
                     {% else %}
                         {{ govukSelect({
@@ -222,7 +220,7 @@
 
                     {% if meetingTypes.length > 3 %}
                       {{ govukSelect({
-                        idPrefix: "meetingType",
+                        id: "meetingType",
                         name: "meetingType",
                         label: {
                           text: "Select meeting type",
@@ -305,13 +303,13 @@
                             }
                         },
                         items: [{
-                            value: "yes",
-                            text: "Yes",
-                            checked: formValues.recurring == 'yes',
-                            conditional: {
-                                html: recurringHtml
-                            }
-                        },
+                              value: "yes",
+                              text: "Yes",
+                              checked: formValues.recurring == 'yes',
+                              conditional: {
+                                  html: recurringHtml
+                              }
+                            },
                             {
                                 value: "no",
                                 text: "No",
@@ -322,18 +320,14 @@
 
                     {# The comments hint text is altered slightly (using JS) depending on the type of appointment #}
                     {% set commentsHintHtml %}
-                       <div id="optional-video-label" class="govuk-label">
-                           <p class="govuk-hint">
-                             Comments can include attendee details or other information relevant to the video appointment.
-                             They will appear on unlock lists and on the prisoner’s schedule. For confidentiality
-                             reasons, comments will not appear on prisoner movement slips.
-                           </p>
+                       <div id="optional-video-label">
+                           Comments can include attendee details or other information relevant to the video appointment.
+                           They will appear on unlock lists and on the prisoner’s schedule.
+                           For confidentiality reasons, comments will not appear on prisoner movement slips.
                        </div>
-                       <div id="optional-standard-label" class="govuk-label">
-                           <p class="govuk-hint">
-                             Do not add anything that should not be seen by or shared with a prisoner. Comments will
-                             appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
-                           </p>
+                       <div id="optional-standard-label">
+                           Do not add anything that should not be seen by or shared with a prisoner.
+                           Comments will appear on prisoner movement slips, unlock lists and on the prisoner’s schedule.
                        </div>
                     {% endset %}
 
@@ -356,6 +350,15 @@
                     </div>
 
                     <div class="js-public-private-notes">
+                        {% set hintText %}
+                          <span id="court-hint-text">
+                            This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.
+                          </span>
+                          <span id="probation-hint-text">
+                            This can include any additional information the prison staff need to know about the booking.
+                            For example, interpreter details if required.
+                          </span>
+                        {% endset %}
                         {{ govukCharacterCount({
                             id: "notesForStaff",
                             name: "notesForStaff",
@@ -365,11 +368,17 @@
                               text: "Notes for prison staff (optional)",
                               classes: 'govuk-fieldset__legend--s'
                             },
-                            hint: {
-                                html: "<p id='court-hint-text' class='govuk-hint'>This can include case number, co-defendant details if this is a multi-hander case, interpreter, or solicitor’s details.</p><p id='probation-hint-text' class='govuk-hint'>This can include any additional information the prison staff need to know about the booking. For example, interpreter details if required.</p>"
-                            },
+                            hint: { html: hintText },
                             maxlength: "400"
                         }) }}
+
+                        {% set hintText %}
+                          <p class="govuk-hint">
+                            Add information the prisoner needs to know about their video link booking.
+                            This will appear on movement slips and will be seen by the prisoner.
+                          </p>
+                          Do not add anything that should not be seen by or shared with a prisoner.
+                        {% endset %}
                         {{ govukCharacterCount({
                             id: "notesForPrisoners",
                             name: "notesForPrisoners",
@@ -379,7 +388,7 @@
                               text: "Notes for prisoner (optional)",
                               classes: 'govuk-fieldset__legend--s'
                             },
-                            hint: { html: "<p class='govuk-hint'>Add information the prisoner needs to know about their video link booking. This will appear on movement slips and will be seen by the prisoner.</p><p class='govuk-hint'>Do not add anything that should not be seen by or shared with a prisoner.</p>" },
+                            hint: { html: hintText },
                             maxlength: "400"
                         }) }}
                     </div>

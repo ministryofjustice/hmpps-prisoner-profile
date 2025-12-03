@@ -16,13 +16,13 @@
                 </div>
             {% endfor %}
         {% else %}
-            <p class="govuk-body">Nothing scheduled on {{ date }} </p>
+            <p class="govuk-body">Nothing scheduled on {{ date }}</p>
         {% endif %}
     {% endset %}
 
-  {{ govukInsetText({
-      html: eventsHtml
-  }) }}
+    {{ govukInsetText({
+        html: eventsHtml
+    }) }}
 {% endmacro %}
 
 {#  Used when rendering events via controller  #}
