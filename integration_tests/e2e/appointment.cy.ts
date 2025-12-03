@@ -3,6 +3,7 @@ import { addDays } from 'date-fns'
 import Page from '../pages/page'
 import { AppointmentPage } from '../pages/appointments/appointmentPage'
 import { ConfirmationPage } from '../pages/appointments/confirmationPage'
+import { MovementSlip } from '../pages/appointments/movementSlip'
 import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
@@ -213,7 +214,7 @@ context('Appointment page', () => {
     ])
   })
 
-  const scenarios: SubmitScenario<AppointmentPage, ConfirmationPage>[] = [
+  const scenarios: (SubmitScenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
     {
       scenarioName: 'OIC',
       fillInForm: page => {
@@ -251,6 +252,11 @@ context('Appointment page', () => {
         })
         page.summaryListRecurring.element.should('not.exist')
         page.summaryListProbation.element.should('not.exist')
+      },
+      movementSlipExpectation: {
+        dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
+        reason: 'Adjudication Review',
+        comments: 'Comment x',
       },
     },
     {
@@ -290,6 +296,10 @@ context('Appointment page', () => {
         })
         page.summaryListRecurring.element.should('not.exist')
         page.summaryListProbation.element.should('not.exist')
+      },
+      movementSlipExpectation: {
+        dateAndTime: `${formatDate(tomorrow, 'long')} 14:00 to 15:00`,
+        reason: 'Video Link - Legal Appointment',
       },
     },
     {
@@ -360,10 +370,15 @@ context('Appointment page', () => {
         page.summaryListRecurring.element.should('not.exist')
         page.summaryListComments.element.should('not.exist')
       },
+      movementSlipExpectation: {
+        dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
+        reason: 'Video Link - Probation Meeting',
+        comments: 'Prisoner note',
+      },
     },
   ]
-  for (const { scenarioName, fillInForm, expectations } of scenarios) {
-    it(`should allow adding an appointment of type ${scenarioName}`, () => {
+  for (const { scenarioName, fillInForm, expectations, movementSlipExpectation } of scenarios) {
+    it(`should allow adding an appointment of type ${scenarioName} and generate a movement slip`, () => {
       stubSchedules({
         prisonerNumber,
         date: tomorrow,
@@ -375,6 +390,30 @@ context('Appointment page', () => {
       addPage.submit()
       const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
       expectations(confirmationPage)
+
+      let movemetSlipHref: string
+      confirmationPage.movementSlipLink.then($anchor => {
+        movemetSlipHref = $anchor.attr('href')
+        cy.visit(movemetSlipHref)
+      })
+
+      const movementSlip = Page.verifyOnPage(MovementSlip)
+      movementSlip.shouldHaveNoHeaderOrFooter()
+      movementSlip.labels
+        .should('deep.equal', [
+          { title: 'Name', description: 'John Saunders' },
+          { title: 'Prison number', description: 'G6123VU' },
+          { title: 'Cell location', description: '1-1-035' },
+          { title: 'Date and time', description: movementSlipExpectation.dateAndTime },
+          { title: 'Moving to', description: 'Local name two' },
+          { title: 'Reason', description: movementSlipExpectation.reason },
+          { title: 'Comments', description: movementSlipExpectation.comments ?? '--' },
+          { title: 'Created by', description: 'John Smith' },
+        ])
+        .then(() => {
+          // cannot load movement slip more than once
+          cy.request({ url: movemetSlipHref, failOnStatusCode: false }).its('status').should('equal', 404)
+        })
     })
   }
 
@@ -545,4 +584,12 @@ interface SubmitScenario<P1 extends Page, P2 extends Page> {
   scenarioName: string
   fillInForm: (page: P1) => void
   expectations: (page: P2) => void
+}
+
+interface MovementSlipScenario {
+  movementSlipExpectation: {
+    dateAndTime: string
+    reason: string
+    comments?: string
+  }
 }

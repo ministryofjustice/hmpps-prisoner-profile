@@ -1,4 +1,4 @@
-import Page from '../page'
+import Page, { type PageElement } from '../page'
 import { SummaryList } from '../pageElements/summaryList'
 
 export class ConfirmationPage extends Page {
@@ -13,6 +13,10 @@ export class ConfirmationPage extends Page {
   summaryListProbation = new SummaryList('[data-qa=appointment-details-list__probation]')
 
   summaryListComments = new SummaryList('[data-qa=appointment-details-list__comments]')
+
+  get movementSlipLink(): PageElement<HTMLAnchorElement> {
+    return cy.get<HTMLAnchorElement>('a.govuk-link').contains('Print movement slip')
+  }
 }
 
 export default { ConfirmationPage }
