@@ -1,6 +1,11 @@
 import { stubFor } from './wiremock'
-import type { AppointmentDetails } from '../../server/data/interfaces/whereaboutsApi/Appointment'
+import type {
+  AppointmentDefaults,
+  AppointmentDetails,
+  SavedAppointment,
+} from '../../server/data/interfaces/whereaboutsApi/Appointment'
 import { CellMoveReasonMock } from '../../server/data/localMockData/getCellMoveReasonMock'
+import { appointmentMock, savedAppointmentMock } from '../../server/data/localMockData/appointmentMock'
 
 export default {
   stubGetAppointment: ({ appointment }: { appointment: AppointmentDetails }) => {
@@ -15,6 +20,29 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: appointment,
+      },
+    })
+  },
+
+  stubCreateAppointment: ({
+    request = appointmentMock,
+    response = savedAppointmentMock,
+  }: {
+    request?: AppointmentDefaults
+    response?: SavedAppointment
+  }) => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPath: '/whereabouts/appointment',
+        bodyPatterns: [{ equalToJson: request }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
       },
     })
   },

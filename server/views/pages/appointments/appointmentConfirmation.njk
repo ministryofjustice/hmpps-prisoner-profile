@@ -114,71 +114,74 @@
                                 text: endTime
                             }
                         }
-                    ]
+                    ],
+                    attributes: {"data-qa": "appointment-details-list__common"}
                 }) }}
 
                 {% if recurring === 'yes' %}
-                {{ govukSummaryList({
-                    classes: 'govuk-summary-list--no-border appointment-details-list',
-                    rows: [
-                        {
-                            key: {
-                            text: "Recurring"
-                        },
-                            value: {
-                            text: recurring | title
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Repeats"
-                        },
-                            value: {
-                            text: repeats
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Number added"
-                        },
-                            value: {
-                            text: numberAdded
-                        }
-                        },
-                        {
-                            key: {
-                            text: "Last appointment"
-                        },
-                            value: {
-                            text: lastAppointmentDate
-                        }
-                        }
-                    ]
-                }) }}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                text: "Recurring"
+                            },
+                                value: {
+                                text: recurring | title
+                            }
+                            },
+                            {
+                                key: {
+                                text: "Repeats"
+                            },
+                                value: {
+                                text: repeats
+                            }
+                            },
+                            {
+                                key: {
+                                text: "Number added"
+                            },
+                                value: {
+                                text: numberAdded
+                            }
+                            },
+                            {
+                                key: {
+                                text: "Last appointment"
+                            },
+                                value: {
+                                text: lastAppointmentDate
+                            }
+                            }
+                        ],
+                        attributes: {"data-qa": "appointment-details-list__recurring"}
+                    }) }}
                 {% endif %}
 
                 {% if appointmentTypeCode == 'VLPM' %}
-                {{ govukSummaryList({
-                    classes: 'govuk-summary-list--no-border appointment-details-list',
-                    rows: [
-                        {
-                            key: {
-                                text: "Notes for prison staff"
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                    text: "Notes for prison staff"
+                                },
+                                value: {
+                                    text: notesForStaff or 'None entered'
+                                }
                             },
-                            value: {
-                                text: notesForStaff or 'None entered'
+                            {
+                                key: {
+                                    text: "Notes for prisoner"
+                                },
+                                value: {
+                                    text: notesForPrisoners or 'None entered'
+                                }
                             }
-                        },
-                        {
-                            key: {
-                                text: "Notes for prisoner"
-                            },
-                            value: {
-                                text: notesForPrisoners or 'None entered'
-                            }
-                        }
-                    ]
-                }) }}
+                        ],
+                        attributes: {"data-qa": "appointment-details-list__probation"}
+                    }) }}
                 {% else %}
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border appointment-details-list',
@@ -191,7 +194,8 @@
                                 text: comment
                             }
                         }
-                    ]
+                    ],
+                    attributes: {"data-qa": "appointment-details-list__comments"}
                 }) }}
                 {% endif %}
 

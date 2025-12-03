@@ -63,7 +63,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
         })
       } else if (!emailRegex.test(body.officerEmail)) {
         errors.push({
-          text: "'Enter a valid email address'",
+          text: 'Enter a valid email address',
           href: '#officerEmail',
         })
       }

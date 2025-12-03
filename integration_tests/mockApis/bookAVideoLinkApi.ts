@@ -1,9 +1,9 @@
 import { stubFor } from './wiremock'
 import type ReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type { ProbationTeam } from '../../server/data/interfaces/bookAVideoLinkApi/Court'
-import type {
-  VideoBookingSearchRequest,
-  VideoLinkBooking,
+import CreateVideoBookingRequest, {
+  type VideoBookingSearchRequest,
+  type VideoLinkBooking,
 } from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import { courtHearingTypes, probationMeetingTypes } from '../../server/data/localMockData/courtHearingsMock'
 import { probationTeamsMock } from '../../server/data/localMockData/courtLocationsMock'
@@ -21,6 +21,28 @@ export default {
         method: 'POST',
         urlPath: '/bookavideolink/video-link-booking/search',
         bodyPatterns: [{ equalToJson: searchRequest }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    }),
+
+  stubBookAVideoLinkCreateBooking: ({
+    createRequest,
+    response = 1,
+  }: {
+    createRequest: CreateVideoBookingRequest
+    response?: number
+  }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPath: '/bookavideolink/video-link-booking',
+        bodyPatterns: [{ equalToJson: createRequest }],
       },
       response: {
         status: 200,

@@ -1,9 +1,9 @@
-import Page, { type PageElement } from './page'
-import { Checkboxes } from './pageElements/checkboxes'
-import { RadioButtons } from './pageElements/radioButtons'
-import { ScheduledEventsTable } from './pageElements/scheduledEventsTable'
-import { SelectElement } from './pageElements/selectElement'
-import { SummaryList } from './pageElements/summaryList'
+import Page, { type PageElement } from '../page'
+import { Checkboxes } from '../pageElements/checkboxes'
+import { RadioButtons } from '../pageElements/radioButtons'
+import { ScheduledEventsTable } from '../pageElements/scheduledEventsTable'
+import { SelectElement } from '../pageElements/selectElement'
+import { SummaryList } from '../pageElements/summaryList'
 
 export class AppointmentPage extends Page {
   constructor(readonly appointmentId?: number) {
@@ -42,7 +42,8 @@ export class AppointmentPage extends Page {
     this.officerFullNameInput.should('be.hidden')
     this.officerEmailInput.should('be.hidden')
     this.officerTelephoneInput.should('be.hidden')
-    return this.meetingTypeRadioButtons.fieldset.should('be.hidden').end()
+    this.meetingTypeRadioButtons.fieldset.should('be.hidden')
+    return cy.end()
   }
 
   get dateField(): PageElement<HTMLInputElement> {
@@ -59,6 +60,12 @@ export class AppointmentPage extends Page {
     )
   }
 
+  selectStartTime(hours: string, minutes: string): Cypress.Chainable {
+    this.startTimeHoursField.select(hours)
+    this.startTimeMinutesField.select(minutes)
+    return cy.end()
+  }
+
   endTimeHoursField = new SelectElement('#endTime-hours')
 
   endTimeMinutesField = new SelectElement('#endTime-minutes')
@@ -67,6 +74,12 @@ export class AppointmentPage extends Page {
     return this.endTimeHoursField.value.then(hours =>
       this.endTimeMinutesField.value.then(minutes => `${hours}:${minutes}`),
     )
+  }
+
+  selectEndTime(hours: string, minutes: string): Cypress.Chainable {
+    this.endTimeHoursField.select(hours)
+    this.endTimeMinutesField.select(minutes)
+    return cy.end()
   }
 
   offenderEventsTable = new ScheduledEventsTable('#offender-events')
@@ -97,6 +110,10 @@ export class AppointmentPage extends Page {
 
   get notesForPrisonersHint(): PageElement<HTMLDivElement> {
     return cy.get('#notesForPrisoners-hint')
+  }
+
+  submit(): Cypress.Chainable {
+    return cy.get('.govuk-button').contains('Save and continue').click()
   }
 }
 

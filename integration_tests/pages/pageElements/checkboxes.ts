@@ -28,6 +28,10 @@ export class Checkboxes {
   get value(): Cypress.Chainable<string> {
     return this.inputElements.invoke('val')
   }
+
+  toggleOption(label: string): PageElement<HTMLLabelElement> {
+    return this.container.find('label').contains(label).click()
+  }
 }
 
 export interface Option {

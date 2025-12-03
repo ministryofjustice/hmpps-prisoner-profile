@@ -16,10 +16,12 @@ export default class BookAVideoLinkRestApiClient extends RestClient implements B
     super('Book A Video Link API', config.apis.bookAVideoLinkApi, token, circuitBreaker)
   }
 
+  // TODO: check really returns number
   async addVideoLinkBooking(videoLinkBooking: CreateVideoBookingRequest): Promise<number> {
     return this.post({ path: '/video-link-booking', data: videoLinkBooking }, this.token)
   }
 
+  // TODO: check really returns void
   async amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: AmendVideoBookingRequest): Promise<void> {
     return this.put(
       {

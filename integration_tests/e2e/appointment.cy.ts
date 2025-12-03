@@ -1,5 +1,9 @@
+import { addDays } from 'date-fns'
+
 import Page from '../pages/page'
-import { AppointmentPage } from '../pages/appointmentPage'
+import { AppointmentPage } from '../pages/appointments/appointmentPage'
+import { ConfirmationPage } from '../pages/appointments/confirmationPage'
+import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import type PrisonerSchedule from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
@@ -24,6 +28,8 @@ context('Appointment page', () => {
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const todayDisplay = today.split('-').reverse().join('/')
+  const tomorrow = addDays(now, 1).toISOString().split('T')[0]
+  const tomorrowDisplay = tomorrow.split('-').reverse().join('/')
 
   const prisonerNumber = 'G6123VU'
   const bookingId = 1102484
@@ -42,7 +48,7 @@ context('Appointment page', () => {
     cy.task('stubGetAppointmentTypes', { response: appointmentTypes })
     stubSchedules({
       prisonerNumber,
-      today,
+      date: today,
       courtEvents: courtEventPrisonerSchedulesMock,
       externalTransfers: prisonerSchedulesMock,
     })
@@ -207,6 +213,171 @@ context('Appointment page', () => {
     ])
   })
 
+  const scenarios: SubmitScenario<AppointmentPage, ConfirmationPage>[] = [
+    {
+      scenarioName: 'OIC',
+      fillInForm: page => {
+        page.typeOfAppointmentField.select('Adjudication Review')
+        page.locationField.select('Local name two')
+        page.dateField.clear().type(tomorrowDisplay)
+        page.selectStartTime('11', '05')
+        page.selectEndTime('12', '15')
+        page.recurringRadioButtons.selectOption('No')
+        page.commentsTextArea.type('Comment x')
+
+        cy.task('stubCreateAppointment', {
+          request: {
+            bookingId: '1102484', // TODO: why is this sent as a string?
+            appointmentType: 'OIC',
+            locationId: 25762,
+            startTime: `${tomorrow}T11:05:00`,
+            endTime: `${tomorrow}T12:15:00`,
+            comment: 'Comment x',
+          },
+        })
+      },
+      expectations: page => {
+        page.summaryListCommon.rows.then(rows => {
+          expect(rows).to.have.length(5)
+          expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
+          expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+          expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+          expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
+          expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
+        })
+        page.summaryListComments.rows.then(rows => {
+          expect(rows).to.have.length(1)
+          expect(rows[0]).to.contain({ key: 'Comment', value: 'Comment x' })
+        })
+        page.summaryListRecurring.element.should('not.exist')
+        page.summaryListProbation.element.should('not.exist')
+      },
+    },
+    {
+      scenarioName: 'VLLA',
+      fillInForm: page => {
+        page.typeOfAppointmentField.select('Video Link - Legal Appointment')
+        page.locationField.select('Local name two')
+        page.dateField.clear().type(tomorrowDisplay)
+        page.selectStartTime('14', '00')
+        page.selectEndTime('15', '00')
+        page.recurringRadioButtons.selectOption('No')
+        page.commentsTextArea.type('Some notes')
+
+        cy.task('stubCreateAppointment', {
+          request: {
+            bookingId: '1102484', // TODO: why is this sent as a string?
+            appointmentType: 'VLLA',
+            locationId: 25762,
+            startTime: `${tomorrow}T14:00:00`,
+            endTime: `${tomorrow}T15:00:00`,
+            comment: 'Some notes',
+          },
+        })
+      },
+      expectations: page => {
+        page.summaryListCommon.rows.then(rows => {
+          expect(rows).to.have.length(5)
+          expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
+          expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+          expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+          expect(rows[3]).to.contain({ key: 'Start time', value: '14:00' })
+          expect(rows[4]).to.contain({ key: 'End time', value: '15:00' })
+        })
+        page.summaryListComments.rows.then(rows => {
+          expect(rows).to.have.length(1)
+          expect(rows[0]).to.contain({ key: 'Comment', value: 'Some notes' })
+        })
+        page.summaryListRecurring.element.should('not.exist')
+        page.summaryListProbation.element.should('not.exist')
+      },
+    },
+    {
+      scenarioName: 'VLPM',
+      fillInForm: page => {
+        page.typeOfAppointmentField.select('Video Link - Probation Meeting')
+        page.probationTeamField.select('Blackpool')
+        page.officerFullNameInput.type('Officer name')
+        page.officerEmailInput.type('officer@example.com')
+        page.officerTelephoneInput.type('02000000000')
+        page.meetingTypeRadioButtons.selectOption('Parole Report')
+        page.locationField.select('Local name two')
+        page.dateField.clear().type(tomorrowDisplay)
+        page.selectStartTime('17', '30')
+        page.selectEndTime('18', '30')
+        page.notesForStaffTextArea.clear().type('Staff info')
+        page.notesForPrisonersTextArea.clear().type('Prisoner note')
+
+        cy.task('stubBookAVideoLinkCreateBooking', {
+          createRequest: {
+            bookingType: 'PROBATION',
+            prisoners: [
+              {
+                prisonCode: 'MDI',
+                prisonerNumber: 'G6123VU',
+                appointments: [
+                  {
+                    type: 'VLB_PROBATION',
+                    locationKey: 'ABC',
+                    date: '2025-12-04',
+                    startTime: '17:30',
+                    endTime: '18:30',
+                  },
+                ],
+              },
+            ],
+            probationTeamCode: 'ABC',
+            probationMeetingType: 'PR',
+            additionalBookingDetails: {
+              contactName: 'Officer name',
+              contactEmail: 'officer@example.com',
+              contactNumber: '02000000000',
+            },
+            notesForStaff: 'Staff info',
+            notesForPrisoners: 'Prisoner note',
+          },
+        })
+      },
+      expectations: page => {
+        page.summaryListCommon.rows.then(rows => {
+          expect(rows).to.have.length(10)
+          expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
+          expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+          expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
+          expect(rows[3]).to.contain({ key: 'Probation officer’s full name', value: 'Officer name' })
+          expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
+          expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
+          expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
+          expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+          expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
+          expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
+        })
+        page.summaryListProbation.rows.then(rows => {
+          expect(rows).to.have.length(2)
+          expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff info' })
+          expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
+        })
+        page.summaryListRecurring.element.should('not.exist')
+        page.summaryListComments.element.should('not.exist')
+      },
+    },
+  ]
+  for (const { scenarioName, fillInForm, expectations } of scenarios) {
+    it(`should allow adding an appointment of type ${scenarioName}`, () => {
+      stubSchedules({
+        prisonerNumber,
+        date: tomorrow,
+      })
+      stubLocation(today)
+      stubLocation(tomorrow)
+      const addPage = visitAppointmentPage()
+      fillInForm(addPage)
+      addPage.submit()
+      const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+      expectations(confirmationPage)
+    })
+  }
+
   it('should pre-fill details of an existing appointment', () => {
     cy.task('stubGetAppointment', {
       appointment: {
@@ -256,7 +427,7 @@ context('Appointment page', () => {
       expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
       expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
     })
-    page.locationField.value.should('contain', 'location-2')
+    page.locationField.value.should('equal', 'location-2')
     page.officerFullNameInput.should('have.value', 'Test name')
     page.officerEmailInput.should('have.value', 'Test email')
     page.officerTelephoneInput.should('have.value', 'Test number')
@@ -310,7 +481,7 @@ const appointmentTypes: ReferenceCode[] = [
 
 function stubSchedules({
   prisonerNumber,
-  today,
+  date,
   appointments,
   activities,
   courtEvents,
@@ -318,7 +489,7 @@ function stubSchedules({
   visits,
 }: {
   prisonerNumber: string
-  today: string
+  date: string
   appointments?: PrisonerSchedule[]
   activities?: PrisonerSchedule[]
   courtEvents?: PrisonerSchedule[]
@@ -342,14 +513,14 @@ function stubSchedules({
     offenderNumbers: [prisonerNumber],
     schedule: 'courtEvents',
     response: courtEvents ?? [],
-    date: today,
+    date,
   })
   cy.task('stubSchedulesForOffenders', {
     agencyId: 'MDI',
     offenderNumbers: [prisonerNumber],
     schedule: 'externalTransfers',
     response: externalTransfers ?? [],
-    date: today,
+    date,
   })
   cy.task('stubSchedulesForOffenders', {
     agencyId: 'MDI',
@@ -368,4 +539,10 @@ function stubLocation(date: string) {
   cy.task('stubActivitiesAtLocation', { locationId: 25762, date })
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'VISIT', response: [] })
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'APP', response: [] })
+}
+
+interface SubmitScenario<P1 extends Page, P2 extends Page> {
+  scenarioName: string
+  fillInForm: (page: P1) => void
+  expectations: (page: P2) => void
 }

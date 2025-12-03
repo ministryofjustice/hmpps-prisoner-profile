@@ -3,7 +3,11 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CourtHearingOrMeetingType from '../data/interfaces/bookAVideoLinkApi/ReferenceCode'
-import { AppointmentDefaults, AppointmentDetails } from '../data/interfaces/whereaboutsApi/Appointment'
+import {
+  AppointmentDefaults,
+  AppointmentDetails,
+  SavedAppointment,
+} from '../data/interfaces/whereaboutsApi/Appointment'
 import { timeFormat } from '../utils/dateHelpers'
 import { sortByDateTime } from '../utils/utils'
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
@@ -120,7 +124,7 @@ export default class AppointmentService {
     }
   }
 
-  public async createAppointments(token: string, appointments: AppointmentDefaults): Promise<unknown> {
+  public async createAppointments(token: string, appointments: AppointmentDefaults): Promise<SavedAppointment> {
     return this.whereaboutsApiClientBuilder(token).createAppointments(appointments)
   }
 

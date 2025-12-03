@@ -5,7 +5,7 @@ import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { locationsApiMock } from '../data/localMockData/locationsMock'
 import { courtLocationsMock, probationTeamsMock } from '../data/localMockData/courtLocationsMock'
-import { appointmentMock } from '../data/localMockData/appointmentMock'
+import { appointmentMock, savedAppointmentMock } from '../data/localMockData/appointmentMock'
 import { offenderSentenceDetailsMock } from '../data/localMockData/offenderSentenceDetailsMock'
 import { courtEventPrisonerSchedulesMock, prisonerSchedulesMock } from '../data/localMockData/prisonerSchedulesMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
@@ -44,7 +44,7 @@ describe('Appointment Service', () => {
     }
     whereaboutsApiClient = {
       getAppointment: jest.fn(),
-      createAppointments: jest.fn(async () => appointmentMock),
+      createAppointments: jest.fn(async () => savedAppointmentMock),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
     }
@@ -115,7 +115,7 @@ describe('Appointment Service', () => {
       const response = await appointmentService.createAppointments('', appointmentMock)
 
       expect(whereaboutsApiClient.createAppointments).toHaveBeenCalledWith(appointmentMock)
-      expect(response).toEqual(appointmentMock)
+      expect(response).toEqual(savedAppointmentMock)
     })
   })
 

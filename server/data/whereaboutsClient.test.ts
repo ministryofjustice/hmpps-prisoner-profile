@@ -2,7 +2,7 @@ import nock, { DataMatcherMap, RequestBodyMatcher } from 'nock'
 import config from '../config'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
-import { appointmentMock } from './localMockData/appointmentMock'
+import { appointmentMock, savedAppointmentMock } from './localMockData/appointmentMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -49,11 +49,11 @@ describe('whereaboutsClient', () => {
       mockSuccessfulWhereaboutsPostApiCall(
         '/appointment',
         appointmentMock as unknown as DataMatcherMap,
-        appointmentMock,
+        savedAppointmentMock,
       )
 
       const output = await whereaboutsApiClient.createAppointments(appointmentMock)
-      expect(output).toEqual(appointmentMock)
+      expect(output).toEqual(savedAppointmentMock)
     })
   })
 })
