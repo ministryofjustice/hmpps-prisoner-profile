@@ -56,7 +56,7 @@ export default class CaseNotesController {
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
-          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'case-notes'),
+          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'case-notes'),
           caseNotesApiUnavailable: true,
         })
       }
@@ -81,7 +81,7 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'case-notes'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'case-notes'),
         ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,

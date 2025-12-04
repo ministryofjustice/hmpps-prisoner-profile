@@ -382,7 +382,7 @@ describe('overviewController', () => {
 
   describe('incentiveSummary', () => {
     it('should call incentiveService.getIncentiveOverview and include response', async () => {
-      mockPermissions({ [PrisonerIncentivesPermission.read]: true })
+      mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: true })
 
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
@@ -409,7 +409,7 @@ describe('overviewController', () => {
     })
 
     it('should not call incentiveService.getIncentiveOverview if user does not have permission', async () => {
-      mockPermissions({ [PrisonerIncentivesPermission.read]: false })
+      mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: false })
 
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
