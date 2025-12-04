@@ -140,7 +140,7 @@ export default class AppointmentService {
     token: string,
     videoBookingId: number,
     videoLinkBookingForm: AmendVideoBookingRequest,
-  ): Promise<void> {
+  ): Promise<number> {
     return this.bookAVideoLinkApiClientBuilder(token).amendVideoLinkBooking(videoBookingId, videoLinkBookingForm)
   }
 

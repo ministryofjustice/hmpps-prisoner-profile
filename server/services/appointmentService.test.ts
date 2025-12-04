@@ -50,7 +50,7 @@ describe('Appointment Service', () => {
     }
     bookAVideoLinkApiClient = {
       addVideoLinkBooking: jest.fn(async () => 12345),
-      amendVideoLinkBooking: jest.fn(),
+      amendVideoLinkBooking: jest.fn(async () => 12348),
       getVideoLinkBooking: jest.fn(),
       getProbationTeams: jest.fn(async () => probationTeamsMock),
       getCourts: jest.fn(async () => courtLocationsMock),
@@ -142,11 +142,12 @@ describe('Appointment Service', () => {
 
   describe('amendVideoLinkBooking', () => {
     it('should call API to amend a video link booking', async () => {
-      await appointmentService.amendVideoLinkBooking('', 1, {
+      const response = await appointmentService.amendVideoLinkBooking('', 1, {
         bookingType: 'COURT',
       } as AmendVideoBookingRequest)
 
       expect(bookAVideoLinkApiClient.amendVideoLinkBooking).toHaveBeenCalledWith(1, { bookingType: 'COURT' })
+      expect(response).toEqual(12348)
     })
   })
 
