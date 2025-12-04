@@ -315,8 +315,8 @@ context('Appointment page', () => {
         page.dateField.clear().type(tomorrowDisplay)
         page.selectStartTime('17', '30')
         page.selectEndTime('18', '30')
-        page.notesForStaffTextArea.clear().type('Staff info')
-        page.notesForPrisonersTextArea.clear().type('Prisoner note')
+        page.notesForStaffTextArea.type('Staff info')
+        page.notesForPrisonersTextArea.type('Prisoner note')
 
         cy.task('stubBookAVideoLinkCreateBooking', {
           createRequest: {
@@ -329,7 +329,7 @@ context('Appointment page', () => {
                   {
                     type: 'VLB_PROBATION',
                     locationKey: 'ABC',
-                    date: '2025-12-04',
+                    date: tomorrow,
                     startTime: '17:30',
                     endTime: '18:30',
                   },
@@ -391,6 +391,7 @@ context('Appointment page', () => {
       const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
       expectations(confirmationPage)
 
+      confirmationPage.addMoreLink.invoke('attr', 'href').should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
       let movemetSlipHref: string
       confirmationPage.movementSlipLink.then($anchor => {
         movemetSlipHref = $anchor.attr('href')

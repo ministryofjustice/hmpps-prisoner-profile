@@ -17,6 +17,10 @@ export class ConfirmationPage extends Page {
   get movementSlipLink(): PageElement<HTMLAnchorElement> {
     return cy.get<HTMLAnchorElement>('a.govuk-link').contains('Print movement slip')
   }
+
+  get addMoreLink(): PageElement<HTMLAnchorElement> {
+    return cy.get<HTMLAnchorElement>('a.govuk-button').contains('Add more appointments')
+  }
 }
 
 export default { ConfirmationPage }
