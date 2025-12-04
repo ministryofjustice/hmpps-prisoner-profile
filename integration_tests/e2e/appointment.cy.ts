@@ -401,6 +401,49 @@ context('Appointment page', () => {
   })
 
   context('creating simple appointments', () => {
+    const expectedCreateRequestOIC = {
+      bookingId: 1102484,
+      appointmentType: 'OIC',
+      locationId: 25762,
+      startTime: `${tomorrow}T11:05:00`,
+      endTime: `${tomorrow}T12:15:00`,
+      comment: 'Comment x',
+    }
+    const expectedCreateRequestVLLA = {
+      bookingId: 1102484,
+      appointmentType: 'VLLA',
+      locationId: 25762,
+      startTime: `${tomorrow}T14:00:00`,
+      endTime: `${tomorrow}T15:00:00`,
+      comment: 'Some notes',
+    }
+    const expectedCreateRequestVLPM = {
+      bookingType: 'PROBATION',
+      prisoners: [
+        {
+          prisonCode: 'MDI',
+          prisonerNumber: 'G6123VU',
+          appointments: [
+            {
+              type: 'VLB_PROBATION',
+              locationKey: 'ABC',
+              date: tomorrow,
+              startTime: '17:30',
+              endTime: '18:30',
+            },
+          ],
+        },
+      ],
+      probationTeamCode: 'ABC',
+      probationMeetingType: 'PR',
+      additionalBookingDetails: {
+        contactName: 'Officer name',
+        contactEmail: 'officer@example.com',
+        contactNumber: '02000000000',
+      },
+      notesForStaff: 'Staff info',
+      notesForPrisoners: 'Prisoner note',
+    }
     const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
       {
         scenarioName: 'OIC',
@@ -413,16 +456,7 @@ context('Appointment page', () => {
           page.recurringRadioButtons.selectOption('No')
           page.commentsTextArea.type('Comment x')
 
-          cy.task('stubCreateAppointment', {
-            request: {
-              bookingId: 1102484,
-              appointmentType: 'OIC',
-              locationId: 25762,
-              startTime: `${tomorrow}T11:05:00`,
-              endTime: `${tomorrow}T12:15:00`,
-              comment: 'Comment x',
-            },
-          })
+          cy.task('stubCreateAppointment', { request: expectedCreateRequestOIC })
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
@@ -457,16 +491,7 @@ context('Appointment page', () => {
           page.recurringRadioButtons.selectOption('No')
           page.commentsTextArea.type('Some notes')
 
-          cy.task('stubCreateAppointment', {
-            request: {
-              bookingId: 1102484,
-              appointmentType: 'VLLA',
-              locationId: 25762,
-              startTime: `${tomorrow}T14:00:00`,
-              endTime: `${tomorrow}T15:00:00`,
-              comment: 'Some notes',
-            },
-          })
+          cy.task('stubCreateAppointment', { request: expectedCreateRequestVLLA })
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
@@ -505,35 +530,7 @@ context('Appointment page', () => {
           page.notesForStaffTextArea.type('Staff info')
           page.notesForPrisonersTextArea.type('Prisoner note')
 
-          cy.task('stubBookAVideoLinkCreateBooking', {
-            createRequest: {
-              bookingType: 'PROBATION',
-              prisoners: [
-                {
-                  prisonCode: 'MDI',
-                  prisonerNumber: 'G6123VU',
-                  appointments: [
-                    {
-                      type: 'VLB_PROBATION',
-                      locationKey: 'ABC',
-                      date: tomorrow,
-                      startTime: '17:30',
-                      endTime: '18:30',
-                    },
-                  ],
-                },
-              ],
-              probationTeamCode: 'ABC',
-              probationMeetingType: 'PR',
-              additionalBookingDetails: {
-                contactName: 'Officer name',
-                contactEmail: 'officer@example.com',
-                contactNumber: '02000000000',
-              },
-              notesForStaff: 'Staff info',
-              notesForPrisoners: 'Prisoner note',
-            },
-          })
+          cy.task('stubBookAVideoLinkCreateBooking', { createRequest: expectedCreateRequestVLPM })
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
@@ -601,6 +598,54 @@ context('Appointment page', () => {
             // cannot load movement slip more than once
             cy.request({ url: movemetSlipHref, failOnStatusCode: false }).its('status').should('equal', 404)
           })
+      })
+
+      it(`should allow adding an appointment of type ${scenarioName} without comments`, () => {
+        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubLocation(today)
+        stubLocation(tomorrow)
+
+        // override creation stub
+        if (scenarioName === 'OIC') {
+          cy.task('stubCreateAppointment', {
+            request: { ...expectedCreateRequestOIC, comment: '' },
+          })
+        } else if (scenarioName === 'VLLA') {
+          cy.task('stubCreateAppointment', {
+            request: { ...expectedCreateRequestVLLA, comment: '' },
+          })
+        } else if (scenarioName === 'VLPM') {
+          const expectedCreateRequestVLPM2 = { ...expectedCreateRequestVLPM }
+          delete expectedCreateRequestVLPM2.notesForStaff
+          delete expectedCreateRequestVLPM2.notesForPrisoners
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: expectedCreateRequestVLPM2,
+          })
+        }
+
+        const addPage = visitAppointmentPage()
+        setupScenario(addPage)
+        if (scenarioName === 'VLPM') {
+          addPage.notesForStaffTextArea.clear()
+          addPage.notesForPrisonersTextArea.clear()
+        } else {
+          addPage.commentsTextArea.clear()
+        }
+        addPage.submit()
+
+        const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+        if (scenarioName === 'VLPM') {
+          confirmationPage.summaryListProbation.rows.then(rows => {
+            expect(rows).to.have.length(2)
+            expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
+            expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'None entered' })
+          })
+        } else {
+          confirmationPage.summaryListComments.rows.then(rows => {
+            expect(rows).to.have.length(1)
+            expect(rows[0]).to.contain({ key: 'Comment', value: '' })
+          })
+        }
       })
     }
   })
