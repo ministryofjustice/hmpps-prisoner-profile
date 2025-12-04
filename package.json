@@ -25,8 +25,8 @@
     "integration-test-2": "cypress run --spec \"**/personal/editDistinguishingMarks/**/*.cy.ts\"",
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
     "clean": "rm -rf dist test_results",
-    "rebuild": "npm run clean && npm i && npm run build",
-    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml",
+    "rebuild": "npm run clean && npm run setup && npm run build",
+    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml --gitleaks-ignore-path .gitleaks/.gitleaksignore",
     "precommit:lint": "lint-staged",
     "precommit:verify": "npm run typecheck && npm test",
     "setup": "npm ci && hmpps-npm-script-run-allowlist"
