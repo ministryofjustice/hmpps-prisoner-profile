@@ -614,19 +614,19 @@ context('Appointment page', () => {
           locationId: 25762,
           appointmentTypeCode: 'VLPM',
           offenderNo: prisonerNumber,
-          startTime: `${today}T12:00:00`,
-          endTime: `${today}T13:30:00`,
+          startTime: `${tomorrow}T12:00:00`,
+          endTime: `${tomorrow}T13:30:00`,
           comment: 'Comment',
         },
       },
     })
     cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
-    stubLocation(today)
+    stubLocation(tomorrow)
     cy.task('stubBookAVideoLinkBooking', {
       searchRequest: {
         prisonerNumber: 'G6123VU',
         locationKey: 'ABC',
-        date: today,
+        date: tomorrow,
         startTime: '12:00',
         endTime: '13:30',
       },
@@ -636,7 +636,7 @@ context('Appointment page', () => {
         prisonAppointments: [
           {
             ...probationBookingMock.prisonAppointments[0],
-            appointmentDate: today,
+            appointmentDate: tomorrow,
             startTime: '12:00',
             endTime: '13:30',
           },
@@ -659,7 +659,7 @@ context('Appointment page', () => {
     page.officerEmailInput.should('have.value', 'Test email')
     page.officerTelephoneInput.should('have.value', 'Test number')
     page.meetingTypeRadioButtons.value.should('equal', 'PSR')
-    page.dateField.should('have.value', todayDisplay)
+    page.dateField.should('have.value', tomorrowDisplay)
     page.startTime.should('equal', '12:00')
     page.endTime.should('equal', '13:30')
   })
