@@ -82,6 +82,7 @@ import { OffenderCellHistoryMock } from '../../server/data/localMockData/offende
 import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
 import OffenderCellHistory from '../../server/data/interfaces/prisonApi/OffenderCellHistoryInterface'
 import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
+import OffenderSentenceDetail from '../../server/data/interfaces/prisonApi/OffenderSentenceDetail'
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
 import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
@@ -533,7 +534,13 @@ export default {
     })
   },
 
-  stubSentencesForOffenders: ({ offenderNumbers }: { offenderNumbers: string[] }) => {
+  stubSentencesForOffenders: ({
+    offenderNumbers,
+    response,
+  }: {
+    offenderNumbers: string[]
+    response?: OffenderSentenceDetail[]
+  }) => {
     return stubFor({
       request: {
         method: 'POST',
@@ -545,7 +552,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: offenderSentenceDetailsMock,
+        jsonBody: response ?? offenderSentenceDetailsMock,
       },
     })
   },

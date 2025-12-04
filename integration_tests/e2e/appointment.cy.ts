@@ -13,6 +13,7 @@ import {
   courtEventPrisonerSchedulesMock,
   prisonerSchedulesMock,
 } from '../../server/data/localMockData/prisonerSchedulesMock'
+import { offenderSentenceDetailsMock } from '../../server/data/localMockData/offenderSentenceDetailsMock'
 import { probationMeetingTypes } from '../../server/data/localMockData/courtHearingsMock'
 import { probationBookingMock } from '../../server/data/localMockData/videoLinkBookingMock'
 
@@ -47,12 +48,7 @@ context('Appointment page', () => {
     cy.task('stubBookAVideoLinkReferenceCodes', { group: 'PROBATION_MEETING_TYPE', response: meetingTypes })
     cy.task('stubGetLocationsForAppointments', { prisonId: 'MDI' })
     cy.task('stubGetAppointmentTypes', { response: appointmentTypes })
-    stubSchedules({
-      prisonerNumber,
-      date: today,
-      courtEvents: courtEventPrisonerSchedulesMock,
-      externalTransfers: prisonerSchedulesMock,
-    })
+    stubSchedules({ prisonerNumber, date: today })
     cy.task('stubSentencesForOffenders', { offenderNumbers: [prisonerNumber] })
   })
 
@@ -90,10 +86,8 @@ context('Appointment page', () => {
 
     page.offenderEventsTable.container.should('be.visible')
     page.offenderEventsTable.title.should('equal', 'John Saunders’ schedule')
-    page.offenderEventsTable.eventsList.should('deep.equal', [
-      { time: '', description: '**Court visit scheduled**' },
-      { time: '10:00 to 11:00', description: 'Court - Court - Comment' },
-    ])
+    page.offenderEventsTable.noEventsComment.should('be.visible')
+    page.offenderEventsTable.eventsDivs.should('not.exist')
     page.locationEventsTable.container.should('be.hidden')
 
     page.startTime.should('equal', ':')
@@ -184,6 +178,78 @@ context('Appointment page', () => {
     ])
   })
 
+  context('prisoner’s events', () => {
+    for (const scheduleKey of ['appointments', 'activities', 'externalTransfers', 'visits'] as const) {
+      it(`should list ${scheduleKey} schedule`, () => {
+        stubSchedules({
+          prisonerNumber,
+          date: today,
+          [scheduleKey]: [
+            {
+              ...prisonerSchedulesMock[0],
+              eventDescription: 'Some activity',
+              eventLocation: 'Place 1',
+              comment: 'some notes',
+            },
+          ],
+        })
+        const page = visitAppointmentPage()
+        page.offenderEventsTable.container.should('be.visible')
+        page.offenderEventsTable.noEventsComment.should('not.exist')
+        page.offenderEventsTable.eventsList.should('deep.equal', [
+          { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+        ])
+      })
+    }
+
+    it('should list open-ended schedule', () => {
+      stubSchedules({
+        prisonerNumber,
+        date: today,
+        activities: [
+          {
+            ...prisonerSchedulesMock[0],
+            startTime: `${today}T12:00:00`,
+            endTime: undefined,
+            eventDescription: 'Some activity',
+            eventLocation: 'Place 1',
+            comment: undefined,
+          },
+        ],
+      })
+      const page = visitAppointmentPage()
+      page.offenderEventsTable.container.should('be.visible')
+      page.offenderEventsTable.noEventsComment.should('not.exist')
+      page.offenderEventsTable.eventsList.should('deep.equal', [
+        { time: '12:00', description: 'Place 1 - Some activity' },
+      ])
+    })
+
+    it('should not list courtEvents schedule, but indicate there is one', () => {
+      stubSchedules({
+        prisonerNumber,
+        date: today,
+        courtEvents: courtEventPrisonerSchedulesMock,
+      })
+      const page = visitAppointmentPage()
+      page.offenderEventsTable.container.should('be.visible')
+      page.offenderEventsTable.noEventsComment.should('not.exist')
+      page.offenderEventsTable.eventsList.should('deep.equal', [{ time: '', description: '**Court visit scheduled**' }])
+    })
+
+    it('should indicate when due for release today', () => {
+      const mockData = offenderSentenceDetailsMock[0]
+      cy.task('stubSentencesForOffenders', {
+        offenderNumbers: [prisonerNumber],
+        response: [{ ...mockData, sentenceDetail: { ...mockData.sentenceDetail, releaseDate: today } }],
+      })
+      const page = visitAppointmentPage()
+      page.offenderEventsTable.container.should('be.visible')
+      page.offenderEventsTable.noEventsComment.should('not.exist')
+      page.offenderEventsTable.eventsList.should('deep.equal', [{ time: '', description: '**Due for release**' }])
+    })
+  })
+
   it('should show probation meeting types as a drop-down when there are more than 3', () => {
     cy.task('stubBookAVideoLinkReferenceCodes', {
       group: 'PROBATION_MEETING_TYPE',
@@ -214,10 +280,10 @@ context('Appointment page', () => {
     ])
   })
 
-  const scenarios: (SubmitScenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
+  const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
     {
       scenarioName: 'OIC',
-      fillInForm: page => {
+      setupScenario: page => {
         page.typeOfAppointmentField.select('Adjudication Review')
         page.locationField.select('Local name two')
         page.dateField.clear().type(tomorrowDisplay)
@@ -261,7 +327,7 @@ context('Appointment page', () => {
     },
     {
       scenarioName: 'VLLA',
-      fillInForm: page => {
+      setupScenario: page => {
         page.typeOfAppointmentField.select('Video Link - Legal Appointment')
         page.locationField.select('Local name two')
         page.dateField.clear().type(tomorrowDisplay)
@@ -304,7 +370,7 @@ context('Appointment page', () => {
     },
     {
       scenarioName: 'VLPM',
-      fillInForm: page => {
+      setupScenario: page => {
         page.typeOfAppointmentField.select('Video Link - Probation Meeting')
         page.probationTeamField.select('Blackpool')
         page.officerFullNameInput.type('Officer name')
@@ -377,16 +443,13 @@ context('Appointment page', () => {
       },
     },
   ]
-  for (const { scenarioName, fillInForm, expectations, movementSlipExpectation } of scenarios) {
+  for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of successScenarios) {
     it(`should allow adding an appointment of type ${scenarioName} and generate a movement slip`, () => {
-      stubSchedules({
-        prisonerNumber,
-        date: tomorrow,
-      })
+      stubSchedules({ prisonerNumber, date: tomorrow })
       stubLocation(today)
       stubLocation(tomorrow)
       const addPage = visitAppointmentPage()
-      fillInForm(addPage)
+      setupScenario(addPage)
       addPage.submit()
       const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
       expectations(confirmationPage)
@@ -581,9 +644,9 @@ function stubLocation(date: string) {
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'APP', response: [] })
 }
 
-interface SubmitScenario<P1 extends Page, P2 extends Page> {
+interface Scenario<P1 extends Page, P2 extends Page> {
   scenarioName: string
-  fillInForm: (page: P1) => void
+  setupScenario: (page: P1) => void
   expectations: (page: P2) => void
 }
 
