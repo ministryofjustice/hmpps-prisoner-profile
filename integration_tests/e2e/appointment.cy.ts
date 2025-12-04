@@ -86,7 +86,7 @@ context('Appointment page', () => {
 
     page.offenderEventsTable.container.should('be.visible')
     page.offenderEventsTable.title.should('equal', 'John Saunders’ schedule')
-    page.offenderEventsTable.noEventsComment.should('be.visible')
+    page.offenderEventsTable.noEventsComment.should('be.visible').and('contain.text', 'Nothing scheduled on')
     page.offenderEventsTable.eventsDivs.should('not.exist')
     page.locationEventsTable.container.should('be.hidden')
 
@@ -112,6 +112,8 @@ context('Appointment page', () => {
     page.locationField.select('Local name two')
     page.locationEventsTable.container.should('be.visible')
     page.locationEventsTable.title.should('equal', 'Schedule for Local name two')
+    page.locationEventsTable.noEventsComment.should('be.visible').and('contain.text', 'Nothing scheduled on')
+    page.locationEventsTable.eventsDivs.should('not.exist')
 
     // select a normal appointment type
 
@@ -178,9 +180,11 @@ context('Appointment page', () => {
     ])
   })
 
-  context('prisoner’s events', () => {
-    for (const scheduleKey of ['appointments', 'activities', 'externalTransfers', 'visits'] as const) {
-      it(`should list ${scheduleKey} schedule`, () => {
+  context('prisoner’s schedule', () => {
+    const nonCourtSchedules = ['appointments', 'activities', 'externalTransfers', 'visits'] as const
+
+    for (const scheduleKey of nonCourtSchedules) {
+      it(`should list ${scheduleKey} events`, () => {
         stubSchedules({
           prisonerNumber,
           date: today,
@@ -202,7 +206,37 @@ context('Appointment page', () => {
       })
     }
 
-    it('should list open-ended schedule', () => {
+    it('should list multiple events', () => {
+      const schedules = nonCourtSchedules.map((scheduleKey, index) => [
+        scheduleKey,
+        [
+          {
+            ...prisonerSchedulesMock[0],
+            startTime: `${today}T${10 + index}:00:00`,
+            endTime: `${today}T${11 + index}:00:00`,
+            eventDescription: `${scheduleKey} event`,
+            eventLocation: `Place ${index + 1}`,
+            comment: `some notes ${index + 1}`,
+          },
+        ],
+      ])
+      stubSchedules({
+        prisonerNumber,
+        date: today,
+        ...Object.fromEntries(schedules),
+      })
+      const page = visitAppointmentPage()
+      page.offenderEventsTable.container.should('be.visible')
+      page.offenderEventsTable.noEventsComment.should('not.exist')
+      page.offenderEventsTable.eventsList.should('deep.equal', [
+        { time: '10:00 to 11:00', description: 'Place 1 - appointments event - some notes 1' },
+        { time: '11:00 to 12:00', description: 'Place 2 - activities event - some notes 2' },
+        { time: '12:00 to 13:00', description: 'Place 3 - externalTransfers event - some notes 3' },
+        { time: '13:00 to 14:00', description: 'Place 4 - visits event - some notes 4' },
+      ])
+    })
+
+    it('should list open-ended events', () => {
       stubSchedules({
         prisonerNumber,
         date: today,
@@ -225,7 +259,7 @@ context('Appointment page', () => {
       ])
     })
 
-    it('should not list courtEvents schedule, but indicate there is one', () => {
+    it('should not list courtEvents events, but indicate court visit is planned', () => {
       stubSchedules({
         prisonerNumber,
         date: today,
@@ -247,6 +281,92 @@ context('Appointment page', () => {
       page.offenderEventsTable.container.should('be.visible')
       page.offenderEventsTable.noEventsComment.should('not.exist')
       page.offenderEventsTable.eventsList.should('deep.equal', [{ time: '', description: '**Due for release**' }])
+    })
+  })
+
+  context('selected location’s schedule', () => {
+    let page: AppointmentPage
+
+    beforeEach(() => {
+      page = visitAppointmentPage()
+      stubLocation(today)
+    })
+
+    it('should list activities', () => {
+      cy.task('stubActivitiesAtLocation', {
+        locationId: 25762,
+        date: today,
+        response: [
+          {
+            ...prisonerSchedulesMock[0],
+            eventDescription: 'Some activity',
+            eventLocation: 'Place 1',
+            comment: 'some notes',
+          },
+        ],
+      })
+
+      page.locationField.select('Local name two')
+
+      page.locationEventsTable.noEventsComment.should('not.exist')
+      page.locationEventsTable.eventsList.should('deep.equal', [
+        { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+      ])
+    })
+
+    it('should list multiple events', () => {
+      cy.task('stubActivitiesAtLocation', {
+        locationId: 25762,
+        date: today,
+        response: [
+          {
+            ...prisonerSchedulesMock[0],
+            eventDescription: 'Some activity',
+            eventLocation: 'Place 1',
+            comment: 'some notes',
+          },
+          {
+            ...prisonerSchedulesMock[0],
+            startTime: `${today}T13:30:00`,
+            endTime: `${today}T14:30:00`,
+            eventDescription: 'Elective activity',
+            eventLocation: 'Another place',
+            comment: 'some more notes',
+          },
+        ],
+      })
+
+      page.locationField.select('Local name two')
+
+      page.locationEventsTable.noEventsComment.should('not.exist')
+      page.locationEventsTable.eventsList.should('deep.equal', [
+        { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+        { time: '13:30 to 14:30', description: 'Another place - Elective activity - some more notes' },
+      ])
+    })
+
+    it('should list open-ended events', () => {
+      cy.task('stubActivitiesAtLocation', {
+        locationId: 25762,
+        date: today,
+        response: [
+          {
+            ...prisonerSchedulesMock[0],
+            startTime: `${today}T12:00:00`,
+            endTime: undefined,
+            eventDescription: 'Some activity',
+            eventLocation: 'Place 1',
+            comment: undefined,
+          },
+        ],
+      })
+
+      page.locationField.select('Local name two')
+
+      page.locationEventsTable.noEventsComment.should('not.exist')
+      page.locationEventsTable.eventsList.should('deep.equal', [
+        { time: '12:00', description: 'Place 1 - Some activity' },
+      ])
     })
   })
 
@@ -639,7 +759,7 @@ function stubLocation(date: string) {
     dpsLocationId: 'location-2',
     response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
   })
-  cy.task('stubActivitiesAtLocation', { locationId: 25762, date })
+  cy.task('stubActivitiesAtLocation', { locationId: 25762, date, response: [] })
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'VISIT', response: [] })
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'APP', response: [] })
 }
