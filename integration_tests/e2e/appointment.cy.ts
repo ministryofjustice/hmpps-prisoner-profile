@@ -400,206 +400,210 @@ context('Appointment page', () => {
     ])
   })
 
-  const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
-    {
-      scenarioName: 'OIC',
-      setupScenario: page => {
-        page.typeOfAppointmentField.select('Adjudication Review')
-        page.locationField.select('Local name two')
-        page.dateField.clear().type(tomorrowDisplay)
-        page.selectStartTime('11', '05')
-        page.selectEndTime('12', '15')
-        page.recurringRadioButtons.selectOption('No')
-        page.commentsTextArea.type('Comment x')
+  context('creating simple appointments', () => {
+    const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
+      {
+        scenarioName: 'OIC',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Adjudication Review')
+          page.locationField.select('Local name two')
+          page.dateField.clear().type(tomorrowDisplay)
+          page.selectStartTime('11', '05')
+          page.selectEndTime('12', '15')
+          page.recurringRadioButtons.selectOption('No')
+          page.commentsTextArea.type('Comment x')
 
-        cy.task('stubCreateAppointment', {
-          request: {
-            bookingId: 1102484,
-            appointmentType: 'OIC',
-            locationId: 25762,
-            startTime: `${tomorrow}T11:05:00`,
-            endTime: `${tomorrow}T12:15:00`,
-            comment: 'Comment x',
-          },
-        })
-      },
-      expectations: page => {
-        page.summaryListCommon.rows.then(rows => {
-          expect(rows).to.have.length(5)
-          expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
-          expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-          expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
-          expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
-          expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
-        })
-        page.summaryListComments.rows.then(rows => {
-          expect(rows).to.have.length(1)
-          expect(rows[0]).to.contain({ key: 'Comment', value: 'Comment x' })
-        })
-        page.summaryListRecurring.element.should('not.exist')
-        page.summaryListProbation.element.should('not.exist')
-      },
-      movementSlipExpectation: {
-        dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
-        reason: 'Adjudication Review',
-        comments: 'Comment x',
-      },
-    },
-    {
-      scenarioName: 'VLLA',
-      setupScenario: page => {
-        page.typeOfAppointmentField.select('Video Link - Legal Appointment')
-        page.locationField.select('Local name two')
-        page.dateField.clear().type(tomorrowDisplay)
-        page.selectStartTime('14', '00')
-        page.selectEndTime('15', '00')
-        page.recurringRadioButtons.selectOption('No')
-        page.commentsTextArea.type('Some notes')
-
-        cy.task('stubCreateAppointment', {
-          request: {
-            bookingId: 1102484,
-            appointmentType: 'VLLA',
-            locationId: 25762,
-            startTime: `${tomorrow}T14:00:00`,
-            endTime: `${tomorrow}T15:00:00`,
-            comment: 'Some notes',
-          },
-        })
-      },
-      expectations: page => {
-        page.summaryListCommon.rows.then(rows => {
-          expect(rows).to.have.length(5)
-          expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
-          expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-          expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
-          expect(rows[3]).to.contain({ key: 'Start time', value: '14:00' })
-          expect(rows[4]).to.contain({ key: 'End time', value: '15:00' })
-        })
-        page.summaryListComments.rows.then(rows => {
-          expect(rows).to.have.length(1)
-          expect(rows[0]).to.contain({ key: 'Comment', value: 'Some notes' })
-        })
-        page.summaryListRecurring.element.should('not.exist')
-        page.summaryListProbation.element.should('not.exist')
-      },
-      movementSlipExpectation: {
-        dateAndTime: `${formatDate(tomorrow, 'long')} 14:00 to 15:00`,
-        reason: 'Video Link - Legal Appointment',
-      },
-    },
-    {
-      scenarioName: 'VLPM',
-      setupScenario: page => {
-        page.typeOfAppointmentField.select('Video Link - Probation Meeting')
-        page.probationTeamField.select('Blackpool')
-        page.officerFullNameInput.type('Officer name')
-        page.officerEmailInput.type('officer@example.com')
-        page.officerTelephoneInput.type('02000000000')
-        page.meetingTypeRadioButtons.selectOption('Parole Report')
-        page.locationField.select('Local name two')
-        page.dateField.clear().type(tomorrowDisplay)
-        page.selectStartTime('17', '30')
-        page.selectEndTime('18', '30')
-        page.notesForStaffTextArea.type('Staff info')
-        page.notesForPrisonersTextArea.type('Prisoner note')
-
-        cy.task('stubBookAVideoLinkCreateBooking', {
-          createRequest: {
-            bookingType: 'PROBATION',
-            prisoners: [
-              {
-                prisonCode: 'MDI',
-                prisonerNumber: 'G6123VU',
-                appointments: [
-                  {
-                    type: 'VLB_PROBATION',
-                    locationKey: 'ABC',
-                    date: tomorrow,
-                    startTime: '17:30',
-                    endTime: '18:30',
-                  },
-                ],
-              },
-            ],
-            probationTeamCode: 'ABC',
-            probationMeetingType: 'PR',
-            additionalBookingDetails: {
-              contactName: 'Officer name',
-              contactEmail: 'officer@example.com',
-              contactNumber: '02000000000',
+          cy.task('stubCreateAppointment', {
+            request: {
+              bookingId: 1102484,
+              appointmentType: 'OIC',
+              locationId: 25762,
+              startTime: `${tomorrow}T11:05:00`,
+              endTime: `${tomorrow}T12:15:00`,
+              comment: 'Comment x',
             },
-            notesForStaff: 'Staff info',
-            notesForPrisoners: 'Prisoner note',
-          },
-        })
+          })
+        },
+        expectations: page => {
+          page.summaryListCommon.rows.then(rows => {
+            expect(rows).to.have.length(5)
+            expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
+            expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
+            expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
+          })
+          page.summaryListComments.rows.then(rows => {
+            expect(rows).to.have.length(1)
+            expect(rows[0]).to.contain({ key: 'Comment', value: 'Comment x' })
+          })
+          page.summaryListRecurring.element.should('not.exist')
+          page.summaryListProbation.element.should('not.exist')
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
+          reason: 'Adjudication Review',
+          comments: 'Comment x',
+        },
       },
-      expectations: page => {
-        page.summaryListCommon.rows.then(rows => {
-          expect(rows).to.have.length(10)
-          expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
-          expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
-          expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
-          expect(rows[3]).to.contain({ key: 'Probation officer’s full name', value: 'Officer name' })
-          expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
-          expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
-          expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
-          expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
-          expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
-          expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
-        })
-        page.summaryListProbation.rows.then(rows => {
-          expect(rows).to.have.length(2)
-          expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff info' })
-          expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
-        })
-        page.summaryListRecurring.element.should('not.exist')
-        page.summaryListComments.element.should('not.exist')
-      },
-      movementSlipExpectation: {
-        dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
-        reason: 'Video Link - Probation Meeting',
-        comments: 'Prisoner note',
-      },
-    },
-  ]
-  for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of successScenarios) {
-    it(`should allow adding an appointment of type ${scenarioName} and generate a movement slip`, () => {
-      stubSchedules({ prisonerNumber, date: tomorrow })
-      stubLocation(today)
-      stubLocation(tomorrow)
-      const addPage = visitAppointmentPage()
-      setupScenario(addPage)
-      addPage.submit()
-      const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
-      expectations(confirmationPage)
+      {
+        scenarioName: 'VLLA',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Video Link - Legal Appointment')
+          page.locationField.select('Local name two')
+          page.dateField.clear().type(tomorrowDisplay)
+          page.selectStartTime('14', '00')
+          page.selectEndTime('15', '00')
+          page.recurringRadioButtons.selectOption('No')
+          page.commentsTextArea.type('Some notes')
 
-      confirmationPage.addMoreLink.invoke('attr', 'href').should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
-      let movemetSlipHref: string
-      confirmationPage.movementSlipLink.then($anchor => {
-        movemetSlipHref = $anchor.attr('href')
-        cy.visit(movemetSlipHref)
+          cy.task('stubCreateAppointment', {
+            request: {
+              bookingId: 1102484,
+              appointmentType: 'VLLA',
+              locationId: 25762,
+              startTime: `${tomorrow}T14:00:00`,
+              endTime: `${tomorrow}T15:00:00`,
+              comment: 'Some notes',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListCommon.rows.then(rows => {
+            expect(rows).to.have.length(5)
+            expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
+            expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[3]).to.contain({ key: 'Start time', value: '14:00' })
+            expect(rows[4]).to.contain({ key: 'End time', value: '15:00' })
+          })
+          page.summaryListComments.rows.then(rows => {
+            expect(rows).to.have.length(1)
+            expect(rows[0]).to.contain({ key: 'Comment', value: 'Some notes' })
+          })
+          page.summaryListRecurring.element.should('not.exist')
+          page.summaryListProbation.element.should('not.exist')
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 14:00 to 15:00`,
+          reason: 'Video Link - Legal Appointment',
+        },
+      },
+      {
+        scenarioName: 'VLPM',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Video Link - Probation Meeting')
+          page.probationTeamField.select('Blackpool')
+          page.officerFullNameInput.type('Officer name')
+          page.officerEmailInput.type('officer@example.com')
+          page.officerTelephoneInput.type('02000000000')
+          page.meetingTypeRadioButtons.selectOption('Parole Report')
+          page.locationField.select('Local name two')
+          page.dateField.clear().type(tomorrowDisplay)
+          page.selectStartTime('17', '30')
+          page.selectEndTime('18', '30')
+          page.notesForStaffTextArea.type('Staff info')
+          page.notesForPrisonersTextArea.type('Prisoner note')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'PROBATION',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_PROBATION',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '17:30',
+                      endTime: '18:30',
+                    },
+                  ],
+                },
+              ],
+              probationTeamCode: 'ABC',
+              probationMeetingType: 'PR',
+              additionalBookingDetails: {
+                contactName: 'Officer name',
+                contactEmail: 'officer@example.com',
+                contactNumber: '02000000000',
+              },
+              notesForStaff: 'Staff info',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListCommon.rows.then(rows => {
+            expect(rows).to.have.length(10)
+            expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
+            expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+            expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[3]).to.contain({ key: 'Probation officer’s full name', value: 'Officer name' })
+            expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
+            expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
+            expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
+            expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
+            expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
+          })
+          page.summaryListProbation.rows.then(rows => {
+            expect(rows).to.have.length(2)
+            expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff info' })
+            expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
+          })
+          page.summaryListRecurring.element.should('not.exist')
+          page.summaryListComments.element.should('not.exist')
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
+          reason: 'Video Link - Probation Meeting',
+          comments: 'Prisoner note',
+        },
+      },
+    ]
+    for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of successScenarios) {
+      it(`should allow adding an appointment of type ${scenarioName} and generate a movement slip`, () => {
+        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubLocation(today)
+        stubLocation(tomorrow)
+        const addPage = visitAppointmentPage()
+        setupScenario(addPage)
+        addPage.submit()
+        const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+        expectations(confirmationPage)
+
+        confirmationPage.addMoreLink
+          .invoke('attr', 'href')
+          .should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
+        let movemetSlipHref: string
+        confirmationPage.movementSlipLink.then($anchor => {
+          movemetSlipHref = $anchor.attr('href')
+          cy.visit(movemetSlipHref)
+        })
+
+        const movementSlip = Page.verifyOnPage(MovementSlip)
+        movementSlip.shouldNotShowPageChrome()
+        movementSlip.labels
+          .should('deep.equal', [
+            { title: 'Name', description: 'John Saunders' },
+            { title: 'Prison number', description: 'G6123VU' },
+            { title: 'Cell location', description: '1-1-035' },
+            { title: 'Date and time', description: movementSlipExpectation.dateAndTime },
+            { title: 'Moving to', description: 'Local name two' },
+            { title: 'Reason', description: movementSlipExpectation.reason },
+            { title: 'Comments', description: movementSlipExpectation.comments ?? '--' },
+            { title: 'Created by', description: 'John Smith' },
+          ])
+          .then(() => {
+            // cannot load movement slip more than once
+            cy.request({ url: movemetSlipHref, failOnStatusCode: false }).its('status').should('equal', 404)
+          })
       })
-
-      const movementSlip = Page.verifyOnPage(MovementSlip)
-      movementSlip.shouldNotShowPageChrome()
-      movementSlip.labels
-        .should('deep.equal', [
-          { title: 'Name', description: 'John Saunders' },
-          { title: 'Prison number', description: 'G6123VU' },
-          { title: 'Cell location', description: '1-1-035' },
-          { title: 'Date and time', description: movementSlipExpectation.dateAndTime },
-          { title: 'Moving to', description: 'Local name two' },
-          { title: 'Reason', description: movementSlipExpectation.reason },
-          { title: 'Comments', description: movementSlipExpectation.comments ?? '--' },
-          { title: 'Created by', description: 'John Smith' },
-        ])
-        .then(() => {
-          // cannot load movement slip more than once
-          cy.request({ url: movemetSlipHref, failOnStatusCode: false }).its('status').should('equal', 404)
-        })
-    })
-  }
+    }
+  })
 
   it('should pre-fill details of an existing appointment', () => {
     cy.task('stubGetAppointment', {
