@@ -228,7 +228,7 @@ context('Appointment page', () => {
 
         cy.task('stubCreateAppointment', {
           request: {
-            bookingId: '1102484', // TODO: why is this sent as a string?
+            bookingId: 1102484,
             appointmentType: 'OIC',
             locationId: 25762,
             startTime: `${tomorrow}T11:05:00`,
@@ -272,7 +272,7 @@ context('Appointment page', () => {
 
         cy.task('stubCreateAppointment', {
           request: {
-            bookingId: '1102484', // TODO: why is this sent as a string?
+            bookingId: 1102484,
             appointmentType: 'VLLA',
             locationId: 25762,
             startTime: `${tomorrow}T14:00:00`,

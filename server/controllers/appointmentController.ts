@@ -204,12 +204,13 @@ export default class AppointmentController {
         repeats,
         times,
         comments,
-        bookingId,
+        bookingId: bookingIdStr,
         prisonId,
         refererUrl,
         notesForStaff,
         notesForPrisoners,
       } = req.body
+      const bookingId = parseInt(bookingIdStr, 10)
 
       const appointmentForm: AppointmentForm = {
         appointmentId: appointmentId ? +appointmentId : undefined,
