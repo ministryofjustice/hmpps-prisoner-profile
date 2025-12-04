@@ -7,7 +7,7 @@ export default class NewWebcamImagePage extends Page {
 
   webcamFeed = () => cy.get('video')
 
-  captureImage = () => cy.get('#captureImageButton')
+  captureImage = () => cy.get('#hmpps-webcam__captureImageButton')
 
   saveAndContinue = () => cy.get('button[type="submit"]')
 }

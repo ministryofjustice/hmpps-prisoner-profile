@@ -61,7 +61,7 @@ export default class AppointmentController {
       bookingId: number,
       prisonId: string,
       appointmentFromFlash: string[],
-      appointment: AppointmentDetails,
+      appointment: AppointmentDetails | undefined,
     ): Promise<AppointmentForm> => {
       if (appointmentFromFlash?.length) {
         return appointmentFromFlash[0] as AppointmentForm
@@ -72,10 +72,10 @@ export default class AppointmentController {
           bookingId,
           prisonId,
           date: formatDate(new Date().toISOString(), 'short'),
-        }
+        } satisfies AppointmentForm
       }
 
-      const appointmentForm = {
+      const appointmentForm: AppointmentForm = {
         appointmentId: appointment.appointment.id,
         appointmentType: appointment.appointment.appointmentTypeCode,
         location: (
@@ -95,7 +95,7 @@ export default class AppointmentController {
         comments: appointment.appointment.comment,
         bookingId,
         prisonId,
-      } as AppointmentForm
+      }
       if (
         appointment.appointment.appointmentTypeCode === 'VLB' ||
         appointment.appointment.appointmentTypeCode === 'VLPM'

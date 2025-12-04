@@ -25,7 +25,7 @@ async function getEventsForLocation() {
   const response =
     date &&
     locationId &&
-    (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
+    (await fetch(`/api/get-location-events?date=${encodeURIComponent(date)}&locationId=${encodeURIComponent(locationId)}&appointmentId=${encodeURIComponent(appointmentId)}`))
 
   if (response?.ok) {
     locationEventsContainer.innerHTML = await response.text()
@@ -43,7 +43,7 @@ async function getEventsForOffender() {
     prisonerNumber &&
     date &&
     (await fetch(
-      `/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}&appointmentId=${appointmentId}`,
+      `/api/get-offender-events?date=${encodeURIComponent(date)}&prisonerNumber=${encodeURIComponent(prisonerNumber)}&appointmentId=${encodeURIComponent(appointmentId)}`,
     ))
 
   if (response?.ok) {
@@ -60,7 +60,7 @@ async function getAppointmentEndDate() {
   const times = appointmentRepeatsTimesInput.value
 
   const response =
-    times && date && (await fetch(`/api/get-recurring-end-date?date=${date}&repeats=${repeats}&times=${times}`))
+    times && date && (await fetch(`/api/get-recurring-end-date?date=${encodeURIComponent(date)}&repeats=${encodeURIComponent(repeats)}&times=${encodeURIComponent(times)}`))
 
   if (response?.ok) {
     lastAppointmentDate.removeAttribute('style')
@@ -162,7 +162,7 @@ appointmentRepeatsTimesInput.addEventListener('keyup', () => {
   getAppointmentEndDate()
 })
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   getEventsForOffender()
   getEventsForLocation()
   getAppointmentEndDate()

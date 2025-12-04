@@ -43,7 +43,7 @@ export default class BookAVideoLinkRestApiClient extends RestClient implements B
   async getCourts(): Promise<Court[]> {
     return this.get(
       {
-        path: `/courts`,
+        path: '/courts',
         query: mapToQueryString({ enabledOnly: false }),
       },
       this.token,
@@ -53,7 +53,7 @@ export default class BookAVideoLinkRestApiClient extends RestClient implements B
   async getProbationTeams(): Promise<ProbationTeam[]> {
     return this.get(
       {
-        path: `/probation-teams`,
+        path: '/probation-teams',
         query: mapToQueryString({ enabledOnly: false }),
       },
       this.token,
@@ -61,10 +61,10 @@ export default class BookAVideoLinkRestApiClient extends RestClient implements B
   }
 
   async getCourtHearingTypes(): Promise<ReferenceCode[]> {
-    return this.get({ path: `/reference-codes/group/COURT_HEARING_TYPE` }, this.token)
+    return this.get({ path: '/reference-codes/group/COURT_HEARING_TYPE' }, this.token)
   }
 
   async getProbationMeetingTypes(): Promise<ReferenceCode[]> {
-    return this.get({ path: `/reference-codes/group/PROBATION_MEETING_TYPE` }, this.token)
+    return this.get({ path: '/reference-codes/group/PROBATION_MEETING_TYPE' }, this.token)
   }
 }
