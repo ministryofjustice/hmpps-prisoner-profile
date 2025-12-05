@@ -857,7 +857,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/agencies/${agencyId}\\?.*`,
+        urlPath: `/prison/api/agencies/${agencyId}`,
       },
       response: {
         status: 200,
