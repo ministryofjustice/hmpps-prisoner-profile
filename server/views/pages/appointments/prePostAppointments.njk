@@ -1,5 +1,4 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
@@ -33,12 +32,20 @@
 {% endmacro %}
 
 {% set preAppointmentHtml %}
-    {{ appointment({name:"preAppointment",locations: locations, location: formValues.preAppointmentLocation }) }}
-{% endset -%}
+    {{ appointment({
+      name: "preAppointment",
+      locations: locations,
+      location: formValues.preAppointmentLocation
+    }) }}
+{% endset %}
 
 {% set postAppointmentHtml %}
-    {{ appointment({name:"postAppointment",locations: locations, location: formValues.postAppointmentLocation }) }}
-{% endset -%}
+    {{ appointment({
+      name: "postAppointment",
+      locations: locations,
+      location: formValues.postAppointmentLocation
+    }) }}
+{% endset %}
 
 {% set mainClasses = "govuk-body" %}
 {% block content %}
@@ -160,12 +167,11 @@
                                         html: preAppointmentHtml
                                     }
                                 },
-                                    {
-                                        value: "no",
-                                        text: "No",
-                                        checked: formValues.preAppointment == 'no'
-                                    }
-                                ]
+                                {
+                                    value: "no",
+                                    text: "No",
+                                    checked: formValues.preAppointment == 'no'
+                                }]
                             }) }}
                         </div>
                     </div>
@@ -190,12 +196,11 @@
                                         html: postAppointmentHtml
                                     }
                                 },
-                                    {
-                                        value: "no",
-                                        text: "No",
-                                        checked: formValues.postAppointment == 'no'
-                                    }
-                                ]
+                                {
+                                    value: "no",
+                                    text: "No",
+                                    checked: formValues.postAppointment == 'no'
+                                }]
                             }) }}
                         </div>
                     </div>

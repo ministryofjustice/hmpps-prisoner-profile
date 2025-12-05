@@ -3,6 +3,7 @@ import { addDays } from 'date-fns'
 import Page from '../pages/page'
 import { AppointmentPage } from '../pages/appointments/appointmentPage'
 import { ConfirmationPage } from '../pages/appointments/confirmationPage'
+import { PrePostAppointmentPage } from '../pages/appointments/prePostAppointmentPage'
 import { MovementSlip } from '../pages/appointments/movementSlip'
 import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
@@ -26,7 +27,7 @@ const visitAppointmentPage = (appointmentId?: number) => {
   return Page.verifyOnPage(AppointmentPage, appointmentId)
 }
 
-context('Appointment page', () => {
+context('Appointments pages', () => {
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const todayDisplay = today.split('-').reverse().join('/')
@@ -444,6 +445,7 @@ context('Appointment page', () => {
       notesForStaff: 'Staff info',
       notesForPrisoners: 'Prisoner note',
     }
+
     const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
       {
         scenarioName: 'OIC',
@@ -566,9 +568,11 @@ context('Appointment page', () => {
         stubSchedules({ prisonerNumber, date: tomorrow })
         stubLocation(today)
         stubLocation(tomorrow)
+
         const addPage = visitAppointmentPage()
         setupScenario(addPage)
         addPage.submit()
+
         const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
         expectations(confirmationPage)
 
@@ -650,6 +654,104 @@ context('Appointment page', () => {
     }
   })
 
+  context('creating appointments that may need pre/post hearings', () => {
+    const step1Scenarios: Scenario<AppointmentPage, PrePostAppointmentPage>[] = [
+      {
+        scenarioName: 'an appointment of type VLB',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Video Link - Court Hearing')
+          page.locationField.select('Local name two')
+          page.dateField.clear()
+          page.dateField.type(tomorrowDisplay)
+          page.selectStartTime('12', '30')
+          page.selectEndTime('13', '10')
+          page.notesForStaffTextArea.type('Staff note')
+          page.notesForPrisonersTextArea.type('Prisoner note')
+        },
+        expectations: page => {
+          page.summaryList.rows.then(rows => {
+            expect(rows).to.have.length(6)
+            expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '12:30' })
+            expect(rows[3]).to.contain({ key: 'Court hearing end time', value: '13:10' })
+            expect(rows[4]).to.contain({ key: 'Notes for prison staff', value: 'Staff note' })
+            expect(rows[5]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
+          })
+        },
+      },
+      {
+        scenarioName: 'an appointment of type VLB without comments',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Video Link - Court Hearing')
+          page.locationField.select('Local name two')
+          page.dateField.clear()
+          page.dateField.type(tomorrowDisplay)
+          page.selectStartTime('11', '05')
+          page.selectEndTime('11', '45')
+        },
+        expectations: page => {
+          page.summaryList.rows.then(rows => {
+            expect(rows).to.have.length(6)
+            expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '11:05' })
+            expect(rows[3]).to.contain({ key: 'Court hearing end time', value: '11:45' })
+            expect(rows[4]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
+            expect(rows[5]).to.contain({ key: 'Notes for prisoner', value: 'None entered' })
+          })
+        },
+      },
+    ]
+    for (const { scenarioName, setupScenario, expectations } of step1Scenarios) {
+      it(`should allow entering main details for ${scenarioName}`, () => {
+        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubLocation(today)
+        stubLocation(tomorrow)
+
+        const addPage = visitAppointmentPage()
+        setupScenario(addPage)
+
+        cy.task('stubBookAVideoLinkCourts')
+        cy.task('stubBookAVideoLinkReferenceCodes', { group: 'COURT_HEARING_TYPE', response: meetingTypes })
+        cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+
+        addPage.submit()
+
+        const prePostPage = Page.verifyOnPage(PrePostAppointmentPage)
+        expectations(prePostPage)
+
+        prePostPage.addPreAppointmentRadio.options.should('deep.equal', [
+          { label: 'Yes', value: 'yes', selected: false },
+          { label: 'No', value: 'no', selected: false },
+        ])
+        prePostPage.preLocationSelect.element.should('be.hidden')
+        prePostPage.preScheduledEventsTable.container.should('be.hidden')
+        prePostPage.addPostAppointmentRadio.options.should('deep.equal', [
+          { label: 'Yes', value: 'yes', selected: false },
+          { label: 'No', value: 'no', selected: false },
+        ])
+        prePostPage.postLocationSelect.element.should('be.hidden')
+        prePostPage.postScheduledEventsTable.container.should('be.hidden')
+        prePostPage.courtSelect.options.should('deep.equal', [
+          { label: 'Select court', value: '', selected: true },
+          { label: 'Leeds Court', value: 'ABC', selected: false },
+          { label: 'Barnsley Court', value: 'DEF', selected: false },
+          { label: 'Sheffield Court', value: 'SHF', selected: false },
+        ])
+        prePostPage.hearingTypeSelect.options.should('deep.equal', [
+          { label: 'Select hearing type', value: '', selected: true },
+          { label: 'Post-sentence report', value: 'PSR', selected: false },
+          { label: 'Parole Report', value: 'PR', selected: false },
+          { label: 'HDC (home detention curfew)', value: 'HDC', selected: false },
+        ])
+        prePostPage.cvpNumberInput.should('be.hidden')
+        prePostPage.videoLinkUrlInput.should('be.hidden')
+        prePostPage.guestPinInput.should('be.hidden')
+      })
+    }
+  })
+
   it('should pre-fill details of an existing appointment', () => {
     cy.task('stubGetAppointment', {
       appointment: {
@@ -666,6 +768,7 @@ context('Appointment page', () => {
       },
     })
     cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+    stubSchedules({ prisonerNumber, date: tomorrow })
     stubLocation(tomorrow)
     cy.task('stubBookAVideoLinkBooking', {
       searchRequest: {
