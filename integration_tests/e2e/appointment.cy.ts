@@ -4,6 +4,7 @@ import Page from '../pages/page'
 import { AppointmentPage } from '../pages/appointments/appointmentPage'
 import { ConfirmationPage } from '../pages/appointments/confirmationPage'
 import { PrePostAppointmentPage } from '../pages/appointments/prePostAppointmentPage'
+import { PrePostConfirmationPage } from '../pages/appointments/prePostConfirmationPage'
 import { MovementSlip } from '../pages/appointments/movementSlip'
 import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
@@ -462,7 +463,7 @@ context('Appointments pages', () => {
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
-            expect(rows).to.have.length(5)
+            expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
             expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
             expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
@@ -470,7 +471,7 @@ context('Appointments pages', () => {
             expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
           })
           page.summaryListComments.rows.then(rows => {
-            expect(rows).to.have.length(1)
+            expect(rows).to.have.lengthOf(1)
             expect(rows[0]).to.contain({ key: 'Comment', value: 'Comment x' })
           })
           page.summaryListRecurring.element.should('not.exist')
@@ -497,7 +498,7 @@ context('Appointments pages', () => {
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
-            expect(rows).to.have.length(5)
+            expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
             expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
             expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
@@ -505,7 +506,7 @@ context('Appointments pages', () => {
             expect(rows[4]).to.contain({ key: 'End time', value: '15:00' })
           })
           page.summaryListComments.rows.then(rows => {
-            expect(rows).to.have.length(1)
+            expect(rows).to.have.lengthOf(1)
             expect(rows[0]).to.contain({ key: 'Comment', value: 'Some notes' })
           })
           page.summaryListRecurring.element.should('not.exist')
@@ -536,7 +537,7 @@ context('Appointments pages', () => {
         },
         expectations: page => {
           page.summaryListCommon.rows.then(rows => {
-            expect(rows).to.have.length(10)
+            expect(rows).to.have.lengthOf(10)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
             expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
             expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
@@ -549,7 +550,7 @@ context('Appointments pages', () => {
             expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
           })
           page.summaryListProbation.rows.then(rows => {
-            expect(rows).to.have.length(2)
+            expect(rows).to.have.lengthOf(2)
             expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff info' })
             expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
           })
@@ -640,13 +641,13 @@ context('Appointments pages', () => {
         const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
         if (scenarioName === 'VLPM') {
           confirmationPage.summaryListProbation.rows.then(rows => {
-            expect(rows).to.have.length(2)
+            expect(rows).to.have.lengthOf(2)
             expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
             expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'None entered' })
           })
         } else {
           confirmationPage.summaryListComments.rows.then(rows => {
-            expect(rows).to.have.length(1)
+            expect(rows).to.have.lengthOf(1)
             expect(rows[0]).to.contain({ key: 'Comment', value: '' })
           })
         }
@@ -670,7 +671,7 @@ context('Appointments pages', () => {
         },
         expectations: page => {
           page.summaryList.rows.then(rows => {
-            expect(rows).to.have.length(6)
+            expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
             expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
             expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '12:30' })
@@ -692,7 +693,7 @@ context('Appointments pages', () => {
         },
         expectations: page => {
           page.summaryList.rows.then(rows => {
-            expect(rows).to.have.length(6)
+            expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
             expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
             expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '11:05' })
@@ -745,9 +746,476 @@ context('Appointments pages', () => {
           { label: 'Parole Report', value: 'PR', selected: false },
           { label: 'HDC (home detention curfew)', value: 'HDC', selected: false },
         ])
+        prePostPage.knowVideoLinkRadio.options.should('deep.equal', [
+          { label: 'Yes', value: 'yes', selected: false },
+          { label: 'No', value: 'no', selected: false },
+        ])
         prePostPage.cvpNumberInput.should('be.hidden')
         prePostPage.videoLinkUrlInput.should('be.hidden')
+        prePostPage.guestPinRequiredRadio.options.should('deep.equal', [
+          { label: 'Yes', value: 'yes', selected: false },
+          { label: 'No', value: 'no', selected: false },
+        ])
         prePostPage.guestPinInput.should('be.hidden')
+      })
+    }
+
+    const step2Scenarios: Scenario<PrePostAppointmentPage, PrePostConfirmationPage>[] = [
+      {
+        scenarioName: 'no pre or post briefings',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('No')
+          page.addPostAppointmentRadio.selectOption('No')
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('No')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.element.should('not.exist')
+          page.summaryListPost.element.should('not.exist')
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'pre briefings',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('Yes')
+          page.preLocationSelect.select('Local name two')
+          page.preScheduledEventsTable.eventsList.should('deep.equal', [
+            { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+          ])
+          page.addPostAppointmentRadio.selectOption('No')
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('No')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_PRE',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:15',
+                      endTime: '12:30',
+                    },
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.rows.then(rows => {
+            expect(rows).to.have.lengthOf(1)
+            expect(rows[0]).to.contain({ key: 'Pre-court hearing briefing', value: 'Local name two - 12:15 to 12:30' })
+          })
+          page.summaryListPost.element.should('not.exist')
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'post briefings',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('No')
+          page.addPostAppointmentRadio.selectOption('Yes')
+          page.postLocationSelect.select('Local name two')
+          page.postScheduledEventsTable.eventsList.should('deep.equal', [
+            { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+          ])
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('No')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                    {
+                      type: 'VLB_COURT_POST',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '13:10',
+                      endTime: '13:25',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.element.should('not.exist')
+          page.summaryListPost.rows.then(rows => {
+            expect(rows).to.have.lengthOf(1)
+            expect(rows[0]).to.contain({ key: 'Post-court hearing briefing', value: 'Local name two - 13:10 to 13:25' })
+          })
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'pre & post briefings',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('Yes')
+          page.preLocationSelect.select('Local name two')
+          page.preScheduledEventsTable.eventsList.should('deep.equal', [
+            { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+          ])
+          page.addPostAppointmentRadio.selectOption('Yes')
+          page.postLocationSelect.select('Local name two')
+          page.postScheduledEventsTable.eventsList.should('deep.equal', [
+            { time: '10:00 to 11:00', description: 'Place 1 - Some activity - some notes' },
+          ])
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('No')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_PRE',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:15',
+                      endTime: '12:30',
+                    },
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                    {
+                      type: 'VLB_COURT_POST',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '13:10',
+                      endTime: '13:25',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.rows.then(rows => {
+            expect(rows).to.have.lengthOf(1)
+            expect(rows[0]).to.contain({ key: 'Pre-court hearing briefing', value: 'Local name two - 12:15 to 12:30' })
+          })
+          page.summaryListPost.rows.then(rows => {
+            expect(rows).to.have.lengthOf(1)
+            expect(rows[0]).to.contain({ key: 'Post-court hearing briefing', value: 'Local name two - 13:10 to 13:25' })
+          })
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'number for CVP address',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('No')
+          page.addPostAppointmentRadio.selectOption('No')
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('Yes')
+          page.cvpNumberInput.type('8589')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              hmctsNumber: '8589',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.element.should('not.exist')
+          page.summaryListPost.element.should('not.exist')
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'HMCTS8589@meet.video.justice.gov.uk' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'video link URL',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('No')
+          page.addPostAppointmentRadio.selectOption('No')
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('Yes')
+          page.videoLinkUrlInput.type('https://example.com/8589')
+          page.guestPinRequiredRadio.selectOption('No')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              videoLinkUrl: 'https://example.com/8589',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.element.should('not.exist')
+          page.summaryListPost.element.should('not.exist')
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'https://example.com/8589' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+          })
+        },
+      },
+      {
+        scenarioName: 'guest pin',
+        setupScenario: page => {
+          page.addPreAppointmentRadio.selectOption('No')
+          page.addPostAppointmentRadio.selectOption('No')
+          page.courtSelect.select('Leeds Court')
+          page.hearingTypeSelect.select('Parole Report')
+          page.knowVideoLinkRadio.selectOption('No')
+          page.guestPinRequiredRadio.selectOption('Yes')
+          page.guestPinInput.type('556677')
+
+          cy.task('stubBookAVideoLinkCreateBooking', {
+            createRequest: {
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: 'MDI',
+                  prisonerNumber: 'G6123VU',
+                  appointments: [
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: 'ABC',
+                      date: tomorrow,
+                      startTime: '12:30',
+                      endTime: '13:10',
+                    },
+                  ],
+                },
+              ],
+              courtCode: 'ABC',
+              probationTeamCode: '',
+              courtHearingType: 'PR',
+              guestPin: '556677',
+              notesForStaff: 'Staff note',
+              notesForPrisoners: 'Prisoner note',
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListPre.element.should('not.exist')
+          page.summaryListPost.element.should('not.exist')
+          page.summaryListCourt.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+            expect(rows[1]).to.contain({ key: 'Hearing type', value: 'Parole Report' })
+            expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
+            expect(rows[3]).to.contain({ key: 'Guest pin', value: '556677' })
+          })
+        },
+      },
+    ]
+    for (const { scenarioName, setupScenario, expectations } of step2Scenarios) {
+      it(`should allow creating a VLB appointment with ${scenarioName}`, () => {
+        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubLocation(today)
+        stubLocation(tomorrow)
+        cy.task('stubActivitiesAtLocation', {
+          locationId: 25762,
+          date: tomorrow,
+          response: [
+            {
+              ...prisonerSchedulesMock[0],
+              eventDescription: 'Some activity',
+              eventLocation: 'Place 1',
+              comment: 'some notes',
+            },
+          ],
+        })
+
+        const addPage = visitAppointmentPage()
+        addPage.typeOfAppointmentField.select('Video Link - Court Hearing')
+        addPage.locationField.select('Local name two')
+        addPage.dateField.clear()
+        addPage.dateField.type(tomorrowDisplay)
+        addPage.selectStartTime('12', '30')
+        addPage.selectEndTime('13', '10')
+        addPage.notesForStaffTextArea.type('Staff note')
+        addPage.notesForPrisonersTextArea.type('Prisoner note')
+
+        cy.task('stubBookAVideoLinkCourts')
+        cy.task('stubBookAVideoLinkReferenceCodes', { group: 'COURT_HEARING_TYPE', response: meetingTypes })
+        cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+
+        addPage.submit()
+
+        const prePostPage = Page.verifyOnPage(PrePostAppointmentPage)
+        setupScenario(prePostPage)
+
+        cy.task('stubGetAgency', { agencyId: 'MDI' })
+        prePostPage.submit()
+
+        const prePostConfirmationPage = Page.verifyOnPage(PrePostConfirmationPage)
+        prePostConfirmationPage.summaryListCommon.rows.then(rows => {
+          expect(rows).to.have.lengthOf(6)
+          expect(rows[0]).to.contain({ key: 'Name', value: 'John Saunders' })
+          expect(rows[1]).to.contain({ key: 'Prison', value: 'Moorland (HMP & YOI)' })
+          expect(rows[2]).to.contain({ key: 'Prison room', value: 'Local name two' })
+          expect(rows[3]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+          expect(rows[4]).to.contain({ key: 'Start time', value: '12:30' })
+          expect(rows[5]).to.contain({ key: 'End time', value: '13:10' })
+        })
+        prePostConfirmationPage.summaryListNotes.rows.then(rows => {
+          expect(rows).to.have.lengthOf(2)
+          expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff note' })
+          expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
+        })
+        expectations(prePostConfirmationPage)
       })
     }
   })
@@ -798,7 +1266,7 @@ context('Appointments pages', () => {
 
     const page = visitAppointmentPage(81)
     page.appointmentSummary.rows.then(rows => {
-      expect(rows).to.have.length(2)
+      expect(rows).to.have.lengthOf(2)
       expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
       expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
     })

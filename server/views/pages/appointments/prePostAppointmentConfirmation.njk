@@ -1,4 +1,3 @@
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "partials/formatCvpLink.njk" import formatCvpLink %}
@@ -30,17 +29,17 @@
                 <h2 class="govuk-heading-m">Video link details</h2>
 
                 {% if mustContactTheCourt %}
-                {% set html %}
-                  <h3 class="govuk-notification-banner__heading">
-                    You must email {{ court }} to confirm the booking.
-                  </h3>
-                  <p class="govuk-body">This is because they do not yet have access to the Book a video link service.</p>
-                {% endset %}
+                  {% set html %}
+                    <h3 class="govuk-notification-banner__heading">
+                      You must email {{ court }} to confirm the booking.
+                    </h3>
+                    <p class="govuk-body">This is because they do not yet have access to the Book a video link service.</p>
+                  {% endset %}
 
-                {{ govukNotificationBanner({
-                  html: html,
-                  titleText: 'Email ' + court + ' to confirm the booking'
-                }) }}
+                  {{ govukNotificationBanner({
+                    html: html,
+                    titleText: 'Email ' + court + ' to confirm the booking'
+                  }) }}
                 {% endif %}
 
                 {{ govukSummaryList({
@@ -95,7 +94,8 @@
                                 text: endTime
                             }
                         }
-                    ]
+                    ],
+                    attributes: {"data-qa": "appointment-details-list__common"}
                 }) }}
 
                 {% if appointmentTypeCode == 'VLB' %}
@@ -118,7 +118,8 @@
                                     text: notesForPrisoners or 'None entered'
                                 }
                             }
-                        ]
+                        ],
+                        attributes: {"data-qa": "appointment-details-list__notes"}
                     }) }}
                 {% endif %}
 
@@ -136,7 +137,8 @@
                                     text: pre
                                 }
                             }
-                        ]
+                        ],
+                        attributes: {"data-qa": "appointment-details-list__pre"}
                     }) }}
                 {% endif %}
 
@@ -152,7 +154,8 @@
                                     text: post
                                 }
                             }
-                        ]
+                        ],
+                        attributes: {"data-qa": "appointment-details-list__post"}
                     }) }}
                 {% endif %}
 
@@ -191,7 +194,8 @@
                                 text: guestPin or "None entered"
                             }
                         }
-                    ]
+                    ],
+                    attributes: {"data-qa": "appointment-details-list__court"}
                 }) }}
 
                 <div class="govuk-!-margin-bottom-4">
