@@ -23,6 +23,7 @@
             }) }}
         </div>
 
+        {# TODO: `events` and `formValues` are not available inside macro as they are not passed in so schedule is not pre-rendered #}
         <div id="{{ params.name + 'EventsContainer' }}">
             {% if formValues[params.name + "Location"] %}
                 {{ scheduledEvents(events[params.name].events, 'location', 'Schedule for ' + events[params.name].locationName) }}
