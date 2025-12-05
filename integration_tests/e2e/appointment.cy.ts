@@ -449,7 +449,8 @@ context('Appointments pages', () => {
 
     const successScenarios: (Scenario<AppointmentPage, ConfirmationPage> & MovementSlipScenario)[] = [
       {
-        scenarioName: 'OIC',
+        scenarioName: 'of type OIC',
+        appointmentType: 'OIC',
         setupScenario: page => {
           page.typeOfAppointmentField.select('Adjudication Review')
           page.locationField.select('Local name two')
@@ -484,7 +485,8 @@ context('Appointments pages', () => {
         },
       },
       {
-        scenarioName: 'VLLA',
+        scenarioName: 'of type VLLA',
+        appointmentType: 'VLLA',
         setupScenario: page => {
           page.typeOfAppointmentField.select('Video Link - Legal Appointment')
           page.locationField.select('Local name two')
@@ -518,7 +520,8 @@ context('Appointments pages', () => {
         },
       },
       {
-        scenarioName: 'VLPM',
+        scenarioName: 'of type VLPM',
+        appointmentType: 'VLPM',
         setupScenario: page => {
           page.typeOfAppointmentField.select('Video Link - Probation Meeting')
           page.probationTeamField.select('Blackpool')
@@ -563,80 +566,138 @@ context('Appointments pages', () => {
           comments: 'Prisoner note',
         },
       },
-    ]
-    for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of successScenarios) {
-      it(`should allow adding an appointment of type ${scenarioName} and generate a movement slip`, () => {
-        stubSchedules({ prisonerNumber, date: tomorrow })
-        stubLocation(today)
-        stubLocation(tomorrow)
+      {
+        scenarioName: 'of type VLPM with unknown officer',
+        appointmentType: 'VLPM',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Video Link - Probation Meeting')
+          page.probationTeamField.select('Blackpool')
+          page.officerDetailsNotKnownCheckbox.toggleOption('Not yet known')
+          page.meetingTypeRadioButtons.selectOption('Parole Report')
+          page.locationField.select('Local name two')
+          page.dateField.clear().type(tomorrowDisplay)
+          page.selectStartTime('17', '30')
+          page.selectEndTime('18', '30')
+          page.notesForStaffTextArea.type('Staff info')
+          page.notesForPrisonersTextArea.type('Prisoner note')
 
-        const addPage = visitAppointmentPage()
-        setupScenario(addPage)
-        addPage.submit()
-
-        const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
-        expectations(confirmationPage)
-
-        confirmationPage.addMoreLink
-          .invoke('attr', 'href')
-          .should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
-        let movementSlipUrl: string
-        confirmationPage.movementSlipLink.then($anchor => {
-          movementSlipUrl = $anchor.attr('href')
-          cy.visit(movementSlipUrl)
-        })
-        expectCorrectMovementSlip(movementSlipExpectation).then(() => {
-          // cannot load movement slip more than once
-          cy.request({ url: movementSlipUrl, failOnStatusCode: false }).its('status').should('equal', 404)
-        })
-      })
-
-      it(`should allow adding an appointment of type ${scenarioName} without comments`, () => {
-        stubSchedules({ prisonerNumber, date: tomorrow })
-        stubLocation(today)
-        stubLocation(tomorrow)
-
-        // override creation stub
-        if (scenarioName === 'OIC') {
-          cy.task('stubCreateAppointment', {
-            request: { ...expectedCreateRequestOIC, comment: '' },
-          })
-        } else if (scenarioName === 'VLLA') {
-          cy.task('stubCreateAppointment', {
-            request: { ...expectedCreateRequestVLLA, comment: '' },
-          })
-        } else if (scenarioName === 'VLPM') {
-          const expectedCreateRequestVLPM2 = { ...expectedCreateRequestVLPM }
-          delete expectedCreateRequestVLPM2.notesForStaff
-          delete expectedCreateRequestVLPM2.notesForPrisoners
           cy.task('stubBookAVideoLinkCreateBooking', {
-            createRequest: expectedCreateRequestVLPM2,
+            createRequest: { ...expectedCreateRequestVLPM, additionalBookingDetails: undefined },
           })
-        }
-
-        const addPage = visitAppointmentPage()
-        setupScenario(addPage)
-        if (scenarioName === 'VLPM') {
-          addPage.notesForStaffTextArea.clear()
-          addPage.notesForPrisonersTextArea.clear()
-        } else {
-          addPage.commentsTextArea.clear()
-        }
-        addPage.submit()
-
-        const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
-        if (scenarioName === 'VLPM') {
-          confirmationPage.summaryListProbation.rows.then(rows => {
+        },
+        expectations: page => {
+          page.summaryListCommon.rows.then(rows => {
+            expect(rows).to.have.lengthOf(10)
+            expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
+            expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+            expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[3]).to.contain({ key: 'Probation officer’s full name', value: 'Not yet known' })
+            expect(rows[4]).to.contain({ key: 'Email address', value: 'Not yet known' })
+            expect(rows[5]).to.contain({ key: 'UK phone number', value: 'Not yet known' })
+            expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
+            expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
+            expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
+          })
+          page.summaryListProbation.rows.then(rows => {
             expect(rows).to.have.lengthOf(2)
-            expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
-            expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'None entered' })
+            expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Staff info' })
+            expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
           })
-        } else {
-          confirmationPage.summaryListComments.rows.then(rows => {
-            expect(rows).to.have.lengthOf(1)
-            expect(rows[0]).to.contain({ key: 'Comment', value: '' })
+          page.summaryListRecurring.element.should('not.exist')
+          page.summaryListComments.element.should('not.exist')
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
+          reason: 'Video Link - Probation Meeting',
+          comments: 'Prisoner note',
+        },
+      },
+    ]
+    for (const {
+      scenarioName,
+      appointmentType,
+      setupScenario,
+      expectations,
+      movementSlipExpectation,
+    } of successScenarios) {
+      context(scenarioName, () => {
+        it('should save appointment and generate a movement slip', () => {
+          stubSchedules({ prisonerNumber, date: tomorrow })
+          stubLocation(today)
+          stubLocation(tomorrow)
+
+          const addPage = visitAppointmentPage()
+          setupScenario(addPage)
+          addPage.submit()
+
+          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+          expectations(confirmationPage)
+
+          confirmationPage.addMoreLink
+            .invoke('attr', 'href')
+            .should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
+          let movementSlipUrl: string
+          confirmationPage.movementSlipLink.then($anchor => {
+            movementSlipUrl = $anchor.attr('href')
+            cy.visit(movementSlipUrl)
           })
-        }
+          expectCorrectMovementSlip(movementSlipExpectation).then(() => {
+            // cannot load movement slip more than once
+            cy.request({ url: movementSlipUrl, failOnStatusCode: false }).its('status').should('equal', 404)
+          })
+        })
+
+        it('save appointment without comments', () => {
+          stubSchedules({ prisonerNumber, date: tomorrow })
+          stubLocation(today)
+          stubLocation(tomorrow)
+
+          // override creation stub
+          if (appointmentType === 'OIC') {
+            cy.task('stubCreateAppointment', {
+              request: { ...expectedCreateRequestOIC, comment: '' },
+            })
+          } else if (appointmentType === 'VLLA') {
+            cy.task('stubCreateAppointment', {
+              request: { ...expectedCreateRequestVLLA, comment: '' },
+            })
+          } else if (appointmentType === 'VLPM') {
+            const expectedCreateRequestVLPM2 = { ...expectedCreateRequestVLPM }
+            delete expectedCreateRequestVLPM2.notesForStaff
+            delete expectedCreateRequestVLPM2.notesForPrisoners
+            if (scenarioName.includes('unknown officer')) {
+              delete expectedCreateRequestVLPM2.additionalBookingDetails
+            }
+            cy.task('stubBookAVideoLinkCreateBooking', {
+              createRequest: expectedCreateRequestVLPM2,
+            })
+          }
+
+          const addPage = visitAppointmentPage()
+          setupScenario(addPage)
+          if (appointmentType === 'VLPM') {
+            addPage.notesForStaffTextArea.clear()
+            addPage.notesForPrisonersTextArea.clear()
+          } else {
+            addPage.commentsTextArea.clear()
+          }
+          addPage.submit()
+
+          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+          if (appointmentType === 'VLPM') {
+            confirmationPage.summaryListProbation.rows.then(rows => {
+              expect(rows).to.have.lengthOf(2)
+              expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
+              expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'None entered' })
+            })
+          } else {
+            confirmationPage.summaryListComments.rows.then(rows => {
+              expect(rows).to.have.lengthOf(1)
+              expect(rows[0]).to.contain({ key: 'Comment', value: '' })
+            })
+          }
+        })
       })
     }
   })
@@ -645,6 +706,7 @@ context('Appointments pages', () => {
     const step1Scenarios: Scenario<AppointmentPage, PrePostAppointmentPage>[] = [
       {
         scenarioName: 'an appointment of type VLB',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.typeOfAppointmentField.select('Video Link - Court Hearing')
           page.locationField.select('Local name two')
@@ -669,6 +731,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'an appointment of type VLB without comments',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.typeOfAppointmentField.select('Video Link - Court Hearing')
           page.locationField.select('Local name two')
@@ -749,6 +812,7 @@ context('Appointments pages', () => {
     const step2Scenarios: (Scenario<PrePostAppointmentPage, PrePostConfirmationPage> & MovementSlipScenario)[] = [
       {
         scenarioName: 'no pre or post briefings',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
@@ -802,6 +866,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'pre briefings',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('Yes')
           page.preLocationSelect.select('Local name two')
@@ -869,6 +934,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'post briefings',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('Yes')
@@ -936,6 +1002,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'pre & post briefings',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('Yes')
           page.preLocationSelect.select('Local name two')
@@ -1017,6 +1084,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'number for CVP address',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
@@ -1072,6 +1140,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'video link URL',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
@@ -1127,6 +1196,7 @@ context('Appointments pages', () => {
       },
       {
         scenarioName: 'guest pin',
+        appointmentType: 'VLB',
         setupScenario: page => {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
@@ -1417,6 +1487,7 @@ function stubLocation(date: string) {
 
 interface Scenario<P1 extends Page, P2 extends Page> {
   scenarioName: string
+  appointmentType: string
   setupScenario: (page: P1) => void
   expectations: (page: P2) => void
 }
