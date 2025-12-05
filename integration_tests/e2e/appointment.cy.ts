@@ -648,7 +648,7 @@ context('Appointments pages', () => {
           })
         })
 
-        it('save appointment without comments', () => {
+        it('should save appointment without comments', () => {
           stubSchedules({ prisonerNumber, date: tomorrow })
           stubLocation(today)
           stubLocation(tomorrow)

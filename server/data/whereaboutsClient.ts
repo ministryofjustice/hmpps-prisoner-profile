@@ -16,7 +16,7 @@ export default class WhereaboutsRestApiClient extends RestClient implements Wher
     return this.get({ path: `/appointment/${appointmentId}` }, this.token)
   }
 
-  async createAppointments(appointments: AppointmentDefaults): Promise<SavedAppointment> {
+  async createAppointments(appointments: AppointmentDefaults): Promise<SavedAppointment[]> {
     return this.post(
       {
         path: '/appointment',

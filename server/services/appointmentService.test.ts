@@ -44,7 +44,7 @@ describe('Appointment Service', () => {
     }
     whereaboutsApiClient = {
       getAppointment: jest.fn(),
-      createAppointments: jest.fn(async () => savedAppointmentMock),
+      createAppointments: jest.fn(async () => [savedAppointmentMock]),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
     }
@@ -115,7 +115,7 @@ describe('Appointment Service', () => {
       const response = await appointmentService.createAppointments('', appointmentMock)
 
       expect(whereaboutsApiClient.createAppointments).toHaveBeenCalledWith(appointmentMock)
-      expect(response).toEqual(savedAppointmentMock)
+      expect(response).toEqual([savedAppointmentMock])
     })
   })
 

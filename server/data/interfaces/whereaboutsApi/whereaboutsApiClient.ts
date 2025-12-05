@@ -5,7 +5,7 @@ import { AppointmentDefaults, AppointmentDetails, SavedAppointment } from './App
 
 export interface WhereaboutsApiClient {
   getAppointment(appointmentId: number): Promise<AppointmentDetails>
-  createAppointments(appointments: AppointmentDefaults): Promise<SavedAppointment>
+  createAppointments(appointments: AppointmentDefaults): Promise<SavedAppointment[]>
   getUnacceptableAbsences(
     prisonerNumber: string,
     fromDate: string,

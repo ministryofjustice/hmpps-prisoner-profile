@@ -46,14 +46,12 @@ describe('whereaboutsClient', () => {
 
   describe('createAppointments', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulWhereaboutsPostApiCall(
-        '/appointment',
-        appointmentMock as unknown as DataMatcherMap,
+      mockSuccessfulWhereaboutsPostApiCall('/appointment', appointmentMock as unknown as DataMatcherMap, [
         savedAppointmentMock,
-      )
+      ])
 
       const output = await whereaboutsApiClient.createAppointments(appointmentMock)
-      expect(output).toEqual(savedAppointmentMock)
+      expect(output).toEqual([savedAppointmentMock])
     })
   })
 })

@@ -26,10 +26,10 @@ export default {
 
   stubCreateAppointment: ({
     request = appointmentMock,
-    response = savedAppointmentMock,
+    response = [savedAppointmentMock],
   }: {
     request?: AppointmentDefaults
-    response?: SavedAppointment
+    response?: SavedAppointment[]
   }) => {
     return stubFor({
       request: {
