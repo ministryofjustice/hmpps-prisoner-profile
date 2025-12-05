@@ -88,6 +88,12 @@ export class AppointmentPage extends Page {
 
   recurringRadioButtons = new RadioButtons('recurring')
 
+  recurringPeriodField = new SelectElement('#repeats')
+
+  get recurringCountInput(): PageElement<HTMLInputElement> {
+    return cy.get('#times')
+  }
+
   get commentsTextArea(): PageElement<HTMLTextAreaElement> {
     return cy.get('#comments')
   }

@@ -2,8 +2,8 @@ import Page, { type PageElement } from '../page'
 import { SummaryList } from '../pageElements/summaryList'
 
 export class ConfirmationPage extends Page {
-  constructor(fullName: string) {
-    super(`${fullName} appointment has been added`)
+  constructor(fullName: string, multipleAppointments = false) {
+    super(multipleAppointments ? `${fullName} appointments have been added` : `${fullName} appointment has been added`)
   }
 
   summaryListCommon = new SummaryList('[data-qa=appointment-details-list__common]')

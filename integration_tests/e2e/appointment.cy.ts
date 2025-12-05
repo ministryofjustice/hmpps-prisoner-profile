@@ -1,4 +1,4 @@
-import { addDays } from 'date-fns'
+import { addDays, addWeeks } from 'date-fns'
 
 import Page from '../pages/page'
 import { AppointmentPage } from '../pages/appointments/appointmentPage'
@@ -10,6 +10,8 @@ import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import type PrisonerSchedule from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
+import type CreateVideoBookingRequest from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
+import type { AppointmentDefaults } from '../../server/data/interfaces/whereaboutsApi/Appointment'
 import { appointmentTypesMock } from '../../server/data/localMockData/appointmentTypesMock'
 import {
   courtEventPrisonerSchedulesMock,
@@ -100,6 +102,8 @@ context('Appointments pages', () => {
       { label: 'Yes', value: 'yes', selected: false },
       { label: 'No', value: 'no', selected: false },
     ])
+    page.recurringPeriodField.element.should('be.hidden')
+    page.recurringCountInput.should('be.hidden')
 
     page.commentsTextArea.should('be.visible')
     page.commentsHint.should('contain.text', 'Comments will appear on prisoner movement slips')
@@ -403,7 +407,7 @@ context('Appointments pages', () => {
   })
 
   context('creating simple appointments', () => {
-    const expectedCreateRequestOIC = {
+    const expectedCreateRequestOIC: AppointmentDefaults = {
       bookingId: 1102484,
       appointmentType: 'OIC',
       locationId: 25762,
@@ -411,7 +415,7 @@ context('Appointments pages', () => {
       endTime: `${tomorrow}T12:15:00`,
       comment: 'Comment x',
     }
-    const expectedCreateRequestVLLA = {
+    const expectedCreateRequestVLLA: AppointmentDefaults = {
       bookingId: 1102484,
       appointmentType: 'VLLA',
       locationId: 25762,
@@ -419,7 +423,7 @@ context('Appointments pages', () => {
       endTime: `${tomorrow}T15:00:00`,
       comment: 'Some notes',
     }
-    const expectedCreateRequestVLPM = {
+    const expectedCreateRequestVLPM: CreateVideoBookingRequest = {
       bookingType: 'PROBATION',
       prisoners: [
         {
@@ -482,6 +486,59 @@ context('Appointments pages', () => {
           dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
           reason: 'Adjudication Review',
           comments: 'Comment x',
+        },
+      },
+      {
+        scenarioName: 'of type OIC that’s recurring',
+        appointmentType: 'OIC',
+        setupScenario: page => {
+          page.typeOfAppointmentField.select('Adjudication Review')
+          page.locationField.select('Local name two')
+          page.dateField.clear().type(tomorrowDisplay)
+          page.selectStartTime('11', '05')
+          page.selectEndTime('12', '15')
+          page.recurringRadioButtons.selectOption('Yes')
+          page.recurringPeriodField.select('Weekly')
+          page.recurringCountInput.type('3')
+          page.commentsTextArea.type('Repeats thrice')
+
+          cy.task('stubCreateAppointment', {
+            request: {
+              ...expectedCreateRequestOIC,
+              comment: 'Repeats thrice',
+              repeat: { repeatPeriod: 'WEEKLY', count: 3 },
+            },
+          })
+        },
+        expectations: page => {
+          page.summaryListCommon.rows.then(rows => {
+            expect(rows).to.have.lengthOf(5)
+            expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
+            expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
+            expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
+          })
+          page.summaryListRecurring.rows.then(rows => {
+            expect(rows).to.have.lengthOf(4)
+            expect(rows[0]).to.contain({ key: 'Recurring', value: 'Yes' })
+            expect(rows[1]).to.contain({ key: 'Repeats', value: 'Weekly' })
+            expect(rows[2]).to.contain({ key: 'Number added', value: '3' })
+            expect(rows[3]).to.contain({
+              key: 'Last appointment',
+              value: formatDate(addWeeks(addDays(now, 1), 2).toISOString(), 'long'),
+            })
+          })
+          page.summaryListComments.rows.then(rows => {
+            expect(rows).to.have.lengthOf(1)
+            expect(rows[0]).to.contain({ key: 'Comment', value: 'Repeats thrice' })
+          })
+          page.summaryListProbation.element.should('not.exist')
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
+          reason: 'Adjudication Review',
+          comments: 'Repeats thrice',
         },
       },
       {
@@ -622,6 +679,8 @@ context('Appointments pages', () => {
       movementSlipExpectation,
     } of successScenarios) {
       context(scenarioName, () => {
+        const multipleAppointments = scenarioName.includes('recurring')
+
         it('should save appointment and generate a movement slip', () => {
           stubSchedules({ prisonerNumber, date: tomorrow })
           stubLocation(today)
@@ -631,7 +690,7 @@ context('Appointments pages', () => {
           setupScenario(addPage)
           addPage.submit()
 
-          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’', multipleAppointments)
           expectations(confirmationPage)
 
           confirmationPage.addMoreLink
@@ -655,9 +714,15 @@ context('Appointments pages', () => {
 
           // override creation stub
           if (appointmentType === 'OIC') {
-            cy.task('stubCreateAppointment', {
-              request: { ...expectedCreateRequestOIC, comment: '' },
-            })
+            if (multipleAppointments) {
+              cy.task('stubCreateAppointment', {
+                request: { ...expectedCreateRequestOIC, repeat: { repeatPeriod: 'WEEKLY', count: 3 }, comment: '' },
+              })
+            } else {
+              cy.task('stubCreateAppointment', {
+                request: { ...expectedCreateRequestOIC, comment: '' },
+              })
+            }
           } else if (appointmentType === 'VLLA') {
             cy.task('stubCreateAppointment', {
               request: { ...expectedCreateRequestVLLA, comment: '' },
@@ -684,7 +749,7 @@ context('Appointments pages', () => {
           }
           addPage.submit()
 
-          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’')
+          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’', multipleAppointments)
           if (appointmentType === 'VLPM') {
             confirmationPage.summaryListProbation.rows.then(rows => {
               expect(rows).to.have.lengthOf(2)

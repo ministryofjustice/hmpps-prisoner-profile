@@ -202,7 +202,7 @@ export default class AppointmentController {
         endTimeMinutes,
         recurring,
         repeats,
-        times,
+        times: timesStr,
         comments,
         bookingId: bookingIdStr,
         prisonId,
@@ -210,6 +210,7 @@ export default class AppointmentController {
         notesForStaff,
         notesForPrisoners,
       } = req.body
+      const times: number | undefined = timesStr ? parseInt(timesStr, 10) : undefined
       const bookingId = parseInt(bookingIdStr, 10)
 
       const appointmentForm: AppointmentForm = {
@@ -329,7 +330,7 @@ export default class AppointmentController {
       const prisonerName = res.locals.prisonerName?.firstLast
       const appointmentDetails: AppointmentForm = appointmentFlash[0] as never
       const heading = `${apostrophe(prisonerName)} ${pluralise(
-        appointmentDetails.recurring === 'yes' ? +appointmentDetails.times : 1,
+        appointmentDetails.recurring === 'yes' ? appointmentDetails.times : 1,
         'appointment has',
         {
           plural: 'appointments have',
@@ -915,7 +916,7 @@ export default class AppointmentController {
     return async (req, res) => {
       const date = parseDate(req.query.date as string)
       const repeats = req.query.repeats as string
-      const times = +req.query.times
+      const times = parseInt(req.query.times as string, 10)
 
       const endDate = formatDateISO(calculateEndDate(date, repeats, times))
 

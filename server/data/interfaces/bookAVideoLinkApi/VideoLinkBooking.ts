@@ -28,7 +28,7 @@ interface PrisonerDetails {
 }
 
 interface Appointment {
-  type: 'VLB_COURT_PRE' | 'VLB_COURT_MAIN' | 'VLB_COURT_POST'
+  type: 'VLB_COURT_PRE' | 'VLB_COURT_MAIN' | 'VLB_COURT_POST' | 'VLB_PROBATION'
   locationKey: string
   date: string
   startTime: string
@@ -46,11 +46,11 @@ export interface VideoBookingSearchRequest {
 export interface VideoLinkBooking {
   videoLinkBookingId: number
   statusCode: string
-  bookingType: string
+  bookingType: 'COURT' | 'PROBATION'
   prisonAppointments: {
     prisonCode: string
     prisonerNumber: string
-    appointmentType: string
+    appointmentType: 'VLB_COURT_PRE' | 'VLB_COURT_MAIN' | 'VLB_COURT_POST' | 'VLB_PROBATION'
     comments?: string
     prisonLocKey: string
     appointmentDate: string
