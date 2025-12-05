@@ -113,7 +113,7 @@ export default class OverviewController {
         ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber)
         : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
-      isGranted(PrisonerIncentivesPermission.read, prisonerPermissions)
+      isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)
         ? Result.wrap(this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
@@ -147,7 +147,7 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, user, prisonerPermissions, 'overview'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
       moneySummary,
       adjudicationSummary,
       visitsSummary,
