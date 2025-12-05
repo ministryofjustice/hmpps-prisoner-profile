@@ -580,29 +580,15 @@ context('Appointments pages', () => {
         confirmationPage.addMoreLink
           .invoke('attr', 'href')
           .should('equal', `/prisoner/${prisonerNumber}/add-appointment`)
-        let movemetSlipHref: string
+        let movementSlipUrl: string
         confirmationPage.movementSlipLink.then($anchor => {
-          movemetSlipHref = $anchor.attr('href')
-          cy.visit(movemetSlipHref)
+          movementSlipUrl = $anchor.attr('href')
+          cy.visit(movementSlipUrl)
         })
-
-        const movementSlip = Page.verifyOnPage(MovementSlip)
-        movementSlip.shouldNotShowPageChrome()
-        movementSlip.labels
-          .should('deep.equal', [
-            { title: 'Name', description: 'John Saunders' },
-            { title: 'Prison number', description: 'G6123VU' },
-            { title: 'Cell location', description: '1-1-035' },
-            { title: 'Date and time', description: movementSlipExpectation.dateAndTime },
-            { title: 'Moving to', description: 'Local name two' },
-            { title: 'Reason', description: movementSlipExpectation.reason },
-            { title: 'Comments', description: movementSlipExpectation.comments ?? '--' },
-            { title: 'Created by', description: 'John Smith' },
-          ])
-          .then(() => {
-            // cannot load movement slip more than once
-            cy.request({ url: movemetSlipHref, failOnStatusCode: false }).its('status').should('equal', 404)
-          })
+        expectCorrectMovementSlip(movementSlipExpectation).then(() => {
+          // cannot load movement slip more than once
+          cy.request({ url: movementSlipUrl, failOnStatusCode: false }).its('status').should('equal', 404)
+        })
       })
 
       it(`should allow adding an appointment of type ${scenarioName} without comments`, () => {
@@ -760,7 +746,7 @@ context('Appointments pages', () => {
       })
     }
 
-    const step2Scenarios: Scenario<PrePostAppointmentPage, PrePostConfirmationPage>[] = [
+    const step2Scenarios: (Scenario<PrePostAppointmentPage, PrePostConfirmationPage> & MovementSlipScenario)[] = [
       {
         scenarioName: 'no pre or post briefings',
         setupScenario: page => {
@@ -807,6 +793,11 @@ context('Appointments pages', () => {
             expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
         },
       },
       {
@@ -870,6 +861,11 @@ context('Appointments pages', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
+        },
       },
       {
         scenarioName: 'post briefings',
@@ -931,6 +927,11 @@ context('Appointments pages', () => {
             expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'None entered' })
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
         },
       },
       {
@@ -1008,6 +1009,11 @@ context('Appointments pages', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
+        },
       },
       {
         scenarioName: 'number for CVP address',
@@ -1057,6 +1063,11 @@ context('Appointments pages', () => {
             expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'HMCTS8589@meet.video.justice.gov.uk' })
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
+        },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
         },
       },
       {
@@ -1108,6 +1119,11 @@ context('Appointments pages', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
+        },
       },
       {
         scenarioName: 'guest pin',
@@ -1158,10 +1174,15 @@ context('Appointments pages', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: '556677' })
           })
         },
+        movementSlipExpectation: {
+          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+          reason: 'Video Link - Court Hearing',
+          comments: 'Prisoner note',
+        },
       },
     ]
-    for (const { scenarioName, setupScenario, expectations } of step2Scenarios) {
-      it(`should allow creating a VLB appointment with ${scenarioName}`, () => {
+    for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of step2Scenarios) {
+      it(`should allow creating a VLB appointment with ${scenarioName} and generate a movement slip`, () => {
         stubSchedules({ prisonerNumber, date: tomorrow })
         stubLocation(today)
         stubLocation(tomorrow)
@@ -1216,6 +1237,16 @@ context('Appointments pages', () => {
           expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Prisoner note' })
         })
         expectations(prePostConfirmationPage)
+
+        let movementSlipUrl: string
+        prePostConfirmationPage.movementSlipLink.then($anchor => {
+          movementSlipUrl = $anchor.attr('href')
+          cy.visit(movementSlipUrl)
+        })
+        expectCorrectMovementSlip(movementSlipExpectation).then(() => {
+          // cannot load movement slip more than once
+          cy.request({ url: movementSlipUrl, failOnStatusCode: false }).its('status').should('equal', 404)
+        })
       })
     }
   })
@@ -1396,4 +1427,20 @@ interface MovementSlipScenario {
     reason: string
     comments?: string
   }
+}
+
+function expectCorrectMovementSlip(expected: MovementSlipScenario['movementSlipExpectation']): Cypress.Chainable {
+  const movementSlip = Page.verifyOnPage(MovementSlip)
+  movementSlip.shouldNotShowPageChrome()
+  movementSlip.labels.should('deep.equal', [
+    { title: 'Name', description: 'John Saunders' },
+    { title: 'Prison number', description: 'G6123VU' },
+    { title: 'Cell location', description: '1-1-035' },
+    { title: 'Date and time', description: expected.dateAndTime },
+    { title: 'Moving to', description: 'Local name two' },
+    { title: 'Reason', description: expected.reason },
+    { title: 'Comments', description: expected.comments ?? '--' },
+    { title: 'Created by', description: 'John Smith' },
+  ])
+  return cy.end()
 }
