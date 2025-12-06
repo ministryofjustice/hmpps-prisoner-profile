@@ -160,6 +160,8 @@ describe('Appointment Controller', () => {
       },
       render: jest.fn(),
       send: jest.fn(),
+      set: jest.fn(),
+      status: jest.fn(() => ({ end: jest.fn() })),
       redirect: jest.fn(),
     } as unknown as Response
 
@@ -1187,6 +1189,22 @@ describe('Appointment Controller', () => {
 
     await controller.getRecurringEndDate()(req, res, next)
 
+    expect(res.set).toHaveBeenCalledWith('Content-Type', 'text/plain')
     expect(res.send).toHaveBeenCalledWith(endDate)
+  })
+
+  it.each([
+    { scenario: 'invalid repeats', query: { date: '30/02/2023', repeats: 'DAILY', count: '3' } },
+    { scenario: 'missing repeats', query: { date: '02/01/2023', count: '3' } },
+    { scenario: 'invalid repeats', query: { date: '02/01/2023', repeats: 'YEARLY', count: '3' } },
+    { scenario: 'missing count', query: { date: '02/01/2023', repeats: 'DAILY' } },
+    { scenario: 'invalid count', query: { date: '02/01/2023', repeats: 'DAILY', count: '0' } },
+  ])('should return error if cannot calculate recurring end date ($scenario)', async ({ query }) => {
+    req.query = query
+
+    await controller.getRecurringEndDate()(req, res, next)
+
+    expect(res.send).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(400)
   })
 })

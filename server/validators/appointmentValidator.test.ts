@@ -235,7 +235,7 @@ describe('Validation middleware - VLPM appointment', () => {
     expect(result).toEqual([
       {
         href: '#officerEmail',
-        text: "'Enter a valid email address'",
+        text: 'Enter a valid email address',
       },
       {
         href: '#officerTelephone',

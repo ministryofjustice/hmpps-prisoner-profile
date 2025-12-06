@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const preAppointmentLocation = document.getElementById('preAppointmentLocation')
   const postAppointmentEventsContainer = document.getElementById('postAppointmentEventsContainer')
   const postAppointmentLocation = document.getElementById('postAppointmentLocation')
-  const courtSelect = document.getElementById('court')
   const appointmentId = document.getElementById('appointment-id')?.innerText || ''
 
   async function getPrePostEventsForLocation(input, container) {
@@ -28,10 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   postAppointmentLocation?.addEventListener('change', () => {
     getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
-  })
-
-  courtSelect.addEventListener('change', () => {
-    showHideOtherCourt()
   })
 
   // Initialise

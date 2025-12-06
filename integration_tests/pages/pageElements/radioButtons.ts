@@ -28,6 +28,10 @@ export class RadioButtons {
   get value(): Cypress.Chainable<string> {
     return this.inputElements.invoke('val')
   }
+
+  selectOption(label: string): PageElement<HTMLLabelElement> {
+    return this.fieldset.find('label').contains(label).click()
+  }
 }
 
 export interface Option {

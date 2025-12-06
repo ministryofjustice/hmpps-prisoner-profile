@@ -20,7 +20,7 @@ export default class BookAVideoLinkRestApiClient extends RestClient implements B
     return this.post({ path: '/video-link-booking', data: videoLinkBooking }, this.token)
   }
 
-  async amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: AmendVideoBookingRequest): Promise<void> {
+  async amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: AmendVideoBookingRequest): Promise<number> {
     return this.put(
       {
         path: `/video-link-booking/id/${videoBookingId}`,
