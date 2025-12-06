@@ -7,6 +7,7 @@ const probationOfficerDetails = document.querySelector('.js-probation-officer')
 const recurringRadios = document.querySelector('.js-recurring-radios')
 const appointmentRepeatsSelect = document.getElementById('repeats')
 const appointmentRepeatsTimesInput = document.getElementById('times')
+const lastAppointmentDateContainer = document.querySelector('.js-appointment-last-appointment')
 const lastAppointmentDate = document.getElementById('last-appointment-date')
 const locationEventsContainer = document.getElementById('location-events')
 const offenderEventsContainer = document.getElementById('offender-events')
@@ -60,13 +61,13 @@ async function getAppointmentEndDate() {
   const times = appointmentRepeatsTimesInput.value
 
   const response =
-    times && date && (await fetch(`/api/get-recurring-end-date?date=${encodeURIComponent(date)}&repeats=${encodeURIComponent(repeats)}&times=${encodeURIComponent(times)}`))
+    date && repeats && times  && (await fetch(`/api/get-recurring-end-date?date=${encodeURIComponent(date)}&repeats=${encodeURIComponent(repeats)}&times=${encodeURIComponent(times)}`))
 
   if (response?.ok) {
-    lastAppointmentDate.removeAttribute('style')
+    lastAppointmentDateContainer.removeAttribute('style')
     lastAppointmentDate.innerText = await response.text()
   } else {
-    lastAppointmentDate.style.display = 'none'
+    lastAppointmentDateContainer.style.display = 'none'
   }
 }
 

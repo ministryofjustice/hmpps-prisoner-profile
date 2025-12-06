@@ -104,6 +104,7 @@ context('Appointments pages', () => {
     ])
     page.recurringPeriodField.element.should('be.hidden')
     page.recurringCountInput.should('be.hidden')
+    page.lastRecurringAppointmentDate.should('be.hidden')
 
     page.commentsTextArea.should('be.visible')
     page.commentsHint.should('contain.text', 'Comments will appear on prisoner movement slips')
@@ -497,9 +498,17 @@ context('Appointments pages', () => {
           page.dateField.clear().type(tomorrowDisplay)
           page.selectStartTime('11', '05')
           page.selectEndTime('12', '15')
+          page.lastRecurringAppointmentDate.should('be.hidden')
           page.recurringRadioButtons.selectOption('Yes')
+          page.lastRecurringAppointmentDate.should('be.hidden')
           page.recurringPeriodField.select('Weekly')
+          page.lastRecurringAppointmentDate.should('be.hidden')
           page.recurringCountInput.type('3')
+          page.lastRecurringAppointmentDate.should('be.visible')
+          page.lastRecurringAppointmentDate.should(
+            'contain.text',
+            formatDate(addWeeks(addDays(now, 1), 2).toISOString(), 'long'),
+          )
           page.commentsTextArea.type('Repeats thrice')
 
           cy.task('stubCreateAppointment', {

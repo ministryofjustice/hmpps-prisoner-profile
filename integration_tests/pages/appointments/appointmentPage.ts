@@ -94,6 +94,10 @@ export class AppointmentPage extends Page {
     return cy.get('#times')
   }
 
+  get lastRecurringAppointmentDate(): PageElement<HTMLDivElement> {
+    return cy.get('#last-appointment-date')
+  }
+
   get commentsTextArea(): PageElement<HTMLTextAreaElement> {
     return cy.get('#comments')
   }

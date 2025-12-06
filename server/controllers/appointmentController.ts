@@ -918,9 +918,19 @@ export default class AppointmentController {
       const repeats = req.query.repeats as string
       const times = parseInt(req.query.times as string, 10)
 
-      const endDate = formatDateISO(calculateEndDate(date, repeats, times))
-
-      res.send(formatDate(endDate, 'full'))
+      if (
+        !Number.isNaN(date.getTime()) &&
+        ['DAILY', 'WEEKDAYS', 'WEEKLY', 'FORTNIGHTLY', 'MONTHLY'].includes(repeats) &&
+        times &&
+        !Number.isNaN(times) &&
+        times > 1
+      ) {
+        const endDate = formatDateISO(calculateEndDate(date, repeats, times))
+        res.set('Content-Type', 'text/plain')
+        res.send(formatDate(endDate, 'full'))
+      } else {
+        res.status(400).end()
+      }
     }
   }
 
