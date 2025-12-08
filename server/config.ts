@@ -213,27 +213,11 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000))),
     },
-    complexityApi: {
-      url: get('COMPLEXITY_OF_NEED_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_DEADLINE', 3000)),
-      },
-      agent: new AgentConfig(Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_DEADLINE', 3000))),
-    },
     educationAndWorkPlanApi: {
       url: get('EDUCATION_AND_WORK_PLAN_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('EDUCATION_AND_WORK_PLAN_API_TIMEOUT_RESPONSE', 3000)),
         deadline: Number(get('EDUCATION_AND_WORK_PLAN_API_TIMEOUT_DEADLINE', 3000)),
-      },
-      agent: new AgentConfig(),
-    },
-    restrictedPatientApi: {
-      url: get('RESTRICTED_PATIENT_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_DEADLINE', 3000)),
       },
       agent: new AgentConfig(),
     },
