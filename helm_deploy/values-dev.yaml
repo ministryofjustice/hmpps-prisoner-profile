@@ -56,7 +56,6 @@ generic-service:
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
     BOOK_A_VIDEO_LINK_API_URL: "https://book-a-video-link-api-dev.prison.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://dev.offender-case-notes.service.justice.gov.uk"
-    COMPLEXITY_OF_NEED_API_URL: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk"
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
     CURIOUS_API_URL: "https://testservices.sequation.net/sequation-virtual-campus2-api"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-dev.hmpps.service.justice.gov.uk"
@@ -72,7 +71,6 @@ generic-service:
     NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
-    RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api-dev.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"

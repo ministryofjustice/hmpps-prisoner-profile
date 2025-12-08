@@ -13,8 +13,6 @@ import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
 import { Result } from '../utils/result/result'
-import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
-import { complexityOfNeedHighMock } from '../data/localMockData/complexityOfNeedMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { mockContactDetail, mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
 import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
@@ -136,7 +134,6 @@ describe('professionalContactsService', () => {
   let allocationManagerApiClient: AllocationManagerClient
   let professionalContactsClient: PrisonerProfileDeliusApiClient
   let keyWorkerApiClient: KeyWorkerClient
-  let complexityApiClient: ComplexityApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -156,10 +153,6 @@ describe('professionalContactsService', () => {
     keyWorkerApiClient = {
       getCurrentAllocations: jest.fn(async () => staffAllocationMock),
     }
-
-    complexityApiClient = {
-      getComplexityOfNeed: jest.fn(async () => complexityOfNeedHighMock),
-    }
   })
 
   describe('getContacts', () => {
@@ -176,7 +169,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -223,7 +215,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -253,7 +244,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -297,7 +287,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -350,7 +339,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -397,7 +385,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -429,7 +416,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -455,7 +441,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -484,7 +469,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -536,7 +520,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, true)).map(result => result.getOrThrow())
@@ -581,7 +564,6 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
-        () => complexityApiClient,
       )
     })
 

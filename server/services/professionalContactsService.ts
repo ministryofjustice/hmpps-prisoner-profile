@@ -23,7 +23,6 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
 import { formatDate } from '../utils/dateHelpers'
-import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
@@ -51,7 +50,6 @@ export default class ProfessionalContactsService {
     private readonly allocationApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
-    private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
   async getContacts(
