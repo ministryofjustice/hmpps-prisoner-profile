@@ -4,7 +4,6 @@ import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge, unavailableApiErrorMessage } from '../../server/utils/utils'
-import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import {
   mockContactDetailStaffContacts,
   mockContactDetailYouthEstate,
@@ -665,7 +664,7 @@ context('Overview Page', () => {
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
-        complexityLevel: ComplexityLevel.High,
+        highComplexityOfNeeds: true,
       })
       cy.task('stubGetOffenderContacts', mockContactDetailStaffContacts)
       visitOverviewPage()
@@ -692,7 +691,7 @@ context('Overview Page', () => {
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
-        complexityLevel: ComplexityLevel.Low,
+        highComplexityOfNeeds: false,
       })
       visitOverviewPage()
     })

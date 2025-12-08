@@ -1,7 +1,6 @@
 import 'cypress-file-upload'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
-import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import {
   CountryReferenceDataCodesMock,
@@ -50,7 +49,7 @@ Cypress.Commands.add(
     ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
-    complexityLevel = ComplexityLevel.Low,
+    highComplexityOfNeeds = false,
     failToLoadKeyWorker = false,
   }) => {
     cy.task('stubNonAssociations', prisonerNumber)
@@ -66,7 +65,7 @@ Cypress.Commands.add(
     cy.task('stubPomData')
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
     if (failToLoadKeyWorker) cy.task('stubCurrentAllocationsFail', prisonerNumber)
-    else cy.task('stubCurrentAllocations', { prisonerNumber, complexityLevel })
+    else cy.task('stubCurrentAllocations', { prisonerNumber, highComplexityOfNeeds })
     cy.task('stubGetOffenderContacts')
     cy.task('stubEventsForProfileImage', prisonerNumber)
     cy.task('stubGetMainOffence', bookingId)
@@ -82,7 +81,6 @@ Cypress.Commands.add(
     cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
-    cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
     cy.setupComponentsData({ caseLoads })

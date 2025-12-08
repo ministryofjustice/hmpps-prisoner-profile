@@ -1,8 +1,7 @@
 import { stubFor } from './wiremock'
-import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 export default {
-  stubCurrentAllocations: ({ prisonerNumber, complexityLevel, notFound = false }) =>
+  stubCurrentAllocations: ({ prisonerNumber, highComplexityOfNeeds = false, notFound = false }) =>
     stubFor({
       request: {
         method: 'GET',
@@ -13,7 +12,7 @@ export default {
             status: 200,
             headers: { 'Content-Type': 'application/json;charset=UTF-8' },
             jsonBody: {
-              hasHighComplexityOfNeeds: complexityLevel === ComplexityLevel.High,
+              hasHighComplexityOfNeeds: highComplexityOfNeeds,
               allocations: [],
               latestRecordedEvents: [],
             },
@@ -23,65 +22,64 @@ export default {
             headers: {
               'Content-Type': 'application/json;charset=UTF-8',
             },
-            jsonBody:
-              complexityLevel === ComplexityLevel.High
-                ? {
-                    hasHighComplexityOfNeeds: true,
-                    allocations: [],
-                    latestRecordedEvents: [],
-                    policies: [
-                      {
-                        policy: 'KEY_WORKER',
-                        enabled: true,
+            jsonBody: highComplexityOfNeeds
+              ? {
+                  hasHighComplexityOfNeeds: true,
+                  allocations: [],
+                  latestRecordedEvents: [],
+                  policies: [
+                    {
+                      policy: 'KEY_WORKER',
+                      enabled: true,
+                    },
+                    {
+                      policy: 'PERSONAL_OFFICER',
+                      enabled: true,
+                    },
+                  ],
+                }
+              : {
+                  hasHighComplexityOfNeeds: false,
+                  allocations: [
+                    {
+                      policy: {
+                        code: 'KEY_WORKER',
+                        description: 'Key worker',
                       },
-                      {
-                        policy: 'PERSONAL_OFFICER',
-                        enabled: true,
+                      prison: {
+                        code: 'CODE',
+                        description: 'Description',
                       },
-                    ],
-                  }
-                : {
-                    hasHighComplexityOfNeeds: false,
-                    allocations: [
-                      {
-                        policy: {
-                          code: 'KEY_WORKER',
-                          description: 'Key worker',
-                        },
-                        prison: {
-                          code: 'CODE',
-                          description: 'Description',
-                        },
-                        staffMember: {
-                          staffId: 3532453,
-                          firstName: 'DAVE',
-                          lastName: 'STEVENS',
-                          emailAddresses: ['dave@steve.ns'],
-                        },
+                      staffMember: {
+                        staffId: 3532453,
+                        firstName: 'DAVE',
+                        lastName: 'STEVENS',
+                        emailAddresses: ['dave@steve.ns'],
                       },
-                    ],
-                    latestRecordedEvents: [
-                      {
-                        prison: {
-                          code: 'CODE',
-                          description: 'Description',
-                        },
-                        policy: 'KEY_WORKER',
-                        type: 'SESSION',
-                        occurredAt: '2025-06-24T12:00:00',
+                    },
+                  ],
+                  latestRecordedEvents: [
+                    {
+                      prison: {
+                        code: 'CODE',
+                        description: 'Description',
                       },
-                    ],
-                    policies: [
-                      {
-                        policy: 'KEY_WORKER',
-                        enabled: true,
-                      },
-                      {
-                        policy: 'PERSONAL_OFFICER',
-                        enabled: true,
-                      },
-                    ],
-                  },
+                      policy: 'KEY_WORKER',
+                      type: 'SESSION',
+                      occurredAt: '2025-06-24T12:00:00',
+                    },
+                  ],
+                  policies: [
+                    {
+                      policy: 'KEY_WORKER',
+                      enabled: true,
+                    },
+                    {
+                      policy: 'PERSONAL_OFFICER',
+                      enabled: true,
+                    },
+                  ],
+                },
           },
     }),
 

@@ -23,10 +23,8 @@ import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
-import ComplexityApiRestClient from './complexityApiClient'
 import applicationInfo from '../applicationInfo'
 import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
-import RestrictedPatientApiRestClient from './restrictedPatientApiClient'
 import PrisonRegisterStore from './prisonRegisterStore/prisonRegisterStore'
 import CalculateReleaseDatesApiClient from './calculateReleaseDatesApiClient'
 import PrisonRegisterApiRestClient from './prisonRegisterApiClient'
@@ -119,11 +117,8 @@ export const dataAccess = {
     new BookAVideoLinkRestApiClient(token, circuitBreakers.bookAVideoLink),
   prisonerProfileDeliusApiClientBuilder: (token: string) =>
     new PrisonerProfileDeliusApiRestClient(token, circuitBreakers.prisonerProfileDelius),
-  complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token, circuitBreakers.complexity),
   educationAndWorkPlanApiClientBuilder: (token: string) =>
     new EducationAndWorkPlanApiRestClient(token, circuitBreakers.educationAndWorkPlan),
-  restrictedPatientApiClientBuilder: (token: string) =>
-    new RestrictedPatientApiRestClient(token, circuitBreakers.restrictedPatient),
   prisonRegisterApiClientBuilder: (token: string) =>
     new PrisonRegisterApiRestClient(token, circuitBreakers.prisonRegister),
   prisonRegisterStore: new PrisonRegisterStore(createRedisClient()),

@@ -2,7 +2,6 @@ import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/t
 import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
 import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
-import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { UserToken } from './mockApis/auth'
 import { ReferenceDataCode } from '../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
@@ -29,7 +28,7 @@ declare global {
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
         prisonId?: string
-        complexityLevel?: ComplexityLevel
+        highComplexityOfNeeds?: boolean
         failToLoadKeyWorker?: boolean
       }): Chainable<AUTWindow>
 

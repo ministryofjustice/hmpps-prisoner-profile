@@ -67,7 +67,6 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
-    complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
@@ -144,7 +143,6 @@ export const services = () => {
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     keyworkerApiClientBuilder,
-    complexityApiClientBuilder,
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
