@@ -32,6 +32,6 @@ export class ScheduledEventsTable {
   }
 
   get noEventsComment(): PageElement<HTMLParagraphElement> {
-    return this.container.find('p')
+    return this.container.find('[data-qa=no-scheduled-events')
   }
 }

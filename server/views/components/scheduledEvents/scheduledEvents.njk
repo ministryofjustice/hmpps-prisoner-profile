@@ -10,13 +10,13 @@
 
         {% if events.length %}
             {% for event in events %}
-                <div class="scheduled-event govuk-!-margin-bottom-3" data-qa="{{type + '-events'}}">
+                <div class="scheduled-event govuk-!-margin-bottom-3" data-qa="{{ type + '-events' }}">
                     <div class="scheduled-event__time">{{ event.startTime + ' to ' + event.endTime if event.endTime else event.startTime }}</div>
-                    <pre class="govuk-body">{{event.eventDescription}}</pre>
+                    <pre class="govuk-body">{{ event.eventDescription }}</pre>
                 </div>
             {% endfor %}
         {% else %}
-            <p class="govuk-body">Nothing scheduled on {{ date }}</p>
+            <p data-qa="no-scheduled-events">Nothing scheduled on {{ date }}</p>
         {% endif %}
     {% endset %}
 

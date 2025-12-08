@@ -1,10 +1,11 @@
 {% extends "../../partials/layout.njk" %}
-{% macro labelAndValue(label, value, isPre) %}
+
+{% macro labelAndValue(label, value, isPre=false) %}
     <div class="movement-slip__section__values">
         <div>
             <strong>{{label}}</strong>
         </div>
-        {% if isPre === true %}
+        {% if isPre %}
             <pre class="govuk-body">{{ value if value else "--" }}</pre>
         {% else %}
             <span>{{ value if value else "--" }}</span>
@@ -16,6 +17,7 @@
 {% set htmlClasses = "printed-page" %}
 
 {% block header %}{% endblock %}
+{% block beforeContent %}{% endblock %}
 
 {% block content %}
     <div class="movement-slip">
@@ -27,19 +29,19 @@
         </div>
 
         <div class="movement-slip__section">
-            {{ labelAndValue('Date and time', date +' ' + startTime + ' to ' + endTime) }}
+            {{ labelAndValue('Date and time', date + ' ' + startTime + ' to ' + endTime) }}
             {{ labelAndValue('Moving to', location) }}
             {{ labelAndValue('Reason', appointmentType) }}
 
             {% if (appointmentTypeCode in ['VLB', 'VLPM']) %}
                 {# BVLS appointments show only the notes for prisoners on movement slips #}
-                {{ labelAndValue('Comments', notesForPrisoners, true) }}
+                {{ labelAndValue('Comments', notesForPrisoners, isPre=true) }}
             {% elif appointmentTypeCode in ['VLOO', 'VLLA', 'VLAP', 'VLPA'] %}
               {# Non-BVLS video appointments suppress comments from movement slips #}
-              {{ labelAndValue('Comments', '', true) }}
+              {{ labelAndValue('Comments', undefined, isPre=true) }}
             {% else %}
                 {# All other appointment types show the comments on movement slips #}
-                {{ labelAndValue('Comments', comment, true) }}
+                {{ labelAndValue('Comments', comment, isPre=true) }}
             {% endif %}
         </div>
 

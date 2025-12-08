@@ -73,6 +73,15 @@ export interface AppointmentDefaults {
   }
 }
 
+export interface SavedAppointment {
+  appointmentEventId: number
+  bookingId: number
+  startTime: string
+  endTime: string
+  appointmentType: string
+  locationId: number
+}
+
 export interface PrePostAppointmentDetails {
   appointmentId?: number
   appointmentDefaults: AppointmentDefaults // Summary details
