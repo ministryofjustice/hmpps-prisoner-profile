@@ -1,6 +1,7 @@
 import { addDays, addWeeks } from 'date-fns'
 
 import Page from '../pages/page'
+import NotFoundPage from '../pages/notFoundPage'
 import { AppointmentPage } from '../pages/appointments/appointmentPage'
 import { ConfirmationPage } from '../pages/appointments/confirmationPage'
 import { PrePostAppointmentPage } from '../pages/appointments/prePostAppointmentPage'
@@ -10,8 +11,11 @@ import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import type PrisonerSchedule from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
-import type CreateVideoBookingRequest from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
-import type { AppointmentDefaults } from '../../server/data/interfaces/whereaboutsApi/Appointment'
+import CreateVideoBookingRequest, {
+  type VideoBookingSearchRequest,
+  type VideoLinkBooking,
+} from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
+import type { AppointmentDefaults, AppointmentDetails } from '../../server/data/interfaces/whereaboutsApi/Appointment'
 import { appointmentTypesMock } from '../../server/data/localMockData/appointmentTypesMock'
 import {
   courtEventPrisonerSchedulesMock,
@@ -452,7 +456,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'of type OIC',
         appointmentType: 'OIC',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Adjudication Review')
           page.locationField.select('Local name two')
           page.dateField.clear().type(tomorrowDisplay)
@@ -463,7 +467,7 @@ context('Add appointment', () => {
 
           cy.task('stubCreateAppointment', { request: expectedCreateRequestOIC })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListCommon.rows.then(rows => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
@@ -488,7 +492,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'of type OIC that’s recurring',
         appointmentType: 'OIC',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Adjudication Review')
           page.locationField.select('Local name two')
           page.dateField.clear().type(tomorrowDisplay)
@@ -515,7 +519,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListCommon.rows.then(rows => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
@@ -549,7 +553,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'of type VLLA',
         appointmentType: 'VLLA',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Video Link - Legal Appointment')
           page.locationField.select('Local name two')
           page.dateField.clear().type(tomorrowDisplay)
@@ -560,7 +564,7 @@ context('Add appointment', () => {
 
           cy.task('stubCreateAppointment', { request: expectedCreateRequestVLLA })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListCommon.rows.then(rows => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
@@ -584,7 +588,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'of type VLPM',
         appointmentType: 'VLPM',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Video Link - Probation Meeting')
           page.probationTeamField.select('Blackpool')
           page.officerFullNameInput.type('Officer name')
@@ -600,7 +604,7 @@ context('Add appointment', () => {
 
           cy.task('stubBookAVideoLinkCreateBooking', { createRequest: expectedCreateRequestVLPM })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListCommon.rows.then(rows => {
             expect(rows).to.have.lengthOf(10)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
@@ -631,7 +635,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'of type VLPM with unknown officer',
         appointmentType: 'VLPM',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Video Link - Probation Meeting')
           page.probationTeamField.select('Blackpool')
           page.officerDetailsNotKnownCheckbox.toggleOption('Not yet known')
@@ -647,7 +651,7 @@ context('Add appointment', () => {
             createRequest: { ...expectedCreateRequestVLPM, additionalBookingDetails: undefined },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListCommon.rows.then(rows => {
             expect(rows).to.have.lengthOf(10)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
@@ -777,7 +781,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'an appointment of type VLB',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Video Link - Court Hearing')
           page.locationField.select('Local name two')
           page.dateField.clear()
@@ -787,7 +791,7 @@ context('Add appointment', () => {
           page.notesForStaffTextArea.type('Staff note')
           page.notesForPrisonersTextArea.type('Prisoner note')
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryList.rows.then(rows => {
             expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
@@ -802,7 +806,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'an appointment of type VLB without comments',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.typeOfAppointmentField.select('Video Link - Court Hearing')
           page.locationField.select('Local name two')
           page.dateField.clear()
@@ -810,7 +814,7 @@ context('Add appointment', () => {
           page.selectStartTime('11', '05')
           page.selectEndTime('11', '45')
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryList.rows.then(rows => {
             expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
@@ -883,7 +887,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'no pre or post briefings',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
           page.courtSelect.select('Leeds Court')
@@ -917,7 +921,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.element.should('not.exist')
           page.summaryListPost.element.should('not.exist')
           page.summaryListCourt.rows.then(rows => {
@@ -937,7 +941,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'pre briefings',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('Yes')
           page.preLocationSelect.select('Local name two')
           page.preScheduledEventsTable.eventsList.should('deep.equal', [
@@ -982,7 +986,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.rows.then(rows => {
             expect(rows).to.have.lengthOf(1)
             expect(rows[0]).to.contain({ key: 'Pre-court hearing briefing', value: 'Local name two - 12:15 to 12:30' })
@@ -1005,7 +1009,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'post briefings',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('Yes')
           page.postLocationSelect.select('Local name two')
@@ -1050,7 +1054,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.element.should('not.exist')
           page.summaryListPost.rows.then(rows => {
             expect(rows).to.have.lengthOf(1)
@@ -1073,7 +1077,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'pre & post briefings',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('Yes')
           page.preLocationSelect.select('Local name two')
           page.preScheduledEventsTable.eventsList.should('deep.equal', [
@@ -1129,7 +1133,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.rows.then(rows => {
             expect(rows).to.have.lengthOf(1)
             expect(rows[0]).to.contain({ key: 'Pre-court hearing briefing', value: 'Local name two - 12:15 to 12:30' })
@@ -1155,7 +1159,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'number for CVP address',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
           page.courtSelect.select('Leeds Court')
@@ -1191,7 +1195,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.element.should('not.exist')
           page.summaryListPost.element.should('not.exist')
           page.summaryListCourt.rows.then(rows => {
@@ -1211,7 +1215,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'video link URL',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
           page.courtSelect.select('Leeds Court')
@@ -1247,7 +1251,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.element.should('not.exist')
           page.summaryListPost.element.should('not.exist')
           page.summaryListCourt.rows.then(rows => {
@@ -1267,7 +1271,7 @@ context('Add appointment', () => {
       {
         scenarioName: 'guest pin',
         appointmentType: 'VLB',
-        setupScenario: page => {
+        setupScenario(page) {
           page.addPreAppointmentRadio.selectOption('No')
           page.addPostAppointmentRadio.selectOption('No')
           page.courtSelect.select('Leeds Court')
@@ -1303,7 +1307,7 @@ context('Add appointment', () => {
             },
           })
         },
-        expectations: page => {
+        expectations(page) {
           page.summaryListPre.element.should('not.exist')
           page.summaryListPost.element.should('not.exist')
           page.summaryListCourt.rows.then(rows => {
@@ -1393,65 +1397,181 @@ context('Add appointment', () => {
 })
 
 context('Edit appointment', () => {
-  it('should pre-fill details of an existing appointment', () => {
-    cy.task('stubGetAppointment', {
-      appointment: {
-        appointment: {
-          id: 81,
-          agencyId: 'MDI',
-          locationId: 25762,
-          appointmentTypeCode: 'VLPM',
-          offenderNo: prisonerNumber,
-          startTime: `${tomorrow}T12:00:00`,
-          endTime: `${tomorrow}T13:30:00`,
-          comment: 'Comment',
-        },
-      },
-    })
-    cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
-    stubSchedules({ date: tomorrow })
-    stubLocation(tomorrow)
-    cy.task('stubBookAVideoLinkBooking', {
-      searchRequest: {
-        prisonerNumber: 'G6123VU',
-        locationKey: 'ABC',
-        date: tomorrow,
+  const sampleAppointment: AppointmentDetails['appointment'] = {
+    id: 81,
+    agencyId: 'MDI',
+    locationId: 25762,
+    appointmentTypeCode: 'REPLACED IN TEST CASES',
+    offenderNo: prisonerNumber,
+    startTime: `${tomorrow}T12:00:00`,
+    endTime: `${tomorrow}T13:30:00`,
+    comment: 'Comment',
+  }
+  const sampleVideoLinkBooking: VideoLinkBooking = {
+    ...probationBookingMock,
+    probationTeamCode: 'ABC',
+    prisonAppointments: [
+      {
+        ...probationBookingMock.prisonAppointments[0],
+        appointmentDate: tomorrow,
         startTime: '12:00',
         endTime: '13:30',
       },
-      response: {
-        ...probationBookingMock,
-        probationTeamCode: 'ABC',
-        prisonAppointments: [
-          {
-            ...probationBookingMock.prisonAppointments[0],
-            appointmentDate: tomorrow,
+    ],
+    additionalBookingDetails: undefined,
+    notesForStaff: 'Staff info',
+    notesForPrisoners: 'Prisoner note',
+  }
+
+  for (const appointmentType of ['OIC', 'VLLA']) {
+    it(`should not allow editing an existing appointment of type ${appointmentType}`, () => {
+      cy.task('stubGetAppointment', {
+        response: { appointment: { ...sampleAppointment, appointmentTypeCode: appointmentType } },
+      })
+      cy.signIn({ failOnStatusCode: false, redirectPath: `/prisoner/G6123VU/edit-appointment/${sampleAppointment.id}` })
+      Page.verifyOnPage(NotFoundPage)
+    })
+  }
+
+  const prefillScenarios: Scenario<null, AppointmentPage>[] = [
+    {
+      scenarioName: 'of type VLB',
+      appointmentType: 'VLB',
+      setupScenario() {
+        cy.task('stubGetAppointment', {
+          response: { appointment: { ...sampleAppointment, appointmentTypeCode: 'VLB' } },
+        })
+        cy.task('stubBookAVideoLinkBooking', {
+          searchRequest: {
+            prisonerNumber: 'G6123VU',
+            locationKey: 'ABC',
+            date: tomorrow,
             startTime: '12:00',
             endTime: '13:30',
-          },
-        ],
+          } satisfies VideoBookingSearchRequest,
+          response: {
+            ...sampleVideoLinkBooking,
+            probationTeamCode: '',
+          } satisfies VideoLinkBooking,
+        })
       },
+      expectations(page) {
+        page.appointmentSummary.rows.then(rows => {
+          expect(rows).to.have.lengthOf(2)
+          expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Court Hearing' })
+          expect(rows[1]).to.contain({ key: 'Probation team', value: '' })
+        })
+        page.locationField.value.should('equal', 'location-2')
+        page.probationMeetingFieldsShouldBeHiden()
+        page.meetingTypeRadioButtons.value.should('equal', 'PSR')
+        page.dateField.should('have.value', tomorrowDisplay)
+        page.startTime.should('equal', '12:00')
+        page.endTime.should('equal', '13:30')
+        page.notesForStaffTextArea.should('contain.text', 'Staff info')
+        page.notesForPrisonersTextArea.should('contain.text', 'Prisoner note')
+      },
+    },
+    {
+      scenarioName: 'of type VLPM',
+      appointmentType: 'VLPM',
+      setupScenario() {
+        cy.task('stubGetAppointment', {
+          response: { appointment: { ...sampleAppointment, appointmentTypeCode: 'VLPM' } },
+        })
+        cy.task('stubBookAVideoLinkBooking', {
+          searchRequest: {
+            prisonerNumber: 'G6123VU',
+            locationKey: 'ABC',
+            date: tomorrow,
+            startTime: '12:00',
+            endTime: '13:30',
+          } satisfies VideoBookingSearchRequest,
+          response: {
+            ...sampleVideoLinkBooking,
+            additionalBookingDetails: {
+              contactName: 'Test name',
+              contactEmail: 'Test email',
+              contactNumber: 'Test number',
+            },
+          } satisfies VideoLinkBooking,
+        })
+      },
+      expectations(page) {
+        page.appointmentSummary.rows.then(rows => {
+          expect(rows).to.have.lengthOf(2)
+          expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
+          expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+        })
+        page.locationField.value.should('equal', 'location-2')
+        page.officerDetailsNotKnownCheckbox.value.should('be.false')
+        page.officerFullNameInput.should('have.value', 'Test name')
+        page.officerEmailInput.should('have.value', 'Test email')
+        page.officerTelephoneInput.should('have.value', 'Test number')
+        page.meetingTypeRadioButtons.value.should('equal', 'PSR')
+        page.dateField.should('have.value', tomorrowDisplay)
+        page.startTime.should('equal', '12:00')
+        page.endTime.should('equal', '13:30')
+        page.notesForStaffTextArea.should('contain.text', 'Staff info')
+        page.notesForPrisonersTextArea.should('contain.text', 'Prisoner note')
+      },
+    },
+    {
+      scenarioName: 'of type VLPM with unknown officer',
+      appointmentType: 'VLPM',
+      setupScenario() {
+        cy.task('stubGetAppointment', {
+          response: { appointment: { ...sampleAppointment, appointmentTypeCode: 'VLPM' } },
+        })
+        cy.task('stubBookAVideoLinkBooking', {
+          searchRequest: {
+            prisonerNumber: 'G6123VU',
+            locationKey: 'ABC',
+            date: tomorrow,
+            startTime: '12:00',
+            endTime: '13:30',
+          } satisfies VideoBookingSearchRequest,
+          response: {
+            ...sampleVideoLinkBooking,
+            probationTeamCode: 'DEF',
+            probationTeamDescription: 'Barnsley',
+            probationMeetingType: 'PR',
+          } satisfies VideoLinkBooking,
+        })
+      },
+      expectations(page) {
+        page.appointmentSummary.rows.then(rows => {
+          expect(rows).to.have.lengthOf(2)
+          expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
+          expect(rows[1]).to.contain({ key: 'Probation team', value: 'Barnsley' })
+        })
+        page.locationField.value.should('equal', 'location-2')
+        page.officerDetailsNotKnownCheckbox.value.should('be.true')
+        page.officerFullNameInput.should('have.value', '')
+        page.officerEmailInput.should('have.value', '')
+        page.officerTelephoneInput.should('have.value', '')
+        page.meetingTypeRadioButtons.value.should('equal', 'PR')
+        page.dateField.should('have.value', tomorrowDisplay)
+        page.startTime.should('equal', '12:00')
+        page.endTime.should('equal', '13:30')
+        page.notesForStaffTextArea.should('contain.text', 'Staff info')
+        page.notesForPrisonersTextArea.should('contain.text', 'Prisoner note')
+      },
+    },
+  ]
+  for (const { scenarioName, setupScenario, expectations } of prefillScenarios) {
+    it(`should pre-fill details of an existing appointment ${scenarioName}`, () => {
+      setupScenario(null)
+      cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+      stubSchedules({ date: tomorrow })
+      stubLocation(tomorrow)
+      cy.task('stubGetLocationByKey', {
+        key: 'ABC',
+        response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
+      })
+      const page = visitAppointmentPage(81)
+      expectations(page)
     })
-    cy.task('stubGetLocationByKey', {
-      key: 'ABC',
-      response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
-    })
-
-    const page = visitAppointmentPage(81)
-    page.appointmentSummary.rows.then(rows => {
-      expect(rows).to.have.lengthOf(2)
-      expect(rows[0]).to.contain({ key: 'Type of appointment', value: 'Video Link - Probation Meeting' })
-      expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
-    })
-    page.locationField.value.should('equal', 'location-2')
-    page.officerFullNameInput.should('have.value', 'Test name')
-    page.officerEmailInput.should('have.value', 'Test email')
-    page.officerTelephoneInput.should('have.value', 'Test number')
-    page.meetingTypeRadioButtons.value.should('equal', 'PSR')
-    page.dateField.should('have.value', tomorrowDisplay)
-    page.startTime.should('equal', '12:00')
-    page.endTime.should('equal', '13:30')
-  })
+  }
 })
 
 const meetingTypes: VideoLinkReferenceCode[] = [
@@ -1555,7 +1675,7 @@ function stubLocation(date: string) {
   cy.task('stubActivityList', { agencyId: 'MDI', locationId: 25762, date, usage: 'APP', response: [] })
 }
 
-interface Scenario<P1 extends Page, P2 extends Page> {
+interface Scenario<P1 extends Page | null, P2 extends Page> {
   scenarioName: string
   appointmentType: string
   setupScenario: (page: P1) => void

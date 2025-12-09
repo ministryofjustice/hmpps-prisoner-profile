@@ -25,8 +25,8 @@ export class Checkboxes {
     )
   }
 
-  get value(): Cypress.Chainable<string> {
-    return this.inputElements.invoke('val')
+  get value(): Cypress.Chainable<boolean> {
+    return this.inputElements.invoke('prop', 'checked')
   }
 
   toggleOption(label: string): PageElement<HTMLLabelElement> {
