@@ -39,23 +39,23 @@ const tomorrowDisplay = tomorrow.split('-').reverse().join('/')
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 
-context('Appointments pages', () => {
-  beforeEach(() => {
-    cy.task('reset')
-    cy.setupUserAuth()
-    cy.setupComponentsData()
-    cy.setupBannerStubs({ prisonerNumber, bookingId })
+beforeEach(() => {
+  cy.task('reset')
+  cy.setupUserAuth()
+  cy.setupComponentsData()
+  cy.setupBannerStubs({ prisonerNumber, bookingId })
 
-    cy.task('stubBanner')
-    cy.task('stubPrisonerData', { prisonerNumber })
-    cy.task('stubBookAVideoLinkProbationTeams')
-    cy.task('stubBookAVideoLinkReferenceCodes', { group: 'PROBATION_MEETING_TYPE', response: meetingTypes })
-    cy.task('stubGetLocationsForAppointments', { prisonId: 'MDI' })
-    cy.task('stubGetAppointmentTypes', { response: appointmentTypes })
-    stubSchedules({ date: today })
-    cy.task('stubSentencesForOffenders', { offenderNumbers: [prisonerNumber] })
-  })
+  cy.task('stubBanner')
+  cy.task('stubPrisonerData', { prisonerNumber })
+  cy.task('stubBookAVideoLinkProbationTeams')
+  cy.task('stubBookAVideoLinkReferenceCodes', { group: 'PROBATION_MEETING_TYPE', response: meetingTypes })
+  cy.task('stubGetLocationsForAppointments', { prisonId: 'MDI' })
+  cy.task('stubGetAppointmentTypes', { response: appointmentTypes })
+  stubSchedules({ date: today })
+  cy.task('stubSentencesForOffenders', { offenderNumbers: [prisonerNumber] })
+})
 
+context('Add appointment', () => {
   it('should display different sections depending on appointment type', () => {
     const page = visitAppointmentPage()
 
@@ -1390,7 +1390,9 @@ context('Appointments pages', () => {
       })
     }
   })
+})
 
+context('Edit appointment', () => {
   it('should pre-fill details of an existing appointment', () => {
     cy.task('stubGetAppointment', {
       appointment: {
