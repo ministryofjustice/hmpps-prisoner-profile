@@ -30,16 +30,16 @@ const visitAppointmentPage = (appointmentId?: number) => {
   return Page.verifyOnPage(AppointmentPage, appointmentId)
 }
 
+const now = new Date()
+const today = now.toISOString().split('T')[0]
+const todayDisplay = today.split('-').reverse().join('/')
+const tomorrow = addDays(now, 1).toISOString().split('T')[0]
+const tomorrowDisplay = tomorrow.split('-').reverse().join('/')
+
+const prisonerNumber = 'G6123VU'
+const bookingId = 1102484
+
 context('Appointments pages', () => {
-  const now = new Date()
-  const today = now.toISOString().split('T')[0]
-  const todayDisplay = today.split('-').reverse().join('/')
-  const tomorrow = addDays(now, 1).toISOString().split('T')[0]
-  const tomorrowDisplay = tomorrow.split('-').reverse().join('/')
-
-  const prisonerNumber = 'G6123VU'
-  const bookingId = 1102484
-
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
@@ -52,7 +52,7 @@ context('Appointments pages', () => {
     cy.task('stubBookAVideoLinkReferenceCodes', { group: 'PROBATION_MEETING_TYPE', response: meetingTypes })
     cy.task('stubGetLocationsForAppointments', { prisonId: 'MDI' })
     cy.task('stubGetAppointmentTypes', { response: appointmentTypes })
-    stubSchedules({ prisonerNumber, date: today })
+    stubSchedules({ date: today })
     cy.task('stubSentencesForOffenders', { offenderNumbers: [prisonerNumber] })
   })
 
@@ -193,7 +193,6 @@ context('Appointments pages', () => {
     for (const scheduleKey of nonCourtSchedules) {
       it(`should list ${scheduleKey} events`, () => {
         stubSchedules({
-          prisonerNumber,
           date: today,
           [scheduleKey]: [
             {
@@ -228,7 +227,6 @@ context('Appointments pages', () => {
         ],
       ])
       stubSchedules({
-        prisonerNumber,
         date: today,
         ...Object.fromEntries(schedules),
       })
@@ -245,7 +243,6 @@ context('Appointments pages', () => {
 
     it('should list open-ended events', () => {
       stubSchedules({
-        prisonerNumber,
         date: today,
         activities: [
           {
@@ -268,7 +265,6 @@ context('Appointments pages', () => {
 
     it('should not list courtEvents events, but indicate court visit is planned', () => {
       stubSchedules({
-        prisonerNumber,
         date: today,
         courtEvents: courtEventPrisonerSchedulesMock,
       })
@@ -691,7 +687,7 @@ context('Appointments pages', () => {
         const multipleAppointments = scenarioName.includes('recurring')
 
         it('should save appointment and generate a movement slip', () => {
-          stubSchedules({ prisonerNumber, date: tomorrow })
+          stubSchedules({ date: tomorrow })
           stubLocation(today)
           stubLocation(tomorrow)
 
@@ -717,7 +713,7 @@ context('Appointments pages', () => {
         })
 
         it('should save appointment without comments', () => {
-          stubSchedules({ prisonerNumber, date: tomorrow })
+          stubSchedules({ date: tomorrow })
           stubLocation(today)
           stubLocation(tomorrow)
 
@@ -829,7 +825,7 @@ context('Appointments pages', () => {
     ]
     for (const { scenarioName, setupScenario, expectations } of step1Scenarios) {
       it(`should allow entering main details for ${scenarioName}`, () => {
-        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubSchedules({ date: tomorrow })
         stubLocation(today)
         stubLocation(tomorrow)
 
@@ -1327,7 +1323,7 @@ context('Appointments pages', () => {
     ]
     for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of step2Scenarios) {
       it(`should allow creating a VLB appointment with ${scenarioName} and generate a movement slip`, () => {
-        stubSchedules({ prisonerNumber, date: tomorrow })
+        stubSchedules({ date: tomorrow })
         stubLocation(today)
         stubLocation(tomorrow)
         cy.task('stubActivitiesAtLocation', {
@@ -1411,7 +1407,7 @@ context('Appointments pages', () => {
       },
     })
     cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
-    stubSchedules({ prisonerNumber, date: tomorrow })
+    stubSchedules({ date: tomorrow })
     stubLocation(tomorrow)
     cy.task('stubBookAVideoLinkBooking', {
       searchRequest: {
@@ -1498,7 +1494,6 @@ const appointmentTypes: ReferenceCode[] = [
 ]
 
 function stubSchedules({
-  prisonerNumber,
   date,
   appointments,
   activities,
@@ -1506,7 +1501,6 @@ function stubSchedules({
   externalTransfers,
   visits,
 }: {
-  prisonerNumber: string
   date: string
   appointments?: PrisonerSchedule[]
   activities?: PrisonerSchedule[]
