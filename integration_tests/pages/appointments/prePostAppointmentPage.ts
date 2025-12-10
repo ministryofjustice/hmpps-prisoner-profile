@@ -5,8 +5,8 @@ import { ScheduledEventsTable } from '../pageElements/scheduledEventsTable'
 import { SummaryList } from '../pageElements/summaryList'
 
 export class PrePostAppointmentPage extends Page {
-  constructor() {
-    super('Video link booking details')
+  constructor(action: 'add' | 'update' = 'add') {
+    super(action === 'add' ? 'Video link booking details' : 'Change appointment details')
   }
 
   summaryList = new SummaryList('.appointment-details-list')

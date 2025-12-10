@@ -2,6 +2,7 @@ import { stubFor } from './wiremock'
 import type ReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import Court, { type ProbationTeam } from '../../server/data/interfaces/bookAVideoLinkApi/Court'
 import CreateVideoBookingRequest, {
+  type AmendVideoBookingRequest,
   type VideoBookingSearchRequest,
   type VideoLinkBooking,
 } from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
@@ -43,6 +44,30 @@ export default {
         method: 'POST',
         urlPath: '/bookavideolink/video-link-booking',
         bodyPatterns: [{ equalToJson: createRequest }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    }),
+
+  stubBookAVideoLinkUpdateBooking: ({
+    id,
+    updateRequest,
+    response = 1,
+  }: {
+    id: number
+    updateRequest: AmendVideoBookingRequest
+    response?: number
+  }) =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPath: `/bookavideolink/video-link-booking/id/${id}`,
+        bodyPatterns: [{ equalToJson: updateRequest }],
       },
       response: {
         status: 200,

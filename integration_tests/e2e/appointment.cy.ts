@@ -23,7 +23,7 @@ import {
 } from '../../server/data/localMockData/prisonerSchedulesMock'
 import { offenderSentenceDetailsMock } from '../../server/data/localMockData/offenderSentenceDetailsMock'
 import { probationMeetingTypes } from '../../server/data/localMockData/courtHearingsMock'
-import { probationBookingMock } from '../../server/data/localMockData/videoLinkBookingMock'
+import { courtBookingMock, probationBookingMock } from '../../server/data/localMockData/videoLinkBookingMock'
 
 const visitAppointmentPage = (appointmentId?: number) => {
   cy.signIn({
@@ -699,7 +699,11 @@ context('Add appointment', () => {
           setupScenario(addPage)
           addPage.submit()
 
-          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’', multipleAppointments)
+          const confirmationPage = Page.verifyOnPage(
+            ConfirmationPage,
+            'John Saunders’',
+            multipleAppointments ? 'addMany' : 'addOne',
+          )
           expectations(confirmationPage)
 
           confirmationPage.addMoreLink
@@ -758,7 +762,11 @@ context('Add appointment', () => {
           }
           addPage.submit()
 
-          const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’', multipleAppointments)
+          const confirmationPage = Page.verifyOnPage(
+            ConfirmationPage,
+            'John Saunders’',
+            multipleAppointments ? 'addMany' : 'addOne',
+          )
           if (appointmentType === 'VLPM') {
             confirmationPage.summaryListProbation.rows.then(rows => {
               expect(rows).to.have.lengthOf(2)
@@ -1397,8 +1405,9 @@ context('Add appointment', () => {
 })
 
 context('Edit appointment', () => {
+  const appointmentId = 81
   const sampleAppointment: AppointmentDetails['appointment'] = {
-    id: 81,
+    id: appointmentId,
     agencyId: 'MDI',
     locationId: 25762,
     appointmentTypeCode: 'REPLACED IN TEST CASES',
@@ -1406,21 +1415,6 @@ context('Edit appointment', () => {
     startTime: `${tomorrow}T12:00:00`,
     endTime: `${tomorrow}T13:30:00`,
     comment: 'Comment',
-  }
-  const sampleVideoLinkBooking: VideoLinkBooking = {
-    ...probationBookingMock,
-    probationTeamCode: 'ABC',
-    prisonAppointments: [
-      {
-        ...probationBookingMock.prisonAppointments[0],
-        appointmentDate: tomorrow,
-        startTime: '12:00',
-        endTime: '13:30',
-      },
-    ],
-    additionalBookingDetails: undefined,
-    notesForStaff: 'Staff info',
-    notesForPrisoners: 'Prisoner note',
   }
 
   for (const appointmentType of ['OIC', 'VLLA']) {
@@ -1450,8 +1444,22 @@ context('Edit appointment', () => {
             endTime: '13:30',
           } satisfies VideoBookingSearchRequest,
           response: {
-            ...sampleVideoLinkBooking,
-            probationTeamCode: '',
+            ...courtBookingMock,
+            videoLinkBookingId: appointmentId,
+            prisonAppointments: [
+              {
+                ...courtBookingMock.prisonAppointments[0],
+                appointmentDate: tomorrow,
+                startTime: '12:00',
+                endTime: '13:30',
+              },
+            ],
+            courtCode: 'ABC',
+            courtHearingType: 'PR',
+            videoLinkUrl: 'https://example.com/8589',
+            guestPin: '556677',
+            notesForStaff: 'Staff info',
+            notesForPrisoners: 'Prisoner note',
           } satisfies VideoLinkBooking,
         })
       },
@@ -1463,7 +1471,6 @@ context('Edit appointment', () => {
         })
         page.locationField.value.should('equal', 'location-2')
         page.probationMeetingFieldsShouldBeHiden()
-        page.meetingTypeRadioButtons.value.should('equal', 'PSR')
         page.dateField.should('have.value', tomorrowDisplay)
         page.startTime.should('equal', '12:00')
         page.endTime.should('equal', '13:30')
@@ -1487,12 +1494,18 @@ context('Edit appointment', () => {
             endTime: '13:30',
           } satisfies VideoBookingSearchRequest,
           response: {
-            ...sampleVideoLinkBooking,
-            additionalBookingDetails: {
-              contactName: 'Test name',
-              contactEmail: 'Test email',
-              contactNumber: 'Test number',
-            },
+            ...probationBookingMock,
+            probationTeamCode: 'ABC',
+            prisonAppointments: [
+              {
+                ...probationBookingMock.prisonAppointments[0],
+                appointmentDate: tomorrow,
+                startTime: '12:00',
+                endTime: '13:30',
+              },
+            ],
+            notesForStaff: 'Staff info',
+            notesForPrisoners: 'Prisoner note',
           } satisfies VideoLinkBooking,
         })
       },
@@ -1531,10 +1544,22 @@ context('Edit appointment', () => {
             endTime: '13:30',
           } satisfies VideoBookingSearchRequest,
           response: {
-            ...sampleVideoLinkBooking,
+            ...probationBookingMock,
+            videoLinkBookingId: appointmentId,
             probationTeamCode: 'DEF',
             probationTeamDescription: 'Barnsley',
             probationMeetingType: 'PR',
+            prisonAppointments: [
+              {
+                ...probationBookingMock.prisonAppointments[0],
+                appointmentDate: tomorrow,
+                startTime: '12:00',
+                endTime: '13:30',
+              },
+            ],
+            notesForStaff: 'Staff info',
+            notesForPrisoners: 'Prisoner note',
+            additionalBookingDetails: undefined,
           } satisfies VideoLinkBooking,
         })
       },
@@ -1568,10 +1593,245 @@ context('Edit appointment', () => {
         key: 'ABC',
         response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
       })
-      const page = visitAppointmentPage(81)
+      const page = visitAppointmentPage(appointmentId)
       expectations(page)
     })
   }
+
+  context('should allow saving changes', () => {
+    beforeEach(() => {
+      cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+      stubSchedules({ date: tomorrow })
+      stubLocation(tomorrow)
+      cy.task('stubGetLocationByKey', {
+        key: 'ABC',
+        response: { id: 'location-2', localName: 'Local name two', key: 'ABC' },
+      })
+    })
+
+    it('to an existing appointment of type VLB', () => {
+      cy.task('stubGetAppointment', {
+        response: { appointment: { ...sampleAppointment, appointmentTypeCode: 'VLB' } },
+      })
+      cy.task('stubBookAVideoLinkBooking', {
+        searchRequest: {
+          prisonerNumber: 'G6123VU',
+          locationKey: 'ABC',
+          date: tomorrow,
+          startTime: '12:00',
+          endTime: '13:30',
+        } satisfies VideoBookingSearchRequest,
+        response: {
+          ...courtBookingMock,
+          videoLinkBookingId: appointmentId,
+          prisonAppointments: [
+            {
+              ...courtBookingMock.prisonAppointments[0],
+              appointmentDate: tomorrow,
+              startTime: '12:00',
+              endTime: '13:30',
+            },
+          ],
+          courtCode: 'ABC',
+          courtHearingType: 'PR',
+          videoLinkUrl: 'https://example.com/8589',
+          guestPin: '556677',
+          notesForStaff: 'Staff info',
+          notesForPrisoners: 'Prisoner note',
+        } satisfies VideoLinkBooking,
+      })
+
+      const editPage = visitAppointmentPage(appointmentId)
+
+      // change details
+      editPage.selectStartTime('17', '30')
+      editPage.selectEndTime('18', '30')
+      editPage.notesForStaffTextArea.clear().type('Different staff info')
+      editPage.notesForPrisonersTextArea.clear().type('Different prisoner note')
+
+      cy.task('stubBookAVideoLinkCourts')
+      cy.task('stubBookAVideoLinkReferenceCodes', { group: 'COURT_HEARING_TYPE', response: meetingTypes })
+      cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId: 25762, dpsLocationId: 'location-2' })
+
+      editPage.submit()
+
+      const prePostPage = Page.verifyOnPage(PrePostAppointmentPage, 'update')
+      prePostPage.summaryList.rows.then(rows => {
+        expect(rows).to.have.lengthOf(7)
+        expect(rows[0]).to.contain({ key: 'Court', value: 'Leeds Court' })
+        expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
+        expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[3]).to.contain({ key: 'Court hearing start time', value: '17:30' })
+        expect(rows[4]).to.contain({ key: 'Court hearing end time', value: '18:30' })
+        expect(rows[5]).to.contain({ key: 'Notes for prison staff', value: 'Different staff info' })
+        expect(rows[6]).to.contain({ key: 'Notes for prisoner', value: 'Different prisoner note' })
+      })
+
+      // expect to be pre-filled
+      prePostPage.hearingTypeSelect.value.should('equal', 'PR')
+      prePostPage.knowVideoLinkRadio.value.should('equal', 'yes')
+      prePostPage.cvpNumberInput.should('have.value', '')
+      prePostPage.videoLinkUrlInput.should('have.value', 'https://example.com/8589')
+      prePostPage.guestPinRequiredRadio.value.should('equal', 'yes')
+      prePostPage.guestPinInput.should('have.value', '556677')
+
+      // change details
+      prePostPage.hearingTypeSelect.select('HDC (home detention curfew)')
+      prePostPage.cvpNumberInput.type('8589')
+      prePostPage.videoLinkUrlInput.clear()
+      prePostPage.guestPinRequiredRadio.selectOption('No')
+
+      cy.task('stubBookAVideoLinkUpdateBooking', {
+        id: appointmentId,
+        updateRequest: {
+          bookingType: 'COURT',
+          prisoners: [
+            {
+              prisonCode: 'MDI',
+              prisonerNumber: 'G6123VU',
+              appointments: [
+                {
+                  type: 'VLB_COURT_MAIN',
+                  locationKey: 'ABC',
+                  date: tomorrow,
+                  startTime: '17:30',
+                  endTime: '18:30',
+                },
+              ],
+            },
+          ],
+          courtCode: 'ABC',
+          probationTeamCode: '',
+          courtHearingType: 'HDC',
+          hmctsNumber: '8589',
+          notesForStaff: 'Different staff info',
+          notesForPrisoners: 'Different prisoner note',
+        },
+      })
+      cy.task('stubGetAgency', { agencyId: 'MDI' })
+
+      prePostPage.submit()
+
+      const prePostConfirmationPage = Page.verifyOnPage(PrePostConfirmationPage, 'update')
+      prePostConfirmationPage.summaryListCommon.rows.then(rows => {
+        expect(rows).to.have.lengthOf(6)
+        expect(rows[0]).to.contain({ key: 'Name', value: 'John Saunders' })
+        expect(rows[1]).to.contain({ key: 'Prison', value: 'Moorland (HMP & YOI)' })
+        expect(rows[2]).to.contain({ key: 'Prison room', value: 'Local name two' })
+        expect(rows[3]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[4]).to.contain({ key: 'Start time', value: '17:30' })
+        expect(rows[5]).to.contain({ key: 'End time', value: '18:30' })
+      })
+      prePostConfirmationPage.summaryListNotes.rows.then(rows => {
+        expect(rows).to.have.lengthOf(2)
+        expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Different staff info' })
+        expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Different prisoner note' })
+      })
+      prePostConfirmationPage.summaryListCourt.rows.then(rows => {
+        expect(rows).to.have.lengthOf(4)
+        expect(rows[0]).to.contain({ key: 'Court location', value: 'Leeds Court' })
+        expect(rows[1]).to.contain({ key: 'Hearing type', value: 'HDC (home detention curfew)' })
+        expect(rows[2]).to.contain({ key: 'Court hearing link', value: 'HMCTS8589@meet.video.justice.gov.uk' })
+        expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
+      })
+    })
+
+    it('to an existing appointment of type VLPM', () => {
+      cy.task('stubGetAppointment', {
+        response: { appointment: { ...sampleAppointment, appointmentTypeCode: 'VLPM' } },
+      })
+      cy.task('stubBookAVideoLinkBooking', {
+        searchRequest: {
+          prisonerNumber: 'G6123VU',
+          locationKey: 'ABC',
+          date: tomorrow,
+          startTime: '12:00',
+          endTime: '13:30',
+        } satisfies VideoBookingSearchRequest,
+        response: {
+          ...probationBookingMock,
+          videoLinkBookingId: appointmentId,
+          probationTeamCode: 'ABC',
+          prisonAppointments: [
+            {
+              ...probationBookingMock.prisonAppointments[0],
+              appointmentDate: tomorrow,
+              startTime: '12:00',
+              endTime: '13:30',
+            },
+          ],
+          additionalBookingDetails: undefined,
+          notesForStaff: 'Staff info',
+          notesForPrisoners: 'Prisoner note',
+        },
+      })
+
+      const editPage = visitAppointmentPage(appointmentId)
+      // change details
+      editPage.officerDetailsNotKnownCheckbox.toggleOption('Not yet known')
+      editPage.officerFullNameInput.type('Officer name')
+      editPage.officerEmailInput.type('officer@example.com')
+      editPage.officerTelephoneInput.type('02000000000')
+      editPage.meetingTypeRadioButtons.selectOption('Parole Report')
+      editPage.selectStartTime('17', '30')
+      editPage.selectEndTime('18', '30')
+      editPage.notesForStaffTextArea.clear().type('Different staff info')
+      editPage.notesForPrisonersTextArea.clear().type('Different prisoner note')
+
+      cy.task('stubBookAVideoLinkUpdateBooking', {
+        id: appointmentId,
+        updateRequest: {
+          bookingType: 'PROBATION',
+          prisoners: [
+            {
+              prisonCode: 'MDI',
+              prisonerNumber: 'G6123VU',
+              appointments: [
+                {
+                  type: 'VLB_PROBATION',
+                  locationKey: 'ABC',
+                  date: tomorrow,
+                  startTime: '17:30',
+                  endTime: '18:30',
+                },
+              ],
+            },
+          ],
+          probationTeamCode: 'ABC',
+          probationMeetingType: 'PR',
+          additionalBookingDetails: {
+            contactName: 'Officer name',
+            contactEmail: 'officer@example.com',
+            contactNumber: '02000000000',
+          },
+          notesForStaff: 'Different staff info',
+          notesForPrisoners: 'Different prisoner note',
+        },
+      })
+
+      editPage.submit()
+
+      const confirmationPage = Page.verifyOnPage(ConfirmationPage, 'John Saunders’', 'update')
+      confirmationPage.summaryListCommon.rows.then(rows => {
+        expect(rows).to.have.lengthOf(10)
+        expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Probation Meeting' })
+        expect(rows[1]).to.contain({ key: 'Probation team', value: 'Blackpool' })
+        expect(rows[2]).to.contain({ key: 'Location', value: 'Local name two' })
+        expect(rows[3]).to.contain({ key: 'Probation officer’s full name', value: 'Officer name' })
+        expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
+        expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
+        expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
+        expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
+        expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
+      })
+      confirmationPage.summaryListProbation.rows.then(rows => {
+        expect(rows).to.have.lengthOf(2)
+        expect(rows[0]).to.contain({ key: 'Notes for prison staff', value: 'Different staff info' })
+        expect(rows[1]).to.contain({ key: 'Notes for prisoner', value: 'Different prisoner note' })
+      })
+    })
+  })
 })
 
 const meetingTypes: VideoLinkReferenceCode[] = [
