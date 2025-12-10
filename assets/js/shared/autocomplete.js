@@ -58,9 +58,11 @@ export function autocomplete() {
         }
 
         const options = $(`#${inputElement.id}-select`).find('option')
-        const textValues = $.map(options, option => option.text)
+        const textValues = $.map(options, function (option) {
+          return option.text
+        })
 
-        if (!textValues.map(v => v.toLowerCase()).includes(autocompleteInput.toLowerCase())) {
+        if (!textValues.map(value => value.toLowerCase()).includes(autocompleteInput.toLowerCase())) {
           autocompleteSelect.value = ''
           errorField.value = autocompleteInput
         } else {
