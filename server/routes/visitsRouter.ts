@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import {
+  prisonerPermissionsGuard,
+  PrisonerVisitsAndVisitorsPermission,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../services'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
@@ -17,7 +20,9 @@ export default function visitsRouter(services: Services): Router {
     `${basePath}/visits-details`,
     auditPageAccessAttempt({ services, page: Page.VisitDetails }),
     getPrisonerData(services, { minimal: true }),
-    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    prisonerPermissionsGuard(prisonPermissionsService, {
+      requestDependentOn: [PrisonerVisitsAndVisitorsPermission.read],
+    }),
     visitsController.visitsDetails(),
   )
 
