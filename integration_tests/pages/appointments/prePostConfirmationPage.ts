@@ -2,8 +2,8 @@ import Page, { type PageElement } from '../page'
 import { SummaryList } from '../pageElements/summaryList'
 
 export class PrePostConfirmationPage extends Page {
-  constructor() {
-    super('The video link has been booked')
+  constructor(action: 'add' | 'update' = 'add') {
+    super(action === 'add' ? 'The video link has been booked' : 'The video link has been updated')
   }
 
   summaryListCommon = new SummaryList('[data-qa=appointment-details-list__common]')

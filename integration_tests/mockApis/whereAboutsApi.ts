@@ -8,18 +8,18 @@ import { CellMoveReasonMock } from '../../server/data/localMockData/getCellMoveR
 import { appointmentMock, savedAppointmentMock } from '../../server/data/localMockData/appointmentMock'
 
 export default {
-  stubGetAppointment: ({ appointment }: { appointment: AppointmentDetails }) => {
+  stubGetAppointment: ({ response }: { response: AppointmentDetails }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/whereabouts/appointment/${appointment.appointment.id}`,
+        urlPath: `/whereabouts/appointment/${response.appointment.id}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: appointment,
+        jsonBody: response,
       },
     })
   },
