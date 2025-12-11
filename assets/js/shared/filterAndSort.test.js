@@ -25,8 +25,7 @@ describe('filterAndSort', () => {
   })
 
   test('no matches returns empty array', () => {
-    const source = filterAndSort(['a', 'b', 'c'])
-    source('d', populateResults)
+    source('Pluto', populateResults)
     expect(populateResults).toHaveBeenCalledWith([])
   })
 })
