@@ -34,7 +34,7 @@ export const nextOfKinValidator: Validator = (body: NextOfKinSubmission): HmppsE
       dateOfBirthYear,
       'dateOfBirth',
       'Date of birth',
-      'Date of birth must include a day, month and year',
+      "Enter this person's date of birth",
       true,
       false,
     ),
