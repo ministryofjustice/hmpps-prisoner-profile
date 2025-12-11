@@ -26,7 +26,7 @@ export class RadioButtons {
   }
 
   get value(): Cypress.Chainable<string> {
-    return this.inputElements.invoke('val')
+    return this.inputElements.filter(':checked').invoke('val')
   }
 
   selectOption(label: string): PageElement<HTMLLabelElement> {
