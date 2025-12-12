@@ -338,9 +338,16 @@ export default class AppointmentController {
         },
       )} been ${appointmentDetails.appointmentId ? 'updated' : 'added'}`
 
-      const lastAppointmentISODate = formatDateISO(
-        calculateEndDate(parseDate(appointmentDetails.date), appointmentDetails.repeats, appointmentDetails.times),
-      )
+      const lastAppointmentISODate =
+        appointmentDetails.recurring === 'yes'
+          ? formatDateISO(
+              calculateEndDate(
+                parseDate(appointmentDetails.date),
+                appointmentDetails.repeats,
+                appointmentDetails.times,
+              ),
+            )
+          : undefined
 
       const appointmentData = {
         heading,
@@ -361,7 +368,7 @@ export default class AppointmentController {
         recurring: appointmentDetails.recurring,
         repeats: repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text,
         numberAdded: appointmentDetails.times,
-        lastAppointmentDate: formatDate(lastAppointmentISODate, 'long'),
+        lastAppointmentDate: lastAppointmentISODate ? formatDate(lastAppointmentISODate, 'long') : undefined,
         comment: appointmentDetails.comments,
         notesForStaff: appointmentDetails.notesForStaff,
         notesForPrisoners: appointmentDetails.notesForPrisoners,
