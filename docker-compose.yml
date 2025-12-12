@@ -12,7 +12,7 @@ services:
       - '6379:6379'
 
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
     depends_on:
       - nomis-user-roles-api
     networks:
