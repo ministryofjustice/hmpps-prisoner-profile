@@ -1,5 +1,6 @@
 import accessibleAutocomplete from 'accessible-autocomplete'
 import { getParentConditionalRadioInput } from './helpers'
+import { filterAndSort } from './filterAndSort.js'
 
 export function autocomplete() {
   document.querySelectorAll('.js-autocomplete-select').forEach(selectElement => {
@@ -7,12 +8,14 @@ export function autocomplete() {
 
     const inputClasses = selectElement.getAttribute('data-input-classes')
     const menuClasses = selectElement.getAttribute('data-menu-classes')
+    const options = Array.from(selectElement.querySelectorAll('option')).map(option => option.textContent || '')
 
     accessibleAutocomplete.enhanceSelectElement({
       defaultValue: invalidInput ?? '',
       selectElement,
       inputClasses,
       menuClasses,
+      source: filterAndSort(options),
     })
   })
 
