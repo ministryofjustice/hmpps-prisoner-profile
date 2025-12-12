@@ -7,7 +7,7 @@ export default {
   collectCoverageFrom: ['server/**/*.{ts,js,jsx,mjs}'],
   testMatch: [
     '<rootDir>/(server|job)/**/?(*.)(cy|test).{ts,js,jsx,mjs}',
-    '<rootDir>/assets/js/shared/**/?(*.)(cy|test).{ts,js,jsx,mjs}'
+    '<rootDir>/assets/js/shared/**/?(*.)(cy|test).{ts,js,jsx,mjs}',
   ],
   testEnvironment: 'node',
   reporters: [
