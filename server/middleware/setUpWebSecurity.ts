@@ -5,6 +5,7 @@ import config from '../config'
 
 const googleDomains = ['*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com']
 const azureDomains = ['https://northeurope-0.in.applicationinsights.azure.com', '*.monitor.azure.com']
+const sanDevDomain = 'https://support-for-additional-needs-dev.hmpps.service.justice.gov.uk'
 
 export default function setUpWebSecurity(): Router {
   const router = express.Router()
@@ -35,6 +36,7 @@ export default function setUpWebSecurity(): Router {
     "'self'",
     ...googleDomains,
     ...azureDomains,
+    sanDevDomain,
     (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
   ]
 

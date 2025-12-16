@@ -12,6 +12,7 @@ import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { openCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
+import { Modal } from './modal'
 
 document.addEventListener('DOMContentLoaded', function () {
   addAnotherButton()
@@ -24,6 +25,16 @@ document.addEventListener('DOMContentLoaded', function () {
   openCloseAll()
   printPage()
   sortSelector()
+
+  const helloModalEl = document.getElementById('hello-modal')
+  const helloModalLink = document.getElementById('hello-modal-link')
+  if (helloModalEl && helloModalLink) {
+    const helloModal = new Modal(helloModalEl)
+    helloModalLink.addEventListener('click', e => {
+      e.preventDefault()
+      helloModal.load('https://support-for-additional-needs-dev.hmpps.service.justice.gov.uk/profile/A6255EC/overview')
+    })
+  }
 })
 
 govukFrontend.initAll()
