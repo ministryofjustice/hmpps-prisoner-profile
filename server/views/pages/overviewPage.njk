@@ -6,10 +6,14 @@
   }
 ] %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
+{% from "components/modal/modal.njk" import modal %}
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-width-container">
       <h1 class="govuk-heading-l govuk-!-margin-top-5">Overview</h1>
+      <p class="govuk-!-margin-bottom-3">
+        <a href="#hello-modal" id="hello-modal-link" class="govuk-link govuk-link--no-visited-state">Open hello modal</a>
+      </p>
     </div>
     {% if pageHasApiErrors and useCustomErrorBanner %}
       <div class="hmpps-api-error-banner govuk-!-margin-3">
@@ -29,4 +33,16 @@
       {%- endcall -%}
     </div>
   </div>
+
+  {% call modal({
+    id: "hello-modal",
+    title: "Hello",
+    classes: "",
+    close: {
+      label: "Close"
+    },
+    call: true
+  }) %}
+    <p>hello world</p>
+  {% endcall %}
 {% endblock %}
