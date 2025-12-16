@@ -29,7 +29,7 @@
 
 {% endblock %}
 
-{% block pageTitle %}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
+{% block pageTitle %}{{ 'Error: ' if errors.length > 0 }}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
 {% block header %}
   {{ feComponents.header | safe }}

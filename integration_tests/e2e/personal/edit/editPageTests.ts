@@ -68,7 +68,7 @@ export function editPageTests<TPage extends EditPage>(options: {
       testSetup()
     })
 
-    /* 
+    /*
       Permissions tests
       For now we just do permissions based on the role so this can be shared
       across multiple tests easily, it might need its own option in the future
@@ -154,6 +154,7 @@ export function editPageTests<TPage extends EditPage>(options: {
                 errorMessages.forEach(message => {
                   page.errorMessage().should('include.text', message)
                 })
+                cy.title().should('include', 'Error: ')
 
                 // Ensure inputted values are persisted across errors
                 if (input.textInputs) {
