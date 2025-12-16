@@ -4,7 +4,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
-    <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
+    <div class="govuk-!-margin-bottom-4 govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {% call govukFieldset({
           legend: {
             text: "Height",
@@ -24,11 +24,15 @@
       }) }}
       {% endcall %}
     </div>
-    <p class="govuk-body">
-      <a class="govuk-link" data-qa="switch-units" href="/prisoner/{{ prisonerNumber }}/personal/height/imperial">
-        Switch to feet and inches
-      </a>
-    </p>
+    <div class="govuk-button-group govuk-!-margin-bottom-6">
+      {{ govukButton({
+        text: "Switch to feet and inches",
+        classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+        href: "/prisoner/" + prisonerNumber  + "/personal/height/imperial",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "convert-units-button" }
+      }) }}
+    </div>
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Save",
