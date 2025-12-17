@@ -15,6 +15,12 @@ import { HmppsUser } from '../interfaces/HmppsUser'
 const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info', 'GET /api/addresses/find']
 const dependencyPrefixesToIgnore = ['sqs', 'api.os.uk']
 
+const SECONDS_IN_A_MINUTE = 60
+const SECONDS_IN_AN_HOUR = SECONDS_IN_A_MINUTE * 60
+const SECONDS_IN_A_DAY = SECONDS_IN_AN_HOUR * 24
+
+const MINIMUM_SUCCESSFUL_DURATION_SECONDS = 3
+
 export type ContextObject = {
   ['http.ServerRequest']?: Request
   correlationContext?: CorrelationContext
@@ -88,8 +94,12 @@ function ignoredDependenciesProcessor(envelope: EnvelopeTelemetry) {
   if (envelope.data.baseType === Contracts.TelemetryTypeString.Dependency) {
     const dependencyData = envelope.data.baseData
     if (dependencyData instanceof Contracts.RemoteDependencyData) {
-      const { target } = dependencyData
-      return dependencyPrefixesToIgnore.every(prefix => !target.startsWith(prefix))
+      const { target, success, duration } = dependencyData
+
+      return (
+        dependencyPrefixesToIgnore.every(prefix => !target.startsWith(prefix)) &&
+        (parseDurationToSeconds(duration) > MINIMUM_SUCCESSFUL_DURATION_SECONDS || !success)
+      )
     }
   }
   return true
@@ -105,4 +115,15 @@ export function appInsightsMiddleware(): RequestHandler {
     })
     next()
   }
+}
+
+function parseDurationToSeconds(value: string): number {
+  const withoutMillis = value.split('.')[0]
+  const tokens = withoutMillis.split(':').reverse()
+  return (
+    parseInt(tokens[0], 10) +
+    parseInt(tokens[1], 10) * SECONDS_IN_A_MINUTE +
+    parseInt(tokens[2], 10) * SECONDS_IN_AN_HOUR +
+    (tokens.length > 3 ? parseInt(tokens[3], 10) * SECONDS_IN_A_DAY : 0)
+  )
 }
