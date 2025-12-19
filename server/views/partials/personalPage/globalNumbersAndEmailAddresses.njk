@@ -5,7 +5,7 @@
 <p class="govuk-body not-entered-tag">Not entered</p>
 {% endset %}
 {% set phonesHtml %}
-<div class="hmpps-global-numbers-and-emails__phones__list">\
+<div class="hmpps-global-numbers-and-emails__phones__list">
   {% if globalNumbersAndEmails.status === 'fulfilled' %}
     {% for x in globalNumbersAndEmails.value.phones %}
       <div class="hmpps-global-numbers-and-emails__phone">
@@ -49,8 +49,8 @@
 </div>
 {% endset %}
 {%- call summaryCard({
-  title: "Phone numbers and email addresses", 
-  id: "phones-and-emails", 
+  title: "Phone numbers and email addresses",
+  id: "phones-and-emails",
   actions: [
     { href: 'personal/add-phone-number', text: 'Add a phone number' } if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions) and globalNumbersAndEmails.status === 'fulfilled',
     { href: 'personal/add-email-address', text: 'Add an email address' } if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions) and globalNumbersAndEmails.status === 'fulfilled'
