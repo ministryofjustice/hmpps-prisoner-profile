@@ -47,7 +47,6 @@
     "@ministryofjustice/hmpps-auth-clients": "^0.0.3",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.0.0",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "3.2.1",
-    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.3",
     "@ministryofjustice/hmpps-prison-permissions-lib": "1.0.0",
     "@ministryofjustice/hmpps-rest-client": "^0.0.3",
     "@sentry/node": "^10.27.0",
@@ -86,7 +85,8 @@
   "devDependencies": {
     "@cypress/webpack-batteries-included-preprocessor": "^4.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
-    "@ministryofjustice/eslint-config-hmpps": "^0.0.5",
+    "@ministryofjustice/eslint-config-hmpps": "1.0.2",
+    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.3",
     "@ministryofjustice/hmpps-precommit-hooks": "^0.0.4",
     "@tsconfig/node22": "^22.0.2",
     "@types/bunyan": "^1.8.11",
