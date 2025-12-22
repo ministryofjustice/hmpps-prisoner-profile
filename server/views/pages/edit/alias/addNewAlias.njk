@@ -28,7 +28,7 @@
         <span class="govuk-visually-hidden">Error:</span> This alias already exists for this person
       </p>
     {% endif %}
-
+    
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {{ govukInput({
       id: 'firstName',
       name: 'firstName',
@@ -91,19 +91,16 @@
       items: [
         {
           name: "day",
-          attributes: { maxlength: 2 },
           classes: "govuk-input--width-2" + dayErrorClass,
           value: formValues['dateOfBirth-day']
         },
         {
           name: "month",
-          attributes: { maxlength: 2 },
           classes: "govuk-input--width-2" + monthErrorClass,
           value: formValues['dateOfBirth-month']
         },
         {
           name: "year",
-          attributes: { maxlength: 4 },
           classes: "govuk-input--width-4" + yearErrorClass,
           value: formValues['dateOfBirth-year']
         }
