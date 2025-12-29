@@ -283,7 +283,7 @@ const baseEmailAddressTextFieldData = {
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
   redirectAnchor: 'phones-and-emails',
-  inputClasses: 'govuk-!-width-one-third',
+  inputClasses: 'govuk-!-width-one-half',
   submitButtonText: 'Save and return to profile',
 }
 
