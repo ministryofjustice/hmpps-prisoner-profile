@@ -3188,6 +3188,8 @@ describe('PersonalController', () => {
             fieldValue: '',
             inputClasses: 'govuk-!-width-one-half',
             submitButtonText: 'Save and return to profile',
+            inputType: 'email',
+            spellcheck: false,
             redirectAnchor: 'phones-and-emails',
             errors: [],
             miniBannerData: {
@@ -3372,6 +3374,8 @@ describe('PersonalController', () => {
             fieldValue: 'one@example.com',
             inputClasses: 'govuk-!-width-one-half',
             submitButtonText: 'Save and return to profile',
+            inputType: 'email',
+            spellcheck: false,
             redirectAnchor: 'phones-and-emails',
             errors: [],
             miniBannerData: {

@@ -475,6 +475,8 @@ export default class PersonalController {
           fieldName,
           inputClasses,
           submitButtonText,
+          inputType,
+          spellcheck,
           redirectAnchor,
         } = fieldData
         const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
@@ -502,6 +504,8 @@ export default class PersonalController {
           redirectAnchor,
           miniBannerData,
           submitButtonText,
+          inputType,
+          spellcheck,
         })
       },
 
