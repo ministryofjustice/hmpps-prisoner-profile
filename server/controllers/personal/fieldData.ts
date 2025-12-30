@@ -19,11 +19,15 @@ export interface FieldData {
   successFlashFieldName?: string
 }
 
+type TextInputType = 'text' | 'email'
+
 export interface TextFieldData extends FieldData {
   inputClasses?: string
   submitButtonText?: string
   formTitle?: string
   formatter?: (value: number | string) => string
+  inputType?: TextInputType
+  spellcheck?: boolean
 }
 
 export interface PhysicalAttributesTextFieldData extends TextFieldData {
@@ -283,7 +287,9 @@ const baseEmailAddressTextFieldData = {
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
   redirectAnchor: 'phones-and-emails',
-  inputClasses: 'govuk-!-width-one-third',
+  inputClasses: 'govuk-!-width-one-half',
+  inputType: 'email' as TextInputType,
+  spellcheck: false,
   submitButtonText: 'Save and return to profile',
 }
 

@@ -3186,8 +3186,10 @@ describe('PersonalController', () => {
             hintText: 'For example name@email.co.uk',
             fieldName: 'emailAddress',
             fieldValue: '',
-            inputClasses: 'govuk-!-width-one-third',
+            inputClasses: 'govuk-!-width-one-half',
             submitButtonText: 'Save and return to profile',
+            inputType: 'email',
+            spellcheck: false,
             redirectAnchor: 'phones-and-emails',
             errors: [],
             miniBannerData: {
@@ -3370,8 +3372,10 @@ describe('PersonalController', () => {
             hintText: 'For example name@email.co.uk',
             fieldName: 'emailAddress',
             fieldValue: 'one@example.com',
-            inputClasses: 'govuk-!-width-one-third',
+            inputClasses: 'govuk-!-width-one-half',
             submitButtonText: 'Save and return to profile',
+            inputType: 'email',
+            spellcheck: false,
             redirectAnchor: 'phones-and-emails',
             errors: [],
             miniBannerData: {
