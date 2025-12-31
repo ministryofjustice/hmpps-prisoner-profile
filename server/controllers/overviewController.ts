@@ -14,7 +14,7 @@ import {
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { canViewCsraHistory, formatName, isInUsersCaseLoad } from '../utils/utils'
+import { formatName, isInUsersCaseLoad } from '../utils/utils'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
@@ -194,7 +194,6 @@ export default class OverviewController {
         showCourtCaseSummary,
       },
       actionsMayBeMissing: !(socNominal.isFulfilled() && pathfinderNominal.isFulfilled()),
-      showCsraHistoryLink: canViewCsraHistory(prisonId, user),
     }
 
     res.render('pages/overviewPage', { ...viewData, useCustomErrorBanner: true })

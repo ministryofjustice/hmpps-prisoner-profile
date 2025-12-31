@@ -47,7 +47,6 @@ export default interface OverviewPageData {
     showCourtCaseSummary: boolean
   }
   actionsMayBeMissing: boolean
-  showCsraHistoryLink: boolean
 }
 
 export interface CourtCaseSummary {
