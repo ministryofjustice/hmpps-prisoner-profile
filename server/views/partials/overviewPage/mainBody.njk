@@ -19,13 +19,13 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-a">
     <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
-      {% if isGranted(PrisonerMoneyPermission.read, prisonerPermissions) %}
+      {% if moneySummary and isGranted(PrisonerMoneyPermission.read, prisonerPermissions) %}
         <div class="govuk-grid-column-one-third">
           {{ miniSummaryMacro(moneySummary | toMoneySummaryDisplay(prisonerNumber)) }}
         </div>
       {% endif %}
 
-      {% if isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions) %}
+      {% if visitsSummary and isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions) %}
         <div class="govuk-grid-column-one-third">
           {{ miniSummaryMacro(visitsSummary | toVisitsSummaryDisplay(prisonerNumber)) }}
         </div>
@@ -62,13 +62,13 @@
 </div>
 
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
-  {% if isGranted(PrisonerAdjudicationsPermission.read, prisonerPermissions) %}
+  {% if adjudicationSummary and isGranted(PrisonerAdjudicationsPermission.read, prisonerPermissions) %}
     <div class="govuk-grid-column-one-half" data-qa="adjudications-summary">
       {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber), adjudicationSummary.status != 'fulfilled') }}
     </div>
   {% endif %}
 
-  {% if isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) %}
+  {% if incentiveSummary and isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) %}
     <div class="govuk-grid-column-one-half">
       {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
     </div>
@@ -78,15 +78,16 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
     <div class="mini-card-wrapper" data-qa="mini-summary-list-macro">
-      {% if isGranted(PersonPrisonCategoryPermission.read, prisonerPermissions) %}
+      {% if categorySummary and isGranted(PersonPrisonCategoryPermission.read, prisonerPermissions) %}
         {{ miniCard(categorySummary | toCategorySummaryDisplay(prisonerInCaseLoad, bookingId), 'mini-card--categories') }}
       {% endif %}
 
-      {% if isGranted(PrisonerSpecificRisksPermission.read_csra_rating, prisonerPermissions) %}
+      {% set showCsraHistoryLink = isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions) %}
+      {% if csraSummary and isGranted(PrisonerSpecificRisksPermission.read_csra_rating, prisonerPermissions) %}
         {{ miniCard(csraSummary | toCsraSummaryDisplay(showCsraHistoryLink, prisonerNumber), 'mini-card--csra') }}
       {% endif %}
 
-      {% if isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions)  %}
+      {% if currentCsipDetail and isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions)  %}
         {{ miniCard(currentCsipDetail | toCsipMiniCardContent(prisonerNumber), 'mini-card--csip') }}
       {% endif %}
     </div>
