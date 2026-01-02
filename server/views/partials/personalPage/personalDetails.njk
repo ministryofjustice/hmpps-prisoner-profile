@@ -135,6 +135,7 @@
                 changeText: 'Add an alias',
                 changeHref: "personal/enter-alias-details",
                 changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
+                activateHiddenText: false,
                 rowUpdated: flashMessage.fieldName === 'aliases',
                 hideIfEmpty: false,
                 classes: 'hmpps-alias-row'
