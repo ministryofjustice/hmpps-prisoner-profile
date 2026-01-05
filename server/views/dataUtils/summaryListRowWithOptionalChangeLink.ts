@@ -7,6 +7,7 @@ interface Options {
   changeHref?: string
   rowUpdated?: boolean
   hiddenText?: string
+  activateHiddenText?: boolean
   hideIfEmpty?: boolean
   visible?: boolean
   dataQa?: string
@@ -19,6 +20,7 @@ interface Options {
 const defaultOptions: Options = {
   changeLinkEnabled: false,
   rowUpdated: false,
+  activateHiddenText: true,
   hideIfEmpty: true,
   mergeKeyDown: false,
   classes: [],
@@ -41,7 +43,9 @@ const summaryListRowWithOptionalChangeLink = (
 ): {
   key: { html?: string; text?: string }
   value: { html?: string; text?: string }
-  actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
+  actions: {
+    items: { href: string; text: string; visuallyHiddenText: string; classes: string }[]
+  }
   classes: string
 } => {
   const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string)
@@ -76,7 +80,7 @@ const summaryListRowWithOptionalChangeLink = (
           {
             href: options.changeHref,
             text: options.changeText || 'Change',
-            visuallyHiddenText: options.hiddenText || key,
+            visuallyHiddenText: options.activateHiddenText ? options.hiddenText || key : '',
             classes: 'govuk-link--no-visited-state',
           },
         ]

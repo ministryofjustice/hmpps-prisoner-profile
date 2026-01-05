@@ -75,14 +75,22 @@ describe('summaryListRowWithOptionalChangeLink', () => {
       )
     })
 
-    it('Supports custom visually hidden text', () => {
-      const res = summaryListRowWithOptionalChangeLink('key', 'value', {
-        changeLinkEnabled: true,
-        hiddenText: 'Change this',
+    it('Supports custom visually hidden text with screenreader display options', () => {
+      const testCases = [
+        { activateHiddenText: true, expected: 'Change this' },
+        { activateHiddenText: false, expected: '' },
+      ]
+
+      testCases.forEach(({ activateHiddenText, expected }) => {
+        const res = summaryListRowWithOptionalChangeLink('key', 'value', {
+          changeLinkEnabled: true,
+          hiddenText: 'Change this',
+          activateHiddenText,
+        })
+        expect(res.actions.items).toEqual(
+          expect.arrayContaining([expect.objectContaining({ visuallyHiddenText: expected })]),
+        )
       })
-      expect(res.actions.items).toEqual(
-        expect.arrayContaining([expect.objectContaining({ visuallyHiddenText: 'Change this' })]),
-      )
     })
   })
 
