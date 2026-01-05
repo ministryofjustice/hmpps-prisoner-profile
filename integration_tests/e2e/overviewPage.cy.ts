@@ -9,6 +9,7 @@ import {
   mockContactDetailYouthEstate,
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
+import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -299,6 +300,19 @@ context('Overview Page', () => {
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
         overviewPage.statusList().contains('li > p', 'Support needed')
         overviewPage.statusList().contains('li > p', 'Scheduled transfer')
+        overviewPage.statusList().should('not.contain.text', 'Has additional needs')
+      })
+
+      it('Displays link to support additional needs when needed', () => {
+        cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', response: prisonerHasNeedsMock })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.statusList().should('contain.text', 'Has additional needs')
+        overviewPage
+          .statusList()
+          .find('a')
+          .should('have.attr', 'href', 'http://localhost:9091/supportForAdditionalNeedsUI/profile/G6123VU/overview')
+          .and('have.text', 'View details')
       })
     })
 
@@ -761,6 +775,26 @@ context('Overview Page', () => {
     })
   })
 
+  context('Given API call to support for additional needs api fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', error: true })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the status list', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage.statusList().should('exist')
+      overviewPage.statusList().contains('li > p', 'Additional needs unavailable')
+    })
+  })
+
   context('Given API call to get key worker name fails', () => {
     beforeEach(() => {
       cy.task('reset')
@@ -788,7 +822,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('Displays a page error banner and highlights the failure in the status list', () => {
+    it('Displays a page error banner and highlights the failure in the non-association details', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
       overviewPage.apiErrorBanner().should('exist')

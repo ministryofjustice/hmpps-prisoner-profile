@@ -9,7 +9,13 @@
             <span aria-label="{{ status.date | formatDate }}">{{ status.date | formatDate('short') }}</span>
           </p>
         {% elseif status.subText %}
-          <p>{{ status.subText }}</p>
+          <p>
+            {% if status.subTextHref %}
+              <a href="{{ status.subTextHref }}">{{ status.subText }}</a>
+            {% else %}
+              {{ status.subText }}
+            {% endif %}
+          </p>
         {% endif %}
       </li>
     {% endfor %}

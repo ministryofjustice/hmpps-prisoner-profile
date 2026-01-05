@@ -2,6 +2,7 @@ import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import { Result } from '../../../utils/result/result'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
 import { OverviewStatus } from '../../interfaces/OverviewPageData'
 import {
@@ -14,12 +15,14 @@ export default function getOverviewStatuses(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
+  hasNeedsForAdditionalSupport: Result<HasNeed>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
 ): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
     getListenerStatus(inmateDetail),
     getNeurodiversitySupportStatus(learnerNeurodivergence),
+    getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
     getScheduledTransferStatus(scheduledTransfers),
   ].filter(Boolean)
 }
@@ -64,6 +67,28 @@ function getNeurodiversitySupportStatus(learnerNeurodivergence: Result<LearnerNe
   return learnerNeurodivergence.handle({
     fulfilled: it => it?.length && supportNeededStatus,
     rejected: () => supportNeededErrorStatus,
+  })
+}
+
+function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<HasNeed>): OverviewStatus | null {
+  return hasNeedsForAdditionalSupport.handle({
+    fulfilled(value: HasNeed): OverviewStatus | null {
+      if (value?.hasNeed) {
+        return {
+          label: 'Has additional needs',
+          subText: 'View details',
+          subTextHref: value.url,
+        }
+      }
+      return null
+    },
+    rejected(): OverviewStatus {
+      return {
+        label: 'Additional needs unavailable',
+        subText: 'Try again later',
+        error: true,
+      }
+    },
   })
 }
 

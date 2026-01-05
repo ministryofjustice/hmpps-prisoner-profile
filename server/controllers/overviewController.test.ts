@@ -52,6 +52,9 @@ import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfers
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
 import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
+import { supportForAdditionalNeedsApiClientMock } from '../../tests/mocks/supportForAdditionalNeedsApiClientMock'
+import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
+import { prisonerHasNeedsMock } from '../data/localMockData/supportForAdditionalNeedsMock'
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import config from '../config'
@@ -88,6 +91,7 @@ describe('overviewController', () => {
   let moneyService: MoneyService
   let pathfinderApiClient: PathfinderApiClient
   let manageSocCasesApiClient: ManageSocCasesApiClient
+  let supportForAdditionalNeedsApiClient: jest.Mocked<SupportForAdditionalNeedsApiClient>
   let auditService: AuditService
   let offencesService: OffencesService
   let adjudicationsService: AdjudicationsService
@@ -124,6 +128,7 @@ describe('overviewController', () => {
     moneyService = moneyServiceMock() as MoneyService
     pathfinderApiClient = pathfinderApiClientMock() as PathfinderApiClient
     manageSocCasesApiClient = manageSocCasesApiClientMock() as ManageSocCasesApiClient
+    supportForAdditionalNeedsApiClient = supportForAdditionalNeedsApiClientMock()
     auditService = auditServiceMock() as AuditService
     offencesService = offencesServiceMock() as OffencesService
     adjudicationsService = adjudicationsServiceMock() as AdjudicationsService
@@ -139,6 +144,7 @@ describe('overviewController', () => {
     controller = new OverviewController(
       () => pathfinderApiClient,
       () => manageSocCasesApiClient,
+      () => supportForAdditionalNeedsApiClient,
       auditService,
       offencesService,
       moneyService,
@@ -605,6 +611,50 @@ describe('overviewController', () => {
         )
       },
     )
+
+    describe('support for additional needs', () => {
+      it('should display link when returned by API', async () => {
+        supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport.mockResolvedValue(prisonerHasNeedsMock)
+
+        await controller.displayOverview(req, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              { label: 'Recognised Listener' },
+              {
+                label: 'Has additional needs',
+                subText: 'View details',
+                subTextHref: expect.any(String),
+              },
+            ],
+          }),
+        )
+      })
+
+      it('should indicate an error when API fails', async () => {
+        supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport.mockRejectedValue('Server Error')
+
+        await controller.displayOverview(req, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              { label: 'Recognised Listener' },
+              {
+                label: 'Additional needs unavailable',
+                subText: 'Try again later',
+                error: true,
+              },
+            ],
+          }),
+        )
+      })
+    })
 
     describe('upcoming transfers', () => {
       const scheduledTransferLabel = 'Scheduled transfer'

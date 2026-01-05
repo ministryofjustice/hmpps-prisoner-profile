@@ -17,6 +17,7 @@ import config from '../config'
 import { formatName, isInUsersCaseLoad } from '../utils/utils'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
+import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
 import { RestClientBuilder } from '../data'
 import buildOverviewActions from './utils/overviewController/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
@@ -51,6 +52,7 @@ export default class OverviewController {
   constructor(
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
+    private readonly supportForAdditionalNeedsApiClientBuilder: RestClientBuilder<SupportForAdditionalNeedsApiClient>,
     private readonly auditService: AuditService,
     private readonly offencesService: OffencesService,
     private readonly moneyService: MoneyService,
@@ -75,6 +77,7 @@ export default class OverviewController {
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
+    const supportForAdditionalNeedsApiClient = this.supportForAdditionalNeedsApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
 
     const [
@@ -89,6 +92,7 @@ export default class OverviewController {
       schedule,
       incentiveSummary,
       learnerNeurodivergence,
+      hasNeedsForAdditionalSupport,
       scheduledTransfers,
       staffContacts,
       offencesOverview,
@@ -117,6 +121,7 @@ export default class OverviewController {
         ? Result.wrap(this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
+      Result.wrap(supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport(prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
       this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
@@ -174,7 +179,13 @@ export default class OverviewController {
         isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
-      statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
+      statuses: getOverviewStatuses(
+        prisonerData,
+        inmateDetail,
+        learnerNeurodivergence,
+        hasNeedsForAdditionalSupport,
+        scheduledTransfers,
+      ),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       bookingId: prisonerData.bookingId,
