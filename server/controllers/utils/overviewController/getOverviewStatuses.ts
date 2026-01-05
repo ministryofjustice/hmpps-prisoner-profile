@@ -78,6 +78,7 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
           label: 'Has additional needs',
           subText: 'View details',
           subTextHref: value.url,
+          prominent: true,
         }
       }
       return null

@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .hmpps-status-list {
   display: flex;
   flex-wrap: wrap;
@@ -29,5 +31,10 @@
 
   &--error {
     border-left-color: govuk-colour('red');
+  }
+
+  &--prominent {
+    background-color: color.adjust(govuk-colour('blue'), $lightness: 52%);
+    border-left-color: govuk-colour('blue');
   }
 }

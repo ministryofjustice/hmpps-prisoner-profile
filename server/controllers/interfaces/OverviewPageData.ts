@@ -76,6 +76,7 @@ export interface OverviewStatus {
   subText?: string
   subTextHref?: string
   error?: boolean
+  prominent?: boolean
 }
 
 interface PersonalDetails {

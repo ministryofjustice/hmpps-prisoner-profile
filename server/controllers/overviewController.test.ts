@@ -628,6 +628,7 @@ describe('overviewController', () => {
                 label: 'Has additional needs',
                 subText: 'View details',
                 subTextHref: expect.any(String),
+                prominent: true,
               },
             ],
           }),
