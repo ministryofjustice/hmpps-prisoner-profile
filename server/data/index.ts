@@ -42,6 +42,7 @@ import HealthAndMedicationApiRestClient from './healthAndMedicationApiRestClient
 import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApiRestClient'
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
+import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
@@ -85,6 +86,10 @@ const circuitBreakers = {
   ),
   prisonerProfile: circuitBreakerBuilder('prisonerProfile', {} as ApiConfig),
   personalRelationships: circuitBreakerBuilder('personalRelationshipsApi', config.apis.personalRelationshipsApi),
+  supportForAdditionalNeeds: circuitBreakerBuilder(
+    'supportForAdditionalNeedsApi',
+    config.apis.supportForAdditionalNeeds,
+  ),
 }
 
 export const dataAccess = {
@@ -98,6 +103,8 @@ export const dataAccess = {
   manageSocCasesApiClientBuilder: (token: string) =>
     new ManageSocCasesApiRestClient(token, circuitBreakers.manageSocCases),
   pathfinderApiClientBuilder: (token: string) => new PathfinderApiRestClient(token, circuitBreakers.pathfinder),
+  supportForAdditionalNeedsApiClientBuilder: (token: string) =>
+    new SupportForAdditionalNeedsApiRestClient(token, circuitBreakers.supportForAdditionalNeeds),
   adjudicationsApiClientBuilder: (token: string) =>
     new AdjudicationsApiRestClient(token, circuitBreakers.adjudications),
   prisonApiClientBuilder: (token: string) => new PrisonApiRestClient(token, circuitBreakers.prisonApi),

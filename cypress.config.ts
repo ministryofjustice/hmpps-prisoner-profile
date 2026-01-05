@@ -33,6 +33,7 @@ import healthAndMedicationApi from './integration_tests/mockApis/healthAndMedica
 import osPlacesApi from './integration_tests/mockApis/osPlacesApi'
 import personCommunicationNeedsApi from './integration_tests/mockApis/personCommunicationNeedsApi'
 import personalRelationshipsApi from './integration_tests/mockApis/personalRelationshipsApi'
+import supportForAdditionalNeedsApi from './integration_tests/mockApis/supportForAdditionalNeedsApi'
 
 function preprocessorOptions() {
   const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
@@ -95,6 +96,7 @@ export default defineConfig({
         ...osPlacesApi,
         ...personCommunicationNeedsApi,
         ...personalRelationshipsApi,
+        ...supportForAdditionalNeedsApi,
       })
     },
     baseUrl: 'http://localhost:3007',
