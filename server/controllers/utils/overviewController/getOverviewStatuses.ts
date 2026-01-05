@@ -3,7 +3,7 @@ import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import { Result } from '../../../utils/result/result'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
-import OverviewPageData from '../../interfaces/OverviewPageData'
+import { OverviewStatus } from '../../interfaces/OverviewPageData'
 import {
   getProfileInformationValue,
   ProfileInformationType,
@@ -15,7 +15,7 @@ export default function getOverviewStatuses(
   inmateDetail: InmateDetail,
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
-): OverviewPageData['statuses'] {
+): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
     getListenerStatus(inmateDetail),
@@ -24,7 +24,7 @@ export default function getOverviewStatuses(
   ].filter(Boolean)
 }
 
-function getLocationStatus(prisonerData: Prisoner): OverviewPageData['statuses'][number] {
+function getLocationStatus(prisonerData: Prisoner): OverviewStatus {
   if (prisonerData.inOutStatus === 'IN') {
     return { label: `In ${prisonerData.prisonName}` }
   }
@@ -40,7 +40,7 @@ function getLocationStatus(prisonerData: Prisoner): OverviewPageData['statuses']
   return null
 }
 
-function getListenerStatus(inmateDetail: InmateDetail): OverviewPageData['statuses'][number] {
+function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus {
   const recognised = getProfileInformationValue(
     ProfileInformationType.RecognisedListener,
     inmateDetail.profileInformation,
@@ -58,9 +58,7 @@ function getListenerStatus(inmateDetail: InmateDetail): OverviewPageData['status
   return null
 }
 
-function getNeurodiversitySupportStatus(
-  learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
-): OverviewPageData['statuses'][number] {
+function getNeurodiversitySupportStatus(learnerNeurodivergence: Result<LearnerNeurodivergence[]>): OverviewStatus {
   const supportNeededStatus = { label: 'Support needed', subText: 'Has neurodiversity needs' }
   const supportNeededErrorStatus = { label: 'Support needs unavailable', subText: 'Try again later', error: true }
   return learnerNeurodivergence.handle({
@@ -69,9 +67,7 @@ function getNeurodiversitySupportStatus(
   })
 }
 
-function getScheduledTransferStatus(
-  scheduledTransfers: PrisonerPrisonSchedule[] | null,
-): OverviewPageData['statuses'][number] {
+function getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[] | null): OverviewStatus {
   return (
     scheduledTransfers?.length > 0 && {
       label: 'Scheduled transfer',
