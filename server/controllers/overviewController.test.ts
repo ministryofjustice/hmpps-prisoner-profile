@@ -625,8 +625,8 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               { label: 'Recognised Listener' },
               {
-                label: 'Has additional needs',
-                subText: 'View details',
+                label: 'Additional needs',
+                subText: 'View support for additional needs',
                 subTextHref: expect.any(String),
                 prominent: true,
               },

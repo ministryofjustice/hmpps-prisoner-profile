@@ -300,19 +300,19 @@ context('Overview Page', () => {
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
         overviewPage.statusList().contains('li > p', 'Support needed')
         overviewPage.statusList().contains('li > p', 'Scheduled transfer')
-        overviewPage.statusList().should('not.contain.text', 'Has additional needs')
+        overviewPage.statusList().should('not.contain.text', 'Additional needs')
       })
 
       it('Displays link to support additional needs when needed', () => {
         cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', response: prisonerHasNeedsMock })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.statusList().should('contain.text', 'Has additional needs')
+        overviewPage.statusList().should('contain.text', 'Additional needs')
         overviewPage
           .statusList()
           .find('a')
           .should('have.attr', 'href', 'http://localhost:9091/supportForAdditionalNeedsUI/profile/G6123VU/overview')
-          .and('have.text', 'View details')
+          .and('have.text', 'View support for additional needs')
       })
     })
 

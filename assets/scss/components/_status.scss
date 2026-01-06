@@ -34,7 +34,7 @@
   }
 
   &--prominent {
-    background-color: color.adjust(govuk-colour('blue'), $lightness: 52%);
-    border-left-color: govuk-colour('blue');
+    background-color: color.adjust(govuk-colour('light-blue'), $lightness: 38%);
+    border-left-color: govuk-colour('light-blue');
   }
 }

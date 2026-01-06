@@ -75,8 +75,8 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
     fulfilled(value: HasNeed): OverviewStatus | null {
       if (value?.hasNeed) {
         return {
-          label: 'Has additional needs',
-          subText: 'View details',
+          label: 'Additional needs',
+          subText: 'View support for additional needs',
           subTextHref: value.url,
           prominent: true,
         }
