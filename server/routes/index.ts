@@ -72,7 +72,6 @@ export default function routes(services: Services): Router {
     services.visitsService,
     services.prisonerScheduleService,
     services.incentivesService,
-    services.personalPageService,
     services.offenderService,
     services.professionalContactsService,
     services.csipService,

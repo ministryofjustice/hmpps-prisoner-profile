@@ -41,13 +41,10 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import { assessmentsMock } from '../data/localMockData/miniSummaryMock'
 import IncentivesService from '../services/incentivesService'
 import { incentiveServiceMock } from '../../tests/mocks/incentiveServiceMock'
-import PersonalPageService from '../services/personalPageService'
-import { personalPageServiceMock } from '../../tests/mocks/personalPageServiceMock'
 import OffenderService from '../services/offenderService'
 import { offenderServiceMock } from '../../tests/mocks/offenderServiceMock'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import { professionalContactsServiceMock } from '../../tests/mocks/professionalContactsServiceMock'
-import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
@@ -98,7 +95,6 @@ describe('overviewController', () => {
   let visitsService: VisitsService
   let prisonerScheduleService: PrisonerScheduleService
   let incentiveService: IncentivesService
-  let personalPageService: PersonalPageService
   let offenderService: OffenderService
   let professionalContactsService: ProfessionalContactsService
   let csipService: CsipService
@@ -135,7 +131,6 @@ describe('overviewController', () => {
     visitsService = visitsServiceMock() as VisitsService
     prisonerScheduleService = prisonerScheduleServiceMock() as PrisonerScheduleService
     incentiveService = incentiveServiceMock() as IncentivesService
-    personalPageService = personalPageServiceMock() as PersonalPageService
     offenderService = offenderServiceMock() as OffenderService
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
     csipService = csipServiceMock() as CsipService
@@ -152,7 +147,6 @@ describe('overviewController', () => {
       visitsService,
       prisonerScheduleService,
       incentiveService,
-      personalPageService,
       offenderService,
       professionalContactsService,
       csipService,
@@ -435,61 +429,13 @@ describe('overviewController', () => {
   })
 
   describe('statuses', () => {
-    it('should get statuses for Current Location, Recognised Listener and Neurodiversity', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
-
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        } as Request,
-        res,
-      )
-
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          statuses: [
-            { label: 'In Moorland (HMP & YOI)' },
-            { label: 'Recognised Listener' },
-            { label: 'Support needed', subText: 'Has neurodiversity needs' },
-          ],
-        }),
-      )
-    })
-
-    it('should not return Neurodiversity if not at supported prison', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue([])
-
+    it('should get statuses for Current Location and Recognised Listener', async () => {
       await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
           statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
-        }),
-      )
-    })
-
-    it('should indicate an error with neurodiversity support status when API fails', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockRejectedValue('ERROR')
-
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        } as Request,
-        res,
-      )
-
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          statuses: [
-            { label: 'In Moorland (HMP & YOI)' },
-            { label: 'Recognised Listener' },
-            { label: 'Support needs unavailable', subText: 'Try again later', error: true },
-          ],
         }),
       )
     })
@@ -623,13 +569,13 @@ describe('overviewController', () => {
           expect.objectContaining({
             statuses: [
               { label: 'In Moorland (HMP & YOI)' },
-              { label: 'Recognised Listener' },
               {
                 label: 'Additional needs',
                 subText: 'View support for additional needs',
                 subTextHref: expect.any(String),
                 prominent: true,
               },
+              { label: 'Recognised Listener' },
             ],
           }),
         )
@@ -645,12 +591,12 @@ describe('overviewController', () => {
           expect.objectContaining({
             statuses: [
               { label: 'In Moorland (HMP & YOI)' },
-              { label: 'Recognised Listener' },
               {
                 label: 'Additional needs unavailable',
                 subText: 'Try again later',
                 error: true,
               },
+              { label: 'Recognised Listener' },
             ],
           }),
         )

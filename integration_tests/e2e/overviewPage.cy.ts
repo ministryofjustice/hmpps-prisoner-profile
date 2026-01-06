@@ -298,7 +298,6 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
-        overviewPage.statusList().contains('li > p', 'Support needed')
         overviewPage.statusList().contains('li > p', 'Scheduled transfer')
         overviewPage.statusList().should('not.contain.text', 'Additional needs')
       })
@@ -752,26 +751,6 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('contain.text', 'Youth Justice Service')
         overviewPage.staffContacts().should('contain.text', 'Youth Justice Service Case Manager')
       })
-    })
-  })
-
-  context('Given API call to get learner neurodivergence fails', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth()
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      cy.task('stubGetLearnerNeurodivergence', { prisonerNumber: 'G6123VU', error: true })
-      visitOverviewPage()
-    })
-
-    it('Displays a page error banner and highlights the failure in the status list', () => {
-      const overviewPage = Page.verifyOnPage(OverviewPage)
-
-      overviewPage.apiErrorBanner().should('exist')
-      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
-
-      overviewPage.statusList().should('exist')
-      overviewPage.statusList().contains('li > p', 'Support needs unavailable')
     })
   })
 

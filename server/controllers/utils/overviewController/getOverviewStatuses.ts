@@ -1,7 +1,6 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import { Result } from '../../../utils/result/result'
-import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
 import { OverviewStatus } from '../../interfaces/OverviewPageData'
@@ -14,15 +13,13 @@ import { BooleanString } from '../../../data/enums/booleanString'
 export default function getOverviewStatuses(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
-  learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
   hasNeedsForAdditionalSupport: Result<HasNeed>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
 ): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
-    getListenerStatus(inmateDetail),
-    getNeurodiversitySupportStatus(learnerNeurodivergence),
     getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
+    getListenerStatus(inmateDetail),
     getScheduledTransferStatus(scheduledTransfers),
   ].filter(Boolean)
 }
@@ -59,15 +56,6 @@ function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus {
   }
 
   return null
-}
-
-function getNeurodiversitySupportStatus(learnerNeurodivergence: Result<LearnerNeurodivergence[]>): OverviewStatus {
-  const supportNeededStatus = { label: 'Support needed', subText: 'Has neurodiversity needs' }
-  const supportNeededErrorStatus = { label: 'Support needs unavailable', subText: 'Try again later', error: true }
-  return learnerNeurodivergence.handle({
-    fulfilled: it => it?.length && supportNeededStatus,
-    rejected: () => supportNeededErrorStatus,
-  })
 }
 
 function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<HasNeed>): OverviewStatus | null {

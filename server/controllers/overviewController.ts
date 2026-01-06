@@ -30,7 +30,6 @@ import AdjudicationsService from '../services/adjudicationsService'
 import { VisitsService } from '../services/visitsService'
 import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
-import PersonalPageService from '../services/personalPageService'
 import { Result } from '../utils/result/result'
 import OffenderService from '../services/offenderService'
 import ProfessionalContactsService from '../services/professionalContactsService'
@@ -60,7 +59,6 @@ export default class OverviewController {
     private readonly visitsService: VisitsService,
     private readonly prisonerScheduleService: PrisonerScheduleService,
     private readonly incentivesService: IncentivesService,
-    private readonly personalPageService: PersonalPageService,
     private readonly offenderService: OffenderService,
     private readonly professionalContactsService: ProfessionalContactsService,
     private readonly csipService: CsipService,
@@ -91,7 +89,6 @@ export default class OverviewController {
       visitsSummary,
       schedule,
       incentiveSummary,
-      learnerNeurodivergence,
       hasNeedsForAdditionalSupport,
       scheduledTransfers,
       staffContacts,
@@ -120,7 +117,6 @@ export default class OverviewController {
       isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)
         ? Result.wrap(this.incentivesService.getIncentiveOverview(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      Result.wrap(this.personalPageService.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       Result.wrap(supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport(prisonerNumber), apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.professionalContactsService.getProfessionalContactsOverview(clientToken, prisonerData, apiErrorCallback),
@@ -179,13 +175,7 @@ export default class OverviewController {
         isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
-      statuses: getOverviewStatuses(
-        prisonerData,
-        inmateDetail,
-        learnerNeurodivergence,
-        hasNeedsForAdditionalSupport,
-        scheduledTransfers,
-      ),
+      statuses: getOverviewStatuses(prisonerData, inmateDetail, hasNeedsForAdditionalSupport, scheduledTransfers),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       bookingId: prisonerData.bookingId,
