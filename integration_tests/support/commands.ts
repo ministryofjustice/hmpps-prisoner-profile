@@ -76,7 +76,6 @@ Cypress.Commands.add(
     cy.task('stubGetPathfinderNominal404')
     cy.task('stubGetSocNominal')
     cy.task('stubGetSocNominal404')
-    cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
     cy.task('stubSupportForAdditionalNeeds', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
