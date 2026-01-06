@@ -11,7 +11,7 @@
         {% elseif status.subText %}
           <p>
             {% if status.subTextHref %}
-              <a href="{{ status.subTextHref }}">{{ status.subText }}</a>
+              <a href="{{ status.subTextHref }}" class="govuk-link--no-visited-state">{{ status.subText }}</a>
             {% else %}
               {{ status.subText }}
             {% endif %}
