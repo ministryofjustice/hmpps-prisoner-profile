@@ -18,9 +18,7 @@
                         </span>
                     </summary>
                     <div class="govuk-details__text">
-                        {% set markIndex = 0 %}
                         {% for mark in marks %}
-                            {% set markIndex = markIndex + 1 %}
                             <div class="personal-distinguishing-marks__row__populated__mark">
                                 <dl>
                                     {% if not (bodyPart === 'Neck' or bodyPart === 'Back') %}
@@ -53,7 +51,7 @@
                                 {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                                     <div>
                                         <a href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}"
-                                           class="govuk-link govuk-link--no-visited-state">Change <span class="govuk-visually-hidden">{{ type }} {{ markIndex }} of {{ marks.length }} on {{ mark.location }}</span></a>
+                                           class="govuk-link govuk-link--no-visited-state">Change <span class="govuk-visually-hidden">{{ type }} {{ loop.index }} of {{ loop.length }} on {{ mark.location }}</span></a>
                                     </div>
                                 {% endif %}
                             </div>
