@@ -79,6 +79,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.csraCard().find('a').should('not.exist')
       })
+
+      it('Does not display the incentives link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.incentivesCard().find('a').should('not.exist')
+      })
     })
   })
 
