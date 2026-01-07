@@ -19,7 +19,7 @@
         {% if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions) %}
           <div class="hmpps-global-numbers-and-emails__phone__change">
             <a class="govuk-link govuk-link--no-visited-state" href="personal/change-phone-number/{{ x.id }}">
-              Change
+              Change <span class="govuk-visually-hidden">{{ x.typeDescription }} number {{ x.number }} {% if x.extension %} ext {{ x.extension }} {% endif %}</span>
             </a>
           </div>
         {% endif %}
@@ -39,7 +39,7 @@
         {% if isGranted(CorePersonRecordPermission.edit_email_addresses, prisonerPermissions) %}
           <div class="hmpps-global-numbers-and-emails__email__change">
             <a class="govuk-link govuk-link--no-visited-state" href="personal/change-email-address/{{ x.id }}">
-              Change
+              Change <span class="govuk-visually-hidden">{{ x.email }}</span>
             </a>
           </div>
         {% endif %}

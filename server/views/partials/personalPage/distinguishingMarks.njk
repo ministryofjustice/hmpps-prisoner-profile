@@ -51,7 +51,7 @@
                                 {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
                                     <div>
                                         <a href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}"
-                                           class="govuk-link govuk-link--no-visited-state">Change</a>
+                                           class="govuk-link govuk-link--no-visited-state">Change <span class="govuk-visually-hidden">{{ type }} {{ loop.index }} of {{ loop.length }} on {{ mark.location }}</span></a>
                                     </div>
                                 {% endif %}
                             </div>
