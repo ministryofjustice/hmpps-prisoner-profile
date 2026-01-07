@@ -3,7 +3,7 @@
 {% from "../../macros/summaryListSectionHeading.njk" import summaryListSectionHeading %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% macro identityNumbersWithComment(identityNumbers, options) %}
+{% macro identityNumbersWithComment(name, identityNumbers, options) %}
   {% set editable = options.editable | default(true) %}
 
   {% if identityNumbers.length > 0 %}
@@ -22,7 +22,7 @@
         </div>
         {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
           <div class="action-link-container">
-            <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change <span class="govuk-visually-hidden">{{ name }} {{ identityNumber.value }}</span></a>
           </div>
         {% endif %}
       </div>
@@ -34,7 +34,7 @@
       </div>
       {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
         <div class="action-link-container">
-          <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change <span class="govuk-visually-hidden">{{ name }} {{ identityNumber.value }}</span></a>
         </div>
       {% endif %}
     </div>
@@ -48,7 +48,7 @@
     {{ "row-updated" if ("'" + id + "-row'") in updatedFields else "" }}
   {% endset %}
   {% if identityNumbers.length > 0 or not options.hideIfEmpty %}
-    {{ summaryListRow(name, identityNumbersWithComment(identityNumbers, options), id, {html: true, classes: rowClasses}) }}
+    {{ summaryListRow(name, identityNumbersWithComment(name, identityNumbers, options), id, {html: true, classes: rowClasses}) }}
   {% endif %}
 {% endmacro %}
 
