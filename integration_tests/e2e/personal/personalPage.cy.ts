@@ -100,18 +100,21 @@ context('When signed in', () => {
     })
 
     it('Hides the next of kin card', () => {
+      const page = Page.verifyOnPage(PersonalPage)
       cy.getDataQa('hidden-next-of-kin').should('exist')
-      cy.getDataQa('hidden-next-of-kin-nav').should('exist')
+      page.sidebarLinks().should('not.contain.text', 'Next of kin')
     })
 
     it('Hides the appearance card', () => {
+      const page = Page.verifyOnPage(PersonalPage)
       cy.getDataQa('hidden-appearance').should('exist')
-      cy.getDataQa('hidden-appearance-nav').should('exist')
+      page.sidebarLinks().should('not.contain.text', 'Appearance')
     })
 
     it('Hides the property card', () => {
+      const page = Page.verifyOnPage(PersonalPage)
       cy.getDataQa('hidden-property').should('exist')
-      cy.getDataQa('hidden-property-nav').should('exist')
+      page.sidebarLinks().should('not.contain.text', 'Property')
     })
 
     it('Hides the fields within personal details', () => {
@@ -282,6 +285,8 @@ context('When signed in', () => {
     context('Property card', () => {
       it('Displays the prisoners property', () => {
         const page = Page.verifyOnPage(PersonalPage)
+        page.sidebarLinks().should('contain.text', 'Property')
+
         page.property().item(0).containerType().should('include.text', 'Valuables')
         page.property().item(0).sealMark().should('include.text', 'MDA646165646')
         page.property().item(0).location().should('include.text', 'Property Box 14')
@@ -297,6 +302,7 @@ context('When signed in', () => {
     context('Emergency contacts and next of kin', () => {
       it('Displays the contacts', () => {
         const page = Page.verifyOnPage(PersonalPage)
+        page.sidebarLinks().should('contain.text', 'Next of kin')
 
         const firstContact = page.contacts().contact(0)
         firstContact.name().should('include.text', 'Bill Doe')
@@ -339,6 +345,8 @@ context('When signed in', () => {
     context('Appearance', () => {
       it('Displays the appearance information', () => {
         const page = Page.verifyOnPage(PersonalPage)
+        page.sidebarLinks().should('contain.text', 'Appearance')
+
         page.appearance().height().should('include.text', '1m')
         page.appearance().weight().should('include.text', '100kg')
         page.appearance().hairColour().should('include.text', 'Brown')

@@ -10,6 +10,7 @@
 %}
 {% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
+{% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 
 {% block body %}
   <div class="govuk-grid-row">
@@ -29,25 +30,25 @@
         <li><a class="govuk-link govuk-link--no-visited-state" href="#personal-details">Personal details</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
-        {%- call conditionallyShow({condition: showNeurodiversity, id: 'neurodiversity'}) -%}
+        {% if showNeurodiversity %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
-        {%- endcall -%}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'appearance-nav'}) -%}
+        {% endif %}
+        {% if inUserCaseload %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
-        {%- endcall -%}
+        {% endif %}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) and editEnabled, id: 'global-numbers-and-email-addresses-nav'}) -%}
+        {% if inUserCaseload and editEnabled %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#phones-and-emails">Phone and email</a></li>
-        {%- endcall -%}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin-nav'}) -%}
+        {% endif %}
+        {% if inUserCaseload %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
-        {%- endcall -%}
-        {%- call conditionallyShow({condition: showSecurity, id: 'security-nav'}) -%}
+        {% endif %}
+        {% if showSecurity %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
-        {%- endcall -%}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'property-nav'}) -%}
+        {% endif %}
+        {% if inUserCaseload %}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
-        {%- endcall -%}
+        {% endif %}
       </ul>
     </div>
     <div class="govuk-grid-column-three-quarters hmpps-profile--personal-content hmpps-full-width-print {{ 'new-arrival' if newArrival72 }}">
