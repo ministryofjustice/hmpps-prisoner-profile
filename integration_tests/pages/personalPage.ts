@@ -7,6 +7,8 @@ export default class PersonalPage extends Page {
 
   activeTab = (): PageElement => cy.get('[data-qa=active-tab]')
 
+  sidebarLinks = (): PageElement => cy.get('.app-sidebar li > a')
+
   personalDetails = () => {
     const cardData = dataQa => cy.get('[data-qa=personal-details]').find(`[data-qa=${dataQa}]`)
     return {
