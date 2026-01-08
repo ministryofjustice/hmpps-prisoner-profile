@@ -32,7 +32,7 @@ export default {
     } else if (prisonerNumber === 'X9999XX') {
       jsonResp = { ...PrisonerOnRemandMockData, prisonerNumber: 'X9999XX', bookingId: 1234568, restrictedPatient }
     }
-    jsonResp = { ...jsonResp, ...overrides }
+    jsonResp = { ...jsonResp, prisonId: restrictedPatient ? 'OUT' : jsonResp.prisonId, ...overrides }
     return stubFor({
       request: {
         method: 'GET',

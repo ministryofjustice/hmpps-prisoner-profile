@@ -318,55 +318,55 @@ context('Overview Page', () => {
     context('Actions', () => {
       it('should display Add case note link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.addCaseNoteActionLink().should('exist')
+        overviewPage.sideBar().actions().addCaseNoteActionLink().should('exist')
       })
 
       it('should display Add appointment link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.addAppointmentActionLink().should('exist')
+        overviewPage.sideBar().actions().addAppointmentActionLink().should('exist')
       })
 
       it('should display Report use of force link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.reportUseOfForceActionLink().should('exist')
+        overviewPage.sideBar().actions().reportUseOfForceActionLink().should('exist')
       })
 
       it('should not display Refer to Pathfinder link or the Pathfinder profile link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.referToPathfinderActionLink().should('not.exist')
-        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('not.exist')
       })
 
       it('should not display Add to SOC link or the SOC profile link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.addToSocActionLink().should('not.exist')
-        overviewPage.socProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().addToSocActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().socProfileInfoLink().should('not.exist')
       })
 
       it('should not display Manage category link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.manageCategoryActionLink().should('not.exist')
+        overviewPage.sideBar().actions().manageCategoryActionLink().should('not.exist')
       })
 
       it('should not display Manage activity allocations link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.manageActivityAllocationsActionLink().should('not.exist')
+        overviewPage.sideBar().actions().manageActivityAllocationsActionLink().should('not.exist')
       })
     })
 
     context('More Info', () => {
       it('should not display probation documents link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.probationDocumentsInfoLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().probationDocumentsInfoLink().should('not.exist')
       })
 
       it('should not display pathfinder profile link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('not.exist')
       })
       it('should not display soc profile link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.socProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().socProfileInfoLink().should('not.exist')
       })
     })
   })
@@ -381,7 +381,7 @@ context('Overview Page', () => {
 
     it('should not display calculate release dates link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.calculateReleaseDatesActionLink().should('not.exist')
+      overviewPage.sideBar().actions().calculateReleaseDatesActionLink().should('not.exist')
     })
   })
 
@@ -398,8 +398,8 @@ context('Overview Page', () => {
 
       it('should not display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
         const overviewPage = visitOverviewPageAlt()
-        overviewPage.referToPathfinderActionLink().should('not.exist')
-        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('not.exist')
       })
     })
   })
@@ -417,8 +417,8 @@ context('Overview Page', () => {
 
       it('should display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
         const overviewPage = visitOverviewPageAlt()
-        overviewPage.referToPathfinderActionLink().should('exist')
-        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('not.exist')
       })
     })
 
@@ -430,8 +430,8 @@ context('Overview Page', () => {
 
       it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.pathfinderProfileInfoLink().should('exist')
-        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
       })
     })
   })
@@ -449,8 +449,8 @@ context('Overview Page', () => {
 
       it('should display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
         const overviewPage = visitOverviewPageAlt()
-        overviewPage.referToPathfinderActionLink().should('exist')
-        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('not.exist')
       })
     })
 
@@ -462,8 +462,8 @@ context('Overview Page', () => {
 
       it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.pathfinderProfileInfoLink().should('exist')
-        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().pathfinderProfileInfoLink().should('exist')
+        overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
       })
     })
   })
@@ -481,8 +481,8 @@ context('Overview Page', () => {
 
       it('should display Add to SOC link, and not the SOC profile link', () => {
         const overviewPage = visitOverviewPageAlt()
-        overviewPage.addToSocActionLink().should('exist')
-        overviewPage.socProfileInfoLink().should('not.exist')
+        overviewPage.sideBar().actions().addToSocActionLink().should('exist')
+        overviewPage.sideBar().moreInfo().socProfileInfoLink().should('not.exist')
       })
     })
 
@@ -494,8 +494,8 @@ context('Overview Page', () => {
 
       it('should display SOC profile link, and not the Add to SOC link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.socProfileInfoLink().should('exist')
-        overviewPage.addToSocActionLink().should('not.exist')
+        overviewPage.sideBar().moreInfo().socProfileInfoLink().should('exist')
+        overviewPage.sideBar().actions().addToSocActionLink().should('not.exist')
       })
     })
   })
@@ -510,7 +510,7 @@ context('Overview Page', () => {
 
     it('should display Manage category link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.manageCategoryActionLink().should('exist')
+      overviewPage.sideBar().actions().manageCategoryActionLink().should('exist')
     })
   })
 
@@ -524,7 +524,7 @@ context('Overview Page', () => {
 
     it('should display Probation documents  link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.probationDocumentsInfoLink().should('exist')
+      overviewPage.sideBar().moreInfo().probationDocumentsInfoLink().should('exist')
     })
   })
 
@@ -538,7 +538,7 @@ context('Overview Page', () => {
 
     it('should display Probation documents  link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.probationDocumentsInfoLink().should('exist')
+      overviewPage.sideBar().moreInfo().probationDocumentsInfoLink().should('exist')
     })
   })
 
@@ -552,7 +552,7 @@ context('Overview Page', () => {
 
     it('Should display the add key worker session buton', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.addKeyWorkerSessionActionLink().should('exist')
+      overviewPage.sideBar().actions().addKeyWorkerSessionActionLink().should('exist')
     })
   })
 
@@ -571,21 +571,10 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    context('Actions', () => {
-      it('should display Add case note link', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.addCaseNoteActionLink().should('exist')
-      })
-
-      it('should not display Add appointment link', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.addAppointmentActionLink().should('not.exist')
-      })
-
-      it('should not display Report use of force link', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.reportUseOfForceActionLink().should('not.exist')
-      })
+    it('Does not display any actions', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.sideBar().visible().should('not.exist')
+      overviewPage.sideBar().hidden().should('exist')
     })
   })
 
@@ -922,7 +911,7 @@ context('Overview Page', () => {
 
     it('should not show the soc action and should show error detail', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.addToSocActionLink().should('not.exist')
+      overviewPage.sideBar().actions().addToSocActionLink().should('not.exist')
       cy.get('[data-qa=actions-unavailable]').should('exist')
     })
   })
@@ -936,7 +925,7 @@ context('Overview Page', () => {
 
     it('should not show the soc action and should show error detail', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.referToPathfinderActionLink().should('not.exist')
+      overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
       cy.get('[data-qa=actions-unavailable]').should('exist')
     })
   })
