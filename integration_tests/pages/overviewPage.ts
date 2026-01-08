@@ -127,33 +127,29 @@ export default class OverviewPage extends Page {
 
   statusList = (): PageElement => cy.get('.hmpps-status-list')
 
-  // Actions
+  // Sidebar
+  sideBar = () => ({
+    visible: (): PageElement => cy.get('[data-qa="visible-overview-side-bar"]'),
+    hidden: (): PageElement => cy.get('[data-qa="hidden-overview-side-bar"]'),
 
-  addCaseNoteActionLink = (): PageElement => cy.get('[data-qa=add-case-note-action-link]')
+    actions: () => ({
+      addCaseNoteActionLink: (): PageElement => cy.get('[data-qa=add-case-note-action-link]'),
+      calculateReleaseDatesActionLink: (): PageElement => cy.get('[data-qa=calculate-release-dates-action-link]'),
+      addAppointmentActionLink: (): PageElement => cy.get('[data-qa=add-appointment-action-link]'),
+      reportUseOfForceActionLink: (): PageElement => cy.get('[data-qa=report-use-of-force-action-link]'),
+      referToPathfinderActionLink: (): PageElement => cy.get('[data-qa=refer-to-pathfinder-action-link]'),
+      addToSocActionLink: (): PageElement => cy.get('[data-qa=add-to-soc-action-link]'),
+      manageCategoryActionLink: (): PageElement => cy.get('[data-qa=manage-category-action-link]'),
+      manageActivityAllocationsActionLink: (): PageElement => cy.get('[data-qa=manage-allocations-link]'),
+      addKeyWorkerSessionActionLink: (): PageElement => cy.getDataQa('add-key-worker-session-action-link'),
+    }),
 
-  calculateReleaseDatesActionLink = (): PageElement => cy.get('[data-qa=calculate-release-dates-action-link]')
-
-  addAppointmentActionLink = (): PageElement => cy.get('[data-qa=add-appointment-action-link]')
-
-  reportUseOfForceActionLink = (): PageElement => cy.get('[data-qa=report-use-of-force-action-link]')
-
-  referToPathfinderActionLink = (): PageElement => cy.get('[data-qa=refer-to-pathfinder-action-link]')
-
-  addToSocActionLink = (): PageElement => cy.get('[data-qa=add-to-soc-action-link]')
-
-  manageCategoryActionLink = (): PageElement => cy.get('[data-qa=manage-category-action-link]')
-
-  manageActivityAllocationsActionLink = (): PageElement => cy.get('[data-qa=manage-allocations-link]')
-
-  addKeyWorkerSessionActionLink = (): PageElement => cy.getDataQa('add-key-worker-session-action-link')
-
-  // More Info
-
-  probationDocumentsInfoLink = (): PageElement => cy.get('[data-qa=probation-documents-info-link]')
-
-  pathfinderProfileInfoLink = (): PageElement => cy.get('[data-qa=pathfinder-profile-info-link]')
-
-  socProfileInfoLink = (): PageElement => cy.get('[data-qa=soc-profile-info-link]')
+    moreInfo: () => ({
+      probationDocumentsInfoLink: (): PageElement => cy.get('[data-qa=probation-documents-info-link]'),
+      pathfinderProfileInfoLink: (): PageElement => cy.get('[data-qa=pathfinder-profile-info-link]'),
+      socProfileInfoLink: (): PageElement => cy.get('[data-qa=soc-profile-info-link]'),
+    }),
+  })
 
   // Offences
 
