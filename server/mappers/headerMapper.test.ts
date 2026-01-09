@@ -24,6 +24,7 @@ describe('HeaderMapping', () => {
         const locationLink = topLinks.find(link => link.heading === 'Location')
         expect(locationLink).toBeDefined()
         expect(locationLink.info).toEqual('1-1-035')
+        expect(locationLink.hiddenLabel).toEqual('location')
         expect(locationLink.url).toEqual(`/prisoner/${PrisonerMockDataA.prisonerNumber}/location-details`)
       })
 
@@ -35,6 +36,7 @@ describe('HeaderMapping', () => {
         const locationLink = topLinks.find(link => link.heading === 'Location')
         expect(locationLink).toBeDefined()
         expect(locationLink.info).toEqual('1-1-015 (Outside)')
+        expect(locationLink.hiddenLabel).toEqual('location')
         expect(locationLink.url).toEqual(`/prisoner/${PrisonerMockDataB.prisonerNumber}/location-details`)
       })
 
@@ -55,27 +57,13 @@ describe('HeaderMapping', () => {
         expect(topLinks.map(link => link.heading)).not.toContain('Category')
       })
 
-      it('should show category link with "View category" label when only read permission is granted', () => {
+      it('should show category link if permitted', () => {
         mockPermissions({ [PersonPrisonCategoryPermission.read]: true })
         const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
 
         const categoryLink = topLinks.find(link => link.heading === 'Category')
         expect(categoryLink).toBeDefined()
-        expect(categoryLink.hiddenLabel).toBe('View category')
-        expect(categoryLink.url).toBe(`${config.serviceUrls.incentives}/${PrisonerMockDataA.bookingId}`)
-      })
-
-      it('should show category link with "Manage category" label when both read and edit permissions are granted', () => {
-        mockPermissions({
-          [PersonPrisonCategoryPermission.read]: true,
-          [PersonPrisonCategoryPermission.edit]: true,
-        })
-
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
-
-        const categoryLink = topLinks.find(link => link.heading === 'Category')
-        expect(categoryLink).toBeDefined()
-        expect(categoryLink.hiddenLabel).toBe('Manage category')
+        expect(categoryLink.hiddenLabel).toBe('category')
         expect(categoryLink.url).toBe(`${config.serviceUrls.incentives}/${PrisonerMockDataA.bookingId}`)
       })
     })
@@ -97,7 +85,6 @@ describe('HeaderMapping', () => {
         const csra = topLinks.find(link => link.heading === 'CSRA')
         expect(csra).toBeDefined()
         expect(csra.info).toBe('High')
-        expect(csra.hiddenLabel).toBeUndefined()
         expect(csra.url).toBeUndefined()
       })
 
@@ -111,7 +98,7 @@ describe('HeaderMapping', () => {
         const csraLink = topLinks.find(link => link.heading === 'CSRA')
         expect(csraLink).toBeDefined()
         expect(csraLink.info).toBe('High')
-        expect(csraLink.hiddenLabel).toBe('View CSRA history')
+        expect(csraLink.hiddenLabel).toBe('CSRA')
         expect(csraLink.url).toBe(`/prisoner/${PrisonerMockDataA.prisonerNumber}/csra-history`)
       })
     })
@@ -134,7 +121,6 @@ describe('HeaderMapping', () => {
       const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
       expect(incentiveLink).toBeDefined()
       expect(incentiveLink.info).toBe('Standard')
-      expect(incentiveLink.hiddenLabel).toBeUndefined()
       expect(incentiveLink.url).toBeUndefined()
     })
 
@@ -149,7 +135,7 @@ describe('HeaderMapping', () => {
       const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
       expect(incentiveLink).toBeDefined()
       expect(incentiveLink.info).toBe('Standard')
-      expect(incentiveLink.hiddenLabel).toBe('View incentive level details')
+      expect(incentiveLink.hiddenLabel).toBe('incentive level')
       expect(incentiveLink.url).toBe(
         `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       )
