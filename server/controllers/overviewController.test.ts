@@ -429,13 +429,13 @@ describe('overviewController', () => {
   })
 
   describe('statuses', () => {
-    it('should get statuses for Current Location and Recognised Listener', async () => {
+    it('should get statuses for Current Location and Recognised listener', async () => {
       await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -455,7 +455,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Out from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Out from Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -481,7 +481,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Outside - released from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Outside - released from Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -505,7 +505,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Being transferred' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Being transferred' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -538,7 +538,7 @@ describe('overviewController', () => {
 
         const suitableMatcher = (displaySuitable ? expect.arrayContaining : expect.not.arrayContaining)([
           expect.objectContaining({
-            label: 'Suitable Listener',
+            label: 'Suitable listener',
           }),
         ])
         expect(res.render).toHaveBeenCalledWith(
@@ -548,7 +548,7 @@ describe('overviewController', () => {
 
         const recognisedMatcher = (displayRecognised ? expect.arrayContaining : expect.not.arrayContaining)([
           expect.objectContaining({
-            label: 'Recognised Listener',
+            label: 'Recognised listener',
           }),
         ])
         expect(res.render).toHaveBeenCalledWith(
@@ -575,7 +575,7 @@ describe('overviewController', () => {
                 subTextHref: expect.any(String),
                 prominent: true,
               },
-              { label: 'Recognised Listener' },
+              { label: 'Recognised listener' },
             ],
           }),
         )
@@ -596,7 +596,7 @@ describe('overviewController', () => {
                 subText: 'Try again later',
                 error: true,
               },
-              { label: 'Recognised Listener' },
+              { label: 'Recognised listener' },
             ],
           }),
         )

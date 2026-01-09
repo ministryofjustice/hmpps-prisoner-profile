@@ -48,11 +48,11 @@ function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus {
   const suitable = getProfileInformationValue(ProfileInformationType.SuitableListener, inmateDetail.profileInformation)
 
   if (recognised === BooleanString.Yes) {
-    return { label: 'Recognised Listener' }
+    return { label: 'Recognised listener' }
   }
 
   if (suitable === BooleanString.Yes) {
-    return { label: 'Suitable Listener' }
+    return { label: 'Suitable listener' }
   }
 
   return null

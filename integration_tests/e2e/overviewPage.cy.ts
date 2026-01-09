@@ -296,9 +296,10 @@ context('Overview Page', () => {
     context('Statuses', () => {
       it('Displays the status list', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.statusList().should('exist')
-        overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
-        overviewPage.statusList().contains('li > p', 'Scheduled transfer')
+        overviewPage.statusList().find('li').should('have.length', 3)
+        overviewPage.statusList().find('li').eq(0).should('contain.text', 'In Moorland (HMP & YOI)')
+        overviewPage.statusList().find('li').eq(1).should('contain.text', 'Recognised listener')
+        overviewPage.statusList().find('li').eq(2).should('contain.text', 'Scheduled transfer')
         overviewPage.statusList().should('not.contain.text', 'Additional needs')
       })
 
