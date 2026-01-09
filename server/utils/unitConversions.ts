@@ -17,16 +17,16 @@ export const feetAndInchesToCentimetres = (feet: number, inches: number): number
 }
 
 // Kg and Stone
-export const kilogramsToStoneAndPounds = (kilograms: number): { stone: number; pounds: number } => {
+export const kilogramsToStoneAndPounds = (kilograms: number): { stone: number; pounds: number; poundsOnly: number } => {
   const stoneTotal = kilograms / 6.35
   const stone = Math.floor(stoneTotal)
   const pounds = Math.round((stoneTotal % 1) * 14)
 
-  if (pounds === 14) {
-    return { stone: stone + 1, pounds: 0 }
+  return {
+    stone: pounds === 14 ? stone + 1 : stone,
+    pounds: pounds === 14 ? 0 : pounds,
+    poundsOnly: stone * 14 + pounds,
   }
-
-  return { stone, pounds }
 }
 
 export const stoneAndPoundsToKilograms = (stones: number, pounds: number): number => {

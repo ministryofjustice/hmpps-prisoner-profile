@@ -52,37 +52,79 @@ context('Edit weight (Imperial)', () => {
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
-  editPageTests<EditWeight>({
-    prisonerNumber,
-    prisonerName,
-    bookingId,
-    testSetup: () => {
-      cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser] })
-      cy.setupComponentsData()
-      cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-      cy.task('stubPersonalCareNeeds')
-      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
-    },
-    editUrl: `prisoner/${prisonerNumber}/personal/weight/imperial`,
-    validInputs: [{ textInputs: { stone: '5', pounds: '3' } }],
-    invalidInputs: [
-      {
-        testDescription: 'Invalid',
-        input: { textInputs: { stone: 'Example', pounds: '5' } },
-        errorMessages: ['Weight must only contain numbers'],
+  context('Stone and pounds', () => {
+    const stoneAndPounds = { imperialWeightOption: 'stoneAndPounds' }
+
+    editPageTests<EditWeight>({
+      prisonerNumber,
+      prisonerName,
+      bookingId,
+      testSetup: () => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
+        cy.setupComponentsData()
+        cy.setupBannerStubs({ prisonerNumber, bookingId })
+        cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+        cy.task('stubPersonalCareNeeds')
+        cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
       },
-      {
-        testDescription: 'Invalid',
-        input: { textInputs: { stone: '5', pounds: 'Example' } },
-        errorMessages: ['Weight must only contain numbers'],
+      editUrl: `prisoner/${prisonerNumber}/personal/weight/imperial`,
+      validInputs: [{ radioInputs: stoneAndPounds, textInputs: { stone: '5', pounds: '3' } }],
+      invalidInputs: [
+        {
+          testDescription: 'Non numeric stone value',
+          input: { radioInputs: stoneAndPounds, textInputs: { stone: 'Example', pounds: '5' } },
+          errorMessages: ['Weight must only contain numbers'],
+        },
+        {
+          testDescription: 'Non numeric pounds value',
+          input: { radioInputs: stoneAndPounds, textInputs: { stone: '5', pounds: 'Example' } },
+          errorMessages: ['Weight must only contain numbers'],
+        },
+      ],
+      editPageWithTitle: EditWeight,
+      editPageTitle: 'Weight',
+      successfulFlashMessage: 'Weight updated',
+      redirectAnchor: 'weight',
+      isUnrestricted: true,
+    })
+  })
+
+  context('Pounds only', () => {
+    const poundsOnly = { imperialWeightOption: 'poundsOnly' }
+
+    editPageTests<EditWeight>({
+      prisonerNumber,
+      prisonerName,
+      bookingId,
+      testSetup: () => {
+        cy.task('reset')
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
+        cy.setupComponentsData()
+        cy.setupBannerStubs({ prisonerNumber, bookingId })
+        cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+        cy.task('stubPersonalCareNeeds')
+        cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
       },
-    ],
-    editPageWithTitle: EditWeight,
-    editPageTitle: 'Weight',
-    successfulFlashMessage: 'Weight updated',
-    redirectAnchor: 'weight',
-    isUnrestricted: true,
+      editUrl: `prisoner/${prisonerNumber}/personal/weight/imperial`,
+      validInputs: [{ radioInputs: poundsOnly, textInputs: { poundsOnly: '150' } }],
+      invalidInputs: [
+        {
+          testDescription: 'Non numeric pounds value',
+          input: { radioInputs: poundsOnly, textInputs: { poundsOnly: 'Example' } },
+          errorMessages: ['Weight must only contain numbers'],
+        },
+        {
+          testDescription: 'Value outside acceptable range',
+          input: { radioInputs: poundsOnly, textInputs: { poundsOnly: '1401' } },
+          errorMessages: ['Weight must be between 28 and 1400 pounds'],
+        },
+      ],
+      editPageWithTitle: EditWeight,
+      editPageTitle: 'Weight',
+      successfulFlashMessage: 'Weight updated',
+      redirectAnchor: 'weight',
+      isUnrestricted: true,
+    })
   })
 })

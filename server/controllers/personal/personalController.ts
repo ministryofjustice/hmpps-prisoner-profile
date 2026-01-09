@@ -337,12 +337,18 @@ export default class PersonalController {
 
           const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
-          const { stone, pounds } =
+          const { stone, pounds, poundsOnly } =
             weight === undefined || weight === null
-              ? { stone: undefined, pounds: undefined }
+              ? { stone: undefined, pounds: undefined, poundsOnly: undefined }
               : kilogramsToStoneAndPounds(weight)
 
-          const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
+          const requestBodyFlash = requestBodyFromFlash<{
+            stone: string
+            pounds: string
+            poundsOnly: string
+            imperialWeightOption: string
+          }>(req)
+
           const errors = req.flash('errors')
 
           await this.auditService.sendPageView({
@@ -358,6 +364,8 @@ export default class PersonalController {
             errors,
             stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
             poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
+            poundsOnlyValue: requestBodyFlash ? requestBodyFlash.poundsOnly : poundsOnly,
+            imperialWeightOption: requestBodyFlash ? requestBodyFlash.imperialWeightOption : 'stoneAndPounds',
             miniBannerData,
           })
         },
@@ -366,23 +374,35 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
-          const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
+          const {
+            stone: stoneString,
+            pounds: poundsString,
+            poundsOnly: poundsOnlyString,
+            imperialWeightOption,
+          }: { stone: string; pounds: string; poundsOnly: string; imperialWeightOption: string } = req.body
 
           const { weight: previousWeight } = await this.personalPageService.getPhysicalAttributes(
             clientToken,
             prisonerNumber,
           )
 
+          const stoneAndPoundsUsed = imperialWeightOption === 'stoneAndPounds'
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
-          const weight = stoneAndPoundsToKilograms(stone, pounds)
+          const poundsOnly = poundsOnlyString && poundsOnlyString ? parseInt(poundsOnlyString, 10) : 0
+
+          const weight = stoneAndPoundsToKilograms(
+            stoneAndPoundsUsed ? stone : 0,
+            stoneAndPoundsUsed ? pounds : poundsOnly,
+          )
+
           return this.submit({
             req,
             res,
             prisonerNumber,
             submit: async () => {
               await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-                weight: !stoneString && !poundsString ? null : weight,
+                weight: !stoneString && !poundsString && !poundsOnlyString ? null : weight,
               })
             },
             fieldData: weightImperialFieldData,
