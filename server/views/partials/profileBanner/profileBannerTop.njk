@@ -62,8 +62,8 @@
         </div>
         <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName.lastCommaFirst }}</h2>
         <div class="info">
-          <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
-            {{ prisonerNumber }}
+          <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number">
+            {{ prisonerNumber }} <span class="govuk-visually-hidden"> prison number</span>
           </p>
           <div class="info__links">
             {% for link in  profileBannerTopLinks %}
@@ -72,7 +72,9 @@
                 {% if  link.url === undefined %}
                   <span data-qa="prisoner-csra-info-without-link" class="hmpps-white-font">{{ link.info }}</span>
                 {% else %}
-                  <a data-qa="prisoner-csra-info-with-link" href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
+                  <a data-qa="prisoner-csra-info-with-link" href="{{ link.url }}" class="govuk-link govuk-link--inverse">
+                    {{ link.info }}<span class="govuk-visually-hidden"> {{ link.hiddenLabel }}</span>
+                  </a>
                 {% endif %}
               </div>
             {% endfor %}

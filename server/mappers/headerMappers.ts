@@ -31,7 +31,7 @@ export function mapProfileBannerTopLinks(
 
     profileBannerTopLinks.push({
       heading: 'Location',
-      hiddenLabel: 'View location details',
+      hiddenLabel: 'location',
       info: location,
       classes: '',
       url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
@@ -41,9 +41,7 @@ export function mapProfileBannerTopLinks(
   if (isGranted(PersonPrisonCategoryPermission.read, prisonerPermissions)) {
     profileBannerTopLinks.push({
       heading: 'Category',
-      hiddenLabel: isGranted(PersonPrisonCategoryPermission.edit, prisonerPermissions)
-        ? 'Manage category'
-        : 'View category',
+      hiddenLabel: 'category',
       info: formatCategoryCodeDescription(prisonerData.category, inmateDetail.category),
       classes: '',
       url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
@@ -53,9 +51,7 @@ export function mapProfileBannerTopLinks(
   if (isGranted(PrisonerSpecificRisksPermission.read_csra_rating, prisonerPermissions)) {
     profileBannerTopLinks.push({
       heading: 'CSRA',
-      hiddenLabel: isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions)
-        ? 'View CSRA history'
-        : undefined,
+      hiddenLabel: 'CSRA',
       info: prisonerData.csra ? prisonerData.csra : 'Not entered',
       classes: '',
       url: isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions)
@@ -67,9 +63,7 @@ export function mapProfileBannerTopLinks(
   if (isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)) {
     profileBannerTopLinks.push({
       heading: 'Incentive level',
-      hiddenLabel: isGranted(PrisonerIncentivesPermission.read_incentive_level_history, prisonerPermissions)
-        ? 'View incentive level details'
-        : undefined,
+      hiddenLabel: 'incentive level',
       info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
       classes: 'remove-column-gutter-right',
       url: isGranted(PrisonerIncentivesPermission.read_incentive_level_history, prisonerPermissions)
