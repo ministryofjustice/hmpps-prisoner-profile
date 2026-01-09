@@ -24,6 +24,14 @@ export const weightMetricValidator: Validator = (body: Record<string, string>) =
 }
 
 export const weightImperialValidator: Validator = (body: Record<string, string>) => {
+  const { imperialWeightOption } = body
+
+  return imperialWeightOption === 'stoneAndPounds'
+    ? weightImperialStoneAndPoundsValidator(body)
+    : weightImperialPoundsOnlyValidator(body)
+}
+
+const weightImperialStoneAndPoundsValidator: Validator = (body: Record<string, string>) => {
   const { stone: stoneString, pounds: poundsString } = body
 
   if ((stoneString && !containsOnlyNumbers(stoneString)) || (poundsString && !containsOnlyNumbers(poundsString))) {
@@ -44,6 +52,24 @@ export const weightImperialValidator: Validator = (body: Record<string, string>)
 
   if (stone < 2 || stone > 100 || (stone === 100 && pounds > 0)) {
     return [{ text: 'Weight must be between 2 stone and 100 stone', href: '#stone' }]
+  }
+
+  return []
+}
+
+const weightImperialPoundsOnlyValidator: Validator = (body: Record<string, string>) => {
+  const { poundsOnly: poundsOnlyString } = body
+
+  if (!poundsOnlyString) return []
+
+  if (!containsOnlyNumbers(poundsOnlyString)) {
+    return [{ text: 'Weight must only contain numbers', href: '#poundsOnly' }]
+  }
+
+  const poundsOnly = parseInt(poundsOnlyString, 10)
+
+  if (poundsOnly < 28 || poundsOnly > 1400) {
+    return [{ text: 'Weight must be between 28 and 1400 pounds', href: '#poundsOnly' }]
   }
 
   return []
