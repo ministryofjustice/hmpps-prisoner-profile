@@ -73,8 +73,7 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
     },
     rejected(): OverviewStatus {
       return {
-        label: 'Additional needs unavailable',
-        subText: 'Try again later',
+        label: 'Additional needs information is currently unavailable. Try again later.',
         error: true,
       }
     },

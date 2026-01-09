@@ -592,8 +592,7 @@ describe('overviewController', () => {
             statuses: [
               { label: 'In Moorland (HMP & YOI)' },
               {
-                label: 'Additional needs unavailable',
-                subText: 'Try again later',
+                label: 'Additional needs information is currently unavailable. Try again later.',
                 error: true,
               },
               { label: 'Recognised listener' },

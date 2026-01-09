@@ -307,6 +307,7 @@ context('Overview Page', () => {
         cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', response: prisonerHasNeedsMock })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.statusList().find('li').should('have.length', 4)
         overviewPage.statusList().should('contain.text', 'Additional needs')
         overviewPage
           .statusList()
@@ -770,8 +771,12 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage.statusList().should('exist')
-      overviewPage.statusList().contains('li > p', 'Additional needs unavailable')
+      overviewPage.statusList().find('li').should('have.length', 4)
+      overviewPage
+        .statusList()
+        .find('li')
+        .eq(1)
+        .should('contain.text', 'Additional needs information is currently unavailable')
     })
   })
 

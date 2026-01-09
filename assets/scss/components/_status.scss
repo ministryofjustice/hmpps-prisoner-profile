@@ -1,5 +1,3 @@
-@use 'sass:color';
-
 .hmpps-status-list {
   display: flex;
   flex-wrap: wrap;
@@ -14,9 +12,10 @@
   display: inline-grid;
   align-content: center;
   height: 70px;
+  max-width: 14em;
   padding: 0 15px;
   background-color: govuk-colour('light-grey');
-  border-left: 8px solid govuk-colour('mid-grey');
+  border-left: 6px solid govuk-colour('mid-grey');
 
   p {
     @include govuk-font($size: 19, $weight: 'bold');
@@ -30,11 +29,23 @@
   }
 
   &--error {
+    background-color: transparent;
     border-left-color: govuk-colour('red');
+
+    p {
+      @include govuk-font($size: 16);
+    }
   }
 
   &--prominent {
-    background-color: color.adjust(govuk-colour('light-blue'), $lightness: 38%);
+    background-color: govuk-tint(govuk-colour("blue"), 90%);
     border-left-color: govuk-colour('light-blue');
+
+    a, a:visited {
+      color: #1c5791; // NB: custom colour for increased contrast
+    }
+    a:focus {
+      color: $govuk-text-colour;
+    }
   }
 }
