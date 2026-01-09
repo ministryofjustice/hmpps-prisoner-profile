@@ -72,7 +72,6 @@ interface CategorySummary {
 
 export interface OverviewStatus {
   label: string
-  date?: string
   subText?: string
   subTextHref?: string
   error?: boolean

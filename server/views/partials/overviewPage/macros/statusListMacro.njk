@@ -3,12 +3,7 @@
     {% for status in statuses %}
       <li class="hmpps-status {% if status.error %}hmpps-status--error{% elif status.prominent %}hmpps-status--prominent{% endif %}">
         <p>{{ status.label }}</p>
-        {% if status.date %}
-          <p>
-            Last Updated:
-            <span aria-label="{{ status.date | formatDate }}">{{ status.date | formatDate('short') }}</span>
-          </p>
-        {% elseif status.subText %}
+        {% if status.subText %}
           <p>
             {% if status.subTextHref %}
               <a href="{{ status.subTextHref }}" class="govuk-link--no-visited-state">{{ status.subText }}</a>
