@@ -21,6 +21,7 @@
 
 .hmpps-profile-banner {
   padding: 0 15px;
+  overflow-wrap: anywhere;
 
   .hmpps-profile-banner-top {
     padding: 30px 30px 15px 30px;
@@ -169,10 +170,6 @@
 
     .govuk-grid-column-three-quarters {
       padding-left: govuk-spacing(4);
-
-      .hmpps-profile-prisoner-name {
-        margin-top: 2px;
-      }
 
       @media (min-width: 961px) and (max-width: 1152px) {
         margin-top: govuk-spacing(7);
