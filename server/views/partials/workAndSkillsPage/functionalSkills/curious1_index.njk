@@ -15,7 +15,7 @@ This will be replaced by the Curious 2 equivalent
                     rows: [list.type, list.date, list.location]
                 }) }}
                 {% if(loop.last === false) %}
-                    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6" />
+                    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6" aria-hidden="true" />
                 {% endif %}
             {% endfor %}
         {% else %}

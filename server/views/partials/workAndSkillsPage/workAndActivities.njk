@@ -9,7 +9,7 @@
         <div class="govuk-grid-column-full" data-qa="current-activities">
           <h3 class="govuk-heading-s">Current activities</h3>
           {% if(offenderActivitiesHistory.activitiesHistory.length > 0) %}
-            <hr class="govuk-section-break govuk-section-break--visible" />
+            <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
             {{
               govukSummaryList({
               classes: "hmpps-font-weight-normal",
@@ -51,7 +51,7 @@
         <div class="govuk-grid-column-full">
           <h3 class="govuk-heading-s">Unacceptable absences</h3>
 
-          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-third">
               <h3 class="govuk-heading-s">Last 30 days</h3>
@@ -61,7 +61,7 @@
             </div>
           </div>
           {% if(unacceptableAbsences.unacceptableAbsenceLastSixMonths === 0) %}
-            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
             <p data-qa="unacceptable-absence-last-six-months">
               {{ workAndSkillsPrisonerName }} has no unacceptable absences in the last 6 months.
             </p>
