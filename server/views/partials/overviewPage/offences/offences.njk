@@ -8,30 +8,30 @@
         <p>
             {{offencesOverview.mainOffenceDescription or 'Not entered'}}
         </p>
-        <hr class="govuk-section-break govuk-section-break--visible" />
+        <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Imprisonment status</p>
         <p> {{ offencesOverview.imprisonmentStatusDescription}}</p>
         {% if courtCaseSummary.nextCourtAppearance.date %}
-            <hr class="govuk-section-break govuk-section-break--visible" />
+            <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
             <p data-qa="overview-next-court-appearance" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Next court appearance</p>
             <p> {{ courtCaseSummary.nextCourtAppearance.date | formatDate }}</p>
         {% endif %}
         {% if offencesOverview.confirmedReleaseDate %}
-            <hr class="govuk-section-break govuk-section-break--visible" />
+            <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
             <p data-qa="overview-confirmed-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Confirmed release date</p>
             <p data-qa="overview-confirmed-release"> {{ offencesOverview.confirmedReleaseDate | formatDate}}</p>
             {{ govukInsetText({
                 text: "This person is currently due to be released from prison on this date."
             }) }}
         {% elseif offencesOverview.fullStatus.legalStatus !== "REMAND" and offencesOverview.conditionalReleaseDate %}
-            <hr class="govuk-section-break govuk-section-break--visible" />
+            <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
             <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Conditional release date (CRD)</p>
             <p data-qa="overview-conditional-release"> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>
             {{ govukInsetText({
                 text: "This person may be released earlier if they are approved for release under another scheme, such as Home Detention Curfew. Any ongoing court cases may also change their release date."
             }) }}
         {% endif %}
-        <hr class="govuk-section-break govuk-section-break--visible" />
+        <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
         <p class="govuk-body govuk-!-margin-top-4">
             <a data-qa="overview-offences-view-all" href="/prisoner/{{offencesOverview.fullStatus.nomsId}}/offences" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
             {% if offencesOverview.fullStatus.legalStatus == "REMAND"%}
