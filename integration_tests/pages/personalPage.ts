@@ -69,10 +69,10 @@ export default class PersonalPage extends Page {
   identityNumbers = () => {
     const cardData = dataQa => cy.get('[data-qa=identity-numbers]').find(`[data-qa=${dataQa}]`)
     return {
-      justiceNumbersHeading: () => cardData('justice-numbers-section-heading'),
-      personalNumbersHeading: () => cardData('personal-numbers-section-heading'),
-      homeOfficeNumbersHeading: () => cardData('home-office-numbers-section-heading'),
-      additionalNumbersHeading: () => cardData('additional-identity-numbers-section-heading'),
+      justiceNumbersHeading: () => cardData('justice-numbers-heading'),
+      personalNumbersHeading: () => cardData('personal-numbers-heading'),
+      homeOfficeNumbersHeading: () => cardData('home-office-numbers-heading'),
+      additionalNumbersHeading: () => cardData('additional-identity-numbers-heading'),
       prisonNumber: () => cardData('prison-number'),
       pncNumber: () => cardData('pnc'),
       croNumber: () => cardData('cro'),

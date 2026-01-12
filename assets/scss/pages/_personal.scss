@@ -98,7 +98,7 @@
     }
   }
 
-  .govuk-summary-list__section-heading {
+  .govuk-summary-list__heading {
     display: table-row;
 
     h3 {
@@ -107,13 +107,23 @@
       padding-bottom: 10px;
     }
 
-    &:first-of-type  h3 {
-      padding-top: 10px;
-    }
-
     a {
       display: table-cell;
       text-align: right;
+    }
+  }
+
+  #identity-numbers dl {
+    .govuk-summary-list__row {
+      border-bottom: 1px solid $govuk-border-colour;
+    }
+
+    &:first-of-type h3 {
+      padding-top: 10px;
+    }
+
+    &:last-of-type .govuk-summary-list__row:last-of-type {
+      border-bottom: none;
     }
   }
 }
