@@ -75,7 +75,12 @@ services:
       - PORT=3002
 
   app:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_NUMBER: "1.0.0"
+        GIT_REF: "a1b2c3"
+        GIT_BRANCH: main
     networks:
       - hmpps
     depends_on: [redis]
