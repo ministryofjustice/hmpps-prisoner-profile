@@ -2,17 +2,10 @@ import { Request, RequestHandler, Response } from 'express'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
-import {
-  centimetresToFeetAndInches,
-  feetAndInchesToCentimetres,
-  kilogramsToStoneAndPounds,
-  stoneAndPoundsToKilograms,
-} from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
   apostrophe,
-  convertToTitleCase,
   formatName,
   objectToRadioOptions,
   objectToSelectOptions,
@@ -32,15 +25,12 @@ import {
   addPhoneNumberFieldData,
   changeEmailAddressTextFieldData,
   changePhoneNumberFieldData,
-  cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
   domesticStatusFieldData,
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
-  heightFieldData,
-  heightImperialFieldData,
   nationalityFieldData,
   numberOfChildrenFieldData,
   PhysicalAttributesTextFieldData,
@@ -49,8 +39,6 @@ import {
   sexualOrientationFieldData,
   smokerOrVaperFieldData,
   TextFieldData,
-  weightFieldData,
-  weightImperialFieldData,
 } from './fieldData'
 import logger from '../../../logger'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -156,284 +144,6 @@ export default class PersonalController {
         useCustomErrorBanner: true,
       })
     }
-  }
-
-  height(): Record<'metric' | 'imperial', PersonalControllerRequestHandlers> {
-    const { pageTitle, fieldName, auditEditPageLoad } = heightFieldData
-
-    return {
-      metric: {
-        edit: async (req, res) => {
-          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
-          const requestBodyFlash = requestBodyFromFlash<{ editField: string }>(req)
-          const errors = req.flash('errors')
-
-          const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-
-          await this.auditService.sendPageView({
-            user: res.locals.user,
-            prisonerNumber,
-            prisonId,
-            correlationId: req.id,
-            page: auditEditPageLoad,
-          })
-
-          res.render('pages/edit/heightMetric', {
-            pageTitle: `${pageTitle} - Prisoner personal details`,
-            errors,
-            fieldValue: requestBodyFlash ? requestBodyFlash.editField : height,
-            miniBannerData,
-          })
-        },
-
-        submit: async (req, res) => {
-          const { prisonerNumber } = req.params
-          const { clientToken } = req.middleware
-          const { editField } = req.body
-          const user = res.locals.user as PrisonUser
-
-          const height = editField ? parseInt(editField, 10) : 0
-
-          const { height: previousHeight } = await this.personalPageService.getPhysicalAttributes(
-            clientToken,
-            prisonerNumber,
-          )
-
-          return this.submit({
-            req,
-            res,
-            prisonerNumber,
-            submit: async () => {
-              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-                height: editField ? height : null,
-              })
-            },
-            fieldData: heightFieldData,
-            auditDetails: { fieldName, previous: previousHeight, updated: height },
-          })
-        },
-      },
-
-      imperial: {
-        edit: async (req, res) => {
-          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
-
-          const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-
-          const { feet, inches } =
-            height === undefined || height === null
-              ? { feet: undefined, inches: undefined }
-              : centimetresToFeetAndInches(height)
-
-          const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
-          const errors = req.flash('errors')
-
-          await this.auditService.sendPageView({
-            user: res.locals.user,
-            prisonerNumber,
-            prisonId,
-            correlationId: req.id,
-            page: auditEditPageLoad,
-          })
-
-          res.render('pages/edit/heightImperial', {
-            pageTitle: `${pageTitle} - Prisoner personal details`,
-            errors,
-            feetValue: requestBodyFlash ? requestBodyFlash.feet : feet,
-            inchesValue: requestBodyFlash ? requestBodyFlash.inches : inches,
-            miniBannerData,
-          })
-        },
-
-        submit: async (req, res) => {
-          const { prisonerNumber } = req.params
-          const { clientToken } = req.middleware
-          const user = res.locals.user as PrisonUser
-          const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
-
-          const { height: previousHeight } = await this.personalPageService.getPhysicalAttributes(
-            clientToken,
-            prisonerNumber,
-          )
-
-          const feet = feetString ? parseInt(feetString, 10) : 0
-          const inches = inchesString ? parseInt(inchesString, 10) : 0
-          const height = feetAndInchesToCentimetres(feet, inches)
-          return this.submit({
-            req,
-            res,
-            prisonerNumber,
-            submit: async () => {
-              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-                height: !feetString && !inchesString ? null : height,
-              })
-            },
-            fieldData: heightImperialFieldData,
-            auditDetails: { fieldName, previous: previousHeight, updated: height },
-          })
-        },
-      },
-    }
-  }
-
-  weight(): Record<'metric' | 'imperial', PersonalControllerRequestHandlers> {
-    const { pageTitle, fieldName, auditEditPageLoad } = weightFieldData
-
-    return {
-      metric: {
-        edit: async (req, res) => {
-          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
-          const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
-          const errors = req.flash('errors')
-
-          const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-
-          await this.auditService.sendPageView({
-            user: res.locals.user,
-            prisonerNumber,
-            prisonId,
-            correlationId: req.id,
-            page: Page.EditWeight,
-          })
-
-          res.render('pages/edit/weightMetric', {
-            pageTitle: `${pageTitle} - Prisoner personal details`,
-            errors,
-            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : weight,
-            miniBannerData,
-          })
-        },
-
-        submit: async (req, res) => {
-          const { prisonerNumber } = req.params
-          const { clientToken } = req.middleware
-          const user = res.locals.user as PrisonUser
-          const { kilograms } = req.body
-          const weight = parseInt(kilograms, 10)
-
-          const { weight: previousWeight } = await this.personalPageService.getPhysicalAttributes(
-            clientToken,
-            prisonerNumber,
-          )
-
-          return this.submit({
-            req,
-            res,
-            prisonerNumber,
-            submit: async () => {
-              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-                weight: kilograms ? weight : null,
-              })
-            },
-            fieldData: weightFieldData,
-            auditDetails: { fieldName, previous: previousWeight, updated: weight },
-          })
-        },
-      },
-
-      imperial: {
-        edit: async (req, res) => {
-          const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
-
-          const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-
-          const { stone, pounds, poundsOnly } =
-            weight === undefined || weight === null
-              ? { stone: undefined, pounds: undefined, poundsOnly: undefined }
-              : kilogramsToStoneAndPounds(weight)
-
-          const requestBodyFlash = requestBodyFromFlash<{
-            stone: string
-            pounds: string
-            poundsOnly: string
-            imperialWeightOption: string
-          }>(req)
-
-          const errors = req.flash('errors')
-
-          await this.auditService.sendPageView({
-            user: res.locals.user,
-            prisonerNumber,
-            prisonId,
-            correlationId: req.id,
-            page: auditEditPageLoad,
-          })
-
-          res.render('pages/edit/weightImperial', {
-            pageTitle: `${pageTitle} - Prisoner personal details`,
-            errors,
-            stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
-            poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
-            poundsOnlyValue: requestBodyFlash ? requestBodyFlash.poundsOnly : poundsOnly,
-            imperialWeightOption: requestBodyFlash ? requestBodyFlash.imperialWeightOption : 'stoneAndPounds',
-            miniBannerData,
-          })
-        },
-
-        submit: async (req, res) => {
-          const { prisonerNumber } = req.params
-          const { clientToken } = req.middleware
-          const user = res.locals.user as PrisonUser
-          const {
-            stone: stoneString,
-            pounds: poundsString,
-            poundsOnly: poundsOnlyString,
-            imperialWeightOption,
-          }: { stone: string; pounds: string; poundsOnly: string; imperialWeightOption: string } = req.body
-
-          const { weight: previousWeight } = await this.personalPageService.getPhysicalAttributes(
-            clientToken,
-            prisonerNumber,
-          )
-
-          const stoneAndPoundsUsed = imperialWeightOption === 'stoneAndPounds'
-          const stone = stoneString ? parseInt(stoneString, 10) : 0
-          const pounds = poundsString ? parseInt(poundsString, 10) : 0
-          const poundsOnly = poundsOnlyString && poundsOnlyString ? parseInt(poundsOnlyString, 10) : 0
-
-          const weight = stoneAndPoundsToKilograms(
-            stoneAndPoundsUsed ? stone : 0,
-            stoneAndPoundsUsed ? pounds : poundsOnly,
-          )
-
-          return this.submit({
-            req,
-            res,
-            prisonerNumber,
-            submit: async () => {
-              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-                weight: !stoneString && !poundsString && !poundsOnlyString ? null : weight,
-              })
-            },
-            fieldData: weightImperialFieldData,
-            auditDetails: { fieldName, previous: previousWeight, updated: weight },
-          })
-        },
-      },
-    }
-  }
-
-  cityOrTownOfBirthTextInput = () =>
-    this.textInput(
-      () => cityOrTownOfBirthFieldData,
-      this.getCityOrTownOfBirth.bind(this),
-      this.setCityOrTownOfBirth.bind(this),
-    )
-
-  private async getCityOrTownOfBirth(req: Request): Promise<string> {
-    return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
-  }
-
-  private async setCityOrTownOfBirth(
-    req: Request,
-    res: Response,
-    _fieldData: TextFieldData,
-    value: string,
-  ): Promise<void> {
-    const { prisonerNumber } = req.params
-    const { clientToken } = req.middleware
-    const user = res.locals.user as PrisonUser
-    await this.personalPageService.updateCityOrTownOfBirth(clientToken, user, prisonerNumber, value)
   }
 
   physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
@@ -1399,7 +1109,7 @@ export default class PersonalController {
       edit: async (req, res, next) => {
         const { prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const sexualOrientationReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
           CorePersonRecordReferenceDataDomain.sexualOrientation,

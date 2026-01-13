@@ -2,7 +2,7 @@ import {
   AllBodyPartSelection,
   BodyPartSelection,
   MarkTypeSelection,
-} from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+} from '../../controllers/interfaces/distinguishingMarks/SelectionTypes'
 
 type BodyPartConfig = {
   tab: string

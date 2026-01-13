@@ -1,7 +1,7 @@
 import { IdentifierMappings } from '../../data/constants/identifierMappings'
 import HmppsError from '../../interfaces/HmppsError'
 import { AddIdentityNumberSubmission } from '../../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
-import { EditIdentityNumberSubmission } from '../../controllers/identityNumbersController'
+import { EditIdentityNumberSubmission } from '../../controllers/personal/edit/identityNumbers/identityNumbersController'
 import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifierType'
 import { pncFormatValidator } from './identity-numbers/pncFormatValidator'
 import { croFormatValidator } from './identity-numbers/croFormatValidator'

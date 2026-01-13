@@ -27,7 +27,7 @@ import bannerMiddleware from './middleware/bannerMiddleware'
 import logger from '../logger'
 import config from './config'
 import { warningMiddleware, warningRenderMiddleware } from './middleware/warningMiddleware'
-import { distinguishingMarksMulterExceptions } from './routes/distinguishingMarksRouter'
+import { distinguishingMarksMulterExceptions } from './routes/personal/edit/distinguishingMarksRouter'
 import unless from './utils/unless'
 import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
 

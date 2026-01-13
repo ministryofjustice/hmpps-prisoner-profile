@@ -5,7 +5,7 @@ import {
   updateLocationValidator,
   updatePhotoValidator,
 } from './distinguishingMarksValidator'
-import { allBodyParts } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import { allBodyParts } from '../../controllers/interfaces/distinguishingMarks/SelectionTypes'
 import MulterFile from '../../controllers/interfaces/MulterFile'
 
 describe('Distinguishing Marks Validators', () => {

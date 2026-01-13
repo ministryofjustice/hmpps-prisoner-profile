@@ -2,7 +2,7 @@ import {
   allBodyParts,
   bodyPartMap,
   bodyPartSelections,
-} from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+} from '../../controllers/interfaces/distinguishingMarks/SelectionTypes'
 import MulterFile from '../../controllers/interfaces/MulterFile'
 
 interface MulterFiles {
