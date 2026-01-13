@@ -7,12 +7,11 @@
   "scripts": {
     "prepare": "hmpps-precommit-hooks-prepare",
     "watch-ts": "tsc -w",
-    "build": "node esbuild/esbuild.config.js --build",
+    "build": "node esbuild/esbuild",
     "start": "node $NODE_OPTIONS dist/server.js | bunyan -o short",
-    "start:dev": "concurrently -k -p \"[{name}]\" -n \"ESBuild,Node\" -c \"yellow.bold,cyan.bold\" \"node esbuild/esbuild.config.js --build --watch\" \"node esbuild/esbuild.config.js --dev-server\"",
+    "start:dev": "node esbuild/esbuild --watch",
     "start-feature": "node $NODE_DEBUG_OPTION --env-file=feature.env dist/server.js | bunyan -o short",
-    "start-feature:dev": "concurrently -k -p \"[{name}]\" -n \"ESBuild,Node\" -c \"yellow.bold,cyan.bold\" \"node esbuild/esbuild.config.js  --build --watch \" \"node esbuild/esbuild.config.js --dev-test-server\"",
-    "record-build-info": "node ./bin/record-build-info",
+    "start-feature:dev": "node esbuild/esbuild --watch --env feature.env",
     "lint": "eslint . --cache --max-warnings 0",
     "lint-fix": "eslint . --cache --max-warnings 0 --fix",
     "typecheck": "tsc && tsc -p integration_tests",
@@ -26,8 +25,8 @@
     "integration-test-2": "cypress run --spec \"**/personal/editDistinguishingMarks/**/*.cy.ts\"",
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
     "clean": "rm -rf dist test_results",
-    "rebuild": "npm run clean && npm i && npm run build",
-    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml",
+    "rebuild": "npm run clean && npm run setup && npm run build",
+    "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml --gitleaks-ignore-path .gitleaks/.gitleaksignore",
     "precommit:lint": "lint-staged",
     "precommit:verify": "npm run typecheck && npm test",
     "setup": "npm ci && hmpps-npm-script-run-allowlist"
@@ -108,17 +107,15 @@
     "audit-ci": "^7.1.0",
     "aws-sdk-client-mock": "^4.1.0",
     "cheerio": "^1.1.2",
-    "chokidar": "^4.0.3",
-    "concurrently": "^9.2.1",
     "cookie-session": "^2.1.1",
     "cypress": "^15.8.2",
     "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
+    "del": "8.0.1",
     "esbuild": "^0.27.2",
-    "esbuild-plugin-clean": "^1.0.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
-    "esbuild-sass-plugin": "^3.3.1",
+    "esbuild-sass-plugin": "^3.6.0",
     "jest": "^30.2.0",
     "jest-html-reporter": "^4.3.0",
     "jest-junit": "^16.0.0",
@@ -132,10 +129,5 @@
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "uuid": "^11.1.0"
-  },
-  "overrides": {
-    "nunjucks": {
-      "chokidar": "$chokidar"
-    }
   }
 }
