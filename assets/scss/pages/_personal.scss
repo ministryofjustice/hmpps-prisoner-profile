@@ -146,6 +146,7 @@
 
     dt {
       width: auto;
+      padding-right: 0;
       margin: 0;
 
       @include govuk-media-query($from: tablet) {
@@ -172,6 +173,7 @@
     .govuk-summary-list__value {
       border-bottom: none;
       @include govuk-media-query($from: tablet) {
+        margin-left: 20px;
         grid-column: 2;
         border-bottom: solid 1px $govuk-border-colour;
       }
