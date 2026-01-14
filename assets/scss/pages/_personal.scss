@@ -115,7 +115,12 @@
 #identity-numbers {
   .govuk-summary-list__heading {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
+
+    @media (min-width: 40.0625em) {
+      flex-direction: row;
+    }
 
     h3, .action-link-container {
       padding-top: 30px;
@@ -130,14 +135,23 @@
 
   .govuk-summary-list__row {
     display: grid;
-    grid-template-columns: 30% 57% 13%;
     padding-top: 10px;
     border-bottom: 1px solid $govuk-border-colour;
 
+    grid-template-columns: 1fr;
+
+    @media (min-width: 40.0625em) {
+      grid-template-columns: 30% 57% 13%;
+    }
+
     dt {
-      grid-row: 1 / span 3;
       width: auto;
       margin: 0;
+
+      @media (min-width: 40.0625em) {
+        grid-row: 1 / span 3;
+        grid-column: auto;
+      }
     }
 
     dd {
@@ -148,7 +162,7 @@
     }
 
     .no-bottom-border {
-      border-bottom: none;
+      border-bottom: none !important;
     }
 
     &:first-of-type h3 {
@@ -156,13 +170,20 @@
     }
 
     .govuk-summary-list__value {
-      grid-column: 2;
+      border-bottom: none;
+      @media (min-width: 40.0625em) {
+        grid-column: 2;
+        border-bottom: solid 1px $govuk-border-colour;
+      }
     }
 
     .govuk-summary-list__actions {
-      grid-column: 3;
       width: 100%;
       padding-right: 0;
+
+      @media (min-width: 40.0625em) {
+        grid-column: 3;
+      }
     }
   }
 
