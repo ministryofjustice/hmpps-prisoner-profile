@@ -78,6 +78,14 @@
         svg {
           fill: govuk-colour('black');
         }
+
+        @media (forced-colors: active) and (prefers-color-scheme: dark) {
+          background-color: govuk-colour('yellow');
+
+          svg {
+            fill: govuk-colour('black');
+          }
+        }
       }
     }
   }
