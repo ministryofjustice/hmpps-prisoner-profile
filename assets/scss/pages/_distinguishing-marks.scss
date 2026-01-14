@@ -219,7 +219,7 @@ label.govuk-link {
 
   td:last-child {
     padding-right: 0;
-    @media (min-width: 40.0625em) {
+    @include govuk-media-query($from: tablet) {
       width: 20%;
       text-align: right;
     }
