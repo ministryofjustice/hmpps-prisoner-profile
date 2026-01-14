@@ -67,13 +67,6 @@
         cursor: pointer;
         outline: none;
 
-        .hmpps-datepicker-icon {
-          height: 32px;
-          padding: 0;
-          position: static;
-          width: 24px;
-        }
-
         &:hover {
           background-color: rgba(govuk-colour('yellow'), .5);
         }
@@ -83,6 +76,13 @@
           border-bottom: 4px solid govuk-colour('black');
         }
       }
+    }
+
+    .hmpps-datepicker__dialog__navbutton__icon {
+      height: 32px;
+      padding: 0;
+      position: static;
+      width: 24px;
     }
 
     &__table {
