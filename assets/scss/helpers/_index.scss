@@ -58,7 +58,7 @@
   background-color: govuk-colour('light-grey');
 }
 
-@media (min-width: 40.0625em) {
+@include govuk-media-query($from: tablet) {
   .hmpps-conditional-summary-row {
     display: table-row-group;
   }
