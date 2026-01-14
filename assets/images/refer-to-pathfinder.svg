@@ -1,5 +1,11 @@
 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g fill="#0B0C0C">
+<style>
+:root {color: #0B0C0C}
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root {color: #F3F2F1}
+}
+</style>
+<g fill="currentColor">
 <path d="M21.2765 22V18.7235H18V17.2765H21.2765V14H22.7235V17.2765H26V18.7235H22.7235V22H21.2765Z"/>
 <path d="M21.2765 22V18.7235H18V17.2765H21.2765V14H22.7235V17.2765H26V18.7235H22.7235V22H21.2765Z"/>
 <path d="M9.97157 6C8.88397 6 8 6.89294 8 7.99157C8 8.73794 8.40846 9.38825 9.012 9.72942V34.9988H10.9311V9.72942C11.5347 9.38825 11.9431 8.73794 11.9431 7.99157C11.9431 6.89294 11.0592 6 9.97157 6Z"/>

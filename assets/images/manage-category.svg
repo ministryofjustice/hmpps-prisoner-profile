@@ -1,5 +1,11 @@
 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g stroke="#0B0C0C" stroke-width="2">
+<style>
+:root {color: #0B0C0C}
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root {color: #F3F2F1}
+}
+</style>
+<g stroke="currentColor" stroke-width="2">
 <rect x="5" y="27" width="22" height="6" rx="3"/>
 <rect x="9" y="17" width="22" height="6" rx="3"/>
 <rect x="13" y="7" width="22" height="6" rx="3"/>
