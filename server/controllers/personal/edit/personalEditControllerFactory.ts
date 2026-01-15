@@ -5,6 +5,7 @@ import WeightController from './weight/weightController'
 import CityOrTownOfBirthController from './cityOrTownOfBirth/cityOrTownOfBirthController'
 import ShoeSizeController from './shoeSize/shoeSizeController'
 import SmokerOrVaperController from './smokerOrVaper/smokerOrVaperController'
+import NationalityController from './nationality/nationalityController'
 
 export default function personalEditControllerFactory(
   personalPageService: PersonalPageService,
@@ -16,5 +17,6 @@ export default function personalEditControllerFactory(
     cityOrTownOfBirthController: new CityOrTownOfBirthController(personalPageService, auditService),
     shoeSizeController: new ShoeSizeController(personalPageService, auditService),
     smokerOrVaperController: new SmokerOrVaperController(personalPageService, auditService),
+    nationalityController: new NationalityController(personalPageService, auditService),
   }
 }

@@ -10,11 +10,11 @@ import MulterFile from '../controllers/interfaces/MulterFile'
 import {
   BodyPartId,
   BodyPartSideId,
+  DistinguishingMarkRequest,
   MarkTypeId,
   PartOrientationId,
-  PersonIntegrationDistinguishingMark,
-  DistinguishingMarkRequest,
   PersonIntegrationApiClient,
+  PersonIntegrationDistinguishingMark,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
