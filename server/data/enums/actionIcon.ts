@@ -1,4 +1,11 @@
-export enum Icon {
+/**
+ * Collection of 40×40 action SVG icons in `/assets/images/actions`.
+ * Used by DPS components:
+ * - action button
+ * - actions block
+ * - mini actions block
+ */
+export enum ActionIcon {
   AddAlert = 'add-alert',
   AddAppointment = 'add-appointment',
   AddCaseNote = 'add-case-note',
@@ -18,4 +25,4 @@ export enum Icon {
   ReportUseOfForce = 'report-use-of-force',
 }
 
-export default { Icon }
+export default { Icon: ActionIcon }

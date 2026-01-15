@@ -12,7 +12,7 @@ import {
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
-import { Icon } from '../../../data/enums/icon'
+import { ActionIcon } from '../../../data/enums/actionIcon'
 import { includesActiveCaseLoad } from '../../../utils/utils'
 import conf from '../../../config'
 import isServiceNavEnabled from '../../../utils/isServiceEnabled'
@@ -36,7 +36,7 @@ export default (
   if (isGranted(CaseNotesPermission.edit, permissions)) {
     actions.push({
       text: 'Add case note',
-      icon: Icon.AddCaseNote,
+      icon: ActionIcon.AddCaseNote,
       url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
       dataQA: 'add-case-note-action-link',
     })
@@ -45,7 +45,7 @@ export default (
   if (isServiceNavEnabled('my-key-worker-allocations', feComponentsSharedData)) {
     actions.push({
       text: 'Add key worker session',
-      icon: Icon.AddKeyWorkerSession,
+      icon: ActionIcon.AddKeyWorkerSession,
       url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA`,
       dataQA: 'add-key-worker-session-action-link',
     })
@@ -54,7 +54,7 @@ export default (
   if (isServiceNavEnabled('my-personal-officer-allocations', feComponentsSharedData)) {
     actions.push({
       text: 'Add personal officer entry',
-      icon: Icon.AddKeyWorkerSession,
+      icon: ActionIcon.AddKeyWorkerSession,
       url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=REPORT&subType=POE`,
       dataQA: 'add-personal-officer-entry-action-link',
     })
@@ -63,7 +63,7 @@ export default (
   if (isGranted(PrisonerSchedulePermission.edit_appointment, permissions)) {
     actions.push({
       text: 'Add appointment',
-      icon: Icon.AddAppointment,
+      icon: ActionIcon.AddAppointment,
       url: addAppointmentUrl,
       dataQA: 'add-appointment-action-link',
     })
@@ -75,7 +75,7 @@ export default (
   ) {
     actions.push({
       text: 'Report use of force',
-      icon: Icon.ReportUseOfForce,
+      icon: ActionIcon.ReportUseOfForce,
       url: `${config.serviceUrls.useOfForce}/report/${prisonerData.bookingId}/report-use-of-force`,
       dataQA: 'report-use-of-force-action-link',
     })
@@ -87,7 +87,7 @@ export default (
   ) {
     actions.push({
       text: 'Log an activity application',
-      icon: Icon.LogActivityApplication,
+      icon: ActionIcon.LogActivityApplication,
       url: `${config.serviceUrls.activities}/waitlist/${prisonerData.prisonerNumber}/apply`,
       dataQA: 'log-an-activity-application-link',
     })
@@ -96,7 +96,7 @@ export default (
   if (isGranted(PathfinderPermission.edit, permissions) && !pathfinderNominal) {
     actions.push({
       text: 'Refer to Pathfinder',
-      icon: Icon.ReferToPathfinder,
+      icon: ActionIcon.ReferToPathfinder,
       url: `${config.serviceUrls.pathfinder}/refer/offender/${prisonerData.prisonerNumber}`,
       dataQA: 'refer-to-pathfinder-action-link',
     })
@@ -105,7 +105,7 @@ export default (
   if (isGranted(SOCPermission.edit, permissions) && !socNominal) {
     actions.push({
       text: 'Add to SOC',
-      icon: Icon.AddToSOC,
+      icon: ActionIcon.AddToSOC,
       url: `${config.serviceUrls.manageSocCases}/refer/offender/${prisonerData.prisonerNumber}`,
       dataQA: 'add-to-soc-action-link',
     })
@@ -114,7 +114,7 @@ export default (
   if (isGranted(PersonPrisonCategoryPermission.edit, permissions)) {
     actions.push({
       text: 'Manage category',
-      icon: Icon.ManageCategory,
+      icon: ActionIcon.ManageCategory,
       url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
       dataQA: 'manage-category-action-link',
     })
@@ -126,7 +126,7 @@ export default (
   ) {
     actions.push({
       text: 'Make CSIP referral',
-      icon: Icon.MakeCSIPReferral,
+      icon: ActionIcon.MakeCSIPReferral,
       url: `${config.serviceUrls.csip}/prisoners/${prisonerData.prisonerNumber}/referral/start`,
       dataQA: 'make-csip-referral-action-link',
     })
@@ -139,7 +139,7 @@ export default (
   ) {
     actions.push({
       text: 'Manage activity allocations',
-      icon: Icon.ManageAllocations,
+      icon: ActionIcon.ManageAllocations,
       url: `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`,
       dataQA: 'manage-allocations-link',
     })

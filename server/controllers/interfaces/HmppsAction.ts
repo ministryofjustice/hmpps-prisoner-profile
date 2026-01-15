@@ -1,8 +1,8 @@
-import type { Icon } from '../../data/enums/icon'
+import type { ActionIcon } from '../../data/enums/actionIcon'
 
 export default interface HmppsAction {
   text: string
   url: string
-  icon: Icon
+  icon: ActionIcon
   dataQA: string
 }
