@@ -63,6 +63,7 @@ export default function routes(services: Services): Router {
   const overviewController = new OverviewController(
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
+    services.dataAccess.supportForAdditionalNeedsApiClientBuilder,
     services.auditService,
     services.offencesService,
     services.moneyService,
@@ -70,7 +71,6 @@ export default function routes(services: Services): Router {
     services.visitsService,
     services.prisonerScheduleService,
     services.incentivesService,
-    services.personalPageService,
     services.offenderService,
     services.professionalContactsService,
     services.csipService,

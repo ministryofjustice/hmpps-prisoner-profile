@@ -125,7 +125,7 @@ export default class OverviewPage extends Page {
 
   // Statuses
 
-  statusList = (): PageElement => cy.get('.hmpps-status-list')
+  statusList = (): PageElement<HTMLUListElement> => cy.get('.hmpps-status-list')
 
   // Sidebar
   sideBar = () => ({

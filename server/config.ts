@@ -308,6 +308,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('COMPONENT_TIMEOUT_DEADLINE', 10000))),
     },
+    supportForAdditionalNeeds: {
+      url: get('SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('SUPPORT_FOR_ADDITIONAL_NEEDS_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('SUPPORT_FOR_ADDITIONAL_NEEDS_TIMEOUT_DEADLINE', 5000)),
+      },
+      agent: new AgentConfig(Number(get('SUPPORT_FOR_ADDITIONAL_NEEDS_TIMEOUT_DEADLINE', 5000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
