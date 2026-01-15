@@ -23,14 +23,16 @@ function previewSelectedImage(component) {
 // Hide the photo preview and show upload controls when 'change' link is clicked
 function showUploadControls(component) {
   const imageInput = component.querySelector('input[type="file"]')
+  const imageFilename = component.querySelector('span[aria-live="polite"]')
   const inputContainer = component.querySelector('#file-upload')
   const previewFilename = component.querySelector('#preview-filename')
   const previewContainer = component.querySelector('#preview-container')
 
   imageInput.value = null
+  imageFilename.innerText = 'No file chosen'
   previewFilename.innerText = ''
   previewContainer.style.display = 'none'
-  inputContainer.style.display = 'flex'
+  inputContainer.style.display = 'initial'
 }
 
 export function fileUploadWithPreview() {

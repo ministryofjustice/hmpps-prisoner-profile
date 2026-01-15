@@ -1,3 +1,8 @@
+import {
+  isGranted,
+  PrisonerIncentivesPermission,
+  PrisonerPermissions,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../../config'
 import { formatDate } from '../../utils/dateHelpers'
 import { pluralise } from '../../utils/pluralise'
@@ -10,6 +15,7 @@ export default (
   incentiveSummary: Result<IncentiveSummary, Error>,
   prisonerNumber: string,
   prisonerDisplayName: string,
+  prisonerPermissions: PrisonerPermissions,
 ): MiniCardData => {
   // if api call failed.
   if (incentiveSummary.status === 'rejected')
@@ -34,7 +40,9 @@ export default (
         },
       ],
       linkLabel: 'Incentive level details',
-      linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
+      linkHref: isGranted(PrisonerIncentivesPermission.read_incentive_level_history, prisonerPermissions)
+        ? `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`
+        : undefined,
     }
 
   const { positiveBehaviourCount, negativeBehaviourCount, nextReviewDate, daysOverdue } = incentiveSummary.getOrNull()
@@ -63,7 +71,9 @@ export default (
           ]
         : []),
     ],
-    linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
+    linkHref: isGranted(PrisonerIncentivesPermission.read_incentive_level_history, prisonerPermissions)
+      ? `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`
+      : undefined,
     linkLabel: 'Incentive level details',
   }
 }

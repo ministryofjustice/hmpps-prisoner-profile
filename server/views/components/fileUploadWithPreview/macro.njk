@@ -4,9 +4,7 @@
   <div data-component="file-upload-with-preview-component" class="hmpps-file-upload-with-preview">
     <div
       id="file-upload"
-      class="hmpps-file-upload-with-preview__upload {{ "
-      hmpps-file-upload-with-preview__upload__hidden" if options.initialPhotoUrl else "
-      hmpps-file-upload-with-preview__upload__visible" }}">
+      class="hmpps-file-upload-with-preview__upload {{ "hmpps-file-upload-with-preview__upload__hidden" if options.initialPhotoUrl else "hmpps-file-upload-with-preview__upload__visible" }}">
       {{ govukFileUpload({
         id: options.id if options.id else "file",
         name: fileUploadName,
@@ -20,7 +18,8 @@
         errorMessage: { text: options.errorMessage } if options.errorMessage,
         attributes: {
           accept: "image/jpeg, image/gif"
-        }
+        },
+        javascript: true
       }) }}
     </div>
     <div

@@ -74,8 +74,17 @@
 
       &:hover, &:focus {
         background-color: govuk-colour('yellow');
+
         svg {
           fill: govuk-colour('black');
+        }
+
+        @media (forced-colors: active) and (prefers-color-scheme: dark) {
+          background-color: govuk-colour('yellow');
+
+          svg {
+            fill: govuk-colour('black');
+          }
         }
       }
     }
@@ -92,12 +101,17 @@
       display: block;
       margin: calc((var(--modal-width) / 2) - 70px) auto auto;
 
-      .spinner_OSmW {
+      .modal__spinner {
         transform-origin: center;
-        animation: spinner_T6mA .75s step-end infinite
+        animation: modal__spinner .75s step-end infinite;
+        fill: govuk-colour('black');
+
+        @media (forced-colors: active) and (prefers-color-scheme: dark) {
+          fill: govuk-colour('white');
+        }
       }
 
-      @keyframes spinner_T6mA {
+      @keyframes modal__spinner {
         8.3% {
           transform: rotate(30deg)
         }

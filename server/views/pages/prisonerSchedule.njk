@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3" aria-hidden="true">
       {% for day in days %}
         <div class="prisoner-schedule__day" data-test="schedule-day">
           <h2 class="govuk-heading-m">{{ day.date }}</h2>
@@ -82,7 +82,7 @@
         </div>
 
         {% if not loop.last %}
-          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true">
         {% endif %}
       {% endfor %}
 

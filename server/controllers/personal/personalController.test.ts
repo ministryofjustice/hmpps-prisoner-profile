@@ -560,8 +560,10 @@ describe('PersonalController', () => {
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightImperial', {
             pageTitle: expect.anything(),
             errors: [],
+            imperialWeightOption: 'stoneAndPounds',
             stoneValue: 15,
             poundsValue: 10,
+            poundsOnlyValue: 220,
             miniBannerData: {
               prisonerNumber,
               prisonerName: 'Last, First',
@@ -588,14 +590,28 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber },
             flash: (key: string) => {
-              return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
+              return key === 'requestBody'
+                ? [
+                    JSON.stringify({
+                      imperialWeightOption: 'poundsOnly',
+                      stone: '5',
+                      pounds: '10',
+                      poundsOnly: '220',
+                    }),
+                  ]
+                : []
             },
             middleware: defaultMiddleware,
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
-            expect.objectContaining({ stoneValue: '5', poundsValue: '10' }),
+            expect.objectContaining({
+              imperialWeightOption: 'poundsOnly',
+              stoneValue: '5',
+              poundsValue: '10',
+              poundsOnlyValue: '220',
+            }),
           )
         })
 
@@ -615,7 +631,7 @@ describe('PersonalController', () => {
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
-            expect.objectContaining({ stoneValue: undefined, poundsValue: undefined }),
+            expect.objectContaining({ stoneValue: undefined, poundsValue: undefined, poundsOnlyValue: undefined }),
           )
         })
 
@@ -648,17 +664,22 @@ describe('PersonalController', () => {
           validRequest = {
             middleware: defaultMiddleware,
             params: { prisonerNumber },
-            body: { stone: '10', pounds: '12' },
+            body: { imperialWeightOption: 'stoneAndPounds', stone: '10', pounds: '12' },
             flash: jest.fn(),
           } as unknown as Request
         })
 
         it.each([
-          { stone: '', pounds: '', updateRequest: { weight: null } },
-          { stone: '5', pounds: '2', updateRequest: { weight: 33 } },
-          { stone: '3', pounds: '', updateRequest: { weight: 19 } },
-        ])('Valid request: %s', async ({ stone, pounds, updateRequest }) => {
-          const request = { ...validRequest, body: { stone, pounds } } as Request
+          // Stone and Pounds:
+          { imperialWeightOption: 'stoneAndPounds', stone: '', pounds: '', updateRequest: { weight: null } },
+          { imperialWeightOption: 'stoneAndPounds', stone: '5', pounds: '2', updateRequest: { weight: 33 } },
+          { imperialWeightOption: 'stoneAndPounds', stone: '3', pounds: '', updateRequest: { weight: 19 } },
+
+          // Pounds only:
+          { imperialWeightOption: 'poundsOnly', poundsOnly: '', updateRequest: { weight: null } },
+          { imperialWeightOption: 'poundsOnly', poundsOnly: '150', updateRequest: { weight: 68 } },
+        ])('Valid request: %s', async ({ imperialWeightOption, stone, pounds, poundsOnly, updateRequest }) => {
+          const request = { ...validRequest, body: { imperialWeightOption, stone, pounds, poundsOnly } } as Request
           await action(request, res, next)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
@@ -686,20 +707,27 @@ describe('PersonalController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/weight/imperial`)
         })
 
-        it('Sends a post success audit event', async () => {
-          const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } } as unknown as Request
-          const expectedAuditEvent = {
-            user: prisonUserMock,
-            prisonerNumber,
-            correlationId: request.id,
-            action: PostAction.EditWeight,
-            details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
-          }
+        it.each(['stoneAndPounds', 'poundsOnly'])(
+          'Sends a post success audit event for update type: %s',
+          async (imperialWeightOption: string) => {
+            const request = {
+              ...validRequest,
+              id: 1,
+              body: { stone: '15', pounds: '2', poundsOnly: '212', imperialWeightOption },
+            } as unknown as Request
+            const expectedAuditEvent = {
+              user: prisonUserMock,
+              prisonerNumber,
+              correlationId: request.id,
+              action: PostAction.EditWeight,
+              details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
+            }
 
-          await action(request, res, next)
+            await action(request, res, next)
 
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
-        })
+            expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          },
+        )
       })
     })
   })

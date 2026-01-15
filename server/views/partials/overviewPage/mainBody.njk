@@ -70,7 +70,7 @@
 
   {% if incentiveSummary and isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) %}
     <div class="govuk-grid-column-one-half">
-      {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
+      {{ miniCard(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName, prisonerPermissions), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
     </div>
   {% endif %}
 </div>
@@ -102,7 +102,10 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'overview-schedule'}) -%}
+    {%- call conditionallyShow({
+      id: 'overview-schedule',
+      condition: isGranted(PrisonerSchedulePermission.read_schedule, prisonerPermissions)
+    }) -%}
       {% include "./schedule/schedule.njk" %}
     {%- endcall -%}
   </div>

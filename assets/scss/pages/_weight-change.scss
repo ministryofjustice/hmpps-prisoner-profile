@@ -1,0 +1,8 @@
+.weight-change__stone-pound-input {
+  display: flex;
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+}

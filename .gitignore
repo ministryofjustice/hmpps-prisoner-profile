@@ -118,7 +118,6 @@ dist
 
 .idea
 .vscode
-build-info.json
 dist/
 test_results/
 integration_tests/videos/

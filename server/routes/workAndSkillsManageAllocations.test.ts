@@ -22,7 +22,7 @@ describe('workAndActivities.njk', () => {
 
   it('should show the "Manage activity allocations" link when canManageAllocations is true', () => {
     const context = {
-      isInUsersCaseLoad: jest.fn().mockReturnValue(true),
+      isGranted: jest.fn().mockReturnValue(true),
       canManageAllocations: true,
       manageAllocationsLinkUrl: '/manage-allocations',
       workAndSkillsPrisonerName: 'John Doe',
@@ -38,7 +38,7 @@ describe('workAndActivities.njk', () => {
 
   it('should not show the "Manage activity allocations" link when canManageAllocations is false', () => {
     const context = {
-      isInUsersCaseLoad: jest.fn().mockReturnValue(true),
+      isGranted: jest.fn().mockReturnValue(true),
       canManageAllocations: false,
       manageAllocationsLinkUrl: '/manage-allocations',
       workAndSkillsPrisonerName: 'John Doe',

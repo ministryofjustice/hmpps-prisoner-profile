@@ -68,6 +68,7 @@ export default (
       dataQA: 'add-appointment-action-link',
     })
   }
+
   if (
     isGranted(UseOfForcePermission.edit, permissions) &&
     !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)

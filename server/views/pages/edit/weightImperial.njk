@@ -2,52 +2,94 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
-    <div class="govuk-!-margin-bottom-4 govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}"/> {% call govukFieldset({
-        legend: {
-          text: "Weight",
-          classes: "govuk-fieldset__legend--l",
-          isPageHeading: true
-        }
-      }) %}
-      {% if errors.length > 0 %}
-        <p id="weight-error" class="govuk-error-message">
-          <span class="govuk-visually-hidden">Error:</span>
-          {{ errors[0].text }}
-        </p>
-      {% endif %}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half">
-          <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-quarter">
-              {{ govukInput({
-                label: {
-                  text: "Stone"
-                },
-                id: "stone",
-                name: "stone",
-                value: stoneValue,
-                classes: "govuk-input--width-3"
-              }) }}
-            </div>
-            <div class="govuk-grid-column-one-quarter">
-              {{ govukInput({
-                label: {
-                  text: "Pounds"
-                },
-                id: "pounds",
-                name: "pounds",
-                value: poundsValue,
-                classes: "govuk-input--width-3"
-              }) }}
-            </div>
+    <div class="govuk-!-margin-bottom-4">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+
+      {% set poundsOnlyHtml %}
+        {{ govukInput({
+          label: {
+            text: "Weight in pounds"
+          },
+          id: "poundsOnly",
+          name: "poundsOnly",
+          value: poundsOnlyValue,
+          classes: "govuk-input--width-10 govuk-!-static-margin-top-1",
+          errorMessage: errors | findError("poundsOnly")
+        }) }}
+      {% endset %}
+
+      {% set stoneAndPoundsError = errors | findError("stone") !== null %}
+
+      {% set stoneAndPoundsHtml %}
+        <div class="govuk-form-group {{ " govuk-form-group--error" if stoneAndPoundsError }}">
+
+          {% if errors | findError("stoneAndPounds") %}
+            <p id="weight-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span>
+              errors | findError("stone")
+            </p>
+          {% endif %}
+
+          <div class="weight-change__stone-pound-input">
+            {{ govukInput({
+              label: {
+                text: "Stone"
+              },
+              id: "stone",
+              name: "stone",
+              value: stoneValue,
+              classes: "govuk-input--width-2" + ( " govuk-input--error" if stoneAndPoundsError else "" )
+            }) }}
+
+            {{ govukInput({
+              label: {
+                text: "Pounds"
+              },
+              id: "pounds",
+              name: "pounds",
+              value: poundsValue,
+              classes: "govuk-input--width-2" + ( " govuk-input--error" if stoneAndPoundsError else "" )
+            }) }}
           </div>
         </div>
-      </div>
-      {% endcall %}
+      {% endset %}
+
+      {{ govukRadios({
+        name: "imperialWeightOption",
+        fieldset: {
+          legend: {
+            text: "Weight",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        hint: {
+          text: "Select a unit of measurement and enter weight."
+        },
+        items: [
+          {
+            value: "stoneAndPounds",
+            text: "Stone and pounds",
+            checked: imperialWeightOption === "stoneAndPounds",
+            conditional: {
+              html: stoneAndPoundsHtml
+            }
+          },
+          {
+            value: "poundsOnly",
+            text: "Pounds",
+            checked: imperialWeightOption === "poundsOnly",
+            conditional: {
+              html: poundsOnlyHtml
+            }
+          }
+        ]
+      }) }}
     </div>
+
     <div class="govuk-button-group govuk-!-margin-bottom-6">
       {{ govukButton({
         text: "Switch to kilograms",
@@ -57,6 +99,7 @@
         attributes: { "data-qa": "convert-units-button" }
       }) }}
     </div>
+
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Save",

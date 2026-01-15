@@ -37,7 +37,10 @@ import supportForAdditionalNeedsApi from './integration_tests/mockApis/supportFo
 
 function preprocessorOptions() {
   const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
-  const options = webpackPreprocessor.defaultOptions
+  const options = webpackPreprocessor.defaultOptions as typeof webpackPreprocessor.defaultOptions & {
+    typescript: string
+    webpackOptions: { resolve: { alias: Record<string, string> } }
+  }
   options.typescript = require.resolve('typescript')
   options.webpackOptions.resolve.alias = {
     bunyan: path.join(replacementModulesPath, 'bunyan.ts'),

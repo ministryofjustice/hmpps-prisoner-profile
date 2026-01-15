@@ -39,12 +39,12 @@ describe('Unit conversions', () => {
   describe('KG/Stone', () => {
     describe('Kilograms to stone and pounds', () => {
       it.each([
-        [null, { stone: 0, pounds: 0 }],
-        [60, { stone: 9, pounds: 6 }],
-        [63, { stone: 9, pounds: 13 }],
-        [63.4, { stone: 10, pounds: 0 }],
-        [63.5, { stone: 10, pounds: 0 }],
-        [64, { stone: 10, pounds: 1 }],
+        [null, { stone: 0, pounds: 0, poundsOnly: 0 }],
+        [60, { stone: 9, pounds: 6, poundsOnly: 132 }],
+        [63, { stone: 9, pounds: 13, poundsOnly: 139 }],
+        [63.4, { stone: 10, pounds: 0, poundsOnly: 140 }],
+        [63.5, { stone: 10, pounds: 0, poundsOnly: 140 }],
+        [64, { stone: 10, pounds: 1, poundsOnly: 141 }],
       ])('%s kg -> %s', (kilograms: number, expectedResult: { stone: number; pounds: number }) => {
         expect(kilogramsToStoneAndPounds(kilograms)).toEqual(expectedResult)
       })
@@ -52,10 +52,10 @@ describe('Unit conversions', () => {
 
     describe('stone and pounds to Kilograms', () => {
       it.each([
-        [{ stone: 0, pounds: 0 }, 0],
-        [{ stone: 9, pounds: 6 }, 60],
-        [{ stone: 9, pounds: 13 }, 63],
-        [{ stone: 10, pounds: 0 }, 64],
+        [{ stone: 0, pounds: 0, poundsOnly: 0 }, 0],
+        [{ stone: 9, pounds: 6, poundsOnly: 132 }, 60],
+        [{ stone: 9, pounds: 13, poundsOnly: 139 }, 63],
+        [{ stone: 10, pounds: 0, poundsOnly: 140 }, 64],
       ])('%s -> %s kg', ({ stone, pounds }: { stone: number; pounds: number }, expectedResult) => {
         expect(stoneAndPoundsToKilograms(stone, pounds)).toEqual(expectedResult)
       })

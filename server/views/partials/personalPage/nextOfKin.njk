@@ -59,7 +59,7 @@
       </div>
     {% endif %}
     {% if not hasNextOfKin and not hasEmergencyContact %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
     {% endif %}
     {% if not hasEmergencyContact %}
       <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
@@ -73,7 +73,7 @@
       </div>
     {% endif %}
     {% if hasNextOfKin !== hasEmergencyContact %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
     {% endif %}
     {% for contact in contacts %}
       <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
@@ -111,7 +111,7 @@
         </div>
       </div>
       {% if not loop.last %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
       {% endif %}
     {% endfor %}
   {% else %}

@@ -55,8 +55,8 @@ export function editPageTests<TPage extends EditPage>(options: {
   let page: TPage
 
   const fillWithInputs = (input: EditPageInput) => {
-    if (input.textInputs) page.fillInTextFields(input.textInputs)
     if (input.radioInputs) page.selectRadios(input.radioInputs)
+    if (input.textInputs) page.fillInTextFields(input.textInputs)
     if (input.checkboxInputs) page.selectCheckboxes(input.checkboxInputs)
     if (input.autocompleteInputs) page.fillInAutocompleteFields(input.autocompleteInputs)
     if (input.addressAutoSuggestInputs) page.fillInAddressAutoSuggestFields(input.addressAutoSuggestInputs)

@@ -1,9 +1,19 @@
+import { PrisonerIncentivesPermission, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import incentiveSummaryToMiniSummary from './incentiveSummaryToMiniSummary'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
 import { unavailablePlaceholder } from '../../utils/utils'
 import { Result } from '../../utils/result/result'
+import mockPermissions from '../../../tests/mocks/mockPermissions'
+
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
+
+const permissions = {} as PrisonerPermissions
 
 describe('incentiveSummaryToMiniSummary', () => {
+  beforeEach(() => {
+    mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level_history]: true })
+  })
+
   it('should return a mini summary object', () => {
     const incentiveSummary = {
       positiveBehaviourCount: 1,
@@ -17,6 +27,7 @@ describe('incentiveSummaryToMiniSummary', () => {
       Result.fulfilled(incentiveSummary),
       prisonerNumber,
       prisonerDisplayName,
+      permissions,
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
@@ -32,6 +43,24 @@ describe('incentiveSummaryToMiniSummary', () => {
     })
   })
 
+  it('should not provide a link if read_incentive_level_history permission not granted', () => {
+    mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level_history]: false })
+
+    const miniSummary = incentiveSummaryToMiniSummary(
+      Result.fulfilled({
+        positiveBehaviourCount: 1,
+        negativeBehaviourCount: 2,
+        nextReviewDate: '2021-01-01',
+        daysOverdue: 1,
+      }),
+      'A1234BC',
+      'John Doe',
+      permissions,
+    )
+
+    expect(miniSummary).toEqual(expect.objectContaining({ linkHref: undefined }))
+  })
+
   it('should pluralise the overdue days', () => {
     const incentiveSummary = {
       positiveBehaviourCount: 1,
@@ -45,6 +74,7 @@ describe('incentiveSummaryToMiniSummary', () => {
       Result.fulfilled(incentiveSummary),
       prisonerNumber,
       prisonerDisplayName,
+      permissions,
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
@@ -73,6 +103,7 @@ describe('incentiveSummaryToMiniSummary', () => {
       Result.fulfilled(incentiveSummary),
       prisonerNumber,
       prisonerDisplayName,
+      permissions,
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
@@ -90,6 +121,7 @@ describe('incentiveSummaryToMiniSummary', () => {
       Result.rejected(new Error('error')),
       prisonerNumber,
       prisonerDisplayName,
+      permissions,
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
