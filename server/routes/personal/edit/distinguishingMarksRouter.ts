@@ -14,7 +14,7 @@ import {
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../../../utils/featureToggles'
-import { allBodyParts } from '../../../controllers/interfaces/distinguishingMarks/SelectionTypes'
+import { allBodyParts } from '../../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import setUpCsrf from '../../../middleware/setUpCsrf'
 import { parameterGuard } from '../../../middleware/parameterGuard'
 

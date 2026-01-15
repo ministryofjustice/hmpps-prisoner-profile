@@ -1,4 +1,4 @@
-import { bodyPartMap, BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/SelectionTypes'
+import { bodyPartMap, BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import { PersonIntegrationDistinguishingMark } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 type DistinguishingMarkDecorated = PersonIntegrationDistinguishingMark & { location: string }

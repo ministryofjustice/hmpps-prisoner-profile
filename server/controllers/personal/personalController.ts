@@ -36,7 +36,6 @@ import {
   RadioFieldData,
   religionFieldData,
   sexualOrientationFieldData,
-  smokerOrVaperFieldData,
   TextFieldData,
 } from './fieldData'
 import logger from '../../../logger'
@@ -54,7 +53,6 @@ import {
   CorePersonRecordReferenceDataDomain,
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
-import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import config from '../../config'
 import { NomisLockedError } from '../../utils/nomisLockedError'
 import getCommonRequestData from '../../utils/getCommonRequestData'
@@ -305,46 +303,6 @@ export default class PersonalController {
         redirectAnchor,
         miniBannerData,
       })
-    }
-  }
-
-  smokerOrVaper(): PersonalControllerRequestHandlers {
-    return {
-      edit: async (req, res, next) => {
-        const { clientToken, naturalPrisonerName } = getCommonRequestData(req, res)
-        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const fieldValue = requestBodyFlash?.radioField || this.getSmokerStatus(req.middleware.inmateDetail)
-        const smokerOrVaperValues = await this.personalPageService.getReferenceDataCodes(
-          clientToken,
-          HealthAndMedicationReferenceDataDomain.smoker,
-        )
-
-        const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
-
-        return this.editRadioFields(`Does ${naturalPrisonerName} smoke or vape?`, smokerOrVaperFieldData, options)(
-          req,
-          res,
-          next,
-        )
-      },
-
-      submit: async (req, res) => {
-        const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const radioField = req.body.radioField || null
-        const previousValue: string = this.getSmokerStatus(req.middleware.inmateDetail)
-        return this.submit({
-          req,
-          res,
-          prisonerNumber,
-          submit: async () => {
-            await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
-          },
-          fieldData: smokerOrVaperFieldData,
-          auditDetails: { fieldName: smokerOrVaperFieldData.fieldName, previous: previousValue, updated: radioField },
-        })
-      },
     }
   }
 
@@ -1580,16 +1538,6 @@ export default class PersonalController {
         onSubmit: globalEmailOnSubmit,
       }),
     }
-  }
-
-  // This will be replaced by a request to the Health and Medication API once it masters this data:
-  getSmokerStatus(inmateDetail: InmateDetail): string {
-    const statusMap: Record<string, string> = {
-      Yes: 'SMOKER_YES',
-      No: 'SMOKER_NO',
-      'Vaper/NRT Only': 'SMOKER_VAPER',
-    }
-    return statusMap[getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)]
   }
 
   private async submit({

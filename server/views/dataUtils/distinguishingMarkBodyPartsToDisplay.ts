@@ -1,4 +1,4 @@
-import { BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/SelectionTypes'
+import { BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 const selectionsToText: Record<BodyPartSelection, string> = {
   face: 'Face and head',

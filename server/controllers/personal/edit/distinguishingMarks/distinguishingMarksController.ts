@@ -9,7 +9,7 @@ import {
   bodyPartSelections,
   MarkTypeSelection,
   markTypeSelections,
-} from '../../../interfaces/distinguishingMarks/SelectionTypes'
+} from '../../../interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from '../../../interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
 import { FlashMessageType } from '../../../../data/enums/flashMessageType'

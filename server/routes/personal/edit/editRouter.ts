@@ -52,8 +52,14 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { heightController, weightController, cityOrTownOfBirthController, shoeSizeController } =
-    personalEditControllerFactory(services.personalPageService, services.auditService)
+  const {
+    heightController,
+    weightController,
+    cityOrTownOfBirthController,
+    shoeSizeController,
+    smokerOrVaperController,
+  } = personalEditControllerFactory(services.personalPageService, services.auditService)
+
   const personalController = new PersonalController(
     services.personalPageService,
     services.careNeedsService,
@@ -315,11 +321,11 @@ export default function editRouter(services: Services): Router {
     path: 'smoker-or-vaper',
     edit: {
       audit: Page.EditSmokerOrVaper,
-      method: personalController.smokerOrVaper().edit,
+      method: smokerOrVaperController.smokerOrVaper().edit,
     },
     submit: {
       audit: Page.PostEditSmokerOrVaper,
-      method: personalController.smokerOrVaper().submit,
+      method: smokerOrVaperController.smokerOrVaper().submit,
     },
     requiredPermission: PersonHealthAndMedicationPermission.edit_smoker,
   })

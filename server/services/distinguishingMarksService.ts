@@ -5,7 +5,7 @@ import {
   AllBodyPartSelection,
   BodyPartSelection,
   MarkTypeSelection,
-} from '../controllers/interfaces/distinguishingMarks/SelectionTypes'
+} from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from '../controllers/interfaces/MulterFile'
 import {
   BodyPartId,
