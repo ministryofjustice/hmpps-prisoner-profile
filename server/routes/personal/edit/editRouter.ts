@@ -17,7 +17,6 @@ import {
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
-  shoeSizeFieldData,
 } from '../../../controllers/personal/fieldData'
 import validationMiddleware, {
   RedirectWithParams,
@@ -47,16 +46,14 @@ import PersonalController from '../../../controllers/personal/personalController
 import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
 import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
 import { parameterGuard } from '../../../middleware/parameterGuard'
-import personalEditControllers from '../../../controllers/personal/edit/personalEditControllerFactory'
+import personalEditControllerFactory from '../../../controllers/personal/edit/personalEditControllerFactory'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { heightController, weightController, cityOrTownOfBirthController } = personalEditControllers(
-    services.personalPageService,
-    services.auditService,
-  )
+  const { heightController, weightController, cityOrTownOfBirthController, shoeSizeController } =
+    personalEditControllerFactory(services.personalPageService, services.auditService)
   const personalController = new PersonalController(
     services.personalPageService,
     services.careNeedsService,
@@ -223,11 +220,11 @@ export default function editRouter(services: Services): Router {
     path: 'shoe-size',
     edit: {
       audit: Page.EditShoeSize,
-      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).edit,
+      method: shoeSizeController.shoeSizeTextInput().edit,
     },
     submit: {
       audit: Page.PostEditShoeSize,
-      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).submit,
+      method: shoeSizeController.shoeSizeTextInput().submit,
       validation: {
         validators: [shoeSizeValidator],
         redirectBackOnError: true,
