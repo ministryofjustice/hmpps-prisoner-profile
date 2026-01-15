@@ -1,16 +1,21 @@
 export enum Icon {
-  AddCaseNote = 'add-case-note',
+  AddAlert = 'add-alert',
   AddAppointment = 'add-appointment',
-  ReportUseOfForce = 'report-use-of-force',
-  ReferToPathfinder = 'refer-to-pathfinder',
-  AddToSOC = 'add-to-soc',
-  ManageCategory = 'manage-category',
+  AddCaseNote = 'add-case-note',
   AddKeyWorkerSession = 'add-key-worker-session',
+  AddNonAssociation = 'add-non-association',
+  AddTemporaryAbsence = 'add-temporary-absence',
+  AddToSOC = 'add-to-soc',
   CalculateReleaseDates = 'calculate-release-dates',
   ChangeCell = 'change-cell',
   LogActivityApplication = 'log-an-activity-appointment',
   MakeCSIPReferral = 'make-csip-referral',
   ManageAllocations = 'manage-allocations',
+  ManageCategory = 'manage-category',
+  MoveToReception = 'move-to-reception',
+  RecordIncentiveReview = 'record-incentive-review',
+  ReferToPathfinder = 'refer-to-pathfinder',
+  ReportUseOfForce = 'report-use-of-force',
 }
 
 export default { Icon }

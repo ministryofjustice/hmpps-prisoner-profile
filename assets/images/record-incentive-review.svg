@@ -1,0 +1,13 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+:root {color: #0B0C0C}
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root {color: #F3F2F1}
+}
+</style>
+<circle cx="28.5" cy="10.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+<circle cx="18.5" cy="21.5" r="4.5" stroke="currentColor" stroke-width="2"/>
+<circle cx="9.5" cy="31.5" r="3.5" stroke="currentColor" stroke-width="2"/>
+<path d="M 15.021484 5.5078125 L 6.8066406 7.7714844 L 8.3808594 9.0839844 L 4.5371094 13.691406 L 8.8535156 17.291016 L 12.695312 12.683594 L 14.269531 13.996094 L 15.021484 5.5078125 z" fill="currentColor"/>
+<path d="m 29.941406,22.732422 -3.894531,4.564453 -1.558594,-1.332031 -0.849609,8.480468 8.240234,-2.171875 -1.558594,-1.330078 3.896485,-4.5625 z" fill="currentColor"/>
+</svg>
