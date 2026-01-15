@@ -67,13 +67,6 @@
         cursor: pointer;
         outline: none;
 
-        .hmpps-datepicker-icon {
-          height: 32px;
-          padding: 0;
-          position: static;
-          width: 24px;
-        }
-
         &:hover {
           background-color: rgba(govuk-colour('yellow'), .5);
         }
@@ -83,6 +76,13 @@
           border-bottom: 4px solid govuk-colour('black');
         }
       }
+    }
+
+    .hmpps-datepicker__dialog__navbutton__icon {
+      height: 32px;
+      padding: 0;
+      position: static;
+      width: 24px;
     }
 
     &__table {
@@ -228,11 +228,6 @@
     padding-right: 56px;
   }
 
-  .hmpps-datepicker-icon {
-    height: 24px;
-    width: 32px;
-  }
-
   .govuk-form-group {
     width: 100%;
   }
@@ -256,20 +251,35 @@
   height: 40px;
   padding-top: 6px;
   border: none;
-  border-bottom: 4px solid govuk-colour('black');
+  border-bottom: 4px solid transparent;
   outline: none;
   cursor: pointer;
 
   &:hover {
     background-color: govuk-colour('mid-grey');
     fill: govuk-colour('black');
-    border-bottom: 4px solid govuk-colour('mid-grey');
   }
 
   &:focus {
     background-color: $govuk-focus-colour;
     fill: $govuk-focus-text-colour;
-    border-bottom: 4px solid govuk-colour('black');
+    border-color: govuk-colour('black');
+  }
+
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    &:hover {
+      fill: govuk-colour('white');
+    }
+
+    &:focus {
+      fill: $govuk-focus-text-colour;
+      border-color: $govuk-focus-text-colour;
+    }
+  }
+
+  .hmpps-datepicker-icon {
+    height: 24px;
+    width: 32px;
   }
 
   @media (max-width: 768px) {
