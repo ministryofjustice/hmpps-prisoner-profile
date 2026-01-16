@@ -7,12 +7,7 @@ import { AuditService, Page, PostAction } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import {
-  domesticStatusFieldData,
-  numberOfChildrenFieldData,
-  RadioFieldData,
-  sexualOrientationFieldData,
-} from './fieldData'
+import { domesticStatusFieldData, numberOfChildrenFieldData, sexualOrientationFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
@@ -27,7 +22,7 @@ import {
   personalisedDietCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { buildCodesMock, eyeColourCodesMock } from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
+import { eyeColourCodesMock } from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import {
@@ -105,184 +100,6 @@ describe('PersonalController', () => {
   describe('displayPersonalPage', () => {
     // Skipped to focus on the edit routes for now
     it.skip('Renders the page with information from the service', () => {})
-  })
-
-  /**
-   * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
-   */
-  describe('physical characteristics radio field', () => {
-    const fieldData: RadioFieldData = {
-      pageTitle: 'Build',
-      fieldName: 'build',
-      code: 'buildCode',
-      domain: CorePersonRecordReferenceDataDomain.build,
-      auditEditPageLoad: 'PAGE' as Page,
-      auditEditPostAction: 'ACTION' as PostAction,
-      url: 'build',
-      redirectAnchor: 'appearance',
-      hintText: 'Hint text',
-    }
-
-    describe('edit', () => {
-      const action: RequestHandler = async (req, response) =>
-        controller.physicalCharacteristicRadioField(fieldData).edit(req, response, next)
-
-      it('Renders the radios edit page with the field data config supplied', async () => {
-        const req = {
-          id: '1',
-          params: { prisonerNumber },
-          flash: (): string[] => [],
-          middleware: defaultMiddleware,
-        } as unknown as Request
-
-        await action(req, res, next)
-
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
-          'token',
-          CorePersonRecordReferenceDataDomain.build,
-        )
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
-        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
-          pageTitle: 'Build - Prisoner personal details',
-          formTitle: 'Build',
-          errors: [],
-          hintText: 'Hint text',
-          options: objectToRadioOptions(buildCodesMock, 'code', 'description'),
-          redirectAnchor: 'appearance',
-          miniBannerData: {
-            prisonerName: 'Last, First',
-            prisonerNumber,
-            cellLocation: '2-3-001',
-            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
-          },
-        })
-      })
-
-      it('Populates the errors from the flash', async () => {
-        const req = {
-          id: '1',
-          params: { prisonerNumber },
-          flash: (key: string) => {
-            if (key === 'errors') return ['error']
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        await action(req, res, next)
-        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
-      })
-
-      it('Selects the correct radio using field value from the flash', async () => {
-        const req = {
-          id: '1',
-          params: { prisonerNumber },
-          flash: (key: string) => {
-            if (key === 'requestBody') return [JSON.stringify({ radioField: 'MEDIUM' })]
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        await action(req, res, next)
-        expect(res.render).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.objectContaining({
-            options: expect.arrayContaining([{ checked: true, text: 'Medium', value: 'MEDIUM' }]),
-          }),
-        )
-      })
-
-      it('Sends a page view audit event', async () => {
-        const req = {
-          id: 1,
-          params: { prisonerNumber },
-          flash: (): string[] => [],
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        const expectedAuditEvent = {
-          user: prisonUserMock,
-          prisonerNumber,
-          prisonId: 999,
-          correlationId: req.id,
-          page: fieldData.auditEditPageLoad,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
-      })
-    })
-
-    describe('submit', () => {
-      let validRequest: Request
-      const action: RequestHandler = async (req, response) =>
-        controller.physicalCharacteristicRadioField(fieldData).submit(req, response, next)
-
-      beforeEach(() => {
-        validRequest = {
-          id: '1',
-          middleware: defaultMiddleware,
-          params: { prisonerNumber },
-          body: { radioField: 'MEDIUM' },
-          flash: jest.fn(),
-        } as unknown as Request
-      })
-
-      it('Updates the physical characteristic', async () => {
-        await action(validRequest, res, next)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-          'token',
-          prisonUserMock,
-          prisonerNumber,
-          {
-            buildCode: 'MEDIUM',
-          },
-        )
-      })
-
-      it('Redirects to the personal page #appearance on success', async () => {
-        await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#appearance`)
-      })
-
-      it('Adds the success message to the flash', async () => {
-        await action(validRequest, res, next)
-
-        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Build updated',
-          type: FlashMessageType.success,
-          fieldName: 'build',
-        })
-      })
-
-      it('Handles API errors', async () => {
-        personalPageService.updatePhysicalAttributes = async () => {
-          throw new Error()
-        }
-
-        await action(validRequest, res, next)
-
-        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/build`)
-      })
-
-      it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
-          user: prisonUserMock,
-          prisonerNumber,
-          correlationId: validRequest.id,
-          action: 'ACTION',
-          details: {
-            fieldName: fieldData.fieldName,
-            previous: corePersonPhysicalAttributesMock.buildCode,
-            updated: 'MEDIUM',
-          },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
-      })
-    })
   })
 
   describe('country of birth', () => {

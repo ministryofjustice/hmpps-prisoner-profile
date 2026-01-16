@@ -47,10 +47,7 @@ import {
   HealthAndMedicationReferenceDataDomain,
   ReferenceDataIdSelection,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import {
-  CorePersonPhysicalAttributesRequest,
-  CorePersonRecordReferenceDataDomain,
-} from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import config from '../../config'
 import { NomisLockedError } from '../../utils/nomisLockedError'
@@ -302,58 +299,6 @@ export default class PersonalController {
         redirectAnchor,
         miniBannerData,
       })
-    }
-  }
-
-  /**
-   * Handler for editing single-value radio fields.
-   *
-   * @param fieldData - config for which physical characteristic to edit
-   *
-   * Handles editing:
-   *   Hair type or colour
-   *   Facial hair
-   *   Face shape
-   *   Build
-   */
-  physicalCharacteristicRadioField(fieldData: RadioFieldData): PersonalControllerRequestHandlers {
-    const { pageTitle, code, domain, fieldName } = fieldData
-    return {
-      edit: async (req, res, next) => {
-        const { clientToken } = req.middleware
-        const { prisonerNumber } = req.params
-        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-
-        const [characteristics, physicalAttributes] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, domain),
-          this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber),
-        ])
-        const fieldValue = requestBodyFlash?.radioField || physicalAttributes[code]
-        const options = objectToRadioOptions(characteristics, 'code', 'description', fieldValue)
-
-        return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
-      },
-
-      submit: async (req, res) => {
-        const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const radioField = req.body.radioField || null
-        const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-        const previousValue = physicalAttributes?.[code as keyof CorePersonPhysicalAttributesRequest]
-        return this.submit({
-          req,
-          res,
-          prisonerNumber,
-          submit: async () => {
-            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              [code]: radioField,
-            })
-          },
-          fieldData,
-          auditDetails: { fieldName, previous: previousValue, updated: radioField },
-        })
-      },
     }
   }
 

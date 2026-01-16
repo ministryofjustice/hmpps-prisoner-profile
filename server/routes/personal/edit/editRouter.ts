@@ -59,6 +59,7 @@ export default function editRouter(services: Services): Router {
     shoeSizeController,
     smokerOrVaperController,
     nationalityController,
+    physicalCharacteristicsController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
@@ -244,11 +245,11 @@ export default function editRouter(services: Services): Router {
     path: 'hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
-      method: personalController.physicalCharacteristicRadioField(hairFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(hairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditHairTypeOrColour,
-      method: personalController.physicalCharacteristicRadioField(hairFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(hairFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -257,11 +258,11 @@ export default function editRouter(services: Services): Router {
     path: 'facial-hair',
     edit: {
       audit: Page.EditFacialHair,
-      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(facialHairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFacialHair,
-      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(facialHairFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -270,11 +271,11 @@ export default function editRouter(services: Services): Router {
     path: 'face-shape',
     edit: {
       audit: Page.EditFaceShape,
-      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFaceShape,
-      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -283,11 +284,11 @@ export default function editRouter(services: Services): Router {
     path: 'build',
     edit: {
       audit: Page.EditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(buildFieldData).edit,
     },
     submit: {
       audit: Page.PostEditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(buildFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
