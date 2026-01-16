@@ -60,6 +60,8 @@ export default function editRouter(services: Services): Router {
     smokerOrVaperController,
     nationalityController,
     physicalCharacteristicsController,
+    eyeColourController,
+    dietAndFoodAllergiesController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
@@ -297,11 +299,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColour().edit,
+      method: eyeColourController.eyeColour().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColour().submit,
+      method: eyeColourController.eyeColour().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -310,11 +312,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour-individual',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColourIndividual().edit,
+      method: eyeColourController.eyeColourIndividual().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColourIndividual().submit,
+      method: eyeColourController.eyeColourIndividual().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -336,11 +338,11 @@ export default function editRouter(services: Services): Router {
     path: 'diet-and-food-allergies',
     edit: {
       audit: Page.EditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().edit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().edit,
     },
     submit: {
       audit: Page.PostEditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().submit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().submit,
       validation: {
         validators: [dietAndFoodAllergiesValidator],
         redirectBackOnError: true,
