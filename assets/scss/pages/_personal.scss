@@ -117,25 +117,24 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-top: 30px;
+    padding-bottom: 10px;
 
     @include govuk-media-query($from: tablet) {
       flex-direction: row;
     }
 
-    h3, .action-link-container {
-      padding-top: 30px;
-      padding-bottom: 10px;
+    h3 {
       margin: 0;
+    }
 
-      &:first-of-type {
-        padding-top: 10px;
-      }
+    &:first-of-type {
+      padding-top: 0;
     }
   }
 
   .govuk-summary-list__row {
     display: grid;
-    padding-top: 10px;
     border-bottom: 1px solid $govuk-border-colour;
 
     grid-template-columns: 1fr;
