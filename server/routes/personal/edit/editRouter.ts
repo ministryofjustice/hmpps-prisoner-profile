@@ -62,6 +62,7 @@ export default function editRouter(services: Services): Router {
     physicalCharacteristicsController,
     eyeColourController,
     dietAndFoodAllergiesController,
+    countryOfBirthController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
@@ -379,11 +380,11 @@ export default function editRouter(services: Services): Router {
     path: 'country-of-birth',
     edit: {
       audit: Page.EditCountryOfBirth,
-      method: personalController.countryOfBirth().edit,
+      method: countryOfBirthController.countryOfBirth().edit,
     },
     submit: {
       audit: Page.PostEditCountryOfBirth,
-      method: personalController.countryOfBirth().submit,
+      method: countryOfBirthController.countryOfBirth().submit,
       validation: {
         validators: [countryOfBirthValidator],
         redirectBackOnError: true,

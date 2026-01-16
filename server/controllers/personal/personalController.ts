@@ -4,14 +4,7 @@ import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
-import {
-  apostrophe,
-  formatName,
-  objectToRadioOptions,
-  objectToSelectOptions,
-  RadioOption,
-  SelectOption,
-} from '../../utils/utils'
+import { apostrophe, formatName, objectToRadioOptions, RadioOption, SelectOption } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import {
@@ -25,7 +18,6 @@ import {
   addPhoneNumberFieldData,
   changeEmailAddressTextFieldData,
   changePhoneNumberFieldData,
-  countryOfBirthFieldData,
   domesticStatusFieldData,
   FieldData,
   numberOfChildrenFieldData,
@@ -289,77 +281,6 @@ export default class PersonalController {
         redirectAnchor,
         miniBannerData,
       })
-    }
-  }
-
-  countryOfBirth(): PersonalControllerRequestHandlers {
-    const { fieldName } = countryOfBirthFieldData
-
-    return {
-      edit: async (req, res, next) => {
-        const { inmateDetail, prisonerData, clientToken } = req.middleware
-        const { firstName, lastName } = prisonerData
-        const { autocompleteField, autocompleteError, radioField } =
-          requestBodyFromFlash<{
-            autocompleteField: string
-            autocompleteError: string
-            radioField: string
-          }>(req) || {}
-        const countryReferenceData = await this.personalPageService.getReferenceDataCodes(
-          clientToken,
-          CorePersonRecordReferenceDataDomain.country,
-        )
-
-        const fieldValue =
-          autocompleteField ||
-          radioField ||
-          countryReferenceData.find(country => country.code === inmateDetail.birthCountryCode)?.code
-
-        const countriesAsRadioOptions = ['ENG', 'SCOT', 'WALES', 'NI']
-          .map(code => countryReferenceData.find(val => val.code === code))
-          .filter(Boolean)
-
-        const countriesAsAutocompleteOptions = countryReferenceData.filter(
-          val => !countriesAsRadioOptions.includes(val),
-        )
-
-        return this.editRadioFieldsWithAutocomplete({
-          formTitle: `What country was ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} born in?`,
-          fieldData: countryOfBirthFieldData,
-          radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
-          autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
-          autocompleteSelected: fieldValue === 'OTHER',
-          autocompleteOptionTitle: 'A country outside the UK',
-          autocompleteOptionLabel: 'Country',
-          autocompleteOptionHint: 'Start typing to select country.',
-          autocompleteError,
-        })(req, res, next)
-      },
-
-      submit: async (req, res) => {
-        const { prisonerNumber } = req.params
-        const { clientToken, inmateDetail } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const radioField = req.body.radioField || null
-        const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
-        const previousValue = inmateDetail.birthCountryCode
-
-        return this.submit({
-          req,
-          res,
-          prisonerNumber,
-          submit: async () => {
-            await this.personalPageService.updateCountryOfBirth(
-              clientToken,
-              user,
-              prisonerNumber,
-              autocompleteField || radioField,
-            )
-          },
-          fieldData: countryOfBirthFieldData,
-          auditDetails: { fieldName, previous: previousValue, updated: autocompleteField || radioField },
-        })
-      },
     }
   }
 
