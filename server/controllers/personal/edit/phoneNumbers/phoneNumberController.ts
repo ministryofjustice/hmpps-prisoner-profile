@@ -11,7 +11,7 @@ import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces
 import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 import { EditControllerRequestHandlers } from '../../../interfaces/EditControllerRequestHandlers'
 
-export default class PhoneNumbersController extends PersonalEditController {
+export default class PhoneNumberController extends PersonalEditController {
   constructor(
     private readonly personalPageService: PersonalPageService,
     protected readonly auditService: AuditService,

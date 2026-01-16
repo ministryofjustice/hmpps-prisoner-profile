@@ -68,6 +68,7 @@ export default function editRouter(services: Services): Router {
     numberOfChildrenController,
     domesticStatusController,
     phoneNumberController,
+    emailAddressController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
@@ -515,11 +516,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-email-address',
     edit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.edit,
+      method: emailAddressController.globalEmails().add.edit,
     },
     submit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.submit,
+      method: emailAddressController.globalEmails().add.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
@@ -532,11 +533,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-email-address/:emailAddressId',
     edit: {
       audit: Page.EditEmailAddress,
-      method: personalController.globalEmails().edit.edit,
+      method: emailAddressController.globalEmails().edit.edit,
     },
     submit: {
       audit: Page.PostEditEmailAddress,
-      method: personalController.globalEmails().edit.submit,
+      method: emailAddressController.globalEmails().edit.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,

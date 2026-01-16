@@ -8,13 +8,13 @@ import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
-import PhoneNumbersController from './phoneNumbersController'
+import PhoneNumberController from './phoneNumberController'
 import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/globalPhonesAndEmails'
 
 describe('PhoneNumbersController', () => {
   let personalPageService: PersonalPageService
   let auditService: AuditService
-  let controller: PhoneNumbersController
+  let controller: PhoneNumberController
   let res: Response
   const next: NextFunction = jest.fn()
 
@@ -40,7 +40,7 @@ describe('PhoneNumbersController', () => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     auditService = auditServiceMock()
 
-    controller = new PhoneNumbersController(personalPageService, auditService)
+    controller = new PhoneNumberController(personalPageService, auditService)
     res = {
       locals: {
         user: prisonUserMock,

@@ -306,7 +306,7 @@ export const changeEmailAddressTextFieldData = (
   ...baseEmailAddressTextFieldData,
   url: `change-email-address/${id}`,
   pageTitle: `Change this person’s email address`,
-  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  formTitle: `Change ${apostrophe(formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast }))} email address`,
   auditEditPageLoad: Page.EditEmailAddress,
   auditEditPostAction: PostAction.EditEmailAddress,
 })
@@ -319,7 +319,7 @@ export const addEmailAddressTextFieldData = ({
   ...baseEmailAddressTextFieldData,
   url: `add-email-address`,
   pageTitle: `Add this person’s email address`,
-  formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  formTitle: `Add ${apostrophe(formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast }))} email address`,
   auditEditPageLoad: Page.AddEmailAddress,
   auditEditPostAction: PostAction.AddEmailAddress,
 })

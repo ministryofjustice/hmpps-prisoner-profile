@@ -8,9 +8,9 @@ import getCommonRequestData from '../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
 import { RadioOption, SelectOption } from '../../../utils/utils'
 
-type TextFieldDataGetter = (req: Request) => TextFieldData
-type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
-type TextFieldSetter = (
+export type TextFieldDataGetter = (req: Request) => TextFieldData
+export type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
+export type TextFieldSetter = (
   req: Request,
   res: Response,
   fieldData: TextFieldData,

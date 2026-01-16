@@ -14,7 +14,8 @@ import ReligionController from './religion/religionController'
 import SexualOrientationController from './sexualOrientation/sexualOrientationController'
 import NumberOfChildrenController from './numberOfChildren/numberOfChildrenController'
 import DomesticStatusController from './domesticStatus/domesticStatusController'
-import PhoneNumbersController from './phoneNumbers/phoneNumbersController'
+import PhoneNumberController from './phoneNumbers/phoneNumberController'
+import EmailAddressController from './emailAddress/emailAddressController'
 
 export default function personalEditControllerFactory(
   personalPageService: PersonalPageService,
@@ -35,6 +36,7 @@ export default function personalEditControllerFactory(
     sexualOrientationController: new SexualOrientationController(personalPageService, auditService),
     numberOfChildrenController: new NumberOfChildrenController(personalPageService, auditService),
     domesticStatusController: new DomesticStatusController(personalPageService, auditService),
-    phoneNumberController: new PhoneNumbersController(personalPageService, auditService),
+    phoneNumberController: new PhoneNumberController(personalPageService, auditService),
+    emailAddressController: new EmailAddressController(personalPageService, auditService),
   }
 }
