@@ -66,6 +66,8 @@ export default function editRouter(services: Services): Router {
     religionController,
     sexualOrientationController,
     numberOfChildrenController,
+    domesticStatusController,
+    phoneNumberController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
@@ -465,11 +467,11 @@ export default function editRouter(services: Services): Router {
     path: 'marital-status',
     edit: {
       audit: Page.EditDomesticStatus,
-      method: personalController.domesticStatus().edit,
+      method: domesticStatusController.domesticStatus().edit,
     },
     submit: {
       audit: Page.PostEditDomesticStatus,
-      method: personalController.domesticStatus().submit,
+      method: domesticStatusController.domesticStatus().submit,
     },
     requiredPermission: PersonalRelationshipsPermission.edit_domestic_status,
   })
@@ -478,11 +480,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-phone-number',
     edit: {
       audit: Page.AddPhoneNumber,
-      method: personalController.globalNumbers().add.edit,
+      method: phoneNumberController.globalNumbers().add.edit,
     },
     submit: {
       audit: Page.PostAddPhoneNumber,
-      method: personalController.globalNumbers().add.submit,
+      method: phoneNumberController.globalNumbers().add.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
@@ -495,11 +497,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-phone-number/:phoneNumberId',
     edit: {
       audit: Page.EditPhoneNumber,
-      method: personalController.globalNumbers().edit.edit,
+      method: phoneNumberController.globalNumbers().edit.edit,
     },
     submit: {
       audit: Page.PostEditPhoneNumber,
-      method: personalController.globalNumbers().edit.submit,
+      method: phoneNumberController.globalNumbers().edit.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,

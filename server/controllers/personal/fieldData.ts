@@ -1,5 +1,5 @@
 import { Page, PostAction } from '../../services/auditService'
-import { formatHeight, formatName, formatWeight } from '../../utils/utils'
+import { apostrophe, formatHeight, formatName, formatWeight } from '../../utils/utils'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
@@ -334,7 +334,7 @@ export const addPhoneNumberFieldData = (name: string): FieldData => ({
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.AddPhoneNumber,
   auditEditPostAction: PostAction.AddPhoneNumber,
-  formTitle: `Add ${name}’s phone number`,
+  formTitle: `Add ${apostrophe(name)} phone number`,
   pageTitle: `Add this person’s phone number`,
   url: `add-phone-number`,
 })
@@ -343,7 +343,7 @@ export const changePhoneNumberFieldData = (id: string, name: string): FieldData 
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.EditPhoneNumber,
   auditEditPostAction: PostAction.EditPhoneNumber,
-  formTitle: `Change ${name}’s phone number`,
+  formTitle: `Change ${apostrophe(name)} phone number`,
   pageTitle: `Change this person’s phone number`,
   url: `change-phone-number/${id}`,
 })

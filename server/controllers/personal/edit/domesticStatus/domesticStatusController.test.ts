@@ -1,21 +1,22 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import PersonalPageService from '../../../../services/personalPageService'
+import { prisonUserMock } from '../../../../data/localMockData/user'
 import { AuditService, Page, PostAction } from '../../../../services/auditService'
-import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
-import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
-import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
+import PersonalPageService from '../../../../services/personalPageService'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
-import { prisonUserMock } from '../../../../data/localMockData/user'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
+import DomesticStatusController from './domesticStatusController'
+import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 import { FlashMessageType } from '../../../../data/enums/flashMessageType'
-import NumberOfChildrenController from './numberOfChildrenController'
-import { numberOfChildrenFieldData } from '../../fieldData'
-import { PersonalRelationshipsNumberOfChildrenMock } from '../../../../data/localMockData/personalRelationshipsApiMock'
+import { domesticStatusFieldData } from '../../fieldData'
+import { PersonalRelationshipsDomesticStatusMock } from '../../../../data/localMockData/personalRelationshipsApiMock'
 
-describe('NumberOfChildrenController', () => {
+describe('NationalityController', () => {
   let personalPageService: PersonalPageService
   let auditService: AuditService
-  let controller: NumberOfChildrenController
+  let controller: DomesticStatusController
   let res: Response
   const next: NextFunction = jest.fn()
 
@@ -39,11 +40,11 @@ describe('NumberOfChildrenController', () => {
 
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
+    personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
 
     auditService = auditServiceMock()
 
-    controller = new NumberOfChildrenController(personalPageService, auditService)
+    controller = new DomesticStatusController(personalPageService, auditService)
     res = {
       locals: {
         user: prisonUserMock,
@@ -60,11 +61,45 @@ describe('NumberOfChildrenController', () => {
     } as unknown as Response
   })
 
-  describe('Number of children', () => {
+  describe('Domestic status', () => {
     describe('Edit', () => {
-      const action: RequestHandler = async (req, response) => controller.numberOfChildren().edit(req, response, next)
+      const action: RequestHandler = async (req, response) => controller.domesticStatus().edit(req, response, next)
+      const referenceData: ReferenceDataCodeDto[] = [
+        {
+          id: '1',
+          code: 'S',
+          description: 'Single',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '2',
+          code: 'M',
+          description: 'Married',
+          listSequence: 99,
+          isActive: true,
+        },
+        {
+          id: '3',
+          code: 'N',
+          description: 'The prefer not to say',
+          listSequence: 99,
+          isActive: true,
+        },
+      ]
 
-      it('Renders the default edit page with the correct data from the prison person API', async () => {
+      beforeEach(() => {
+        personalPageService.getDomesticStatusReferenceData = jest.fn(async () => referenceData)
+      })
+
+      it('Renders the default edit page with the correct data', async () => {
+        const expectedOptions = [
+          { text: 'Single', value: 'S', checked: true },
+          { text: 'Married', value: 'M' },
+          { divider: 'Or' },
+          { text: 'They prefer not to say', value: 'N' },
+        ]
+
         const req = {
           params: { prisonerNumber },
           flash: (): string[] => [],
@@ -72,19 +107,19 @@ describe('NumberOfChildrenController', () => {
         } as unknown as Request
         await action(req, res, next)
 
-        expect(res.render).toHaveBeenCalledWith('pages/edit/children', {
-          pageTitle: 'Children - Prisoner personal details',
-          formTitle: `Does John Saunders have any children?`,
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Marital or civil partnership status - Prisoner personal details',
+          formTitle: `What is John Saunders’ marital or civil partnership status?`,
+          hintText: undefined,
           errors: [],
-          redirectAnchor: 'number-of-children',
+          options: expectedOptions,
+          redirectAnchor: 'marriage-or-civil-partnership-status',
           miniBannerData: {
             cellLocation: '1-1-035',
             prisonerName: 'Saunders, John',
             prisonerNumber,
             prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
           },
-          radioFieldValue: 'YES',
-          currentNumberOfChildren: '2',
         })
       })
 
@@ -101,11 +136,11 @@ describe('NumberOfChildrenController', () => {
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
-      it('Populates the field values from the flash', async () => {
+      it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber },
           flash: (key: string) => {
-            return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
           },
           middleware,
         } as unknown as Request
@@ -113,8 +148,7 @@ describe('NumberOfChildrenController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            radioFieldValue: 'YES',
-            currentNumberOfChildren: '4',
+            options: expect.arrayContaining([expect.objectContaining({ value: 'M', checked: true })]),
           }),
         )
       })
@@ -131,7 +165,7 @@ describe('NumberOfChildrenController', () => {
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
-          page: Page.EditNumberOfChildren,
+          page: Page.EditDomesticStatus,
         }
 
         await action(req, res, next)
@@ -142,85 +176,64 @@ describe('NumberOfChildrenController', () => {
 
     describe('submit', () => {
       let validRequest: Request
-      const action: RequestHandler = async (req, response) => controller.numberOfChildren().submit(req, response, next)
+      const action: RequestHandler = async (req, response) => controller.domesticStatus().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
           id: '1',
           middleware,
           params: { prisonerNumber },
-          body: { hasChildren: 'YES', numberOfChildren: '5' },
+          body: { radioField: 'M' },
           flash: jest.fn(),
         } as unknown as Request
-
-        personalPageService.updateNumberOfChildren = jest.fn()
       })
 
-      it('Updates the number of children', async () => {
+      it('Updates the domestic status', async () => {
         await action(validRequest, res, next)
-        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith(
+        expect(personalPageService.updateDomesticStatus).toHaveBeenCalledWith(
           'token',
           prisonUserMock,
           prisonerNumber,
-          5,
+          'M',
         )
       })
 
-      it(`Updates the number of children to 0 if 'NO' selected as answer`, async () => {
-        await action(
-          {
-            ...validRequest,
-            body: { hasChildren: 'NO' },
-          } as Request,
-          res,
-          next,
-        )
-        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith(
-          'token',
-          prisonUserMock,
-          prisonerNumber,
-          0,
-        )
-      })
-
-      it('Redirects to the personal page #number-of-children on success', async () => {
+      it('Redirects to the personal page #marriage-or-civil-partnership-status on success', async () => {
         await action(validRequest, res, next)
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#number-of-children`)
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/prisoner/${prisonerNumber}/personal#marriage-or-civil-partnership-status`,
+        )
       })
 
       it('Adds the success message to the flash', async () => {
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Number of children updated',
+          text: 'Marital or civil partnership status updated',
           type: FlashMessageType.success,
-          fieldName: 'numberOfChildren',
+          fieldName: 'domesticStatus',
         })
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateNumberOfChildren = async () => {
+        personalPageService.updateDomesticStatus = async () => {
           throw new Error()
         }
 
         await action(validRequest, res, next)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/children`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/marital-status`)
       })
 
       it('Sends a post success audit event', async () => {
-        const request = {
-          ...validRequest,
-          id: 1,
-          body: { hasChildren: 'YES', numberOfChildren: '5' },
-        } as unknown as Request
+        const request = { ...validRequest, id: 1, body: { radioField: 'M' } } as unknown as Request
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
-          action: PostAction.EditNumberOfChildren,
-          details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
+          action: PostAction.EditDomesticStatus,
+          details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
         }
 
         await action(request, res, next)
