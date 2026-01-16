@@ -10,6 +10,7 @@ import PhysicalCharacteristicsController from './physicalCharacteristics/physica
 import EyeColourController from './eyeColour/eyeColourController'
 import DietAndFoodAllergiesController from './dietAndFoodAllergies/dietAndFoodAllergiesController'
 import CountryOfBirthController from './countryOfBirth/countryOfBirthController'
+import ReligionController from './religion/religionController'
 
 export default function personalEditControllerFactory(
   personalPageService: PersonalPageService,
@@ -26,5 +27,6 @@ export default function personalEditControllerFactory(
     eyeColourController: new EyeColourController(personalPageService, auditService),
     dietAndFoodAllergiesController: new DietAndFoodAllergiesController(personalPageService, auditService),
     countryOfBirthController: new CountryOfBirthController(personalPageService, auditService),
+    religionController: new ReligionController(personalPageService, auditService),
   }
 }
