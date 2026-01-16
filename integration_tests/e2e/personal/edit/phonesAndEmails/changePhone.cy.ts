@@ -56,7 +56,7 @@ context('Change phone number', () => {
       },
     ],
     editPageWithTitle: ChangePhoneNumber,
-    editPageTitle: 'Change John Saunders’s phone number',
+    editPageTitle: 'Change John Saunders’ phone number',
     successfulFlashMessage: 'Phone number updated',
     redirectAnchor: 'phones-and-emails',
   })

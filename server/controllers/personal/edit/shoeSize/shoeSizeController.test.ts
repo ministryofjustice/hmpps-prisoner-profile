@@ -58,7 +58,7 @@ describe('ShoeSizeController', () => {
         expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'Shoe size - Prisoner personal details',
-          formTitle: 'Enter shoe size',
+          formTitle: 'Shoe size',
           errors: [],
           hintText: shoeSizeFieldData.hintText,
           inputClasses: shoeSizeFieldData.inputClasses,

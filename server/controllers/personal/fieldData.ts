@@ -44,13 +44,11 @@ export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
   url: 'shoe-size',
   fieldName: 'shoeSize',
   pageTitle: 'Shoe size',
-  formTitle: 'Enter shoe size',
   auditEditPageLoad: Page.EditShoeSize,
   auditEditPostAction: PostAction.EditShoeSize,
-  hintText: 'Start typing to select a UK or EU shoe size, for example 10 or 44.',
+  hintText: 'Enter a UK shoe size, for example 7.5 or 11.',
   redirectAnchor: 'shoe-size',
   inputClasses: 'govuk-input--width-5',
-  successFlashFieldName: 'Shoe size',
 }
 
 export const hairFieldData: RadioFieldData = {

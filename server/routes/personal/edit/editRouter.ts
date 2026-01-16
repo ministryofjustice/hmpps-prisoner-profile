@@ -42,7 +42,6 @@ import { phoneNumberValidator } from '../../../validators/personal/phoneNumberVa
 import { populateEditPageData } from '../../../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
 import { personalPageBasePath } from '../personalRouter'
-import PersonalController from '../../../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
 import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
 import { parameterGuard } from '../../../middleware/parameterGuard'
@@ -53,29 +52,23 @@ export default function editRouter(services: Services): Router {
   const { prisonPermissionsService } = services
 
   const {
-    heightController,
-    weightController,
     cityOrTownOfBirthController,
-    shoeSizeController,
-    smokerOrVaperController,
-    nationalityController,
-    physicalCharacteristicsController,
-    eyeColourController,
-    dietAndFoodAllergiesController,
     countryOfBirthController,
+    dietAndFoodAllergiesController,
+    domesticStatusController,
+    emailAddressController,
+    eyeColourController,
+    heightController,
+    nationalityController,
+    numberOfChildrenController,
+    phoneNumberController,
+    physicalCharacteristicsController,
     religionController,
     sexualOrientationController,
-    numberOfChildrenController,
-    domesticStatusController,
-    phoneNumberController,
-    emailAddressController,
+    shoeSizeController,
+    smokerOrVaperController,
+    weightController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
-
-  const personalController = new PersonalController(
-    services.personalPageService,
-    services.careNeedsService,
-    services.auditService,
-  )
 
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
