@@ -12,6 +12,7 @@ import DietAndFoodAllergiesController from './dietAndFoodAllergies/dietAndFoodAl
 import CountryOfBirthController from './countryOfBirth/countryOfBirthController'
 import ReligionController from './religion/religionController'
 import SexualOrientationController from './sexualOrientation/sexualOrientationController'
+import NumberOfChildrenController from './numberOfChildren/numberOfChildrenController'
 
 export default function personalEditControllerFactory(
   personalPageService: PersonalPageService,
@@ -30,5 +31,6 @@ export default function personalEditControllerFactory(
     countryOfBirthController: new CountryOfBirthController(personalPageService, auditService),
     religionController: new ReligionController(personalPageService, auditService),
     sexualOrientationController: new SexualOrientationController(personalPageService, auditService),
+    numberOfChildrenController: new NumberOfChildrenController(personalPageService, auditService),
   }
 }
