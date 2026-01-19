@@ -9,6 +9,7 @@ import {
   mockContactDetailYouthEstate,
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
+import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -300,10 +301,24 @@ context('Overview Page', () => {
     context('Statuses', () => {
       it('Displays the status list', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.statusList().should('exist')
-        overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
-        overviewPage.statusList().contains('li > p', 'Support needed')
-        overviewPage.statusList().contains('li > p', 'Scheduled transfer')
+        overviewPage.statusList().find('li').should('have.length', 3)
+        overviewPage.statusList().find('li').eq(0).should('contain.text', 'In Moorland (HMP & YOI)')
+        overviewPage.statusList().find('li').eq(1).should('contain.text', 'Recognised listener')
+        overviewPage.statusList().find('li').eq(2).should('contain.text', 'Scheduled transfer')
+        overviewPage.statusList().should('not.contain.text', 'Additional needs')
+      })
+
+      it('Displays link to support additional needs when needed', () => {
+        cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', response: prisonerHasNeedsMock })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.statusList().find('li').should('have.length', 4)
+        overviewPage.statusList().should('contain.text', 'Additional needs')
+        overviewPage
+          .statusList()
+          .find('a')
+          .should('have.attr', 'href', 'http://localhost:9091/supportForAdditionalNeedsUI/profile/G6123VU/overview')
+          .and('have.text', 'View support for additional needs')
       })
     })
 
@@ -735,12 +750,12 @@ context('Overview Page', () => {
     })
   })
 
-  context('Given API call to get learner neurodivergence fails', () => {
+  context('Given API call to support for additional needs api fails', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      cy.task('stubGetLearnerNeurodivergence', { prisonerNumber: 'G6123VU', error: true })
+      cy.task('stubSupportForAdditionalNeeds', { prisonerNumber: 'G6123VU', error: true })
       visitOverviewPage()
     })
 
@@ -750,8 +765,12 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage.statusList().should('exist')
-      overviewPage.statusList().contains('li > p', 'Support needs unavailable')
+      overviewPage.statusList().find('li').should('have.length', 4)
+      overviewPage
+        .statusList()
+        .find('li')
+        .eq(1)
+        .should('contain.text', 'Additional needs information is currently unavailable')
     })
   })
 
@@ -782,7 +801,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('Displays a page error banner and highlights the failure in the status list', () => {
+    it('Displays a page error banner and highlights the failure in the non-association details', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
       overviewPage.apiErrorBanner().should('exist')

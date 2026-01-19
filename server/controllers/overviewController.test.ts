@@ -41,17 +41,17 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import { assessmentsMock } from '../data/localMockData/miniSummaryMock'
 import IncentivesService from '../services/incentivesService'
 import { incentiveServiceMock } from '../../tests/mocks/incentiveServiceMock'
-import PersonalPageService from '../services/personalPageService'
-import { personalPageServiceMock } from '../../tests/mocks/personalPageServiceMock'
 import OffenderService from '../services/offenderService'
 import { offenderServiceMock } from '../../tests/mocks/offenderServiceMock'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import { professionalContactsServiceMock } from '../../tests/mocks/professionalContactsServiceMock'
-import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
 import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
+import { supportForAdditionalNeedsApiClientMock } from '../../tests/mocks/supportForAdditionalNeedsApiClientMock'
+import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
+import { prisonerHasNeedsMock } from '../data/localMockData/supportForAdditionalNeedsMock'
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import config from '../config'
@@ -88,13 +88,13 @@ describe('overviewController', () => {
   let moneyService: MoneyService
   let pathfinderApiClient: PathfinderApiClient
   let manageSocCasesApiClient: ManageSocCasesApiClient
+  let supportForAdditionalNeedsApiClient: jest.Mocked<SupportForAdditionalNeedsApiClient>
   let auditService: AuditService
   let offencesService: OffencesService
   let adjudicationsService: AdjudicationsService
   let visitsService: VisitsService
   let prisonerScheduleService: PrisonerScheduleService
   let incentiveService: IncentivesService
-  let personalPageService: PersonalPageService
   let offenderService: OffenderService
   let professionalContactsService: ProfessionalContactsService
   let csipService: CsipService
@@ -124,13 +124,13 @@ describe('overviewController', () => {
     moneyService = moneyServiceMock() as MoneyService
     pathfinderApiClient = pathfinderApiClientMock() as PathfinderApiClient
     manageSocCasesApiClient = manageSocCasesApiClientMock() as ManageSocCasesApiClient
+    supportForAdditionalNeedsApiClient = supportForAdditionalNeedsApiClientMock()
     auditService = auditServiceMock() as AuditService
     offencesService = offencesServiceMock() as OffencesService
     adjudicationsService = adjudicationsServiceMock() as AdjudicationsService
     visitsService = visitsServiceMock() as VisitsService
     prisonerScheduleService = prisonerScheduleServiceMock() as PrisonerScheduleService
     incentiveService = incentiveServiceMock() as IncentivesService
-    personalPageService = personalPageServiceMock() as PersonalPageService
     offenderService = offenderServiceMock() as OffenderService
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
     csipService = csipServiceMock() as CsipService
@@ -139,6 +139,7 @@ describe('overviewController', () => {
     controller = new OverviewController(
       () => pathfinderApiClient,
       () => manageSocCasesApiClient,
+      () => supportForAdditionalNeedsApiClient,
       auditService,
       offencesService,
       moneyService,
@@ -146,7 +147,6 @@ describe('overviewController', () => {
       visitsService,
       prisonerScheduleService,
       incentiveService,
-      personalPageService,
       offenderService,
       professionalContactsService,
       csipService,
@@ -429,61 +429,13 @@ describe('overviewController', () => {
   })
 
   describe('statuses', () => {
-    it('should get statuses for Current Location, Recognised Listener and Neurodiversity', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
-
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        } as Request,
-        res,
-      )
-
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          statuses: [
-            { label: 'In Moorland (HMP & YOI)' },
-            { label: 'Recognised Listener' },
-            { label: 'Support needed', subText: 'Has neurodiversity needs' },
-          ],
-        }),
-      )
-    })
-
-    it('should not return Neurodiversity if not at supported prison', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue([])
-
+    it('should get statuses for Current Location and Recognised listener', async () => {
       await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
-        }),
-      )
-    })
-
-    it('should indicate an error with neurodiversity support status when API fails', async () => {
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockRejectedValue('ERROR')
-
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
-        } as Request,
-        res,
-      )
-
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          statuses: [
-            { label: 'In Moorland (HMP & YOI)' },
-            { label: 'Recognised Listener' },
-            { label: 'Support needs unavailable', subText: 'Try again later', error: true },
-          ],
+          statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -503,7 +455,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Out from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Out from Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -529,7 +481,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Outside - released from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Outside - released from Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -553,7 +505,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          statuses: [{ label: 'Being transferred' }, { label: 'Recognised Listener' }],
+          statuses: [{ label: 'Being transferred' }, { label: 'Recognised listener' }],
         }),
       )
     })
@@ -586,7 +538,7 @@ describe('overviewController', () => {
 
         const suitableMatcher = (displaySuitable ? expect.arrayContaining : expect.not.arrayContaining)([
           expect.objectContaining({
-            label: 'Suitable Listener',
+            label: 'Suitable listener',
           }),
         ])
         expect(res.render).toHaveBeenCalledWith(
@@ -596,7 +548,7 @@ describe('overviewController', () => {
 
         const recognisedMatcher = (displayRecognised ? expect.arrayContaining : expect.not.arrayContaining)([
           expect.objectContaining({
-            label: 'Recognised Listener',
+            label: 'Recognised listener',
           }),
         ])
         expect(res.render).toHaveBeenCalledWith(
@@ -605,6 +557,50 @@ describe('overviewController', () => {
         )
       },
     )
+
+    describe('support for additional needs', () => {
+      it('should display link when returned by API', async () => {
+        supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport.mockResolvedValue(prisonerHasNeedsMock)
+
+        await controller.displayOverview(req, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              {
+                label: 'Additional needs',
+                subText: 'View support for additional needs',
+                subTextHref: expect.any(String),
+                prominent: true,
+              },
+              { label: 'Recognised listener' },
+            ],
+          }),
+        )
+      })
+
+      it('should indicate an error when API fails', async () => {
+        supportForAdditionalNeedsApiClient.hasNeedsForAdditionalSupport.mockRejectedValue('Server Error')
+
+        await controller.displayOverview(req, res)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              {
+                label: 'Additional needs information is currently unavailable. Try again later.',
+                error: true,
+              },
+              { label: 'Recognised listener' },
+            ],
+          }),
+        )
+      })
+    })
 
     describe('upcoming transfers', () => {
       const scheduledTransferLabel = 'Scheduled transfer'

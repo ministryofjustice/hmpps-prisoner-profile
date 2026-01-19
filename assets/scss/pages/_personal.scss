@@ -117,25 +117,24 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-top: 30px;
+    padding-bottom: 10px;
 
     @include govuk-media-query($from: tablet) {
       flex-direction: row;
     }
 
-    h3, .action-link-container {
-      padding-top: 30px;
-      padding-bottom: 10px;
+    h3 {
       margin: 0;
+    }
 
-      &:first-of-type {
-        padding-top: 10px;
-      }
+    &:first-of-type {
+      padding-top: 0;
     }
   }
 
   .govuk-summary-list__row {
     display: grid;
-    padding-top: 10px;
     border-bottom: 1px solid $govuk-border-colour;
 
     grid-template-columns: 1fr;
@@ -146,6 +145,7 @@
 
     dt {
       width: auto;
+      padding-right: 0;
       margin: 0;
 
       @include govuk-media-query($from: tablet) {
@@ -172,6 +172,7 @@
     .govuk-summary-list__value {
       border-bottom: none;
       @include govuk-media-query($from: tablet) {
+        margin-left: 20px;
         grid-column: 2;
         border-bottom: solid 1px $govuk-border-colour;
       }
@@ -302,13 +303,13 @@
 }
 
 .contact-type-pill--next-of-kin {
-  background-image: url('/assets/images/next-of-kin.svg');
+  background-image: url('/assets/images/contacts/next-of-kin.svg');
   background-repeat: no-repeat;
   background-position: 9px center;
 }
 
 .contact-type-pill--emergency-contact {
-  background-image: url('/assets/images/emergency-contact.svg');
+  background-image: url('/assets/images/contacts/emergency-contact.svg');
   background-repeat: no-repeat;
   background-position: 9px center;
 }

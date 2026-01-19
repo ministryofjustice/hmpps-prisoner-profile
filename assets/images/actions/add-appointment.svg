@@ -1,0 +1,14 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+:root {color: #0B0C0C}
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root {color: #F3F2F1}
+}
+</style>
+<g fill="currentColor">
+<path d="M19.0956 29V24.9044H15V23.0956H19.0956V19H20.9044V23.0956H25V24.9044H20.9044V29H19.0956Z"/>
+<path fill-rule="evenodd" d="M27 9H13V11C13 12.1046 12.1046 13 11 13C9.89543 13 9 12.1046 9 11V9H7C5.89543 9 5 9.89543 5 11V32C5 33.1046 5.89543 34 7 34H33C34.1046 34 35 33.1046 35 32V11C35 9.89543 34.1046 9 33 9H31V11C31 12.1046 30.1046 13 29 13C27.8954 13 27 12.1046 27 11V9ZM33 16H7V31C7 31.5523 7.44772 32 8 32H32C32.5523 32 33 31.5523 33 31V16Z"/>
+<rect x="10" y="5" width="2" height="7" rx="1"/>
+<rect x="28" y="5" width="2" height="7" rx="1"/>
+</g>
+</svg>

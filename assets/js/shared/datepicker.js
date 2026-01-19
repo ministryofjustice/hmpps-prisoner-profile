@@ -162,26 +162,26 @@ Datepicker.prototype.createDialogMarkup = function (titleId) {
         <div class="hmpps-datepicker__dialog__navbuttons">
             <button class="js-datepicker-prev-year" aria-label="previous year" data-button="button-datepicker-prevyear">
                 <span class="govuk-visually-hidden">Previous year</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_left"></use></svg>
+                <img src="/assets/images/datePicker/doubleChevronLeft.svg" class="hmpps-datepicker__dialog__navbutton__icon" aria-hidden="true" alt=""/>
             </button>
 
             <button class="js-datepicker-prev-month" aria-label="previous month" data-button="button-datepicker-prevmonth">
                 <span class="govuk-visually-hidden">Previous month</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_left"></use></svg>
+                <img src="/assets/images/datePicker/chevronLeft.svg" class="hmpps-datepicker__dialog__navbutton__icon" aria-hidden="true" alt=""/>
             </button>
         </div>
 
-        <h2 id="${titleId}" class="hmpps-datepicker__dialog__title  js-datepicker-month-year" aria-live="polite">June 2020</h2>
+        <h2 id="${titleId}" class="hmpps-datepicker__dialog__title js-datepicker-month-year" aria-live="polite"></h2>
 
         <div class="hmpps-datepicker__dialog__navbuttons">
             <button class="js-datepicker-next-month" aria-label="next month" data-button="button-datepicker-nextmonth">
                 <span class="govuk-visually-hidden">Next month</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_right"></use></svg>
+                <img src="/assets/images/datePicker/chevronRight.svg" class="hmpps-datepicker__dialog__navbutton__icon" aria-hidden="true" alt=""/>
             </button>
 
             <button class="js-datepicker-next-year" aria-label="next year" data-button="button-datepicker-nextyear">
                 <span class="govuk-visually-hidden">Next year</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_right"></use></svg>
+                <img src="/assets/images/datePicker/doubleChevronRight.svg" class="hmpps-datepicker__dialog__navbutton__icon" aria-hidden="true" alt=""/>
             </button>
         </div>
       </div>

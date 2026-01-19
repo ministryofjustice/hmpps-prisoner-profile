@@ -104,6 +104,7 @@ ALERTS_API_URL=https://alerts-api-dev.hmpps.service.justice.gov.uk
 PERSON_INTEGRATION_API_URL=https://person-integration-api-dev.hmpps.service.justice.gov.uk
 PERSONAL_RELATIONSHIPS_API_URL=https://personal-relationships-api-dev.hmpps.service.justice.gov.uk
 CSIP_API_URL=https://csip-api-dev.hmpps.service.justice.gov.uk
+SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL=https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>
@@ -176,4 +177,3 @@ Features can be toggled by setting the relevant environment variable.
 |---------------------|---------------|---------|-----------------------------------------------------------------------------------------------------------|
 | SOME_TOGGLE_ENABLED | false         | Boolean | Example feature toggle, for demonstration purposes.                                                       |
 | USE_CURIOUS2_API    | false         | Boolean | Set to true to use the Curious 2 API endpoints for Functional Skills & In Prison Courses & Qualifications |
-

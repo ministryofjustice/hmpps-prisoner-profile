@@ -1,0 +1,22 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+:root {color: #0B0C0C}
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  :root {color: #F3F2F1}
+}
+</style>
+<g fill="currentColor">
+<path d="M17 29L9.97355 24L9.97355 34L17 29Z"/>
+<path d="M9.97355 26.1082L2 26.1082L2 31.891L9.97355 31.891L9.97355 26.1082Z"/>
+</g>
+<g stroke="currentColor">
+<path d="M7 34.1429V36C7 36.5523 7.44772 37 8 37H32C32.5523 37 33 36.5523 33 36V22C33 21.4477 32.5523 21 32 21H8C7.44772 21 7 21.4477 7 22V23.8571"/>
+<rect x="3" y="18" width="34" height="3" rx="1"/>
+<ellipse cx="26.9412" cy="7.41177" rx="3.52941" ry="4.41177"/>
+<path d="M20.346 13.5392C18.6972 14.5686 19.0269 18 19.0269 18H34.8554C34.8554 18 35.1852 14.5686 33.5364 13.5392C31.8876 12.5098 30.5685 11.8235 30.5685 11.8235C30.5685 11.8235 28.4972 13.5392 26.9412 13.5392C25.3851 13.5392 23.3138 11.8235 23.3138 11.8235C23.3138 11.8235 21.9948 12.5098 20.346 13.5392Z"/>
+<rect x="3" y="7" width="14" height="9"/>
+<rect x="8" y="16" width="4" height="2"/>
+<rect x="5.25" y="13.25" width="1.5" height="0.5" stroke-width="0.5"/>
+<rect x="8.25" y="13.25" width="1.5" height="0.5" stroke-width="0.5"/>
+</g>
+</svg>

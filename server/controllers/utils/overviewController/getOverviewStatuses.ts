@@ -1,9 +1,9 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import { Result } from '../../../utils/result/result'
-import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
-import OverviewPageData from '../../interfaces/OverviewPageData'
+import { OverviewStatus } from '../../interfaces/OverviewPageData'
 import {
   getProfileInformationValue,
   ProfileInformationType,
@@ -13,18 +13,18 @@ import { BooleanString } from '../../../data/enums/booleanString'
 export default function getOverviewStatuses(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
-  learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
+  hasNeedsForAdditionalSupport: Result<HasNeed>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
-): OverviewPageData['statuses'] {
+): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
+    getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
     getListenerStatus(inmateDetail),
-    getNeurodiversitySupportStatus(learnerNeurodivergence),
     getScheduledTransferStatus(scheduledTransfers),
   ].filter(Boolean)
 }
 
-function getLocationStatus(prisonerData: Prisoner): OverviewPageData['statuses'][number] {
+function getLocationStatus(prisonerData: Prisoner): OverviewStatus {
   if (prisonerData.inOutStatus === 'IN') {
     return { label: `In ${prisonerData.prisonName}` }
   }
@@ -40,7 +40,7 @@ function getLocationStatus(prisonerData: Prisoner): OverviewPageData['statuses']
   return null
 }
 
-function getListenerStatus(inmateDetail: InmateDetail): OverviewPageData['statuses'][number] {
+function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus {
   const recognised = getProfileInformationValue(
     ProfileInformationType.RecognisedListener,
     inmateDetail.profileInformation,
@@ -48,30 +48,39 @@ function getListenerStatus(inmateDetail: InmateDetail): OverviewPageData['status
   const suitable = getProfileInformationValue(ProfileInformationType.SuitableListener, inmateDetail.profileInformation)
 
   if (recognised === BooleanString.Yes) {
-    return { label: 'Recognised Listener' }
+    return { label: 'Recognised listener' }
   }
 
   if (suitable === BooleanString.Yes) {
-    return { label: 'Suitable Listener' }
+    return { label: 'Suitable listener' }
   }
 
   return null
 }
 
-function getNeurodiversitySupportStatus(
-  learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
-): OverviewPageData['statuses'][number] {
-  const supportNeededStatus = { label: 'Support needed', subText: 'Has neurodiversity needs' }
-  const supportNeededErrorStatus = { label: 'Support needs unavailable', subText: 'Try again later', error: true }
-  return learnerNeurodivergence.handle({
-    fulfilled: it => it?.length && supportNeededStatus,
-    rejected: () => supportNeededErrorStatus,
+function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<HasNeed>): OverviewStatus | null {
+  return hasNeedsForAdditionalSupport.handle({
+    fulfilled(value: HasNeed): OverviewStatus | null {
+      if (value?.hasNeed) {
+        return {
+          label: 'Additional needs',
+          subText: 'View support for additional needs',
+          subTextHref: value.url,
+          prominent: true,
+        }
+      }
+      return null
+    },
+    rejected(): OverviewStatus {
+      return {
+        label: 'Additional needs information is currently unavailable. Try again later.',
+        error: true,
+      }
+    },
   })
 }
 
-function getScheduledTransferStatus(
-  scheduledTransfers: PrisonerPrisonSchedule[] | null,
-): OverviewPageData['statuses'][number] {
+function getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[] | null): OverviewStatus {
   return (
     scheduledTransfers?.length > 0 && {
       label: 'Scheduled transfer',

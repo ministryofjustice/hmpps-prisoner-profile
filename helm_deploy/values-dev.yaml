@@ -80,6 +80,7 @@ generic-service:
     CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
     PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api-dev.hmpps.service.justice.gov.uk"
     PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-dev.hmpps.service.justice.gov.uk"
+    SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
