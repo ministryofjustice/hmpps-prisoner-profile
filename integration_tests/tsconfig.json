@@ -1,8 +1,10 @@
 {
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
-    "target": "es2022",
+    "strict": false,
     "noEmit": true,
-    "moduleResolution": "node",
+    "target": "es2021",
+    "lib": ["dom", "es2021"],
     "types": ["cypress", "cypress-file-upload"],
     "esModuleInterop": true,
     "skipLibCheck": true,

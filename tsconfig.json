@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compileOnSave": true,
   "compilerOptions": {
     "isolatedModules": true,
@@ -13,7 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types", "eslint.config.mjs"],
+    "typeRoots": ["./server/@types", "./node_modules/@types", "eslint.config.mjs"]
   },
   "exclude": [
     "node_modules/",
