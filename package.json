@@ -40,7 +40,7 @@
     "@aws-sdk/client-sqs": "^3.965.0",
     "@contentful/rich-text-html-renderer": "^17.1.6",
     "@contentful/rich-text-types": "^17.2.5",
-    "@microsoft/applicationinsights-clickanalytics-js": "^3.3.10",
+    "@microsoft/applicationinsights-clickanalytics-js": "^3.3.11",
     "@microsoft/applicationinsights-web": "^3.3.10",
     "@ministryofjustice/frontend": "^3.7.2",
     "@ministryofjustice/hmpps-auth-clients": "^0.0.3",
