@@ -35,9 +35,10 @@
     {% include "./banner.njk" %}
   {% endif %}
 
+  <div id="flash-announcement" role="alert"></div>
   {% if flashMessage %}
     <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}{{ ' hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
-      <p role="alert">{{ flashMessage.text }}</p>
+      <p id="flash-content">{{ flashMessage.text }}</p>
     </div>
   {% endif %}
 

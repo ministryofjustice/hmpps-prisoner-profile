@@ -12,6 +12,7 @@ import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { openCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
+import { announceFlash } from './flashAnnouncement'
 
 document.addEventListener('DOMContentLoaded', function () {
   addAnotherButton()
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
   openCloseAll()
   printPage()
   sortSelector()
+  announceFlash()
 })
 
 govukFrontend.initAll()
