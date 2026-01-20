@@ -14,7 +14,6 @@ import {
   JusticeIdentifierMappings,
   PersonalIdentifierMappings,
 } from '../data/constants/identifierMappings'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import { capitaliseFirstLetter } from '../utils/utils'
@@ -212,7 +211,6 @@ describe('IdentityNumbersController', () => {
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Identity numbers updated',
-        type: FlashMessageType.success,
         fieldName: expect.stringContaining(`'probation-legacy-system-row','yjaf-row'`),
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirect}`)
@@ -400,7 +398,6 @@ describe('IdentityNumbersController', () => {
         })
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Identity numbers updated',
-          type: FlashMessageType.success,
           fieldName: `'${editPageUrl}-row'`,
         })
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirectAnchor}`)

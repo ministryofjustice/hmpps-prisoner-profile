@@ -57,7 +57,7 @@ context('Add Case Note Page', () => {
         addCaseNotePage.textField().type('This is a test')
         addCaseNotePage.saveButton().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/case-notes')
-        caseNotesPage.successMessage().should('contain.text', 'Case note added')
+        caseNotesPage.flashMessage().should('contain.text', 'Case note added')
       })
     })
 

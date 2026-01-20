@@ -12,7 +12,6 @@ import {
   PersonalRelationshipsReferenceDataDomain,
   PersonalRelationshipType,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { dateToIsoDate } from '../utils/dateHelpers'
 import { displayWhereIsTheAddressHandler, submitWhereIsTheAddressHandler } from './handlers/whereIsTheAddress'
@@ -202,7 +201,6 @@ export default class NextOfKinController {
       if (formValues.action !== 'add-address') {
         req.flash('flashMessage', {
           text: `Next of kin and emergency contacts added`,
-          type: FlashMessageType.success,
           ...(formValues.action === 'continue' ? {} : { fieldName: 'next-of-kin' }),
         })
       }
@@ -397,7 +395,6 @@ export default class NextOfKinController {
 
         req.flash('flashMessage', {
           text: 'Contact address updated',
-          type: FlashMessageType.success,
           fieldName: 'nextOfKin',
         })
 

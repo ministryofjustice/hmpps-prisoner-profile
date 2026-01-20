@@ -1,4 +1,4 @@
-@keyframes fadeOut {
+@keyframes flashMessageFadeOut {
   0% {
     opacity: 1;
     visibility: visible;
@@ -18,7 +18,7 @@
   left: 50%;
   visibility: hidden;
   opacity: 0;
-  animation: fadeOut 3s;
+  animation: flashMessageFadeOut 3s;
 
   &--at-anchor {
     position: fixed;
@@ -33,12 +33,9 @@
     text-align: center;
     padding: 10px 30px;
     margin-bottom: 0;
-    @include govuk-font($size: 19, $weight: 'bold');
-  }
-
-  &--success p {
     background-color: $govuk-success-colour;
     color: govuk-colour("white");
+    @include govuk-font($size: 19, $weight: 'bold');
 
     &::before {
       content: url("/assets/images/tick-icon.svg");
@@ -46,38 +43,4 @@
       margin-right: 12px;
     }
   }
-
-  &--info p {
-    background-color: govuk-colour("light-blue");
-    color: govuk-colour("white");
-
-    &::before {
-      content: url("/assets/images/info-icon.svg");
-      height: 25px;
-      margin-right: 12px;
-    }
-  }
-
-  &--warn p {
-    background-color: govuk-colour("orange");
-    color: govuk-colour("white");
-
-    &::before {
-      content: url("/assets/images/warn-icon.svg");
-      height: 25px;
-      margin-right: 12px;
-    }
-  }
-
-  &--error p {
-    background-color: $govuk-error-colour;
-    color: govuk-colour("white");
-
-    &::before {
-      content: url("/assets/images/cross-icon.svg");
-      height: 25px;
-      margin-right: 12px;
-    }
-  }
-
 }

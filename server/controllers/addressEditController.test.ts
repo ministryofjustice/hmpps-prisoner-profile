@@ -11,7 +11,6 @@ import EphemeralDataService from '../services/ephemeralDataService'
 import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AddressLocation } from '../services/mappers/addressMapper'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
@@ -423,7 +422,6 @@ describe('Address Edit Controller', () => {
 
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Address updated',
-          type: FlashMessageType.success,
           fieldName: 'addresses',
         })
 

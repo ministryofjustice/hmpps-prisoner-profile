@@ -48,7 +48,7 @@ context('Close Alert Page', () => {
           closeAlertPage.comments().type('Comments added')
           closeAlertPage.confirmButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert closed')
+          alertsPage.flashMessage().should('contain.text', 'Alert closed')
         })
       })
 
@@ -72,7 +72,7 @@ context('Close Alert Page', () => {
           closeAlertPage.endDateField().type('01/01/2199')
           closeAlertPage.confirmButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert updated')
+          alertsPage.flashMessage().should('contain.text', 'Alert updated')
         })
       })
 
