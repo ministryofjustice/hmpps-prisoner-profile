@@ -1,46 +1,45 @@
-// Show the image preview and hide upload controls when adding a new photo
-function previewSelectedImage(component) {
-  const imageInput = component.querySelector('input[type="file"]')
-  const inputContainer = component.querySelector('#file-upload')
-  const previewImage = component.querySelector('#preview-image')
-  const previewFilename = component.querySelector('#preview-filename')
-  const previewContainer = component.querySelector('#preview-container')
-
-  const file = imageInput.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = function (e) {
-      previewImage.src = e.target.result
-      previewImage.alt = 'Preview of uploaded image'
-      previewFilename.innerText = file.name
-      previewContainer.style.display = 'flex'
-      inputContainer.style.display = 'none'
-    }
-  }
-}
-
-// Hide the photo preview and show upload controls when 'change' link is clicked
-function showUploadControls(component) {
-  const imageInput = component.querySelector('input[type="file"]')
-  const imageFilename = component.querySelector('span[aria-live="polite"]')
-  const inputContainer = component.querySelector('#file-upload')
-  const previewFilename = component.querySelector('#preview-filename')
-  const previewContainer = component.querySelector('#preview-container')
-
-  imageInput.value = null
-  imageFilename.innerText = 'No file chosen'
-  previewFilename.innerText = ''
-  previewContainer.style.display = 'none'
-  inputContainer.style.display = 'initial'
-}
-
 export function fileUploadWithPreview() {
-  const components = document.querySelectorAll('[data-component="file-upload-with-preview-component"]')
-  components.forEach(component => {
-    const imageInput = component.querySelector('input[type="file"]')
-    const changeLink = component.querySelector('#change-photo-link')
-    imageInput.addEventListener('change', () => previewSelectedImage(component))
-    changeLink.addEventListener('click', () => showUploadControls(component))
+  const uploadComponents = document.querySelectorAll('.hmpps-file-upload-with-preview')
+  uploadComponents.forEach(component => {
+    let uploadContainer = component.querySelector('.govuk-file-upload')
+    if (uploadContainer) {
+      uploadContainer.addEventListener('change', () => {
+        let uploadFile = uploadContainer.files[0]
+        let uploadButton = component.querySelector('.govuk-file-upload-button')
+        let uploadButtonStatus = component.querySelector('.govuk-file-upload-button__status')
+        if (uploadFile && uploadButtonStatus) {
+          const reader = new FileReader()
+          reader.readAsDataURL(uploadFile)
+          reader.onload = function (e) {
+            uploadButtonStatus.innerText = uploadFile.name
+
+            let previewContent = component.querySelector('.hmpps-file-upload-with-preview__content')
+            if (!previewContent) {
+              previewContent = document.createElement('div')
+              previewContent.className = 'hmpps-file-upload-with-preview__content'
+              while (uploadButton.firstChild) {
+                previewContent.appendChild(uploadButton.firstChild)
+              }
+              uploadButton.appendChild(previewContent)
+            }
+
+            let previewThumbnail = component.querySelector('.hmpps-file-upload-with-preview__photo')
+            if (!previewThumbnail) {
+              previewThumbnail = document.createElement('img')
+              previewThumbnail.className = 'hmpps-file-upload-with-preview__photo'
+              uploadButton.insertBefore(previewThumbnail, previewContent)
+            }
+
+            if (previewThumbnail) {
+              previewThumbnail.src = e.target.result
+              previewThumbnail.alt = uploadFile.name
+            }
+
+            uploadButton.style.display = 'flex'
+            uploadButton.style.gap = '18px'
+          }
+        }
+      })
+    }
   })
 }

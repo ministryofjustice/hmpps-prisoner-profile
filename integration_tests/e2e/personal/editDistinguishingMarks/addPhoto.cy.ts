@@ -64,15 +64,12 @@ context('Add distinguishing mark photo', () => {
         page.miniBanner().name().should('contain.text', prisonerNumber)
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
-        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
 
-        page.fileUploadButton().should('not.be.visible')
-        page.imagePreview().should('be.visible')
+        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('exist')
         page.imageFilename().should('have.text', 'tat.jpeg')
-        page.changeLink().should('be.visible')
       })
 
       it('Save photo and return to profile', () => {
@@ -87,9 +84,8 @@ context('Add distinguishing mark photo', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/tattoo/100/photo')
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
       })
     })
 
@@ -104,15 +100,12 @@ context('Add distinguishing mark photo', () => {
         page.miniBanner().name().should('contain.text', prisonerNumber)
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
-        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
 
-        page.fileUploadButton().should('not.be.visible')
-        page.imagePreview().should('be.visible')
+        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('exist')
         page.imageFilename().should('have.text', 'tat.jpeg')
-        page.changeLink().should('be.visible')
       })
 
       it('Save photo and return to profile', () => {
@@ -127,9 +120,8 @@ context('Add distinguishing mark photo', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100/photo')
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
       })
     })
 
@@ -144,15 +136,12 @@ context('Add distinguishing mark photo', () => {
         page.miniBanner().name().should('contain.text', prisonerNumber)
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
-        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
 
-        page.fileUploadButton().should('not.be.visible')
-        page.imagePreview().should('be.visible')
+        page.photoField().attachFile('tat.jpeg')
+        page.imagePreview().should('exist')
         page.imageFilename().should('have.text', 'tat.jpeg')
-        page.changeLink().should('be.visible')
       })
 
       it('Save photo and return to profile', () => {
@@ -167,9 +156,8 @@ context('Add distinguishing mark photo', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/mark/100/photo')
 
         page.fileUploadButton().should('be.visible')
-        page.imagePreview().should('not.be.visible')
-        page.imageFilename().should('not.be.visible')
-        page.changeLink().should('not.be.visible')
+        page.imagePreview().should('not.exist')
+        page.imageFilename().should('have.text', 'No file chosen')
       })
     })
   })
