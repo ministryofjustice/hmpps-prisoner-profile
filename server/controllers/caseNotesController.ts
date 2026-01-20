@@ -5,7 +5,6 @@ import CaseNotesService from '../services/caseNotesService'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
@@ -201,7 +200,7 @@ export default class CaseNotesController {
         )
       }
 
-      req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
+      req.flash('flashMessage', { text: 'Case note added' })
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -305,7 +304,7 @@ export default class CaseNotesController {
         return res.redirect(`/prisoner/${prisonerNumber}/update-case-note/${caseNoteId}`)
       }
 
-      req.flash('flashMessage', { text: 'Case note updated', type: FlashMessageType.success })
+      req.flash('flashMessage', { text: 'Case note updated' })
       this.auditService
         .sendPutSuccess({
           user: res.locals.user,

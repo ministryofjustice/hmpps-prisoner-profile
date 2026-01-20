@@ -51,7 +51,7 @@ context('Change End Date Page', () => {
           changeEndDatePage.endDateField().type('01/01/2199')
           changeEndDatePage.confirmButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert updated')
+          alertsPage.flashMessage().should('contain.text', 'Alert updated')
         })
       })
 
@@ -74,7 +74,7 @@ context('Change End Date Page', () => {
           changeEndDatePage.removeEndDateRadio().click()
           changeEndDatePage.confirmButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert updated')
+          alertsPage.flashMessage().should('contain.text', 'Alert updated')
         })
       })
 

@@ -8,7 +8,6 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import ProblemSavingError from '../utils/problemSavingError'
 
 const getResLocals = () => ({
@@ -475,7 +474,6 @@ describe('Distinguishing Marks Controller', () => {
 
         expect(typeReq.flash).toHaveBeenCalledWith('flashMessage', {
           text: flashMessage,
-          type: FlashMessageType.success,
           fieldName: `distinguishing-marks-${markType}`,
         })
 
