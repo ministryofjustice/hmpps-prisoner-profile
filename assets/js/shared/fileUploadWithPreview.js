@@ -32,7 +32,7 @@ export function fileUploadWithPreview() {
 
             if (previewThumbnail) {
               previewThumbnail.src = e.target.result
-              previewThumbnail.alt = uploadFile.name
+              previewThumbnail.alt = 'Uploaded image thumbnail'
             }
 
             uploadButton.style.display = 'flex'
