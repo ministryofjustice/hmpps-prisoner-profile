@@ -45,7 +45,7 @@ context('Change email address', () => {
       },
     ],
     editPageWithTitle: ChangeEmailAddress,
-    editPageTitle: 'Change John Saunders’s email address',
+    editPageTitle: 'Change John Saunders’ email address',
     successfulFlashMessage: 'Email address updated',
     redirectAnchor: 'phones-and-emails',
   })

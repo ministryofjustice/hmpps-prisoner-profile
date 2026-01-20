@@ -45,7 +45,7 @@ context('Change email address', () => {
       },
     ],
     editPageWithTitle: AddEmailAddress,
-    editPageTitle: 'Add John Saunders’s email address',
+    editPageTitle: 'Add John Saunders’ email address',
     successfulFlashMessage: 'Email address updated',
     redirectAnchor: 'phones-and-emails',
     submitButtonId: 'edit-submit-button',

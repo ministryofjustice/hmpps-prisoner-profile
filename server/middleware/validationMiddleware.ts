@@ -8,8 +8,8 @@ import {
 } from '../validators/personal/distinguishingMarksValidator'
 import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
 import { AddIdentityNumberSubmission } from '../controllers/utils/identityNumbersController/buildIdentityNumberOptions'
-import { EditIdentityNumberSubmission } from '../controllers/identityNumbersController'
-import { NextOfKinSubmission } from '../controllers/nextOfKinController'
+import { EditIdentityNumberSubmission } from '../controllers/personal/edit/identityNumbers/identityNumbersController'
+import { NextOfKinSubmission } from '../controllers/personal/edit/nextOfKin/nextOfKinController'
 
 export type Validator = (
   body:

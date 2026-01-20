@@ -1,5 +1,5 @@
 import { Page, PostAction } from '../../services/auditService'
-import { formatHeight, formatName, formatWeight } from '../../utils/utils'
+import { apostrophe, formatHeight, formatName, formatWeight } from '../../utils/utils'
 import {
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
@@ -304,7 +304,7 @@ export const changeEmailAddressTextFieldData = (
   ...baseEmailAddressTextFieldData,
   url: `change-email-address/${id}`,
   pageTitle: `Change this person’s email address`,
-  formTitle: `Change ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  formTitle: `Change ${apostrophe(formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast }))} email address`,
   auditEditPageLoad: Page.EditEmailAddress,
   auditEditPostAction: PostAction.EditEmailAddress,
 })
@@ -317,7 +317,7 @@ export const addEmailAddressTextFieldData = ({
   ...baseEmailAddressTextFieldData,
   url: `add-email-address`,
   pageTitle: `Add this person’s email address`,
-  formTitle: `Add ${formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast })}’s email address`,
+  formTitle: `Add ${apostrophe(formatName(name.firstName, '', name.lastName, { style: NameFormatStyle.firstLast }))} email address`,
   auditEditPageLoad: Page.AddEmailAddress,
   auditEditPostAction: PostAction.AddEmailAddress,
 })
@@ -332,7 +332,7 @@ export const addPhoneNumberFieldData = (name: string): FieldData => ({
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.AddPhoneNumber,
   auditEditPostAction: PostAction.AddPhoneNumber,
-  formTitle: `Add ${name}’s phone number`,
+  formTitle: `Add ${apostrophe(name)} phone number`,
   pageTitle: `Add this person’s phone number`,
   url: `add-phone-number`,
 })
@@ -341,7 +341,7 @@ export const changePhoneNumberFieldData = (id: string, name: string): FieldData 
   ...basePhoneNumberFieldData,
   auditEditPageLoad: Page.EditPhoneNumber,
   auditEditPostAction: PostAction.EditPhoneNumber,
-  formTitle: `Change ${name}’s phone number`,
+  formTitle: `Change ${apostrophe(name)} phone number`,
   pageTitle: `Change this person’s phone number`,
   url: `change-phone-number/${id}`,
 })

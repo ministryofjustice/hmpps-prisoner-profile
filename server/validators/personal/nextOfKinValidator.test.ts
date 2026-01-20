@@ -6,7 +6,7 @@ import {
   validateRelationshipType,
 } from './nextOfKinValidator'
 import HmppsError from '../../interfaces/HmppsError'
-import { NextOfKinSubmission } from '../../controllers/nextOfKinController'
+import { NextOfKinSubmission } from '../../controllers/personal/edit/nextOfKin/nextOfKinController'
 
 describe('Next of Kin Validator', () => {
   describe('validateContactType', () => {
