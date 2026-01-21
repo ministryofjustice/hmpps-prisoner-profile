@@ -123,9 +123,7 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),
-    config.featureToggles.useCurious2Api
-      ? retrieveCuriousFunctionalSkills(services.curiousService)
-      : (req, res, next) => next(),
+    retrieveCuriousFunctionalSkills(services.curiousService),
     async (req, res) => {
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const prisonerData = req.middleware?.prisonerData
@@ -139,9 +137,7 @@ export default function routes(services: Services): Router {
       )
 
       const allFunctionalSkillsLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/functional-skills`
-      const fullCourseHistoryLinkUrl = config.featureToggles.useCurious2Api
-        ? `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/in-prison-courses-and-qualifications`
-        : `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const manageAllocationsLinkUrl = `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`
