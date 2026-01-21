@@ -118,7 +118,7 @@ export const services = () => {
   )
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
-  const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
+  const curiousService = new CuriousService(curiousApiClientBuilder, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
     prisonApiClientBuilder,

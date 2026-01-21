@@ -1,7 +1,5 @@
 import type { AllAssessmentDTO, AllQualificationsDTO } from 'curiousApiClient'
 import LearnerEmployabilitySkills from './LearnerEmployabilitySkills'
-import { LearnerEductionPagedResponse } from './LearnerEducation'
-import { LearnerLatestAssessment } from './LearnerLatestAssessment'
 import LearnerGoals from './LearnerGoals'
 import LearnerNeurodivergence from './LearnerNeurodivergence'
 
@@ -11,18 +9,7 @@ export default interface CuriousApiClient {
   getLearnerGoals(prisonerNumber: string): Promise<LearnerGoals | null>
   getLearnerNeurodivergence(prisonerNumber: string): Promise<LearnerNeurodivergence[] | null>
 
-  /**
-   * @deprecated - this method calls a Curious 1 endpoint. Use a method that calls a suitable Curious 2 endpoint instead
-   */
-  getLearnerEducationPage(prisonerNumber: string, page?: number): Promise<LearnerEductionPagedResponse | null>
-
-  /**
-   * @deprecated - this method calls a Curious 1 endpoint. Use a method that calls a suitable Curious 2 endpoint instead
-   */
-  getLearnerLatestAssessments(prisonerNumber: string): Promise<LearnerLatestAssessment[] | null>
-
   // Curious 2 endpoints
-
   /**
    * Calls the Curious V2 endpoint to get all assessments for a given prisoner
    * The returned data includes LDD and Functional Skills data as recorded in Curious 1, and all assessments (ALN,

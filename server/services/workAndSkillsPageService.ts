@@ -1,7 +1,7 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import GovSummaryItem, { GovSummaryGroup } from '../interfaces/GovSummaryItem'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
 
 import OffenderActivitiesHistory from '../data/interfaces/prisonApi/OffenderActivitiesHistory'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -14,14 +14,11 @@ import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmployabilitySkills'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
-import { Assessment, LearnerLatestAssessment } from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import { Result } from '../utils/result/result'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
-import config from '../config'
 
 export interface WorkAndSkillsData {
   learnerEmployabilitySkills: Result<LearnerEmployabilitySkills>
-  learnerLatestAssessments: Result<Array<Array<GovSummaryGroup>>> | undefined // TODO - Deprecated property. Remove when Functional Skills are retrieved from the Curious 2 endpoint via the useCurious2Api feature toggle.
   curiousGoals: Result<CuriousGoals>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
@@ -59,16 +56,12 @@ export default class WorkAndSkillsPageService {
 
     const [
       learnerEmployabilitySkills,
-      learnerLatestAssessments,
       curiousGoals,
       offenderActivitiesHistory,
       unacceptableAbsences,
       personalLearningPlanActionPlan,
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient, apiErrorCallback),
-      !config.featureToggles.useCurious2Api
-        ? this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient, apiErrorCallback)
-        : undefined, // undefined if the useCurious2Api feature flag is set - we get Functional Skills from Curious 2 via a middleware call in this case
       this.getCuriousGoals(prisonerNumber, curiousApiClient, apiErrorCallback),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
       this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
@@ -77,7 +70,6 @@ export default class WorkAndSkillsPageService {
 
     return {
       learnerEmployabilitySkills,
-      learnerLatestAssessments,
       curiousGoals,
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
@@ -145,46 +137,6 @@ export default class WorkAndSkillsPageService {
     apiErrorCallback: (error: Error) => void,
   ): Promise<Result<LearnerEmployabilitySkills>> {
     return Result.wrap(curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber), apiErrorCallback)
-  }
-
-  /*
-    @deprecated - the following is the old behaviour/approach of getting Functional Skills
-    It retrieves Curious 1 only Functional Skills, from the Curious 1 endpoint
-
-    TODO - remove this code and all supporting code/functions when Functional Skills are retrieved from the Curious 2
-      endpoint via the useCurious2Api feature toggle.
-   */
-  private async getLearnerLatestAssessments(
-    prisonerNumber: string,
-    curiousApiClient: CuriousApiClient,
-    apiErrorCallback: (error: Error) => void,
-  ): Promise<Result<GovSummaryGroup[][]>> {
-    return (await Result.wrap(curiousApiClient.getLearnerLatestAssessments(prisonerNumber), apiErrorCallback)).map(
-      assessments => (assessments ? this.mapAssessmentsToSummaryGroups(assessments) : []),
-    )
-  }
-
-  private mapAssessmentsToSummaryGroups(learnerLatestAssessments: LearnerLatestAssessment[]): GovSummaryGroup[][] {
-    const multiListArray: GovSummaryGroup[][] = []
-
-    if (learnerLatestAssessments) {
-      const list: GovSummaryGroup[] = []
-      ;((learnerLatestAssessments?.at(0)?.qualifications || []) as Array<Assessment>).forEach(content => {
-        const type = {
-          key: { text: content.qualification.qualificationType },
-          value: { text: content.qualification.qualificationGrade },
-        }
-        const date = {
-          key: { text: 'Assessment date' },
-          value: { text: formatDate(content.qualification.assessmentDate, 'long') },
-        }
-        const location = { key: { text: 'Assessment location' }, value: { text: content.establishmentName } }
-        list.push({ type, date, location })
-      })
-      multiListArray.push(list)
-    }
-
-    return multiListArray
   }
 
   private async getCuriousGoals(
