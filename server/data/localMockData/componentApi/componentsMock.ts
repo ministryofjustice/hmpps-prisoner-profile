@@ -44,4 +44,11 @@ export const componentsServicesMock: Service[] = [
     href: '',
     navEnabled: true,
   },
+  {
+    id: 'external-movements',
+    heading: 'External movements',
+    description: 'Add a temporary absence',
+    href: 'http://localhost:3001/externalMovements',
+    navEnabled: true,
+  },
 ]
