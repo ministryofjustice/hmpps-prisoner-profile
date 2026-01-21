@@ -57,7 +57,7 @@ context('Add Alert Page', () => {
           addAlertPage.textField().type('This is a test')
           addAlertPage.saveButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert added')
+          alertsPage.flashMessage().should('contain.text', 'Alert added')
         })
       })
 

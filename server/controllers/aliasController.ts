@@ -2,7 +2,6 @@ import { RequestHandler } from 'express'
 import { apostrophe, formatNamePart } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import AliasService, { Name } from '../services/aliasService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { PrisonUser } from '../interfaces/HmppsUser'
@@ -215,7 +214,6 @@ export default class AliasController {
 
         req.flash('flashMessage', {
           text: 'Alias added',
-          type: FlashMessageType.success,
           fieldName: 'aliases',
         })
 
@@ -298,7 +296,6 @@ export default class AliasController {
 
         req.flash('flashMessage', {
           text: 'Date of birth updated',
-          type: FlashMessageType.success,
           fieldName: 'dateOfBirth',
         })
 
@@ -455,7 +452,6 @@ export default class AliasController {
 
         req.flash('flashMessage', {
           text: 'Ethnic group updated',
-          type: FlashMessageType.success,
           fieldName: 'ethnicity',
         })
 
@@ -578,7 +574,6 @@ export default class AliasController {
 
         req.flash('flashMessage', {
           text: 'Name updated',
-          type: FlashMessageType.success,
           fieldName: 'fullName',
         })
 

@@ -3,7 +3,6 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import LanguagesController from './languagesController'
 import LanguagesService from '../services/languagesService'
 import { AuditService, Page, PostAction } from '../services/auditService'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
@@ -169,7 +168,6 @@ describe('LanguagesController', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 
@@ -390,7 +388,6 @@ describe('LanguagesController', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 
@@ -453,7 +450,6 @@ describe('LanguagesController', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 
@@ -523,7 +519,6 @@ describe('LanguagesController', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 

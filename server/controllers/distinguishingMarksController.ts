@@ -12,7 +12,6 @@ import {
 } from './interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import {
   BodyPartId,
   BodyPartSideId,
@@ -141,7 +140,6 @@ export default class DistinguishingMarksController {
 
       req.flash('flashMessage', {
         text: updateMessages[verifiedMarkType],
-        type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
     } catch (error) {
@@ -202,7 +200,6 @@ export default class DistinguishingMarksController {
 
       req.flash('flashMessage', {
         text: updateMessages[verifiedMarkType],
-        type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
     } catch (error) {
@@ -253,7 +250,6 @@ export default class DistinguishingMarksController {
     if (verifiedMarkType) {
       req.flash('flashMessage', {
         text: updateMessages[verifiedMarkType],
-        type: FlashMessageType.success,
         fieldName: `distinguishing-marks-${verifiedMarkType}`,
       })
 

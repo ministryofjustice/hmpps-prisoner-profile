@@ -2,7 +2,6 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
 import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
-import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
@@ -216,7 +215,6 @@ describe('PersonalController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#height`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
-            type: FlashMessageType.success,
             fieldName: 'height',
           })
         })
@@ -373,7 +371,6 @@ describe('PersonalController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#height`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height updated',
-            type: FlashMessageType.success,
             fieldName: 'height',
           })
         })
@@ -511,7 +508,6 @@ describe('PersonalController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#weight`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
-            type: FlashMessageType.success,
             fieldName: 'weight',
           })
         })
@@ -690,7 +686,6 @@ describe('PersonalController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#weight`)
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight updated',
-            type: FlashMessageType.success,
             fieldName: 'weight',
           })
         })
@@ -874,7 +869,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Build updated',
-          type: FlashMessageType.success,
           fieldName: 'build',
         })
       })
@@ -1027,7 +1021,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Smoking and vaping updated',
-          type: FlashMessageType.success,
           fieldName: 'smokerOrVaper',
         })
       })
@@ -1268,7 +1261,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Nationality updated',
-          type: FlashMessageType.success,
           fieldName: 'nationality',
         })
       })
@@ -1396,7 +1388,6 @@ describe('PersonalController', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#shoe-size`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Shoe size updated',
-          type: FlashMessageType.success,
           fieldName: 'shoeSize',
         })
       })
@@ -1500,7 +1491,6 @@ describe('PersonalController', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#city-or-town-of-birth`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'City or town of birth updated',
-          type: FlashMessageType.success,
           fieldName: 'cityOrTownOfBirth',
         })
       })
@@ -1642,7 +1632,6 @@ describe('PersonalController', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#country-of-birth`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Country of birth updated',
-          type: FlashMessageType.success,
           fieldName: 'countryOfBirth',
         })
       })
@@ -1792,7 +1781,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Eye colour updated',
-          type: FlashMessageType.success,
           fieldName: 'eyeColour',
         })
       })
@@ -1972,7 +1960,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Left and right eye colours updated',
-          type: FlashMessageType.success,
           fieldName: 'eyeColour',
         })
       })
@@ -2248,7 +2235,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Diet and food allergies updated',
-          type: FlashMessageType.success,
           fieldName: 'dietAndFoodAllergies',
         })
       })
@@ -2583,7 +2569,6 @@ describe('PersonalController', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#religion-faith-or-belief`)
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
-          type: FlashMessageType.success,
           fieldName: 'religion',
         })
       })
@@ -2631,7 +2616,6 @@ describe('PersonalController', () => {
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#religion-faith-or-belief`)
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Religion, faith or belief updated',
-          type: FlashMessageType.success,
           fieldName: 'religion',
         })
       })
@@ -2806,7 +2790,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Sexual orientation updated',
-          type: FlashMessageType.success,
           fieldName: 'sexualOrientation',
         })
       })
@@ -2972,7 +2955,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Number of children updated',
-          type: FlashMessageType.success,
           fieldName: 'numberOfChildren',
         })
       })
@@ -3158,7 +3140,6 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Marital or civil partnership status updated',
-          type: FlashMessageType.success,
           fieldName: 'domesticStatus',
         })
       })
@@ -3320,7 +3301,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Email address updated',
-            type: FlashMessageType.success,
             fieldName: 'emailAddress',
           })
         })
@@ -3501,7 +3481,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Email address updated',
-            type: FlashMessageType.success,
             fieldName: 'emailAddress',
           })
         })
@@ -3691,7 +3670,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
-            type: FlashMessageType.success,
             fieldName: 'phoneNumber',
           })
         })
@@ -3764,7 +3742,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
-            type: FlashMessageType.success,
             fieldName: 'phoneNumber',
           })
         })
@@ -3936,7 +3913,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
-            type: FlashMessageType.success,
             fieldName: 'phoneNumber',
           })
         })
@@ -4006,7 +3982,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
-            type: FlashMessageType.success,
             fieldName: 'phoneNumber',
           })
         })

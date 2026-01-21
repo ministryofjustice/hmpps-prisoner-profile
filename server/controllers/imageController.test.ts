@@ -2,7 +2,6 @@ import { Readable } from 'stream'
 import { Request, Response } from 'express'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import { AuditService } from '../services/auditService'
@@ -231,7 +230,6 @@ describe('ImageController', () => {
       await controller.updateProfileImage().submitImage(request, response)
       expect(request.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Profile image updated',
-        type: FlashMessageType.success,
       })
       expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image')
     })
@@ -362,7 +360,6 @@ describe('ImageController', () => {
         await controller.updateProfileImage().newWithheldImage.post(request, response)
         expect(request.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Profile image updated',
-          type: FlashMessageType.success,
         })
         expect(response.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/image')
       })

@@ -7,7 +7,6 @@ import { prisonUserMock } from '../data/localMockData/user'
 import AliasService, { Name } from '../services/aliasService'
 import { aliasServiceMock } from '../../tests/mocks/aliasServiceMock'
 import { PseudonymResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
 import { ethnicityCodesMock } from '../data/localMockData/personIntegrationApi/referenceDataMocks'
 import {
@@ -229,7 +228,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
-        type: FlashMessageType.success,
         fieldName: 'fullName',
       })
     })
@@ -367,7 +365,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
-        type: FlashMessageType.success,
         fieldName: 'fullName',
       })
     })
@@ -550,7 +547,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Alias added',
-        type: FlashMessageType.success,
         fieldName: 'aliases',
       })
     })
@@ -686,7 +682,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Date of birth updated',
-        type: FlashMessageType.success,
         fieldName: 'dateOfBirth',
       })
     })
@@ -807,7 +802,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',
-        type: FlashMessageType.success,
         fieldName: 'ethnicity',
       })
 
@@ -902,7 +896,6 @@ describe('Alias Controller', () => {
 
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Ethnic group updated',
-        type: FlashMessageType.success,
         fieldName: 'ethnicity',
       })
     })

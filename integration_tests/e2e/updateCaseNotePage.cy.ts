@@ -47,7 +47,7 @@ context('Update Case Note Page', () => {
         updateCaseNotePage.textField().type('This is a test')
         updateCaseNotePage.saveButton().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/case-notes')
-        caseNotesPage.successMessage().should('contain.text', 'Case note updated')
+        caseNotesPage.flashMessage().should('contain.text', 'Case note updated')
       })
     })
 

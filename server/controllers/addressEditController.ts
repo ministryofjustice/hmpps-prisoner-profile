@@ -7,7 +7,6 @@ import EphemeralDataService from '../services/ephemeralDataService'
 import AddressService from '../services/addressService'
 import NotFoundError from '../utils/notFoundError'
 import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AddressLocation } from '../services/mappers/addressMapper'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { displayWhereIsTheAddressHandler, submitWhereIsTheAddressHandler } from './handlers/whereIsTheAddress'
@@ -164,7 +163,6 @@ export default class AddressEditController {
 
         req.flash('flashMessage', {
           text: 'Address updated',
-          type: FlashMessageType.success,
           fieldName: 'addresses',
         })
 
