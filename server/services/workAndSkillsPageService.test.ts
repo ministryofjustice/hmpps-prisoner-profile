@@ -13,14 +13,12 @@ import WorkAndSkillsPageService, { WorkAndSkillsData } from './workAndSkillsPage
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
 import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
-import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
 import { Result } from '../utils/result/result'
-import { LearnerLatestAssessmentsSummary } from '../data/localMockData/learnerLatestAssessmentsSummary'
 import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 
 jest.mock('./mappers/curiousGoalsMapper')
@@ -52,7 +50,6 @@ describe('WorkAndSkillsService', () => {
     return {
       getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
       getLearnerEducationPage: jest.fn(),
-      getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
       getLearnerGoals: jest.fn(async () => learnerGoals),
       getLearnerNeurodivergence: jest.fn(),
       getLearnerAssessments: jest.fn(),
@@ -127,7 +124,6 @@ describe('WorkAndSkillsService', () => {
 
   const expectedWorkAndSkills: WorkAndSkillsData = {
     learnerEmployabilitySkills: Result.fulfilled(learnerEmployabilitySkills),
-    learnerLatestAssessments: Result.fulfilled(LearnerLatestAssessmentsSummary),
     curiousGoals: Result.fulfilled(expectedCuriousGoals),
     workAndSkillsPrisonerName: ' ',
     offenderActivitiesHistory: expectedActivitiesHistory,
@@ -240,41 +236,6 @@ describe('WorkAndSkillsService', () => {
         expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
       })
     })
-
-    describe('Learner latest assessments', () => {
-      beforeEach(() => {
-        jest.clearAllMocks()
-        curiousApiClient = curiousApiClientMock()
-      })
-
-      it('should handle a 404 from the Curious API, which is presented to the service as null', async () => {
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
-        curiousApiClient.getLearnerLatestAssessments = jest.fn().mockReturnValue(null)
-
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-
-        responseAssertions(res, {
-          ...expectedWorkAndSkills,
-          learnerLatestAssessments: Result.fulfilled([]),
-        })
-      })
-
-      it('should handle Curious API failure', async () => {
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
-        const apiErrorCallback = jest.fn()
-        curiousApiClient.getLearnerLatestAssessments = jest.fn().mockRejectedValue(curiousApiError)
-
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner, apiErrorCallback)
-
-        responseAssertions(res, {
-          ...expectedWorkAndSkills,
-          learnerLatestAssessments: Result.rejected(curiousApiError),
-        })
-        expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
-      })
-    })
   })
 
   const responseAssertions = (actual: WorkAndSkillsData, expected: WorkAndSkillsData = expectedWorkAndSkills) => {
@@ -287,7 +248,5 @@ describe('WorkAndSkillsService', () => {
     expect(actual.curiousGoals.getOrNull()).toEqual(expected.curiousGoals.getOrNull())
     expect(actual.learnerEmployabilitySkills.isFulfilled()).toEqual(expected.learnerEmployabilitySkills.isFulfilled())
     expect(actual.learnerEmployabilitySkills.getOrNull()).toEqual(expected.learnerEmployabilitySkills.getOrNull())
-    expect(actual.learnerLatestAssessments.isFulfilled()).toEqual(expected.learnerLatestAssessments.isFulfilled())
-    expect(actual.learnerLatestAssessments.getOrNull()).toEqual(expected.learnerLatestAssessments.getOrNull())
   }
 })

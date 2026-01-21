@@ -10,7 +10,6 @@ import {
   DisciplinaryAction,
   MilitaryServiceInformation,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { dateToIsoDate } from '../utils/dateHelpers'
@@ -201,7 +200,6 @@ export default class MilitaryRecordsController {
 
       req.flash('flashMessage', {
         text: `UK military service information ${militarySeq ? 'updated' : 'added'}`,
-        type: FlashMessageType.success,
         ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
 
@@ -310,7 +308,6 @@ export default class MilitaryRecordsController {
 
       req.flash('flashMessage', {
         text: `UK military service information updated`,
-        type: FlashMessageType.success,
         ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
       this.auditService
@@ -426,7 +423,6 @@ export default class MilitaryRecordsController {
 
       req.flash('flashMessage', {
         text: `UK military service information updated`,
-        type: FlashMessageType.success,
         ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
       this.auditService
@@ -551,7 +547,6 @@ export default class MilitaryRecordsController {
 
       req.flash('flashMessage', {
         text: `UK military service information updated`,
-        type: FlashMessageType.success,
         ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
       this.auditService

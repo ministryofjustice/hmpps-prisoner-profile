@@ -48,7 +48,7 @@ context('Add More Details Page', () => {
           addMoreDetailsPage.comments().type('Comments added')
           addMoreDetailsPage.updateButton().click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/active')
-          alertsPage.successMessage().should('contain.text', 'Alert updated')
+          alertsPage.flashMessage().should('contain.text', 'Alert updated')
         })
       })
 

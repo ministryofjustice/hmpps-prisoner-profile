@@ -10,7 +10,6 @@ import {
   SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import getCommonRequestData from '../utils/getCommonRequestData'
 
@@ -138,7 +137,6 @@ export default class LanguagesController {
 
       req.flash('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 
@@ -275,7 +273,6 @@ export default class LanguagesController {
 
       req.flash('flashMessage', {
         text: 'Languages updated',
-        type: FlashMessageType.success,
         fieldName: 'languages',
       })
 

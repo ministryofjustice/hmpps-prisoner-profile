@@ -367,6 +367,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.sideBar().actions().manageActivityAllocationsActionLink().should('not.exist')
       })
+
+      it('should not display Add a temporary absence link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.sideBar().actions().addTemporaryAbsenceLink().should('not.exist')
+      })
     })
 
     context('More Info', () => {
@@ -537,7 +542,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('should display Probation documents  link', () => {
+    it('should display Probation documents link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.sideBar().moreInfo().probationDocumentsInfoLink().should('exist')
     })
@@ -551,7 +556,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('should display Probation documents  link', () => {
+    it('should display Probation documents link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.sideBar().moreInfo().probationDocumentsInfoLink().should('exist')
     })
@@ -565,9 +570,23 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('Should display the add key worker session buton', () => {
+    it('Should display the add key worker session button', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.sideBar().actions().addKeyWorkerSessionActionLink().should('exist')
+    })
+  })
+
+  context('Given the user can manage temporary absences in external movements', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ExternalMovementsTapManage] })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
+    })
+
+    it('Should display the add a temporary absence button', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.sideBar().actions().addTemporaryAbsenceLink().should('exist')
     })
   })
 

@@ -3,10 +3,7 @@ import config from '../config'
 import CuriousApiClient from './curiousApiClient'
 import { learnerEmployabilitySkills } from './localMockData/learnerEmployabilitySkills'
 import aValidLearnerGoals from './localMockData/learnerGoalsMock'
-import { LearnerLatestAssessmentsMock } from './localMockData/learnerLatestAssessmentsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
-import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
-import { learnerEducationPagedResponsePage1Of1 } from './localMockData/learnerEducationPagedResponse'
 import { LearnerAssessmentsMock } from './localMockData/learnerAssessmentsMock'
 import { LearnerQualificationsMock } from './localMockData/learnerQualificationsMock'
 
@@ -35,83 +32,6 @@ describe('curiousApiClient', () => {
 
       const output = await curiousApiClient.getLearnerEmployabilitySkills('G6123VU')
       expect(output).toEqual(learnerEmployabilitySkills)
-    })
-  })
-
-  describe('getLearnerEducationPage', () => {
-    it('should get learner eduction page', async () => {
-      // Given
-      const prisonNumber = 'A1234BC'
-      const page = 0
-
-      const learnerEducationPage1Of1: LearnerEductionPagedResponse = learnerEducationPagedResponsePage1Of1(prisonNumber)
-      fakeCuriousApi
-        .get(`/learnerEducation/${prisonNumber}?page=${page}`)
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, learnerEducationPage1Of1)
-
-      // When
-      const actual = await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
-
-      // Then
-      expect(actual).toEqual(learnerEducationPage1Of1)
-      expect(nock.isDone()).toBe(true)
-    })
-
-    it('should not get learner education page given the API returns a 404 response', async () => {
-      // Given
-      const prisonNumber = 'A1234BC'
-      const page = 0
-
-      fakeCuriousApi
-        .get(`/learnerEducation/${prisonNumber}?page=${page}`)
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(404, 'Not found')
-
-      // When
-      const actual = await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
-
-      // Then
-      expect(actual).toBe(null)
-      expect(nock.isDone()).toBe(true)
-    })
-
-    it('should not get learner education page given the API returns an error response', async () => {
-      // Given
-      const prisonNumber = 'A1234BC'
-      const page = 0
-
-      const expectedResponseBody = {
-        errorCode: 'VC4001',
-        errorMessage: 'Invalid token',
-        httpStatusCode: 401,
-      }
-      fakeCuriousApi
-        .get(`/learnerEducation/${prisonNumber}?page=${page}`)
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(401, expectedResponseBody)
-
-      // When
-      try {
-        await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
-      } catch (e) {
-        // Then
-        expect(nock.isDone()).toBe(true)
-        expect(e.responseStatus).toEqual(401)
-        expect(e.data).toEqual(expectedResponseBody)
-      }
-    })
-  })
-
-  describe('getLearnerLatestAssessments', () => {
-    it('should return data from api', async () => {
-      fakeCuriousApi
-        .get('/latestLearnerAssessments/G6123VU')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LearnerLatestAssessmentsMock)
-
-      const output = await curiousApiClient.getLearnerLatestAssessments('G6123VU')
-      expect(output).toEqual(LearnerLatestAssessmentsMock)
     })
   })
 

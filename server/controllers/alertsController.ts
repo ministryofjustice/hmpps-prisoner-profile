@@ -6,7 +6,6 @@ import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { sortByDateTime } from '../utils/utils'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
@@ -199,7 +198,7 @@ export default class AlertsController {
         return res.redirect(`/prisoner/${prisonerNumber}/add-alert`)
       }
 
-      req.flash('flashMessage', { text: 'Alert added', type: FlashMessageType.success })
+      req.flash('flashMessage', { text: 'Alert added' })
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -316,7 +315,7 @@ export default class AlertsController {
         return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/add-more-details`)
       }
 
-      req.flash('flashMessage', { text: 'Alert updated', type: FlashMessageType.success })
+      req.flash('flashMessage', { text: 'Alert updated' })
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -406,7 +405,6 @@ export default class AlertsController {
 
       req.flash('flashMessage', {
         text: today === 'yes' ? 'Alert closed' : 'Alert updated',
-        type: FlashMessageType.success,
       })
       this.auditService
         .sendPostSuccess({
@@ -497,7 +495,6 @@ export default class AlertsController {
 
       req.flash('flashMessage', {
         text: removeEndDate === 'no' && isToday(parseDate(activeTo)) ? 'Alert closed' : 'Alert updated',
-        type: FlashMessageType.success,
       })
       this.auditService
         .sendPostSuccess({

@@ -2,7 +2,6 @@ import { Request, RequestHandler, Response } from 'express'
 import { apostrophe, capitaliseFirstLetter } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import IdentityNumbersService from '../services/identityNumbersService'
 import {
@@ -181,8 +180,7 @@ export default class IdentityNumbersController {
         }
 
         req.flash('flashMessage', {
-          text: `Identity numbers updated`,
-          type: FlashMessageType.success,
+          text: 'Identity numbers updated',
           fieldName: `'${editPageUrl}-row'`,
         })
 
@@ -273,7 +271,6 @@ export default class IdentityNumbersController {
 
       req.flash('flashMessage', {
         text: 'Identity numbers updated',
-        type: FlashMessageType.success,
         fieldName: this.getUpdatedFieldsFromFormValues(formValues),
       })
 

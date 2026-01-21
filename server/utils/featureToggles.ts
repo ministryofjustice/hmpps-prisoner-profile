@@ -31,5 +31,3 @@ export const externalContactsEnabled: FeatureFlagMethod = (activeCaseLoadId: str
 export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes('***') ||
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes(activeCaseLoadId)
-
-export const useCurious2Api: FeatureFlagMethod = () => config.featureToggles.useCurious2Api

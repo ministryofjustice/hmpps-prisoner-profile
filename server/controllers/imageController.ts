@@ -4,7 +4,6 @@ import { PersonIntegrationApiClient } from '../data/interfaces/personIntegration
 import { AuditService, PostAction } from '../services/auditService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import MulterFile from './interfaces/MulterFile'
-import { FlashMessageType } from '../data/enums/flashMessageType'
 import logger from '../../logger'
 import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import MetricsService from '../services/metrics/metricsService'
@@ -136,10 +135,7 @@ export default class ImageController {
           })
         }
 
-        req.flash('flashMessage', {
-          text: `Profile image updated`,
-          type: FlashMessageType.success,
-        })
+        req.flash('flashMessage', { text: 'Profile image updated' })
 
         this.auditService
           .sendPostSuccess({
@@ -215,10 +211,7 @@ export default class ImageController {
             )
           }
 
-          req.flash('flashMessage', {
-            text: `Profile image updated`,
-            type: FlashMessageType.success,
-          })
+          req.flash('flashMessage', { text: 'Profile image updated' })
 
           this.auditService
             .sendPostSuccess({

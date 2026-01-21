@@ -9,38 +9,14 @@
     }
   }
 
-  &__preview {
-    &__visible {
-      display: flex;
-    }
-
-    &__hidden {
-      display: none;
-    }
-
-    flex-direction: row;
-    flex-wrap: nowrap;
-    column-gap: 20px;
-    justify-content: space-between;
-    padding: 14px 15px;
-    border: 1px solid $govuk-border-colour;
-
-    a {
-      color: $govuk-link-colour;
-    }
-
-    > .image-preview {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      column-gap: 20px;
-      justify-content: start;
-    }
-  }
-
   &__photo {
     width: 120px;
     min-width: 120px;
+    height: auto;
+  }
+  
+  &__content {
+    flex: 1;
   }
 
   &__file-name {

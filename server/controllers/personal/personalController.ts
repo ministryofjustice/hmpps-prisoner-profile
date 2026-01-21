@@ -20,7 +20,6 @@ import {
   SelectOption,
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
-import { FlashMessageType } from '../../data/enums/flashMessageType'
 import {
   dietAndAllergyEnabled,
   editProfileEnabled,
@@ -1949,7 +1948,6 @@ export default class PersonalController {
       if (setterOutcome === SetterOutcome.SUCCESS || setterOutcome === undefined) {
         req.flash('flashMessage', {
           text: `${successFlashFieldName ?? pageTitle} updated`,
-          type: FlashMessageType.success,
           fieldName,
         })
 

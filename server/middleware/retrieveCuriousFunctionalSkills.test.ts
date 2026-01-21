@@ -7,7 +7,7 @@ import { FunctionalSkills } from '../services/interfaces/curiousService/CuriousF
 jest.mock('../services/curiousService')
 
 describe('retrieveCuriousFunctionalSkills', () => {
-  const curiousService = new CuriousService(null, null, null) as jest.Mocked<CuriousService>
+  const curiousService = new CuriousService(null, null) as jest.Mocked<CuriousService>
   const requestHandler = retrieveCuriousFunctionalSkills(curiousService)
 
   const prisonerNumber = 'A1234GC'
