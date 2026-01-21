@@ -35,7 +35,9 @@
     {% include "./banner.njk" %}
   {% endif %}
 
-  <div id="flash-announcement" role="alert"></div>
+  {# role="status" is implicitly aria-live="polite" - this feels like the right thing to use #}
+  {# role="alert" is implicitly aria-live="assertive" - this works but feels confusing #}
+  <div id="flash-announcement" class="govuk-visually-hidden" role="status" aria-atomic="true"></div>
   {% if flashMessage %}
     <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}{{ ' hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
       <p id="flash-content">{{ flashMessage.text }}</p>
