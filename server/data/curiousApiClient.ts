@@ -4,8 +4,6 @@ import RestClient, { Request } from './restClient'
 import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
 import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
-import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
-import { LearnerLatestAssessment } from './interfaces/curiousApi/LearnerLatestAssessment'
 import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
 import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
 import { CuriousApiToken } from './hmppsAuthClient'
@@ -18,21 +16,6 @@ export default class CuriousRestApiClient extends RestClient implements CuriousA
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills | null> {
     return this.getAndIgnore404({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
-    })
-  }
-
-  async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse | null> {
-    return this.getAndIgnore404({
-      path: `/learnerEducation/${offenderNumber}`,
-      query: {
-        page,
-      },
-    })
-  }
-
-  async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[] | null> {
-    return this.getAndIgnore404({
-      path: `/latestLearnerAssessments/${offenderNumber}`,
     })
   }
 
