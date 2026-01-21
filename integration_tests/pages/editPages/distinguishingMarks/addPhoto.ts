@@ -12,15 +12,13 @@ export default class ChangePhoto extends Page {
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  imagePreview = (): PageElement => cy.get('#preview-image')
+  imagePreview = (): PageElement => cy.get('.hmpps-file-upload-with-preview__photo')
 
-  imageFilename = (): PageElement => cy.get('#preview-filename')
+  imageFilename = (): PageElement => cy.get('.govuk-file-upload-button__status')
 
-  changeLink = (): PageElement => cy.get('#change-photo-link')
+  fileUploadButton = (): PageElement => cy.get('.govuk-file-upload-button')
 
-  fileUploadButton = (): PageElement => cy.get('#file-upload button')
-
-  photoField = (): PageElement => cy.get('input[type=file]')
+  photoField = (): PageElement => cy.get('.govuk-file-upload')
 
   saveAndReturnBtn = (): PageElement => cy.get('button[type=submit][value=returnToMarkSummary][name=action]')
 

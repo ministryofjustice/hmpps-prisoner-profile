@@ -68,8 +68,6 @@ context('Change distinguishing mark photo', () => {
       page.miniBanner().name().should('contain.text', prisonerNumber)
 
       page.h1().should('contain.text', 'Change the photo of the tattoo')
-      page.fileUploadButton().should('not.be.visible')
-      page.changeLink().click()
       page.fileUploadButton().should('be.visible')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
@@ -84,8 +82,6 @@ context('Change distinguishing mark photo', () => {
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the scar')
 
       page.h1().should('contain.text', 'Change the photo of the scar')
-      page.fileUploadButton().should('not.be.visible')
-      page.changeLink().click()
       page.fileUploadButton().should('be.visible')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
@@ -100,8 +96,6 @@ context('Change distinguishing mark photo', () => {
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the mark')
 
       page.h1().should('contain.text', 'Change the photo of the mark')
-      page.fileUploadButton().should('not.be.visible')
-      page.changeLink().click()
       page.fileUploadButton().should('be.visible')
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
