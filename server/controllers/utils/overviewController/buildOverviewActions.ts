@@ -13,7 +13,8 @@ import {
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { ActionIcon } from '../../../data/enums/actionIcon'
-import { includesActiveCaseLoad } from '../../../utils/utils'
+import { Role } from '../../../data/enums/role'
+import { includesActiveCaseLoad, userHasRoles } from '../../../utils/utils'
 import conf from '../../../config'
 import isServiceNavEnabled from '../../../utils/isServiceEnabled'
 import { HmppsUser } from '../../../interfaces/HmppsUser'
@@ -142,6 +143,21 @@ export default (
       icon: ActionIcon.ManageAllocations,
       url: `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`,
       dataQA: 'manage-allocations-link',
+    })
+  }
+
+  if (
+    userHasRoles([Role.ExternalMovementsTapManage], user.userRoles) &&
+    isServiceNavEnabled('external-movements', feComponentsSharedData)
+  ) {
+    const externalMovementsUiUrl = feComponentsSharedData.services.find(
+      service => service.id === 'external-movements',
+    ).href
+    actions.push({
+      text: 'Add a temporary absence',
+      icon: ActionIcon.AddTemporaryAbsence,
+      url: `${externalMovementsUiUrl}/add-temporary-absence/start/${prisonerData.prisonerNumber}`,
+      dataQA: 'add-temporary-absence-link',
     })
   }
 

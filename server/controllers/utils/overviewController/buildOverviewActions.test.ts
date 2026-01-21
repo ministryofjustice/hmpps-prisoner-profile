@@ -9,7 +9,9 @@ import {
   SOCPermission,
   UseOfForcePermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import buildOverviewActions from './buildOverviewActions'
+import { Role } from '../../../data/enums/role'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
@@ -310,6 +312,51 @@ describe('buildOverviewActions', () => {
               `${config.serviceUrls.activities}/prisoner-allocations/${PrisonerMockDataA.prisonerNumber}`,
           ),
         ).toEqual(visible)
+      },
+    )
+  })
+
+  describe('Add a temporary absence', () => {
+    const externalMovementsService = (navEnabled: boolean): Service => ({
+      id: 'external-movements',
+      heading: 'External movements',
+      description: 'Add a temporary absence',
+      href: 'http://localhost:3001/externalMovements',
+      navEnabled,
+    })
+    test.each`
+      userHasTAPRole | availableServices                    | visible
+      ${true}        | ${[externalMovementsService(true)]}  | ${true}
+      ${true}        | ${[externalMovementsService(false)]} | ${false}
+      ${true}        | ${[]}                                | ${false}
+      ${false}       | ${[externalMovementsService(true)]}  | ${false}
+    `(
+      'user with external movements TAP manage role: $userHasTAPRole and navEnabled: $availableServices.0.navEnabled can see ‘Add a temporary absence’: $visible',
+      ({
+        userHasTAPRole,
+        availableServices,
+        visible,
+      }: {
+        userHasTAPRole: boolean
+        availableServices: Service[]
+        visible: boolean
+      }) => {
+        const actions = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          { ...prisonUserMock, userRoles: userHasTAPRole ? [Role.ExternalMovementsTapManage] : [] },
+          config,
+          { services: availableServices, caseLoads: prisonUserMock.caseLoads, allocationJobResponsibilities: [] },
+          permissions,
+        )
+        expect(
+          actions.some(
+            action =>
+              action.url ===
+              `http://localhost:3001/externalMovements/add-temporary-absence/start/${PrisonerMockDataA.prisonerNumber}`,
+          ),
+        ).toBe(visible)
       },
     )
   })
