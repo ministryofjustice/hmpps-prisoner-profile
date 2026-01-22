@@ -35,10 +35,9 @@
     {% include "./banner.njk" %}
   {% endif %}
 
-  <div id="flash-announcement" class="hmpps-flash-message__announcement govuk-visually-hidden" role="alert" aria-atomic="true"></div>
   {% if flashMessage %}
     <div class="hmpps-flash-message {{ 'hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
-      <p id="flash-content">{{ flashMessage.text }}</p>
+      <p role="alert">{{ flashMessage.text }}</p>
     </div>
   {% endif %}
 

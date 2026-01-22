@@ -136,7 +136,6 @@ export function editPageTests<TPage extends EditPage>(options: {
             if (redirectAnchor) cy.location('hash').should('eq', `#${redirectAnchor}`)
             if (successfulFlashMessage) {
               page.flashMessage().should('include.text', successfulFlashMessage)
-              page.flashAnnouncement().should('include.text', successfulFlashMessage)
             }
           })
         })

@@ -31,7 +31,5 @@ export default abstract class Page {
 
   flashMessage = (): PageElement<HTMLDivElement> => cy.get('.hmpps-flash-message')
 
-  flashAnnouncement = (): PageElement<HTMLDivElement> => cy.get('.hmpps-flash-message__announcement')
-
   errorMessage = (): PageElement<HTMLDivElement> => cy.get('.govuk-error-summary')
 }
