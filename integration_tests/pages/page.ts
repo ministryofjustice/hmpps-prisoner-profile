@@ -29,9 +29,9 @@ export default abstract class Page {
 
   apiErrorBanner = (): PageElement<HTMLDivElement> => cy.get('.hmpps-api-error-banner')
 
-  flashAnnouncement = (): PageElement<HTMLDivElement> => cy.get('#flash-announcement')
-
   flashMessage = (): PageElement<HTMLDivElement> => cy.get('.hmpps-flash-message')
+
+  flashAnnouncement = (): PageElement<HTMLDivElement> => cy.get('.hmpps-flash-message__announcement')
 
   errorMessage = (): PageElement<HTMLDivElement> => cy.get('.govuk-error-summary')
 }

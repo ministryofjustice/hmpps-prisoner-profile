@@ -35,9 +35,7 @@
     {% include "./banner.njk" %}
   {% endif %}
 
-  {# role="status" is implicitly aria-live="polite" - this feels like the right thing to use #}
-  {# role="alert" is implicitly aria-live="assertive" - this works but feels confusing #}
-  <div id="flash-announcement" class="govuk-visually-hidden" role="status" aria-atomic="true"></div>
+  <div id="flash-announcement" class="hmpps-flash-message__announcement govuk-visually-hidden" role="alert" aria-atomic="true"></div>
   {% if flashMessage %}
     <div class="hmpps-flash-message {{ 'hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
       <p id="flash-content">{{ flashMessage.text }}</p>
@@ -61,7 +59,7 @@
     {% endif %}
 
     <div class="prisoner-profile-breadcrumbs__breadcrumbs">
-    {{ govukBreadcrumbs({
+      {{ govukBreadcrumbs({
         items: breadCrumbs | default([])
       }) }}
     </div>
@@ -85,5 +83,5 @@
 {% endblock %}
 
 {% block footer %}
-    {{ feComponents.footer | safe }}
+  {{ feComponents.footer | safe }}
 {% endblock %}
