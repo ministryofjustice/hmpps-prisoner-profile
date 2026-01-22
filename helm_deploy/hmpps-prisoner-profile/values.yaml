@@ -32,6 +32,7 @@ generic-service:
     REDIS_ENABLED: "true"
     REDIS_TLS_ENABLED: "true"
     TOKEN_VERIFICATION_ENABLED: "true"
+    CIRCUIT_BREAKER_ENABLED: "true"
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
     OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
