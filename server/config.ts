@@ -326,6 +326,7 @@ export default {
     pathfinder: get('PATHFINDER_UI_URL', 'http://localhost:3001', requiredInProduction),
     manageSocCases: get('MANAGE_SOC_CASES_UI_URL', 'http://localhost:3001', requiredInProduction),
     welcomePeopleIntoPrison: get('WELCOME_PEOPLE_INTO_PRISON_UI_URL', 'http://localhost:3001', requiredInProduction),
+    incidentReporting: get('INCIDENT_REPORTING_UI_URL', 'http://localhost:3001', requiredInProduction),
     createAndVaryALicence: get('CREATE_AND_VARY_A_LICENCE_UI_URL', 'http://localhost:3001', requiredInProduction),
     calculateReleaseDates: get('CALCULATE_RELEASE_DATES_UI_URL', 'http://localhost:3001', requiredInProduction),
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
