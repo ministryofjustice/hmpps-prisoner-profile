@@ -9,25 +9,30 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set cropHtml %}
-<div class="hmpps-image-cropper-button-text">
-  Edit the photo
-</div>
-{% endset %}
-{% set previewHtml %}
-<div class="hmpps-image-cropper-button-text">
-  Preview
-</div>
-{% endset %}
-{% set rotateHtml %}
-<div class="hmpps-image-cropper-button-text">
-  <img src="/assets/images/imageEditing/rotate.svg" role="presentation" alt=""/> Rotate
-</div>
-{% endset %}
+
 {% set cropperTextHtml %}
-<h2 class="govuk-heading-m">Edit the image before uploading</h2>
-<p class="govuk-body">You can edit the image using the yellow crop tool and rotate button.</p>
+  <label class="govuk-label govuk-label--m">Edit the image before uploading</label>
+  <p class="govuk-body">You can edit the image using the yellow crop tool and rotate button.</p>
 {% endset %}
+
+{% set cropHtml %}
+  <div class="hmpps-image-cropper-button-text">
+    Edit the photo
+  </div>
+{% endset %}
+
+{% set previewHtml %}
+  <div class="hmpps-image-cropper-button-text">
+    Preview
+  </div>
+{% endset %}
+
+{% set rotateHtml %}
+  <div class="hmpps-image-cropper-button-text">
+    <img src="/assets/images/imageEditing/rotate.svg" role="presentation" alt=""/> Rotate
+  </div>
+{% endset %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -60,88 +65,90 @@
       </div>
     </div>
   {% endif %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <form method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/submit" | appendRefererToUrl(referer) }}">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-        <input type="file" id="js-cropped-image-input" name="file" hidden/>
-        <input type="hidden" name="originalImgSrc" value="{{ originalImgSrc }}"/>
-        {% if photoType %}
-          <input type="hidden" name="photoType" value="{{ photoType }}"/>
-        {% endif %}
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image{{ " captured by webcam" if webcamImage }}</h1>
-        <div class="hmpps-cropper-photo-container" id="photo-preview-container">
-          <div class="hmpps-cropper-photo-container__content">
-            <div class="hmpps-cropper-photo-container__photo-preview">
-              <img src='{{ imgSrc }}' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id='photo-preview'/>
-              <div class="hmpps-cropper-photo-container__controls govuk-!-margin-bottom-0">
-                {{ govukButton({
-                  html: cropHtml,
-                  type: "button",
-                  id: "toggle-crop-button",
-                  classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__full-width govuk-button--secondary",
-                  preventDoubleClick: true
-                }) }}
-              </div>
-            </div>
-            <div class="hmpps-cropper-photo-container__description">
-              {{ cropperTextHtml | safe }}
-            </div>
-          </div>
-        </div>
-        <div class="hmpps-cropper-photo-container" id="photo-cropper-container">
-          <div class="hmpps-cropper-photo-container__content">
-            <div class='hmpps-cropper-container'>
-              <div class="hmpps-cropper-photo-container__photo">
-                <cropper-canvas background>
-                  <cropper-image src='{{ imgSrc }}' alt="Picture" initial-center-size="contain" rotatable="false" skewable="false" scalable="false" translatable="false"></cropper-image>
-                  <cropper-shade hidden></cropper-shade>
-                  <cropper-selection id="cropperSelection" aspect-ratio="0.8" movable resizable outlined keyboard>
-                    <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0)"></cropper-handle>
-                    <cropper-handle action="n-resize"></cropper-handle>
-                    <cropper-handle action="e-resize"></cropper-handle>
-                    <cropper-handle action="s-resize"></cropper-handle>
-                    <cropper-handle action="w-resize"></cropper-handle>
-                    <cropper-handle action="ne-resize"></cropper-handle>
-                    <cropper-handle action="nw-resize"></cropper-handle>
-                    <cropper-handle action="se-resize"></cropper-handle>
-                    <cropper-handle action="sw-resize"></cropper-handle>
-                  </cropper-selection>
-                </cropper-canvas>
+  <div class="govuk-form-group">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <form method='post' enctype='multipart/form-data' action="{{ "/prisoner/" + prisonerNumber + "/image/submit" | appendRefererToUrl(referer) }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+          <input type="file" id="js-cropped-image-input" name="file" hidden/>
+          <input type="hidden" name="originalImgSrc" value="{{ originalImgSrc }}"/>
+          {% if photoType %}
+            <input type="hidden" name="photoType" value="{{ photoType }}"/>
+          {% endif %}
+          <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image{{ " captured by webcam" if webcamImage }}</h1>
+          <div class="hmpps-cropper-photo-container" id="photo-preview-container">
+            <div class="hmpps-cropper-photo-container__content">
+              <div class="hmpps-cropper-photo-container__photo-preview">
+                <img src='{{ imgSrc }}' alt="Thumbnail of {{ fileName }}" data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id='photo-preview'/>
                 <div class="hmpps-cropper-photo-container__controls govuk-!-margin-bottom-0">
                   {{ govukButton({
-                    html: rotateHtml,
-                    type: "button",
-                    id: "rotate-clockwise",
-                    classes: "hmpps-button__rotate-clockwise hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
-                    preventDoubleClick: true
-                  }) }}
-                  {{ govukButton({
-                    html: previewHtml,
+                    html: cropHtml,
                     type: "button",
                     id: "toggle-crop-button",
-                    classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
+                    classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__full-width govuk-button--secondary",
                     preventDoubleClick: true
                   }) }}
                 </div>
               </div>
-            </div>
-            <div class="hmpps-cropper-photo-container__description">
-              {{ cropperTextHtml | safe }}
+              <div class="hmpps-cropper-photo-container__description">
+                {{ cropperTextHtml | safe }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Save new facial image",
-            type: "submit",
-            preventDoubleClick: true,
-            attributes: { "data-qa": "submit-button" }
-          }) }}
-          <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
-            Cancel</a>
-        </div>
-      </form>
+          <div class="hmpps-cropper-photo-container" id="photo-cropper-container">
+            <div class="hmpps-cropper-photo-container__content">
+              <div class='hmpps-cropper-container'>
+                <div class="hmpps-cropper-photo-container__photo">
+                  <cropper-canvas background>
+                    <cropper-image src='{{ imgSrc }}' alt="Thumbnail of {{ fileName }}" initial-center-size="contain" rotatable="false" skewable="false" scalable="false" translatable="false"></cropper-image>
+                    <cropper-shade hidden></cropper-shade>
+                    <cropper-selection id="cropperSelection" aspect-ratio="0.8" movable resizable outlined keyboard>
+                      <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0)"></cropper-handle>
+                      <cropper-handle action="n-resize"></cropper-handle>
+                      <cropper-handle action="e-resize"></cropper-handle>
+                      <cropper-handle action="s-resize"></cropper-handle>
+                      <cropper-handle action="w-resize"></cropper-handle>
+                      <cropper-handle action="ne-resize"></cropper-handle>
+                      <cropper-handle action="nw-resize"></cropper-handle>
+                      <cropper-handle action="se-resize"></cropper-handle>
+                      <cropper-handle action="sw-resize"></cropper-handle>
+                    </cropper-selection>
+                  </cropper-canvas>
+                  <div class="hmpps-cropper-photo-container__controls govuk-!-margin-bottom-0">
+                    {{ govukButton({
+                      html: rotateHtml,
+                      type: "button",
+                      id: "rotate-clockwise",
+                      classes: "hmpps-button__rotate-clockwise hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
+                      preventDoubleClick: true
+                    }) }}
+                    {{ govukButton({
+                      html: previewHtml,
+                      type: "button",
+                      id: "toggle-crop-button",
+                      classes: "hmpps-button__toggle-crop hmpps-cropper-photo-container__controls__half-width govuk-button--secondary",
+                      preventDoubleClick: true
+                    }) }}
+                  </div>
+                </div>
+              </div>
+              <div class="hmpps-cropper-photo-container__description">
+                {{ cropperTextHtml | safe }}
+              </div>
+            </div>
+          </div>
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Save new facial image",
+              type: "submit",
+              preventDoubleClick: true,
+              attributes: { "data-qa": "submit-button" }
+            }) }}
+            <a href="{{ "/prisoner/" + prisonerNumber + "/image" | appendRefererToUrl(referer) }}" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+              Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 {% endblock %}
