@@ -1,31 +1,36 @@
 import { Request, RequestHandler } from 'express'
 import { UUID } from 'crypto'
-import { apostrophe, formatName, mapRelationshipDescriptionByCode, objectToSelectOptions } from '../utils/utils'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import NextOfKinService from '../services/nextOfKinService'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import logger from '../../logger'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import {
+  apostrophe,
+  formatName,
+  mapRelationshipDescriptionByCode,
+  objectToSelectOptions,
+} from '../../../../utils/utils'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import NextOfKinService from '../../../../services/nextOfKinService'
+import { NameFormatStyle } from '../../../../data/enums/nameFormatStyle'
+import logger from '../../../../../logger'
+import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
 import {
   PersonalRelationshipsContactRequest,
   PersonalRelationshipsContactRequestAddress,
   PersonalRelationshipsReferenceDataDomain,
   PersonalRelationshipType,
-} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import { dateToIsoDate } from '../utils/dateHelpers'
-import { displayWhereIsTheAddressHandler, submitWhereIsTheAddressHandler } from './handlers/whereIsTheAddress'
-import { AddressLocation } from '../services/mappers/addressMapper'
-import { displayManualEditAddressHandler, submitManualEditAddressHandler } from './handlers/manualEditAddress'
-import AddressService from '../services/addressService'
-import EphemeralDataService from '../services/ephemeralDataService'
-import { displayConfirmAddressHandler } from './handlers/confirmAddress'
-import { displayFindUkAddressHandler, submitFindUkAddressHandler } from './handlers/findUkAddress'
-import NotFoundError from '../utils/notFoundError'
-import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { PhoneNumberTypeMappings } from '../data/constants/phoneNumberMappings'
-import getCommonRequestData from '../utils/getCommonRequestData'
-import { errorHasStatus } from '../utils/errorHelpers'
+} from '../../../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
+import { dateToIsoDate } from '../../../../utils/dateHelpers'
+import { displayWhereIsTheAddressHandler, submitWhereIsTheAddressHandler } from '../../../handlers/whereIsTheAddress'
+import { AddressLocation } from '../../../../services/mappers/addressMapper'
+import { displayManualEditAddressHandler, submitManualEditAddressHandler } from '../../../handlers/manualEditAddress'
+import AddressService from '../../../../services/addressService'
+import EphemeralDataService from '../../../../services/ephemeralDataService'
+import { displayConfirmAddressHandler } from '../../../handlers/confirmAddress'
+import { displayFindUkAddressHandler, submitFindUkAddressHandler } from '../../../handlers/findUkAddress'
+import NotFoundError from '../../../../utils/notFoundError'
+import { AddressRequestDto } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PhoneNumberTypeMappings } from '../../../../data/constants/phoneNumberMappings'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
+import { errorHasStatus } from '../../../../utils/errorHelpers'
 
 export interface NextOfKinSubmission {
   contactType: string

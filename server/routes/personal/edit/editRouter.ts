@@ -7,50 +7,52 @@ import {
   PrisonerPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
-import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import { Services } from '../services'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../utils/featureToggles'
+import auditPageAccessAttempt from '../../../middleware/auditPageAccessAttempt'
+import { Page } from '../../../services/auditService'
+import getPrisonerData from '../../../middleware/getPrisonerDataMiddleware'
+import { Services } from '../../../services'
+import { dietAndAllergyEnabled, editProfileEnabled } from '../../../utils/featureToggles'
 import {
   buildFieldData,
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
-  shoeSizeFieldData,
-} from '../controllers/personal/fieldData'
+} from '../../../controllers/personal/fieldData'
 import validationMiddleware, {
   RedirectWithParams,
   ValidationMiddlewareOptions,
   Validator,
-} from '../middleware/validationMiddleware'
-import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
-import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
-import { religionValidator } from '../validators/personal/religionValidator'
-import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
+} from '../../../middleware/validationMiddleware'
+import { heightImperialValidator, heightMetricValidator } from '../../../validators/personal/heightValidator'
+import { weightImperialValidator, weightMetricValidator } from '../../../validators/personal/weightValidator'
+import { religionValidator } from '../../../validators/personal/religionValidator'
+import { shoeSizeValidator } from '../../../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter, { markTypes } from './distinguishingMarksRouter'
-import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
+import { dietAndFoodAllergiesValidator } from '../../../validators/personal/dietAndFoodAllergiesValidator'
 import militaryRecordsRouter from './militaryRecordsRouter'
-import { nationalityValidator } from '../validators/personal/nationalityValidator'
+import { nationalityValidator } from '../../../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
 import nextOfKinRouter from './nextOfKinRouter'
-import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
+import { numberOfChildrenValidator } from '../../../validators/personal/numberOfChildrenValidator'
 import addressEditRouter from './addressEditRouter'
-import { emailValidator } from '../validators/personal/emailValidator'
+import { emailValidator } from '../../../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
-import { phoneNumberValidator } from '../validators/personal/phoneNumberValidator'
-import { populateEditPageData } from '../middleware/populateEditPageData'
-import { featureFlagGuard, FeatureFlagMethod } from '../middleware/featureFlagGuard'
-import { personalPageBasePath } from './personalRouter'
-import PersonalController from '../controllers/personal/personalController'
-import { textFieldLengthValidator } from '../validators/personal/textFieldLengthValidator'
-import { countryOfBirthValidator } from '../validators/personal/countryOfBirthValidator'
-import { parameterGuard } from '../middleware/parameterGuard'
+import { phoneNumberValidator } from '../../../validators/personal/phoneNumberValidator'
+import { populateEditPageData } from '../../../middleware/populateEditPageData'
+import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
+import { personalPageBasePath } from '../personalRouter'
+import PersonalController from '../../../controllers/personal/personalController'
+import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
+import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
+import { parameterGuard } from '../../../middleware/parameterGuard'
+import personalEditControllerFactory from '../../../controllers/personal/edit/personalEditControllerFactory'
 
 export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
+
+  const { shoeSizeController } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
     services.personalPageService,
@@ -218,11 +220,11 @@ export default function editRouter(services: Services): Router {
     path: 'shoe-size',
     edit: {
       audit: Page.EditShoeSize,
-      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).edit,
+      method: shoeSizeController.shoeSizeTextInput().edit,
     },
     submit: {
       audit: Page.PostEditShoeSize,
-      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).submit,
+      method: shoeSizeController.shoeSizeTextInput().submit,
       validation: {
         validators: [shoeSizeValidator],
         redirectBackOnError: true,

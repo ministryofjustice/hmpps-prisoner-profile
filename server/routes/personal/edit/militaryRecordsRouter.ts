@@ -1,12 +1,12 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import MilitaryRecordsController from '../controllers/militaryRecordsController'
-import { militaryServiceInformationValidator } from '../validators/personal/militaryServiceInformationValidator'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { dischargeDetailsValidator } from '../validators/personal/dischargeDetailsValidator'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { militaryHistoryEnabled } from '../utils/featureToggles'
+import { Services } from '../../../services'
+import MilitaryRecordsController from '../../../controllers/personal/edit/militaryRecords/militaryRecordsController'
+import { militaryServiceInformationValidator } from '../../../validators/personal/militaryServiceInformationValidator'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import { dischargeDetailsValidator } from '../../../validators/personal/dischargeDetailsValidator'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { militaryHistoryEnabled } from '../../../utils/featureToggles'
 
 export default function militaryRecordsRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

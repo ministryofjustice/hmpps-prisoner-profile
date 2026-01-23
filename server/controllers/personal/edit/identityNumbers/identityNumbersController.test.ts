@@ -1,23 +1,23 @@
 import { NextFunction, Request, Response } from 'express'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import IdentityNumbersService from '../services/identityNumbersService'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import IdentityNumbersService from '../../../../services/identityNumbersService'
 import IdentityNumbersController, { EditIdentityNumberSubmission } from './identityNumbersController'
-import { GetIdentifierMock, GetIdentifiersMock } from '../data/localMockData/getIdentifiersMock'
-import { AuditService, Page, PostAction } from '../services/auditService'
+import { GetIdentifierMock, GetIdentifiersMock } from '../../../../data/localMockData/getIdentifiersMock'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,
-} from './utils/identityNumbersController/buildIdentityNumberOptions'
+} from '../../../utils/identityNumbersController/buildIdentityNumberOptions'
 import {
   HomeOfficeIdentifierMappings,
   JusticeIdentifierMappings,
   PersonalIdentifierMappings,
-} from '../data/constants/identifierMappings'
+} from '../../../../data/constants/identifierMappings'
 
-import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
-import { capitaliseFirstLetter } from '../utils/utils'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { OffenderIdentifierType } from '../../../../data/interfaces/prisonApi/OffenderIdentifierType'
+import { capitaliseFirstLetter } from '../../../../utils/utils'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 const { prisonerNumber } = PrisonerMockDataA
 

@@ -4,7 +4,10 @@ import HmppsError from '../../interfaces/HmppsError'
 import { validateDate } from './dateValidator'
 import { validateExtensionNumber, validateMandatoryPhoneNumber } from './phoneNumberValidator'
 import { PhoneNumberTypeMappings } from '../../data/constants/phoneNumberMappings'
-import { NextOfKinPhoneNumberSubmission, NextOfKinSubmission } from '../../controllers/nextOfKinController'
+import {
+  NextOfKinPhoneNumberSubmission,
+  NextOfKinSubmission,
+} from '../../controllers/personal/edit/nextOfKin/nextOfKinController'
 
 export const nextOfKinValidator: Validator = (body: NextOfKinSubmission): HmppsError[] => {
   const {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import DistinguishingMarksService, {
   findBodyPartByCodeAndSideAndOrientation,
-} from '../services/distinguishingMarksService'
+} from '../../../../services/distinguishingMarksService'
 import {
   AllBodyPartSelection,
   bodyPartMap,
@@ -9,18 +9,18 @@ import {
   bodyPartSelections,
   MarkTypeSelection,
   markTypeSelections,
-} from './interfaces/distinguishingMarks/selectionTypes'
-import MulterFile from './interfaces/MulterFile'
-import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
+} from '../../../interfaces/distinguishingMarks/selectionTypes'
+import MulterFile from '../../../interfaces/MulterFile'
+import { getBodyPartDescription, getBodyPartToken } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
 import {
   BodyPartId,
   BodyPartSideId,
   PartOrientationId,
-} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import logger from '../../logger'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import ProblemSavingError from '../utils/problemSavingError'
+} from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import logger from '../../../../../logger'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
+import ProblemSavingError from '../../../../utils/problemSavingError'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]

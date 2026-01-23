@@ -14,7 +14,6 @@ import {
   numberOfChildrenFieldData,
   RadioFieldData,
   sexualOrientationFieldData,
-  shoeSizeFieldData,
   smokerOrVaperFieldData,
   weightFieldData,
 } from './fieldData'
@@ -1296,111 +1295,6 @@ describe('PersonalController', () => {
         await action(request, res, next)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
-      })
-    })
-  })
-
-  describe('physical attributes text input', () => {
-    describe('edit', () => {
-      const action: RequestHandler = async (req, response) =>
-        controller.physicalAttributesTextInput(shoeSizeFieldData).edit(req, response, next)
-
-      it('Renders the default edit page with the correct data from the prison person API', async () => {
-        const req = {
-          params: { prisonerNumber },
-          flash: (): string[] => [],
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        await action(req, res, next)
-
-        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
-        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
-          pageTitle: 'Shoe size - Prisoner personal details',
-          formTitle: 'Shoe size',
-          errors: [],
-          hintText: shoeSizeFieldData.hintText,
-          inputClasses: shoeSizeFieldData.inputClasses,
-          fieldName: shoeSizeFieldData.fieldName,
-          fieldValue: '11',
-          miniBannerData: {
-            cellLocation: '2-3-001',
-            prisonerName: 'Last, First',
-            prisonerNumber,
-            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=undefined&fullSizeImage=false`,
-          },
-          redirectAnchor: shoeSizeFieldData.redirectAnchor,
-        })
-      })
-
-      it('Populates the errors from the flash', async () => {
-        const req = {
-          params: { prisonerNumber },
-          flash: (key: string) => {
-            if (key === 'errors') return ['error']
-            return []
-          },
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        await action(req, res, next)
-        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
-      })
-
-      it('Populates the field value from the flash', async () => {
-        const req = {
-          params: { prisonerNumber },
-          flash: (key: string) => {
-            return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
-          },
-          middleware: defaultMiddleware,
-        } as unknown as Request
-        await action(req, res, next)
-        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
-      })
-    })
-
-    describe('submit', () => {
-      let validRequest: Request
-      const action: RequestHandler = async (req, response) =>
-        controller.physicalAttributesTextInput(shoeSizeFieldData).submit(req, response, next)
-
-      beforeEach(() => {
-        validRequest = {
-          middleware: defaultMiddleware,
-          params: { prisonerNumber },
-          body: { shoeSize: '10' },
-          flash: jest.fn(),
-        } as unknown as Request
-      })
-
-      it.each([
-        { shoeSize: '', updateRequest: { shoeSize: null } },
-        { shoeSize: '10', updateRequest: { shoeSize: '10' } },
-        { shoeSize: '7.5', updateRequest: { shoeSize: '7.5' } },
-      ])('Valid request: %s', async ({ shoeSize, updateRequest }) => {
-        const request = { ...validRequest, body: { shoeSize } } as Request
-        await action(request, res, next)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-          expect.anything(),
-          prisonUserMock,
-          expect.anything(),
-          expect.objectContaining(updateRequest),
-        )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#shoe-size`)
-        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Shoe size updated',
-          fieldName: 'shoeSize',
-        })
-      })
-
-      it('Handles API errors', async () => {
-        personalPageService.updatePhysicalAttributes = async () => {
-          throw new Error()
-        }
-
-        await action(validRequest, res, next)
-
-        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/shoe-size`)
       })
     })
   })

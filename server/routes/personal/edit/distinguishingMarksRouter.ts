@@ -1,22 +1,22 @@
 import multer from 'multer'
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import DistinguishingMarksController from '../controllers/distinguishingMarksController'
-import { Services } from '../services'
-import validationMiddleware from '../middleware/validationMiddleware'
+import DistinguishingMarksController from '../../../controllers/personal/edit/distinguishingMarks/distinguishingMarksController'
+import { Services } from '../../../services'
+import validationMiddleware from '../../../middleware/validationMiddleware'
 import {
   newDetailedDistinguishingMarkValidator,
   newDistinguishingMarkValidator,
   updateDescriptionValidator,
   updateLocationValidator,
   updatePhotoValidator,
-} from '../validators/personal/distinguishingMarksValidator'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
-import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
-import setUpCsrf from '../middleware/setUpCsrf'
-import { parameterGuard } from '../middleware/parameterGuard'
+} from '../../../validators/personal/distinguishingMarksValidator'
+import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
+import { allBodyParts } from '../../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import setUpCsrf from '../../../middleware/setUpCsrf'
+import { parameterGuard } from '../../../middleware/parameterGuard'
 
 // Define valid mark types
 export const markTypes = ['tattoo', 'scar', 'mark']

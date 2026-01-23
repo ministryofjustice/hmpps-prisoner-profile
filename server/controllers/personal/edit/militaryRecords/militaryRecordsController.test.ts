@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express'
 import MilitaryRecordsController from './militaryRecordsController'
-import MilitaryRecordsService from '../services/militaryRecordsService'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import MilitaryRecordsService from '../../../../services/militaryRecordsService'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import {
   DisciplinaryActionRefDataMock,
   MilitaryDischargeRefDataMock,
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
-} from '../data/localMockData/personIntegrationApiReferenceDataMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { objectToRadioOptions } from '../utils/utils'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+} from '../../../../data/localMockData/personIntegrationApiReferenceDataMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import { objectToRadioOptions } from '../../../../utils/utils'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 const { prisonerNumber } = PrisonerMockDataA
 

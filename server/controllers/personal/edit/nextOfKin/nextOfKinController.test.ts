@@ -1,23 +1,23 @@
 import { Request, Response } from 'express'
 import { randomUUID, UUID } from 'crypto'
 import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
-import NextOfKinService from '../services/nextOfKinService'
-import { AuditService, Page, PostAction } from '../services/auditService'
+import NextOfKinService from '../../../../services/nextOfKinService'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { PersonalRelationshipsReferenceDataDomain } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import { PersonalRelationshipsReferenceDataDomain } from '../../../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import {
   OfficialRelationshipsReferenceCodesMock,
   SocialRelationshipsReferenceCodesMock,
-} from '../data/localMockData/personalRelationshipsApiMock'
-import AddressService from '../services/addressService'
-import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
-import { ephemeralDataServiceMock } from '../../tests/mocks/ephemeralDataServiceMock'
-import EphemeralDataService from '../services/ephemeralDataService'
-import { AddressLocation } from '../services/mappers/addressMapper'
-import { AddressRequestDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+} from '../../../../data/localMockData/personalRelationshipsApiMock'
+import AddressService from '../../../../services/addressService'
+import { addressServiceMock } from '../../../../../tests/mocks/addressServiceMock'
+import { ephemeralDataServiceMock } from '../../../../../tests/mocks/ephemeralDataServiceMock'
+import EphemeralDataService from '../../../../services/ephemeralDataService'
+import { AddressLocation } from '../../../../services/mappers/addressMapper'
+import { AddressRequestDto } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 describe('NextOfKinController', () => {
   let nextOfKinService: NextOfKinService
