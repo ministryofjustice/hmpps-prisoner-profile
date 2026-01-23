@@ -58,7 +58,7 @@
     {% endif %}
 
     <div class="prisoner-profile-breadcrumbs__breadcrumbs">
-    {{ govukBreadcrumbs({
+      {{ govukBreadcrumbs({
         items: breadCrumbs | default([])
       }) }}
     </div>
@@ -82,5 +82,5 @@
 {% endblock %}
 
 {% block footer %}
-    {{ feComponents.footer | safe }}
+  {{ feComponents.footer | safe }}
 {% endblock %}
