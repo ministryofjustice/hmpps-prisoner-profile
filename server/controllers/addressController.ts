@@ -45,9 +45,11 @@ export default class AddressController {
 
   public async findAddressesByFreeTextQuery(req: Request, res: Response): Promise<void> {
     try {
+      logger.info('Fetching addresses from address lookup service')
       const results = await this.addressService.getAddressesMatchingQuery(req.params.query)
       res.json({ status: 200, results })
     } catch (error) {
+      logger.warn('Error fetching addresses from address lookup service', error)
       res.status(getErrorStatus(error)).json({ status: getErrorStatus(error), error: error.message })
     }
   }
