@@ -52,8 +52,12 @@ export default class EditPage extends Page {
   fillInAutocompleteFields = (fields: { [key: string]: string }) => {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[id=${key}]`).clear()
-      // The trailing {esc} is to explicitly close the autocomplete dropdown allowing testing invalid inputs
-      cy.get(`input[id=${key}]`).type(`${value}{esc}`)
+      if (value) {
+        cy.get(`input[id=${key}]`).type(`${value}`, { delay: 0 })
+
+        // Tab allows testing both valid and invalid inputs
+        cy.press(Cypress.Keyboard.Keys.TAB)
+      }
     })
   }
 

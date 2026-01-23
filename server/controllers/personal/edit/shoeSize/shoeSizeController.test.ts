@@ -31,6 +31,7 @@ describe('ShoeSizeController', () => {
     auditService = auditServiceMock()
 
     controller = new ShoeSizeController(personalPageService, auditService)
+
     res = {
       locals: {
         user: prisonUserMock,
@@ -42,27 +43,33 @@ describe('ShoeSizeController', () => {
     } as unknown as Response
   })
 
-  describe('shoeSizeTextInput', () => {
+  describe('shoeSize', () => {
     describe('edit', () => {
-      const action: RequestHandler = async (req, response) => controller.shoeSizeTextInput().edit(req, response, next)
+      const action: RequestHandler = async (req, response) => controller.shoeSize().edit(req, response, next)
 
-      it('Renders the default edit page with the correct data from the prison person API', async () => {
+      it('Renders the default edit page with the correct data', async () => {
         const req = {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
         } as unknown as Request
+
         await action(req, res, next)
 
         expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', prisonerNumber)
-        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/shoeSize', {
           pageTitle: 'Shoe size - Prisoner personal details',
-          formTitle: 'Shoe size',
+          formTitle: 'Enter shoe size',
           errors: [],
           hintText: shoeSizeFieldData.hintText,
-          inputClasses: shoeSizeFieldData.inputClasses,
-          fieldName: shoeSizeFieldData.fieldName,
-          fieldValue: '11',
+          autocompleteOptions: expect.arrayContaining([
+            {
+              selected: true,
+              text: 'UK 11 (EU 46)',
+              value: '11',
+            },
+          ]),
           miniBannerData: {
             cellLocation: '1-1-035',
             prisonerName: 'Saunders, John',
@@ -71,6 +78,33 @@ describe('ShoeSizeController', () => {
           },
           redirectAnchor: shoeSizeFieldData.redirectAnchor,
         })
+      })
+
+      test.each`
+        sex         | shoeSize
+        ${'Male'}   | ${'UK 11 (EU 46)'}
+        ${'Female'} | ${'UK 11 (EU 44)'}
+      `(`EU shoe size equivalent becomes: '$shoeSize' when prisoner sex is: '$sex'`, async ({ sex, shoeSize }) => {
+        const req = {
+          params: { prisonerNumber },
+          flash: (): string[] => [],
+          middleware: { ...middleware, prisonerData: { ...middleware.prisonerData, gender: sex } },
+        } as unknown as Request
+
+        await action(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/shoeSize',
+          expect.objectContaining({
+            autocompleteOptions: expect.arrayContaining([
+              {
+                selected: true,
+                text: shoeSize,
+                value: '11',
+              },
+            ]),
+          }),
+        )
       })
 
       it('Populates the errors from the flash', async () => {
@@ -90,34 +124,36 @@ describe('ShoeSizeController', () => {
         const req = {
           params: { prisonerNumber },
           flash: (key: string) => {
-            return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
+            return key === 'requestBody' ? [JSON.stringify({ autocompleteError: '1234' })] : []
           },
           middleware,
         } as unknown as Request
         await action(req, res, next)
-        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({ autocompleteError: '1234' }),
+        )
       })
     })
 
     describe('submit', () => {
       let validRequest: Request
-      const action: RequestHandler = async (req, response) => controller.shoeSizeTextInput().submit(req, response, next)
+      const action: RequestHandler = async (req, response) => controller.shoeSize().submit(req, response, next)
 
       beforeEach(() => {
         validRequest = {
           middleware,
           params: { prisonerNumber },
-          body: { shoeSize: '10' },
+          body: { autocompleteField: '10' },
           flash: jest.fn(),
         } as unknown as Request
       })
 
       it.each([
-        { shoeSize: '', updateRequest: { shoeSize: null } },
-        { shoeSize: '10', updateRequest: { shoeSize: '10' } },
-        { shoeSize: '7.5', updateRequest: { shoeSize: '7.5' } },
-      ])('Valid request: %s', async ({ shoeSize, updateRequest }) => {
-        const request = { ...validRequest, body: { shoeSize } } as Request
+        { autocompleteField: '', updateRequest: { shoeSize: null } },
+        { autocompleteField: '10', updateRequest: { shoeSize: '10' } },
+      ])('Valid request: %s', async ({ autocompleteField, updateRequest }) => {
+        const request = { ...validRequest, body: { autocompleteField } } as Request
         await action(request, res, next)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
           expect.anything(),
