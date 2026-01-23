@@ -1,29 +1,29 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, capitaliseFirstLetter } from '../utils/utils'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import logger from '../../logger'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import IdentityNumbersService from '../services/identityNumbersService'
+import { apostrophe, capitaliseFirstLetter } from '../../../../utils/utils'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import logger from '../../../../../logger'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
+import IdentityNumbersService from '../../../../services/identityNumbersService'
 import {
   HomeOfficeIdentifierMappings,
   IdentifierMapping,
   IdentifierMappings,
   JusticeIdentifierMappings,
   PersonalIdentifierMappings,
-} from '../data/constants/identifierMappings'
+} from '../../../../data/constants/identifierMappings'
 import {
   AddIdentifierRequestDto,
   UpdateIdentifierRequestDto,
-} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+} from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,
-} from './utils/identityNumbersController/buildIdentityNumberOptions'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import OffenderIdentifier from '../data/interfaces/prisonApi/OffenderIdentifier'
-import HmppsError from '../interfaces/HmppsError'
-import getCommonRequestData from '../utils/getCommonRequestData'
-import { errorHasStatus } from '../utils/errorHelpers'
+} from '../../../utils/identityNumbersController/buildIdentityNumberOptions'
+import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
+import OffenderIdentifier from '../../../../data/interfaces/prisonApi/OffenderIdentifier'
+import HmppsError from '../../../../interfaces/HmppsError'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
+import { errorHasStatus } from '../../../../utils/errorHelpers'
 
 export interface EditIdentityNumberSubmission {
   type?: string

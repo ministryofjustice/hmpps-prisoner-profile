@@ -1,21 +1,21 @@
 import { RequestHandler } from 'express'
-import { apostrophe, objectToRadioOptions } from '../utils/utils'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import logger from '../../logger'
-import MilitaryRecordsService from '../services/militaryRecordsService'
+import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import logger from '../../../../../logger'
+import MilitaryRecordsService from '../../../../services/militaryRecordsService'
 import {
   Conflicts,
   CorePersonRecordReferenceDataDomain,
   DischargeDetails,
   DisciplinaryAction,
   MilitaryServiceInformation,
-} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import { dateToIsoDate } from '../utils/dateHelpers'
-import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
-import getCommonRequestData from '../utils/getCommonRequestData'
-import { errorHasStatus } from '../utils/errorHelpers'
+} from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
+import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
+import { dateToIsoDate } from '../../../../utils/dateHelpers'
+import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
+import { errorHasStatus } from '../../../../utils/errorHelpers'
 
 export default class MilitaryRecordsController {
   constructor(

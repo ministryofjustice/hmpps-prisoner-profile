@@ -1,15 +1,15 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import validationMiddleware from '../middleware/validationMiddleware'
-import IdentityNumbersController from '../controllers/identityNumbersController'
+import { Services } from '../../../services'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import IdentityNumbersController from '../../../controllers/personal/edit/identityNumbers/identityNumbersController'
 import {
   addIdentityNumbersValidator,
   editIdentityNumberValidator,
-} from '../validators/personal/identityNumbersValidator'
-import { IdentifierMappings } from '../data/constants/identifierMappings'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
+} from '../../../validators/personal/identityNumbersValidator'
+import { IdentifierMappings } from '../../../data/constants/identifierMappings'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
 
 export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

@@ -1,14 +1,14 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import AddressEditController from '../controllers/addressEditController'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { notEmptyValidator } from '../validators/general/notEmptyValidator'
-import { Page, PostAction } from '../services/auditService'
-import { addressValidator } from '../validators/personal/addressValidator'
-import { AddressLocation } from '../services/mappers/addressMapper'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
+import { Services } from '../../../services'
+import AddressEditController from '../../../controllers/personal/edit/address/addressEditController'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import { notEmptyValidator } from '../../../validators/general/notEmptyValidator'
+import { Page, PostAction } from '../../../services/auditService'
+import { addressValidator } from '../../../validators/personal/addressValidator'
+import { AddressLocation } from '../../../services/mappers/addressMapper'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
 
 export default function addressEditRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
-import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import { Services } from '../services'
-import PersonalController from '../controllers/personal/personalController'
+import auditPageAccessAttempt from '../../middleware/auditPageAccessAttempt'
+import { Page } from '../../services/auditService'
+import getPrisonerData from '../../middleware/getPrisonerDataMiddleware'
+import { Services } from '../../services'
+import PersonalController from '../../controllers/personal/personalController'
 
 export const personalPageBasePath = '/prisoner/:prisonerNumber/personal'
 

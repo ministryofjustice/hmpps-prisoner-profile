@@ -42,7 +42,6 @@ import {
   heightImperialFieldData,
   nationalityFieldData,
   numberOfChildrenFieldData,
-  PhysicalAttributesTextFieldData,
   RadioFieldData,
   religionFieldData,
   sexualOrientationFieldData,
@@ -433,40 +432,6 @@ export default class PersonalController {
     const { clientToken } = req.middleware
     const user = res.locals.user as PrisonUser
     await this.personalPageService.updateCityOrTownOfBirth(clientToken, user, prisonerNumber, value)
-  }
-
-  physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
-    this.textInput(
-      () => fieldData,
-      this.getPhysicalAttributesText.bind(this),
-      this.setPhysicalAttributesText.bind(this),
-    )
-
-  private async getPhysicalAttributesText(
-    req: Request,
-    fieldData: PhysicalAttributesTextFieldData,
-  ): Promise<string | number> {
-    const { prisonerNumber } = req.params
-    const { clientToken } = req.middleware
-
-    const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
-
-    return physicalAttributes[fieldData.fieldName]
-  }
-
-  private async setPhysicalAttributesText(
-    req: Request,
-    res: Response,
-    fieldData: PhysicalAttributesTextFieldData,
-    value: string | number,
-  ): Promise<void> {
-    const { prisonerNumber } = req.params
-    const { clientToken } = req.middleware
-    const user = res.locals.user as PrisonUser
-
-    await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-      [fieldData.fieldName]: value,
-    })
   }
 
   /**

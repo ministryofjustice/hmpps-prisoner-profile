@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
-import DistinguishingMarksService from '../services/distinguishingMarksService'
-import { distinguishingMarkMock, leftLegMarkMock } from '../data/localMockData/distinguishingMarksMock'
-import { bodyPartMap, markTypeSelections } from './interfaces/distinguishingMarks/selectionTypes'
-import { getBodyPartDescription } from '../views/dataUtils/groupDistinguishingMarksForView'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { prisonUserMock } from '../data/localMockData/user'
-import ProblemSavingError from '../utils/problemSavingError'
+import DistinguishingMarksService from '../../../../services/distinguishingMarksService'
+import { distinguishingMarkMock, leftLegMarkMock } from '../../../../data/localMockData/distinguishingMarksMock'
+import { bodyPartMap, markTypeSelections } from '../../../interfaces/distinguishingMarks/selectionTypes'
+import { getBodyPartDescription } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import { prisonUserMock } from '../../../../data/localMockData/user'
+import ProblemSavingError from '../../../../utils/problemSavingError'
 
 const getResLocals = () => ({
   user: prisonUserMock,

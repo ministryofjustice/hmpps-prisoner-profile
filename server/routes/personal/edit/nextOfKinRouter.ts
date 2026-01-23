@@ -3,16 +3,16 @@ import {
   PersonalRelationshipsPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import NextOfKinController from '../controllers/nextOfKinController'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { nextOfKinValidator } from '../validators/personal/nextOfKinValidator'
-import { notEmptyValidator } from '../validators/general/notEmptyValidator'
-import { AddressLocation } from '../services/mappers/addressMapper'
-import { Page, PostAction } from '../services/auditService'
-import { addressValidator } from '../validators/personal/addressValidator'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
+import { Services } from '../../../services'
+import NextOfKinController from '../../../controllers/personal/edit/nextOfKin/nextOfKinController'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import { nextOfKinValidator } from '../../../validators/personal/nextOfKinValidator'
+import { notEmptyValidator } from '../../../validators/general/notEmptyValidator'
+import { AddressLocation } from '../../../services/mappers/addressMapper'
+import { Page, PostAction } from '../../../services/auditService'
+import { addressValidator } from '../../../validators/personal/addressValidator'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
 
 export default function nextOfKinRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

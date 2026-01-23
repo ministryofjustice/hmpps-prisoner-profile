@@ -1,25 +1,25 @@
 import { RequestHandler } from 'express'
-import { apostrophe, formatNamePart } from '../utils/utils'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import logger from '../../logger'
-import AliasService, { Name } from '../services/aliasService'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import { PrisonUser } from '../interfaces/HmppsUser'
+import { apostrophe, formatNamePart } from '../../../../utils/utils'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import logger from '../../../../../logger'
+import AliasService, { Name } from '../../../../services/aliasService'
+import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import {
   CorePersonRecordReferenceDataDomain,
   PseudonymRequestDto,
   PseudonymResponseDto,
-} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { dateToIsoDate } from '../utils/dateHelpers'
+} from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { dateToIsoDate } from '../../../../utils/dateHelpers'
 import {
   getEthnicBackgroundRadioOptions,
   getEthnicGroupDescription,
   getEthnicGroupDescriptionForHeading,
   getEthnicGroupRadioOptions,
-} from './utils/alias/ethnicityUtils'
-import ReferenceDataService from '../services/referenceData/referenceDataService'
-import { NomisLockedError } from '../utils/nomisLockedError'
-import getCommonRequestData from '../utils/getCommonRequestData'
+} from '../../../utils/alias/ethnicityUtils'
+import ReferenceDataService from '../../../../services/referenceData/referenceDataService'
+import { NomisLockedError } from '../../../../utils/nomisLockedError'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
 
 interface DateOfBirthForm {
   'dateOfBirth-year': string

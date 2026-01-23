@@ -1,14 +1,14 @@
 import { RequestHandler, Router } from 'express'
 import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import AliasController from '../controllers/aliasController'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { nameValidator } from '../validators/personal/nameValidator'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
-import { radioFieldValidator } from '../validators/personal/radioFieldValidator'
-import { dateOfBirthValidator } from '../validators/personal/dateOfBirthValidator'
-import { parameterGuard } from '../middleware/parameterGuard'
+import { Services } from '../../../services'
+import AliasController from '../../../controllers/personal/edit/alias/aliasController'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import { nameValidator } from '../../../validators/personal/nameValidator'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
+import { radioFieldValidator } from '../../../validators/personal/radioFieldValidator'
+import { dateOfBirthValidator } from '../../../validators/personal/dateOfBirthValidator'
+import { parameterGuard } from '../../../middleware/parameterGuard'
 
 export default function aliasRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

@@ -1,21 +1,21 @@
 import { NextFunction, Request, Response } from 'express'
 import AliasController from './aliasController'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import { prisonUserMock } from '../data/localMockData/user'
-import AliasService, { Name } from '../services/aliasService'
-import { aliasServiceMock } from '../../tests/mocks/aliasServiceMock'
-import { PseudonymResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
-import ReferenceDataService from '../services/referenceData/referenceDataService'
-import { ethnicityCodesMock } from '../data/localMockData/personIntegrationApi/referenceDataMocks'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import { prisonUserMock } from '../../../../data/localMockData/user'
+import AliasService, { Name } from '../../../../services/aliasService'
+import { aliasServiceMock } from '../../../../../tests/mocks/aliasServiceMock'
+import { PseudonymResponseMock } from '../../../../data/localMockData/personIntegrationApiReferenceDataMock'
+import ReferenceDataService from '../../../../services/referenceData/referenceDataService'
+import { ethnicityCodesMock } from '../../../../data/localMockData/personIntegrationApi/referenceDataMocks'
 import {
   getEthnicBackgroundRadioOptions,
   getEthnicGroupDescription,
   getEthnicGroupDescriptionForHeading,
   getEthnicGroupRadioOptions,
-} from './utils/alias/ethnicityUtils'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+} from '../../../utils/alias/ethnicityUtils'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 const { prisonerNumber } = PrisonerMockDataA
 

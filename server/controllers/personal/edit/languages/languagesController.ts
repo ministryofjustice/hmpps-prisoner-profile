@@ -1,17 +1,17 @@
 import { RequestHandler } from 'express'
-import { apostrophe, objectToSelectOptions, requestStringToBoolean } from '../utils/utils'
-import { AuditService, Page, PostAction } from '../services/auditService'
-import logger from '../../logger'
-import LanguagesService from '../services/languagesService'
+import { apostrophe, objectToSelectOptions, requestStringToBoolean } from '../../../../utils/utils'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import logger from '../../../../../logger'
+import LanguagesService from '../../../../services/languagesService'
 import {
   CommunicationNeedsDto,
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageRequest,
-} from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import getCommonRequestData from '../utils/getCommonRequestData'
+} from '../../../../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
+import { PrisonUser } from '../../../../interfaces/HmppsUser'
+import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
 
 export default class LanguagesController {
   constructor(

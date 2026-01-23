@@ -1,19 +1,19 @@
 import { Request, Response } from 'express'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import LanguagesController from './languagesController'
-import LanguagesService from '../services/languagesService'
-import { AuditService, Page, PostAction } from '../services/auditService'
+import LanguagesService from '../../../../services/languagesService'
+import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageRequest,
-} from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
+} from '../../../../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import {
   CommunicationNeedsDtoMock,
   LanguageRefDataMock,
-} from '../data/localMockData/personCommunicationNeedsApiRefDataMock'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+} from '../../../../data/localMockData/personCommunicationNeedsApiRefDataMock'
+import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 describe('LanguagesController', () => {
   let languagesService: LanguagesService

@@ -3,13 +3,13 @@ import {
   PersonCommunicationNeedsPermission,
   prisonerPermissionsGuard,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { Services } from '../services'
-import LanguagesController from '../controllers/languagesController'
-import { featureFlagGuard } from '../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../utils/featureToggles'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { mainLanguageValidator } from '../validators/personal/mainLanguageValidator'
-import { otherLanguageValidator } from '../validators/personal/otherLanguageValidator'
+import { Services } from '../../../services'
+import LanguagesController from '../../../controllers/personal/edit/languages/languagesController'
+import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
+import { editProfileEnabled } from '../../../utils/featureToggles'
+import validationMiddleware from '../../../middleware/validationMiddleware'
+import { mainLanguageValidator } from '../../../validators/personal/mainLanguageValidator'
+import { otherLanguageValidator } from '../../../validators/personal/otherLanguageValidator'
 
 export default function languagesRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
