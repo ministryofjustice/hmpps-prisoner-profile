@@ -1,0 +1,48 @@
+{% extends "./editPage.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% block form %}
+  <form method="post" novalidate="novalidate" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+    <input type="hidden" id="autocomplete-error" name="autocompleteError" value="{{ autocompleteError }}"/>
+
+    <div class="govuk-form-group">
+      {% set autocompleteOptions = [{ value: '', text: 'Please select a shoe size' }].concat(autocompleteOptions) %}
+
+      {{ govukSelect({
+        id: "autocomplete",
+        name: "autocompleteField",
+        label: {
+          text: formTitle,
+          isPageHeading: true,
+          classes: "govuk-label--l"
+        },
+        hint: {
+          text: hintText
+        },
+        items: autocompleteOptions,
+        errorMessage: errors | findError("autocomplete"),
+        classes: "js-autocomplete-select",
+        attributes: {
+          "data-test": "select-autocomplete-input",
+          "data-input-classes": "govuk-input--width-10",
+          "data-menu-classes": "govuk-input--width-10"
+        }
+      }) }}
+    </div>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Save and return to profile",
+        type: "submit",
+        classes: "js-autocomplete-submit",
+        preventDoubleClick: true,
+        attributes: { "data-qa": "edit-submit-button" }
+      }) }}
+      <a
+        href="/prisoner/{{ prisonerNumber }}/personal#{{ redirectAnchor }}"
+        class="govuk-link govuk-link--no-visited-state"
+        data-qa="edit-cancel-button">Cancel</a>
+    </div>
+  </form>
+{% endblock %}
