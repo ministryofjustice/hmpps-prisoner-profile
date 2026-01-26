@@ -220,11 +220,11 @@ export default function editRouter(services: Services): Router {
     path: 'shoe-size',
     edit: {
       audit: Page.EditShoeSize,
-      method: shoeSizeController.shoeSizeTextInput().edit,
+      method: shoeSizeController.shoeSize().edit,
     },
     submit: {
       audit: Page.PostEditShoeSize,
-      method: shoeSizeController.shoeSizeTextInput().submit,
+      method: shoeSizeController.shoeSize().submit,
       validation: {
         validators: [shoeSizeValidator],
         redirectBackOnError: true,
