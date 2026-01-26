@@ -45,6 +45,11 @@ export const registeredBackLinkServices: RegisteredService[] = [
     hostname: sanitizeUrl(config.serviceUrls.allocatePersonalOfficers),
     defaultBackLinkText: 'Back to Personal officers',
   },
+  {
+    name: 'external-movements',
+    hostname: sanitizeUrl(config.serviceUrls.externalMovements),
+    defaultBackLinkText: 'Back to External movements',
+  },
 ]
 
 export const saveBackLink =
