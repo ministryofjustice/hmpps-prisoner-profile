@@ -52,7 +52,10 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { shoeSizeController } = personalEditControllerFactory(services.personalPageService, services.auditService)
+  const { heightController, shoeSizeController } = personalEditControllerFactory(
+    services.personalPageService,
+    services.auditService,
+  )
 
   const personalController = new PersonalController(
     services.personalPageService,
@@ -151,11 +154,11 @@ export default function editRouter(services: Services): Router {
   editRoute({
     path: `height`,
     edit: {
-      method: personalController.height().metric.edit,
+      method: heightController.height().metric.edit,
       audit: Page.EditHeight,
     },
     submit: {
-      method: personalController.height().metric.submit,
+      method: heightController.height().metric.submit,
       audit: Page.PostEditHeight,
       validation: {
         validators: [heightMetricValidator],
@@ -169,11 +172,11 @@ export default function editRouter(services: Services): Router {
     path: 'height/imperial',
     edit: {
       audit: Page.EditHeight,
-      method: personalController.height().imperial.edit,
+      method: heightController.height().imperial.edit,
     },
     submit: {
       audit: Page.PostEditHeight,
-      method: personalController.height().imperial.submit,
+      method: heightController.height().imperial.submit,
       validation: {
         validators: [heightImperialValidator],
         redirectBackOnError: true,
