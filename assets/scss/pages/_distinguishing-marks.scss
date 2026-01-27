@@ -150,9 +150,13 @@ label.govuk-link {
       font-size: 16pt;
     }
 
-
-    &:hover {
+    &:hover,
+    &:focus-within {
       opacity: 0.95;
+    }
+
+    &:focus-within {
+      border-color: $govuk-focus-colour;
     }
   }
 
