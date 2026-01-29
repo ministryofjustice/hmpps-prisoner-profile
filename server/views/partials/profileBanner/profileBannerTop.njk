@@ -49,15 +49,13 @@
               href="/prisoner/{{ prisonerNumber }}/image{{ '?referer=' + prisonerUrlPath if prisonerUrlPath }}"
               class="hmpps-clickable-image {{ prisonerUrlPath }}"
               data-qa="prisoner-photo-link">
-              <img class="hmpps-profile-photo" src="{{ prisonerImageUrl }}" alt="{{ prisonerName }}"/>
+              <img class="hmpps-profile-photo" src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }} profile facial image" data-qa="prisoner-photo"/>
               <div class="hmpps-clickable-image__overlay">
-                <p class="govuk-body govuk-!-text-align-centre">
-                  Facial<br/> images
-                </p>
+                <p class="govuk-body govuk-!-text-align-centre">Facial<br/> images</p>
               </div>
             </a>
           {% else %}
-            <img class="hmpps-profile-photo" src="/assets/images/prisoner-profile-image.png" alt="Photo of {{ prisonerName }} not available"/>
+            <img class="hmpps-profile-photo" src="/assets/images/prisoner-profile-image.png" alt="Photo of {{ prisonerName.firstLast }} is not available" data-qa="prisoner-photo"/>
           {% endif %}
         </div>
         <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName.lastCommaFirst }}</h2>
