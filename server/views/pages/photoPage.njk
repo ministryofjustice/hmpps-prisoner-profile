@@ -90,7 +90,7 @@
   </div>
   <div class="govuk-grid-row govuk-!-display-none-print">
     <div class="govuk-grid-column-three-quarters">
-      <div class="hmpps-profile-photo" src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }}" data-qa="prisoner-photo">
+      <div class="hmpps-profile-photo">
         {% if photoStatus.placeholder %}
           {{ photo("placeholder") }}
         {% elif photoStatus.withheld %}
