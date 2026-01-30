@@ -36,7 +36,7 @@ context('Edit number of children', () => {
       {
         testDescription: 'Number of children not specified',
         input: { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '' } },
-        errorMessages: [`Enter the number of children.`],
+        errorMessages: [`Enter a valid number using digits.`],
       },
       {
         testDescription: 'Negative number of children',
@@ -51,12 +51,12 @@ context('Edit number of children', () => {
       {
         testDescription: 'Non-integer number of children',
         input: { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: '2.5' } },
-        errorMessages: [`Enter the number of children.`],
+        errorMessages: [`Enter a valid number using digits.`],
       },
       {
         testDescription: 'Non-numeric value provided for number of children',
         input: { radioInputs: { hasChildren: 'YES' }, textInputs: { numberOfChildren: 'Zwei' } },
-        errorMessages: [`Enter the number of children.`],
+        errorMessages: [`Enter a valid number using digits.`],
       },
     ],
     redirectAnchor: 'number-of-children',
