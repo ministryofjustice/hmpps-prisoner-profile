@@ -39,11 +39,9 @@
     <div class="govuk-grid-column-three-quarters">
       {% for image in facialImages %}
         <div
-          class="govuk-grid-row govuk-!-margin-left-0 govuk-!-margin-right-0 hmpps-photo-list__item {{ "
-          hmpps-photo-list__main" if image.main }}"
-          data-qa="image-list-item">
+          class="govuk-grid-row govuk-!-margin-left-0 govuk-!-margin-right-0 hmpps-photo-list__item {{ "hmpps-photo-list__main" if image.main }}" data-qa="image-list-item">
           <div class="hmpps-photo-list__photo" data-qa="image-item-photo">
-            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName.firstLast + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
+            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName.firstLast }} image uploaded {{ image.uploadedDateTime }}" data-qa="prisoner-photo"/>
           </div>
           <div class="hmpps-photo-list__details" data-qa="image-item-details">
             {% if image.main %}
