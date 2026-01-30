@@ -14,13 +14,13 @@ describe('Number of children validator', () => {
   })
 
   it.each([
-    [{ hasChildren: 'YES' }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: null }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: undefined }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: 'BADVALUE' }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: '2.5' }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: '' }, `Enter the number of children.`, '#numberOfChildren'],
-    [{ hasChildren: 'YES', numberOfChildren: '   ' }, `Enter the number of children.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES' }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: null }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: undefined }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: 'BADVALUE' }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: '2.5' }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: '' }, `Enter a valid number using digits.`, '#numberOfChildren'],
+    [{ hasChildren: 'YES', numberOfChildren: '   ' }, `Enter a valid number using digits.`, '#numberOfChildren'],
     [
       { hasChildren: 'YES', numberOfChildren: '0' },
       `Number of children must be between 1 and 99.`,

@@ -16,7 +16,7 @@ export const numberOfChildrenValidator: Validator = (body: Record<string, string
     Number.isNaN(children) ||
     !Number.isInteger(children)
   ) {
-    errors.push({ href: '#numberOfChildren', text: `Enter the number of children.` })
+    errors.push({ href: '#numberOfChildren', text: `Enter a valid number using digits.` })
   } else if (children < 1 || children > 99) {
     errors.push({ href: '#numberOfChildren', text: `Number of children must be between 1 and 99.` })
   }
