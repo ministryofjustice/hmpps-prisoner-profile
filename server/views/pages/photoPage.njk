@@ -5,9 +5,9 @@
 {% from "../macros/newFacialImageButton.njk" import newFacialImageButton %}
 {% extends "../partials/layout.njk" %}
 {% set photoAllHref = "/prisoner/" + prisonerNumber + "/image/all" + ("?referer=" + referer if referer) %}
-{% macro photo(classSuffix) %}
+{% macro photo(classSuffix, facialImageType) %}
   <div class="hmpps-profile-photo__{{ classSuffix }}">
-    <img src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }} main facial image" data-qa="prisoner-photo"/>
+    <img src="{{ prisonerImageUrl }}" alt="{{ prisonerName.firstLast }} {{ facialImageType }} facial image" data-qa="prisoner-photo"/>
   </div>
 {% endmacro %}
 {% macro description() %}
@@ -92,11 +92,11 @@
     <div class="govuk-grid-column-three-quarters">
       <div class="hmpps-profile-photo">
         {% if photoStatus.placeholder %}
-          {{ photo("placeholder") }}
+          {{ photo("placeholder", "placeholder") }}
         {% elif photoStatus.withheld %}
-          {{ photo("withheld") }}
+          {{ photo("withheld", "withheld") }}
         {% else %}
-          {{ photo("photo") }}
+          {{ photo("photo", "main") }}
         {% endif %}
         {{ description() }}
       </div>
