@@ -8,10 +8,15 @@ import { alertFlags } from './alertFlags'
 import { autocomplete } from './autocomplete'
 import { backToTop } from './backToTop'
 import { datepicker } from './datepicker'
+import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { openCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
+
+govukFrontend.initAll()
+mojFrontend.initAll()
+connectDps.initAll()
 
 document.addEventListener('DOMContentLoaded', function () {
   addAnotherButton()
@@ -24,8 +29,5 @@ document.addEventListener('DOMContentLoaded', function () {
   openCloseAll()
   printPage()
   sortSelector()
+  govukFrontend.createAll(BodyParts)
 })
-
-govukFrontend.initAll()
-mojFrontend.initAll()
-connectDps.initAll()

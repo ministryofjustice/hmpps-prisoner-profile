@@ -2,6 +2,7 @@ import {
   allBodyParts,
   bodyPartMap,
   bodyPartSelections,
+  type ValidBodyPart,
 } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from '../../controllers/interfaces/MulterFile'
 
@@ -35,7 +36,7 @@ const maxSizeMB = 200
 const maxSize = maxSizeMB * 1024 * 1024
 
 export function newDistinguishingMarkValidator({ bodyPart }: BodySubmission) {
-  const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
+  const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart as ValidBodyPart])
   if (!verifiedBodyPart) {
     return [{ text: 'Select a body part', href: '#body-part-selection' }]
   }

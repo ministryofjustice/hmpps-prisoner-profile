@@ -1,4 +1,8 @@
-import { bodyPartMap, BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import {
+  bodyPartMap,
+  BodyPartSelection,
+  ValidBodyPart,
+} from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import { PersonIntegrationDistinguishingMark } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 type DistinguishingMarkDecorated = PersonIntegrationDistinguishingMark & { location: string }
@@ -24,38 +28,26 @@ type BodyPartCategory =
 
 type CategorisedMarks = Record<MarkCategory, Partial<Record<BodyPartCategory, DistinguishingMarkDecorated[]>>>
 export type CategorisedMarksForView = CategorisedMarks & {
-  highlights: {
-    asset: string
-    class: string
-    name: string
-  }[]
+  selected: readonly ValidBodyPart[]
 }
 
 interface BodyPartConfig {
   name: BodyPartCategory
   markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) => boolean
-  getHighlightConfig: (mark: PersonIntegrationDistinguishingMark) => {
-    asset: string
-    class: string
-    name: string
-  } | null
+  selectableBodyPart?: ValidBodyPart
   getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => string
 }
 
 const bodyPartsConfig: Record<string, BodyPartConfig> = {
   leftArm: {
     name: 'Left arm',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_ARM' ||
         mark.bodyPart.id === 'BODY_PART_SHOULDER' ||
         mark.bodyPart.id === 'BODY_PART_ELBOW') &&
       mark.side?.id === 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/left-arm-overlay.svg',
-      class: 'dm-overlay-left-arm',
-      name: 'left arm',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'left-arm',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_ELBOW') return 'Elbow'
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
@@ -65,17 +57,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   rightArm: {
     name: 'Right arm',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_ARM' ||
         mark.bodyPart.id === 'BODY_PART_SHOULDER' ||
         mark.bodyPart.id === 'BODY_PART_ELBOW') &&
       mark.side?.id === 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/right-arm-overlay.svg',
-      class: 'dm-overlay-right-arm',
-      name: 'right arm',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'right-arm',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_ELBOW') return 'Elbow'
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
@@ -85,14 +73,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   arm: {
     name: 'Arm',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_ARM' ||
         mark.bodyPart.id === 'BODY_PART_SHOULDER' ||
         mark.bodyPart.id === 'BODY_PART_ELBOW') &&
       mark.side?.id !== 'SIDE_R' &&
       mark.side?.id !== 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => null,
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_ELBOW') return 'Elbow'
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
@@ -102,28 +89,20 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   neck: {
     name: 'Neck',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) => mark.bodyPart.id === 'BODY_PART_NECK',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/neck-overlay.svg',
-      class: 'dm-overlay-neck',
-      name: 'neck',
-    }),
+    markIsForBodyPart: mark => mark.bodyPart.id === 'BODY_PART_NECK',
+    selectableBodyPart: 'neck',
     getLocationDescription: () => 'Neck',
   },
   face: {
     name: 'Face and head',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       mark.bodyPart.id === 'BODY_PART_FACE' ||
       mark.bodyPart.id === 'BODY_PART_HEAD' ||
       mark.bodyPart.id === 'BODY_PART_EAR' ||
       mark.bodyPart.id === 'BODY_PART_LIP' ||
       mark.bodyPart.id === 'BODY_PART_NOSE',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/face-overlay.svg',
-      class: 'dm-overlay-face',
-      name: 'face',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'face',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_FACE') return 'Face'
       if (mark.bodyPart.id === 'BODY_PART_EAR') return 'Ear'
       if (mark.bodyPart.id === 'BODY_PART_LIP') return 'Lip'
@@ -133,17 +112,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   rightFoot: {
     name: 'Right foot',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_FOOT' ||
         mark.bodyPart.id === 'BODY_PART_TOE' ||
         mark.bodyPart.id === 'BODY_PART_ANKLE') &&
       mark.side?.id === 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/right-foot-overlay.svg',
-      class: 'dm-overlay-right-foot',
-      name: 'right foot',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'right-foot',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toes on right foot'
       if (mark.bodyPart.id === 'BODY_PART_ANKLE') return 'Right ankle'
       return 'Right foot'
@@ -151,17 +126,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   leftFoot: {
     name: 'Left foot',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_FOOT' ||
         mark.bodyPart.id === 'BODY_PART_TOE' ||
         mark.bodyPart.id === 'BODY_PART_ANKLE') &&
       mark.side?.id === 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/left-foot-overlay.svg',
-      class: 'dm-overlay-left-foot',
-      name: 'left foot',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'left-foot',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toes on left foot'
       if (mark.bodyPart.id === 'BODY_PART_ANKLE') return 'Left ankle'
       return 'Left foot'
@@ -169,14 +140,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   foot: {
     name: 'Foot',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_FOOT' ||
         mark.bodyPart.id === 'BODY_PART_TOE' ||
         mark.bodyPart.id === 'BODY_PART_ANKLE') &&
       mark.side?.id !== 'SIDE_R' &&
       mark.side?.id !== 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => null,
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toe'
       if (mark.bodyPart.id === 'BODY_PART_ANKLE') return 'Ankle'
       return 'Foot'
@@ -184,57 +154,44 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   rightHand: {
     name: 'Right hand',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_HAND' || mark.bodyPart.id === 'BODY_PART_FINGER') && mark.side?.id === 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/right-hand-overlay.svg',
-      class: 'dm-overlay-right-hand',
-      name: 'right hand',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'right-hand',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Fingers on right hand'
       return 'Right hand'
     },
   },
   leftHand: {
     name: 'Left hand',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_HAND' || mark.bodyPart.id === 'BODY_PART_FINGER') && mark.side?.id === 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/left-hand-overlay.svg',
-      class: 'dm-overlay-left-hand',
-      name: 'left hand',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'left-hand',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Fingers on left hand'
       return 'Left hand'
     },
   },
   hand: {
     name: 'Hand',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_HAND' || mark.bodyPart.id === 'BODY_PART_FINGER') &&
       mark.side?.id !== 'SIDE_L' &&
       mark.side?.id !== 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => null,
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Finger'
       return 'Hand - no specific location'
     },
   },
   rightLeg: {
     name: 'Right leg',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_LEG' ||
         mark.bodyPart.id === 'BODY_PART_THIGH' ||
         mark.bodyPart.id === 'BODY_PART_KNEE') &&
       mark.side?.id === 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/right-leg-overlay.svg',
-      class: 'dm-overlay-right-leg',
-      name: 'right leg',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'right-leg',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_THIGH') return 'Right thigh'
       if (mark.bodyPart.id === 'BODY_PART_KNEE') return 'Right knee'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower right leg'
@@ -243,17 +200,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   leftLeg: {
     name: 'Left leg',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_LEG' ||
         mark.bodyPart.id === 'BODY_PART_THIGH' ||
         mark.bodyPart.id === 'BODY_PART_KNEE') &&
       mark.side?.id === 'SIDE_L',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/left-leg-overlay.svg',
-      class: 'dm-overlay-left-leg',
-      name: 'left leg',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    selectableBodyPart: 'left-leg',
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_THIGH') return 'Left thigh'
       if (mark.bodyPart.id === 'BODY_PART_KNEE') return 'Left knee'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower left leg'
@@ -262,14 +215,13 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   leg: {
     name: 'Leg',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
+    markIsForBodyPart: mark =>
       (mark.bodyPart.id === 'BODY_PART_LEG' ||
         mark.bodyPart.id === 'BODY_PART_THIGH' ||
         mark.bodyPart.id === 'BODY_PART_KNEE') &&
       mark.side?.id !== 'SIDE_L' &&
       mark.side?.id !== 'SIDE_R',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => null,
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    getLocationDescription: mark => {
       if (mark.bodyPart.id === 'BODY_PART_THIGH') return 'Thigh'
       if (mark.bodyPart.id === 'BODY_PART_KNEE') return 'Knee'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower leg'
@@ -278,14 +230,9 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   torso: {
     name: 'Front and sides',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
-      mark.bodyPart.id === 'BODY_PART_TORSO' && mark.side?.id !== 'SIDE_B',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/torso-front-overlay.svg',
-      class: 'dm-overlay-torso',
-      name: 'torso',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    markIsForBodyPart: mark => mark.bodyPart.id === 'BODY_PART_TORSO' && mark.side?.id !== 'SIDE_B',
+    selectableBodyPart: 'front-and-sides',
+    getLocationDescription: mark => {
       if (mark.side?.id === 'SIDE_F') return 'Front'
       if (mark.side?.id === 'SIDE_R') return 'Right side'
       if (mark.side?.id === 'SIDE_L') return 'Left side'
@@ -294,14 +241,9 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
   },
   back: {
     name: 'Back',
-    markIsForBodyPart: (mark: PersonIntegrationDistinguishingMark) =>
-      mark.bodyPart.id === 'BODY_PART_TORSO' && mark.side?.id === 'SIDE_B',
-    getHighlightConfig: (_mark: PersonIntegrationDistinguishingMark) => ({
-      asset: '/assets/images/distinguishingMarks/back-overlay.svg',
-      class: 'dm-overlay-back',
-      name: 'back',
-    }),
-    getLocationDescription: (mark: PersonIntegrationDistinguishingMark) => {
+    markIsForBodyPart: mark => mark.bodyPart.id === 'BODY_PART_TORSO' && mark.side?.id === 'SIDE_B',
+    selectableBodyPart: 'back',
+    getLocationDescription: mark => {
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower back'
       if (mark.partOrientation?.id === 'PART_ORIENT_UPP') return 'Upper back'
       return 'Back'
@@ -317,8 +259,8 @@ export default (distinguishingMarks: PersonIntegrationDistinguishingMark[]): Cat
     MARK_TYPE_MARK: 'others',
   }
 
-  const unsortedMarks = distinguishingMarks.reduce<CategorisedMarksForView>(
-    ({ highlights, ...outputMark }, mark) => {
+  const unsortedMarks = distinguishingMarks.reduce<CategorisedMarks & { selected: Set<ValidBodyPart> }>(
+    ({ selected, ...outputMark }, mark) => {
       const markCategory = categoryForMarkTypeId[mark.markType.id]
       const bodyPartConfig = Object.values(bodyPartsConfig).find(partConfig => partConfig.markIsForBodyPart(mark))
 
@@ -328,24 +270,23 @@ export default (distinguishingMarks: PersonIntegrationDistinguishingMark[]): Cat
       const markWithLocation = { ...mark, location: markLocationDesc }
       const newGroupedMarks = mergeIn(markWithLocation, outputMark, [markCategory, bodyPartDescription])
 
-      // If the body part config for mark has highlight image config, add it to the highlights array (if not already there) to be used by view
-      const highlight = bodyPartConfig?.getHighlightConfig(mark)
-      const newHighlights =
-        !highlight || highlights.find(hl => hl.name === highlight.name) ? highlights : [...highlights, highlight]
+      if (bodyPartConfig?.selectableBodyPart) {
+        selected.add(bodyPartConfig.selectableBodyPart)
+      }
 
       return {
         ...newGroupedMarks,
-        highlights: newHighlights,
+        selected,
       }
     },
-    { tattoos: {}, scars: {}, others: {}, highlights: [] },
+    { tattoos: {}, scars: {}, others: {}, selected: new Set() },
   )
 
   return {
     tattoos: sortMarks(unsortedMarks.tattoos),
     scars: sortMarks(unsortedMarks.scars),
     others: sortMarks(unsortedMarks.others),
-    highlights: unsortedMarks.highlights,
+    selected: Array.from(unsortedMarks.selected),
   }
 }
 
@@ -388,17 +329,19 @@ export const getBodyPartDescription = (distinguishingMark: PersonIntegrationDist
   return bodyPartConfig?.name ?? 'Uncategorised'
 }
 
-const findBodyPartToken = (map: Record<string, string>, value: BodyPartSelection): string | undefined => {
-  const entry = Object.entries(map).find(([_, mapValue]) => mapValue === value)
-  return entry ? entry[0] : undefined
+const findBodyPartToken = (value: BodyPartSelection | undefined): ValidBodyPart | undefined => {
+  const entry = Object.entries(bodyPartMap).find(([_, mapValue]) => mapValue === value)
+  return entry?.[0] as ValidBodyPart | undefined
 }
 
-export const getBodyPartToken = (distinguishingMark: PersonIntegrationDistinguishingMark): string => {
+export const getBodyPartToken = (
+  distinguishingMark: PersonIntegrationDistinguishingMark,
+): ValidBodyPart | undefined => {
   const bodyPart = Object.entries(bodyPartsConfig).find(([, partConfig]) =>
     partConfig.markIsForBodyPart(distinguishingMark),
-  )?.[0]
+  )?.[0] as BodyPartSelection
 
-  return findBodyPartToken(bodyPartMap, bodyPart as BodyPartSelection)
+  return findBodyPartToken(bodyPart)
 }
 
 function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPartCategory]) {

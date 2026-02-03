@@ -27,7 +27,8 @@ import { heightImperialValidator, heightMetricValidator } from '../../../validat
 import { weightImperialValidator, weightMetricValidator } from '../../../validators/personal/weightValidator'
 import { religionValidator } from '../../../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../../../validators/personal/shoeSizeValidator'
-import distinguishingMarksRouter, { markTypes } from './distinguishingMarksRouter'
+import distinguishingMarksRouter from './distinguishingMarksRouter'
+import { markTypeSelections } from '../../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import { dietAndFoodAllergiesValidator } from '../../../validators/personal/dietAndFoodAllergiesValidator'
 import militaryRecordsRouter from './militaryRecordsRouter'
 import { nationalityValidator } from '../../../validators/personal/nationalityValidator'
@@ -67,7 +68,7 @@ export default function editRouter(services: Services): Router {
 
   router.use(
     `${personalPageBasePath}/distinguishing-marks/:markType`,
-    parameterGuard('markType', markTypes),
+    parameterGuard('markType', markTypeSelections),
     ...commonMiddleware,
     distinguishingMarksRouter(services),
   )

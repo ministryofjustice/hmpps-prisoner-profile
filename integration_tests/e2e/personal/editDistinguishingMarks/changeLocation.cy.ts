@@ -49,28 +49,28 @@ context('Change location of distinguishing mark on face', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
-    function testChangeDistinguishingMarkDetailWithRadios(bodyPartSelectorAlt) {
+    function testChangeDistinguishingMarkDetailWithRadios(bodyPartLabel: string) {
       return (bodyPart: string) => {
         it(`User can add distinguishing mark detail for body part: ${bodyPart}`, () => {
           cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
           visitChangeLocationScarPage()
           const bodyPage = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the scar is')
 
-          const selection = bodyPage.bodyParts().filter(`[alt="${bodyPartSelectorAlt}"]`)
+          const selection = bodyPage.findBodyPart(bodyPartLabel)
           selection.click({ force: true })
 
           // Click on the left arm twice as it is initially selected so the first click unselects it
-          if (bodyPartSelectorAlt === 'Left arm') {
+          if (bodyPartLabel === 'Left arm') {
             selection.click({ force: true })
           }
 
-          bodyPage.continueBtn().click()
+          bodyPage.continueBtn.click()
 
           const page = Page.verifyOnPageWithTitle(ChangeLocation, 'Change the location of the scar')
 
-          page.bodyPartRadios().filter(`[value="${bodyPart}"]`).check()
+          page.bodyPartRadios.filter(`[value="${bodyPart}"]`).check()
 
-          page.saveBtn().click()
+          page.saveBtn.click()
           cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/distinguishing-marks/scar/100')
         })
       }
