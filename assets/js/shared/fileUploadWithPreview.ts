@@ -1,19 +1,19 @@
 export function fileUploadWithPreview() {
-  const uploadComponents = document.querySelectorAll('.hmpps-file-upload-with-preview')
+  const uploadComponents = document.querySelectorAll<HTMLDivElement>('.hmpps-file-upload-with-preview')
   uploadComponents.forEach(component => {
-    let uploadContainer = component.querySelector('.govuk-file-upload')
+    const uploadContainer = component.querySelector<HTMLInputElement>('.govuk-file-upload')
     if (uploadContainer) {
       uploadContainer.addEventListener('change', () => {
         let uploadFile = uploadContainer.files[0]
-        let uploadButton = component.querySelector('.govuk-file-upload-button')
-        let uploadButtonStatus = component.querySelector('.govuk-file-upload-button__status')
+        let uploadButton = component.querySelector<HTMLButtonElement>('.govuk-file-upload-button')
+        let uploadButtonStatus = component.querySelector<HTMLSpanElement>('.govuk-file-upload-button__status')
         if (uploadFile && uploadButtonStatus) {
           const reader = new FileReader()
           reader.readAsDataURL(uploadFile)
           reader.onload = function (e) {
             uploadButtonStatus.innerText = uploadFile.name
 
-            let previewContent = component.querySelector('.hmpps-file-upload-with-preview__content')
+            let previewContent = component.querySelector<HTMLDivElement>('.hmpps-file-upload-with-preview__content')
             if (!previewContent) {
               previewContent = document.createElement('div')
               previewContent.className = 'hmpps-file-upload-with-preview__content'
@@ -23,7 +23,7 @@ export function fileUploadWithPreview() {
               uploadButton.appendChild(previewContent)
             }
 
-            let previewThumbnail = component.querySelector('.hmpps-file-upload-with-preview__photo')
+            let previewThumbnail = component.querySelector<HTMLImageElement>('.hmpps-file-upload-with-preview__photo')
             if (!previewThumbnail) {
               previewThumbnail = document.createElement('img')
               previewThumbnail.className = 'hmpps-file-upload-with-preview__photo'
@@ -31,7 +31,7 @@ export function fileUploadWithPreview() {
             }
 
             if (previewThumbnail) {
-              previewThumbnail.src = e.target.result
+              previewThumbnail.src = e.target.result as string
               previewThumbnail.alt = 'Uploaded image thumbnail'
             }
 
