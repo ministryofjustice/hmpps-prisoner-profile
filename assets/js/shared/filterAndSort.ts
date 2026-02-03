@@ -1,5 +1,9 @@
-function filterAndSort(options) {
-  const scoreBySubstringIndex = (query, option) => {
+interface Source {
+  (query: string, populateResults: (options: string[]) => void): void
+}
+
+export function filterAndSort(options: string[]): Source {
+  const scoreBySubstringIndex = (query: string, option: string): number => {
     const index = option.toLowerCase().indexOf(query.toLowerCase())
     return index === -1 ? Infinity : index
   }
@@ -21,5 +25,3 @@ function filterAndSort(options) {
     populateResults(sortedOptions)
   }
 }
-
-module.exports = { filterAndSort }

@@ -1,6 +1,6 @@
 import accessibleAutocomplete from 'accessible-autocomplete'
 import { getParentConditionalRadioInput } from './helpers'
-import { filterAndSort } from './filterAndSort.js'
+import { filterAndSort } from './filterAndSort'
 
 export function autocomplete() {
   document.querySelectorAll('.js-autocomplete-select').forEach(selectElement => {
