@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
 import DistinguishingMarksService from '../../../../services/distinguishingMarksService'
 import { distinguishingMarkMock, leftLegMarkMock } from '../../../../data/localMockData/distinguishingMarksMock'
-import { bodyPartMap, markTypeSelections } from '../../../interfaces/distinguishingMarks/selectionTypes'
+import {
+  bodyPartMap,
+  markTypeSelections,
+  type ValidBodyPart,
+} from '../../../interfaces/distinguishingMarks/selectionTypes'
 import { getBodyPartDescription } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
 import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
@@ -64,6 +68,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType,
         selected: undefined,
         miniBannerData: {
@@ -88,7 +93,7 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
-    it.each(Object.keys(bodyPartMap))('should add a valid selection (%s)', async bodyPart => {
+    it.each(Object.keys(bodyPartMap))('should add a valid selection (%s)', async (bodyPart: ValidBodyPart) => {
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo' },
@@ -99,6 +104,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType: 'tattoo',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
@@ -122,6 +128,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
+        cancelUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType: 'tattoo',
         selected: 'invalidSelection',
         verifiedSelection: undefined,
@@ -157,7 +164,7 @@ describe('Distinguishing Marks Controller', () => {
   describe('addDistinguishingMark', () => {
     it.each(Object.keys(bodyPartMap))(
       'should add a new distinguishing mark with valid bodyPart (%s)',
-      async bodyPart => {
+      async (bodyPart: ValidBodyPart) => {
         const submissionReq = {
           ...req,
           params: { prisonerNumber, markType: 'tattoo' },
@@ -289,7 +296,7 @@ describe('Distinguishing Marks Controller', () => {
       })
     })
 
-    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
+    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async (bodyPart: ValidBodyPart) => {
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', bodyPart },
@@ -589,7 +596,7 @@ describe('Distinguishing Marks Controller', () => {
       })
     })
 
-    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
+    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async (bodyPart: ValidBodyPart) => {
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '100' },
@@ -633,7 +640,7 @@ describe('Distinguishing Marks Controller', () => {
   describe('updateBodyPart', () => {
     it.each(Object.keys(bodyPartMap).filter(part => !['neck', 'back'].includes(part)))(
       'should update distinguishing mark with valid bodyPart and available locations (%s)',
-      async bodyPart => {
+      async (bodyPart: ValidBodyPart) => {
         const submissionReq = {
           ...req,
           params: { prisonerNumber, markType: 'tattoo', markId: '100' },
@@ -670,7 +677,7 @@ describe('Distinguishing Marks Controller', () => {
 
     it.each(Object.keys(bodyPartMap).filter(part => ['neck', 'back'].includes(part)))(
       'should update distinguishing mark with valid bodyPart with no available locations (%s)',
-      async bodyPart => {
+      async (bodyPart: ValidBodyPart) => {
         const submissionReq = {
           ...req,
           params: { prisonerNumber, markType: 'tattoo', markId: '100' },
@@ -773,7 +780,7 @@ describe('Distinguishing Marks Controller', () => {
       })
     })
 
-    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async bodyPart => {
+    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async (bodyPart: ValidBodyPart) => {
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '100' },

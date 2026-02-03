@@ -5,20 +5,32 @@ export default class ChangeLocation extends Page {
     super(pageTitle)
   }
 
-  h1 = (): PageElement => cy.get('h1')
+  get h1(): PageElement<HTMLHeadingElement> {
+    return cy.get('h1')
+  }
 
   miniBanner = () => ({
     card: (): PageElement => cy.get('.hmpps-mini-banner'),
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  form = (): PageElement => cy.get('form#mark-detail-form[enctype=multipart/form-data]')
+  get form(): PageElement<HTMLFormElement> {
+    return cy.get('form#mark-detail-form[enctype="multipart/form-data"]')
+  }
 
-  bodyPartRadios = (): PageElement => cy.get('input[type=radio]')
+  get bodyPartRadios(): PageElement<HTMLInputElement> {
+    return cy.get('input[type=radio]')
+  }
 
-  imageFields = (): PageElement => cy.get('input[type=file]')
+  get imageFields(): PageElement<HTMLInputElement> {
+    return cy.get('input[type=file]')
+  }
 
-  descriptionFields = (): PageElement => cy.get('textarea')
+  get descriptionFields(): PageElement<HTMLTextAreaElement> {
+    return cy.get('textarea')
+  }
 
-  saveBtn = (): PageElement => cy.get('button[type=submit]')
+  get saveBtn(): PageElement<HTMLButtonElement> {
+    return cy.get('button[type=submit]')
+  }
 }

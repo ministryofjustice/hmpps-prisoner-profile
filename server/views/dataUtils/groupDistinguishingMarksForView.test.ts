@@ -60,6 +60,7 @@ describe('groupIdentifyingMarks', () => {
       expect(grouped.scars['Left arm'][0].id).toEqual(101)
       expect(grouped.others['Left arm'][0].id).toEqual(102)
       expect(grouped.others['Left arm'][1].id).toEqual(103)
+      expect(grouped.selected).toEqual(['left-arm'])
     })
   })
 

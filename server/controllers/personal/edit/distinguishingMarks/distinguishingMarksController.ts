@@ -6,10 +6,10 @@ import DistinguishingMarksService, {
 import {
   AllBodyPartSelection,
   bodyPartMap,
-  BodyPartSelection,
   bodyPartSelections,
   MarkTypeSelection,
   markTypeSelections,
+  type ValidBodyPart,
 } from '../../../interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from '../../../interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
@@ -83,7 +83,7 @@ export default class DistinguishingMarksController {
   public newDistinguishingMark: RequestHandler = async (req, res) => {
     const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
     const { markType } = req.params
-    const selected = req.query.selected as string
+    const selected = req.query.selected as ValidBodyPart | undefined
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
@@ -98,11 +98,14 @@ export default class DistinguishingMarksController {
       page: Page.AddDistinguishingMark,
     })
 
+    const cancelUrl = `/prisoner/${prisonerNumber}/personal#marks`
+
     return res.render('pages/distinguishingMarks/addNewDistinguishingMark', {
       markType,
       selected,
       verifiedSelection,
-      backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
+      cancelUrl,
+      backLinkUrl: cancelUrl,
       miniBannerData,
     })
   }
@@ -125,7 +128,7 @@ export default class DistinguishingMarksController {
         res.locals.user as PrisonUser,
         prisonerNumber,
         verifiedMarkType,
-        bodyPartMap[bodyPart] as BodyPartSelection,
+        bodyPartMap[bodyPart as ValidBodyPart],
       )
 
       this.auditService
@@ -157,7 +160,7 @@ export default class DistinguishingMarksController {
     const { markType, bodyPart } = req.params
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
+    const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart as ValidBodyPart])
 
     if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
@@ -270,7 +273,7 @@ export default class DistinguishingMarksController {
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
 
-    const selected = (req.query.selected as string) || getBodyPartToken(mark)
+    const selected = (req.query.selected as ValidBodyPart | undefined) || getBodyPartToken(mark)
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
@@ -304,7 +307,7 @@ export default class DistinguishingMarksController {
         mark.side?.code,
         mark?.partOrientation?.code,
       )
-      const verifiedBodyPart = bodyPartMap[bodyPart] as BodyPartSelection
+      const verifiedBodyPart = bodyPartMap[bodyPart as ValidBodyPart]
       bodyPartChanged = currentSpecificBodyPart !== verifiedBodyPart
       await this.distinguishingMarksService.updateDistinguishingMarkLocation(
         clientToken,
@@ -349,7 +352,7 @@ export default class DistinguishingMarksController {
   public changeLocation: RequestHandler = async (req, res) => {
     const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
     const { markId, markType } = req.params
-    const bodyPart = req.query.bodyPart as string
+    const bodyPart = req.query.bodyPart as ValidBodyPart | undefined
     const referer = req.query.referer as string
     const bodyPartChanged = (req.query.bodyPartChanged as string) === 'true'
 

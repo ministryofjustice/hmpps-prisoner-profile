@@ -10,12 +10,12 @@ import MulterFile from '../../controllers/interfaces/MulterFile'
 
 describe('Distinguishing Marks Validators', () => {
   describe('newDistinguishingMarkValidator', () => {
-    it.each([{ bodyPart: 'face' }, { bodyPart: 'right-arm' }])('Valid body part: %s', ({ bodyPart }) => {
+    it.each([{ bodyPart: 'face' }, { bodyPart: 'right-arm' }])('Valid body part: $bodyPart', ({ bodyPart }) => {
       const errors = newDistinguishingMarkValidator({ bodyPart })
       expect(errors.length).toEqual(0)
     })
 
-    it.each([{ bodyPart: 'invalid-part' }, { bodyPart: '' }])('Invalid body part: %s', ({ bodyPart }) => {
+    it.each([{ bodyPart: 'invalid-part' }, { bodyPart: '' }])('Invalid body part: $bodyPart', ({ bodyPart }) => {
       const errors = newDistinguishingMarkValidator({ bodyPart })
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual('Select a body part')
@@ -25,7 +25,7 @@ describe('Distinguishing Marks Validators', () => {
 
   describe('newDetailedDistinguishingMarkValidator', () => {
     it.each(allBodyParts.map(part => ({ specificBodyPart: part, description: 'Valid description' })))(
-      'Valid body part and description: %s',
+      'Valid body part and description: $specificBodyPart',
       ({ specificBodyPart, description }) => {
         const req = {
           body: { [`description-${specificBodyPart}`]: description, specificBodyPart },
@@ -79,10 +79,13 @@ describe('Distinguishing Marks Validators', () => {
   })
 
   describe('updateLocationValidator', () => {
-    it.each(allBodyParts.map(part => ({ specificBodyPart: part })))('Valid body part: %s', ({ specificBodyPart }) => {
-      const errors = updateLocationValidator({ specificBodyPart })
-      expect(errors.length).toEqual(0)
-    })
+    it.each(allBodyParts.map(part => ({ specificBodyPart: part })))(
+      'Valid body part: $specificBodyPart',
+      ({ specificBodyPart }) => {
+        const errors = updateLocationValidator({ specificBodyPart })
+        expect(errors.length).toEqual(0)
+      },
+    )
 
     it('Invalid body part', () => {
       const errors = updateLocationValidator({ specificBodyPart: 'invalid-part' })
