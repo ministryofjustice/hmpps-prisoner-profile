@@ -1,4 +1,5 @@
-import { Request, Response } from 'express'
+import { RequestHandler } from 'express'
+import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import DistinguishingMarksService, {
   findBodyPartByCodeAndSideAndOrientation,
 } from '../../../../services/distinguishingMarksService'
@@ -79,9 +80,9 @@ export default class DistinguishingMarksController {
     this.viewAllImages = this.viewAllImages.bind(this)
   }
 
-  public async newDistinguishingMark(req: Request, res: Response) {
-    const { markType, prisonerNumber } = req.params
-    const { prisonerData } = req.middleware
+  public newDistinguishingMark: RequestHandler = async (req, res) => {
+    const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const { markType } = req.params
     const selected = req.query.selected as ValidBodyPart | undefined
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
@@ -91,8 +92,8 @@ export default class DistinguishingMarksController {
 
     await this.auditService.sendPageView({
       user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
+      prisonerNumber,
+      prisonId,
       correlationId: req.id,
       page: Page.AddDistinguishingMark,
     })
@@ -105,13 +106,14 @@ export default class DistinguishingMarksController {
       verifiedSelection,
       cancelUrl,
       backLinkUrl: cancelUrl,
+      miniBannerData,
     })
   }
 
-  public async postNewDistinguishingMark(req: Request, res: Response) {
-    const { markType, prisonerNumber } = req.params
+  public postNewDistinguishingMark: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markType } = req.params
     const { bodyPart, action } = req.body
-    const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -153,8 +155,9 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchors[verifiedMarkType]}`)
   }
 
-  public async newDistinguishingMarkWithDetail(req: Request, res: Response) {
-    const { markType, prisonerNumber, bodyPart } = req.params
+  public newDistinguishingMarkWithDetail: RequestHandler = async (req, res) => {
+    const { prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+    const { markType, bodyPart } = req.params
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart as ValidBodyPart])
@@ -165,13 +168,14 @@ export default class DistinguishingMarksController {
       markType,
       bodyPart: verifiedBodyPart,
       backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${verifiedMarkType}?selected=${bodyPart}`,
+      miniBannerData,
     })
   }
 
-  public async postNewDistinguishingMarkWithDetail(req: Request, res: Response) {
-    const { markType, bodyPart, prisonerNumber } = req.params
+  public postNewDistinguishingMarkWithDetail: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markType, bodyPart } = req.params
     const { specificBodyPart, action } = req.body
-    const { clientToken } = req.middleware
     const files = req.files as MulterFiles
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
@@ -223,17 +227,17 @@ export default class DistinguishingMarksController {
       : res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}`)
   }
 
-  public async changeDistinguishingMark(req: Request, res: Response) {
-    const { clientToken, prisonerData } = req.middleware
-    const { prisonerNumber, markId, markType } = req.params
+  public changeDistinguishingMark: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const updated = (req.query.updated as string) === 'true'
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
 
     await this.auditService.sendPageView({
       user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
+      prisonerNumber,
+      prisonId,
       correlationId: req.id,
       page: Page.EditDistinguishingMark,
     })
@@ -243,10 +247,11 @@ export default class DistinguishingMarksController {
       mark,
       markType,
       updated,
+      miniBannerData,
     })
   }
 
-  public async returnToPrisonerProfileAfterUpdate(req: Request, res: Response) {
+  public returnToPrisonerProfileAfterUpdate: RequestHandler = async (req, res) => {
     const { prisonerNumber, markType } = req.params
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
 
@@ -262,9 +267,9 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
   }
 
-  public async changeBodyPart(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
-    const { clientToken } = req.middleware
+  public changeBodyPart: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
 
@@ -282,13 +287,14 @@ export default class DistinguishingMarksController {
       selected,
       verifiedSelection,
       cancelUrl,
+      miniBannerData,
     })
   }
 
-  public async updateBodyPart(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+  public updateBodyPart: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const { bodyPart } = req.body
-    const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -343,12 +349,12 @@ export default class DistinguishingMarksController {
     )
   }
 
-  public async changeLocation(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+  public changeLocation: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const bodyPart = req.query.bodyPart as ValidBodyPart | undefined
     const referer = req.query.referer as string
     const bodyPartChanged = (req.query.bodyPartChanged as string) === 'true'
-    const { clientToken } = req.middleware
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
     const bodyPartCode: BodyPartId = mark.bodyPart.code as BodyPartId
@@ -370,13 +376,14 @@ export default class DistinguishingMarksController {
       ...(bodyPartChanged ? {} : { specificBodyPart }),
       backLinkUrl,
       cancelUrl,
+      miniBannerData,
     })
   }
 
-  public async updateLocation(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+  public updateLocation: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const { specificBodyPart } = req.body
-    const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -420,9 +427,9 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
 
-  public async changeDescription(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
-    const { clientToken } = req.middleware
+  public changeDescription: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
 
@@ -441,13 +448,14 @@ export default class DistinguishingMarksController {
       markType,
       formValues,
       cancelUrl,
+      miniBannerData,
     })
   }
 
-  public async updateDescription(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+  public updateDescription: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const { description } = req.body
-    const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -487,9 +495,9 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
 
-  public async changePhoto(req: Request, res: Response) {
-    const { photoId, markId, markType, prisonerNumber } = req.params
-    const { clientToken, prisonerData } = req.middleware
+  public changePhoto: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const { photoId, markId, markType } = req.params
     const upload = req.query.upload !== undefined
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
@@ -502,8 +510,8 @@ export default class DistinguishingMarksController {
 
     await this.auditService.sendPageView({
       user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
+      prisonerNumber,
+      prisonId,
       correlationId: req.id,
       page: Page.EditDistinguishingMarkPhoto,
     })
@@ -517,12 +525,13 @@ export default class DistinguishingMarksController {
       },
       cancelUrl,
       upload,
+      miniBannerData,
     })
   }
 
-  public async addNewPhoto(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
-    const { prisonerData } = req.middleware
+  public addNewPhoto: RequestHandler = async (req, res) => {
+    const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const upload = req.query.upload !== undefined
     const updated = (req.query.updated as string) === 'true'
 
@@ -533,8 +542,8 @@ export default class DistinguishingMarksController {
 
     await this.auditService.sendPageView({
       user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
+      prisonerNumber,
+      prisonId,
       correlationId: req.id,
       page: Page.AddDistinguishingMarkPhoto,
     })
@@ -544,12 +553,13 @@ export default class DistinguishingMarksController {
       markType,
       upload,
       cancelUrl,
+      miniBannerData,
     })
   }
 
-  public async updatePhoto(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber, photoId } = req.params
-    const { clientToken } = req.middleware
+  public updatePhoto: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markId, markType, photoId } = req.params
     const file = req.file as MulterFile
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
@@ -587,10 +597,10 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
 
-  public async addPhoto(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+  public addPhoto: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
     const { action } = req.body
-    const { clientToken } = req.middleware
     const file = req.file as MulterFile
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
@@ -631,9 +641,9 @@ export default class DistinguishingMarksController {
       : res.redirect(`/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/${markId}?updated=true`)
   }
 
-  public async viewAllImages(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
-    const { clientToken, prisonerData } = req.middleware
+  public viewAllImages: RequestHandler = async (req, res) => {
+    const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
+    const { markId, markType } = req.params
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -642,8 +652,8 @@ export default class DistinguishingMarksController {
 
     await this.auditService.sendPageView({
       user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
+      prisonerNumber,
+      prisonId,
       correlationId: req.id,
       page: Page.DistinguishingMarkAllPhotos,
     })
@@ -651,6 +661,7 @@ export default class DistinguishingMarksController {
     return res.render('pages/distinguishingMarks/viewAllImages', {
       mark,
       markType,
+      miniBannerData,
     })
   }
 }
