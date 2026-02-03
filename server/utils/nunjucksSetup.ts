@@ -63,8 +63,8 @@ import groupDistinguishingMarks, {
   getBodyPartToken,
   getMarkLocationDescription,
 } from '../views/dataUtils/groupDistinguishingMarksForView'
-import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
+import { bodyPartLabels } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
 import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
@@ -136,6 +136,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('appInsightsWebAnalyticsEnabled', appInsightsWebAnalyticsEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
+  njkEnv.addGlobal('bodyPartLabels', bodyPartLabels)
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('initialiseName', initialiseName)
@@ -218,7 +219,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
-  njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
   njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
   njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)

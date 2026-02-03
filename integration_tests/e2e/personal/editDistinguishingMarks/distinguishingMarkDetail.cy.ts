@@ -43,15 +43,15 @@ context('New distinguishing mark on face', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
-    function testAddDistinguishingMarkDetailWithRadios(title, bodyPartSelectorAlt) {
+    function testAddDistinguishingMarkDetailWithRadios(title: string, bodyPartLabel: string) {
       return (bodyPart: string) => {
         it(`User can add distinguishing mark detail for body part: ${bodyPart}`, () => {
           visitNewScarPage()
           const bodyPage = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the scar is')
 
-          const selection = bodyPage.bodyParts().filter(`[alt="${bodyPartSelectorAlt}"]`)
+          const selection = bodyPage.findBodyPart(bodyPartLabel)
           selection.click({ force: true })
-          bodyPage.continueBtn().click()
+          bodyPage.continueBtn.click()
 
           const page = Page.verifyOnPageWithTitle(DistinguishingMarkDetail, title)
 
@@ -65,14 +65,14 @@ context('New distinguishing mark on face', () => {
       }
     }
 
-    function testAddDistinguishingMarkDetailSingleField(title: string, bodyPartSelectorAlt: string, bodyPart: string) {
+    function testAddDistinguishingMarkDetailSingleField(title: string, bodyPartLabel: string, bodyPart: string) {
       it(`User can add distinguishing mark detail for body part: ${bodyPart}`, () => {
         visitNewScarPage()
         const bodyPage = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the scar is')
 
-        const selection = bodyPage.bodyParts().filter(`[alt="${bodyPartSelectorAlt}"]`)
+        const selection = bodyPage.findBodyPart(bodyPartLabel)
         selection.click({ force: true })
-        bodyPage.continueBtn().click()
+        bodyPage.continueBtn.click()
 
         const page = Page.verifyOnPageWithTitle(DistinguishingMarkDetail, title)
 

@@ -177,6 +177,14 @@ export default class PersonalPage extends Page {
         const scarsDetail = () => marks().findDataQa('distinguishing-marks-scars').find('details')
         const tattoosDetail = () => marks().findDataQa('distinguishing-marks-tattoos').find('details')
         return {
+          get selectedBodyPartDescriptions() {
+            return cy.get<SVGDescElement>('#all-distinguishing-marks__front-desc').then(front => {
+              return cy.get<SVGDescElement>('#all-distinguishing-marks__back-desc').then(back => ({
+                front,
+                back,
+              }))
+            })
+          },
           tattoos: () => marks().findDataQa('distinguishing-marks-tattoos'),
           scars: () => marks().findDataQa('distinguishing-marks-scars'),
           others: () => marks().findDataQa('distinguishing-marks-others'),

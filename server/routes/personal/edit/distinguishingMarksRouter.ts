@@ -14,32 +14,19 @@ import {
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
 import { editProfileEnabled } from '../../../utils/featureToggles'
-import { allBodyParts } from '../../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import {
+  allBodyParts,
+  markTypeSelections,
+  validBodyParts,
+} from '../../../controllers/interfaces/distinguishingMarks/selectionTypes'
 import setUpCsrf from '../../../middleware/setUpCsrf'
 import { parameterGuard } from '../../../middleware/parameterGuard'
 
-// Define valid mark types
-export const markTypes = ['tattoo', 'scar', 'mark']
-
-// Define valid body parts
-const validBodyParts = [
-  'face',
-  'front-and-sides',
-  'right-arm',
-  'right-leg',
-  'right-hand',
-  'right-foot',
-  'left-arm',
-  'left-leg',
-  'left-hand',
-  'left-foot',
-  'back',
-  'neck',
-]
-
 export function distinguishingMarksMulterExceptions(path: string): boolean {
   return (
-    path.match(`\\/personal\\/distinguishing-marks\\/(${markTypes.join('|')})\\/(${validBodyParts.join('|')})`) != null
+    path.match(
+      `\\/personal\\/distinguishing-marks\\/(${markTypeSelections.join('|')})\\/(${validBodyParts.join('|')})`,
+    ) != null
   )
 }
 

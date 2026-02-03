@@ -396,6 +396,14 @@ context('When signed in', () => {
           .detail()
           .get('[data-qa=mark-images-link]')
           .should('not.exist')
+
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .selectedBodyPartDescriptions.then(({ front, back }) => {
+            expect(front.text()).to.contain('Left arm selected')
+            expect(back.text()).to.contain('No body part selected on the back')
+          })
       })
 
       it(`Renders only the latest photo when there are multiple photos for a distinguishing mark`, () => {

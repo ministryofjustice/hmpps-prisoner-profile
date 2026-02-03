@@ -5,26 +5,44 @@ export default class NewDistinguishingMark extends Page {
     super(pageTitle)
   }
 
-  h1 = (): PageElement => cy.get('h1')
+  get h1(): PageElement<HTMLHeadingElement> {
+    return cy.get('h1')
+  }
 
   miniBanner = () => ({
     card: (): PageElement => cy.get('.hmpps-mini-banner'),
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  explanationText = (): PageElement => cy.get('[data-qa=explanation-text]')
+  get explanationText(): PageElement<HTMLParagraphElement> {
+    return cy.get('[data-qa="explanation-text"]')
+  }
 
-  image = (): PageElement => cy.get('img[usemap=#body-part-map]')
+  get bodyParts(): PageElement<SVGAElement> {
+    return cy.get('#select-body-part .dps-body-part')
+  }
 
-  bodyParts = (): PageElement => cy.get('map[name=body-part-map] area')
+  findBodyPart(label: string): PageElement<SVGAElement> {
+    return this.bodyParts.filter(`[aria-label="${label}"]`)
+  }
 
-  selectionDescription = (): PageElement => cy.get('#distinguishing-mark-selection-text')
+  get selectionDescription(): PageElement<HTMLParagraphElement> {
+    return cy.get('#select-body-part__message')
+  }
 
-  formValue = (name: string): PageElement => cy.get(`input[name=${name}]`)
+  formValue(name: string): PageElement<HTMLInputElement> {
+    return cy.get(`input[name=${name}]`)
+  }
 
-  continueBtn = (): PageElement => cy.get('button[type=submit][value=continue]')
+  get continueBtn(): PageElement<HTMLButtonElement> {
+    return cy.get('button[type=submit][value=continue]')
+  }
 
-  saveAndReturnBtn = (): PageElement => cy.get('button[type=submit][value=returnToProfile]')
+  get saveAndReturnBtn(): PageElement<HTMLButtonElement> {
+    return cy.get('button[type=submit][value=returnToProfile]')
+  }
 
-  validationErrorBox = (): PageElement => cy.get('.govuk-error-summary')
+  get validationErrorBox(): PageElement<HTMLDivElement> {
+    return cy.get('.govuk-error-summary')
+  }
 }
