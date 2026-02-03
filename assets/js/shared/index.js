@@ -10,7 +10,7 @@ import { backToTop } from './backToTop'
 import { datepicker } from './datepicker'
 import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
-import { openCloseAll } from './openCloseAll'
+import { OpenCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
 
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
   backToTop()
   datepicker()
   fileUploadWithPreview()
-  openCloseAll()
   printPage()
   sortSelector()
   govukFrontend.createAll(BodyParts)
+  govukFrontend.createAll(OpenCloseAll)
 })

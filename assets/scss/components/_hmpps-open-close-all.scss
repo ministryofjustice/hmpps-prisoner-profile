@@ -1,5 +1,6 @@
 .hmpps-open-close-all {
   &__button {
+    appearance: none;
     background: none;
     border: none;
     color: $govuk-link-colour;
@@ -17,7 +18,7 @@
       background-color: $govuk-focus-colour;
       text-decoration: none;
     }
-    
+
     &:hover:not(:focus):not(:active) {
       color: $govuk-link-hover-colour;
     }
