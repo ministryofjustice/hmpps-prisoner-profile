@@ -6,11 +6,11 @@ export function alertFlags() {
   if (alertDetailsElement) {
     const alertDetailsModal = new Modal(alertDetailsElement)
 
-    document.querySelectorAll('.alerts-list .dps-alert-status').forEach(el => {
+    document.querySelectorAll<HTMLAnchorElement>('.alerts-list .dps-alert-status').forEach(el => {
       el.addEventListener('click', event => {
         event.preventDefault()
-        const ids = event.target.attributes.href.value.split('?')[1]
-        const prisonerNumber = event.target.dataset.prisonerNumber
+        const ids = el.href.split('?')[1]
+        const prisonerNumber = el.dataset.prisonerNumber
         alertDetailsModal.load(`/api/prisoner/${prisonerNumber}/get-alert-details?${ids}`)
       })
     })
