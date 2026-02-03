@@ -1,4 +1,7 @@
-export function nodeListForEach(nodes, callback) {
+export function nodeListForEach<E extends Element>(
+  nodes: NodeListOf<E>,
+  callback: (this: Window, node: E, index: number, nodes: NodeListOf<E>) => void,
+) {
   if (window.NodeList.prototype.forEach) {
     return nodes.forEach(callback)
   }
@@ -7,6 +10,6 @@ export function nodeListForEach(nodes, callback) {
   }
 }
 
-export function getParentConditionalRadioInput(element) {
+export function getParentConditionalRadioInput(element: Element): HTMLInputElement | undefined {
   return element?.closest('.govuk-radios__conditional')?.previousElementSibling?.querySelector('input')
 }
