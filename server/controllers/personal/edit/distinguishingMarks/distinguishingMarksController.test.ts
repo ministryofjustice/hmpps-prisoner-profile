@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
 import DistinguishingMarksService from '../../../../services/distinguishingMarksService'
 import { distinguishingMarkMock, leftLegMarkMock } from '../../../../data/localMockData/distinguishingMarksMock'
@@ -12,49 +12,71 @@ import { AuditService, Page, PostAction } from '../../../../services/auditServic
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../../data/localMockData/user'
+import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import ProblemSavingError from '../../../../utils/problemSavingError'
 
-const getResLocals = () => ({
-  user: prisonUserMock,
-})
+const { prisonerNumber, prisonId } = PrisonerMockDataA
 
 describe('Distinguishing Marks Controller', () => {
-  const prisonerNumber = 'A12345'
-
   let req: Request
   let res: Response
+  let next: NextFunction
   let controller: DistinguishingMarksController
   let distinguishingMarksService: DistinguishingMarksService
   let auditService: AuditService
 
   beforeEach(() => {
     req = {
+      id: '123',
+      params: { prisonerNumber },
       middleware: {
         clientToken: 'token',
         prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
       },
-      flash: jest.fn(),
+      flash: jest.fn().mockReturnValue([]),
+      body: {},
     } as unknown as Request
+
     res = {
-      locals: getResLocals(),
+      locals: {
+        user: prisonUserMock,
+        prisonerNumber,
+        prisonId,
+      },
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response
+
+    next = jest.fn()
+
     distinguishingMarksService = new DistinguishingMarksService(null, null)
     auditService = auditServiceMock() as AuditService
+
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)
   })
 
   describe('newDistinguishingMark', () => {
     it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
-      const typeReq = { ...req, params: { prisonerNumber, markType }, query: {} } as unknown as Request
-      await controller.newDistinguishingMark(typeReq, res)
+      const typeReq = {
+        ...req,
+        params: { prisonerNumber, markType },
+        query: {},
+      } as unknown as Request
+
+      await controller.newDistinguishingMark(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         cancelUrl: `/prisoner/${prisonerNumber}/personal#marks`,
         markType,
         selected: undefined,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -64,7 +86,8 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'invalidType' },
         query: {},
       } as unknown as Request
-      await controller.newDistinguishingMark(typeReq, res)
+
+      await controller.newDistinguishingMark(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -76,7 +99,8 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo' },
         query: { selected: bodyPart },
       } as unknown as Request
-      await controller.newDistinguishingMark(typeReq, res)
+
+      await controller.newDistinguishingMark(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
@@ -84,6 +108,12 @@ describe('Distinguishing Marks Controller', () => {
         markType: 'tattoo',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -93,7 +123,8 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo' },
         query: { selected: 'invalidSelection' },
       } as unknown as Request
-      await controller.newDistinguishingMark(typeReq, res)
+
+      await controller.newDistinguishingMark(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMark', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal#marks`,
@@ -101,6 +132,12 @@ describe('Distinguishing Marks Controller', () => {
         markType: 'tattoo',
         selected: 'invalidSelection',
         verifiedSelection: undefined,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -112,13 +149,13 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'G6123VU',
-        prisonId: 'MDI',
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.AddDistinguishingMark,
       }
 
-      await controller.newDistinguishingMark(typeReq, res)
+      await controller.newDistinguishingMark(typeReq, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -132,12 +169,12 @@ describe('Distinguishing Marks Controller', () => {
           ...req,
           params: { prisonerNumber, markType: 'tattoo' },
           body: { bodyPart },
-          flash: jest.fn(),
+          flash: jest.fn().mockReturnValue([]),
         } as unknown as Request
 
         jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-        await controller.postNewDistinguishingMark(submissionReq, res)
+        await controller.postNewDistinguishingMark(submissionReq, res, next)
 
         expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
           'token',
@@ -155,12 +192,12 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber, markType },
         body: { bodyPart: 'left-leg' },
-        flash: jest.fn(),
+        flash: jest.fn().mockReturnValue([]),
       } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.postNewDistinguishingMark(submissionReq, res)
+      await controller.postNewDistinguishingMark(submissionReq, res, next)
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
@@ -181,18 +218,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.postNewDistinguishingMark(typeReq, res)
+      await controller.postNewDistinguishingMark(typeReq, res, next)
       expect(distinguishingMarksService.postNewDistinguishingMark).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
 
     it('Sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
-        flash: jest.fn(),
+        flash: jest.fn().mockReturnValue([]),
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
@@ -202,7 +240,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: 1 },
       }
 
-      await controller.postNewDistinguishingMark(typeReq, res)
+      await controller.postNewDistinguishingMark(typeReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -212,12 +250,12 @@ describe('Distinguishing Marks Controller', () => {
         ...req,
         params: { prisonerNumber, markType: 'tattoo' },
         body: { bodyPart: 'left-leg' },
-        flash: jest.fn(),
+        flash: jest.fn().mockReturnValue([]),
       } as unknown as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
 
-      await expect(controller.postNewDistinguishingMark(typeReq, res)).rejects.toThrow(
+      await expect(controller.postNewDistinguishingMark(typeReq, res, next)).rejects.toThrow(
         new ProblemSavingError('Error while saving new distinguishing mark'),
       )
     })
@@ -243,12 +281,18 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType, bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
-      await controller.newDistinguishingMarkWithDetail(typeReq, res)
+      await controller.newDistinguishingMarkWithDetail(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}?selected=left-leg`,
         markType,
         bodyPart: 'leftLeg',
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -258,12 +302,18 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo', bodyPart },
         query: {},
       } as unknown as Request
-      await controller.newDistinguishingMarkWithDetail(typeReq, res)
+      await controller.newDistinguishingMarkWithDetail(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo?selected=${bodyPart}`,
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -273,7 +323,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'invalidType', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
-      await controller.newDistinguishingMarkWithDetail(typeReq, res)
+      await controller.newDistinguishingMarkWithDetail(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -285,7 +335,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo', bodyPart: 'invalidPart' },
         query: {},
       } as unknown as Request
-      await controller.newDistinguishingMarkWithDetail(typeReq, res)
+      await controller.newDistinguishingMarkWithDetail(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -307,7 +357,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.postNewDistinguishingMarkWithDetail(partReq, res)
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
@@ -335,7 +385,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.postNewDistinguishingMarkWithDetail(partReq, res)
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
 
       expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
         'token',
@@ -350,6 +400,7 @@ describe('Distinguishing Marks Controller', () => {
 
     it('Sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
       const partReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo' },
@@ -369,7 +420,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: 1, photoId: 100 },
       }
 
-      await controller.postNewDistinguishingMarkWithDetail(partReq, res)
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -396,7 +447,8 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockRejectedValue(null)
 
-      await controller.postNewDistinguishingMarkWithDetail(partReq, res)
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
+
       expect(partReq.flash).toHaveBeenCalledWith('errors', [
         expect.objectContaining({
           text: errorMessage,
@@ -412,56 +464,79 @@ describe('Distinguishing Marks Controller', () => {
   describe('changeDistinguishingMark', () => {
     it.each(['tattoo', 'scar', 'mark'])('should return the mark details', async markType => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType, markId: distinguishingMarkMock.id },
         query: {},
       } as unknown as Request
 
-      await controller.changeDistinguishingMark(typeReq, res)
+      await controller.changeDistinguishingMark(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDistinguishingMark', {
         prisonerNumber,
         markType,
         mark: distinguishingMarkMock,
         updated: false,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
     it('should flag to the template when an update has happened', async () => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
       const typeReq = {
         ...req,
-        params: { prisonerNumber, markType: 'tattoo', markId: distinguishingMarkMock.id },
+        params: {
+          prisonerNumber,
+          markType: 'tattoo',
+          markId: distinguishingMarkMock.id,
+        },
         query: { updated: 'true' },
       } as unknown as Request
 
-      await controller.changeDistinguishingMark(typeReq, res)
+      await controller.changeDistinguishingMark(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/distinguishingMarks/changeDistinguishingMark',
         expect.objectContaining({
           updated: true,
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+            cellLocation: '1-1-035',
+            prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          },
         }),
       )
     })
 
     it('sends a page view audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
       const typeReq = {
         ...req,
-        params: { prisonerNumber, markType: 'tattoo', markId: distinguishingMarkMock.id },
+        params: {
+          prisonerNumber,
+          markType: 'tattoo',
+          markId: distinguishingMarkMock.id,
+        },
         query: {},
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'G6123VU',
-        prisonId: 'MDI',
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.EditDistinguishingMark,
       }
 
-      await controller.changeDistinguishingMark(typeReq, res)
+      await controller.changeDistinguishingMark(typeReq, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -475,15 +550,17 @@ describe('Distinguishing Marks Controller', () => {
     ])(
       'creates a flashMessage and redirects to the profile for type: %s',
       async (markType, flashMessage, redirectAnchor) => {
-        const typeReq = { ...req, params: { prisonerNumber, markType } } as unknown as Request
+        const typeReq = {
+          ...req,
+          params: { prisonerNumber, markType },
+        } as unknown as Request
 
-        await controller.returnToPrisonerProfileAfterUpdate(typeReq, res)
+        await controller.returnToPrisonerProfileAfterUpdate(typeReq, res, next)
 
         expect(typeReq.flash).toHaveBeenCalledWith('flashMessage', {
           text: flashMessage,
           fieldName: `distinguishing-marks-${markType}`,
         })
-
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
       },
     )
@@ -503,13 +580,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
-      await controller.changeBodyPart(typeReq, res)
+      await controller.changeBodyPart(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType,
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         selected: 'left-leg',
         verifiedSelection: 'leftLeg',
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -522,13 +605,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeBodyPart(typeReq, res)
+      await controller.changeBodyPart(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType: 'tattoo',
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -541,7 +630,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeBodyPart(typeReq, res)
+      await controller.changeBodyPart(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -563,7 +652,7 @@ describe('Distinguishing Marks Controller', () => {
           .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
           .mockResolvedValue(distinguishingMarkMock)
 
-        await controller.updateBodyPart(submissionReq, res)
+        await controller.updateBodyPart(submissionReq, res, next)
 
         expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
           'token',
@@ -600,7 +689,7 @@ describe('Distinguishing Marks Controller', () => {
           .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
           .mockResolvedValue(distinguishingMarkMock)
 
-        await controller.updateBodyPart(submissionReq, res)
+        await controller.updateBodyPart(submissionReq, res, next)
 
         expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
           'token',
@@ -628,7 +717,8 @@ describe('Distinguishing Marks Controller', () => {
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
         .mockResolvedValue(distinguishingMarkMock)
 
-      await controller.updateBodyPart(typeReq, res)
+      await controller.updateBodyPart(typeReq, res, next)
+
       expect(distinguishingMarksService.updateDistinguishingMarkLocation).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
     })
@@ -638,6 +728,7 @@ describe('Distinguishing Marks Controller', () => {
       jest
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
         .mockResolvedValue(distinguishingMarkMock)
+
       const typeReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '100' },
@@ -651,7 +742,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'leftLeg' },
       }
 
-      await controller.updateBodyPart(typeReq, res)
+      await controller.updateBodyPart(typeReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -671,7 +762,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
-      await controller.changeLocation(typeReq, res)
+      await controller.changeLocation(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeLocation', {
         markId: '100',
@@ -680,6 +771,12 @@ describe('Distinguishing Marks Controller', () => {
         specificBodyPart: 'leftLeg',
         backLinkUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100/body-part?selected=left-leg`,
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -692,13 +789,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeLocation(typeReq, res)
+      await controller.changeLocation(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeLocation', {
         markId: '100',
         markType: 'tattoo',
         bodyPart: bodyPartMap[bodyPart],
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -711,7 +814,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeLocation(typeReq, res)
+      await controller.changeLocation(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -726,7 +829,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeLocation(typeReq, res)
+      await controller.changeLocation(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -749,7 +852,7 @@ describe('Distinguishing Marks Controller', () => {
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
         .mockResolvedValue(distinguishingMarkMock)
 
-      await controller.updateLocation(markReq, res)
+      await controller.updateLocation(markReq, res, next)
 
       expect(distinguishingMarksService.updateDistinguishingMarkLocation).toHaveBeenCalledWith(
         'token',
@@ -767,9 +870,15 @@ describe('Distinguishing Marks Controller', () => {
       jest
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkLocation')
         .mockResolvedValue(distinguishingMarkMock)
+
       const markReq = {
         ...req,
-        params: { prisonerNumber, fieldName: 'location', markType: 'tattoo', markId: '100' },
+        params: {
+          prisonerNumber,
+          fieldName: 'location',
+          markType: 'tattoo',
+          markId: '100',
+        },
         body: {
           specificBodyPart: 'lowerLeftArm',
         },
@@ -783,7 +892,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'lowerLeftArm' },
       }
 
-      await controller.updateLocation(markReq, res)
+      await controller.updateLocation(markReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -803,13 +912,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
-      await controller.changeDescription(typeReq, { ...res, locals: {} } as Response)
+      await controller.changeDescription(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDescription', {
         markId: '100',
         markType,
         formValues: { description: 'Comment' },
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -822,13 +937,19 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeDescription(typeReq, { ...res, locals: {} } as Response)
+      await controller.changeDescription(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDescription', {
         markId: '100',
         markType: 'tattoo',
         formValues: { description: 'Horrible arm scar' },
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -841,7 +962,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changeDescription(typeReq, res)
+      await controller.changeDescription(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -864,7 +985,7 @@ describe('Distinguishing Marks Controller', () => {
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkDescription')
         .mockResolvedValue(distinguishingMarkMock)
 
-      await controller.updateDescription(markReq, res)
+      await controller.updateDescription(markReq, res, next)
 
       expect(distinguishingMarksService.updateDistinguishingMarkDescription).toHaveBeenCalledWith(
         'token',
@@ -882,6 +1003,7 @@ describe('Distinguishing Marks Controller', () => {
       jest
         .spyOn(distinguishingMarksService, 'updateDistinguishingMarkDescription')
         .mockResolvedValue(distinguishingMarkMock)
+
       const markReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '100' },
@@ -903,7 +1025,7 @@ describe('Distinguishing Marks Controller', () => {
         },
       }
 
-      await controller.updateDescription(markReq, res)
+      await controller.updateDescription(markReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -925,7 +1047,7 @@ describe('Distinguishing Marks Controller', () => {
       global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
-      await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
+      await controller.changePhoto(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
@@ -936,6 +1058,12 @@ describe('Distinguishing Marks Controller', () => {
         },
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         upload: false,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -954,7 +1082,7 @@ describe('Distinguishing Marks Controller', () => {
       global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
+      await controller.changePhoto(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
@@ -965,6 +1093,12 @@ describe('Distinguishing Marks Controller', () => {
         },
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         upload: false,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -977,7 +1111,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changePhoto(typeReq, res)
+      await controller.changePhoto(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -991,15 +1125,15 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'G6123VU',
-        prisonId: 'MDI',
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.EditDistinguishingMarkPhoto,
       }
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.changePhoto(typeReq, res)
+      await controller.changePhoto(typeReq, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -1017,7 +1151,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.updatePhoto(photoReq, res)
+      await controller.updatePhoto(photoReq, res, next)
 
       expect(distinguishingMarksService.updateDistinguishingMarkPhoto).toHaveBeenCalledWith(
         'token',
@@ -1032,6 +1166,7 @@ describe('Distinguishing Marks Controller', () => {
 
     it('sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
+
       const photoReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '100', photoId: '123' },
@@ -1050,7 +1185,7 @@ describe('Distinguishing Marks Controller', () => {
         },
       }
 
-      await controller.updatePhoto(photoReq, res)
+      await controller.updatePhoto(photoReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -1067,7 +1202,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockRejectedValue(null)
 
-      await controller.updatePhoto(photoReq, res)
+      await controller.updatePhoto(photoReq, res, next)
 
       expect(photoReq.flash).toHaveBeenCalledWith('errors', [
         expect.objectContaining({
@@ -1094,13 +1229,19 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
       } as unknown as Request
 
-      await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
+      await controller.addNewPhoto(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType,
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/${markType}/100`,
         upload: false,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -1116,13 +1257,19 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
       } as unknown as Request
 
-      await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
+      await controller.addNewPhoto(typeReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType: 'tattoo',
         cancelUrl: `/prisoner/${prisonerNumber}/personal/distinguishing-marks/tattoo/100`,
         upload: false,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -1133,7 +1280,7 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
       } as unknown as Request
 
-      await controller.addNewPhoto(typeReq, res)
+      await controller.addNewPhoto(typeReq, res, next)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#marks`)
@@ -1147,13 +1294,13 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'G6123VU',
-        prisonId: 'MDI',
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.AddDistinguishingMarkPhoto,
       }
 
-      await controller.addNewPhoto(typeReq, res)
+      await controller.addNewPhoto(typeReq, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -1177,7 +1324,7 @@ describe('Distinguishing Marks Controller', () => {
 
         jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
-        await controller.addPhoto(photoReq, res)
+        await controller.addPhoto(photoReq, res, next)
 
         expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith(
           'token',
@@ -1194,6 +1341,7 @@ describe('Distinguishing Marks Controller', () => {
 
     it('Sends a post success audit event', async () => {
       jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
+
       const photoReq = {
         ...req,
         params: { prisonerNumber, markType: 'tattoo', markId: '101' },
@@ -1209,7 +1357,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '101', photoId: 100 },
       }
 
-      await controller.addPhoto(photoReq, res)
+      await controller.addPhoto(photoReq, res, next)
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
@@ -1225,7 +1373,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockRejectedValue(null)
 
-      await controller.addPhoto(photoReq, res)
+      await controller.addPhoto(photoReq, res, next)
 
       expect(photoReq.flash).toHaveBeenCalledWith('errors', [
         expect.objectContaining({
@@ -1250,11 +1398,17 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.viewAllImages(imagesReq, res)
+      await controller.viewAllImages(imagesReq, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/viewAllImages', {
         mark: distinguishingMarkMock,
         markType: 'tattoo',
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+          prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+        },
       })
     })
 
@@ -1267,14 +1421,15 @@ describe('Distinguishing Marks Controller', () => {
       } as unknown as Request
       const expectedAuditEvent = {
         user: prisonUserMock,
-        prisonerNumber: 'G6123VU',
-        prisonId: 'MDI',
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.DistinguishingMarkAllPhotos,
       }
+
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.viewAllImages(imagesReq, res)
+      await controller.viewAllImages(imagesReq, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
     })
