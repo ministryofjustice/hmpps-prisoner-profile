@@ -33,6 +33,7 @@ const getBuildConfig = () => {
       entryPoints: globSync([
         path.join(cwd, 'assets/js/shared/index.js'),
         path.join(cwd, 'assets/js/*.js'),
+        path.join(cwd, 'assets/js/*.ts'),
         path.join(cwd, 'assets/scss/*.scss'),
       ]),
       copy: [

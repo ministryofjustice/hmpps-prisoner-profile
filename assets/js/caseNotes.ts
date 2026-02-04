@@ -1,4 +1,4 @@
-const WARNING = {
+const WARNING: Record<string, string> = {
   'OMIC.OPEN_COMM':
     'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
   'KA.KE':
@@ -8,9 +8,9 @@ const WARNING = {
 }
 
 function toggleBehaviourPrompts() {
-  const behaviourPromptsPos = document.querySelector('.case-notes-behaviour-prompt--pos')
-  const behaviourPromptsNeg = document.querySelector('.case-notes-behaviour-prompt--neg')
-  const typeElement = document.getElementById('type')
+  const behaviourPromptsPos = document.querySelector<HTMLDetailsElement>('.case-notes-behaviour-prompt--pos')
+  const behaviourPromptsNeg = document.querySelector<HTMLDetailsElement>('.case-notes-behaviour-prompt--neg')
+  const typeElement = document.getElementById('type') as HTMLSelectElement
 
   if (!(behaviourPromptsPos || behaviourPromptsNeg)) return
 
@@ -25,10 +25,10 @@ function toggleBehaviourPrompts() {
 }
 
 function toggleOpenCaseNoteWarning() {
-  const openCaseNoteWarning = document.querySelectorAll('.case-notes-open-warning')
-  const openCaseNoteHint = document.querySelectorAll('.case-notes-open-hint')
-  const typeElement = document.getElementById('type')
-  const subTypeElement = document.getElementById('subType')
+  const openCaseNoteWarning = document.querySelectorAll<HTMLDivElement>('.case-notes-open-warning')
+  const openCaseNoteHint = document.querySelectorAll<HTMLDivElement>('.case-notes-open-hint')
+  const typeElement = document.getElementById('type') as HTMLSelectElement
+  const subTypeElement = document.getElementById('subType') as HTMLSelectElement
   const typeSubTypeKey = `${typeElement?.value}.${subTypeElement?.value}`
 
   openCaseNoteWarning.forEach(el => el.classList.remove('is-visible'))
@@ -40,14 +40,19 @@ function toggleOpenCaseNoteWarning() {
 
   if (Object.keys(WARNING).includes(typeSubTypeKey)) {
     openCaseNoteWarning.forEach(el => el.classList.add('is-visible'))
-    document.querySelector('.case-notes-open-warning > strong').innerText = WARNING[typeSubTypeKey]
+    document.querySelector<HTMLElement>('.case-notes-open-warning > strong').innerText = WARNING[typeSubTypeKey]
   }
 }
 
+type TypeSubTypeMap = Record<string, {
+  value: string
+  text: string
+}[]>
+
 function initTypeSubTypeDropdowns() {
-  const typeElement = document.getElementById('type')
-  const subTypeElement = document.getElementById('subType')
-  const typeSubTypeMap = JSON.parse(document.getElementById('typeData').textContent)
+  const typeElement = document.getElementById('type') as HTMLSelectElement
+  const subTypeElement = document.getElementById('subType') as HTMLSelectElement
+  const typeSubTypeMap: TypeSubTypeMap = JSON.parse(document.getElementById('typeData').textContent)
 
   typeElement.addEventListener('change', () => {
     toggleBehaviourPrompts()
@@ -64,7 +69,7 @@ function initTypeSubTypeDropdowns() {
   })
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   toggleBehaviourPrompts()
   toggleOpenCaseNoteWarning()
   initTypeSubTypeDropdowns()
