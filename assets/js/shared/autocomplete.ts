@@ -3,8 +3,8 @@ import { getParentConditionalRadioInput } from './helpers'
 import { filterAndSort } from './filterAndSort'
 
 export function autocomplete() {
-  document.querySelectorAll('.js-autocomplete-select').forEach(selectElement => {
-    const invalidInput = document.getElementById(`${selectElement.id}-error`)?.value
+  document.querySelectorAll<HTMLSelectElement>('.js-autocomplete-select').forEach(selectElement => {
+    const invalidInput = (document.getElementById(`${selectElement.id}-error`) as HTMLInputElement)?.value
 
     const inputClasses = selectElement.getAttribute('data-input-classes')
     const menuClasses = selectElement.getAttribute('data-menu-classes')
@@ -19,12 +19,12 @@ export function autocomplete() {
     })
   })
 
-  document.querySelectorAll('.js-autocomplete-submit').forEach(submitButton => {
-    submitButton.addEventListener('click', function () {
-      document.querySelectorAll('.autocomplete__input').forEach(inputElement => {
+  document.querySelectorAll<HTMLButtonElement>('.js-autocomplete-submit').forEach(submitButton => {
+    submitButton.addEventListener('click', () => {
+      document.querySelectorAll<HTMLInputElement>('.autocomplete__input').forEach(inputElement => {
         const autocompleteInput = inputElement.value.trim()
-        const autocompleteSelect = document.getElementById(`${inputElement.id}-select`)
-        const errorField = document.getElementById(`${inputElement.id}-error`)
+        const autocompleteSelect = document.getElementById(`${inputElement.id}-select`) as HTMLSelectElement
+        const errorField = document.getElementById(`${inputElement.id}-error`) as HTMLInputElement
 
         // Handling case where an autocomplete input box may be within a conditional radio button
         const parentConditionalRadioInput = getParentConditionalRadioInput(inputElement)
@@ -34,10 +34,8 @@ export function autocomplete() {
           return
         }
 
-        const options = $(`#${inputElement.id}-select`).find('option')
-        const textValues = $.map(options, function (option) {
-          return option.text
-        })
+        const options = autocompleteSelect.getElementsByTagName('option')
+        const textValues = Array.from(options).map(option => option.text)
 
         if (!textValues.map(value => value.toLowerCase()).includes(autocompleteInput.toLowerCase())) {
           autocompleteSelect.value = ''

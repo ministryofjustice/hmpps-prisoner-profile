@@ -1,6 +1,4 @@
-interface Source {
-  (query: string, populateResults: (options: string[]) => void): void
-}
+import type { Source } from 'accessible-autocomplete'
 
 export function filterAndSort(options: string[]): Source {
   const scoreBySubstringIndex = (query: string, option: string): number => {
