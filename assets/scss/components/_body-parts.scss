@@ -61,7 +61,6 @@
 
 .dps-body-parts {
   outline: none;
-  forced-color-adjust: none;
   @include govuk-responsive-margin(6, "bottom");
 }
 
@@ -81,7 +80,7 @@
     gap: 2px;
   }
 
-  svg {
+  .dps-body-parts__body {
     width: 100%;
     height: auto;
   }
@@ -103,7 +102,9 @@
   pointer-events: none;
 }
 
-.dps-body-parts__side {
+.dps-body-parts__body {
+  forced-color-adjust: none;
+
   path {
     transition: fill 0.1s, stroke 0.1s;
     vector-effect: non-scaling-stroke;
@@ -202,6 +203,7 @@
   color: var(--body-part-tooltip-foreground-colour);
   border: $border-size solid var(--body-part-tooltip-border-colour);
   box-shadow: 0 2px 4px var(--body-part-tooltip-shadow-colour);
+  forced-color-adjust: none;
   text-align: center;
   z-index: 1000;
 
