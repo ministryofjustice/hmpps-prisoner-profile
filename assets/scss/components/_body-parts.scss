@@ -66,17 +66,24 @@
 }
 
 .dps-body-parts__sides {
+  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   gap: 2em;
   column-gap: 1.5em;
   row-gap: 2em;
+}
 
-  .dps-body-parts--small & {
+.dps-body-parts--scalable {
+  .dps-body-parts__sides {
+    flex-wrap: nowrap;
     gap: 2px;
-    column-gap: 2px;
-    row-gap: 0;
+  }
+
+  svg {
+    width: 100%;
+    height: auto;
   }
 }
 
@@ -131,6 +138,10 @@
   .dps-body-part__outline {
     stroke: var(--body-part-outline-colour);
     stroke-width: 1.5;
+
+    @container (width < 200px) {
+      stroke-width: 1;
+    }
   }
 
   .dps-body-part__tooltip-anchor {
