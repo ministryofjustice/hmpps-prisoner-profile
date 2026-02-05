@@ -6,7 +6,11 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
   config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
 
 export const editProfileEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
+  config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId) ||
+  config.featureToggles.editProfileEnabledPrisons.includes('***') ||
+  (isAfter(Date.now(), config.featureToggles.editProfileEnabledPrisonsFrom) &&
+    (config.featureToggles.editProfileEnabledPrisonsByDate.includes(activeCaseLoadId) ||
+      config.featureToggles.editProfileEnabledPrisonsByDate.includes('***')))
 
 export const editProfilePhotoEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   editProfileEnabled(activeCaseLoadId) ||

@@ -2,12 +2,79 @@ import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
 import {
   dietAndAllergyEnabled,
+  editProfileEnabled,
   editProfilePhotoEnabled,
   editProfileSimulateFetch,
   externalContactsEnabled,
 } from './featureToggles'
 
 describe('featureToggles', () => {
+  describe('editProfileEnabled', () => {
+    afterEach(() => {
+      // reset to defaults:
+      config.featureToggles.editProfileEnabledPrisons = []
+      config.featureToggles.editProfileEnabledPrisonsByDate = []
+      config.featureToggles.editProfileEnabledPrisonsFrom = '2099-01-01T00:00:00'
+    })
+
+    it('is not enabled by default', () => {
+      expect(editProfileEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if active case load is not listed as permanently enabled', () => {
+      config.featureToggles.editProfileEnabledPrisons = ['LEI']
+
+      expect(editProfileEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if active case load is not enabled by date', () => {
+      config.featureToggles.editProfileEnabledPrisonsByDate = ['LEI']
+      config.featureToggles.editProfileEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(editProfileEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if now is before the from datetime', () => {
+      config.featureToggles.editProfileEnabledPrisonsByDate = ['MDI']
+      config.featureToggles.editProfileEnabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(editProfileEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled if now is before the from datetime, even when wildcard used', () => {
+      config.featureToggles.editProfileEnabledPrisonsByDate = ['***']
+      config.featureToggles.editProfileEnabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(editProfileEnabled('MDI')).toBeFalsy()
+    })
+
+    it('enabled if active case load is listed as permanently enabled', () => {
+      config.featureToggles.editProfileEnabledPrisons = ['MDI']
+
+      expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if wildcard used in list of permanently enabled', () => {
+      config.featureToggles.editProfileEnabledPrisons = ['***']
+
+      expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if active case load is listed as enabled after date', () => {
+      config.featureToggles.editProfileEnabledPrisonsByDate = ['MDI']
+      config.featureToggles.editProfileEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+
+    it('enabled if wildcard is listed as enabled after date', () => {
+      config.featureToggles.editProfileEnabledPrisonsByDate = ['***']
+      config.featureToggles.editProfileEnabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+  })
+
   describe('dietAndAllergyEnabled', () => {
     afterEach(() => {
       // reset to defaults:
@@ -108,7 +175,6 @@ describe('featureToggles', () => {
       // reset to defaults:
       config.featureToggles.editProfilePhotoEnabledPrisons = []
       config.featureToggles.editProfileEnabledPrisons = []
-      config.featureToggles.editProfileEnabled = false
     })
 
     it('is not enabled by default', () => {
@@ -134,7 +200,6 @@ describe('featureToggles', () => {
     })
 
     it('enabled if profile edit is enabled', () => {
-      config.featureToggles.editProfileEnabled = true
       config.featureToggles.editProfileEnabledPrisons = ['MDI']
 
       expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
@@ -145,7 +210,6 @@ describe('featureToggles', () => {
     afterEach(() => {
       // reset to defaults:
       config.featureToggles.editProfileEnabledPrisons = []
-      config.featureToggles.editProfileEnabled = false
       config.featureToggles.editProfileSimulateFetch = false
     })
 
@@ -159,7 +223,6 @@ describe('featureToggles', () => {
     })
 
     it('is disabled when profile edit is enabled', () => {
-      config.featureToggles.editProfileEnabled = true
       config.featureToggles.editProfileEnabledPrisons = ['MDI']
       config.featureToggles.editProfileSimulateFetch = true
 

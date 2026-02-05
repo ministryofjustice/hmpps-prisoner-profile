@@ -362,8 +362,11 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
+
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
+    editProfileEnabledPrisonsByDate: get('EDIT_PROFILE_ENABLED_PRISONS_BY_DATE', []),
+    editProfileEnabledPrisonsFrom: get('EDIT_PROFILE_ENABLED_FROM', '2099-01-01T00:00:00'),
+
     editProfilePhotoEnabledPrisons: get('EDIT_PROFILE_PHOTO_ENABLED_PRISONS', []),
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
