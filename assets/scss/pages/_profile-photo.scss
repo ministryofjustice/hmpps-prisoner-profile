@@ -49,6 +49,23 @@
   &__description {
     margin-left: 30px;
   }
+
+  @media (max-width: 1000px) {
+    align-items: flex-start;
+
+    &__description {
+      margin-left: 30px;
+    }
+
+    &__placeholder,
+    &__withheld,
+    &__photo {
+      img {
+        max-width: 170px;
+        height: auto;
+      }
+    }
+  }
 }
 
 .photo-upload-error__back-link {
