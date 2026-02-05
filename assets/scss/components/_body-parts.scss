@@ -61,22 +61,28 @@
 
 .dps-body-parts {
   outline: none;
-  forced-color-adjust: none;
   @include govuk-responsive-margin(6, "bottom");
 }
 
 .dps-body-parts__sides {
+  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   gap: 2em;
   column-gap: 1.5em;
   row-gap: 2em;
+}
 
-  .dps-body-parts--small & {
+.dps-body-parts--scalable {
+  .dps-body-parts__sides {
+    flex-wrap: nowrap;
     gap: 2px;
-    column-gap: 2px;
-    row-gap: 0;
+  }
+
+  .dps-body-parts__body {
+    width: 100%;
+    height: auto;
   }
 }
 
@@ -96,7 +102,9 @@
   pointer-events: none;
 }
 
-.dps-body-parts__side {
+.dps-body-parts__body {
+  forced-color-adjust: none;
+
   path {
     transition: fill 0.1s, stroke 0.1s;
     vector-effect: non-scaling-stroke;
@@ -131,6 +139,10 @@
   .dps-body-part__outline {
     stroke: var(--body-part-outline-colour);
     stroke-width: 1.5;
+
+    @container (width < 200px) {
+      stroke-width: 1;
+    }
   }
 
   .dps-body-part__tooltip-anchor {
@@ -191,6 +203,7 @@
   color: var(--body-part-tooltip-foreground-colour);
   border: $border-size solid var(--body-part-tooltip-border-colour);
   box-shadow: 0 2px 4px var(--body-part-tooltip-shadow-colour);
+  forced-color-adjust: none;
   text-align: center;
   z-index: 1000;
 

@@ -68,9 +68,9 @@
         id: 'all-distinguishing-marks',
         selected: groupedDistinguishingMarks.selected,
         disabled: true,
-        small: true
+        scalable: true
     }) }}
-    <div class='personal-distinguishing-marks__info'>
+    <div class="personal-distinguishing-marks__info">
         <dl>
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-tattoo' }}">
                 <span class="anchor-center" id="tattoos"></span>
