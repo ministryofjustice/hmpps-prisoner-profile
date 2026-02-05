@@ -7,7 +7,7 @@ Parameters as JSDoc:
  * @param {boolean} [params.disabled] - whether to make the component inert and non-interactive
  * @param {string} [params.controlsField] - optional name of field whose value is set on change
  * @param {string | string[]} [params.selected] - the currently-selected body part value, if any, and can be an array when component is disabled
- * @param {boolean} [params.small] - whether to make the component appear smaller
+ * @param {boolean} [params.scalable] - whether component fits the width of container, preventing wrapping
  */
 #}
 {%- macro bodyParts(params) %}
@@ -35,7 +35,7 @@ Parameters as JSDoc:
     {%- endif %}
   {%- endmacro %}
 
-  <div {% if params.id %}id="{{ params.id }}"{% endif %} class="dps-body-parts {% if params.disabled %}dps-body-parts--disabled{% else %}dps-body-parts--interactive{% endif %} {% if params.small %}dps-body-parts--small{% endif %}"
+  <div {% if params.id %}id="{{ params.id }}"{% endif %} class="dps-body-parts {% if params.disabled %}dps-body-parts--disabled{% else %}dps-body-parts--interactive{% endif %} {% if params.scalable %}dps-body-parts--scalable{% endif %}"
       {% if params.id %}id="{{ params.id }}" {% if not params.disabled %}aria-describedby="{{ params.id }}__message"{% endif %}{% endif %}
       {% if selected.length === 1 %}data-selected-body-part="{{ selected[0] }}"{% endif%}
       {% if params.controlsField and not params.disabled %}data-controls-field="{{ params.controlsField }}"{% endif %}
@@ -47,7 +47,7 @@ Parameters as JSDoc:
           Front
         </span>
 
-        <svg width="{{ 123 if params.small else 170 }}" height="{{ 459 if params.small else 634 }}" viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__front" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
+        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__front" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
           {%- if params.disabled %}
             <desc {% if params.id %}id="{{ params.id }}__front-desc"{% endif %}>
               {%- set selectedLabels = [] %}
@@ -146,7 +146,7 @@ Parameters as JSDoc:
           Back
         </span>
 
-        <svg width="{{ 123 if params.small else 170 }}" height="{{ 459 if params.small else 634 }}" viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__back" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
+        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__back" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
           {%- if params.disabled %}
             <desc {% if params.id %}id="{{ params.id }}__back-desc"{% endif %}>
               {%- set selectedLabels = [] %}
