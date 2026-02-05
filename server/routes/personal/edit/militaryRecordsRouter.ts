@@ -6,7 +6,7 @@ import { militaryServiceInformationValidator } from '../../../validators/persona
 import validationMiddleware from '../../../middleware/validationMiddleware'
 import { dischargeDetailsValidator } from '../../../validators/personal/dischargeDetailsValidator'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { militaryHistoryEnabled } from '../../../utils/featureToggles'
+import { militaryHistoryEnabled } from '../../../utils/featureFlags'
 
 export default function militaryRecordsRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

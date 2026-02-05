@@ -2,27 +2,36 @@ import { isAfter } from 'date-fns'
 import config from '../config'
 import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
 
+interface ScheduledFeatureFlag {
+  enabledPrisons: string[]
+  enabledPrisonsByDate: string[]
+  enabledPrisonsFrom: string
+}
+
+const scheduledFeatureFlag =
+  (scheduledFeatureFlagConfig: ScheduledFeatureFlag): FeatureFlagMethod =>
+  (activeCaseLoadId: string) => {
+    const { enabledPrisons, enabledPrisonsByDate, enabledPrisonsFrom } = scheduledFeatureFlagConfig
+
+    return (
+      enabledPrisons.includes(activeCaseLoadId) ||
+      enabledPrisons.includes('***') ||
+      (isAfter(Date.now(), enabledPrisonsFrom) &&
+        (enabledPrisonsByDate.includes(activeCaseLoadId) || enabledPrisonsByDate.includes('***')))
+    )
+  }
+
 export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
 
-export const editProfileEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId) ||
-  config.featureToggles.editProfileEnabledPrisons.includes('***') ||
-  (isAfter(Date.now(), config.featureToggles.editProfileEnabledPrisonsFrom) &&
-    (config.featureToggles.editProfileEnabledPrisonsByDate.includes(activeCaseLoadId) ||
-      config.featureToggles.editProfileEnabledPrisonsByDate.includes('***')))
+export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
 
 export const editProfilePhotoEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   editProfileEnabled(activeCaseLoadId) ||
   config.featureToggles.editProfilePhotoEnabledPrisons.includes(activeCaseLoadId) ||
   config.featureToggles.editProfilePhotoEnabledPrisons.includes('***')
 
-export const dietAndAllergyEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId) ||
-  config.featureToggles.dietAndAllergyEnabledPrisons.includes('***') ||
-  (isAfter(Date.now(), config.featureToggles.dietAndAllergyEnabledPrisonsFrom) &&
-    (config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes(activeCaseLoadId) ||
-      config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes('***')))
+export const dietAndAllergyEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.dietAndAllergy)
 
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 

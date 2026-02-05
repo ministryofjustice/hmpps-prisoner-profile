@@ -9,7 +9,7 @@ import {
 } from '../../../validators/personal/identityNumbersValidator'
 import { IdentifierMappings } from '../../../data/constants/identifierMappings'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureToggles'
+import { editProfileEnabled } from '../../../utils/featureFlags'
 
 export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

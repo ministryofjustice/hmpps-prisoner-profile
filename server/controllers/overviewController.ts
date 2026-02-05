@@ -42,7 +42,7 @@ import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
-import { externalContactsEnabled } from '../utils/featureToggles'
+import { externalContactsEnabled } from '../utils/featureFlags'
 
 /**
  * Parse request for overview page and orchestrate response
