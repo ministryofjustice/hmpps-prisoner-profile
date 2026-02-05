@@ -47,7 +47,7 @@ Parameters as JSDoc:
           Front
         </span>
 
-        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__front" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
+        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__front" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} class="dps-body-parts__body" xmlns="http://www.w3.org/2000/svg">
           {%- if params.disabled %}
             <desc {% if params.id %}id="{{ params.id }}__front-desc"{% endif %}>
               {%- set selectedLabels = [] %}
@@ -146,7 +146,7 @@ Parameters as JSDoc:
           Back
         </span>
 
-        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__back" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} xmlns="http://www.w3.org/2000/svg">
+        <svg {% if not params.scalable %}width="170" height="634"{% endif %} viewBox="0 0 166 634" preserveAspectRatio="xMidYMid meet" fill="none" {% if params.id %}id="{{ params.id }}__back" {% if params.disabled %}aria-describedby="{{ params.id }}__front-desc"{% endif %}{% endif %} class="dps-body-parts__body" xmlns="http://www.w3.org/2000/svg">
           {%- if params.disabled %}
             <desc {% if params.id %}id="{{ params.id }}__back-desc"{% endif %}>
               {%- set selectedLabels = [] %}
