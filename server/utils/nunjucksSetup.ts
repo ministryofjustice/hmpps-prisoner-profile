@@ -66,7 +66,7 @@ import groupDistinguishingMarks, {
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import { bodyPartLabels } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
+import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureFlags'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'

@@ -8,7 +8,7 @@ import { Page, PostAction } from '../../../services/auditService'
 import { addressValidator } from '../../../validators/personal/addressValidator'
 import { AddressLocation } from '../../../services/mappers/addressMapper'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureToggles'
+import { editProfileEnabled } from '../../../utils/featureFlags'
 
 export default function addressEditRouter(services: Services): Router {
   const router = Router({ mergeParams: true })

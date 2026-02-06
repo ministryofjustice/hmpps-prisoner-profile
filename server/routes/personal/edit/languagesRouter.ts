@@ -6,7 +6,7 @@ import {
 import { Services } from '../../../services'
 import LanguagesController from '../../../controllers/personal/edit/languages/languagesController'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureToggles'
+import { editProfileEnabled } from '../../../utils/featureFlags'
 import validationMiddleware from '../../../middleware/validationMiddleware'
 import { mainLanguageValidator } from '../../../validators/personal/mainLanguageValidator'
 import { otherLanguageValidator } from '../../../validators/personal/otherLanguageValidator'
