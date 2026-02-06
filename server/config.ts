@@ -362,16 +362,24 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
-    editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
+
+    editProfile: {
+      enabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('EDIT_PROFILE_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('EDIT_PROFILE_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
     editProfilePhotoEnabledPrisons: get('EDIT_PROFILE_PHOTO_ENABLED_PRISONS', []),
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
-    dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
-    dietAndAllergyEnabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []),
-    dietAndAllergyEnabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
+    dietAndAllergy: {
+      enabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
     healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
