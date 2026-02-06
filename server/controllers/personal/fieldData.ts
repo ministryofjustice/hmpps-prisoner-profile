@@ -220,14 +220,29 @@ export const religionFieldData: RadioFieldData = {
       description: 'Church of Jesus Christ of Latter-day Saints',
     },
     {
+      // This is being deactivated - remove from list after migration is complete:
       id: 'HNDHAR',
       description: 'Hindu or Hare Krishna',
     },
     {
+      id: 'OORTH',
+      hint: 'Includes Coptic Orthodox, Syriac Orthodox, Armenian Apostolic, Ethiopian Orthodox Tewahedo, Eritrean Orthodox Tewahedo and Malankara Orthodox Syrian',
+    },
+    {
+      id: 'PAG',
+      hint: 'Includes Druidry, Northern Traditions, Shamanism, Wicca and Witchcraft',
+    },
+    {
+      // This is being deactivated - remove from list after migration is complete:
       id: 'PAGDRU',
       description: 'Pagan or Druid',
     },
     {
+      id: 'RC',
+      hint: 'Includes Ukrainian Greek Catholic, Maronite and Coptic Catholic',
+    },
+    {
+      // This is being deactivated - remove from list after migration is complete:
       id: 'SECULR',
       description: 'Secularist',
     },
@@ -236,13 +251,14 @@ export const religionFieldData: RadioFieldData = {
       description: 'Shintoist or Taoist',
     },
     {
+      // This is being deactivated - remove from list after migration is complete:
       id: 'SUNI',
       hint: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
     },
     {
       id: 'OTH',
       description: 'Other religion, faith or belief',
-      hint: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
+      hint: 'Includes Christadelphian, Unification, Unitarian, mixed or spiritual beliefs, and all other religions, faiths or beliefs',
     },
     {
       id: 'NIL',
