@@ -1070,26 +1070,37 @@ export default class PersonalController {
       }
     }
 
+    // When there are multiple variants of a religion, we want to display the 'Other' option last:
+    const demoteOtherVariant = (prefix: string, a: RadioOption, b: RadioOption): number => {
+      if (a.text.startsWith(prefix) && b.text.startsWith(prefix)) {
+        if (a.text.endsWith('Other')) return 1
+        if (b.text.endsWith('Other')) return -1
+      }
+      return 0
+    }
+
+    // When two options alphabetically next to each other need to be in a specific alternative order:
+    const preferOrder = (
+      optionToDisplayFirst: string,
+      optionToDisplayLast: string,
+      a: RadioOption,
+      b: RadioOption,
+    ): number => {
+      if (a.text === optionToDisplayFirst && b.text === optionToDisplayLast) return -1
+      if (b.text === optionToDisplayFirst && a.text === optionToDisplayLast) return 1
+      return 0
+    }
+
     // Options are already sorted alphabetically, this then applies additional non-alphabetical sorting
     const religionOptionsSorter = (a: RadioOption, b: RadioOption): number => {
-      if (
-        (a.text.startsWith('Christian – ') && b.text.startsWith('Christian – ')) ||
-        (a.text.startsWith('Muslim') && b.text.startsWith('Muslim'))
-      ) {
-        if (a.text.endsWith('Other')) {
-          return b.text.endsWith('Other') ? 0 : 1
-        }
-        if (b.text.endsWith('Other')) {
-          return a.text.endsWith('Other') ? 0 : -1
-        }
-      }
+      const otherVariantSort = demoteOtherVariant('Christian', a, b) || demoteOtherVariant('Muslim', a, b)
+      if (otherVariantSort !== 0) return otherVariantSort
 
-      if (a.text.endsWith('– Oriental Orthodox') && b.text.endsWith('– Orthodox')) {
-        return 1
-      }
-      if (b.text.endsWith('– Oriental Orthodox') && a.text.endsWith('– Orthodox')) {
-        return -1
-      }
+      const muslimPreferredOrder = preferOrder('Muslim', 'Muslim – Shia', a, b)
+      if (muslimPreferredOrder !== 0) return muslimPreferredOrder
+
+      const christianPreferredOrder = preferOrder('Christian – Oriental Orthodox', 'Christian – Orthodox', a, b)
+      if (christianPreferredOrder !== 0) return christianPreferredOrder
 
       return 0
     }

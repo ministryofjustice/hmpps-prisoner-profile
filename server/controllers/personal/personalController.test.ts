@@ -1918,54 +1918,61 @@ describe('PersonalController', () => {
   describe('religion, faith or belief', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.religion().edit(req, response, next)
+      const expectedOptions = [
+        { text: 'Buddhist', value: 'BUDD' },
+        {
+          text: 'Christian – Anglican',
+          value: 'COFE',
+          hint: {
+            text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
+          },
+        },
+        { text: 'Christian – Methodist', value: 'METH' },
+        {
+          text: 'Christian – Oriental Orthodox',
+          value: 'OORTH',
+          hint: {
+            text: 'Includes Coptic Orthodox, Syriac Orthodox, Armenian Apostolic, Ethiopian Orthodox Tewahedo, Eritrean Orthodox Tewahedo and Malankara Orthodox Syrian',
+          },
+        },
+        {
+          text: 'Christian – Orthodox',
+          value: 'CHRODX',
+          hint: {
+            text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
+          },
+        },
+        {
+          text: 'Christian – Other',
+          value: 'CHRST',
+          hint: {
+            text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
+          },
+        },
+        { text: 'Muslim', value: 'MOS' },
+        { text: 'Muslim – Shia', value: 'SHIA' },
+        {
+          text: 'Muslim – Sunni',
+          value: 'SUNI',
+          hint: {
+            text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
+          },
+        },
+        { text: 'Muslim – Other', value: 'MUSOTH' },
+        { text: 'Zoroastrian', value: 'ZORO' },
+        { divider: 'Or' },
+        {
+          text: 'Other religion, faith or belief',
+          value: 'OTH',
+          hint: {
+            text: 'Includes Christadelphian, Unification, Unitarian, mixed or spiritual beliefs, and all other religions, faiths or beliefs',
+          },
+        },
+        { text: 'No religion, faith or belief', value: 'NIL' },
+        { text: 'They prefer not to say', value: 'TPRNTS' },
+      ]
 
       it('Renders the default edit page with the correct data from the prison API, overriding option text and sorting correctly', async () => {
-        const expectedOptions = [
-          { text: 'Buddhist', value: 'BUDD' },
-          {
-            text: 'Christian – Anglican',
-            value: 'COFE',
-            hint: {
-              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
-            },
-          },
-          { text: 'Christian – Methodist', value: 'METH' },
-          {
-            text: 'Christian – Orthodox',
-            value: 'CHRODX',
-            hint: {
-              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
-            },
-          },
-          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
-          {
-            text: 'Christian – Other',
-            value: 'CHRST',
-            hint: {
-              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
-            },
-          },
-          { text: 'Muslim – Shia', value: 'SHIA' },
-          {
-            text: 'Muslim – Sunni',
-            value: 'SUNI',
-            hint: {
-              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
-            },
-          },
-          { text: 'Muslim – Other', value: 'MUSOTH' },
-          { text: 'Zoroastrian', value: 'ZORO' },
-          { divider: 'Or' },
-          {
-            text: 'Other religion, faith or belief',
-            value: 'OTH',
-            hint: {
-              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
-            },
-          },
-          { text: 'No religion, faith or belief', value: 'NIL' },
-          { text: 'They prefer not to say', value: 'TPRNTS' },
-        ]
         const req = {
           params: { prisonerNumber },
           flash: (): string[] => [],
@@ -2012,53 +2019,6 @@ describe('PersonalController', () => {
       })
 
       it('Populates the religion radio buttons from the flash', async () => {
-        const expectedOptions = [
-          { text: 'Buddhist', value: 'BUDD' },
-          {
-            text: 'Christian – Anglican',
-            value: 'COFE',
-            hint: {
-              text: 'Includes Church of England, Church of Ireland, Church in Wales, Church of Norway, Church of Sweden, Episcopalian, and Lutheran',
-            },
-          },
-          { text: 'Christian – Methodist', value: 'METH' },
-          {
-            text: 'Christian – Orthodox',
-            value: 'CHRODX',
-            hint: {
-              text: 'Includes Bulgarian Orthodox, Eastern Orthodox, Greek Orthodox, Romanian Orthodox, Russian Orthodox, Serbian Orthodox, and Ukrainian Orthodox',
-            },
-          },
-          { text: 'Christian – Oriental Orthodox', value: 'OORTH' },
-          {
-            text: 'Christian – Other',
-            value: 'CHRST',
-            hint: {
-              text: 'Includes Apostolic, Calvinist, Celestial Church of God, Church of Scotland, Congregational, Dutch Reform Church, Evangelical, Gospel, Nonconformist, Pentecostal, Protestant, Salvation Army, United Reformed, and Welsh Independent',
-            },
-          },
-          { text: 'Muslim – Shia', value: 'SHIA' },
-          {
-            text: 'Muslim – Sunni',
-            value: 'SUNI',
-            hint: {
-              text: 'Most Muslims in the UK are Sunni, they will often describe themselves just as Muslim',
-            },
-          },
-          { text: 'Muslim – Other', value: 'MUSOTH' },
-          { text: 'Zoroastrian', value: 'ZORO', checked: true },
-          { divider: 'Or' },
-          {
-            text: 'Other religion, faith or belief',
-            value: 'OTH',
-            hint: {
-              text: 'Includes Christadelphian, Unification, Unitarian and all other religions, faiths or beliefs',
-            },
-          },
-          { text: 'No religion, faith or belief', value: 'NIL' },
-          { text: 'They prefer not to say', value: 'TPRNTS' },
-        ]
-
         const req = {
           params: { prisonerNumber },
           flash: (key: string) => {
@@ -2070,7 +2030,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expectedOptions,
+            options: expectedOptions.map(option => (option.value === 'ZORO' ? { ...option, checked: true } : option)),
           }),
         )
       })

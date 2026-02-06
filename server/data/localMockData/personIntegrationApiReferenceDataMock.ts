@@ -142,6 +142,13 @@ export const ReligionReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDt
     isActive: true,
   },
   {
+    id: 'RELF_MOS',
+    code: 'MOS',
+    description: 'Muslim',
+    listSequence: 99,
+    isActive: true,
+  },
+  {
     id: 'RELF_OTH',
     code: 'OTH',
     description: 'Other',
