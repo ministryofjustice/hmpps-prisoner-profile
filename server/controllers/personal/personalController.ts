@@ -20,7 +20,7 @@ import {
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
-} from '../../utils/featureToggles'
+} from '../../utils/featureFlags'
 import {
   addEmailAddressTextFieldData,
   addPhoneNumberFieldData,

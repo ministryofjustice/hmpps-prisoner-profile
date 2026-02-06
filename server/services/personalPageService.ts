@@ -55,7 +55,7 @@ import {
   ReferenceDataCode,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { militaryHistoryEnabled } from '../utils/featureToggles'
+import { militaryHistoryEnabled } from '../utils/featureFlags'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
