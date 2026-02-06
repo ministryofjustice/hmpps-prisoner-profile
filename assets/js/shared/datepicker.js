@@ -1,5 +1,3 @@
-import { nodeListForEach } from './helpers.js'
-
 /**
  * Datepicker config
  *
@@ -597,8 +595,7 @@ DSCalendarDay.prototype.keyPress = function (event) {
 
 export function datepicker() {
   const $datepickers = document.querySelectorAll('[data-module="hmpps-datepicker"]')
-
-  nodeListForEach($datepickers, function ($datepicker) {
+  $datepickers.forEach($datepicker => {
     new Datepicker($datepicker, {}).init()
   })
 }

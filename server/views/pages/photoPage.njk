@@ -1,9 +1,9 @@
-{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../macros/newFacialImageButton.njk" import newFacialImageButton %}
-{% extends "../partials/layout.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "components/printLink.njk" import printLink %}
+{% from "macros/newFacialImageButton.njk" import newFacialImageButton %}
+{% extends "partials/layout.njk" %}
+
 {% set photoAllHref = "/prisoner/" + prisonerNumber + "/image/all" + ("?referer=" + referer if referer) %}
 {% macro photo(classSuffix, facialImageType) %}
   <div class="hmpps-profile-photo__{{ classSuffix }}">
@@ -31,9 +31,7 @@
       }) }}
       {% if not photoStatus.withheld %}
         <span class="govuk-!-padding-top-4">
-          <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link">
-            Print photo
-          </a>
+          {{ printLink('Print photo', id='profile-photo-print-link') }}
         </span>
       {% endif %}
     </div>

@@ -1,0 +1,7 @@
+{% macro printLink(linkText='Print this page', id='', dataQA='') %}
+    <a href="#" class="govuk-link--no-visited-state hmpps-print-link govuk-link govuk-!-display-none-print"
+      {%- if id %} id="{{ id }}"{% endif %}
+      {%- if dataQA %} data-qa="{{ dataQA }}"{% endif %}>
+        {{ linkText }}
+    </a>
+{% endmacro %}

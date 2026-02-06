@@ -54,8 +54,7 @@
     height: 45px;
 
     h1 {
-      font-size: 19px;
-      font-weight: 700;
+      @include govuk-font($size: 19, $weight: 'bold');
       margin: 0;
     }
 

@@ -6,11 +6,11 @@ import { addAnotherButton } from './addAnotherButton'
 import { alertDynamicDropdowns } from './alertDynamicDropdowns'
 import { alertFlags } from './alertFlags'
 import { autocomplete } from './autocomplete'
-import { backToTop } from './backToTop'
+import { BackToTop } from './backToTop'
 import { datepicker } from './datepicker'
 import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
-import { openCloseAll } from './openCloseAll'
+import { OpenCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
 
@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
   alertDynamicDropdowns()
   alertFlags()
   autocomplete()
-  backToTop()
   datepicker()
   fileUploadWithPreview()
-  openCloseAll()
   printPage()
   sortSelector()
+  govukFrontend.createAll(BackToTop)
   govukFrontend.createAll(BodyParts)
+  govukFrontend.createAll(OpenCloseAll)
 })
