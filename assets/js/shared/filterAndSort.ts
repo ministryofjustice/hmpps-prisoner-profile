@@ -1,5 +1,7 @@
-function filterAndSort(options) {
-  const scoreBySubstringIndex = (query, option) => {
+import type { Source } from 'accessible-autocomplete'
+
+export function filterAndSort(options: string[]): Source {
+  const scoreBySubstringIndex = (query: string, option: string): number => {
     const index = option.toLowerCase().indexOf(query.toLowerCase())
     return index === -1 ? Infinity : index
   }
@@ -21,5 +23,3 @@ function filterAndSort(options) {
     populateResults(sortedOptions)
   }
 }
-
-module.exports = { filterAndSort }

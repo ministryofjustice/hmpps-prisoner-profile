@@ -11,7 +11,7 @@ import auditPageAccessAttempt from '../../../middleware/auditPageAccessAttempt'
 import { Page } from '../../../services/auditService'
 import getPrisonerData from '../../../middleware/getPrisonerDataMiddleware'
 import { Services } from '../../../services'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../../../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled } from '../../../utils/featureFlags'
 import {
   buildFieldData,
   faceShapeFieldData,

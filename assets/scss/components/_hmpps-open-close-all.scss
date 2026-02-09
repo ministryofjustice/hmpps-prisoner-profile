@@ -1,5 +1,6 @@
 .hmpps-open-close-all {
   &__button {
+    appearance: none;
     background: none;
     border: none;
     color: $govuk-link-colour;
@@ -10,16 +11,16 @@
     font-size: 16px;
     margin-bottom: govuk-spacing(3);
 
+    &:hover {
+      color: $govuk-link-hover-colour;
+    }
+
     &:focus, &:active {
       outline: 3px solid transparent;
       box-shadow: 0 -2px $govuk-focus-colour,0 4px $govuk-focus-text-colour;
       color: $govuk-focus-text-colour;
       background-color: $govuk-focus-colour;
       text-decoration: none;
-    }
-    
-    &:hover:not(:focus):not(:active) {
-      color: $govuk-link-hover-colour;
     }
   }
 }

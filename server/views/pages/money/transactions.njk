@@ -1,6 +1,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "components/printLink.njk" import printLink %}
 {% extends "./money.njk" %}
 
 {% block body %}
@@ -26,7 +27,7 @@
     </header>
 
     <div class="govuk-!-text-align-right">
-        <a href="#" class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print">Print this page</a>
+        {{ printLink() }}
     </div>
 
     {% if pendingBalance %}

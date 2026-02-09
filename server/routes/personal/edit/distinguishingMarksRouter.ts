@@ -13,7 +13,7 @@ import {
 } from '../../../validators/personal/distinguishingMarksValidator'
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
 import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureToggles'
+import { editProfileEnabled } from '../../../utils/featureFlags'
 import {
   allBodyParts,
   markTypeSelections,

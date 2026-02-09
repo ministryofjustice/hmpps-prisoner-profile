@@ -53,24 +53,30 @@
  *     myModal.show()
  * ```
  */
-/* eslint-disable no-underscore-dangle */
 export class Modal {
-  constructor(element) {
+  private readonly element: HTMLElement
+  private readonly dialog: HTMLDialogElement
+  private readonly body: HTMLElement
+  private closeHandlers: HTMLElement[]
+  private previouslyFocused: HTMLElement | undefined
+
+  constructor(element: HTMLElement) {
     this.element = element
-    this.element.setAttribute('hidden', true)
+    this.element.hidden = true
 
     this.dialog = this.element.querySelector('.modal-content')
     this.body = this.dialog.querySelector('[data-modal-body]')
 
     this.closeHandlers = []
 
-    this._show = this.show.bind(this)
-    this._hide = this.hide.bind(this)
-    this._maintainFocus = this.maintainFocus.bind(this)
-    this._handleKeyDown = this.handleKeyDown.bind(this)
+    this.show = this.show.bind(this)
+    this.hide = this.hide.bind(this)
+    this.maintainFocus = this.maintainFocus.bind(this)
+    this.handleKeyDown = this.handleKeyDown.bind(this)
   }
 
-  async load(url) {
+  /** Show modal dialog box with spinner whilst loading HTML content from `url` */
+  public async load(url: string): Promise<void> {
     // Add loading spinner
     this.body.innerHTML = `
       <svg width="50" height="50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -97,27 +103,29 @@ export class Modal {
     this.attachCloseHandlers()
   }
 
-  show() {
+  /** Show the modal dialog box */
+  public show(): void {
     this.element.removeAttribute('hidden')
-    this.dialog.setAttribute('aria-modal', true)
+    this.dialog.ariaModal = 'true'
 
     this.takeFocus()
     if (this.element.dataset.call) {
       this.attachCloseHandlers()
     }
 
-    document.addEventListener('keydown', this._handleKeyDown)
-    document.body.addEventListener('focus', this._maintainFocus, true)
+    document.addEventListener('keydown', this.handleKeyDown)
+    document.body.addEventListener('focus', this.maintainFocus, true)
 
     document.documentElement.style.overflowY = 'hidden'
   }
 
-  hide() {
-    this.element.setAttribute('hidden', true)
+  /** Hide the modal dialog box */
+  public hide(): void {
+    this.element.hidden = true
     this.dialog.removeAttribute('aria-modal')
 
-    document.removeEventListener('keydown', this._handleKeyDown)
-    document.body.removeEventListener('focus', this._maintainFocus, true)
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.body.removeEventListener('focus', this.maintainFocus, true)
 
     if (!this.element.dataset.call) {
       this.body.replaceChildren()
@@ -128,55 +136,59 @@ export class Modal {
     document.documentElement.style.overflowY = ''
   }
 
-  handleKeyDown(event) {
+  private handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Escape') this.hide()
-    else if (event.key === 'Tab') trapFocus(this.element, event)
+    else if (event.key === 'Tab') this.trapFocus(event)
   }
 
-  takeFocus() {
-    this.previouslyFocused = document.activeElement
+  private takeFocus(): void {
+    this.previouslyFocused = document.activeElement as HTMLElement
 
     this.dialog.focus()
   }
 
-  maintainFocus(event) {
-    const isInModal = event.target.closest('[aria-modal="true"]')
+  private maintainFocus(event: FocusEvent): void {
+    const isInModal = (event.target as HTMLElement).closest('[aria-modal="true"]')
     if (!isInModal) this.takeFocus()
   }
 
-  revertFocus() {
+  private revertFocus(): void {
     if (this.previouslyFocused && this.previouslyFocused.focus) {
       this.previouslyFocused.focus()
     }
   }
 
-  attachCloseHandlers() {
-    this.closeHandlers.forEach(closer => closer.removeEventListener('click', this._hide))
-    this.closeHandlers = [...this.element.querySelectorAll('[data-modal-hide]')]
-    this.closeHandlers.forEach(closer => closer.addEventListener('click', this._hide))
+  private attachCloseHandlers(): void {
+    this.closeHandlers.forEach(closer => closer.removeEventListener('click', this.hide))
+    this.closeHandlers = Array.from(this.element.querySelectorAll<HTMLElement>('[data-modal-hide]'))
+    this.closeHandlers.forEach(closer => closer.addEventListener('click', this.hide))
   }
-}
 
-function trapFocus(el, event) {
-  const focusableChildren = getFocusableChildren(el)
-  const focusedItemIndex = focusableChildren.indexOf(document.activeElement)
-  const lastIndex = focusableChildren.length - 1
+  private trapFocus(event: KeyboardEvent): void {
+    const focusableChildren = this.getFocusableChildren()
+    if (focusableChildren.length === 0) {
+      event.preventDefault()
+      return
+    }
+    const focusedItemIndex = focusableChildren.indexOf(document.activeElement as HTMLElement)
+    const lastIndex = focusableChildren.length - 1
 
-  if (event.shiftKey && focusedItemIndex === 0) {
-    focusableChildren[lastIndex].focus()
-    event.preventDefault()
-  } else if (!event.shiftKey && focusedItemIndex === lastIndex) {
-    focusableChildren[0].focus()
-    event.preventDefault()
+    if (event.shiftKey && focusedItemIndex === 0) {
+      focusableChildren[lastIndex].focus()
+      event.preventDefault()
+    } else if (!event.shiftKey && focusedItemIndex === lastIndex) {
+      focusableChildren[0].focus()
+      event.preventDefault()
+    }
   }
-}
 
-function getFocusableChildren(root) {
-  const elements = [
-    ...root.querySelectorAll(
-      'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])',
-    ),
-  ]
+  private getFocusableChildren(): HTMLElement[] {
+    const elements = [
+      ...this.element.querySelectorAll<HTMLElement>(
+        'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])',
+      ),
+    ]
 
-  return elements.filter(element => element.offsetWidth || element.offsetHeight || element.getClientRects().length)
+    return elements.filter(element => element.offsetWidth || element.offsetHeight || element.getClientRects().length)
+  }
 }

@@ -4,10 +4,11 @@ import { HttpError } from 'http-errors'
 import { isGranted, PrisonerAlertsPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { sortByDateTime } from '../utils/utils'
+import { SelectOption, sortByDateTime } from '../utils/utils'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
+import type HmppsError from '../interfaces/HmppsError'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import AlertView from '../services/interfaces/alertsService/AlertView'
 import { Alert, AlertCode, AlertForm, AlertType } from '../data/interfaces/alertsApi/Alert'
@@ -125,8 +126,8 @@ export default class AlertsController {
     const types = await this.alertsService.getAlertTypes(clientToken)
 
     const existingAlerts = alerts
-      .filter((alert: Prisoner['alerts'][0]) => alert.active)
-      .map((alert: Prisoner['alerts'][0]) => alert.alertCode)
+      .filter((alert: Prisoner['alerts'][number]) => alert.active)
+      .map((alert: Prisoner['alerts'][number]) => alert.alertCode)
       .join(',')
 
     // Initialise form
@@ -519,7 +520,7 @@ export default class AlertsController {
   private mapAlertTypes(types: AlertType[], type?: string, existingAlertCodes?: string) {
     const alertTypes = this.mapActiveSortedAlertTypes(types)
 
-    const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
+    const typeCodeMap: Record<string, SelectOption[]> = types.reduce(
       (ts, t) => ({
         ...ts,
         [t.code]: this.mapActiveSortedAlertCodes(t.alertCodes, existingAlertCodes),
@@ -527,7 +528,7 @@ export default class AlertsController {
       {},
     )
 
-    let alertCodes: { value: string; text: string }[] = []
+    let alertCodes: SelectOption[] = []
     if (type) {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
@@ -537,10 +538,10 @@ export default class AlertsController {
     return { alertTypes, alertCodes, typeCodeMap }
   }
 
-  private mapActiveSortedAlertTypes(alertTypes: AlertType[]): { text: string; value: string }[] {
+  private mapActiveSortedAlertTypes(alertTypes: AlertType[]): SelectOption[] {
     return alertTypes
       ?.filter(alertType => alertType.isActive)
-      .map(alertType => {
+      .map<SelectOption>(alertType => {
         return {
           value: alertType.code,
           text: alertType.description,
@@ -549,15 +550,12 @@ export default class AlertsController {
       .sort((a, b) => a.text.localeCompare(b.text))
   }
 
-  private mapActiveSortedAlertCodes(
-    alertCodes: AlertCode[],
-    existingAlertCodes?: string,
-  ): { text: string; value: string }[] {
+  private mapActiveSortedAlertCodes(alertCodes: AlertCode[], existingAlertCodes?: string): SelectOption[] {
     return alertCodes
       ?.filter(
         alertCode => alertCode.isActive && alertCode.canBeAdministered && !excludedAlertCodes.includes(alertCode.code),
       )
-      .map(alertType => {
+      .map<SelectOption>(alertType => {
         return {
           value: alertType.code,
           text: alertType.description,
@@ -567,7 +565,7 @@ export default class AlertsController {
       .sort((a, b) => a.text.localeCompare(b.text))
   }
 
-  private handleUpdateErrors(error: HttpError): { text: string } {
+  private handleUpdateErrors(error: HttpError): HmppsError {
     if (errorHasStatus(error, 400)) {
       return { text: error.message }
     }

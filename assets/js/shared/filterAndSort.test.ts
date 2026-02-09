@@ -1,4 +1,4 @@
-const { filterAndSort } = require('./filterAndSort.js')
+import { filterAndSort } from './filterAndSort'
 
 describe('filterAndSort', () => {
   const options = ['Spain', 'Angola', 'China', 'Latvia', 'France']

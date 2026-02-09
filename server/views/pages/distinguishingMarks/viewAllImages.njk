@@ -1,8 +1,7 @@
 {% extends "../index.njk" %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "components/printLink.njk" import printLink %}
 
 {% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
 {% set pageTitle =  "View all images for " + markType + " - Prisoner personal details" %}
@@ -33,10 +32,7 @@
 <div class="mark-images__header-container">
     <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} {{ mark | toBodyPartDescription | lower }} {{ markType }} photos</h1>
     <div class="print-link">
-        <a href="#"
-           class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print"
-           data-qa="mark-images-print-link"
-        >Print all</a>
+        {{ printLink('Print all', dataQA='mark-images-print-link') }}
     </div>
 </div>
 <div class="mark-images__container">
