@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import express, { NextFunction, Request, Response, Router } from 'express'
+import express, { Router, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import config from '../config'
 

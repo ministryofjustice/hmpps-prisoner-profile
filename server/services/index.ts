@@ -86,11 +86,11 @@ export const services = () => {
   } = dataAccess
 
   const auditService = AuditService({
-    sqsClient: new SQSClient({ region: config.apis.audit.region }),
-    queueUrl: config.apis.audit.queueUrl,
-    serviceName: config.apis.audit.serviceName,
+    sqsClient: new SQSClient({ region: config.audit.region }),
+    queueUrl: config.audit.queueUrl,
+    serviceName: config.audit.serviceName,
     build: config.gitRef,
-    enabled: config.apis.audit.enabled,
+    enabled: config.audit.enabled,
   })
 
   const prisonPermissionsService = PrisonPermissionsService.create({
@@ -228,9 +228,9 @@ export const services = () => {
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
+      uri: `${config.contentful.host}/content/v1/spaces/${config.contentful.spaceId}/environments/${config.contentful.environment}`,
       headers: {
-        Authorization: `Bearer ${config.apis.contentful.accessToken}`,
+        Authorization: `Bearer ${config.contentful.accessToken}`,
       },
     }),
     ssrMode: true,
