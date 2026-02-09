@@ -49,7 +49,7 @@
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.3",
     "@ministryofjustice/hmpps-prison-permissions-lib": "2.0.1",
     "@ministryofjustice/hmpps-rest-client": "1.0.0",
-    "@sentry/node": "10.35.0",
+    "@sentry/node": "10.38.0",
     "@types/multer": "2.0.0",
     "accessible-autocomplete": "^3.0.1",
     "agentkeepalive": "^4.6.0",
