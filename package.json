@@ -86,7 +86,7 @@
     "@cypress/webpack-batteries-included-preprocessor": "^4.0.4",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
-    "@ministryofjustice/hmpps-precommit-hooks": "^1.0.2",
+    "@ministryofjustice/hmpps-precommit-hooks": "^2.0.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
