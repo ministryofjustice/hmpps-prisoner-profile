@@ -12,7 +12,6 @@ export default function generateContactChangeLink(
   })
     .toString()
     .replace(/%2F/g, '/')
-    .replace(/%23/g, '#')
 
   return `${config.serviceUrls.contacts}/save-backlink?${params}`
 }

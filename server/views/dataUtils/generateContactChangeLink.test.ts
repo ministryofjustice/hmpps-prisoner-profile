@@ -13,7 +13,7 @@ describe('generateContactChangeLink', () => {
 
     const result = generateContactChangeLink(prisonerNumber, contact as PersonalRelationshipsContact)
 
-    const expectedReturnPath = `/prisoner/${prisonerNumber}/personal#next-of-kin`
+    const expectedReturnPath = `/prisoner/${prisonerNumber}/personal%23next-of-kin`
     const expectedRedirectPath = `/prisoner/${prisonerNumber}/contacts/manage/${contact.contactId}/relationship/${contact.prisonerContactId}`
 
     const expected =
