@@ -363,7 +363,7 @@
       {% if militaryHistoryEnabled %}
         {% if militaryRecords.status === 'fulfilled' %}
           {% if militaryRecords.value.length > 0 %}
-            <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
+            <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
                 data-qa="military-records">
                 <div class="govuk-summary-list__row govuk-!-border-none">
                     <dt class="govuk-summary-list__key">UK military service record</dt>
@@ -466,7 +466,7 @@
             </div>
           {% endif %}
         {% else %}
-          <dl class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
+          <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
             data-qa="military-records">
             <div class="govuk-summary-list__row govuk-!-border-none">
               <dt class="govuk-summary-list__key">UK military service record</dt>
