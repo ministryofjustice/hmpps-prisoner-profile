@@ -1,6 +1,6 @@
-const { globSync } = require('node:fs')
 const { copy } = require('esbuild-plugin-copy')
 const { typecheckPlugin } = require('@jgoz/esbuild-plugin-typecheck')
+const { globSync } = require('node:fs')
 const { buildNotificationPlugin } = require('./utils')
 
 /**

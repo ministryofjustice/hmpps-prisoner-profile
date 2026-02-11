@@ -1,9 +1,9 @@
-const { styleText } = require('node:util')
 const esbuild = require('esbuild')
+const { styleText } = require('node:util')
+const { emojis } = require('./utils')
 const { getAppConfig } = require('./app.config')
 const { getAssetsConfig, getAdditionalAssetsConfig } = require('./assets.config')
 const { getBuildConfig } = require('./build.config')
-const { emojis } = require('./utils')
 
 /**
  * Run ESBuild process, if `--watch` provided, run in watch mode.

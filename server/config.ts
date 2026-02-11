@@ -36,7 +36,7 @@ export default {
   branchName: get('GIT_BRANCH', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
   appInsightsConnectionString: get('APPLICATIONINSIGHTS_CONNECTION_STRING', '', requiredInProduction),
   production,
-  https: production,
+  https: process.env.NO_HTTPS === 'true' ? false : production,
   staticResourceCacheDuration: '1h',
   redis: {
     enabled: get('REDIS_ENABLED', 'false', requiredInProduction) === 'true',
@@ -50,15 +50,22 @@ export default {
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
   defaultCircuitBreakerOptions,
+  audit: {
+    queueUrl: get('AUDIT_SQS_QUEUE_URL', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
+    region: get('AUDIT_SQS_REGION', 'eu-west-2', requiredInProduction),
+    serviceName: get('AUDIT_SERVICE_NAME', 'hmpps-prisoner-profile', requiredInProduction),
+    enabled: get('AUDIT_ENABLED', 'false') === 'true',
+  },
+  contentful: {
+    host: get('CONTENTFUL_HOST', '', requiredInProduction),
+    spaceId: get('CONTENTFUL_SPACE_ID', 'spaceId', requiredInProduction),
+    environment: get('CONTENTFUL_ENVIRONMENT', 'environment', requiredInProduction),
+    accessToken: get('CONTENTFUL_ACCESS_TOKEN', 'token', requiredInProduction),
+  },
   apis: {
-    audit: {
-      queueUrl: get('AUDIT_SQS_QUEUE_URL', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
-      region: get('AUDIT_SQS_REGION', 'eu-west-2', requiredInProduction),
-      serviceName: get('AUDIT_SERVICE_NAME', 'hmpps-prisoner-profile', requiredInProduction),
-      enabled: get('AUDIT_ENABLED', 'false') === 'true',
-    },
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
+      healthPath: '/health/ping',
       externalUrl: get('HMPPS_AUTH_EXTERNAL_URL', get('HMPPS_AUTH_URL', 'http://localhost:9090/auth')),
       timeout: {
         response: Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 3000)),
@@ -78,6 +85,7 @@ export default {
     },
     tokenVerification: {
       url: get('TOKEN_VERIFICATION_API_URL', 'http://localhost:8100', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 3000)),
         deadline: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', 3000)),
@@ -87,6 +95,7 @@ export default {
     },
     prisonApi: {
       url: get('PRISON_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('PRISON_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('PRISON_API_TIMEOUT_DEADLINE', 10000)),
@@ -95,6 +104,7 @@ export default {
     },
     locationsInsidePrisonApi: {
       url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_RESPONSE', 3000)),
         deadline: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_DEADLINE', 3000)),
@@ -103,6 +113,7 @@ export default {
     },
     nomisSyncPrisonerMappingApi: {
       url: get('NOMIS_SYNC_PRISONER_MAPPING_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('NOMIS_SYNC_PRISONER_MAPPING_API_TIMEOUT_RESPONSE', 3000)),
         deadline: Number(get('NOMIS_SYNC_PRISONER_MAPPING_API_TIMEOUT_DEADLINE', 3000)),
@@ -111,6 +122,7 @@ export default {
     },
     prisonerSearchApi: {
       url: get('PRISONER_SEARCH_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('PRISONER_SEARCH_API_TIMEOUT_SECONDS', 3000)),
         deadline: Number(get('PRISONER_SEARCH_API_TIMEOUT_SECONDS', 3000)),
@@ -151,6 +163,7 @@ export default {
     },
     bookAVideoLinkApi: {
       url: get('BOOK_A_VIDEO_LINK_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 3000)),
         deadline: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 3000)),
@@ -236,12 +249,6 @@ export default {
         deadline: Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_DEADLINE', 3000)),
       },
       agent: new AgentConfig(Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_DEADLINE', 3000))),
-    },
-    contentful: {
-      host: get('CONTENTFUL_HOST', '', requiredInProduction),
-      spaceId: get('CONTENTFUL_SPACE_ID', 'spaceId', requiredInProduction),
-      environment: get('CONTENTFUL_ENVIRONMENT', 'environment', requiredInProduction),
-      accessToken: get('CONTENTFUL_ACCESS_TOKEN', 'token', requiredInProduction),
     },
     alertsApi: {
       url: get('ALERTS_API_URL', 'http://localhost:8082', requiredInProduction),

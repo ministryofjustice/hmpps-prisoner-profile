@@ -1,38 +1,33 @@
 import express, { Router } from 'express'
+
+import { endpointHealthComponent, monitoringMiddleware } from '@ministryofjustice/hmpps-monitoring'
 import type { ApplicationInfo } from '../applicationInfo'
-import healthcheck from '../services/healthCheck'
+import logger from '../../logger'
+import config from '../config'
 
 export default function setUpHealthChecks(applicationInfo: ApplicationInfo): Router {
   const router = express.Router()
 
-  router.get('/health', (req, res) => {
-    healthcheck(applicationInfo, result => {
-      if (result.status !== 'UP') {
-        res.status(503)
-      }
-      res.json(result)
-    })
+  const allApiConfig = Object.entries(config.apis)
+
+  const middleware = monitoringMiddleware({
+    applicationInfo,
+    healthComponents: allApiConfig.flatMap(([name, apiConfig]) =>
+      'healthPath' in apiConfig && (!('enabled' in apiConfig) || apiConfig.enabled)
+        ? [
+            endpointHealthComponent(logger, name, {
+              url: apiConfig.url,
+              healthPath: apiConfig.healthPath,
+              agentConfig: apiConfig.agent,
+            }),
+          ]
+        : [],
+    ),
   })
 
-  router.get('/ping', (req, res) => {
-    res.send({
-      status: 'UP',
-    })
-  })
-
-  router.get('/info', (req, res) => {
-    res.json({
-      git: {
-        branch: applicationInfo.branchName,
-      },
-      build: {
-        artifact: applicationInfo.applicationName,
-        version: applicationInfo.buildNumber,
-        name: applicationInfo.applicationName,
-      },
-      productId: applicationInfo.productId,
-    })
-  })
+  router.get('/health', middleware.health)
+  router.get('/info', middleware.info)
+  router.get('/ping', middleware.ping)
 
   return router
 }

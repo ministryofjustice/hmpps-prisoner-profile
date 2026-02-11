@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
+const { deleteSync } = require('del')
 const childProcess = require('node:child_process')
 const { styleText } = require('node:util')
-const { deleteSync } = require('del')
 
 // Emoji constants
 const emojis = {
