@@ -73,6 +73,7 @@ import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
 import { ApplicationInfo } from '../applicationInfo'
 import filterArrayOnPropertyFilter from './filterArrayOnPropertyFilter'
+import generateContactChangeLink from '../views/dataUtils/generateContactChangeLink'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
@@ -137,6 +138,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('appInsightsWebAnalyticsEnabled', appInsightsWebAnalyticsEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
   njkEnv.addGlobal('bodyPartLabels', bodyPartLabels)
+  njkEnv.addGlobal('generateContactChangeLink', generateContactChangeLink)
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('initialiseName', initialiseName)

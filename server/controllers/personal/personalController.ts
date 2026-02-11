@@ -16,6 +16,7 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import {
+  changeContactDetailsLinkEnabled,
   dietAndAllergyEnabled,
   editProfileEnabled,
   editProfileSimulateFetch,
@@ -95,6 +96,7 @@ export default class PersonalController {
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
+      const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
         config.featureToggles
@@ -145,6 +147,7 @@ export default class PersonalController {
         hasPersonalId,
         hasHomeOfficeId,
         useCustomErrorBanner: true,
+        changeContactLinkEnabled,
       })
     }
   }

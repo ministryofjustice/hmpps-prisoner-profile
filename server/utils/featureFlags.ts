@@ -44,3 +44,6 @@ export const externalContactsEnabled: FeatureFlagMethod = (activeCaseLoadId: str
 export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes('***') ||
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes(activeCaseLoadId)
+
+export const changeContactDetailsLinkEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
+  editProfileEnabled(activeCaseLoadId) && config.featureToggles.changeContactDetailsLinkEnabled
