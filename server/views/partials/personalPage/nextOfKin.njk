@@ -98,7 +98,7 @@
               isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions) and
               isGranted(PersonalRelationshipsPermission.edit_contacts, prisonerPermissions)
             %}
-              <div class="contact-change-link"><a href="#" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact details</a></div>
+              <div class="contact-change-link"><a href="{{ generateContactChangeLink(prisonerNumber, contact) }}" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact details</a></div>
             {% endif %}
 
           </div>
