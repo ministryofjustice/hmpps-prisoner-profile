@@ -105,6 +105,7 @@ generic-service:
     MANAGE_ALLOCATIONS_ENABLED: "true"
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
     PERSON_ENDPOINTS_ENABLED: "true"
+    CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
