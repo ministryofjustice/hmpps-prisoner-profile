@@ -8,20 +8,21 @@ import config from '../config'
 export default function setUpHealthChecks(applicationInfo: ApplicationInfo): Router {
   const router = express.Router()
 
-  const apiConfig = Object.entries(config.apis)
+  const allApiConfig = Object.entries(config.apis)
 
   const middleware = monitoringMiddleware({
     applicationInfo,
-    healthComponents: apiConfig
-      .map(([name, configuration]) => [name, configuration] as [string, Record<string, unknown>])
-      .filter(([_name, configuration]) => configuration.healthPath !== undefined)
-      .map(([name, configuration]) =>
-        endpointHealthComponent(logger, name, {
-          url: configuration.url as string,
-          healthPath: configuration.healthPath as string,
-          agentConfig: configuration.agent,
-        }),
-      ),
+    healthComponents: allApiConfig.flatMap(([name, apiConfig]) =>
+      'healthPath' in apiConfig && (!('enabled' in apiConfig) || apiConfig.enabled)
+        ? [
+            endpointHealthComponent(logger, name, {
+              url: apiConfig.url,
+              healthPath: apiConfig.healthPath,
+              agentConfig: apiConfig.agent,
+            }),
+          ]
+        : [],
+    ),
   })
 
   router.get('/health', middleware.health)
