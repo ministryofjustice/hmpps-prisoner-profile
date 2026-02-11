@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "34 6 * * 1" # Every Monday
+
 jobs:
   security-veracode-policy-check:
     permissions:

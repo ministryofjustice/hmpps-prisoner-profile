@@ -1,5 +1,5 @@
+const path = require('path')
 const { globSync } = require('node:fs')
-const path = require('node:path')
 
 /**
  * Configuration for build steps

@@ -14,6 +14,7 @@ export default {
         jsonBody: { status: httpStatus === 200 ? 'UP' : 'DOWN' },
       },
     }),
+
   stubVerifyToken: (active = true): SuperAgentRequest =>
     stubFor({
       request: {

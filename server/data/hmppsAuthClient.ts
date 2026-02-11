@@ -3,8 +3,8 @@ import superagent from 'superagent'
 
 import logger from '../../logger'
 import config from '../config'
-import generateOauthClientToken from '../authentication/clientCredentials'
 import TokenStore from './tokenStore/tokenStore'
+import generateOauthClientToken from '../utils/clientCredentials'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url

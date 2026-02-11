@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "19 6 * * MON-FRI" # Every weekday
+
 jobs:
   security-typescript-trivy-check:
     permissions:
