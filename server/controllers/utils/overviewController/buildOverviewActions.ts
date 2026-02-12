@@ -5,6 +5,7 @@ import {
   PathfinderPermission,
   PersonInterventionsPermission,
   PersonPrisonCategoryPermission,
+  PrisonerMovesPermission,
   PrisonerPermissions,
   PrisonerSchedulePermission,
   SOCPermission,
@@ -13,8 +14,7 @@ import {
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { ActionIcon } from '../../../data/enums/actionIcon'
-import { Role } from '../../../data/enums/role'
-import { includesActiveCaseLoad, userHasRoles } from '../../../utils/utils'
+import { includesActiveCaseLoad } from '../../../utils/utils'
 import conf from '../../../config'
 import isServiceNavEnabled from '../../../utils/isServiceEnabled'
 import { HmppsUser } from '../../../interfaces/HmppsUser'
@@ -147,7 +147,7 @@ export default (
   }
 
   if (
-    userHasRoles([Role.ExternalMovementsTapManage], user.userRoles) &&
+    isGranted(PrisonerMovesPermission.edit_temporary_absence, permissions) &&
     isServiceNavEnabled('external-movements', feComponentsSharedData)
   ) {
     const externalMovementsUiUrl = feComponentsSharedData.services.find(
