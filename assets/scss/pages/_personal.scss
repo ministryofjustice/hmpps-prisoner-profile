@@ -208,15 +208,12 @@
 }
 
 @media (max-width: 560px) {
-  .hmpps-military-history > .govuk-summary-list__row dd {
-    border-bottom: none;
-  }
-  
+  .hmpps-military-history > .govuk-summary-list__row dd,
   .hmpps-languages > .govuk-summary-list__row dd {
     border-bottom: none;
   }
-  
-  .hmpps-languages> .govuk-summary-list__row:last-of-type {
+
+  .hmpps-languages > .govuk-summary-list__row:last-of-type {
     padding-bottom: 10px;
   }
 }
@@ -286,7 +283,7 @@
       width: auto;
       grid-column: 1;
     }
-    
+
     .govuk-summary-list__key {
       padding-bottom: 0;
     }
