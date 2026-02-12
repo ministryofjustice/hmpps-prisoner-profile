@@ -136,7 +136,6 @@
   .govuk-summary-list__row {
     display: grid;
     border-bottom: 1px solid $govuk-border-colour;
-
     grid-template-columns: 1fr;
 
     @include govuk-media-query($from: tablet) {
@@ -171,6 +170,7 @@
 
     .govuk-summary-list__value {
       border-bottom: none;
+
       @include govuk-media-query($from: tablet) {
         margin-left: 20px;
         grid-column: 2;
@@ -204,6 +204,113 @@
     &:last-of-type .govuk-summary-list__row:last-of-type {
       border-bottom: none;
     }
+  }
+}
+
+@media (max-width: 560px) {
+  .hmpps-military-history > .govuk-summary-list__row dd,
+  .hmpps-languages > .govuk-summary-list__row dd {
+    border-bottom: none;
+  }
+
+  .hmpps-languages > .govuk-summary-list__row:last-of-type {
+    padding-bottom: 10px;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 999px) {
+  .hmpps-military-history,
+  .hmpps-languages {
+    .govuk-summary-list__heading {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .govuk-summary-list__row {
+      display: grid;
+      border-bottom: 1px solid $govuk-border-colour;
+      grid-template-columns: 1fr;
+
+      @include govuk-media-query($from: tablet) {
+        grid-template-columns: 30% 57% 13%;
+      }
+
+      dt {
+        width: auto;
+        padding-right: 0;
+        margin: 0;
+      }
+
+      dd {
+        margin: 0;
+        border-bottom: solid 1px $govuk-border-colour;
+      }
+
+      .no-bottom-border {
+        border-bottom: none !important;
+      }
+
+      .govuk-summary-list__value {
+        border-bottom: none;
+
+        @include govuk-media-query($from: tablet) {
+          margin-left: 20px;
+          grid-column: 2;
+          border-bottom: solid 1px $govuk-border-colour;
+        }
+      }
+
+      .govuk-summary-list__actions {
+        width: 100%;
+        padding-right: 0;
+
+        @include govuk-media-query($from: tablet) {
+          grid-column: 3;
+        }
+      }
+    }
+  }
+
+  .hmpps-military-history .govuk-summary-list--sub-list,
+  .hmpps-languages .govuk-summary-list--sub-list {
+    .govuk-summary-list__row {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .govuk-summary-list__key,
+    .govuk-summary-list__value {
+      width: auto;
+      grid-column: 1;
+    }
+
+    .govuk-summary-list__key {
+      padding-bottom: 0;
+    }
+
+    .govuk-summary-list__value {
+      margin-left: 0;
+      padding-left: 0;
+      padding-top: 0;
+    }
+
+    .govuk-summary-list__row dd {
+      border-bottom: none;
+    }
+  }
+
+  .hmpps-military-history > .govuk-summary-list__row dd,
+  .hmpps-languages > .govuk-summary-list__row dd {
+    border-bottom: solid 1px $govuk-border-colour;
+  }
+
+  .hmpps-military-history > .govuk-summary-list__row:last-of-type dd,
+  .hmpps-languages > .govuk-summary-list__row:last-of-type dd {
+    border-bottom: none;
+  }
+
+  .hmpps-languages .hmpps-languages__subheading-row dd {
+    border-bottom: none;
   }
 }
 
