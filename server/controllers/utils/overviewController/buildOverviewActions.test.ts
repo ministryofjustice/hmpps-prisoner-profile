@@ -1,9 +1,11 @@
-import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type HeaderFooterSharedData
+  from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import {
   CaseNotesPermission,
   PathfinderPermission,
   PersonInterventionsPermission,
   PersonPrisonCategoryPermission,
+  PrisonerMovesPermission,
   PrisonerPermissions,
   PrisonerSchedulePermission,
   SOCPermission,
@@ -11,7 +13,6 @@ import {
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import buildOverviewActions from './buildOverviewActions'
-import { Role } from '../../../data/enums/role'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
@@ -325,27 +326,29 @@ describe('buildOverviewActions', () => {
       navEnabled,
     })
     test.each`
-      userHasTAPRole | availableServices                    | visible
-      ${true}        | ${[externalMovementsService(true)]}  | ${true}
-      ${true}        | ${[externalMovementsService(false)]} | ${false}
-      ${true}        | ${[]}                                | ${false}
-      ${false}       | ${[externalMovementsService(true)]}  | ${false}
+      permissionGranted | availableServices                    | visible
+      ${true}           | ${[externalMovementsService(true)]}  | ${true}
+      ${true}           | ${[externalMovementsService(false)]} | ${false}
+      ${true}           | ${[]}                                | ${false}
+      ${false}          | ${[externalMovementsService(true)]}  | ${false}
     `(
-      'user with external movements TAP manage role: $userHasTAPRole and navEnabled: $availableServices.0.navEnabled can see ‘Add a temporary absence’: $visible',
+      'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see ‘Add a temporary absence’: $visible',
       ({
-        userHasTAPRole,
+        permissionGranted,
         availableServices,
         visible,
       }: {
-        userHasTAPRole: boolean
+        permissionGranted: boolean
         availableServices: Service[]
         visible: boolean
       }) => {
+        mockPermissions({ [PrisonerMovesPermission.edit_temporary_absence]: permissionGranted })
+
         const actions = buildOverviewActions(
           PrisonerMockDataA,
           pathfinderNominal,
           socNominal,
-          { ...prisonUserMock, userRoles: userHasTAPRole ? [Role.ExternalMovementsTapManage] : [] },
+          prisonUserMock,
           config,
           { services: availableServices, caseLoads: prisonUserMock.caseLoads, allocationJobResponsibilities: [] },
           permissions,
