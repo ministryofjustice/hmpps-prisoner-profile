@@ -1,5 +1,4 @@
-import type HeaderFooterSharedData
-  from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import {
   CaseNotesPermission,
   PathfinderPermission,
