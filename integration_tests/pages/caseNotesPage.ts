@@ -45,9 +45,9 @@ export default class CaseNotesPage extends Page {
 
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
 
-  filterDateFromLabel = (): PageElement => cy.get(':nth-child(3) > .govuk-label')
+  filterDateFromLabel = (): PageElement => cy.get(':nth-child(3) > div > .govuk-label')
 
-  filterDateToLabel = (): PageElement => cy.get(':nth-child(4) > .govuk-label')
+  filterDateToLabel = (): PageElement => cy.get(':nth-child(4) > div > .govuk-label')
 
   warningPrintSlip = (): PageElement => cy.getDataQa('print-slip-warning')
 
