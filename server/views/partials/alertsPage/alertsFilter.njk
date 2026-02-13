@@ -1,6 +1,6 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% set options = {
     title: 'Filter',
     id: 'alertsFilter',
@@ -27,7 +27,7 @@
             </div>
         </fieldset>
         {% endif %}
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "from",
             name: "from",
             label: {
@@ -35,12 +35,12 @@
                 classes: "govuk-label--m"
             },
             hint: {
-              text: "For example, 31/3/2022"
+                text: "For example, 31/3/2022" 
             },
             errorMessage: errors | findError('from'),
             value: listMetadata.filtering.from
         }) }}
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "to",
             name: "to",
             label: {

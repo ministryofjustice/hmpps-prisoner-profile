@@ -7,7 +7,7 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% from "components/timePicker/timePicker.njk" import timePicker %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
@@ -255,14 +255,13 @@
                       }) }}
                     {% endif %}
 
-                    {{ hmppsDatepicker({
+                    {{ mojDatePicker({
                         id: "date",
                         name: "date",
                         label: {
                             text: "Date"
                         },
                         errorMessage: errors | findError('date'),
-                        classes: 'hmpps-datepicker--fixed-width',
                         value: formValues.date,
                         minDate: today
                     }) }}

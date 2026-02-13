@@ -2,7 +2,7 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Create an alert' %}
@@ -69,7 +69,7 @@
                 }
             }) }}
 
-            {{ hmppsDatepicker({
+            {{ mojDatePicker({
                 id: "activeFrom",
                 name: "activeFrom",
                 label: {
@@ -77,13 +77,12 @@
                     classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('activeFrom'),
-                classes: 'hmpps-datepicker--fixed-width',
                 value: formValues.activeFrom,
                 minDate: todayMinus8,
                 maxDate: today
             }) }}
 
-            {{ hmppsDatepicker({
+            {{ mojDatePicker({
                 id: "activeTo",
                 name: "activeTo",
                 label: {
@@ -91,7 +90,6 @@
                     classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('activeTo'),
-                classes: 'hmpps-datepicker--fixed-width',
                 value: formValues.activeTo,
                 minDate: todayMinus8
             }) }}

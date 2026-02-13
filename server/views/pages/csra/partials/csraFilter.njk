@@ -1,6 +1,6 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from '../../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 
 {%- call hmppsSideFilter({currentUrlPath: '/prisoner/' + prisonerNumber + '/csra-history'}) -%}
     <div class="govuk-form-group" data-qa="csra-filters">
@@ -36,7 +36,7 @@
             }) }}
         </fieldset>
 
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "startDate",
             name: "from",
             label: {
@@ -46,7 +46,7 @@
             errorMessage: errors | findError('startDate'),
             value: filterValues.from
         }) }}
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "endDate",
             name: "to",
             label: {
