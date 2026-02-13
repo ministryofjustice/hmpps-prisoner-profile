@@ -1,7 +1,8 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+
 {% set options = {
     title: 'Filter',
     id: 'caseNotesFilter',
@@ -26,7 +27,8 @@
             },
             items: subTypes | addDefaultSelectedValue('Choose sub-type', false) | setSelected(listMetadata.filtering.subType)
         }) }}
-        {{ hmppsDatepicker({
+    
+        {{ mojDatePicker({
             id: "startDate",
             name: "startDate",
             label: {
@@ -37,9 +39,11 @@
                 text: "For example, 31/3/2022"
             },
             errorMessage: errors | findError('startDate'),
-            value: listMetadata.filtering.startDate
+            value: listMetadata.filtering.startDate,
+            classes: "govuk-form-group"
         }) }}
-        {{ hmppsDatepicker({
+
+        {{ mojDatePicker({
             id: "endDate",
             name: "endDate",
             label: {
@@ -50,7 +54,8 @@
                 text: "For example, 31/3/2023"
             },
             errorMessage: errors | findError('endDate'),
-            value: listMetadata.filtering.endDate
+            value: listMetadata.filtering.endDate,
+            classes: "govuk-form-group"
         }) }}
     </div>
 {%- endcall -%}
