@@ -106,5 +106,6 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
+    allowCypressEnv: false,
   },
 })
