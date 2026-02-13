@@ -7,7 +7,6 @@ import { alertDynamicDropdowns } from './alertDynamicDropdowns'
 import { alertFlags } from './alertFlags'
 import { autocomplete } from './autocomplete'
 import { BackToTop } from './backToTop'
-import { datepicker } from './datepicker'
 import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { OpenCloseAll } from './openCloseAll'
@@ -23,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
   alertDynamicDropdowns()
   alertFlags()
   autocomplete()
-  datepicker()
   fileUploadWithPreview()
   printPage()
   sortSelector()
