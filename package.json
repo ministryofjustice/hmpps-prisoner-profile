@@ -39,7 +39,7 @@
     "@contentful/rich-text-types": "^17.2.5",
     "@microsoft/applicationinsights-clickanalytics-js": "3.3.11",
     "@microsoft/applicationinsights-web": "3.3.11",
-    "@ministryofjustice/frontend": "^3.7.2",
+    "@ministryofjustice/frontend": "^7.1.1",
     "@ministryofjustice/hmpps-auth-clients": "1.0.2",
     "@ministryofjustice/hmpps-connect-dps-components": "5.3.2",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "3.5.4",
