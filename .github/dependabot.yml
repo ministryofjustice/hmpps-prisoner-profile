@@ -9,6 +9,9 @@ updates:
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
+      - dependency-name: "govuk-frontend"
+        versions:
+          - ">=6"
     schedule:
       interval: weekly
       day: wednesday
