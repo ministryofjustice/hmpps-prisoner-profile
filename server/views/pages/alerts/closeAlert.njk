@@ -3,21 +3,20 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
 {% extends "../index.njk" %}
 
 {% set anotherDateHtml %}
     <div data-qa="another-date-section">
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "activeTo",
             name: "activeTo",
             label: {
                 text: "End date"
             },
             errorMessage: errors | findError('activeTo'),
-            classes: 'hmpps-datepicker--fixed-width',
             value: formValues.activeTo,
             minDate: tomorrow,
             attributes: { "data-qa": "end-date-field" }

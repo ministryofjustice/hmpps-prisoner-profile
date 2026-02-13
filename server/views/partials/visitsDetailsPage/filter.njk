@@ -2,7 +2,8 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+
 {% set options = {
     title: 'Filter',
     id: 'visitsFilter',
@@ -38,7 +39,7 @@
             items: prisons | addDefaultSelectedValue('Choose establishment', false) | setSelected(listMetadata.filtering.prisonId)
         }) }}
 
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "fromDate",
             name: "fromDate",
             label: {
@@ -52,7 +53,7 @@
             value: listMetadata.filtering.fromDate
         }) }}
 
-        {{ hmppsDatepicker({
+        {{ mojDatePicker({
             id: "toDate",
             name: "toDate",
             label: {
