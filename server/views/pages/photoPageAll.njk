@@ -1,9 +1,8 @@
-{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
-{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from "../macros/newFacialImageButton.njk" import newFacialImageButton %}
-{% extends "../partials/layout.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "macros/newFacialImageButton.njk" import newFacialImageButton %}
+{% extends "partials/layout.njk" %}
+
 {% set photoHref = "/prisoner/" + prisonerNumber + "/image" + ("?referer=" + referer if referer) %}
 {% block content %}
   <div class="govuk-grid-row">
