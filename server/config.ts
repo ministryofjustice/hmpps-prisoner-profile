@@ -21,11 +21,17 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 const requiredInProduction = { requireInProduction: true }
 
 const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
-  timeout: 60000, // the rest client already implements a shorter timeout, hence 60s
-  errorThresholdPercentage: 80, // % of failures before opening the circuit
-  resetTimeout: 120000, // time to wait before attempting to half-open the circuit
-  rollingCountTimeout: 300000, // the time window to consider requests over
-  volumeThreshold: 5, // circuit will stay closed regardless of failures if there is less than this many requests in the window
+  // the rest client already implements a shorter timeout, hence 60s
+  timeout: 60000,
+  // % of failures before opening the circuit
+  errorThresholdPercentage: Number(get('CIRCUIT_BREAKER_DEFAULT_THRESHOLD', 80)),
+  // time to wait before attempting to half-open the circuit
+  resetTimeout: Number(get('CIRCUIT_BREAKER_DEFAULT_RESET_TIME', 120000)),
+  // the time window to consider requests over
+  rollingCountTimeout: Number(get('CIRCUIT_BREAKER_DEFAULT_TIME_WINDOW', 300000)),
+  // circuit will stay closed regardless of failures if there is less than this many requests in the window
+  volumeThreshold: Number(get('CIRCUIT_BREAKER_DEFAULT_VOLUME_THRESHOLD', 5)),
+  // ignore 404s
   errorFilter: (error: SanitisedError<unknown>) => error?.responseStatus === 404,
 }
 
