@@ -5,7 +5,6 @@
   {% include "./appInsightsWebTracking.njk" %}
 
   <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
-  <script src="/assets/js/jquery.min.js"></script>
 
   {% for js in feComponents.jsIncludes %}
     <script src="{{ js }}" nonce="{{ cspNonce }}"></script>

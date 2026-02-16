@@ -20,7 +20,6 @@ export default function setUpStaticResources(): Router {
     '/node_modules/govuk-frontend/dist',
     '/node_modules/@ministryofjustice/frontend/moj/assets',
     '/node_modules/@ministryofjustice/frontend',
-    '/node_modules/jquery/dist',
     '/node_modules/@microsoft/applicationinsights-web/dist/es5',
     '/node_modules/@microsoft/applicationinsights-clickanalytics-js/dist/es5',
   ).forEach(dir => {
@@ -29,10 +28,6 @@ export default function setUpStaticResources(): Router {
 
   Array.of('/node_modules/govuk_frontend_toolkit/images').forEach(dir => {
     router.use('/assets/images/icons', express.static(path.join(process.cwd(), dir), staticResourcesConfig))
-  })
-
-  Array.of('/node_modules/jquery/dist/jquery.min.js').forEach(dir => {
-    router.use('/assets/js/jquery.min.js', express.static(path.join(process.cwd(), dir), staticResourcesConfig))
   })
 
   // Don't cache dynamic resources
