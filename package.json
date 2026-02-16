@@ -67,7 +67,7 @@
     "govuk-frontend": "5.14.0",
     "helmet": "^8.1.0",
     "http-errors": "^2.0.1",
-    "jquery": "3.7.1",
+    "jquery": "4.0.0",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "1.12.36",
     "multer": "^2.0.2",
