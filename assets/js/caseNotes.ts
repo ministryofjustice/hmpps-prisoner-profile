@@ -1,3 +1,5 @@
+import type { SelectOption } from '../../server/utils/utils'
+
 const WARNING: Record<string, string> = {
   'OMIC.OPEN_COMM':
     'This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.',
@@ -46,15 +48,10 @@ function toggleOpenCaseNoteWarning() {
   }
 }
 
-type TypeSubTypeMap = Record<string, {
-  value: string
-  text: string
-}[]>
-
 function initTypeSubTypeDropdowns() {
   const typeElement = document.getElementById('type') as HTMLSelectElement
   const subTypeElement = document.getElementById('subType') as HTMLSelectElement
-  const typeSubTypeMap: TypeSubTypeMap = JSON.parse(document.getElementById('typeData').textContent)
+  const typeSubTypeMap: Record<string, SelectOption[]> = JSON.parse(document.getElementById('typeData').textContent)
 
   typeElement.addEventListener('change', () => {
     toggleBehaviourPrompts()
@@ -62,7 +59,7 @@ function initTypeSubTypeDropdowns() {
     subTypeElement.length = 1
     if (typeElement.value === '') return
     typeSubTypeMap[typeElement.value]?.forEach(subType => {
-      subTypeElement.add(new Option(subType.text, subType.value))
+      subTypeElement.add(new Option(subType.text, subType.value as string))
     })
   })
 
