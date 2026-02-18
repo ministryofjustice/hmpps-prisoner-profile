@@ -98,6 +98,7 @@ export const services = () => {
     authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
     logger,
     telemetryClient,
+    readOnly: config.readOnlyProfile,
   })
 
   const metricsService = new MetricsService(telemetryClient)

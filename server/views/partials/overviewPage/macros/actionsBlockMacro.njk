@@ -1,18 +1,20 @@
 {% macro actionsBlock(actions, actionsMayBeMissing) %}
-  <div class="hmpps-actions-block govuk-!-margin-bottom-5">
-    <h2 class="govuk-heading-m">Actions</h2>
-    {% if actionsMayBeMissing %}
-      <p class="hmpps-action-api-error-inset" data-qa="actions-unavailable">
-        Some actions are currently unavailable. Try again later.
-      </p>
-    {% endif %}
-    <ul class="hmpps-actions-block__list">
-      {% for action in actions %}
-      <li>
-        <img src="/assets/images/actions/{{ action.icon }}.svg" aria-hidden="true" alt="" width="40" height="40" />
-        <a href="{{ action.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ action.dataQA }}" referrerpolicy="no-referrer-when-downgrade">{{ action.text }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
+  {% if actions.length > 0 %}
+    <div class="hmpps-actions-block govuk-!-margin-bottom-5">
+      <h2 class="govuk-heading-m">Actions</h2>
+      {% if actionsMayBeMissing %}
+        <p class="hmpps-action-api-error-inset" data-qa="actions-unavailable">
+          Some actions are currently unavailable. Try again later.
+        </p>
+      {% endif %}
+      <ul class="hmpps-actions-block__list">
+        {% for action in actions %}
+        <li>
+          <img src="/assets/images/actions/{{ action.icon }}.svg" aria-hidden="true" alt="" width="40" height="40" />
+          <a href="{{ action.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ action.dataQA }}" referrerpolicy="no-referrer-when-downgrade">{{ action.text }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 {% endmacro %}

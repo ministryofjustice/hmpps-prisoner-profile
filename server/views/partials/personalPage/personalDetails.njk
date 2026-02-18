@@ -389,10 +389,12 @@
                         </div>
                     </dd>
                     <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                          href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.value[0].militarySeq }}">
-                            Change<span class="govuk-visually-hidden"> service information</span>
-                        </a>
+                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                            <a class="govuk-link govuk-link--no-visited-state"
+                              href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.value[0].militarySeq }}">
+                                Change<span class="govuk-visually-hidden"> service information</span>
+                            </a>
+                        {% endif %}
                     </dd>
                 </div>
 
@@ -409,9 +411,11 @@
                         </div>
                     </dd>
                     <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                          href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                    class="govuk-visually-hidden"> conflict</span></a>
+                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                            <a class="govuk-link govuk-link--no-visited-state"
+                              href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                        class="govuk-visually-hidden"> conflict</span></a>
+                        {% endif %}
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row  govuk-!-border-none">
@@ -427,9 +431,11 @@
                         </div>
                     </dd>
                     <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                          href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                    class="govuk-visually-hidden"> disciplinary action</span></a>
+                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                            <a class="govuk-link govuk-link--no-visited-state"
+                              href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                        class="govuk-visually-hidden"> disciplinary action</span></a>
+                        {% endif %}
                     </dd>
                 </div>
                 <div class="govuk-summary-list__row govuk-!-border-none">
@@ -449,9 +455,11 @@
                         </div>
                     </dd>
                     <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                          href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                    class="govuk-visually-hidden"> discharge</span></a>
+                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                            <a class="govuk-link govuk-link--no-visited-state"
+                              href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                                        class="govuk-visually-hidden"> discharge</span></a>
+                        {% endif %}
                     </dd>
                 </div>
             </dl>
