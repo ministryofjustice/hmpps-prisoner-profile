@@ -44,44 +44,62 @@ describe('buildOverviewActions', () => {
   })
 
   describe('Add key worker session', () => {
-    it.each([true, false])('When user is a keyworker: %s', (keyworker: boolean) => {
-      const resp = buildOverviewActions(
-        PrisonerMockDataA,
-        pathfinderNominal,
-        socNominal,
-        prisonUserMock,
-        config,
-        {
-          services: keyworker ? [{ id: 'my-key-worker-allocations', navEnabled: true }] : [],
-        } as HeaderFooterSharedData,
-        {} as PrisonerPermissions,
-      )
-      expect(
-        !!resp.find(action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA`),
-      ).toEqual(keyworker)
-    })
+    test.each`
+      permissionGranted | availableServices                                           | visible
+      ${true}           | ${[{ id: 'my-key-worker-allocations', navEnabled: true }]}  | ${true}
+      ${true}           | ${[{ id: 'my-key-worker-allocations', navEnabled: false }]} | ${false}
+      ${false}          | ${[{ id: 'my-key-worker-allocations', navEnabled: true }]}  | ${false}
+    `(
+      'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see "Add key worker session": $visible',
+      ({ permissionGranted, availableServices, visible }) => {
+        mockPermissions({ [CaseNotesPermission.edit]: permissionGranted })
+
+        const resp = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          prisonUserMock,
+          config,
+          { services: availableServices } as HeaderFooterSharedData,
+          permissions,
+        )
+
+        expect(
+          !!resp.find(action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=KA`),
+        ).toEqual(visible)
+      },
+    )
   })
 
   describe('Add personal officer entry', () => {
-    it.each([true, false])('When user is a personal officer: %s', (personalOfficer: boolean) => {
-      const resp = buildOverviewActions(
-        PrisonerMockDataA,
-        pathfinderNominal,
-        socNominal,
-        prisonUserMock,
-        config,
-        {
-          services: personalOfficer ? [{ id: 'my-personal-officer-allocations', navEnabled: true }] : [],
-        } as HeaderFooterSharedData,
-        {} as PrisonerPermissions,
-      )
-      expect(
-        !!resp.find(
-          action =>
-            action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=REPORT&subType=POE`,
-        ),
-      ).toEqual(personalOfficer)
-    })
+    test.each`
+      permissionGranted | availableServices                                                 | visible
+      ${true}           | ${[{ id: 'my-personal-officer-allocations', navEnabled: true }]}  | ${true}
+      ${true}           | ${[{ id: 'my-personal-officer-allocations', navEnabled: false }]} | ${false}
+      ${false}          | ${[{ id: 'my-personal-officer-allocations', navEnabled: true }]}  | ${false}
+    `(
+      'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see "Add personal officer entry": $visible',
+      ({ permissionGranted, availableServices, visible }) => {
+        mockPermissions({ [CaseNotesPermission.edit]: permissionGranted })
+
+        const resp = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          prisonUserMock,
+          config,
+          { services: availableServices } as HeaderFooterSharedData,
+          permissions,
+        )
+
+        expect(
+          !!resp.find(
+            action =>
+              action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note?type=REPORT&subType=POE`,
+          ),
+        ).toEqual(visible)
+      },
+    )
   })
 
   describe('Log an activity application', () => {
@@ -256,7 +274,7 @@ describe('buildOverviewActions', () => {
     `(
       'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see Make CSIP referral: $visible',
       ({ permissionGranted, availableServices, visible }) => {
-        mockPermissions({ [PersonInterventionsPermission.read_csip]: permissionGranted })
+        mockPermissions({ [PersonInterventionsPermission.edit_csip]: permissionGranted })
 
         const resp = buildOverviewActions(
           PrisonerMockDataA,
