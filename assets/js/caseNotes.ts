@@ -12,7 +12,9 @@ function toggleBehaviourPrompts() {
   const behaviourPromptsNeg = document.querySelector<HTMLDetailsElement>('.case-notes-behaviour-prompt--neg')
   const typeElement = document.getElementById('type') as HTMLSelectElement
 
-  if (!(behaviourPromptsPos || behaviourPromptsNeg)) return
+  if (!behaviourPromptsPos || !behaviourPromptsNeg) {
+    return
+  }
 
   behaviourPromptsPos.classList.remove('is-visible')
   behaviourPromptsNeg.classList.remove('is-visible')
