@@ -75,7 +75,7 @@
     "opossum": "^9.0.0",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^5.10.0",
+    "redis": "^5.11.0",
     "superagent": "^10.3.0",
     "url-value-parser": "^2.2.0"
   },
