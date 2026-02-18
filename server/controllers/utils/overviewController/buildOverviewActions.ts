@@ -43,7 +43,10 @@ export default (
     })
   }
 
-  if (isServiceNavEnabled('my-key-worker-allocations', feComponentsSharedData)) {
+  if (
+    isGranted(CaseNotesPermission.edit, permissions) &&
+    isServiceNavEnabled('my-key-worker-allocations', feComponentsSharedData)
+  ) {
     actions.push({
       text: 'Add key worker session',
       icon: ActionIcon.AddKeyWorkerSession,
@@ -52,7 +55,10 @@ export default (
     })
   }
 
-  if (isServiceNavEnabled('my-personal-officer-allocations', feComponentsSharedData)) {
+  if (
+    isGranted(CaseNotesPermission.edit, permissions) &&
+    isServiceNavEnabled('my-personal-officer-allocations', feComponentsSharedData)
+  ) {
     actions.push({
       text: 'Add personal officer entry',
       icon: ActionIcon.AddKeyWorkerSession,
@@ -122,7 +128,7 @@ export default (
   }
 
   if (
-    isGranted(PersonInterventionsPermission.read_csip, permissions) &&
+    isGranted(PersonInterventionsPermission.edit_csip, permissions) &&
     isServiceNavEnabled('csipUI', feComponentsSharedData)
   ) {
     actions.push({

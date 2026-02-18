@@ -12,7 +12,6 @@ import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
-import { isServiceEnabled } from '../utils/isServiceEnabled'
 import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
@@ -87,7 +86,6 @@ export default class CaseNotesController {
         typeSubTypeMap,
         showingAll,
         addCaseNoteLinkUrl: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
-        canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponents?.sharedData),
       })
     }
   }

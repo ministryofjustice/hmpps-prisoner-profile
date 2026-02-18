@@ -7,7 +7,7 @@
     <div class="govuk-grid-column-full">
         <div class="hmpps-case-note-card-list" role="list">
             {% for caseNote in pagedCaseNotes.content %}
-                {% set showAddMoreDetailsLink = canAddMoreDetails or user.staffId == caseNote.authorUserId or user.username == caseNote.authorUserId %}
+                {% set showAddMoreDetailsLink = isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
                 {{ caseNoteCard(caseNote, showAddMoreDetailsLink) }}
             {% endfor %}
         </div>
@@ -25,4 +25,3 @@
     </div>
 </div>
 {{ hmppsPagedListFooter(listMetadata) }}
-

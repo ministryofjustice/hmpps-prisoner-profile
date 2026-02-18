@@ -53,13 +53,6 @@ context('Case Notes Page', () => {
         .get('.hmpps-case-note-card-list-item:nth-of-type(3) [data-qa="case-notes-add-more-details-link"]')
     })
 
-    it('Does not display the add more details link for case notes authored by somebody else', () => {
-      caseNotesPage
-        .caseNotesList()
-        .get('.hmpps-case-note-card-list-item:nth-of-type(4) [data-qa="case-notes-add-more-details-link"]')
-        .should('not.exist')
-    })
-
     it('Displays the list with 20 items', () => {
       caseNotesPage.caseNotesList().children().should('have.length', 20)
     })

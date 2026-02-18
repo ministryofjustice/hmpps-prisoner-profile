@@ -407,4 +407,5 @@ export default {
     dsn: get('SENTRY_DSN', null, requiredInProduction),
     environment: get('SENTRY_ENVIRONMENT', 'local'),
   },
+  readOnlyProfile: toBoolean(get('READ_ONLY_PROFILE', 'false')),
 }
