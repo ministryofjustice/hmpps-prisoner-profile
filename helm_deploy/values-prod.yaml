@@ -122,7 +122,7 @@ generic-service:
       - home_office
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-prisoner-profile-prod
+  alertSeverity: hmpps-connect-dps-prod # sent to #connect-dps-prod-alerts
 
   elastiCacheAlertsClusterIds:
     cp-15ac40963e3a4fbf-001: 'HMPPS Prisoner Profile ElastiCache Cluster Node 1'
