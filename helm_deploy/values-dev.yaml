@@ -128,7 +128,7 @@ generic-service:
     shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-prisoner-profile-non-prod
+  alertSeverity: hmpps-connect-dps-non-prod # sent to #connect-dps-non-prod-alerts
   businessHoursOnly: true
 
   elastiCacheAlertsClusterIds:
