@@ -133,6 +133,12 @@ describe('Visits controller', () => {
           })
         },
       )
+
+      it.each(['fromDate', 'fromDate'])('should not filter when %s is invalid', async field => {
+        req.query[field] = 'today'
+        await controller.visitsDetails()(req, res, next)
+        expect(visitsService.getVisits).toHaveBeenCalledWith('CLIENT_TOKEN', PrisonerMockDataA, {})
+      })
     })
   })
 })

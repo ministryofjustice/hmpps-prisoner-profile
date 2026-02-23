@@ -7,6 +7,7 @@ import { compareStrings, generateListMetadata, hasLength } from '../utils/utils'
 import PrisonDetails from '../data/interfaces/prisonApi/PrisonDetails'
 import { VisitType } from '../data/interfaces/prisonApi/VisitWithVisitors'
 import { parseDate } from '../utils/dateHelpers'
+import validateDateRange from '../utils/validateDateRange'
 
 export const VISIT_TYPES = [
   { value: 'SCON', text: 'Social' },
@@ -43,6 +44,11 @@ const visitReasonsToDropdown = (cancellationReasons: ReferenceCode[], completion
     ])
 
 const calculateDateAndStatusFilter = (status: string, fromDate: string, toDate: string) => {
+  const errors = validateDateRange(fromDate, toDate)
+  if (hasLength(errors)) {
+    return { errors }
+  }
+
   const fromAsDate = fromDate ? parseDate(fromDate) : undefined
   const toAsDate = toDate ? parseDate(toDate) : undefined
 
@@ -67,7 +73,7 @@ export class VisitsController {
       const fromDateString = req.query.fromDate as string
       const toDateString = req.query.toDate as string
 
-      const { visitStatus, cancellationReason, fromAsDate, toAsDate } = calculateDateAndStatusFilter(
+      const { errors, visitStatus, cancellationReason, fromAsDate, toAsDate } = calculateDateAndStatusFilter(
         visitStatusString,
         fromDateString,
         toDateString,
@@ -85,6 +91,9 @@ export class VisitsController {
       const { completionReasons, cancellationReasons, prisons, visitsWithPaginationInfo } =
         await this.visitsService.getVisits(clientToken, prisonerData, queryParams)
 
+      const hasNoVisitsForQuery =
+        hasLength(errors) || (!hasLength(visitsWithPaginationInfo.content) && hasLength(Object.keys(queryParams)))
+
       return res.render('pages/visitsDetails', {
         pageTitle: 'Visits details',
         statuses: visitReasonsToDropdown(cancellationReasons, completionReasons),
@@ -99,6 +108,7 @@ export class VisitsController {
           },
         ],
         prisons: prisonsToDropdown(prisons),
+        errors,
         listMetadata: generateListMetadata(
           visitsWithPaginationInfo,
           { ...queryParams, fromDate: fromDateString, toDate: toDateString, page: undefined }, // Remove page param before generating metadata as this value come from API
@@ -109,7 +119,7 @@ export class VisitsController {
           ...visit,
           visitors: this.visitsService.sortVisitors(visit.visitors),
         })),
-        hasNoVisitsForQuery: !hasLength(visitsWithPaginationInfo.content) && hasLength(Object.keys(queryParams)),
+        hasNoVisitsForQuery,
         hasVisits: hasLength(visitsWithPaginationInfo.content),
       })
     }

@@ -40,7 +40,7 @@
         }) }}
 
         {{ mojDatePicker({
-            id: "fromDate",
+            id: "startDate",
             name: "fromDate",
             label: {
                 text: "Date from (earliest)",
@@ -49,12 +49,12 @@
             hint: {
                 text: "For example, 31/3/2022"
             },
-            errorMessage: errors | findError('fromDate'),
+            errorMessage: errors | findError('startDate'),
             value: listMetadata.filtering.fromDate
         }) }}
 
         {{ mojDatePicker({
-            id: "toDate",
+            id: "endDate",
             name: "toDate",
             label: {
                 text: "Date to (latest)",
@@ -63,7 +63,7 @@
             hint: {
                 text: "For example, 31/3/2023"
             },
-            errorMessage: errors | findError('toDate'),
+            errorMessage: errors | findError('endDate'),
             value: listMetadata.filtering.toDate
         }) }}
     </div>
