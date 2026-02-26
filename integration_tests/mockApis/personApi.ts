@@ -3,6 +3,17 @@ import { stubFor } from './wiremock'
 import { PersonRecord } from '../../server/data/personApiClient'
 
 export default {
+  stubPersonApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/person/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
+
   stubPersonApiGetRecord: ({
     prisonerNumber,
     prisonNumbers = [],

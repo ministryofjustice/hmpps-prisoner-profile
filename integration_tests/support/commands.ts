@@ -318,6 +318,7 @@ Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
   cy.task('stubLocationsInsidePrisonApiPing', httpStatus)
   cy.task('stubNomisSyncPrisonerMappingApiPing', httpStatus)
   cy.task('stubBookAVideoLinkPing', httpStatus)
+  cy.task('stubPersonApiPing', httpStatus)
 })
 
 Cypress.Commands.add(
