@@ -106,6 +106,7 @@ PERSON_INTEGRATION_API_URL=https://person-integration-api-dev.hmpps.service.just
 PERSONAL_RELATIONSHIPS_API_URL=https://personal-relationships-api-dev.hmpps.service.justice.gov.uk
 CSIP_API_URL=https://csip-api-dev.hmpps.service.justice.gov.uk
 SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL=https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk
+PERSON_API_URL=https://hmpps-person-record-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>
