@@ -1,6 +1,11 @@
 import { TelemetryClient } from 'applicationinsights'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 
+export interface DuplicatePrisonerInfo {
+  prisonerNumber: string
+  prisonId: string
+}
+
 export default class MetricsService {
   constructor(private readonly telemetryClient?: TelemetryClient) {}
 
@@ -129,6 +134,73 @@ export default class MetricsService {
         username: user.username,
         activeCaseLoad: user.activeCaseLoadId,
         error,
+      },
+    })
+  }
+
+  trackDuplicateRecordsFound(
+    prisonerNumber: string,
+    prisonId: string,
+    duplicatesFound: DuplicatePrisonerInfo[],
+    user: PrisonUser,
+  ) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-duplicate-records-found',
+      properties: {
+        prisonerNumber,
+        prisonId,
+        duplicatesFound: JSON.stringify(duplicatesFound),
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+      },
+    })
+  }
+
+  trackDuplicateRecordsGhostEstablishmentFiltered(
+    prisonerNumber: string,
+    prisonId: string,
+    duplicatesRemoved: DuplicatePrisonerInfo[],
+    user: PrisonUser,
+  ) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-duplicate-records-ghost-establishment-filtered',
+      properties: {
+        prisonerNumber,
+        prisonId,
+        duplicatesRemoved: JSON.stringify(duplicatesRemoved),
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+      },
+    })
+  }
+
+  trackDuplicateRecordsMultipleActiveFiltered(
+    prisonerNumber: string,
+    prisonId: string,
+    duplicatesRemoved: DuplicatePrisonerInfo[],
+    user: PrisonUser,
+  ) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-duplicate-records-multiple-active-filtered',
+      properties: {
+        prisonerNumber,
+        prisonId,
+        duplicatesRemoved: JSON.stringify(duplicatesRemoved),
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+      },
+    })
+  }
+
+  trackDuplicateRecordsApiFailure(prisonerNumber: string, prisonId: string, error: Error, user: PrisonUser) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-duplicate-records-api-failure',
+      properties: {
+        prisonerNumber,
+        prisonId,
+        error: error.message,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
       },
     })
   }

@@ -43,6 +43,7 @@ import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApi
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
+import PersonApiRestClient from './personApiClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
@@ -90,6 +91,7 @@ const circuitBreakers = {
     'supportForAdditionalNeedsApi',
     config.apis.supportForAdditionalNeeds,
   ),
+  personApi: circuitBreakerBuilder('personApi', config.apis.personApi),
 }
 
 export const dataAccess = {
@@ -148,6 +150,7 @@ export const dataAccess = {
     new PrisonerProfileApiRestClient(token, circuitBreakers.prisonerProfile),
   personalRelationshipsApiClientBuilder: (token: string) =>
     new PersonalRelationshipsApiRestClient(token, circuitBreakers.personalRelationships),
+  personApiClientBuilder: (token: string) => new PersonApiRestClient(token, circuitBreakers.personApi),
   tokenStore,
 }
 

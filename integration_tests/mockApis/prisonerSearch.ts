@@ -1,3 +1,4 @@
+import { stubGetWithBody, stubPostWithResponse } from './utils'
 import { stubFor } from './wiremock'
 import { PrisonerMockDataA, PrisonerOnRemandMockData } from '../../server/data/localMockData/prisoner'
 import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
@@ -33,18 +34,26 @@ export default {
       jsonResp = { ...PrisonerOnRemandMockData, prisonerNumber: 'X9999XX', bookingId: 1234568, restrictedPatient }
     }
     jsonResp = { ...jsonResp, prisonId: restrictedPatient ? 'OUT' : jsonResp.prisonId, ...overrides }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: url,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: jsonResp,
-      },
+    return stubGetWithBody({
+      path: url,
+      body: jsonResp,
     })
   },
+
+  stubPrisonerSearchFindByNumbers: ({ prisoners }: { prisoners: Prisoner[] }) =>
+    stubPostWithResponse({
+      path: '/prisonersearch/prisoner-numbers',
+      responseBody: prisoners,
+    }),
+
+  stubPrisonerSearchFindByNumbersError: () =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: '/prisonersearch/prisoner-numbers',
+      },
+      response: {
+        status: 500,
+      },
+    }),
 }

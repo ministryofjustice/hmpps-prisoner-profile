@@ -12,14 +12,17 @@ describe('Prisoner search service', () => {
 
   describe('getUser', () => {
     it('Retrieves prisoner', async () => {
-      prisonerSearchClientSpy = { getPrisonerDetails: jest.fn(async () => PrisonerMockDataA) }
+      prisonerSearchClientSpy = { getPrisonerDetails: jest.fn(async () => PrisonerMockDataA), findByNumbers: jest.fn() }
       prisonerSearchService = new PrisonerSearchService(() => prisonerSearchClientSpy)
       const result = await prisonerSearchService.getPrisonerDetails('', prisonerNumber)
       expect(result.croNumber).toEqual('400862/08W')
     })
 
     it('Propagates error', async () => {
-      prisonerSearchClientSpy = { getPrisonerDetails: jest.fn().mockRejectedValue(new Error('some error')) }
+      prisonerSearchClientSpy = {
+        getPrisonerDetails: jest.fn().mockRejectedValue(new Error('some error')),
+        findByNumbers: jest.fn(),
+      }
       prisonerSearchService = new PrisonerSearchService(() => prisonerSearchClientSpy)
       await expect(prisonerSearchService.getPrisonerDetails('', prisonerNumber)).rejects.toEqual(
         new Error('some error'),

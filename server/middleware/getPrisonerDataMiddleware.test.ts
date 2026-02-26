@@ -57,6 +57,7 @@ describe('GetPrisonerDataMiddleware', () => {
     next = jest.fn()
     prisonerSearchApiClient = {
       getPrisonerDetails: jest.fn(async () => PrisonerMockDataA),
+      findByNumbers: jest.fn(),
     }
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
