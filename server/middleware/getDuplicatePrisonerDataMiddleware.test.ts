@@ -203,15 +203,6 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       expect(req.middleware.duplicatePrisonerData).toEqual([])
       expect(next).toHaveBeenCalled()
     })
-
-    it('should handle non-array prisoner search results', async () => {
-      prisonerSearchClient.findByNumbers = jest.fn(async () => null as unknown as Prisoner[])
-
-      await getDuplicatePrisonerData(services)(req, res, next)
-
-      expect(req.middleware.duplicatePrisonerData).toEqual([])
-      expect(next).toHaveBeenCalled()
-    })
   })
 
   describe('GHI filtering', () => {

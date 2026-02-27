@@ -117,11 +117,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
   }
 
   async getBookingContacts(bookingId: number): Promise<ContactDetail> {
-    try {
-      return await this.get({ path: `/api/bookings/${bookingId}/contacts` }, this.token)
-    } catch (error) {
-      return error
-    }
+    return this.get({ path: `/api/bookings/${bookingId}/contacts` }, this.token)
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {
@@ -144,16 +140,12 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     prisonerNumber: string,
     earliestEndDate: string,
   ): Promise<OffenderActivitiesHistory> {
-    try {
-      return await this.get(
-        {
-          path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
-        },
-        this.token,
-      )
-    } catch (error) {
-      return error
-    }
+    return this.get(
+      {
+        path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
+      },
+      this.token,
+    )
   }
 
   async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
@@ -187,11 +179,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
   }
 
   async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
-    try {
-      return this.get({ path: `/api/offenders/${prisonerNumber}/sentences` }, this.token)
-    } catch (error) {
-      return error
-    }
+    return this.get({ path: `/api/offenders/${prisonerNumber}/sentences` }, this.token)
   }
 
   // NB: This can return 404 for released prisoners

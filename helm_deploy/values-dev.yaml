@@ -84,13 +84,14 @@ generic-service:
     PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api-dev.hmpps.service.justice.gov.uk"
     PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-dev.hmpps.service.justice.gov.uk"
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk"
-    
+    PERSON_API_URL: "https://hmpps-person-record-dev.hmpps.service.justice.gov.uk"
+
     # Circuit Breaker
     CIRCUIT_BREAKER_DEFAULT_THRESHOLD: 80
     CIRCUIT_BREAKER_DEFAULT_RESET_TIME: 120000
     CIRCUIT_BREAKER_DEFAULT_TIME_WINDOW: 300000
     CIRCUIT_BREAKER_DEFAULT_VOLUME_THRESHOLD: 5
-    
+
     # Feature flags
     AUDIT_ENABLED: "true"
     COMPONENT_API_LATEST: "true"
@@ -113,6 +114,7 @@ generic-service:
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
     PERSON_ENDPOINTS_ENABLED: "true"
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "true"
+    PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS: "KMI,LEI,MDI"
 
   allowlist:
     groups:

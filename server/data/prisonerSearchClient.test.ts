@@ -1,6 +1,6 @@
 import nock from 'nock'
 import config from '../config'
-import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisoner'
+import { PrisonerMockDataA } from './localMockData/prisoner'
 import PrisonerSearchClient from './prisonerSearchClient'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -30,14 +30,13 @@ describe('prisonerSearchClient', () => {
       expect(output).toEqual(PrisonerMockDataA)
     })
 
-    it('should not return data from api', async () => {
+    it('should propagate errors from api', async () => {
       fakePrisonerSearchApi
-        .get('/prisoner/123123d')
+        .get('/prisoner/A8469DY')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, PrisonerMockDataB)
+        .reply(404)
 
-      const output = await prisonerSearchClient.getPrisonerDetails('123123123')
-      expect(output).not.toEqual(PrisonerMockDataB)
+      await expect(prisonerSearchClient.getPrisonerDetails('A8469DY')).rejects.toThrow()
     })
   })
 })

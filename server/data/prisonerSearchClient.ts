@@ -10,26 +10,18 @@ export default class PrisonerSearchRestClient extends RestClient implements Pris
   }
 
   async getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
-    try {
-      const prisonerData = await this.get<Prisoner>({ path: `/prisoner/${prisonerNumber}` }, this.token)
-      return {
-        ...prisonerData,
-        bookingId: prisonerData.bookingId ? +prisonerData.bookingId : undefined,
-      }
-    } catch (error) {
-      return error
+    const prisonerData = await this.get<Prisoner>({ path: `/prisoner/${prisonerNumber}` }, this.token)
+    return {
+      ...prisonerData,
+      bookingId: prisonerData.bookingId ? +prisonerData.bookingId : undefined,
     }
   }
 
   async findByNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
-    try {
-      const prisonerData = await this.post<Prisoner[]>(
-        { path: `/prisoner-numbers`, data: { prisonerNumbers } },
-        this.token,
-      )
-      return Array.isArray(prisonerData) ? prisonerData : []
-    } catch (error) {
-      return error
-    }
+    const prisonerData = await this.post<Prisoner[]>(
+      { path: `/prisoner-numbers`, data: { prisonerNumbers } },
+      this.token,
+    )
+    return Array.isArray(prisonerData) ? prisonerData : []
   }
 }

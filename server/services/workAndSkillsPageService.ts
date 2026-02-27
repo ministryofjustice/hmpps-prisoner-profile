@@ -119,7 +119,7 @@ export default class WorkAndSkillsPageService {
       today,
     )
     const activitiesHistory: GovSummaryItem[] = []
-    if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content?.length) {
+    if (offenderActivitiesHistory.content?.length) {
       offenderActivitiesHistory.content.forEach(content => {
         const item = {
           key: { text: content.description },

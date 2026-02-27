@@ -43,11 +43,6 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
       const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
       const prisonerSearchResults = await prisonerSearchClient.findByNumbers(personRecord.identifiers.prisonNumbers)
 
-      if (!Array.isArray(prisonerSearchResults)) {
-        req.middleware = { ...req.middleware, duplicatePrisonerData: [] }
-        return next()
-      }
-
       const originalPrisonId =
         prisonerSearchResults.find((p: Prisoner) => p.prisonerNumber === prisonerNumber)?.prisonId ||
         user.activeCaseLoadId
