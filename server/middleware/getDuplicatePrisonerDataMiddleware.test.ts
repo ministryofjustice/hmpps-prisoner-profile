@@ -54,7 +54,7 @@ const mockPrisoners: Prisoner[] = [
 describe('GetDuplicatePrisonerDataMiddleware', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    ;(featureFlags.personDuplicateRecordsEnabled as jest.Mock).mockReturnValue(true)
+    jest.mocked(featureFlags).personDuplicateRecordsEnabled.mockReturnValue(true)
 
     req = {
       middleware: {
@@ -92,7 +92,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
   describe('Feature flag', () => {
     it('should set empty array and skip API calls when disabled', async () => {
-      ;(featureFlags.personDuplicateRecordsEnabled as jest.Mock).mockReturnValue(false)
+      jest.mocked(featureFlags).personDuplicateRecordsEnabled.mockReturnValue(false)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
