@@ -1,4 +1,10 @@
-export const behaviourPrompts = {
+export interface BehaviourPrompt {
+  summary: string
+  text: string
+  gaId: string
+}
+
+export const behaviourPrompts: Record<'pos' | 'neg', BehaviourPrompt[]> = {
   pos: [
     {
       summary: 'Why recognise positive behaviour?',
@@ -54,5 +60,3 @@ export const behaviourPrompts = {
     },
   ],
 }
-
-export default { behaviourPrompts }

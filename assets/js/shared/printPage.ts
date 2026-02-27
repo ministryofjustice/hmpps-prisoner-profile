@@ -5,6 +5,6 @@ export function printPage(): void {
     el.addEventListener('click', evt => {
       evt.preventDefault()
       window.print()
-    })
+    }),
   )
 }

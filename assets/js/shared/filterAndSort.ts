@@ -1,6 +1,8 @@
 import type { Source } from 'accessible-autocomplete'
 
-export function filterAndSort(options: string[]): Source {
+type NotStringArray<T> = T extends string[] ? never : T
+
+export function filterAndSort(options: string[]): NotStringArray<Source> {
   const scoreBySubstringIndex = (query: string, option: string): number => {
     const index = option.toLowerCase().indexOf(query.toLowerCase())
     return index === -1 ? Infinity : index
