@@ -18,7 +18,7 @@ const toDuplicateInfo = (prisoner: Prisoner): DuplicatePrisonerInfo => ({
 export default function getDuplicatePrisonerData(services: Services): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { metricsService } = services
-    const { prisonerNumber } = res.locals
+    const { prisonerData } = req.middleware
     const user = res.locals.user as PrisonUser
 
     try {
@@ -27,11 +27,12 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
         return next()
       }
 
-      if (!prisonerNumber) {
+      if (!prisonerData) {
         req.middleware = { ...req.middleware, duplicatePrisonerData: [] }
         return next()
       }
 
+      const { prisonerNumber, prisonId } = prisonerData
       const personApiClient = services.dataAccess.personApiClientBuilder(req.middleware.clientToken)
       const personRecord = await personApiClient.getRecord(prisonerNumber)
 
@@ -43,42 +44,44 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
       const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
       const prisonerSearchResults = await prisonerSearchClient.findByNumbers(personRecord.identifiers.prisonNumbers)
 
-      const originalPrisonId =
-        prisonerSearchResults.find((p: Prisoner) => p.prisonerNumber === prisonerNumber)?.prisonId ||
-        user.activeCaseLoadId
-      let duplicates = prisonerSearchResults
-        .filter((p: Prisoner) => p.prisonerNumber && p.prisonerNumber !== prisonerNumber)
-        .map(toDuplicateInfo)
+      const allDuplicates = prisonerSearchResults.filter(
+        (p: Prisoner) => p.prisonerNumber && p.prisonerNumber !== prisonerNumber,
+      )
 
       // Filter out any records held in the ghost establishment GHI (strictly for low-quality data)
-      const ghiDuplicates = duplicates.filter(d => d.prisonId === 'GHI')
+      const ghiDuplicates = allDuplicates.filter(p => p.prisonId === 'GHI')
       if (ghiDuplicates.length > 0) {
         metricsService.trackDuplicateRecordsGhostEstablishmentFiltered(
           prisonerNumber,
-          originalPrisonId,
-          ghiDuplicates,
+          prisonId,
+          ghiDuplicates.map(toDuplicateInfo),
           user,
         )
-        duplicates = duplicates.filter(d => d.prisonId !== 'GHI')
       }
+      const nonGhiDuplicates = allDuplicates.filter(p => p.prisonId !== 'GHI')
 
       // Filter out all duplicates when 2+ are active and flag a data-quality issue
       const totalActiveCount =
-        (isActiveStatus(originalPrisonId) ? 1 : 0) + duplicates.filter(d => isActiveStatus(d.prisonId)).length
+        (isActiveStatus(prisonId) ? 1 : 0) + nonGhiDuplicates.filter(p => isActiveStatus(p.prisonId)).length
       if (totalActiveCount >= 2) {
-        metricsService.trackDuplicateRecordsMultipleActiveFiltered(prisonerNumber, originalPrisonId, duplicates, user)
-        duplicates = []
+        metricsService.trackDuplicateRecordsMultipleActiveFiltered(
+          prisonerNumber,
+          prisonId,
+          nonGhiDuplicates.map(toDuplicateInfo),
+          user,
+        )
       }
+      const duplicates = totalActiveCount >= 2 ? [] : nonGhiDuplicates
 
       if (duplicates.length > 0) {
-        metricsService.trackDuplicateRecordsFound(prisonerNumber, originalPrisonId, duplicates, user)
+        metricsService.trackDuplicateRecordsFound(prisonerNumber, prisonId, duplicates.map(toDuplicateInfo), user)
       }
 
-      req.middleware = { ...req.middleware, duplicatePrisonerData: duplicates.map(d => d.prisonerNumber) }
+      req.middleware = { ...req.middleware, duplicatePrisonerData: duplicates }
       return next()
     } catch (error) {
-      logger.error(error, `Failed to retrieve duplicate prisoner data for: ${prisonerNumber}`)
-      metricsService.trackDuplicateRecordsApiFailure(prisonerNumber, user.activeCaseLoadId, error, user)
+      logger.error(error, `Failed to retrieve duplicate prisoner data for: ${prisonerData?.prisonerNumber}`)
+      metricsService.trackDuplicateRecordsApiFailure(prisonerData?.prisonerNumber, prisonerData?.prisonId, error, user)
 
       res.locals.duplicateRecordApiFailure = true
       req.middleware = { ...req.middleware, duplicatePrisonerData: [] }

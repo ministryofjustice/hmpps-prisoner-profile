@@ -59,12 +59,12 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
+        prisonerData: createTestPrisoner('A1234BC', 'MDI'),
       },
     } as unknown as Request
 
     res = {
       locals: {
-        prisonerNumber: 'A1234BC',
         user: mockUser,
       },
     } as unknown as Response
@@ -106,14 +106,14 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
-      expect(req.middleware.duplicatePrisonerData).toEqual(['B5678DE', 'C9012FG'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([mockPrisoners[1], mockPrisoners[2]])
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('Early exits', () => {
-    it('should set empty array when prisonerNumber is missing from locals', async () => {
-      res.locals.prisonerNumber = undefined
+    it('should set empty array when prisonerData is missing', async () => {
+      req.middleware.prisonerData = undefined
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -156,20 +156,20 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
   })
 
   describe('Happy path', () => {
-    it('should populate duplicatePrisonerData with duplicate prison numbers', async () => {
+    it('should populate duplicatePrisonerData with duplicate prisoners', async () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
       expect(prisonerSearchClient.findByNumbers).toHaveBeenCalledWith(['A1234BC', 'B5678DE', 'C9012FG'])
-      expect(req.middleware.duplicatePrisonerData).toEqual(['B5678DE', 'C9012FG'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([mockPrisoners[1], mockPrisoners[2]])
       expect(next).toHaveBeenCalled()
     })
 
-    it('should exclude the current prisoner number from duplicates', async () => {
+    it('should exclude the current prisoner from duplicates', async () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).not.toContain('A1234BC')
-      expect(req.middleware.duplicatePrisonerData).toEqual(['B5678DE', 'C9012FG'])
+      expect(req.middleware.duplicatePrisonerData.map(p => p.prisonerNumber)).not.toContain('A1234BC')
+      expect(req.middleware.duplicatePrisonerData).toEqual([mockPrisoners[1], mockPrisoners[2]])
     })
 
     it('should track metrics when duplicates are found', async () => {
@@ -217,8 +217,8 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual(['C9012FG'])
-      expect(req.middleware.duplicatePrisonerData).not.toContain('B5678DE')
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithGHI[2]])
+      expect(req.middleware.duplicatePrisonerData.map(p => p.prisonerNumber)).not.toContain('B5678DE')
     })
 
     it('should track metrics when GHI duplicates are filtered', async () => {
@@ -248,7 +248,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual(['D3456HI'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithMultipleGHI[3]])
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -317,12 +317,13 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual(['B5678DE'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithInactiveDuplicates[1]])
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).not.toHaveBeenCalled()
     })
 
     it('should allow duplicates when original is inactive with 1 active duplicate', async () => {
       // Original inactive (OUT) + 1 active duplicate (LEI) = 1 total active → keep
+      req.middleware.prisonerData = createTestPrisoner('A1234BC', 'OUT')
       const prisonersInactiveOriginalOneActiveDuplicate: Prisoner[] = [
         createTestPrisoner('A1234BC', 'OUT'),
         createTestPrisoner('B5678DE', 'LEI'),
@@ -332,12 +333,13 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual(['B5678DE'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersInactiveOriginalOneActiveDuplicate[1]])
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).not.toHaveBeenCalled()
     })
 
     it('should filter all duplicates when original is inactive with 2+ active duplicates', async () => {
       // Original inactive (OUT) + 2 active duplicates = 2 total active → filter
+      req.middleware.prisonerData = createTestPrisoner('A1234BC', 'OUT')
       const prisonersInactiveOriginalMultipleActiveDuplicates: Prisoner[] = [
         createTestPrisoner('A1234BC', 'OUT'),
         createTestPrisoner('B5678DE', 'LEI'),
@@ -440,7 +442,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       // B5678DE filtered as GHI, leaving only inactive duplicates
-      expect(req.middleware.duplicatePrisonerData).toEqual(['C9012FG', 'D3456HI'])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisoners[2], prisoners[3]])
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
