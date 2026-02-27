@@ -329,6 +329,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('SUPPORT_FOR_ADDITIONAL_NEEDS_TIMEOUT_DEADLINE', 5000))),
     },
+    personApi: {
+      url: get('PERSON_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('PERSON_API_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('PERSON_API_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('PERSON_API_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -399,6 +408,7 @@ export default {
     externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
+    personDuplicateRecordsEnabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []),
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
     changeContactDetailsLinkEnabled: toBoolean(get('CHANGE_CONTACT_DETAILS_LINK_ENABLED', 'false')),
   },

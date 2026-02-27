@@ -17,6 +17,7 @@ import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
 import caseNotesRouter from './caseNotesRouter'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import csraRouter from './csraRouter'
@@ -88,6 +89,7 @@ export default function routes(services: Services): Router {
     `/api${basePath}/image`,
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     services.commonApiRoutes.prisonerImage,
   )
@@ -110,6 +112,7 @@ export default function routes(services: Services): Router {
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       return overviewController.displayOverview(req, res)
@@ -120,6 +123,7 @@ export default function routes(services: Services): Router {
     `${basePath}/work-and-skills`,
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),

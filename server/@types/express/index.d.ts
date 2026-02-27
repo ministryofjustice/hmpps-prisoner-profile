@@ -33,6 +33,7 @@ export declare global {
         prisonerData?: Prisoner
         alertSummaryData?: AlertSummaryData
         inmateDetail?: InmateDetail
+        duplicatePrisonerData?: Prisoner[]
         usingGuard?: number
         errors?: { [key: number]: Error[] }
       }
