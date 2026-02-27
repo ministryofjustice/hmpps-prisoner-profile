@@ -15,7 +15,7 @@ declare module 'govuk-frontend/dist/govuk/govuk-frontend-component' {
 
     static elementType: new () => RootElementType = HTMLElement
 
-    protected constructor($root: RootElementType)
+    constructor($root: RootElementType)
 
     /** Returns the root element of the component */
     get $root(): RootElementType
@@ -48,7 +48,7 @@ declare module 'govuk-frontend/dist/govuk/common/configuration' {
 
     static abstract defaults: Config
 
-    protected constructor($root: RootElementType, config?: Config)
+    constructor($root: RootElementType, config?: Config)
 
     [configOverride](param: Config): object
 

@@ -4,7 +4,7 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
-import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
+import { BehaviourPrompt, behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
@@ -15,6 +15,7 @@ import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList
 import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
+import type { SelectOption } from '../utils/utils'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -324,9 +325,9 @@ export default class CaseNotesController {
    * @param onlyActive - if true, filter out types/subtypes where active is true
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const types = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
+    const types: SelectOption[] = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
 
-    const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = caseNoteTypes.reduce(
+    const typeSubTypeMap: Record<string, SelectOption[]> = caseNoteTypes.reduce(
       (ts, t) => ({
         ...ts,
         [t.code]: t.subCodes?.map(s => ({ value: s.code, text: s.description })),
@@ -334,7 +335,7 @@ export default class CaseNotesController {
       {},
     )
 
-    let subTypes: { value: string; text: string }[] = []
+    let subTypes: SelectOption[] = []
     if (type) {
       const selectedType = caseNoteTypes.find(t => t.code === type)
       if (selectedType) {
@@ -359,7 +360,7 @@ export default class CaseNotesController {
         const index = Math.floor(Math.random() * prompts.length)
         return [type, prompts[index]]
       }),
-    )
+    ) as Record<'pos' | 'neg', BehaviourPrompt>
   }
 
   private calculateCaseNoteTotalLength(caseNote: CaseNote): number {
