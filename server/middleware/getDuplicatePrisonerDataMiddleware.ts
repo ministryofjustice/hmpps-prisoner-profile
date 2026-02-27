@@ -35,7 +35,7 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
       const personApiClient = services.dataAccess.personApiClientBuilder(req.middleware.clientToken)
       const personRecord = await personApiClient.getRecord(prisonerNumber)
 
-      if (!personRecord || !personRecord.identifiers?.prisonNumbers) {
+      if (!personRecord || !personRecord.identifiers?.prisonNumbers?.length) {
         req.middleware = { ...req.middleware, duplicatePrisonerData: [] }
         return next()
       }
