@@ -26,6 +26,7 @@ describe('AliasService', () => {
     personIntegrationApiClient = personIntegrationApiClientMock()
     personIntegrationApiClient.getPseudonyms = jest.fn(async () => [PseudonymResponseMock])
     personIntegrationApiClient.updatePseudonym = jest.fn(async () => PseudonymResponseMock)
+    personIntegrationApiClient.createPseudonym = jest.fn(async () => PseudonymResponseMock)
 
     metricsService = {
       trackPersonIntegrationUpdate: jest.fn(),
@@ -43,20 +44,48 @@ describe('AliasService', () => {
   })
 
   describe('updateWorkingName', () => {
-    const newName: Name = {
+    const newNameWithMatchingLastName: Name = {
+      firstName: 'first',
+      middleName1: 'middleone',
+      middleName2: 'middletwo',
+      lastName: PseudonymResponseMock.lastName,
+    }
+
+    const newNameWithDifferentLastName: Name = {
       firstName: 'first',
       middleName1: 'middleone',
       middleName2: 'middletwo',
       lastName: 'last',
     }
 
-    it('should update working name', async () => {
-      const result = await aliasService.updateWorkingName(clientToken, user, prisonerNumber, newName)
+    it('should update working name when last name is the same', async () => {
+      const result = await aliasService.updateWorkingName(clientToken, user, prisonerNumber, newNameWithMatchingLastName)
 
       expect(personIntegrationApiClient.updatePseudonym).toHaveBeenCalledWith(PseudonymResponseMock.sourceSystemId, {
         ...PseudonymRequestMock,
-        ...newName,
+        ...newNameWithMatchingLastName,
       })
+
+      expect(personIntegrationApiClient.createPseudonym).not.toHaveBeenCalled()
+
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['firstName', 'middleName1', 'middleName2'],
+        prisonerNumber,
+        user,
+      })
+
+      expect(result).toEqual(PseudonymResponseMock)
+    })
+
+    it('should create a new working name if the last name is different', async () => {
+      const result = await aliasService.updateWorkingName(clientToken, user, prisonerNumber,  newNameWithDifferentLastName)
+
+      expect(personIntegrationApiClient.createPseudonym).toHaveBeenCalledWith(prisonerNumber, {
+        ...PseudonymRequestMock,
+        ...newNameWithDifferentLastName,
+      })
+
+      expect(personIntegrationApiClient.updatePseudonym).not.toHaveBeenCalled()
 
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
         fieldsUpdated: ['firstName', 'middleName1', 'middleName2', 'lastName'],
@@ -75,7 +104,7 @@ describe('AliasService', () => {
         },
       ])
 
-      const attemptUpdate = async () => aliasService.updateWorkingName(clientToken, user, prisonerNumber, newName)
+      const attemptUpdate = async () => aliasService.updateWorkingName(clientToken, user, prisonerNumber, newNameWithMatchingLastName)
 
       await expect(attemptUpdate).rejects.toThrow('Existing working name not found')
     })

@@ -47,6 +47,10 @@ export default class AliasService {
 
     if (!existingWorkingName) throw new NotFoundError('Existing working name not found')
 
+    if (existingWorkingName.lastName !== name.lastName) {
+      return this.createNewWorkingName(clientToken, user, prisonerNumber, name)
+    }
+
     const response = personIntegrationApiClient.updatePseudonym(existingWorkingName.sourceSystemId, {
       isWorkingName: true,
       dateOfBirth: existingWorkingName.dateOfBirth,
