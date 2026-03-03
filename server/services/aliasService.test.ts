@@ -59,7 +59,12 @@ describe('AliasService', () => {
     }
 
     it('should update working name when last name is the same', async () => {
-      const result = await aliasService.updateWorkingName(clientToken, user, prisonerNumber, newNameWithMatchingLastName)
+      const result = await aliasService.updateWorkingName(
+        clientToken,
+        user,
+        prisonerNumber,
+        newNameWithMatchingLastName,
+      )
 
       expect(personIntegrationApiClient.updatePseudonym).toHaveBeenCalledWith(PseudonymResponseMock.sourceSystemId, {
         ...PseudonymRequestMock,
@@ -78,7 +83,12 @@ describe('AliasService', () => {
     })
 
     it('should create a new working name if the last name is different', async () => {
-      const result = await aliasService.updateWorkingName(clientToken, user, prisonerNumber,  newNameWithDifferentLastName)
+      const result = await aliasService.updateWorkingName(
+        clientToken,
+        user,
+        prisonerNumber,
+        newNameWithDifferentLastName,
+      )
 
       expect(personIntegrationApiClient.createPseudonym).toHaveBeenCalledWith(prisonerNumber, {
         ...PseudonymRequestMock,
@@ -104,7 +114,8 @@ describe('AliasService', () => {
         },
       ])
 
-      const attemptUpdate = async () => aliasService.updateWorkingName(clientToken, user, prisonerNumber, newNameWithMatchingLastName)
+      const attemptUpdate = async () =>
+        aliasService.updateWorkingName(clientToken, user, prisonerNumber, newNameWithMatchingLastName)
 
       await expect(attemptUpdate).rejects.toThrow('Existing working name not found')
     })
