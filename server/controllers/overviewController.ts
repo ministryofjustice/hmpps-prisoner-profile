@@ -183,6 +183,10 @@ export default class OverviewController {
       staffContacts,
       isYouthPrisoner,
       prisonName,
+      duplicatePrisonerData: (req.middleware.duplicatePrisonerData || []).map((prisoner: Prisoner) => ({
+        prisonerNumber: prisoner.prisonerNumber,
+        prisonId: prisoner.prisonId,
+      })),
       offencesOverview: {
         ...offencesOverview,
         imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,
