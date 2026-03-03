@@ -275,12 +275,8 @@
   display: block;
   color: #6e3619;
 
-  @media (forced-colors: active) {
-    color: CanvasText;
-
-    @media (prefers-color-scheme: dark) {
-      color: white;
-    }
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    color: white;
   }
 }
 
