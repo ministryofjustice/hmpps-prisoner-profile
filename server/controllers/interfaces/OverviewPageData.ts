@@ -12,6 +12,7 @@ import NonAssociationSummary from '../../services/interfaces/offenderService/Non
 import { Result } from '../../utils/result/result'
 import CurrentCsipDetail from '../../data/interfaces/csipApi/csip'
 import { PersonalRelationshipsContactCount } from '../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { DuplicatePrisonerInfo } from '../../services/metrics/metricsService'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -34,6 +35,7 @@ export default interface OverviewPageData {
   staffContacts: YouthStaffContacts | StaffContacts
   isYouthPrisoner: boolean
   prisonName: string
+  duplicatePrisonerData: DuplicatePrisonerInfo[]
   offencesOverview: {
     mainOffenceDescription: string
     fullStatus: FullStatus

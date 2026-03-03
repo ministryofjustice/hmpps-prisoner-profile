@@ -41,8 +41,8 @@ context('Duplicate Prisoner Records', () => {
       cy.task('stubPrisonerSearchFindByNumbers', {
         prisoners: buildDuplicatePrisoners([
           { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-          { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob' },
-          { prisonerNumber: 'B5678CD', prisonId: 'BXI', firstName: 'Charlie' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+          { prisonerNumber: 'B5678CD', prisonId: 'TRN', firstName: 'Charlie' },
         ]),
       })
     })
@@ -50,6 +50,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should load the page successfully with duplicate data', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('exist')
     })
   })
 
@@ -63,7 +64,7 @@ context('Duplicate Prisoner Records', () => {
         prisoners: buildDuplicatePrisoners([
           { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
           { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
-          { prisonerNumber: 'B5678CD', prisonId: 'LEI', firstName: 'Charlie' },
+          { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie' },
         ]),
       })
     })
@@ -71,6 +72,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should filter out ghost establishment records and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('exist')
     })
   })
 
@@ -92,6 +94,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should filter out all duplicates when multiple are active and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -110,9 +113,10 @@ context('Duplicate Prisoner Records', () => {
       })
     })
 
-    it('Should include both active and inactive duplicates and load successfully', () => {
+    it('Should filter all duplicates when total active count reaches 2 and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -130,6 +134,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should load successfully with no duplicates', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -141,6 +146,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Person API 404 gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -152,6 +158,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Person API error gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -167,6 +174,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Prisoner Search API error gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 })
