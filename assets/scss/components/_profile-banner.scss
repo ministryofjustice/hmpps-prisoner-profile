@@ -273,6 +273,15 @@
   width: 30px;
   height: 30px;
   display: block;
+  color: #6e3619;
+
+  @media (forced-colors: active) {
+    color: CanvasText;
+
+    @media (prefers-color-scheme: dark) {
+      color: white;
+    }
+  }
 }
 
 .hmpps-duplicate-prisoner-banner__title {
