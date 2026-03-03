@@ -797,4 +797,38 @@ describe('overviewController', () => {
       )
     })
   })
+
+  describe('duplicatePrisonerData', () => {
+    it('Extracts prisonerNumber and prisonId from full Prisoner objects when duplicates exist', async () => {
+      req.middleware.duplicatePrisonerData = [
+        { ...PrisonerMockDataA, prisonerNumber: 'B5678DE', prisonId: 'LEI' },
+        { ...PrisonerMockDataA, prisonerNumber: 'C9012FG', prisonId: 'OUT' },
+      ]
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          duplicatePrisonerData: [
+            { prisonerNumber: 'B5678DE', prisonId: 'LEI' },
+            { prisonerNumber: 'C9012FG', prisonId: 'OUT' },
+          ],
+        }),
+      )
+    })
+
+    it('Returns empty array when middleware provides no duplicates', async () => {
+      req.middleware.duplicatePrisonerData = []
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          duplicatePrisonerData: [],
+        }),
+      )
+    })
+  })
 })

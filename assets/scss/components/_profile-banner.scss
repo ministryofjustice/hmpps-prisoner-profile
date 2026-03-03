@@ -228,7 +228,7 @@
       display: flex;
       flex-wrap: wrap;
       row-gap: 15px;
-      margin: 0;
+      margin: 15px 0px 0px 0px;
       padding: 0;
 
       li {
@@ -251,4 +251,44 @@
       }
     }
   }
+}
+
+.hmpps-duplicate-prisoner-banner-container {
+  background-color: #fcd6c3;
+}
+
+.hmpps-duplicate-prisoner-banner {
+  padding: 15px 0px;
+  margin: 0 -15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hmpps-duplicate-prisoner-banner__icon-wrapper {
+  flex-shrink: 0;
+}
+
+.hmpps-duplicate-prisoner-banner__icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+.hmpps-duplicate-prisoner-banner__title {
+  color: #6e3619;
+  font-size: 19px;
+  margin: 0;
+}
+
+.hmpps-duplicate-prisoner-banner__title strong {
+  color: #6e3619;
+}
+
+.hmpps-duplicate-prisoner-banner .govuk-link {
+  color: #6e3619;
+}
+
+.hmpps-duplicate-prisoner-banner .govuk-link:visited {
+  color: #6e3619;
 }

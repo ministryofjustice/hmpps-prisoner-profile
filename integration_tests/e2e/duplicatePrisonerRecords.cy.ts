@@ -50,6 +50,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should load the page successfully with duplicate data', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -71,6 +72,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should filter out ghost establishment records and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -92,6 +94,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should filter out all duplicates when multiple are active and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -113,6 +116,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should include both active and inactive duplicates and load successfully', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -130,6 +134,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should load successfully with no duplicates', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -141,6 +146,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Person API 404 gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -152,6 +158,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Person API error gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 
@@ -167,6 +174,7 @@ context('Duplicate Prisoner Records', () => {
     it('Should handle Prisoner Search API error gracefully and load page', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
+      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
     })
   })
 })
