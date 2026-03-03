@@ -95,6 +95,7 @@ export enum Page {
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
   PhotoList = 'PHOTO_LIST',
+  PossibleDuplicateProfiles = 'POSSIBLE_DUPLICATE_PROFILES',
   PostAddAlert = 'POST_ADD_ALERT',
   PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',

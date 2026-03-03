@@ -42,6 +42,9 @@ import editRouter from './personal/edit/editRouter'
 import { prisonerNumberGuard } from '../middleware/prisonerNumberGuard'
 import retrievePrisonNamesById from '../middleware/retrievePrisonNamesById'
 import retrieveCuriousFunctionalSkills from '../middleware/retrieveCuriousFunctionalSkills'
+import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import DuplicateProfilesController from '../controllers/duplicateProfilesController'
+import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -84,6 +87,10 @@ export default function routes(services: Services): Router {
   )
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
   const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
+  const duplicateProfilesController = new DuplicateProfilesController(
+    services.prisonPermissionsService,
+    services.auditService,
+  )
 
   router.get(
     `/api${basePath}/image`,
@@ -306,6 +313,18 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       return careNeedsController.displayPastCareNeeds(req, res)
+    },
+  )
+
+  router.get(
+    `${basePath}/possible-duplicate-profiles`,
+    auditPageAccessAttempt({ services, page: Page.PossibleDuplicateProfiles }),
+    featureFlagGuard('Possible Duplicate Profiles', personDuplicateRecordsEnabled),
+    getPrisonerData(services),
+    getDuplicatePrisonerData(services),
+    prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    async (req, res, next) => {
+      return duplicateProfilesController.getDuplicateProfiles(req, res, next)
     },
   )
 

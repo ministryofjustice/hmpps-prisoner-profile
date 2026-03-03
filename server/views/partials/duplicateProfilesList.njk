@@ -1,0 +1,45 @@
+{% set rows = [] %}
+{% for duplicate in duplicateProfiles %}
+
+  {% set duplicatePrisonerPermissions = prisonerPermissionsMap[duplicate.prisonerNumber] %}
+  {% set canDisplayProfile = isGranted(PrisonerBasePermission.read, duplicatePrisonerPermissions) %}
+  {% set canDisplayImage = isGranted(CorePersonRecordPermission.read_photo, duplicatePrisonerPermissions) and duplicate.currentFacialImageId %}
+  {% set canDisplayName = isGranted(CorePersonRecordPermission.read_name_and_aliases, duplicatePrisonerPermissions) %}
+
+  {% set duplicatePrisonerName = duplicate.firstName | formatName('', duplicate.lastName, { style: 1 }) %}
+  {% set duplicatePrisonerImageUrl = ('/api/image/' + duplicate.currentFacialImageId) if canDisplayImage else "/assets/images/prisoner-profile-image.png" %}
+  {% set duplicatePrisonerImage %}
+    <img
+      src="{{ duplicatePrisonerImageUrl }}"
+      alt="Image of {{ duplicatePrisonerName if canDisplayName else 'duplicate prisoner' }}"
+      class="duplicate-profiles__results-list__image"
+      loading="lazy"
+      data-test="prisoner-image"
+    />
+  {% endset %}
+  {% set duplicatePrisonerLink %}
+    <a href="/prisoner/{{ duplicate.prisonerNumber }}" class="govuk-link">
+      {{ duplicatePrisonerName }} (opens in a new tab)
+    </a>
+  {% endset %}
+
+  {% set rows = (rows.push([
+    { html: duplicatePrisonerImage },
+    { html: duplicatePrisonerLink if canDisplayProfile else '' },
+    { text: duplicate.prisonerNumber },
+    { text: duplicate.locationDescription }
+  ]), rows) %}
+{% endfor %}
+
+<div class="duplicate-profiles__results-list">
+  {{ govukTable({
+    head: [
+      { html: '<span class="govuk-visually-hidden">Picture</span>' },
+      { text: "Name" },
+      { text: "Prison number" },
+      { text: "Location" }
+    ],
+    rows: rows,
+    attributes: { "data-test": "duplicate-profiles-results-table" }
+  }) }}
+</div>
