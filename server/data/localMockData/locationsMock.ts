@@ -1,5 +1,5 @@
+import type { SelectOption } from '../../interfaces/GovOptions'
 import Location from '../interfaces/prisonApi/Location'
-import { SelectOption } from '../../utils/utils'
 import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
 export const locationsApiMock: LocationsApiLocation[] = [
