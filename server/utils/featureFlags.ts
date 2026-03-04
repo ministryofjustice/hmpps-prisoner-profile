@@ -26,11 +26,6 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
 
 export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
 
-export const editProfilePhotoEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  editProfileEnabled(activeCaseLoadId) ||
-  config.featureToggles.editProfilePhotoEnabledPrisons.includes(activeCaseLoadId) ||
-  config.featureToggles.editProfilePhotoEnabledPrisons.includes('***')
-
 export const dietAndAllergyEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.dietAndAllergy)
 
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true

@@ -391,7 +391,6 @@ export default {
       enabledPrisonsFrom: get('EDIT_PROFILE_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    editProfilePhotoEnabledPrisons: get('EDIT_PROFILE_PHOTO_ENABLED_PRISONS', []),
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
