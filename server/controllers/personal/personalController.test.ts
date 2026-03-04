@@ -1700,9 +1700,7 @@ describe('PersonalController', () => {
         } as unknown as Request
         await action(req, res, next)
 
-        expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), prisonerNumber, {
-          healthAndMedicationApiReadEnabled: true,
-        })
+        expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), prisonerNumber)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
           pageTitle: expect.anything(),
