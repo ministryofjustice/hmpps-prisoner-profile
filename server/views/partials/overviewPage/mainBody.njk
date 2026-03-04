@@ -41,8 +41,7 @@
 </div>
 
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
-  {% set showExternalContacts = externalContactsEnabled(prisonId) and
-    isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions) %}
+  {% set showExternalContacts = isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions) %}
 
   {% call conditionallyShow({
     condition: showExternalContacts,

@@ -712,13 +712,8 @@ describe('overviewController', () => {
   })
 
   describe('External contacts', () => {
-    afterAll(() => {
-      config.featureToggles.externalContactsEnabledPrisons = []
-    })
-
     it('Returns the external contacts counts from the contacts service', async () => {
       mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: true })
-      config.featureToggles.externalContactsEnabledPrisons = ['MDI']
       contactsService.getExternalContactsCount = jest.fn().mockResolvedValue({
         official: 1,
         social: 2,
@@ -740,25 +735,8 @@ describe('overviewController', () => {
       )
     })
 
-    it('Does not request the external contacts count when toggled off', async () => {
-      config.featureToggles.externalContactsEnabledPrisons = []
-      mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: true })
-      contactsService.getExternalContactsCount = jest.fn()
-
-      await controller.displayOverview(req, res)
-
-      expect(contactsService.getExternalContactsCount).not.toHaveBeenCalled()
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          externalContactsSummary: null,
-        }),
-      )
-    })
-
     it('Does not request the external contacts count if permission not granted', async () => {
       mockPermissions({ [PersonalRelationshipsPermission.read_contacts]: false })
-      config.featureToggles.externalContactsEnabledPrisons = ['MDI']
       contactsService.getExternalContactsCount = jest.fn()
 
       await controller.displayOverview(req, res)

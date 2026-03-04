@@ -3,7 +3,6 @@ import config from '../config'
 import {
   editProfileEnabled,
   editProfileSimulateFetch,
-  externalContactsEnabled,
 } from './featureFlags'
 
 describe('featureToggles', () => {
@@ -70,35 +69,6 @@ describe('featureToggles', () => {
       config.featureToggles.editProfile.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
 
       expect(editProfileEnabled('MDI')).toBeTruthy()
-    })
-  })
-
-  describe('externalContactsEnabled', () => {
-    afterEach(() => {
-      // reset to defaults:
-      config.featureToggles.externalContactsEnabledPrisons = []
-    })
-
-    it('is not enabled by default', () => {
-      expect(externalContactsEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if active case load is not listed as enabled', () => {
-      config.featureToggles.externalContactsEnabledPrisons = ['LEI']
-
-      expect(externalContactsEnabled('MDI')).toBeFalsy()
-    })
-
-    it('enabled if active case load is listed as enabled', () => {
-      config.featureToggles.externalContactsEnabledPrisons = ['MDI']
-
-      expect(externalContactsEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if wildcard is listed as enabled', () => {
-      config.featureToggles.externalContactsEnabledPrisons = ['***']
-
-      expect(externalContactsEnabled('MDI')).toBeTruthy()
     })
   })
 
