@@ -346,9 +346,7 @@ describe('PersonalPageService', () => {
             editProfileEnabled: false,
           })
 
-          expect(response.personalDetails.dietAndAllergy.getOrThrow().medicalDietaryRequirements).toEqual(
-            expectedValue,
-          )
+          expect(response.personalDetails.dietAndAllergy.getOrThrow().medicalDietaryRequirements).toEqual(expectedValue)
         })
       })
 
@@ -368,9 +366,7 @@ describe('PersonalPageService', () => {
 
       describe('Diet and allergy modification details', () => {
         it('Maps the lastModifiedAt field to the latest timestamp', async () => {
-          prisonService.getPrisonByPrisonId = jest.fn(
-            async () => ({ prisonName: 'Moorland (HMP & YOI)' }) as Prison,
-          )
+          prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: 'Moorland (HMP & YOI)' }) as Prison)
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
@@ -381,17 +377,13 @@ describe('PersonalPageService', () => {
 
         it('Maps the lastModifiedPrison field', async () => {
           const expectedValue = 'Moorland (HMP & YOI)'
-          prisonService.getPrisonByPrisonId = jest.fn(
-            async () => ({ prisonName: expectedValue }) as Prison,
-          )
+          prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: expectedValue }) as Prison)
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
           })
 
-          expect(response.personalDetails.dietAndAllergy.getOrThrow().lastModifiedPrison).toEqual(
-            expectedValue,
-          )
+          expect(response.personalDetails.dietAndAllergy.getOrThrow().lastModifiedPrison).toEqual(expectedValue)
         })
       })
 

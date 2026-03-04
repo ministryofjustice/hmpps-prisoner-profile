@@ -54,7 +54,6 @@ import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportFo
 import { prisonerHasNeedsMock } from '../data/localMockData/supportForAdditionalNeedsMock'
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
-import config from '../config'
 import mockPermissions from '../../tests/mocks/mockPermissions'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')

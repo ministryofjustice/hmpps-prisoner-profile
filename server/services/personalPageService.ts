@@ -80,7 +80,6 @@ interface PersonalPageGetOptions {
   editProfileEnabled: boolean
   simulateFetchEnabled: boolean
   personalRelationshipsApiReadEnabled: boolean
-  healthAndMedicationApiReadEnabled: boolean
   personEndpointsEnabled: boolean
   apiErrorCallback: (error: Error) => void
 }
@@ -102,13 +101,7 @@ export default class PersonalPageService {
     private readonly addressService: AddressService,
   ) {}
 
-  async getHealthAndMedication(
-    token: string,
-    prisonerNumber: string,
-    {
-      healthAndMedicationApiReadEnabled,
-    }: { healthAndMedicationApiReadEnabled: boolean },
-  ): Promise<HealthAndMedication | null> {
+  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
     const response = apiClient.getHealthAndMedication(prisonerNumber)
     return response
@@ -264,7 +257,6 @@ export default class PersonalPageService {
       editProfileEnabled: false,
       simulateFetchEnabled: false,
       personalRelationshipsApiReadEnabled: true,
-      healthAndMedicationApiReadEnabled: false,
       personEndpointsEnabled: false,
       apiErrorCallback: () => null,
     }
@@ -296,12 +288,7 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
-      Result.wrap(
-        this.getHealthAndMedication(token, prisonerNumber, {
-          healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
-        }),
-        getOptions.apiErrorCallback,
-      ),
+      Result.wrap(this.getHealthAndMedication(token, prisonerNumber), getOptions.apiErrorCallback),
       getOptions.personalRelationshipsApiReadEnabled
         ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback)
         : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),

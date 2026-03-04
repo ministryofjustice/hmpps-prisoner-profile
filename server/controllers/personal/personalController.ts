@@ -97,8 +97,7 @@ export default class PersonalController {
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
-      const { personalRelationshipsApiReadEnabled, healthAndMedicationApiReadEnabled, personEndpointsEnabled } =
-        config.featureToggles
+      const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -106,7 +105,6 @@ export default class PersonalController {
           simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
-          healthAndMedicationApiReadEnabled,
           personEndpointsEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
@@ -863,9 +861,7 @@ export default class PersonalController {
         const { clientToken, prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
 
         const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
-          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
-            healthAndMedicationApiReadEnabled: true,
-          }),
+          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber),
           this.personalPageService.getReferenceDataCodes(
             clientToken,
             HealthAndMedicationReferenceDataDomain.foodAllergy,
@@ -932,11 +928,8 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const { prisonerNumber } = req.params
-        const dietAndAllergy = (
-          await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
-            healthAndMedicationApiReadEnabled: true,
-          })
-        )?.dietAndAllergy
+        const dietAndAllergy = (await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber))
+          ?.dietAndAllergy
 
         const update: Partial<DietAndAllergyUpdate> = {
           foodAllergies: req.body.allergy

@@ -1,9 +1,6 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import {
-  editProfileEnabled,
-  editProfileSimulateFetch,
-} from './featureFlags'
+import { editProfileEnabled, editProfileSimulateFetch } from './featureFlags'
 
 describe('featureToggles', () => {
   describe('editProfileEnabled', () => {
