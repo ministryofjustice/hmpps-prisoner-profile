@@ -1,9 +1,7 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
 import {
-  dietAndAllergyEnabled,
   editProfileEnabled,
-  editProfilePhotoEnabled,
   editProfileSimulateFetch,
   externalContactsEnabled,
 } from './featureFlags'
@@ -75,72 +73,6 @@ describe('featureToggles', () => {
     })
   })
 
-  describe('dietAndAllergyEnabled', () => {
-    afterEach(() => {
-      // reset to defaults:
-      config.featureToggles.dietAndAllergy.enabledPrisons = []
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = []
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = '2099-01-01T00:00:00'
-    })
-
-    it('is not enabled by default', () => {
-      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if active case load is not listed as permanently enabled', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisons = ['LEI']
-
-      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if active case load is not enabled by date', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = ['LEI']
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
-
-      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if now is before the from datetime', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = ['MDI']
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
-
-      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if now is before the from datetime, even when wildcard used', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = ['***']
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
-
-      expect(dietAndAllergyEnabled('MDI')).toBeFalsy()
-    })
-
-    it('enabled if active case load is listed as permanently enabled', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisons = ['MDI']
-
-      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if wildcard used in list of permanently enabled', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisons = ['***']
-
-      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if active case load is listed as enabled after date', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = ['MDI']
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
-
-      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if wildcard is listed as enabled after date', () => {
-      config.featureToggles.dietAndAllergy.enabledPrisonsByDate = ['***']
-      config.featureToggles.dietAndAllergy.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
-
-      expect(dietAndAllergyEnabled('MDI')).toBeTruthy()
-    })
-  })
-
   describe('externalContactsEnabled', () => {
     afterEach(() => {
       // reset to defaults:
@@ -167,42 +99,6 @@ describe('featureToggles', () => {
       config.featureToggles.externalContactsEnabledPrisons = ['***']
 
       expect(externalContactsEnabled('MDI')).toBeTruthy()
-    })
-  })
-
-  describe('profilePhotoEditEnabled', () => {
-    afterEach(() => {
-      // reset to defaults:
-      config.featureToggles.editProfilePhotoEnabledPrisons = []
-      config.featureToggles.editProfile.enabledPrisons = []
-    })
-
-    it('is not enabled by default', () => {
-      expect(editProfilePhotoEnabled('MDI')).toBeFalsy()
-    })
-
-    it('is not enabled if active case load is not listed as enabled', () => {
-      config.featureToggles.editProfilePhotoEnabledPrisons = ['LEI']
-
-      expect(editProfilePhotoEnabled('MDI')).toBeFalsy()
-    })
-
-    it('enabled if active case load is listed as enabled', () => {
-      config.featureToggles.editProfilePhotoEnabledPrisons = ['MDI']
-
-      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if wildcard is listed as enabled', () => {
-      config.featureToggles.editProfilePhotoEnabledPrisons = ['***']
-
-      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
-    })
-
-    it('enabled if profile edit is enabled', () => {
-      config.featureToggles.editProfile.enabledPrisons = ['MDI']
-
-      expect(editProfilePhotoEnabled('MDI')).toBeTruthy()
     })
   })
 

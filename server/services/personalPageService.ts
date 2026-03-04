@@ -77,7 +77,6 @@ import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIde
 import AddressService from './addressService'
 
 interface PersonalPageGetOptions {
-  dietAndAllergyIsEnabled: boolean
   editProfileEnabled: boolean
   simulateFetchEnabled: boolean
   personalRelationshipsApiReadEnabled: boolean
@@ -107,16 +106,15 @@ export default class PersonalPageService {
     token: string,
     prisonerNumber: string,
     {
-      dietAndAllergiesEnabled,
       healthAndMedicationApiReadEnabled,
-    }: { dietAndAllergiesEnabled: boolean; healthAndMedicationApiReadEnabled: boolean },
+    }: { healthAndMedicationApiReadEnabled: boolean },
   ): Promise<HealthAndMedication | null> {
-    if (!dietAndAllergiesEnabled && !healthAndMedicationApiReadEnabled) {
+    if (!healthAndMedicationApiReadEnabled) {
       return null
     }
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
     const response = apiClient.getHealthAndMedication(prisonerNumber)
-    return dietAndAllergiesEnabled ? response : null
+    return response
   }
 
   async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
@@ -266,7 +264,6 @@ export default class PersonalPageService {
     options: Partial<PersonalPageGetOptions> = {},
   ): Promise<PersonalPage> {
     const defaultOptions: PersonalPageGetOptions = {
-      dietAndAllergyIsEnabled: false,
       editProfileEnabled: false,
       simulateFetchEnabled: false,
       personalRelationshipsApiReadEnabled: true,
@@ -304,7 +301,6 @@ export default class PersonalPageService {
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
       Result.wrap(
         this.getHealthAndMedication(token, prisonerNumber, {
-          dietAndAllergiesEnabled: getOptions.dietAndAllergyIsEnabled,
           healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
         }),
         getOptions.apiErrorCallback,

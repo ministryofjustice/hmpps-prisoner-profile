@@ -26,8 +26,6 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
 
 export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
 
-export const dietAndAllergyEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.dietAndAllergy)
-
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 
 export const editReligionEnabled: FeatureFlagMethod = () => true

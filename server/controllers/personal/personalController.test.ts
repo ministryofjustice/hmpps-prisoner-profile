@@ -1701,7 +1701,6 @@ describe('PersonalController', () => {
         await action(req, res, next)
 
         expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), prisonerNumber, {
-          dietAndAllergiesEnabled: true,
           healthAndMedicationApiReadEnabled: true,
         })
 

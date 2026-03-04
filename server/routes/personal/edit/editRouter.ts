@@ -11,7 +11,7 @@ import auditPageAccessAttempt from '../../../middleware/auditPageAccessAttempt'
 import { Page } from '../../../services/auditService'
 import getPrisonerData from '../../../middleware/getPrisonerDataMiddleware'
 import { Services } from '../../../services'
-import { dietAndAllergyEnabled, editProfileEnabled } from '../../../utils/featureFlags'
+import { editProfileEnabled } from '../../../utils/featureFlags'
 import {
   buildFieldData,
   faceShapeFieldData,
@@ -343,7 +343,6 @@ export default function editRouter(services: Services): Router {
       },
     },
     requiredPermission: PersonHealthAndMedicationPermission.edit_diet,
-    featureFlag: { featureName: 'Diet and Allergy', method: dietAndAllergyEnabled },
   })
 
   editRoute({

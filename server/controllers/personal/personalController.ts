@@ -17,7 +17,6 @@ import {
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import {
   changeContactDetailsLinkEnabled,
-  dietAndAllergyEnabled,
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
@@ -103,7 +102,6 @@ export default class PersonalController {
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
-          dietAndAllergyIsEnabled: dietAndAllergyEnabled(activeCaseLoadId),
           editProfileEnabled: editEnabled,
           simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
@@ -140,8 +138,6 @@ export default class PersonalController {
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
         displayNewAddressesCard: editEnabled,
-        dietAndAllergiesEnabled:
-          dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editReligionEnabled: editEnabled || editReligionEnabled(),
         personalRelationshipsApiReadEnabled,
         hasPersonalId,
@@ -868,7 +864,6 @@ export default class PersonalController {
 
         const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
           this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
-            dietAndAllergiesEnabled: true,
             healthAndMedicationApiReadEnabled: true,
           }),
           this.personalPageService.getReferenceDataCodes(
@@ -939,7 +934,6 @@ export default class PersonalController {
         const { prisonerNumber } = req.params
         const dietAndAllergy = (
           await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber, {
-            dietAndAllergiesEnabled: true,
             healthAndMedicationApiReadEnabled: true,
           })
         )?.dietAndAllergy
