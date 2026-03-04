@@ -47,7 +47,7 @@ context('Duplicate Prisoner Records', () => {
 
     it('Should display page not found', () => {
       visitDuplicateProfilesPage({ failOnStatusCode: false })
-      new NotFoundPage().shouldBeDisplayed()
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 
@@ -81,7 +81,7 @@ context('Duplicate Prisoner Records', () => {
 
     it('Should display page not found', () => {
       visitDuplicateProfilesPage({ failOnStatusCode: false })
-      new NotFoundPage().shouldBeDisplayed()
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 
