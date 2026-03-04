@@ -22,6 +22,10 @@ context('Change name - correction', () => {
         pseudonymId: PseudonymResponseMock.sourceSystemId,
         response: PseudonymResponseMock,
       })
+      cy.task('stubCreatePseudonym', {
+        pseudonymId: PseudonymResponseMock.sourceSystemId,
+        response: PseudonymResponseMock,
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/enter-corrected-name`,
     editPageWithTitle: EditPage,
@@ -33,7 +37,7 @@ context('Change name - correction', () => {
           firstName: 'first',
           middleName1: 'middleone',
           middleName2: 'middletwo',
-          lastName: 'last',
+          lastName: PseudonymResponseMock.lastName,
         },
       },
       {
@@ -41,7 +45,15 @@ context('Change name - correction', () => {
           firstName: `first'name,,,,,,,,,,,,,,,,,,,,,,,,,`,
           middleName1: '',
           middleName2: '',
-          lastName: 'last-name',
+          lastName: PseudonymResponseMock.lastName,
+        },
+      },
+      {
+        textInputs: {
+          firstName: `first`,
+          middleName1: '',
+          middleName2: '',
+          lastName: 'last',
         },
       },
     ],
