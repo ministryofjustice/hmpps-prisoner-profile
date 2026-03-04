@@ -3,6 +3,8 @@ import OverviewPage from '../pages/overviewPage'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 import DuplicateProfilesPage from '../pages/duplicateProfilesPage'
+import NotFoundPage from '../pages/notFoundPage'
+import { Role } from '../../server/data/enums/role'
 
 const buildDuplicatePrisoners = (
   configs: Array<{
@@ -22,7 +24,8 @@ const buildDuplicatePrisoners = (
 }
 
 const visitOverviewPage = () => cy.signIn({ redirectPath: '/prisoner/G6123VU' })
-const visitDuplicateProfilesPage = () => cy.signIn({ redirectPath: '/prisoner/G6123VU/possible-duplicate-profiles' })
+const visitDuplicateProfilesPage = ({ failOnStatusCode = true } = {}) =>
+  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/possible-duplicate-profiles' })
 
 context('Duplicate Prisoner Records', () => {
   const prisonerNumber = 'G6123VU'
@@ -34,7 +37,73 @@ context('Duplicate Prisoner Records', () => {
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })
 
-  // TODO add tests for permissions when access provided by released prisoner viewing roll
+  context('When the prisoner is released and the user does not have the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'OUT' } })
+      cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+    })
+
+    it('Should display page not found', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      new NotFoundPage().shouldBeDisplayed()
+    })
+  })
+
+  context('When the prisoner is released and the user has the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'OUT' } })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber, prisonNumbers: [prisonerNumber, 'A1234BC'] })
+      cy.task('stubPrisonerSearchFindByNumbers', {
+        prisoners: buildDuplicatePrisoners([
+          { prisonerNumber, prisonId: 'OUT' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+        ]),
+      })
+    })
+
+    it('Should display the duplicate profiles page', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+    })
+  })
+
+  context('When the prisoner is transferring and the user does not have the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'TRN' } })
+      cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+    })
+
+    it('Should display page not found', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      new NotFoundPage().shouldBeDisplayed()
+    })
+  })
+
+  context('When the prisoner is transferring and the user has the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'TRN' } })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber, prisonNumbers: [prisonerNumber, 'A1234BC'] })
+      cy.task('stubPrisonerSearchFindByNumbers', {
+        prisoners: buildDuplicatePrisoners([
+          { prisonerNumber, prisonId: 'TRN' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+        ]),
+      })
+    })
+
+    it('Should display the duplicate profiles page', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+    })
+  })
 
   context('When Person API returns duplicate records', () => {
     beforeEach(() => {
