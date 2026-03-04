@@ -1,0 +1,93 @@
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% extends "partials/layout.njk" %}
+
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+  },
+  {
+    text: prisonerName.lastCommaFirst,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+
+{% set pageHasApiErrors = true %}
+
+{% block body %}
+  {% block content %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    </div>
+
+    {% if backLinkUrl %}
+      <div class="govuk-grid-row govuk-!-margin-bottom-6">
+        <div class="govuk-grid-column-full">
+          {{ govukBackLink({
+            text: "Back",
+            classes: "govuk-!-margin-0",
+            attributes: { 'data-qa': 'back-link' },
+            href: backLinkUrl
+          }) }}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="govuk-grid-row">
+      {% if duplicateRecordApiFailure %}
+        <div class="hmpps-api-error-banner govuk-!-margin-3 govuk-!-margin-bottom-7">
+          <p>Some information on this page is currently unavailable</p>
+          <p>You may need to try again later.</p>
+        </div>
+      {% endif %}
+
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Possible duplicate profiles for {{ prisonerName.firstLast }} </h1>
+        <p class="govuk-body">These profiles are separate records that may relate to the same person.</p>
+
+        {% set whatDuplicateProfilesAreHtml %}
+          <p class="govuk-body">A system check has identified these profiles as potential duplicates. They contain
+            matching information that
+            suggests they may belong to the same person.</p>
+          <p class="govuk-body">In rare cases, these records may relate to different people.</p>
+          <p class="govuk-body">If you are still unsure, you can also email the specialist support team in release
+            accuracy support unit (RASU):
+            <a href="mailto:OMU.SpecialistSupportTeam@justice.gov.uk">OMU.SpecialistSupportTeam@justice.gov.uk</a></p>
+        {% endset %}
+
+        {{ govukDetails({
+          summaryText: "What duplicate profiles are",
+          html: whatDuplicateProfilesAreHtml
+        }) }}
+
+        <h2 class="govuk-heading-m">What you should do</h2>
+        <p class="govuk-body">You should check these profiles for any relevant information.</p>
+        <p class="govuk-body">You do not need to report a duplicate. The App Support team will manually review and merge
+          records.</p>
+        <p class="govuk-body">If the banner on the Overview page does not appear next time you search for this person,
+          App
+          Support has either merged the profiles or decided they should stay separate.</p>
+
+        <h2 class="govuk-heading-m">Profiles identified as possible duplicates</h2>
+        <p class="govuk-body">You can only view profiles for prisoners in the establishments you’re authorised to
+          access,
+          including their inactive duplicate records.</p>
+      </div>
+    </div>
+
+    <div class="govuk-grid-row govuk-!-margin-top-5">
+      <div class="govuk-grid-column-full">
+        {% if duplicateRecordApiFailure %}
+          <p class="hmpps-api-error-inset">{{ unavailableApiErrorText }}</p>
+        {% else %}
+          {% include '../partials/duplicateProfilesList.njk' %}
+        {% endif %}
+      </div>
+    </div>
+  {% endblock %}
+{% endblock %}

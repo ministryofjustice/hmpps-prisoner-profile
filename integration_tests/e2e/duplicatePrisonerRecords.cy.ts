@@ -2,12 +2,16 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
+import DuplicateProfilesPage from '../pages/duplicateProfilesPage'
+import NotFoundPage from '../pages/notFoundPage'
+import { Role } from '../../server/data/enums/role'
 
 const buildDuplicatePrisoners = (
   configs: Array<{
     prisonerNumber: string
     prisonId: string
     firstName?: string
+    currentFacialImageId?: number
   }>,
 ): Prisoner[] => {
   return configs.map(config => ({
@@ -15,12 +19,13 @@ const buildDuplicatePrisoners = (
     prisonerNumber: config.prisonerNumber,
     prisonId: config.prisonId,
     ...(config.firstName && { firstName: config.firstName }),
+    ...(config.currentFacialImageId && { currentFacialImageId: config.currentFacialImageId }),
   }))
 }
 
-const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
-}
+const visitOverviewPage = () => cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+const visitDuplicateProfilesPage = ({ failOnStatusCode = true } = {}) =>
+  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/possible-duplicate-profiles' })
 
 context('Duplicate Prisoner Records', () => {
   const prisonerNumber = 'G6123VU'
@@ -32,25 +37,124 @@ context('Duplicate Prisoner Records', () => {
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })
 
+  context('When the prisoner is released and the user does not have the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'OUT' } })
+      cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+    })
+
+    it('Should display page not found', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(NotFoundPage)
+    })
+  })
+
+  context('When the prisoner is released and the user has the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'OUT' } })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber, prisonNumbers: [prisonerNumber, 'A1234BC'] })
+      cy.task('stubPrisonerSearchFindByNumbers', {
+        prisoners: buildDuplicatePrisoners([
+          { prisonerNumber, prisonId: 'OUT' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+        ]),
+      })
+    })
+
+    it('Should display the duplicate profiles page', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+    })
+  })
+
+  context('When the prisoner is transferring and the user does not have the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'TRN' } })
+      cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+    })
+
+    it('Should display page not found', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(NotFoundPage)
+    })
+  })
+
+  context('When the prisoner is transferring and the user has the INACTIVE_BOOKINGS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings] })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'TRN' } })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber, prisonNumbers: [prisonerNumber, 'A1234BC'] })
+      cy.task('stubPrisonerSearchFindByNumbers', {
+        prisoners: buildDuplicatePrisoners([
+          { prisonerNumber, prisonId: 'TRN' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+        ]),
+      })
+    })
+
+    it('Should display the duplicate profiles page', () => {
+      visitDuplicateProfilesPage({ failOnStatusCode: false })
+      Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+    })
+  })
+
   context('When Person API returns duplicate records', () => {
     beforeEach(() => {
       cy.task('stubPersonApiGetRecord', {
         prisonerNumber,
         prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
       })
+      cy.task('stubImages')
       cy.task('stubPrisonerSearchFindByNumbers', {
         prisoners: buildDuplicatePrisoners([
           { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+          { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob', currentFacialImageId: 1234 },
           { prisonerNumber: 'B5678CD', prisonId: 'TRN', firstName: 'Charlie' },
         ]),
       })
     })
 
-    it('Should load the page successfully with duplicate data', () => {
+    it('Should load the overview page successfully with duplicate data', () => {
       visitOverviewPage()
       Page.verifyOnPage(OverviewPage)
       cy.getDataQa('duplicate-prisoner-banner').should('exist')
+    })
+
+    it('Should load the duplicate profiles page successfully with duplicate data', () => {
+      visitDuplicateProfilesPage()
+      const page = Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+
+      page.miniBanner().card().should('be.visible')
+      page.miniBanner().name().should('contain.text', 'Saunders, John')
+      page.miniBanner().name().should('contain.text', prisonerNumber)
+
+      page.h1().should('contain.text', 'Possible duplicate profiles for John Saunders')
+
+      page.duplicates().should('have.length', 2)
+
+      page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
+      page.duplicate(0).name().should('contain.text', 'Saunders, Bob (opens in a new tab)')
+      page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
+      page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+      page.duplicate(0).location().should('contain.text', 'Moorland (HMP & YOI)')
+
+      page
+        .duplicate(1)
+        .photo()
+        .find('img')
+        .should('have.attr', 'src')
+        .should('include', '/assets/images/prisoner-profile-image.png')
+      page.duplicate(1).name().should('contain.text', 'Saunders, Charlie (opens in a new tab)')
+      page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
+      page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
+      page.duplicate(1).location().should('contain.text', 'Moorland (HMP & YOI)')
     })
   })
 

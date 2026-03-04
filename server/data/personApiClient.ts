@@ -20,6 +20,6 @@ export default class PersonApiRestClient extends RestClient implements PersonApi
   }
 
   async getRecord(prisonerNumber: string): Promise<PersonRecord> {
-    return this.get<PersonRecord>({ path: `/prisoner-record/prisoner-number/${prisonerNumber}` }, this.token)
+    return this.get<PersonRecord>({ path: `/person/prison/${prisonerNumber}` }, this.token)
   }
 }
