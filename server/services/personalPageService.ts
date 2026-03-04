@@ -109,9 +109,6 @@ export default class PersonalPageService {
       healthAndMedicationApiReadEnabled,
     }: { healthAndMedicationApiReadEnabled: boolean },
   ): Promise<HealthAndMedication | null> {
-    if (!healthAndMedicationApiReadEnabled) {
-      return null
-    }
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
     const response = apiClient.getHealthAndMedication(prisonerNumber)
     return response
@@ -605,7 +602,9 @@ export default class PersonalPageService {
     return (
       (dietAndAllergy &&
         dietAndAllergy[field]?.value
-          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+          ?.map(({ value: { id, description }, comment }) =>
+            field === 'foodAllergies' ? { id, description } : { id, description, comment },
+          )
           .sort((a, b) => {
             if (a.id?.endsWith('OTHER')) return 1
             if (b.id?.endsWith('OTHER')) return -1

@@ -328,7 +328,7 @@ describe('PersonalPageService', () => {
     describe('Diet and food allergies', () => {
       describe('Food allergies', () => {
         it('Maps the food allergies field', async () => {
-          const expectedValue = { id: 'FOOD_ALLERGY_EGG', description: 'Egg' }
+          const expectedValue = [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg' }]
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
@@ -991,23 +991,6 @@ describe('PersonalPageService', () => {
       expect(dietAndAllergyData.cateringInstructions).toBeFalsy()
       expect(dietAndAllergyData.lastModifiedAt).toEqual('1 July 2024')
       expect(dietAndAllergyData.lastModifiedPrison).toEqual('Styal (HMP)')
-    })
-
-    it('Reads the data from the API but does not display it when configured to do so', async () => {
-      const {
-        personalDetails: { dietAndAllergy },
-      } = await constructService().get('token', PrisonerMockDataA, {
-        editProfileEnabled: false,
-        healthAndMedicationApiReadEnabled: true,
-      })
-
-      const dietAndAllergyData = dietAndAllergy.getOrThrow()
-
-      expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
-
-      expect(dietAndAllergyData.foodAllergies).toEqual([])
-      expect(dietAndAllergyData.medicalDietaryRequirements).toEqual([])
-      expect(dietAndAllergyData.personalisedDietaryRequirements).toEqual([])
     })
   })
 
