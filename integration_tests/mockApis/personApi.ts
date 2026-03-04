@@ -7,7 +7,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/person/health/ping',
+        urlPattern: '/personRecord/health/ping',
       },
       response: {
         status: httpStatus,
@@ -22,7 +22,7 @@ export default {
     prisonNumbers?: string[]
   }) =>
     stubGetWithBody({
-      path: `/person/prisoner-record/prisoner-number/${prisonerNumber}`,
+      path: `/personRecord/person/prison/${prisonerNumber}`,
       body: {
         identifiers: {
           prisonNumbers,
@@ -34,7 +34,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/person/prisoner-record/prisoner-number/${prisonerNumber}`,
+        urlPattern: `/personRecord/person/prison/${prisonerNumber}`,
       },
       response: {
         status: 404,
@@ -45,7 +45,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/person/prisoner-record/prisoner-number/${prisonerNumber}`,
+        urlPattern: `/personRecord/person/prison/${prisonerNumber}`,
       },
       response: {
         status: 500,
