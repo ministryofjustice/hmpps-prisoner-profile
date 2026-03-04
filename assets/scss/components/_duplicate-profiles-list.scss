@@ -1,0 +1,26 @@
+.duplicate-profiles {
+  &__results {
+    &-list {
+      box-sizing: border-box;
+      overflow: auto;
+
+      &__image {
+        width: 90px;
+        max-width: 90px;
+
+        @media print {
+          width: 60px;
+          max-width: 90px;
+        }
+      }
+
+      .govuk-table__header {
+        vertical-align: bottom;
+      }
+
+      .govuk-table__cell {
+        vertical-align: middle;
+      }
+    }
+  }
+}
