@@ -47,6 +47,12 @@ export default class AliasService {
 
     if (!existingWorkingName) throw new NotFoundError('Existing working name not found')
 
+    const normalise = (value: string) => value.trim().toUpperCase()
+
+    if (normalise(existingWorkingName.lastName) !== normalise(name.lastName)) {
+      return this.createNewWorkingName(clientToken, user, prisonerNumber, name)
+    }
+
     const response = personIntegrationApiClient.updatePseudonym(existingWorkingName.sourceSystemId, {
       isWorkingName: true,
       dateOfBirth: existingWorkingName.dateOfBirth,
