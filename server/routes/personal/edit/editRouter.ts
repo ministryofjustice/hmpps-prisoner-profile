@@ -343,7 +343,7 @@ export default function editRouter(services: Services): Router {
       },
     },
     requiredPermission: PersonHealthAndMedicationPermission.edit_diet,
-    featureFlag: { featureName: 'Diet and Food Allergies Edit', method: () => true },
+    featureFlag: { featureName: 'Diet and Allergy', method: () => true },
   })
 
   editRoute({
