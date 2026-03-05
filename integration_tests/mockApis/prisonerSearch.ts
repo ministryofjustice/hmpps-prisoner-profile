@@ -42,7 +42,7 @@ export default {
 
   stubPrisonerSearchFindByNumbers: ({ prisoners }: { prisoners: Prisoner[] }) =>
     stubPostWithResponse({
-      path: '/prisonersearch/prisoner-numbers',
+      path: '/prisonersearch/prisoner-search/prisoner-numbers',
       responseBody: prisoners,
     }),
 
@@ -50,7 +50,7 @@ export default {
     stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/prisonersearch/prisoner-numbers',
+        urlPattern: '/prisonersearch/prisoner-search/prisoner-numbers',
       },
       response: {
         status: 500,

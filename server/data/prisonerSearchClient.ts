@@ -19,7 +19,7 @@ export default class PrisonerSearchRestClient extends RestClient implements Pris
 
   async findByNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
     const prisonerData = await this.post<Prisoner[]>(
-      { path: `/prisoner-numbers`, data: { prisonerNumbers } },
+      { path: `/prisoner-search/prisoner-numbers`, data: { prisonerNumbers } },
       this.token,
     )
     return Array.isArray(prisonerData) ? prisonerData : []
