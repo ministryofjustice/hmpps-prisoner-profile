@@ -26,20 +26,9 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
 
 export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
 
-export const editProfilePhotoEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  editProfileEnabled(activeCaseLoadId) ||
-  config.featureToggles.editProfilePhotoEnabledPrisons.includes(activeCaseLoadId) ||
-  config.featureToggles.editProfilePhotoEnabledPrisons.includes('***')
-
-export const dietAndAllergyEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.dietAndAllergy)
-
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 
 export const editReligionEnabled: FeatureFlagMethod = () => true
-
-export const externalContactsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.externalContactsEnabledPrisons.includes('***') ||
-  config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
 
 export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes('***') ||

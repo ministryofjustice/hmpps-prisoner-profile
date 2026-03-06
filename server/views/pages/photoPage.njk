@@ -13,7 +13,7 @@
 {% macro description() %}
   {% if not photoStatus.placeholder %}
     <div class="hmpps-profile-photo__description">
-      {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+      {% if isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
         {% include '../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
       {% endif %}
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Main facial image</h1>
@@ -59,7 +59,7 @@
             <li class="moj-sub-navigation__item">
               <a class="moj-sub-navigation__link" href="{{ photoAllHref }}">All facial images</a>
             </li>
-            {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+            {% if isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
               {{ newFacialImageButton(prisonerNumber, referer) }}
             {% endif %}
           </ul>
@@ -100,7 +100,7 @@
       </div>
     </div>
     {% if (photoStatus.withheld or photoStatus.placeholder)
-      and editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+      and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
       <div class="govuk-grid-column-one-quarter">
         <div class="hmpps-!-float-right">
           {{ newFacialImageButton(prisonerNumber, referer) }}

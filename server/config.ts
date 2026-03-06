@@ -391,21 +391,13 @@ export default {
       enabledPrisonsFrom: get('EDIT_PROFILE_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    editProfilePhotoEnabledPrisons: get('EDIT_PROFILE_PHOTO_ENABLED_PRISONS', []),
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
-    dietAndAllergy: {
-      enabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []) as string[],
-      enabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []) as string[],
-      enabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
-    },
-
     healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
-    externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
     personDuplicateRecordsEnabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []),

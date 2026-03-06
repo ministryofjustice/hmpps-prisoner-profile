@@ -42,7 +42,6 @@ import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
-import { externalContactsEnabled } from '../utils/featureFlags'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -129,7 +128,7 @@ export default class OverviewController {
       isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions)
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      externalContactsEnabled(prisonId) && isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
+      isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
         ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
         : null,
     ])

@@ -77,11 +77,9 @@ import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIde
 import AddressService from './addressService'
 
 interface PersonalPageGetOptions {
-  dietAndAllergyIsEnabled: boolean
   editProfileEnabled: boolean
   simulateFetchEnabled: boolean
   personalRelationshipsApiReadEnabled: boolean
-  healthAndMedicationApiReadEnabled: boolean
   personEndpointsEnabled: boolean
   apiErrorCallback: (error: Error) => void
 }
@@ -103,20 +101,10 @@ export default class PersonalPageService {
     private readonly addressService: AddressService,
   ) {}
 
-  async getHealthAndMedication(
-    token: string,
-    prisonerNumber: string,
-    {
-      dietAndAllergiesEnabled,
-      healthAndMedicationApiReadEnabled,
-    }: { dietAndAllergiesEnabled: boolean; healthAndMedicationApiReadEnabled: boolean },
-  ): Promise<HealthAndMedication | null> {
-    if (!dietAndAllergiesEnabled && !healthAndMedicationApiReadEnabled) {
-      return null
-    }
+  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
     const response = apiClient.getHealthAndMedication(prisonerNumber)
-    return dietAndAllergiesEnabled ? response : null
+    return response
   }
 
   async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
@@ -266,11 +254,9 @@ export default class PersonalPageService {
     options: Partial<PersonalPageGetOptions> = {},
   ): Promise<PersonalPage> {
     const defaultOptions: PersonalPageGetOptions = {
-      dietAndAllergyIsEnabled: false,
       editProfileEnabled: false,
       simulateFetchEnabled: false,
       personalRelationshipsApiReadEnabled: true,
-      healthAndMedicationApiReadEnabled: false,
       personEndpointsEnabled: false,
       apiErrorCallback: () => null,
     }
@@ -302,13 +288,7 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
-      Result.wrap(
-        this.getHealthAndMedication(token, prisonerNumber, {
-          dietAndAllergiesEnabled: getOptions.dietAndAllergyIsEnabled,
-          healthAndMedicationApiReadEnabled: getOptions.healthAndMedicationApiReadEnabled,
-        }),
-        getOptions.apiErrorCallback,
-      ),
+      Result.wrap(this.getHealthAndMedication(token, prisonerNumber), getOptions.apiErrorCallback),
       getOptions.personalRelationshipsApiReadEnabled
         ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback)
         : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
@@ -609,7 +589,9 @@ export default class PersonalPageService {
     return (
       (dietAndAllergy &&
         dietAndAllergy[field]?.value
-          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+          ?.map(({ value: { id, description }, comment }) =>
+            field === 'foodAllergies' ? { id, description } : { id, description, comment },
+          )
           .sort((a, b) => {
             if (a.id?.endsWith('OTHER')) return 1
             if (b.id?.endsWith('OTHER')) return -1

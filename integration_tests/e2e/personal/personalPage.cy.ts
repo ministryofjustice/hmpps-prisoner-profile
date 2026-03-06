@@ -126,7 +126,6 @@ context('When signed in', () => {
       cy.getDataQa('hidden-number-of-children-key').should('exist')
       cy.getDataQa('hidden-languages-key').should('exist')
       cy.getDataQa('hidden-type-of-diet-key').should('exist')
-      cy.getDataQa('hidden-diet-and-food-allergies-key').should('exist')
       cy.getDataQa('hidden-smoker-or-vaper-key').should('exist')
       cy.getDataQa('hidden-youth-offender-key').should('exist')
       cy.getDataQa('hidden-domestic-abuse-perpetrator-key').should('exist')
@@ -198,7 +197,7 @@ context('When signed in', () => {
           .marriageOrCivilPartnership()
           .should('have.text', 'Single – never married or in a civil partnership')
         page.personalDetails().numberOfChildren().should('have.text', '2')
-        page.personalDetails().typeOfDiet().should('not.exist')
+        page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
         page
           .personalDetails()
           .dietAndFoodAllergies()
@@ -749,13 +748,6 @@ context('When signed in', () => {
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
       visitPersonalDetailsPage()
-    })
-
-    it('Displays old type of diet', () => {
-      const page = Page.verifyOnPage(PersonalPage)
-
-      page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
-      page.personalDetails().dietAndFoodAllergies().should('not.exist')
     })
 
     it('Displays distinguishingMarks information from inmate details', () => {

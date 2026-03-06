@@ -286,7 +286,7 @@
                   options: {
                     anchor: "type-of-diet",
                     dataQa: "type-of-diet",
-                    visible: inUsersCaseLoad and not dietAndAllergiesEnabled
+                    visible: inUsersCaseLoad
                   }
                 },
                 {
@@ -296,9 +296,7 @@
                   options: {
                     anchor: "diet-and-food-allergies",
                     dataQa: "diet-and-food-allergies",
-                    visible: dietAndAllergiesEnabled,
                     changeLinkEnabled:
-                      dietAndAllergiesEnabled and
                       personalDetails.dietAndAllergy.status == "fulfilled" and
                       isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
                     changeHref: 'personal/diet-and-food-allergies',

@@ -66,7 +66,7 @@ import groupDistinguishingMarks, {
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import { bodyPartLabels } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { appInsightsWebAnalyticsEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureFlags'
+import { appInsightsWebAnalyticsEnabled, militaryHistoryEnabled } from './featureFlags'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
@@ -134,7 +134,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('placeholderPrisonerImageUrl', '/assets/images/prisoner-profile-image.png')
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
-  njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('appInsightsWebAnalyticsEnabled', appInsightsWebAnalyticsEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
   njkEnv.addGlobal('bodyPartLabels', bodyPartLabels)
