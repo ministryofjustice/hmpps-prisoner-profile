@@ -45,7 +45,6 @@ import {
   prisonerIsTRN,
   properCaseName,
   refDataToSelectOptions,
-  SelectOption,
   snakeToCamelCase,
   sortArrayOfObjectsByDate,
   sortByLatestAndUuid,
@@ -57,6 +56,7 @@ import {
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import type { SelectOption } from '../interfaces/GovOptions'
 import HmppsError from '../interfaces/HmppsError'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
