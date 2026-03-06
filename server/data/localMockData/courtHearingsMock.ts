@@ -1,6 +1,6 @@
+import type { SelectOption } from '../../interfaces/GovOptions'
 import { CourtHearing } from '../interfaces/prisonApi/CourtCase'
 import ReferenceCode from '../interfaces/bookAVideoLinkApi/ReferenceCode'
-import { SelectOption } from '../../utils/utils'
 
 export const CourtHearingsMock: CourtHearing[] = [
   {

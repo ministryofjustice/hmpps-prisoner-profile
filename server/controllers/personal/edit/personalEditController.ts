@@ -1,9 +1,9 @@
 import { Request, RequestHandler, Response } from 'express'
 import { FieldData, RadioFieldData, TextFieldData } from '../fieldData'
 import { AuditService } from '../../../services/auditService'
+import type { RadioOption, SelectOption } from '../../../interfaces/GovOptions'
 import getCommonRequestData from '../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
-import { RadioOption, SelectOption } from '../../../utils/utils'
 import logger from '../../../../logger'
 import { NomisLockedError } from '../../../utils/nomisLockedError'
 

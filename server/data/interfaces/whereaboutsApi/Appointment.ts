@@ -1,4 +1,4 @@
-import { SelectOption } from '../../../utils/utils'
+import type { SelectOption } from '../../../interfaces/GovOptions'
 
 export default interface Appointment {
   appointmentType: string

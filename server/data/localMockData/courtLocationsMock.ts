@@ -1,4 +1,4 @@
-import { SelectOption } from '../../utils/utils'
+import type { SelectOption } from '../../interfaces/GovOptions'
 import Court, { ProbationTeam } from '../interfaces/bookAVideoLinkApi/Court'
 
 export const courtLocationsMock: Court[] = [

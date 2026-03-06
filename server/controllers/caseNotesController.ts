@@ -15,7 +15,7 @@ import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList
 import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
-import type { SelectOption } from '../utils/utils'
+import type { SelectOption } from '../interfaces/GovOptions'
 
 /**
  * Parse requests for case notes routes and orchestrate response
