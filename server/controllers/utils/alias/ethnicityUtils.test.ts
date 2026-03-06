@@ -1,6 +1,6 @@
+import type { RadioOption } from '../../../interfaces/GovOptions'
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
 import { getEthnicBackgroundRadioOptions, getEthnicGroupRadioOptions } from './ethnicityUtils'
-import { RadioOption } from '../../../utils/utils'
 
 describe('ethnicityUtils', () => {
   describe('Get ethnic group radio options', () => {

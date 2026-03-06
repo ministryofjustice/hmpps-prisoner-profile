@@ -1,5 +1,6 @@
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
-import { objectToRadioOptions, RadioOption } from '../../../utils/utils'
+import type { RadioOption } from '../../../interfaces/GovOptions'
+import { objectToRadioOptions } from '../../../utils/utils'
 
 export function getEthnicGroupRadioOptions(
   ethnicityReferenceCodes: ReferenceDataCodeDto[],

@@ -1,6 +1,7 @@
-import type { Source } from 'accessible-autocomplete'
+import type accessibleAutocomplete from 'accessible-autocomplete'
 
 type NotStringArray<T> = T extends string[] ? never : T
+type Source = Parameters<typeof accessibleAutocomplete>[0]['source']
 
 export function filterAndSort(options: string[]): NotStringArray<Source> {
   const scoreBySubstringIndex = (query: string, option: string): number => {
