@@ -3,6 +3,7 @@ import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjus
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import ProfessionalContactsController from '../controllers/professionalContactsController'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function professionalContactsRouter(services: Services): Router {
   const router = Router()
@@ -14,6 +15,7 @@ export default function professionalContactsRouter(services: Services): Router {
   router.get(
     `${basePath}/professional-contacts`,
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     (req, res) => professionalContactsController.displayProfessionalContacts(req, res),
   )

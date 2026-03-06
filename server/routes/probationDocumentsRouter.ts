@@ -5,6 +5,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import ProbationDocumentsController from '../controllers/probationDocumentsController'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function probationDocumentsRouter(services: Services): Router {
   const router = Router()
@@ -20,6 +21,7 @@ export default function probationDocumentsRouter(services: Services): Router {
     `${basePath}/probation-documents`,
     auditPageAccessAttempt({ services, page: Page.ProbationDocuments }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [ProbationDocumentsPermission.read] }),
     (req, res) => probationDocumentsController.displayDocuments(req, res),
   )

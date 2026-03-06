@@ -5,6 +5,7 @@ import { Page } from '../../services/auditService'
 import getPrisonerData from '../../middleware/getPrisonerDataMiddleware'
 import { Services } from '../../services'
 import PersonalController from '../../controllers/personal/personalController'
+import getDuplicatePrisonerData from '../../middleware/getDuplicatePrisonerDataMiddleware'
 
 export const personalPageBasePath = '/prisoner/:prisonerNumber/personal'
 
@@ -22,6 +23,7 @@ export default function personalRouter(services: Services): Router {
     personalPageBasePath,
     auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     personalController.displayPersonalPage(),
   )

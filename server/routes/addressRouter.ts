@@ -5,6 +5,7 @@ import { Services } from '../services'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function addressRouter(services: Services): Router {
   const router = Router()
@@ -17,6 +18,7 @@ export default function addressRouter(services: Services): Router {
     `${basePath}/addresses`,
     auditPageAccessAttempt({ services, page: Page.Addresses }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     (req, res) => addressController.displayAddresses(req, res),
   )
