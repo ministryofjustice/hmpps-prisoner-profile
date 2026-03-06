@@ -1,4 +1,4 @@
-import type { SelectOption } from '../../../server/utils/utils'
+import type { SelectOption } from '../../../server/interfaces/GovOptions'
 
 export function alertDynamicDropdowns() {
   const alertTypeElement = document.getElementById('alertType') as HTMLSelectElement

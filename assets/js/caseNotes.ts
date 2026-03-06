@@ -1,4 +1,4 @@
-import type { SelectOption } from '../../server/utils/utils'
+import type { SelectOption } from '../../server/interfaces/GovOptions'
 
 const WARNING: Record<string, string> = {
   'OMIC.OPEN_COMM':

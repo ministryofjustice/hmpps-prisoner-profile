@@ -9,6 +9,7 @@ import OverviewNonAssociation from '../services/interfaces/overviewPageService/O
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import type { RadioOption, SelectOption } from '../interfaces/GovOptions'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
 import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
@@ -586,41 +587,6 @@ export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]):
 export const sortByDateTime = (t1: string, t2: string): number => {
   const [date1, date2] = [new Date(t1).getTime(), new Date(t2).getTime()]
   return date1 - date2
-}
-
-export interface SelectOption {
-  text: string
-  value: string | number
-  selected?: boolean
-  attributes?: {
-    hidden?: 'hidden'
-    disabled?: 'disabled'
-  }
-}
-
-export interface RadioOptionHint {
-  text: string
-}
-
-export interface RadioOption {
-  text: string
-  value: string | number
-  checked?: boolean
-  hint?: RadioOptionHint
-  attributes?: {
-    hidden?: 'hidden'
-    disabled?: 'disabled'
-  }
-}
-
-export interface CheckboxOptions {
-  text: string
-  value: string
-  subValues?: {
-    title: string
-    hint: string
-    options: CheckboxOptions[]
-  }
 }
 
 export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {

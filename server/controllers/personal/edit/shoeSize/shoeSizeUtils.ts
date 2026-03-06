@@ -1,4 +1,4 @@
-import { SelectOption } from '../../../../utils/utils'
+import type { SelectOption } from '../../../../interfaces/GovOptions'
 
 export const womensShoeSizes: SelectOption[] = [
   { text: 'UK 1 (EU 34)', value: '1' },

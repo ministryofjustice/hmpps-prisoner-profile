@@ -5,14 +5,13 @@ import CareNeedsService from '../../services/careNeedsService'
 import { kilogramsToStoneAndPounds, stoneAndPoundsToKilograms } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
+import type { RadioOption, SelectOption } from '../../interfaces/GovOptions'
 import {
   apostrophe,
   convertToTitleCase,
   formatName,
   objectToRadioOptions,
   objectToSelectOptions,
-  RadioOption,
-  SelectOption,
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import {
