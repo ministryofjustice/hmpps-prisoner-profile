@@ -16,6 +16,7 @@ import {
 } from '../validators/alertValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
@@ -32,6 +33,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/alerts/active`,
     auditPageAccessAttempt({ services, page: Page.ActiveAlerts }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     (req, res, next) => alertsController.displayAlerts(req, res, next, true),
   )
@@ -40,6 +42,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/alerts/inactive`,
     auditPageAccessAttempt({ services, page: Page.InactiveAlerts }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     (req, res, next) => alertsController.displayAlerts(req, res, next, false),
   )
@@ -63,6 +66,7 @@ export default function alertsRouter(services: Services): Router {
   router.get(
     `${basePath}/alerts/detail`,
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     alertsController.displayAlert(),
   )
@@ -121,6 +125,7 @@ export default function alertsRouter(services: Services): Router {
   router.get(
     `/api${basePath}/get-alert-details`,
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     alertsController.getAlertDetails(),
   )
