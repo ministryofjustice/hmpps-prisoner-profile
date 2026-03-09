@@ -25,12 +25,14 @@ const buildDuplicatePrisoners = (
 
 const nonMdiCaseLoad = [{ caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '', caseloadFunction: '' }]
 
-const visitOverviewPage = () => cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+const verifyBannerOnOverviewPage = (bannerStatus: string) => {
+  cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+  Page.verifyOnPage(OverviewPage)
+  cy.getDataQa('duplicate-prisoner-banner').should(`${bannerStatus}`)
+}
+
 const visitDuplicateProfilesPage = ({ failOnStatusCode = true } = {}) =>
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/possible-duplicate-profiles' })
-
-const assertBackLink = (prisonerNum: string) =>
-  cy.get('[data-qa="back-link"]').should('have.attr', 'href').should('include', `/prisoner/${prisonerNum}`)
 
 const visitAndVerifyDuplicateProfilesPage = ({ failOnStatusCode = true } = {}) => {
   visitDuplicateProfilesPage({ failOnStatusCode })
@@ -39,6 +41,7 @@ const visitAndVerifyDuplicateProfilesPage = ({ failOnStatusCode = true } = {}) =
   page.miniBanner().name().should('contain.text', 'Saunders, John')
   page.miniBanner().name().should('contain.text', 'G6123VU')
   page.h1().should('contain.text', 'Possible duplicate profiles for John Saunders')
+  cy.get('[data-qa="back-link"]').should('have.attr', 'href').should('include', `/prisoner/G6123VU`)
   return page
 }
 
@@ -75,9 +78,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page with the duplicate banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('exist')
+        verifyBannerOnOverviewPage('exist')
       })
 
       it('Should show the duplicates page with the non-filtered list of records', () => {
@@ -90,8 +91,6 @@ context('Duplicate Prisoner Records', () => {
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
-
-        assertBackLink(prisonerNumber)
       })
     })
 
@@ -112,9 +111,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page with the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('exist')
+        verifyBannerOnOverviewPage('exist')
       })
 
       it('Should show the duplicates page with the filtered list of non-ghost duplicates', () => {
@@ -126,8 +123,6 @@ context('Duplicate Prisoner Records', () => {
         page.duplicate(1).name().should('contain.text', 'Saunders, Dave')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/C9999EF')
         page.duplicate(1).prisonNumber().should('contain.text', 'C9999EF')
-
-        assertBackLink(prisonerNumber)
       })
     })
 
@@ -146,9 +141,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -172,9 +165,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -198,9 +189,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -223,9 +212,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -249,9 +236,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -277,9 +262,7 @@ context('Duplicate Prisoner Records', () => {
     })
 
     it('Should show the overview page without the duplicates banner', () => {
-      visitOverviewPage()
-      Page.verifyOnPage(OverviewPage)
-      cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+      verifyBannerOnOverviewPage('not.exist')
     })
 
     it('Should return NOT FOUND on the duplicates page', () => {
@@ -298,9 +281,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -314,9 +295,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -330,9 +309,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -351,9 +328,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should show the overview page without the duplicates banner', () => {
-        visitOverviewPage()
-        Page.verifyOnPage(OverviewPage)
-        cy.getDataQa('duplicate-prisoner-banner').should('not.exist')
+        verifyBannerOnOverviewPage('not.exist')
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -388,8 +363,6 @@ context('Duplicate Prisoner Records', () => {
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
-
-        assertBackLink(prisonerNumber)
       })
     })
 
@@ -420,8 +393,6 @@ context('Duplicate Prisoner Records', () => {
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
-
-        assertBackLink(prisonerNumber)
       })
     })
 
@@ -450,8 +421,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
@@ -481,8 +450,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
@@ -517,8 +484,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicates().should('have.length', 1)
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
@@ -553,8 +518,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicates().should('have.length', 1)
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
@@ -632,8 +595,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
@@ -667,8 +628,6 @@ context('Duplicate Prisoner Records', () => {
           page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
           page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
           page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
-
-          assertBackLink(prisonerNumber)
         })
       },
     )
