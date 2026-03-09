@@ -2,13 +2,7 @@
 {% from "./macros/tabLinksMacro.njk" import tabLinksMacro %}
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full hmpps-profile-banner-bottom">
-    <div class="govuk-grid-row">
-      {{ alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) }}
-    </div>
-    {% if duplicateRecordsFound %}
-      {% include "../../partials/overviewPage/duplicatePrisonerBanner.njk" %}
-    {% endif %}
+  <div class="govuk-grid-column-full hmpps-profile-banner-tabs">
     <nav class="govuk-grid-row govuk-!-display-none-print">
       <div class="govuk-grid-column-full">
         {{ tabLinksMacro(tabLinks, prisonerNumber) }}

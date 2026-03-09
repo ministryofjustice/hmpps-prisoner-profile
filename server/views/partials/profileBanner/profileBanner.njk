@@ -1,6 +1,10 @@
 {% if hideBanner === false %}
   <div data-test="hmpps-profile-banner-partial" class="hmpps-profile-banner">
     {% include "./profileBannerTop.njk" %}
-    {% include "./profileBannerBottom.njk" %}
+    {% include "./profileBannerAlerts.njk" %}
+    {% if duplicateRecordsFound %}
+      {% include "../../partials/overviewPage/duplicatePrisonerBanner.njk" %}
+    {% endif %}
+    {% include "./profileBannerTabs.njk" %}
   </div>
 {% endif %}
