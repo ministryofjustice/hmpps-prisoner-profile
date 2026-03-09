@@ -20,9 +20,9 @@
           <li class="moj-sub-navigation__item">
             <a class="moj-sub-navigation__link" aria-current="page" href="?">All facial images</a>
           </li>
-          {% if editEnabled and isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
+          {% if isGranted(CorePersonRecordPermission.edit_photo, prisonerPermissions) %}
             <li class="moj-sub-navigation__item hmpps-!-float-right govuk-!-margin-right-0">
-              {{ newFacialImageButton(prisonerNumber, referer, editEnabled) }}
+              {{ newFacialImageButton(prisonerNumber, referer) }}
             </li>
           {% endif %}
         </ul>

@@ -967,33 +967,6 @@ context('Overview Page', () => {
       cy.get('[data-qa=actions-unavailable]').should('exist')
     })
   })
-
-  context('Given external contacts is not yet enabled in the prison', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth()
-      cy.setupOverviewPageStubs({
-        prisonerNumber: 'G6123VU',
-        bookingId: 1102484,
-        prisonerDataOverrides: { prisonId: 'WYI' },
-        caseLoads: [
-          {
-            caseloadFunction: '',
-            caseLoadId: 'WYI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-          },
-        ],
-      })
-      visitOverviewPage()
-    })
-
-    it('Does not display the external contacts summary', () => {
-      const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.externalContacts().card().should('not.exist')
-    })
-  })
 })
 
 context('Overview Page - Prisoner not found', () => {
