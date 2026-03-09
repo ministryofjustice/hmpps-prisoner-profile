@@ -5,6 +5,12 @@ import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 import DuplicateProfilesPage from '../pages/duplicateProfilesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
+import { prisonsKeyedByPrisonId } from '../../server/data/localMockData/prisonRegisterMockData'
+
+const specialPrisons: Record<string, { prisonName: string; locationDescription: string }> = {
+  OUT: { prisonName: 'Out of Prison', locationDescription: 'Out of Prison' },
+  TRN: { prisonName: 'In Transit', locationDescription: 'In Transit' },
+}
 
 const buildDuplicatePrisoners = (
   configs: Array<{
@@ -14,13 +20,26 @@ const buildDuplicatePrisoners = (
     currentFacialImageId?: number
   }>,
 ): Prisoner[] => {
-  return configs.map(config => ({
-    ...PrisonerMockDataA,
-    prisonerNumber: config.prisonerNumber,
-    prisonId: config.prisonId,
-    ...(config.firstName && { firstName: config.firstName }),
-    ...(config.currentFacialImageId && { currentFacialImageId: config.currentFacialImageId }),
-  }))
+  return configs.map(config => {
+    const prisonInfo =
+      specialPrisons[config.prisonId] ||
+      (prisonsKeyedByPrisonId[config.prisonId] && {
+        prisonName: prisonsKeyedByPrisonId[config.prisonId].prisonName,
+        locationDescription: prisonsKeyedByPrisonId[config.prisonId].prisonName,
+      })
+
+    return {
+      ...PrisonerMockDataA,
+      prisonerNumber: config.prisonerNumber,
+      prisonId: config.prisonId,
+      ...(prisonInfo && {
+        prisonName: prisonInfo.prisonName,
+        locationDescription: prisonInfo.locationDescription,
+      }),
+      ...(config.firstName && { firstName: config.firstName }),
+      ...(config.currentFacialImageId && { currentFacialImageId: config.currentFacialImageId }),
+    }
+  })
 }
 
 const nonMdiCaseLoad = [{ caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '', caseloadFunction: '' }]
@@ -61,7 +80,7 @@ context('Duplicate Prisoner Records', () => {
   })
 
   context('Duplicates page content', () => {
-    context('When duplicates include a mix of released and transferring prisoners', () => {
+    context('When duplicates include a mix of released and in-transit prisoners', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
@@ -88,23 +107,26 @@ context('Duplicate Prisoner Records', () => {
         page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
         page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
         page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+        page.duplicate(0).location().should('contain.text', 'Out of Prison')
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
+        page.duplicate(1).location().should('contain.text', 'In Transit')
       })
     })
 
-    context('When duplicates include a mix of ghost and released/transferring records', () => {
+    context('When duplicates include a mix of ghost and released/in-transit records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
           prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
         })
+        cy.task('stubImages')
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
             { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
-            { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie' },
+            { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie', currentFacialImageId: 1234 },
             { prisonerNumber: 'C9999EF', prisonId: 'TRN', firstName: 'Dave' },
           ]),
         })
@@ -117,12 +139,15 @@ context('Duplicate Prisoner Records', () => {
       it('Should show the duplicates page with the filtered list of non-ghost duplicates', () => {
         const page = visitAndVerifyDuplicateProfilesPage()
         page.duplicates().should('have.length', 2)
+        page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
         page.duplicate(0).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(0).prisonNumber().should('contain.text', 'B5678CD')
+        page.duplicate(0).location().should('contain.text', 'Out of Prison')
         page.duplicate(1).name().should('contain.text', 'Saunders, Dave')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/C9999EF')
         page.duplicate(1).prisonNumber().should('contain.text', 'C9999EF')
+        page.duplicate(1).location().should('contain.text', 'In Transit')
       })
     })
 
@@ -313,8 +338,7 @@ context('Duplicate Prisoner Records', () => {
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
-        visitDuplicateProfilesPage({ failOnStatusCode: false })
-        Page.verifyOnPage(NotFoundPage)
+        verifyNotFoundOnDuplicatesPage()
       })
     })
 
@@ -336,7 +360,7 @@ context('Duplicate Prisoner Records', () => {
       })
     })
 
-    context('When a user views duplicates for an active record where all duplicates are OUT', () => {
+    context('When a user views duplicates for an active record where all duplicates are released', () => {
       beforeEach(() => {
         cy.task('reset')
         cy.setupUserAuth()
@@ -345,10 +369,11 @@ context('Duplicate Prisoner Records', () => {
           prisonerNumber,
           prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
+        cy.task('stubImages')
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber, prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+            { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob', currentFacialImageId: 1234 },
             { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie' },
           ]),
         })
@@ -357,16 +382,19 @@ context('Duplicate Prisoner Records', () => {
       it('Should show the duplicates page with the non-filtered list of records', () => {
         const page = visitAndVerifyDuplicateProfilesPage()
         page.duplicates().should('have.length', 2)
+        page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
         page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
         page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
         page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+        page.duplicate(0).location().should('contain.text', 'Out of Prison')
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
+        page.duplicate(1).location().should('contain.text', 'Out of Prison')
       })
     })
 
-    context('When a user views duplicates for an active record where all duplicates are TRN', () => {
+    context('When a user views duplicates for an active record where all duplicates are in-transit', () => {
       beforeEach(() => {
         cy.task('reset')
         cy.setupUserAuth()
@@ -375,10 +403,11 @@ context('Duplicate Prisoner Records', () => {
           prisonerNumber,
           prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
+        cy.task('stubImages')
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber, prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'TRN', firstName: 'Bob' },
+            { prisonerNumber: 'A1234BC', prisonId: 'TRN', firstName: 'Bob', currentFacialImageId: 1234 },
             { prisonerNumber: 'B5678CD', prisonId: 'TRN', firstName: 'Charlie' },
           ]),
         })
@@ -387,12 +416,15 @@ context('Duplicate Prisoner Records', () => {
       it('Should show the duplicates page with the non-filtered list of records', () => {
         const page = visitAndVerifyDuplicateProfilesPage()
         page.duplicates().should('have.length', 2)
+        page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
         page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
         page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
         page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+        page.duplicate(0).location().should('contain.text', 'In Transit')
         page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
         page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
         page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
+        page.duplicate(1).location().should('contain.text', 'In Transit')
       })
     })
 
@@ -407,10 +439,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'OUT' },
-              { prisonerNumber: 'A1234BC', prisonId: 'MDI', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'MDI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -418,15 +451,17 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered single record', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 1)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Moorland')
         })
       },
     )
 
     context(
-      'When a user with INACTIVE_BOOKINGS views duplicates for a transferring prisoner where duplicates include an active prisoner in their caseload',
+      'When a user with INACTIVE_BOOKINGS views duplicates for an in-transit prisoner where duplicates include an active prisoner in their caseload',
       () => {
         beforeEach(() => {
           cy.task('reset')
@@ -436,10 +471,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'TRN' },
-              { prisonerNumber: 'A1234BC', prisonId: 'MDI', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'MDI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -447,9 +483,11 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered single record', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 1)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Moorland')
         })
       },
     )
@@ -471,10 +509,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'OUT' },
-              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -482,14 +521,17 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered single record', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 1)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
+          page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Leeds')
         })
       },
     )
 
     context(
-      'When a user with GLOBAL_SEARCH and INACTIVE_BOOKINGS views duplicates for a transferring prisoner where duplicates include an active prisoner not in their caseload',
+      'When a user with GLOBAL_SEARCH and INACTIVE_BOOKINGS views duplicates for an in-transit prisoner where duplicates include an active prisoner not in their caseload',
       () => {
         beforeEach(() => {
           cy.task('reset')
@@ -505,10 +547,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'TRN' },
-              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -516,8 +559,11 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered single record', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 1)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
+          page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Leeds')
         })
       },
     )
@@ -543,7 +589,7 @@ context('Duplicate Prisoner Records', () => {
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'OUT' },
-              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 5678 },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -552,16 +598,17 @@ context('Duplicate Prisoner Records', () => {
           visitDuplicateProfilesPage({ failOnStatusCode: false })
           const page = Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
           page.duplicates().should('have.length', 1)
-          page.duplicate(0).location().should('be.visible')
-          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
           page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
           page.duplicate(0).name().should('be.empty')
+          page.duplicate(0).name().find('a').should('not.exist')
+          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Leeds')
         })
       },
     )
 
     context(
-      'When a user with INACTIVE_BOOKINGS views duplicates for a transferring prisoner where duplicates include an active prisoner not in their caseload',
+      'When a user with INACTIVE_BOOKINGS views duplicates for an in-transit prisoner where duplicates include an active prisoner not in their caseload',
       () => {
         beforeEach(() => {
           cy.task('reset')
@@ -581,7 +628,7 @@ context('Duplicate Prisoner Records', () => {
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'TRN' },
-              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 5678 },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -590,10 +637,11 @@ context('Duplicate Prisoner Records', () => {
           visitDuplicateProfilesPage({ failOnStatusCode: false })
           const page = Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
           page.duplicates().should('have.length', 1)
-          page.duplicate(0).location().should('be.visible')
-          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
           page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
           page.duplicate(0).name().should('be.empty')
+          page.duplicate(0).name().find('a').should('not.exist')
+          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Leeds')
         })
       },
     )
@@ -615,10 +663,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'LEI' },
-              { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob', currentFacialImageId: 1234 },
             ]),
           })
         })
@@ -626,9 +675,11 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered single record', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 1)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Out of Prison')
         })
       },
     )
@@ -644,10 +695,11 @@ context('Duplicate Prisoner Records', () => {
             prisonerNumber,
             prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
           })
+          cy.task('stubImages')
           cy.task('stubPrisonerSearchFindByNumbers', {
             prisoners: buildDuplicatePrisoners([
               { prisonerNumber, prisonId: 'OUT' },
-              { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+              { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob', currentFacialImageId: 1234 },
               { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie' },
             ]),
           })
@@ -656,9 +708,11 @@ context('Duplicate Prisoner Records', () => {
         it('Should show the duplicates page with the non-filtered list of records', () => {
           const page = visitAndVerifyDuplicateProfilesPage({ failOnStatusCode: false })
           page.duplicates().should('have.length', 2)
+          page.duplicate(0).photo().find('img').should('have.attr', 'src').should('include', '/api/image/1234')
           page.duplicate(0).name().should('contain.text', 'Saunders, Bob')
           page.duplicate(0).name().find('a').should('have.attr', 'href').should('include', '/prisoner/A1234BC')
           page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).location().should('contain.text', 'Out of Prison')
           page.duplicate(1).name().should('contain.text', 'Saunders, Charlie')
           page.duplicate(1).name().find('a').should('have.attr', 'href').should('include', '/prisoner/B5678CD')
           page.duplicate(1).prisonNumber().should('contain.text', 'B5678CD')
@@ -683,12 +737,12 @@ context('Duplicate Prisoner Records', () => {
         })
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
+      it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
 
-    context('When a user with only ROLE_PRISON views duplicates for a transferring prisoner', () => {
+    context('When a user with only ROLE_PRISON views duplicates for an in-transit prisoner', () => {
       beforeEach(() => {
         cy.task('reset')
         cy.setupUserAuth({ roles: [Role.PrisonUser] })
@@ -705,7 +759,7 @@ context('Duplicate Prisoner Records', () => {
         })
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
+      it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
@@ -732,7 +786,7 @@ context('Duplicate Prisoner Records', () => {
         })
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
+      it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
@@ -759,13 +813,13 @@ context('Duplicate Prisoner Records', () => {
         })
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
+      it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
 
     context(
-      'When a user with only ROLE_PRISON views duplicates for a transferring prisoner not in their caseload',
+      'When a user with only ROLE_PRISON views duplicates for an in-transit prisoner not in their caseload',
       () => {
         beforeEach(() => {
           cy.task('reset')
@@ -788,7 +842,7 @@ context('Duplicate Prisoner Records', () => {
           })
         })
 
-        it('Should return NOT FOUND on the duplicates page', () => {
+        it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
           verifyNotFoundOnDuplicatesPage()
         })
       },
@@ -818,7 +872,7 @@ context('Duplicate Prisoner Records', () => {
           })
         })
 
-        it('Should return NOT FOUND on the duplicates page', () => {
+        it('Should return NOT FOUND on the duplicates page due to insufficient roles', () => {
           verifyNotFoundOnDuplicatesPage()
         })
       },
