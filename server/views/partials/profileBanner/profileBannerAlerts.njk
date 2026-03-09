@@ -1,0 +1,9 @@
+{% from "./macros/alertsMacro.njk" import alertsMacro %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full hmpps-profile-banner-alerts">
+    <div class="govuk-grid-row">
+      {{ alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) }}
+    </div>
+  </div>
+</div>
