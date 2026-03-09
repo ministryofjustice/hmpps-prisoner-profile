@@ -97,6 +97,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(personApiClient.getRecord).not.toHaveBeenCalled()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
@@ -107,6 +108,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
       expect(req.middleware.duplicatePrisonerData).toEqual([mockPrisoners[1], mockPrisoners[2]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(next).toHaveBeenCalled()
     })
   })
@@ -118,6 +120,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(personApiClient.getRecord).not.toHaveBeenCalled()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
@@ -129,6 +132,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
@@ -140,6 +144,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
@@ -150,18 +155,20 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('Happy path', () => {
-    it('should populate duplicatePrisonerData with duplicate prisoners', async () => {
+    it('should populate duplicate prisoner data', async () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
       expect(prisonerSearchClient.findByNumbers).toHaveBeenCalledWith(['A1234BC', 'B5678DE', 'C9012FG'])
       expect(req.middleware.duplicatePrisonerData).toEqual([mockPrisoners[1], mockPrisoners[2]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(next).toHaveBeenCalled()
     })
 
@@ -192,6 +199,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(metricsService.trackDuplicateRecordsFound).not.toHaveBeenCalled()
     })
 
@@ -201,6 +209,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(next).toHaveBeenCalled()
     })
   })
@@ -218,6 +227,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithGHI[2]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(req.middleware.duplicatePrisonerData.map(p => p.prisonerNumber)).not.toContain('B5678DE')
     })
 
@@ -249,6 +259,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithMultipleGHI[3]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -281,6 +292,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
     })
 
     it('should track metrics when total active count (original + duplicates) >= 2', async () => {
@@ -318,6 +330,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithInactiveDuplicates[1]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).not.toHaveBeenCalled()
     })
 
@@ -334,6 +347,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([prisonersInactiveOriginalOneActiveDuplicate[1]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).not.toHaveBeenCalled()
     })
 
@@ -351,6 +365,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'OUT',
@@ -371,6 +386,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -392,6 +408,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -416,6 +433,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -443,6 +461,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       // B5678DE filtered as GHI, leaving only inactive duplicates
       expect(req.middleware.duplicatePrisonerData).toEqual([prisoners[2], prisoners[3]])
+      expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
@@ -461,6 +480,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(res.locals.duplicateRecordApiFailure).toBe(true)
       expect(metricsService.trackDuplicateRecordsApiFailure).toHaveBeenCalledWith('A1234BC', 'MDI', error, mockUser)
       expect(next).toHaveBeenCalled()
@@ -473,6 +493,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
+      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(res.locals.duplicateRecordApiFailure).toBe(true)
       expect(metricsService.trackDuplicateRecordsApiFailure).toHaveBeenCalledWith('A1234BC', 'MDI', error, mockUser)
       expect(next).toHaveBeenCalled()

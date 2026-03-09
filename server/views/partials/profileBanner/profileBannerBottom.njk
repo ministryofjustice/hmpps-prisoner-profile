@@ -6,7 +6,7 @@
     <div class="govuk-grid-row">
       {{ alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) }}
     </div>
-    {% if duplicatePrisonerData and duplicatePrisonerData.length > 0 %}
+    {% if duplicateRecordsFound %}
       {% include "../../partials/overviewPage/duplicatePrisonerBanner.njk" %}
     {% endif %}
     <nav class="govuk-grid-row govuk-!-display-none-print">
