@@ -243,30 +243,30 @@ context('Duplicate Prisoner Records', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
-  })
 
-  context('When duplicates include a mix of GHI and active records', () => {
-    beforeEach(() => {
-      cy.task('stubPersonApiGetRecord', {
-        prisonerNumber,
-        prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD', 'C9999EF'],
+    context('When duplicates include a mix of ghost and active records', () => {
+      beforeEach(() => {
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD', 'C9999EF'],
+        })
+        cy.task('stubPrisonerSearchFindByNumbers', {
+          prisoners: buildDuplicatePrisoners([
+            { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
+            { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
+            { prisonerNumber: 'B5678CD', prisonId: 'LEI', firstName: 'Charlie' },
+            { prisonerNumber: 'C9999EF', prisonId: 'OUT', firstName: 'Dave' },
+          ]),
+        })
       })
-      cy.task('stubPrisonerSearchFindByNumbers', {
-        prisoners: buildDuplicatePrisoners([
-          { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-          { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
-          { prisonerNumber: 'B5678CD', prisonId: 'LEI', firstName: 'Charlie' },
-          { prisonerNumber: 'C9999EF', prisonId: 'OUT', firstName: 'Dave' },
-        ]),
+
+      it('Should show the overview page without the duplicates banner', () => {
+        verifyBannerOnOverviewPage('not.exist')
       })
-    })
 
-    it('Should show the overview page without the duplicates banner', () => {
-      verifyBannerOnOverviewPage('not.exist')
-    })
-
-    it('Should return NOT FOUND on the duplicates page', () => {
-      verifyNotFoundOnDuplicatesPage()
+      it('Should return NOT FOUND on the duplicates page', () => {
+        verifyNotFoundOnDuplicatesPage()
+      })
     })
 
     context('When no duplicate records exist', () => {
@@ -534,11 +534,28 @@ context('Duplicate Prisoner Records', () => {
             prisonerDataOverrides: { prisonId: 'OUT' },
             caseLoads: nonMdiCaseLoad,
           })
-          cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+          cy.setupComponentsData()
+          cy.task('stubImages')
+          cy.task('stubPersonApiGetRecord', {
+            prisonerNumber,
+            prisonNumbers: [prisonerNumber, 'A1234BC'],
+          })
+          cy.task('stubPrisonerSearchFindByNumbers', {
+            prisoners: buildDuplicatePrisoners([
+              { prisonerNumber, prisonId: 'OUT' },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 5678 },
+            ]),
+          })
         })
 
-        it('Should return NOT FOUND on the duplicates page', () => {
-          verifyNotFoundOnDuplicatesPage()
+        it('Should show the duplicates page with limited details for the out-of-caseload duplicate', () => {
+          visitDuplicateProfilesPage({ failOnStatusCode: false })
+          const page = Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+          page.duplicates().should('have.length', 1)
+          page.duplicate(0).location().should('be.visible')
+          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
+          page.duplicate(0).name().should('be.empty')
         })
       },
     )
@@ -555,11 +572,28 @@ context('Duplicate Prisoner Records', () => {
             prisonerDataOverrides: { prisonId: 'TRN' },
             caseLoads: nonMdiCaseLoad,
           })
-          cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+          cy.setupComponentsData()
+          cy.task('stubImages')
+          cy.task('stubPersonApiGetRecord', {
+            prisonerNumber,
+            prisonNumbers: [prisonerNumber, 'A1234BC'],
+          })
+          cy.task('stubPrisonerSearchFindByNumbers', {
+            prisoners: buildDuplicatePrisoners([
+              { prisonerNumber, prisonId: 'TRN' },
+              { prisonerNumber: 'A1234BC', prisonId: 'LEI', firstName: 'Bob', currentFacialImageId: 5678 },
+            ]),
+          })
         })
 
-        it('Should return NOT FOUND on the duplicates page', () => {
-          verifyNotFoundOnDuplicatesPage()
+        it('Should show the duplicates page with limited details for the out-of-caseload duplicate', () => {
+          visitDuplicateProfilesPage({ failOnStatusCode: false })
+          const page = Page.verifyOnPage(DuplicateProfilesPage, 'John Saunders')
+          page.duplicates().should('have.length', 1)
+          page.duplicate(0).location().should('be.visible')
+          page.duplicate(0).prisonNumber().should('contain.text', 'A1234BC')
+          page.duplicate(0).photo().find('img').should('have.attr', 'src', '/assets/images/prisoner-profile-image.png')
+          page.duplicate(0).name().should('be.empty')
         })
       },
     )
@@ -637,10 +671,19 @@ context('Duplicate Prisoner Records', () => {
         cy.task('reset')
         cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'OUT' } })
-        cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
+        })
+        cy.task('stubPrisonerSearchFindByNumbers', {
+          prisoners: buildDuplicatePrisoners([
+            { prisonerNumber, prisonId: 'OUT' },
+            { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+          ]),
+        })
       })
 
-      it('Should return NOT FOUND', () => {
+      it('Should return NOT FOUND on the duplicates page', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
@@ -650,10 +693,19 @@ context('Duplicate Prisoner Records', () => {
         cy.task('reset')
         cy.setupUserAuth({ roles: [Role.PrisonUser] })
         cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'TRN' } })
-        cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
+        })
+        cy.task('stubPrisonerSearchFindByNumbers', {
+          prisoners: buildDuplicatePrisoners([
+            { prisonerNumber, prisonId: 'TRN' },
+            { prisonerNumber: 'A1234BC', prisonId: 'TRN', firstName: 'Bob' },
+          ]),
+        })
       })
 
-      it('Should return NOT FOUND', () => {
+      it('Should return NOT FOUND on the duplicates page', () => {
         verifyNotFoundOnDuplicatesPage()
       })
     })
@@ -668,7 +720,16 @@ context('Duplicate Prisoner Records', () => {
           prisonerDataOverrides: { prisonId: 'LEI' },
           caseLoads: nonMdiCaseLoad,
         })
-        cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
+        })
+        cy.task('stubPrisonerSearchFindByNumbers', {
+          prisoners: buildDuplicatePrisoners([
+            { prisonerNumber, prisonId: 'LEI' },
+            { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+          ]),
+        })
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -686,7 +747,16 @@ context('Duplicate Prisoner Records', () => {
           prisonerDataOverrides: { prisonId: 'OUT' },
           caseLoads: nonMdiCaseLoad,
         })
-        cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
+        })
+        cy.task('stubPrisonerSearchFindByNumbers', {
+          prisoners: buildDuplicatePrisoners([
+            { prisonerNumber, prisonId: 'OUT' },
+            { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+          ]),
+        })
       })
 
       it('Should return NOT FOUND on the duplicates page', () => {
@@ -706,7 +776,16 @@ context('Duplicate Prisoner Records', () => {
             prisonerDataOverrides: { prisonId: 'TRN' },
             caseLoads: nonMdiCaseLoad,
           })
-          cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+          cy.task('stubPersonApiGetRecord', {
+            prisonerNumber,
+            prisonNumbers: [prisonerNumber, 'A1234BC'],
+          })
+          cy.task('stubPrisonerSearchFindByNumbers', {
+            prisoners: buildDuplicatePrisoners([
+              { prisonerNumber, prisonId: 'TRN' },
+              { prisonerNumber: 'A1234BC', prisonId: 'TRN', firstName: 'Bob' },
+            ]),
+          })
         })
 
         it('Should return NOT FOUND on the duplicates page', () => {
@@ -727,7 +806,16 @@ context('Duplicate Prisoner Records', () => {
             prisonerDataOverrides: { prisonId: 'LEI' },
             caseLoads: nonMdiCaseLoad,
           })
-          cy.task('stubPersonApiGetRecordNotFound', { prisonerNumber })
+          cy.task('stubPersonApiGetRecord', {
+            prisonerNumber,
+            prisonNumbers: [prisonerNumber, 'A1234BC'],
+          })
+          cy.task('stubPrisonerSearchFindByNumbers', {
+            prisoners: buildDuplicatePrisoners([
+              { prisonerNumber, prisonId: 'LEI' },
+              { prisonerNumber: 'A1234BC', prisonId: 'OUT', firstName: 'Bob' },
+            ]),
+          })
         })
 
         it('Should return NOT FOUND on the duplicates page', () => {
