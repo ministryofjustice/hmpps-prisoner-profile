@@ -20,6 +20,7 @@ import ImageController from '../controllers/imageController'
 import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import getCommonRequestData from '../utils/getCommonRequestData'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -65,6 +66,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.read_photo] }),
     buildBreadcrumbsAndReferer(),
     async (req, res) => {
@@ -104,6 +106,7 @@ export default function imageRouter(services: Services): Router {
     `${basePath}/image/all`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CorePersonRecordPermission.read_photo] }),
     buildBreadcrumbsAndReferer(),
     async (req, res, next) => {

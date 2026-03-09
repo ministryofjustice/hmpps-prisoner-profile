@@ -11,6 +11,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import NotFoundError from '../utils/notFoundError'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
@@ -157,6 +158,7 @@ export default function appointmentRouter(services: Services): Router {
     `${basePath}/movement-slips`,
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerSchedulePermission.edit_appointment],
     }),

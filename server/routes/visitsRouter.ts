@@ -8,6 +8,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { VisitsController } from '../controllers/visitsController'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function visitsRouter(services: Services): Router {
   const router = Router()
@@ -20,6 +21,7 @@ export default function visitsRouter(services: Services): Router {
     `${basePath}/visits-details`,
     auditPageAccessAttempt({ services, page: Page.VisitDetails }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerVisitsAndVisitorsPermission.read],
     }),
