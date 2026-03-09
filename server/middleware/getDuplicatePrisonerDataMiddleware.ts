@@ -74,6 +74,7 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
       const duplicates = totalActiveCount >= 2 ? [] : nonGhiDuplicates
 
       if (duplicates.length > 0) {
+        res.locals.duplicateRecordsFound = true
         metricsService.trackDuplicateRecordsFound(prisonerNumber, prisonId, duplicates.map(toDuplicateInfo), user)
       }
 
