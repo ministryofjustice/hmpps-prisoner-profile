@@ -5,6 +5,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import GoalsController from '../controllers/goalsController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function goalsRouter(services: Services): Router {
   const router = Router()
@@ -17,6 +18,7 @@ export default function goalsRouter(services: Services): Router {
     `${basePath}/vc2-goals`,
     auditPageAccessAttempt({ services, page: Page.VirtualCampusGoals }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     (req, res) => goalsController.displayGoals(req, res),
   )

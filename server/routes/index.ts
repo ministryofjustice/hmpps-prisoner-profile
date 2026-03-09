@@ -208,6 +208,7 @@ export default function routes(services: Services): Router {
     `${basePath}/offences`,
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
@@ -253,6 +254,7 @@ export default function routes(services: Services): Router {
     `${basePath}/schedule`,
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerSchedulePermission.read_schedule],
     }),
@@ -266,6 +268,7 @@ export default function routes(services: Services): Router {
     `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       return careNeedsController.displayXrayBodyScans(req, res)
@@ -275,6 +278,7 @@ export default function routes(services: Services): Router {
   router.get(
     `${basePath}/location-history`,
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerBaseLocationPermission.read_location_history],
     }),
@@ -290,6 +294,7 @@ export default function routes(services: Services): Router {
   router.use(
     `${basePath}/money`,
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerMoneyPermission.read] }),
     moneyRouter(services),
   )
@@ -298,6 +303,7 @@ export default function routes(services: Services): Router {
     `${basePath}/religion-belief-history`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PersonProtectedCharacteristicsPermission.read_religion_and_belief],
     }),
@@ -310,6 +316,7 @@ export default function routes(services: Services): Router {
     `${basePath}/past-care-needs`,
     auditPageAccessAttempt({ services, page: Page.PastCareNeeds }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     async (req, res) => {
       return careNeedsController.displayPastCareNeeds(req, res)

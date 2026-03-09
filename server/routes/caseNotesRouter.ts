@@ -8,6 +8,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { UpdateCaseNoteValidator } from '../validators/updateCaseNoteValidator'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
@@ -20,6 +21,7 @@ export default function caseNotesRouter(services: Services): Router {
     `${basePath}/case-notes`,
     auditPageAccessAttempt({ services, page: Page.CaseNotes }),
     getPrisonerData(services),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [CaseNotesPermission.read] }),
     caseNotesController.displayCaseNotes(),
   )

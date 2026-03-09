@@ -8,6 +8,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import LocationDetailsController from '../controllers/locationDetailsController'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function locationDetailsRouter(services: Services): Router {
   const router = Router()
@@ -23,6 +24,7 @@ export default function locationDetailsRouter(services: Services): Router {
     `${basePath}/location-details`,
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [
         PrisonerBaseLocationPermission.read_location_details,

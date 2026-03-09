@@ -8,6 +8,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import CsraController from '../controllers/csraController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
@@ -20,6 +21,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/csra-history`,
     auditPageAccessAttempt({ services, page: Page.CsraHistory }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerSpecificRisksPermission.read_csra_assessment_history],
     }),
@@ -30,6 +32,7 @@ export default function alertsRouter(services: Services): Router {
     `${basePath}/csra-review`,
     auditPageAccessAttempt({ services, page: Page.CsraReview }),
     getPrisonerData(services, { minimal: true }),
+    getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerSpecificRisksPermission.read_csra_assessment_history],
     }),
