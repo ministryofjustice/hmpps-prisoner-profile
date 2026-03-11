@@ -8,7 +8,6 @@ import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/l
 import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 import { prisonUserMock } from '../data/localMockData/user'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
-import e from 'connect-flash'
 
 let req: Request
 let res: Response
