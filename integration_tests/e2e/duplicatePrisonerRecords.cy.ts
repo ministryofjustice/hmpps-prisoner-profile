@@ -125,7 +125,7 @@ context('Duplicate Prisoner Records', () => {
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
+            { prisonerNumber: 'A1234BC', prisonId: 'ZZGHI', firstName: 'Bob' },
             { prisonerNumber: 'B5678CD', prisonId: 'OUT', firstName: 'Charlie', currentFacialImageId: 1234 },
             { prisonerNumber: 'C9999EF', prisonId: 'TRN', firstName: 'Dave' },
           ]),
@@ -160,7 +160,7 @@ context('Duplicate Prisoner Records', () => {
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
+            { prisonerNumber: 'A1234BC', prisonId: 'ZZGHI', firstName: 'Bob' },
           ]),
         })
       })
@@ -183,8 +183,8 @@ context('Duplicate Prisoner Records', () => {
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
-            { prisonerNumber: 'B5678CD', prisonId: 'GHI', firstName: 'Charlie' },
+            { prisonerNumber: 'A1234BC', prisonId: 'ZZGHI', firstName: 'Bob' },
+            { prisonerNumber: 'B5678CD', prisonId: 'ZZGHI', firstName: 'Charlie' },
           ]),
         })
       })
@@ -278,7 +278,7 @@ context('Duplicate Prisoner Records', () => {
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
             { prisonerNumber: 'G6123VU', prisonId: 'MDI' },
-            { prisonerNumber: 'A1234BC', prisonId: 'GHI', firstName: 'Bob' },
+            { prisonerNumber: 'A1234BC', prisonId: 'ZZGHI', firstName: 'Bob' },
             { prisonerNumber: 'B5678CD', prisonId: 'LEI', firstName: 'Charlie' },
             { prisonerNumber: 'C9999EF', prisonId: 'OUT', firstName: 'Dave' },
           ]),
