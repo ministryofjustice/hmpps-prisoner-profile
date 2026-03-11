@@ -62,7 +62,6 @@ export interface PersonalDetails {
   sexualOrientation: string
   smokerOrVaper: string
   socialCareNeeded: string
-  typeOfDiet: string
   youthOffender: string
   dietAndAllergy: Result<DietAndAllergyDetails>
 }
