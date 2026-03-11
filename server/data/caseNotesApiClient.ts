@@ -61,7 +61,7 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
   async addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote> {
     return this.post(
       {
-        path: `/case-notefs/${prisonerNumber}`,
+        path: `/case-notes/${prisonerNumber}`,
         data: {
           ...caseNote,
           locationId: caseloadId,

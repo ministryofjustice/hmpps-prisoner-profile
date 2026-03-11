@@ -544,7 +544,6 @@ export default class PersonalPageService {
         this.mapSmokerVaper(getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation)) ||
         'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
-      typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
       dietAndAllergy: healthAndMedication.map(result => ({
         foodAllergies: this.mapDietAndAllergy(result, 'foodAllergies'),
