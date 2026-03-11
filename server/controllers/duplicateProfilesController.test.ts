@@ -87,6 +87,22 @@ describe('DuplicateProfilesController', () => {
       expect(res.render).not.toHaveBeenCalled()
     })
 
+    it('should render the page when duplicateRecordApiFailure is set to display the error message', async () => {
+      res.locals.duplicateRecordApiFailure = true
+      req.middleware.duplicatePrisonerData = []
+
+      await controller.getDuplicateProfiles(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/duplicateProfiles', {
+        pageTitle: 'Possible duplicate profiles for this person',
+        miniBannerData: expect.any(Object),
+        duplicateProfiles: [],
+        prisonerPermissionsMap: {},
+        backLinkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+        useCustomErrorBanner: true,
+      })
+    })
+
     it('should render the duplicateProfiles page with the correct data', async () => {
       await controller.getDuplicateProfiles(req, res, next)
 
