@@ -48,7 +48,8 @@ export default class AddressController {
       const results = await this.addressService.getAddressesMatchingQuery(req.params.query)
       res.json({ status: 200, results })
     } catch (error) {
-      res.status(getErrorStatus(error)).json({ status: getErrorStatus(error), error: error.message })
+      const status = getErrorStatus(error) ?? 500
+      res.status(status).json({ status, error: error.message })
     }
   }
 }
