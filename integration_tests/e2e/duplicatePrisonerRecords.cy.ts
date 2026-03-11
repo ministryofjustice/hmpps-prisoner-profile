@@ -323,8 +323,9 @@ context('Duplicate Prisoner Records', () => {
         verifyBannerOnOverviewPage('not.exist')
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
-        verifyNotFoundOnDuplicatesPage()
+      it('Should display the duplicates page with an error banner', () => {
+        const page = visitAndVerifyDuplicateProfilesPage()
+        page.apiErrorBanner().should('be.visible')
       })
     })
 
@@ -337,8 +338,9 @@ context('Duplicate Prisoner Records', () => {
         verifyBannerOnOverviewPage('not.exist')
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
-        verifyNotFoundOnDuplicatesPage()
+      it('Should display the duplicates page with an error banner', () => {
+        const page = visitAndVerifyDuplicateProfilesPage()
+        page.apiErrorBanner().should('be.visible')
       })
     })
 
@@ -355,8 +357,9 @@ context('Duplicate Prisoner Records', () => {
         verifyBannerOnOverviewPage('not.exist')
       })
 
-      it('Should return NOT FOUND on the duplicates page', () => {
-        verifyNotFoundOnDuplicatesPage()
+      it('Should display the duplicates page with an error banner', () => {
+        const page = visitAndVerifyDuplicateProfilesPage()
+        page.apiErrorBanner().should('be.visible')
       })
     })
 
