@@ -6,6 +6,8 @@ import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import { DuplicatePrisonerInfo } from '../services/metrics/metricsService'
 import logger from '../../logger'
 
+export const GHOST_PRISON_ID = 'ZZGHI'
+
 const isActiveStatus = (prisonId?: string): boolean => {
   return !!(prisonId && prisonId !== 'TRN' && prisonId !== 'OUT')
 }
@@ -48,30 +50,31 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
         (p: Prisoner) => p.prisonerNumber && p.prisonerNumber !== prisonerNumber,
       )
 
-      // Filter out any records held in the ghost establishment GHI (strictly for low-quality data)
-      const ghiDuplicates = allDuplicates.filter(p => p.prisonId === 'GHI')
-      if (ghiDuplicates.length > 0) {
+      // Filter out any records held in the ghost establishment ZZGHI (strictly for low-quality data)
+      const ghostEstablishmentDuplicates = allDuplicates.filter(p => p.prisonId === GHOST_PRISON_ID)
+      if (ghostEstablishmentDuplicates.length > 0) {
         metricsService.trackDuplicateRecordsGhostEstablishmentFiltered(
           prisonerNumber,
           prisonId,
-          ghiDuplicates.map(toDuplicateInfo),
+          ghostEstablishmentDuplicates.map(toDuplicateInfo),
           user,
         )
       }
-      const nonGhiDuplicates = allDuplicates.filter(p => p.prisonId !== 'GHI')
+      const nonGhostEstablishmentDuplicates = allDuplicates.filter(p => p.prisonId !== GHOST_PRISON_ID)
 
       // Filter out all duplicates when 2+ are active and flag a data-quality issue
       const totalActiveCount =
-        (isActiveStatus(prisonId) ? 1 : 0) + nonGhiDuplicates.filter(p => isActiveStatus(p.prisonId)).length
+        (isActiveStatus(prisonId) ? 1 : 0) +
+        nonGhostEstablishmentDuplicates.filter(p => isActiveStatus(p.prisonId)).length
       if (totalActiveCount >= 2) {
         metricsService.trackDuplicateRecordsMultipleActiveFiltered(
           prisonerNumber,
           prisonId,
-          nonGhiDuplicates.map(toDuplicateInfo),
+          nonGhostEstablishmentDuplicates.map(toDuplicateInfo),
           user,
         )
       }
-      const duplicates = totalActiveCount >= 2 ? [] : nonGhiDuplicates
+      const duplicates = totalActiveCount >= 2 ? [] : nonGhostEstablishmentDuplicates
 
       if (duplicates.length > 0) {
         res.locals.duplicateRecordsFound = true
