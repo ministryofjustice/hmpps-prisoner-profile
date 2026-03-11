@@ -13,7 +13,6 @@ export const getProfileInformationValue = (type: ProfileInformationType, array: 
 export enum ProfileInformationType {
   RecognisedListener = 'LIST_REC',
   SuitableListener = 'LIST_SUIT',
-  TypesOfDiet = 'DIET',
   SmokerOrVaper = 'SMOKE',
   DomesticAbusePerpetrator = 'DOMESTIC',
   DomesticAbuseVictim = 'DOMVIC',

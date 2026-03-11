@@ -197,7 +197,6 @@ context('When signed in', () => {
           .marriageOrCivilPartnership()
           .should('have.text', 'Single – never married or in a civil partnership')
         page.personalDetails().numberOfChildren().should('have.text', '2')
-        page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
         page
           .personalDetails()
           .dietAndFoodAllergies()

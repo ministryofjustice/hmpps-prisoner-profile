@@ -182,10 +182,7 @@ export default class CaseNotesController {
         } catch (error) {
           if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
-          } else {
-            errors.push({ text: 'We cannot save this case note right now, please try again later.' })
-            logger.error(`Error adding case note for prisoner ${prisonerNumber}`, error.message)
-          }
+          } else throw error
         }
       }
 
