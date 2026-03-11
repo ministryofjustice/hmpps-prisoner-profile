@@ -14,8 +14,8 @@ let res: Response
 let addressService: AddressService
 let controller: AddressController
 
-const testError = () => {
-  return { message: 'Test Error Message', status: 500 }
+const testError = (status?: number) => {
+  return { message: 'Test Error Message', status }
 }
 
 describe('Address controller', () => {
@@ -87,17 +87,32 @@ describe('Address controller', () => {
       expect(res.json).toHaveBeenCalledWith({ results: mockOsAddresses, status: 200 })
     })
 
-    it('should handle errors correctly', async () => {
+    it('should handle errors with a status correctly', async () => {
+      const error = testError(503)
       const getAddressesMatchingQuery = jest
         .spyOn(controller.addressService, 'getAddressesMatchingQuery')
         .mockImplementation(() => {
-          throw testError()
+          throw error
         })
 
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
-      expect(res.status).toHaveBeenCalledWith(testError().status)
-      expect(res.json).toHaveBeenCalledWith({ error: testError().message, status: 500 })
+      expect(res.status).toHaveBeenCalledWith(error.status)
+      expect(res.json).toHaveBeenCalledWith({ error: error.message, status: error.status })
+    })
+
+    it('should treat errors without a status as internal server errors', async () => {
+      const error = testError(undefined)
+      const getAddressesMatchingQuery = jest
+        .spyOn(controller.addressService, 'getAddressesMatchingQuery')
+        .mockImplementation(() => {
+          throw error
+        })
+
+      await controller.findAddressesByFreeTextQuery(req, res)
+      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
+      expect(res.status).toHaveBeenCalledWith(500)
+      expect(res.json).toHaveBeenCalledWith({ error: error.message, status: 500 })
     })
   })
 })

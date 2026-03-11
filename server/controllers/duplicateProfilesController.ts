@@ -16,7 +16,7 @@ export default class DuplicateProfilesController {
     const { prisonerData, duplicatePrisonerData } = req.middleware
     const { miniBannerData } = getCommonRequestData(req, res)
 
-    if (!duplicatePrisonerData?.length) {
+    if (!duplicatePrisonerData?.length && !res.locals.duplicateRecordApiFailure) {
       return next(new NotFoundError())
     }
 
