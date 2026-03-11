@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import getDuplicatePrisonerData from './getDuplicatePrisonerDataMiddleware'
+import getDuplicatePrisonerData, { GHOST_PRISON_ID } from './getDuplicatePrisonerDataMiddleware'
 import { Services } from '../services'
 import { DataAccess } from '../data'
 import MetricsService from '../services/metrics/metricsService'
@@ -214,64 +214,67 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
     })
   })
 
-  describe('GHI filtering', () => {
-    it('should filter out duplicates with prisonId === GHI', async () => {
-      const prisonersWithGHI: Prisoner[] = [
+  describe('Ghost establishment filtering', () => {
+    it('should filter out Ghost establishment duplicates', async () => {
+      const prisonersWithGhostEstablishmentDuplicate: Prisoner[] = [
         createTestPrisoner('A1234BC', 'MDI'),
-        createTestPrisoner('B5678DE', 'GHI'),
+        createTestPrisoner('B5678DE', GHOST_PRISON_ID),
         createTestPrisoner('C9012FG', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGHI)
+      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGhostEstablishmentDuplicate)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithGHI[2]])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithGhostEstablishmentDuplicate[2]])
       expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(req.middleware.duplicatePrisonerData.map(p => p.prisonerNumber)).not.toContain('B5678DE')
     })
 
-    it('should track metrics when GHI duplicates are filtered', async () => {
-      const prisonersWithGHI: Prisoner[] = [createTestPrisoner('A1234BC', 'MDI'), createTestPrisoner('B5678DE', 'GHI')]
+    it('should track metrics when Ghost establishment duplicates are filtered', async () => {
+      const prisonersWithGhostEstablishmentDuplicate: Prisoner[] = [
+        createTestPrisoner('A1234BC', 'MDI'),
+        createTestPrisoner('B5678DE', GHOST_PRISON_ID),
+      ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGHI)
+      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGhostEstablishmentDuplicate)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
-        [{ prisonerNumber: 'B5678DE', prisonId: 'GHI' }],
+        [{ prisonerNumber: 'B5678DE', prisonId: GHOST_PRISON_ID }],
         mockUser,
       )
     })
 
-    it('should filter multiple GHI duplicates', async () => {
-      const prisonersWithMultipleGHI: Prisoner[] = [
+    it('should filter multiple Ghost establishment duplicates', async () => {
+      const prisonersWithMultipleGhostEstablishmentDuplicates: Prisoner[] = [
         createTestPrisoner('A1234BC', 'MDI'),
-        createTestPrisoner('B5678DE', 'GHI'),
-        createTestPrisoner('C9012FG', 'GHI'),
+        createTestPrisoner('B5678DE', GHOST_PRISON_ID),
+        createTestPrisoner('C9012FG', GHOST_PRISON_ID),
         createTestPrisoner('D3456HI', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithMultipleGHI)
+      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithMultipleGhostEstablishmentDuplicates)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithMultipleGHI[3]])
+      expect(req.middleware.duplicatePrisonerData).toEqual([prisonersWithMultipleGhostEstablishmentDuplicates[3]])
       expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
         [
-          { prisonerNumber: 'B5678DE', prisonId: 'GHI' },
-          { prisonerNumber: 'C9012FG', prisonId: 'GHI' },
+          { prisonerNumber: 'B5678DE', prisonId: GHOST_PRISON_ID },
+          { prisonerNumber: 'C9012FG', prisonId: GHOST_PRISON_ID },
         ],
         mockUser,
       )
     })
 
-    it('should not track GHI metrics when no GHI duplicates exist', async () => {
+    it('should not track Ghost establishment metrics when no Ghost establishment duplicates exist', async () => {
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).not.toHaveBeenCalled()
@@ -447,10 +450,10 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
   })
 
   describe('Combined filtering scenarios', () => {
-    it('should apply GHI filter before multiple active filter', async () => {
+    it('should apply Ghost establishment filter before multiple active filter', async () => {
       const prisoners: Prisoner[] = [
         createTestPrisoner('A1234BC', 'MDI'),
-        createTestPrisoner('B5678DE', 'GHI'),
+        createTestPrisoner('B5678DE', GHOST_PRISON_ID),
         createTestPrisoner('C9012FG', 'OUT'),
         createTestPrisoner('D3456HI', 'TRN'),
       ]
@@ -459,13 +462,13 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
-      // B5678DE filtered as GHI, leaving only inactive duplicates
+      // B5678DE filtered as Ghost establishment duplicate, leaving only inactive duplicates
       expect(req.middleware.duplicatePrisonerData).toEqual([prisoners[2], prisoners[3]])
       expect(res.locals.duplicateRecordsFound).toBeTruthy()
       expect(metricsService.trackDuplicateRecordsGhostEstablishmentFiltered).toHaveBeenCalledWith(
         'A1234BC',
         'MDI',
-        [{ prisonerNumber: 'B5678DE', prisonId: 'GHI' }],
+        [{ prisonerNumber: 'B5678DE', prisonId: GHOST_PRISON_ID }],
         mockUser,
       )
       expect(metricsService.trackDuplicateRecordsMultipleActiveFiltered).not.toHaveBeenCalled()
