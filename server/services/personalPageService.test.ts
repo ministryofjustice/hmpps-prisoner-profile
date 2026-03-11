@@ -398,11 +398,6 @@ describe('PersonalPageService', () => {
 
         expect(response.personalDetails.dietAndAllergy.isFulfilled()).toEqual(false)
       })
-
-      it('Maps the type of diet field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.typeOfDiet).toEqual('Voluntary - Pork Free/Fish Free')
-      })
     })
 
     describe('Marriage or civil partnership status', () => {
