@@ -8,7 +8,6 @@
   }
 ]%}
 {% block body %}
-
     {% if caseNotesApiUnavailable %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
@@ -65,5 +64,19 @@
         {% endif %}
 
         {% include "partials/backToTop.njk" %}
+    {% endif %}
+{% endblock %}
+
+{% block pageScripts %}
+    {% if flashMessage.text == 'Case note added'%}
+        <script nonce="{{ cspNonce }}">
+            sessionStorage.removeItem('addCaseNoteForm');
+        </script>
+    {% endif %}
+    {% if flashMessage.caseNoteId %}
+        <script nonce="{{ cspNonce }}">
+            console.log('Clearing saved form data for case note: {{ flashMessage.caseNoteId }}');
+            sessionStorage.removeItem('{{ flashMessage.caseNoteId }}');
+        </script>
     {% endif %}
 {% endblock %}

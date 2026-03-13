@@ -35,7 +35,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
-        <form method="post" novalidate="novalidate" autocomplete="off">
+        <form method="post" novalidate="novalidate" autocomplete="off" id="add-case-note-form">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
             {{ govukSelect({
@@ -83,8 +83,7 @@
                 value: formValues.text,
                 errorMessage: errors | findError('text'),
                 label: {
-                    text: "What happened?",
-                    classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
+                    html: "<div class='govuk-!-font-weight-bold govuk-!-margin-top-8'>What happened?</div><div class='govuk-hint'>Your progress is saved while you are in this browser tab.</div>"
                 },
                 hint: {
                     text: 'Do not save any sensitive information as an OMiC open case note.',
@@ -193,4 +192,5 @@
 {% block pageScripts %}
     <script id="typeData" type="application/json">{{ typeSubTypeMap | dump | safe }}</script>
     <script src="{{ "/assets/js/caseNotes.js" | assetMap }}"></script>
+    <script src="{{ "/assets/js/recoverAddCaseNote.js" | assetMap }}"></script>
 {% endblock %}
