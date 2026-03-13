@@ -47,7 +47,7 @@
                 <pre class="govuk-body govuk-!-margin-bottom-6" data-qa="more-details-text">{{ amendment.additionalNoteText }}</pre>
             {% endfor %}
         {% endif %}
-        <form method="post" novalidate="novalidate" autocomplete="off">
+        <form method="post" novalidate="novalidate" autocomplete="off" id="update-case-note-form">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="isExternal" value="{{ isExternal }}" />
             <input type="hidden" name="currentLength" value="{{ currentLength }}" />
@@ -76,8 +76,7 @@
                     value: caseNoteText,
                     errorMessage: errors | findError('text'),
                     label: {
-                        text: 'Additional details',
-                        classes: 'govuk-visually-hidden'
+                        html: "<div class='govuk-visually-hidden'>Additional details</div><div class='govuk-hint'>Your progress is saved while you are in this browser tab.</div>"
                     },
                     hint: hint
                 }) }}
@@ -107,4 +106,8 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="{{ "/assets/js/recoverUpdateCaseNote.js" | assetMap }}"></script>
 {% endblock %}
