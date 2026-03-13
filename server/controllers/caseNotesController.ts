@@ -184,7 +184,9 @@ export default class CaseNotesController {
             errors.push({ text: error.message })
           } else {
             logger.error(`Error adding case note for prisoner ${prisonerNumber}:`, error)
-            errors.push({ text: `There's been a technical problem. Your case not has not been saved, but the information you entered is still on this page. Please try again in a moment.` })
+            errors.push({
+              text: `There's been a technical problem. Your case not has not been saved, but the information you entered is still on this page. Please try again in a moment.`,
+            })
           }
         }
       }
@@ -298,7 +300,9 @@ export default class CaseNotesController {
             errors.push({ text: error.message })
           } else {
             logger.error(`Error updating case note ${caseNoteId} for prisoner ${prisonerNumber}:`, error)
-            errors.push({ text: `There's been a technical problem. Your case not has not been updated, but the information you entered is still on this page. Please try again in a moment.` })
+            errors.push({
+              text: `There's been a technical problem. Your case not has not been updated, but the information you entered is still on this page. Please try again in a moment.`,
+            })
           }
         }
       }
@@ -309,7 +313,7 @@ export default class CaseNotesController {
         return res.redirect(`/prisoner/${prisonerNumber}/update-case-note/${caseNoteId}`)
       }
 
-      req.flash('flashMessage', { text: 'Case note updated', caseNoteId: caseNoteId})
+      req.flash('flashMessage', { text: 'Case note updated', caseNoteId })
       this.auditService
         .sendPutSuccess({
           user: res.locals.user,
