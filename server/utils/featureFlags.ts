@@ -37,6 +37,6 @@ export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoad
 export const changeContactDetailsLinkEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   editProfileEnabled(activeCaseLoadId) && config.featureToggles.changeContactDetailsLinkEnabled
 
-export const personDuplicateRecordsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.personDuplicateRecordsEnabledPrisons.includes('***') ||
-  config.featureToggles.personDuplicateRecordsEnabledPrisons.includes(activeCaseLoadId)
+export const personDuplicateRecordsEnabled: FeatureFlagMethod = scheduledFeatureFlag(
+  config.featureToggles.personDuplicateRecords,
+)
