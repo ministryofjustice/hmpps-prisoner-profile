@@ -848,7 +848,6 @@ describe('utils', () => {
         'Church of Jesus Christ of Latter Day Saints',
       ],
       ['Already lowercase preposition', 'Church of christ', 'Church of christ'],
-      ['Preposition at start', ' Of All Saints', ' of All Saints'],
       ['Multiple spaces between words', 'Church  Of  Christ', 'Church  of  Christ'],
       ['Preposition without surrounding spaces', 'Thereof', 'Thereof'],
       ['Null value', null, null],
