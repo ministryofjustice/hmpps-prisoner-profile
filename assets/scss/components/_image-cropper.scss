@@ -48,6 +48,7 @@ $hmpps-cropper-height: 276px;
 
   cropper-selection {
     outline: 1px solid $govuk-focus-colour;
+    border: 1px solid $govuk-text-colour;
   }
 
   $handles: 'n-resize', 'ne-resize', 'e-resize', 'se-resize', 's-resize', 'sw-resize', 'w-resize', 'nw-resize';
