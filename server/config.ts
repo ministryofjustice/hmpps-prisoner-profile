@@ -400,7 +400,13 @@ export default {
     editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
-    personDuplicateRecordsEnabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []),
+
+    personDuplicateRecords: {
+      enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('PERSON_DUPLICATE_RECORDS_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
     changeContactDetailsLinkEnabled: toBoolean(get('CHANGE_CONTACT_DETAILS_LINK_ENABLED', 'false')),
   },
