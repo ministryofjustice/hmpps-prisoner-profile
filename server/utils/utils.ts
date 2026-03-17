@@ -30,6 +30,8 @@ export const isEmpty = (array: Array<unknown>): boolean => !array || (Array.isAr
 
 export const withheldPhotoCategoryCodes = ['A', 'H', 'P']
 
+export const commonPrepositions = ['Of', 'Or', 'And', 'The', 'In', 'On', 'At', 'By', 'For', 'With', 'To', 'From']
+
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
  * correctly (i.e. each part in a double-barreled is converted to proper case).
@@ -606,10 +608,11 @@ export const objectToRadioOptions = <T>(
   return array.map(obj => {
     const value = obj[id] as string | number
     const override = overrides?.find(o => o.id === value)
+    const baseText = (override?.description ? override.description : (obj[description] as string))
+      ?.replaceAll(' - ', ' – ')
+      ?.replaceAll("'", '’')
     return {
-      text: (override?.description ? override.description : (obj[description] as string))
-        ?.replaceAll(' - ', ' – ')
-        ?.replaceAll("'", '’'),
+      text: lowercasePrepositions(baseText),
       value,
       hint: override?.hint ? { text: override.hint } : undefined,
       ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),
@@ -624,7 +627,7 @@ export const objectToSelectOptions = <T>(
   selected?: string,
 ): SelectOption[] => {
   return array.map(obj => ({
-    text: obj[description] as string,
+    text: lowercasePrepositions(obj[description] as string),
     value: obj[id] as string | number,
     ...(selected && obj[id as keyof typeof obj] === selected && { selected: true }),
   }))
@@ -833,6 +836,11 @@ const lowercaseExceptAcronym = (val: string): string => {
     return val.toLowerCase()
   }
   return val
+}
+
+export const lowercasePrepositions = (val: string): string => {
+  if (!val) return val
+  return commonPrepositions.reduce((result, prep) => result.replaceAll(` ${prep} `, ` ${prep.toLowerCase()} `), val)
 }
 
 export const sentenceCase = (val: string, startsWithUppercase: boolean = true): string => {
