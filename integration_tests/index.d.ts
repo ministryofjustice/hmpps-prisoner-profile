@@ -30,6 +30,8 @@ declare global {
         prisonId?: string
         highComplexityOfNeeds?: boolean
         failToLoadKeyWorker?: boolean
+        nextReviewDate?: string
+        reviewOverdueDays?: number
       }): Chainable<AUTWindow>
 
       setupAlertsPageStubs(options: {

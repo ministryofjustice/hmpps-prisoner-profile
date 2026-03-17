@@ -66,6 +66,7 @@ export default (
         ? [
             {
               text: `${pluralise(daysOverdue, 'day')} overdue`,
+              showWarningIcon: true,
               classes: 'hmpps-red-text govuk-!-font-weight-bold',
             },
           ]

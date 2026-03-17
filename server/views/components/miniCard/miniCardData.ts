@@ -1,5 +1,6 @@
 export interface MiniCardDataItem {
-  text: string
+  text?: string
+  showWarningIcon?: boolean
   classes?: string
 }
 

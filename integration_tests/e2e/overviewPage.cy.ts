@@ -1102,4 +1102,46 @@ context('Court cases and release dates', () => {
       indexPage.banner().should('contain.text', 'Banner')
     })
   })
+
+  context('Overdue Incentives and CSIP', () => {
+    context('Given prisoner has overdue incentive review', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'A1234BC',
+          bookingId: 1234567,
+          prisonerDataOverrides: { category: 'B' },
+          nextReviewDate: '2026-03-15',
+        })
+        cy.setupUserAuth()
+        visitOverviewPageAlt()
+      })
+
+      it('Displays warning icon with overdue incentives status', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.incentivesCard().find('.mini-card__warning-icon').should('exist')
+        overviewPage.incentivesCard().contains('.mini-card__item', '2 days overdue')
+      })
+    })
+
+    context('Given prisoner has overdue CSIP review', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'A1234BC',
+          bookingId: 1234567,
+          prisonerDataOverrides: { category: 'B' },
+          reviewOverdueDays: 7,
+        })
+        cy.setupUserAuth()
+        visitOverviewPageAlt()
+      })
+
+      it('Displays warning icon with overdue CSIP status', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.csipCard().find('.mini-card__warning-icon').should('exist')
+        overviewPage.csipCard().contains('.mini-card__item', '7 days overdue')
+      })
+    })
+  })
 })
