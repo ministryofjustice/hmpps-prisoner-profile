@@ -33,6 +33,7 @@ import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
+  const accessibilityRoute = '/accessibility-statement'
 
   app.set('json spaces', 2)
   app.set('trust proxy', true)
@@ -93,7 +94,12 @@ export default function createApp(services: Services): express.Application {
     }),
   )
 
-  app.use(retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }))
+  app.use(
+    unless(
+      [(path: string) => path.includes(accessibilityRoute)],
+      retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }),
+    ),
+  )
   app.use(warningRenderMiddleware)
   app.use(routes(services))
   app.use(warningMiddleware(services.metricsService))

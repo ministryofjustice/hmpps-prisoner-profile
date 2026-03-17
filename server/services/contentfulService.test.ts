@@ -2,6 +2,10 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
 import ContentfulService from './contentfulService'
 import { HmppsUser, PrisonUser } from '../interfaces/HmppsUser'
 
+jest.mock('@contentful/rich-text-html-renderer', () => ({
+  documentToHtmlString: jest.fn(json => `<p>${json.content[0].value}</p>`),
+}))
+
 describe('ContentfulService', () => {
   let contentfulService: ContentfulService
 
@@ -51,5 +55,46 @@ describe('ContentfulService', () => {
         },
       }),
     )
+  })
+
+  describe('getManagedPage', () => {
+    it('should return a managed page with HTML content', async () => {
+      const mockPage = {
+        title: 'Test Page',
+        slug: 'test-page',
+        content: {
+          json: { content: [{ value: 'Hello world' }] },
+          // @ts-expect-error - ignore implicit any type
+          links: { assets: { hyperlink: [], block: [] } },
+        },
+      }
+
+      const apolloSpy = jest.spyOn(contentfulService.apolloClient, 'query').mockResolvedValue({
+        data: {
+          managedPageCollection: {
+            items: [mockPage],
+          },
+        },
+      })
+
+      const result = await contentfulService.getManagedPage('test-page')
+
+      expect(apolloSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { condition: { slug: 'test-page' } },
+        }),
+      )
+      expect(result.title).toBe('Test Page')
+      expect(result.slug).toBe('test-page')
+      expect(result.content).toBe('<p>Hello world</p>')
+    })
+
+    it('should throw an error if the page is not found', async () => {
+      jest.spyOn(contentfulService.apolloClient, 'query').mockResolvedValue({
+        data: { managedPageCollection: { items: [] } },
+      })
+
+      await expect(contentfulService.getManagedPage('missing-page')).rejects.toThrow('Page not found')
+    })
   })
 })
