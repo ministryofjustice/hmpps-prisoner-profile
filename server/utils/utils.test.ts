@@ -35,6 +35,7 @@ import {
   isTemporaryLocation,
   latestImageId,
   lengthOfService,
+  lowercasePrepositions,
   mapToQueryString,
   neurodiversityEnabled,
   objectToRadioOptions,
@@ -834,6 +835,32 @@ describe('utils', () => {
         { value: 'id2', text: 'Option – Two – B', checked: true },
         { value: 'id3', text: 'hyphenated-word' },
       ])
+    })
+  })
+
+  describe('lowercasePrepositions', () => {
+    it.each([
+      ['No prepositions', 'Christianity', 'Christianity'],
+      ['Single preposition - main use case', 'Church Of Christ, Scientist', 'Church of Christ, Scientist'],
+      [
+        'Multiple prepositions in a name',
+        'Church Of Jesus Christ Of Latter Day Saints',
+        'Church of Jesus Christ of Latter Day Saints',
+      ],
+      ['Already lowercase preposition', 'Church of christ', 'Church of christ'],
+      ['Multiple spaces between words', 'Church  Of  Christ', 'Church  of  Christ'],
+      ['Preposition without surrounding spaces', 'Thereof', 'Thereof'],
+      ['Null value', null, null],
+      ['Empty string', '', ''],
+      ['Various prepositions', 'Society Or Fellowship And Guild', 'Society or Fellowship and Guild'],
+      [
+        'Multiple consecutive prepositions',
+        'The Church Of The Flying Spaghetti Monster',
+        'The Church of the Flying Spaghetti Monster',
+      ],
+      ['Preposition at beginning should not lowercase', 'The Church Of All Saints', 'The Church of All Saints'],
+    ])('%s: lowercasePrepositions("%s")', (_: string, input: string, expected: string) => {
+      expect(lowercasePrepositions(input)).toBe(expected)
     })
   })
 
