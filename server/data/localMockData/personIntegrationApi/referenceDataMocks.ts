@@ -361,5 +361,5 @@ export const ethnicityCodesMock: ReferenceDataCodeDto[] = [
   },
   { id: 'ETHNICITY_O2', code: 'O2', description: 'Arab', listSequence: 0, isActive: true },
   { id: 'ETHNICITY_O9', code: 'O9', description: 'Any other ethnic group', listSequence: 0, isActive: true },
-  { id: 'ETHNICITY_NS', code: 'NS', description: 'Prefer not to say', listSequence: 0, isActive: true },
+  { id: 'ETHNICITY_NS', code: 'NS', description: 'They prefer not to say', listSequence: 0, isActive: true },
 ]

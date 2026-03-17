@@ -121,7 +121,16 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {
-    return this.get({ path: `/api/bookings/${bookingId}` }, this.token)
+    const detail = (await this.get({ path: `/api/bookings/${bookingId}` }, this.token)) as InmateDetail
+    return detail?.physicalAttributes?.ethnicity === 'Prefer not to say'
+      ? {
+          ...detail,
+          physicalAttributes: {
+            ...detail.physicalAttributes,
+            ethnicity: 'They prefer not to say',
+          },
+        }
+      : detail
   }
 
   async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
