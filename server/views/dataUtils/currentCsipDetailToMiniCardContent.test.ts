@@ -170,7 +170,11 @@ describe('currentCsipDetailToMiniCardContent', () => {
       items: [
         { text: 'Status: CSIP open' },
         { text: 'Next review date: 01/01/2024', classes: 'hmpps-secondary-text' },
-        { text: '2 days overdue', classes: 'hmpps-red-text govuk-!-font-weight-bold' },
+        expect.objectContaining({
+          text: '2 days overdue',
+          showWarningIcon: true,
+          classes: 'hmpps-red-text govuk-!-font-weight-bold',
+        }),
         { text: 'History: 1 CSIP (1 referral)', classes: 'hmpps-secondary-text' },
       ],
       linkLabel: 'CSIP details',

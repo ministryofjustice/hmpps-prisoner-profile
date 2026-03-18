@@ -51,13 +51,15 @@ Cypress.Commands.add(
     prisonerDataOverrides = {},
     highComplexityOfNeeds = false,
     failToLoadKeyWorker = false,
+    nextReviewDate,
+    reviewOverdueDays,
   }) => {
     cy.task('stubNonAssociations', prisonerNumber)
     cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, overrides: prisonerDataOverrides })
     cy.task('stubAccountBalances', bookingId)
     cy.task('stubAdjudications', bookingId)
     cy.task('stubCaseNoteUsage', prisonerNumber)
-    cy.task('stubGetReviews', { prisonerNumber, bookingId })
+    cy.task('stubGetReviews', { prisonerNumber, bookingId, ...(nextReviewDate && { nextReviewDate }) })
     cy.task('stubVisitSummary', bookingId)
     cy.task('stubVisitBalances', prisonerNumber)
     cy.task('stubAssessments', bookingId)
@@ -84,7 +86,7 @@ Cypress.Commands.add(
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
     cy.setupComponentsData({ caseLoads })
-    cy.task('stubGetCurrentCsip', prisonerNumber)
+    cy.task('stubGetCurrentCsip', { prisonerNumber, ...(reviewOverdueDays && { reviewOverdueDays }) })
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
   },

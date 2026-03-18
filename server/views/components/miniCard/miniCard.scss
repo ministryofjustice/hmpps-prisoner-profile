@@ -35,6 +35,20 @@
   &__item {
     font-size: 19px;
     margin: 0 0 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__warning-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    color: inherit;
+
+    @media (forced-colors: active) and (prefers-color-scheme: dark) {
+      color: white;
+    }
   }
 
   &__link {

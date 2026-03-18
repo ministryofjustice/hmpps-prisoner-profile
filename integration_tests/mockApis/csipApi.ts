@@ -2,7 +2,13 @@ import { stubFor } from './wiremock'
 import { currentCsipDetailMock } from '../../server/data/localMockData/csipApi/currentCsipDetailMock'
 
 export default {
-  stubGetCurrentCsip: (prisonerNumber: string) => {
+  stubGetCurrentCsip: ({
+    prisonerNumber,
+    reviewOverdueDays,
+  }: {
+    prisonerNumber: string
+    reviewOverdueDays?: number
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -13,7 +19,15 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: currentCsipDetailMock,
+        jsonBody: {
+          ...currentCsipDetailMock,
+          ...(reviewOverdueDays && {
+            currentCsip: {
+              ...currentCsipDetailMock.currentCsip,
+              reviewOverdueDays,
+            },
+          }),
+        },
       },
     })
   },

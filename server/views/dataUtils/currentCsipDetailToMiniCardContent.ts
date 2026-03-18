@@ -72,6 +72,7 @@ export default (currentCsipDetail: Result<CurrentCsipDetail>, prisonerNumber: st
         ? [
             {
               text: `${pluralise(currentCsip.reviewOverdueDays, 'day')} overdue`,
+              showWarningIcon: true,
               classes: 'hmpps-red-text govuk-!-font-weight-bold',
             },
           ]
