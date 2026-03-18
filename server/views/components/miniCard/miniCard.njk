@@ -1,3 +1,4 @@
+{% from "components/warningIcon/warningIcon.njk" import warningIcon %}
 {% macro miniCard(content, classes, errored) %}
 <div class="mini-card {{ 'mini-card__no-header' if not content.heading }} {{ classes }}">
     {% if content.heading %}
@@ -16,6 +17,9 @@
         {% endif %}
         {% for item in content.items %}
             <div class="mini-card__item {{ item.classes }}">
+                {% if item.showWarningIcon %}
+                    {{ warningIcon('mini-card__warning-icon') }}
+                {% endif %}
                 {{ item.text }}
             </div>
         {% endfor %}

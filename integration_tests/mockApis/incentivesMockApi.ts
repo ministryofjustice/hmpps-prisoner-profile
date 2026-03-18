@@ -2,7 +2,15 @@ import { stubFor } from './wiremock'
 import { incentiveReviewsMock } from '../../server/data/localMockData/incentiveReviewsMock'
 
 export default {
-  stubGetReviews: ({ prisonerNumber, bookingId }: { prisonerNumber: string; bookingId: number }) => {
+  stubGetReviews: ({
+    prisonerNumber,
+    bookingId,
+    nextReviewDate,
+  }: {
+    prisonerNumber: string
+    bookingId: number
+    nextReviewDate?: string
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -16,6 +24,7 @@ export default {
         jsonBody: {
           ...incentiveReviewsMock,
           bookingId,
+          ...(nextReviewDate && { nextReviewDate }),
         },
       },
     })
