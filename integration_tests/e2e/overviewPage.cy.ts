@@ -1112,6 +1112,7 @@ context('Court cases and release dates', () => {
           bookingId: 1234567,
           prisonerDataOverrides: { category: 'B' },
           nextReviewDate: '2026-03-15',
+          daysOverdue: 2,
         })
         cy.setupUserAuth()
         visitOverviewPageAlt()

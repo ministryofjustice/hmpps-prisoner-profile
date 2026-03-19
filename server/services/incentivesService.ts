@@ -33,9 +33,11 @@ export default class IncentivesService {
       positiveBehaviourCount,
       negativeBehaviourCount,
       nextReviewDate: incentiveReviews?.nextReviewDate,
-      daysOverdue: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-        ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
-        : undefined,
+      daysOverdue:
+        incentiveReviews?.daysOverdue ??
+        (isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+          ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
+          : undefined),
     }
   }
 }

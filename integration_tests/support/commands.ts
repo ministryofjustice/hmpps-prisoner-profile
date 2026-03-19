@@ -52,6 +52,7 @@ Cypress.Commands.add(
     highComplexityOfNeeds = false,
     failToLoadKeyWorker = false,
     nextReviewDate,
+    daysOverdue,
     reviewOverdueDays,
   }) => {
     cy.task('stubNonAssociations', prisonerNumber)
@@ -59,7 +60,12 @@ Cypress.Commands.add(
     cy.task('stubAccountBalances', bookingId)
     cy.task('stubAdjudications', bookingId)
     cy.task('stubCaseNoteUsage', prisonerNumber)
-    cy.task('stubGetReviews', { prisonerNumber, bookingId, ...(nextReviewDate && { nextReviewDate }) })
+    cy.task('stubGetReviews', {
+      prisonerNumber,
+      bookingId,
+      ...(nextReviewDate && { nextReviewDate }),
+      ...(daysOverdue && { daysOverdue }),
+    })
     cy.task('stubVisitSummary', bookingId)
     cy.task('stubVisitBalances', prisonerNumber)
     cy.task('stubAssessments', bookingId)

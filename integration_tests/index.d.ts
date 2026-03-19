@@ -31,6 +31,7 @@ declare global {
         highComplexityOfNeeds?: boolean
         failToLoadKeyWorker?: boolean
         nextReviewDate?: string
+        daysOverdue?: number
         reviewOverdueDays?: number
       }): Chainable<AUTWindow>
 
