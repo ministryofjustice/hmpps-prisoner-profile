@@ -40,9 +40,10 @@
   </div>
 </div>
 
+{% set showExternalContacts = isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)%}
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
   {% call conditionallyShow({
-    condition: isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions),
+    condition: showExternalContacts,
     id: 'external-contacts',
     visibleClasses: 'govuk-grid-column-one-third'
   }) %}
