@@ -6,10 +6,12 @@ export default {
     prisonerNumber,
     bookingId,
     nextReviewDate,
+    daysOverdue,
   }: {
     prisonerNumber: string
     bookingId: number
     nextReviewDate?: string
+    daysOverdue?: number
   }) => {
     return stubFor({
       request: {
@@ -25,6 +27,7 @@ export default {
           ...incentiveReviewsMock,
           bookingId,
           ...(nextReviewDate && { nextReviewDate }),
+          ...(daysOverdue && { daysOverdue }),
         },
       },
     })

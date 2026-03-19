@@ -18,6 +18,8 @@ context('Add Case Note Page', () => {
     cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetCaseNoteTypes')
     cy.task('stubAddCaseNote')
+    cy.task('stubPersonApiGetRecord', { prisonerNumber: 'G6123VU', prisonNumbers: ['G6123VU'] })
+    cy.task('stubPrisonerSearchFindByNumbers', { prisoners: [] })
   })
 
   context('As a user with prisoner in their caseload', () => {
