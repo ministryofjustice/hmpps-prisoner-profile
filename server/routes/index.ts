@@ -45,6 +45,7 @@ import retrieveCuriousFunctionalSkills from '../middleware/retrieveCuriousFuncti
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import DuplicateProfilesController from '../controllers/duplicateProfilesController'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
+import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -249,6 +250,7 @@ export default function routes(services: Services): Router {
   router.use(personalRouter(services))
   router.use(editRouter(services))
   router.use(imageRouter(services))
+  router.use(accessibilityStatementRouter(services))
 
   router.get(
     `${basePath}/schedule`,

@@ -2,6 +2,11 @@ import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import { ApolloClient, gql, TypedDocumentNode } from '@apollo/client'
 import { BannerQuery, BannerQueryVariables } from '../data/interfaces/contentfulApi/bannerApollo'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import {
+  ManagedPage,
+  ManagedPagesQuery,
+  ManagedPagesQueryVariables,
+} from '../data/interfaces/contentfulApi/managedPageApollo'
 
 export default class ContentfulService {
   constructor(readonly apolloClient: ApolloClient) {}
@@ -44,5 +49,64 @@ export default class ContentfulService {
       ...banner,
       text: documentToHtmlString(banner.text.json),
     }))[0]?.text
+  }
+
+  public async getManagedPage(slug: string): Promise<ManagedPage> {
+    const filter = { slug }
+
+    const getManagedPageBySlugQuery: TypedDocumentNode<ManagedPagesQuery, ManagedPagesQueryVariables> = gql`
+      query ManagedPageBySlug($condition: ManagedPageFilter!) {
+        managedPageCollection(limit: 1, where: $condition) {
+          items {
+            title
+            slug
+            content {
+              json
+              links {
+                assets {
+                  hyperlink {
+                    sys {
+                      id
+                    }
+                    contentType
+                    url
+                    title
+                    description
+                    fileName
+                  }
+                  block {
+                    sys {
+                      id
+                    }
+                    contentType
+                    url
+                    title
+                    width
+                    height
+                    description
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `
+
+    const { items } = (
+      await this.apolloClient.query({
+        query: getManagedPageBySlugQuery,
+        variables: { condition: filter },
+      })
+    ).data.managedPageCollection
+
+    if (!items?.length) {
+      throw new Error('Page not found')
+    }
+
+    return items.map(page => ({
+      ...page,
+      content: documentToHtmlString(page.content.json),
+    }))[0]
   }
 }
