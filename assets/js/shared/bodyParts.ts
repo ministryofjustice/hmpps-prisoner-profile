@@ -144,7 +144,7 @@ export class BodyParts extends Component<HTMLDivElement> {
         this.hideTooltipUnlessFocused()
       })
 
-      $anchor.addEventListener('mousedown', event => {
+      $anchor.addEventListener('mousedown', () => {
         autoPositionTooltip = false
       })
 
