@@ -1,33 +1,38 @@
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from 'govuk/components/button/macro.njk' import govukButton %}
+{% from 'govuk/components/select/macro.njk' import govukSelect %}
 
 {% macro hmppsSortSelector(params) %}
-<div>
-    <form id="{{ params.formId | default('sortForm')}}">
-        <label class="govuk-label" for="{{ params.id }}">{{ params.label }}</label>
-        <select
-                class="govuk-select hmpps-sort-selector__select"
-                id="{{ params.id }}"
-                name="{{ params.id }}"
-                value={{ params.sort }}
-        >
-            {% for option in params.options %}
-                <option value="{{ option.value }}" {{ 'selected' if params.sort === option.value }}>{{ option.description }}</option>
-            {% endfor %}
-        </select>
-        {% for key, val in params.queryParams %}
-            {% if val and val is iterable and val is not string %}
-                {% for i in val %}
-                    <input type="hidden" name="{{ key }}" value="{{ i }}">
-                {% endfor %}
-            {% elseif val %}
-                <input type="hidden" name="{{ key }}" value="{{ val }}">
-            {% endif %}
+  <form id="{{ params.formId | default('sortForm')}}" class="hmpps-sort-selector" novalidate>
+    {% set sortItems = [] %}
+    {% for option in params.options %}
+      {% set _ = sortItems.push({
+        text: option.description,
+        value: option.value,
+        selected: params.sort === option.value
+      }) %}
+    {% endfor %}
+    {{ govukSelect({
+      id: params.id,
+      classes: 'hmpps-sort-selector__select',
+      name: params.id,
+      label: {text: params.label},
+      items: sortItems
+    }) }}
+
+    {% for key, val in params.queryParams %}
+      {% if val and val is iterable and val is not string %}
+        {% for i in val %}
+          <input type="hidden" name="{{ key }}" value="{{ i }}" />
         {% endfor %}
-        {{ govukButton({
-            text: "Sort",
-            classes: "hmpps-sort-selector__sort-button",
-            preventDoubleClick: true
-        }) }}
-    </form>
-</div>
+      {% elseif val %}
+        <input type="hidden" name="{{ key }}" value="{{ val }}" />
+      {% endif %}
+    {% endfor %}
+
+    {{ govukButton({
+      text: 'Sort',
+      classes: 'hmpps-sort-selector__sort-button',
+      preventDoubleClick: true
+    }) }}
+  </form>
 {%  endmacro %}

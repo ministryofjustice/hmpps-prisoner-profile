@@ -44,7 +44,7 @@ context('Alerts API enabled prison', () => {
     })
 
     context('Active Alerts', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -76,22 +76,22 @@ context('Alerts API enabled prison', () => {
       })
 
       it('Displays the pagination correctly', () => {
-        alertsPage.paginationPreviousLink().should('not.exist')
-        alertsPage.paginationCurrentPage().contains('1')
-        alertsPage.paginationNextLink().should('exist')
-        alertsPage.paginationHeaderPageLink().should('have.length', 3)
-        alertsPage.paginationFooterPageLink().should('have.length', 3)
+        alertsPage.pagedList.headerPreviousLink.should('not.exist')
+        alertsPage.pagedList.headerCurrentPage.contains('1')
+        alertsPage.pagedList.headerNextLink.should('exist')
+        alertsPage.pagedList.headerPageLinks.should('have.length', 4)
+        alertsPage.pagedList.footerPageLinks.should('have.length', 4)
       })
 
       it('Displays the pagination summary correctly', () => {
-        alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
-        alertsPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 alerts')
-        alertsPage.viewAllLink().should('exist')
+        alertsPage.pagedList.headerResults.contains('Showing 1 to 20 of 80 alerts')
+        alertsPage.pagedList.footerResults.contains('Showing 1 to 20 of 80 alerts')
+        alertsPage.pagedList.headerViewAllLink.should('exist')
       })
     })
 
     context('Inactive Alerts', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -109,22 +109,22 @@ context('Alerts API enabled prison', () => {
       })
 
       it('Displays the pagination correctly', () => {
-        alertsPage.paginationPreviousLink().should('exist')
-        alertsPage.paginationCurrentPage().contains('2')
-        alertsPage.paginationNextLink().should('exist')
-        alertsPage.paginationHeaderPageLink().should('have.length', 3)
-        alertsPage.paginationFooterPageLink().should('have.length', 3)
+        alertsPage.pagedList.headerPreviousLink.should('exist')
+        alertsPage.pagedList.headerCurrentPage.contains('2')
+        alertsPage.pagedList.headerNextLink.should('exist')
+        alertsPage.pagedList.headerPageLinks.should('have.length', 4)
+        alertsPage.pagedList.footerPageLinks.should('have.length', 4)
       })
 
       it('Displays the pagination summary correctly', () => {
-        alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
-        alertsPage.paginationSummaryFooter().contains('Showing 21 to 40 of 80 alerts')
-        alertsPage.viewAllLink().should('exist')
+        alertsPage.pagedList.headerResults.contains('Showing 21 to 40 of 80 alerts')
+        alertsPage.pagedList.footerResults.contains('Showing 21 to 40 of 80 alerts')
+        alertsPage.pagedList.headerViewAllLink.should('exist')
       })
     })
 
     context('No Active Alerts', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
@@ -145,16 +145,13 @@ context('Alerts API enabled prison', () => {
       })
 
       it('Displays no pagination or pagination summary', () => {
-        alertsPage.paginationHeader().should('not.exist')
-        alertsPage.paginationFooter().should('not.exist')
-        alertsPage.paginationSummaryHeader().should('not.exist')
-        alertsPage.paginationSummaryFooter().should('not.exist')
-        alertsPage.viewAllLink().should('not.exist')
+        alertsPage.pagedList.header.should('not.exist')
+        alertsPage.pagedList.footer.should('not.exist')
       })
     })
 
     context('Paging', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -165,21 +162,21 @@ context('Alerts API enabled prison', () => {
       })
 
       it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
-        alertsPage.paginationCurrentPage().contains('1')
-        alertsPage.paginationNextLink().first().click()
+        alertsPage.pagedList.headerCurrentPage.contains('1')
+        alertsPage.pagedList.headerNextLink.click()
         cy.location('href').should('contain', 'page=2')
-        alertsPage.paginationCurrentPage().contains('2')
-        alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
+        alertsPage.pagedList.headerCurrentPage.contains('2')
+        alertsPage.pagedList.headerResults.contains('Showing 21 to 40 of 80 alerts')
 
-        alertsPage.paginationPreviousLink().first().click()
+        alertsPage.pagedList.headerPreviousLink.click()
         cy.location('href').should('contain', 'page=1')
-        alertsPage.paginationCurrentPage().contains('1')
-        alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
+        alertsPage.pagedList.headerCurrentPage.contains('1')
+        alertsPage.pagedList.headerResults.contains('Showing 1 to 20 of 80 alerts')
       })
     })
 
     context('Sorting', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -190,18 +187,18 @@ context('Alerts API enabled prison', () => {
       })
 
       it('Displays the active alerts tab and sorts results by Start date (oldest)', () => {
-        alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,DESC') // Default sort - Start date (most recent)
+        alertsPage.sort().invoke('val').should('eq', 'dateCreated,DESC') // Default sort - Start date (most recent)
         alertsPage.alertsListItem().first().contains('Start date: 24 October 2022 by James T Kirk')
 
         alertsPage.sort().select('Start date (oldest)')
 
-        alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,ASC')
+        alertsPage.sort().invoke('val').should('eq', 'dateCreated,ASC')
         alertsPage.alertsListItem().first().contains('Start date: 10 June 2020 by Dom Bull')
       })
     })
 
     context('Filtering', () => {
-      let alertsPage
+      let alertsPage: AlertsPage
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -223,6 +220,8 @@ context('Alerts API enabled prison', () => {
   })
 
   context('Alerts Page - User has Update Alert role', () => {
+    let alertsPage: AlertsPage
+
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.UpdateAlert] })
@@ -233,8 +232,6 @@ context('Alerts API enabled prison', () => {
       visitActiveAlertsPage()
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
-
-    let alertsPage
 
     it('Displays the add alert button', () => {
       alertsPage.addAlertButton()
@@ -253,7 +250,8 @@ context('Alerts API enabled prison', () => {
 })
 
 context('Alerts API Unavailable', () => {
-  let alertsPage
+  let alertsPage: AlertsPage
+
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()

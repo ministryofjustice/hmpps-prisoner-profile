@@ -58,17 +58,17 @@ context('Case Notes Page', () => {
     })
 
     it('Displays the pagination correctly', () => {
-      caseNotesPage.paginationPreviousLink().should('not.exist')
-      caseNotesPage.paginationCurrentPage().contains('1')
-      caseNotesPage.paginationNextLink().should('exist')
-      caseNotesPage.paginationHeaderPageLink().should('have.length', 3)
-      caseNotesPage.paginationFooterPageLink().should('have.length', 3)
+      caseNotesPage.pagedList.headerPreviousLink.should('not.exist')
+      caseNotesPage.pagedList.headerCurrentPage.contains('1')
+      caseNotesPage.pagedList.headerNextLink.should('exist')
+      caseNotesPage.pagedList.headerPageLinks.should('have.length', 4)
+      caseNotesPage.pagedList.footerPageLinks.should('have.length', 4)
     })
 
     it('Displays the pagination summary correctly', () => {
-      caseNotesPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 case notes')
-      caseNotesPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 case notes')
-      caseNotesPage.viewAllLink().should('exist')
+      caseNotesPage.pagedList.headerResults.contains('Showing 1 to 20 of 80 case notes')
+      caseNotesPage.pagedList.footerResults.contains('Showing 1 to 20 of 80 case notes')
+      caseNotesPage.pagedList.headerViewAllLink.should('exist')
     })
 
     it('Display correct filter labels', () => {
@@ -80,7 +80,7 @@ context('Case Notes Page', () => {
   })
 
   context('No Case Notes', () => {
-    let caseNotesPage
+    let caseNotesPage: CaseNotesPage
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
@@ -103,16 +103,13 @@ context('Case Notes Page', () => {
     })
 
     it('Displays no pagination or pagination summary', () => {
-      caseNotesPage.paginationHeader().should('not.exist')
-      caseNotesPage.paginationFooter().should('not.exist')
-      caseNotesPage.paginationSummaryHeader().should('not.exist')
-      caseNotesPage.paginationSummaryFooter().should('not.exist')
-      caseNotesPage.viewAllLink().should('not.exist')
+      caseNotesPage.pagedList.header.should('not.exist')
+      caseNotesPage.pagedList.footer.should('not.exist')
     })
   })
 
   context('Paging', () => {
-    let caseNotesPage
+    let caseNotesPage: CaseNotesPage
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
@@ -123,14 +120,14 @@ context('Case Notes Page', () => {
     })
 
     it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
-      caseNotesPage.paginationCurrentPage().contains('1')
-      caseNotesPage.paginationNextLink().first().click()
-      caseNotesPage.paginationCurrentPage().contains('2')
-      caseNotesPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 case notes')
+      caseNotesPage.pagedList.headerCurrentPage.contains('1')
+      caseNotesPage.pagedList.headerNextLink.click()
+      caseNotesPage.pagedList.headerCurrentPage.contains('2')
+      caseNotesPage.pagedList.headerResults.contains('Showing 21 to 40 of 80 case notes')
 
-      caseNotesPage.paginationPreviousLink().first().click()
-      caseNotesPage.paginationCurrentPage().contains('1')
-      caseNotesPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 case notes')
+      caseNotesPage.pagedList.headerPreviousLink.click()
+      caseNotesPage.pagedList.headerCurrentPage.contains('1')
+      caseNotesPage.pagedList.headerResults.contains('Showing 1 to 20 of 80 case notes')
     })
   })
 
@@ -146,20 +143,20 @@ context('Case Notes Page', () => {
     })
 
     it('Displays the case notes and sorts results by Created (oldest)', () => {
-      caseNotesPage.sort().invoke('attr', 'value').should('eq', 'createdAt,DESC') // Default sort - Created (most recent)
+      caseNotesPage.sort().invoke('val').should('eq', 'createdAt,DESC') // Default sort - Created (most recent)
       caseNotesPage.caseNotesListItem().first().contains('18 April 2023 at 17:15')
       caseNotesPage.caseNotesListItem().first().contains('Created by: John Smith')
 
       caseNotesPage.sort().select('Created (oldest)')
 
-      caseNotesPage.sort().invoke('attr', 'value').should('eq', 'createdAt,ASC')
+      caseNotesPage.sort().invoke('val').should('eq', 'createdAt,ASC')
       caseNotesPage.caseNotesListItem().first().contains('9 January 2023 at 11:29')
       caseNotesPage.caseNotesListItem().first().contains('Created by: James T Kirk')
     })
   })
 
   context('Filtering', () => {
-    let caseNotesPage
+    let caseNotesPage: CaseNotesPage
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
@@ -181,7 +178,7 @@ context('Case Notes Page', () => {
 })
 
 context('Sensitive Case Notes', () => {
-  let caseNotesPage
+  let caseNotesPage: CaseNotesPage
 
   context('POM User - No role to delete sensitive case notes', () => {
     beforeEach(() => {
@@ -232,7 +229,8 @@ context('Sensitive Case Notes', () => {
 })
 
 context('Incentive slips', () => {
-  let caseNotesPage
+  let caseNotesPage: CaseNotesPage
+
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
@@ -303,7 +301,8 @@ context('Case Notes Page Not Found', () => {
 })
 
 context('Case Notes API Unavailable', () => {
-  let caseNotesPage
+  let caseNotesPage: CaseNotesPage
+
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()

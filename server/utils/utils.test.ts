@@ -26,6 +26,7 @@ import {
   formatPomName,
   formatScheduleItem,
   formatWeight,
+  generateListMetadata,
   getNamesFromString,
   groupBy,
   includesActiveCaseLoad,
@@ -68,13 +69,16 @@ import {
   xrayCareNeedsMock,
 } from '../data/localMockData/personalCareNeedsMock'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
+import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import Address from '../data/interfaces/prisonApi/Address'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
+import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
+import { emptyAlertsMock, pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -1369,6 +1373,217 @@ describe('utils', () => {
       [{ a: { b: [{ c: ' ' }] } }, { a: { b: [{ c: null }] } }],
     ])('converts blank strings to null for %s', async (input: unknown, output: unknown) => {
       expect(blankStringsToNull(input)).toEqual(output)
+    })
+  })
+
+  describe('generateListMetadata', () => {
+    it('should paginate empty list', () => {
+      const listMetadata = generateListMetadata<AlertsListQueryParams>(emptyAlertsMock, {}, 'alert')
+      expect(listMetadata.pagination.itemDescription).toEqual('alert')
+      expect(listMetadata.pagination.previous).toBeUndefined()
+      expect(listMetadata.pagination.next).toBeUndefined()
+      expect(listMetadata.pagination.pages).toEqual([])
+      expect(listMetadata.pagination.viewAllUrl).toEqual('?showAll=true')
+      expect(listMetadata.pagination.enableShowAll).toBe(false)
+    })
+
+    describe.each([
+      { scenario: 'with empty query params', queryParams: {}, urlSuffix: '' },
+      {
+        scenario: 'with query params provided',
+        queryParams: { sort: 'dateCreated,ASC', from: '01/01/2023' },
+        urlSuffix: '&sort=dateCreated%2CASC&from=01%2F01%2F2023',
+      },
+    ])('short paged list $scenario', ({ queryParams, urlSuffix }) => {
+      it('should paginate first page', () => {
+        const listMetadata = generateListMetadata<AlertsListQueryParams>(pagedActiveAlertsMock, queryParams, 'alert')
+        expect(listMetadata.pagination.previous).toBeUndefined()
+        expect(listMetadata.pagination.next).toEqual({
+          href: `?page=2${urlSuffix}`,
+          text: 'Next',
+        })
+        expect(listMetadata.pagination.pages).toEqual([
+          { number: '1', href: `?page=1${urlSuffix}`, current: true },
+          { number: '2', href: `?page=2${urlSuffix}`, current: false },
+          { number: '3', href: `?page=3${urlSuffix}`, current: false },
+          { number: '4', href: `?page=4${urlSuffix}`, current: false },
+        ])
+        expect(listMetadata.pagination.page).toEqual(1)
+        expect(listMetadata.pagination.viewAllUrl).toEqual(`?showAll=true${urlSuffix}`)
+      })
+
+      it('should paginate mid page', () => {
+        const pagedList = {
+          ...pagedActiveAlertsMock,
+          first: false,
+          last: false,
+          pageable: {
+            ...pagedActiveAlertsMock.pageable,
+            offset: 20,
+            pageNumber: 1,
+          },
+        }
+        const listMetadata = generateListMetadata<AlertsListQueryParams>(pagedList, queryParams, 'alert')
+        expect(listMetadata.pagination.previous).toEqual({
+          href: `?page=1${urlSuffix}`,
+          text: 'Previous',
+        })
+        expect(listMetadata.pagination.next).toEqual({
+          href: `?page=3${urlSuffix}`,
+          text: 'Next',
+        })
+        expect(listMetadata.pagination.pages).toEqual([
+          { number: '1', href: `?page=1${urlSuffix}`, current: false },
+          { number: '2', href: `?page=2${urlSuffix}`, current: true },
+          { number: '3', href: `?page=3${urlSuffix}`, current: false },
+          { number: '4', href: `?page=4${urlSuffix}`, current: false },
+        ])
+        expect(listMetadata.pagination.page).toEqual(2)
+        expect(listMetadata.pagination.viewAllUrl).toEqual(`?showAll=true${urlSuffix}`)
+      })
+
+      it('should paginate last page', () => {
+        const pagedList = {
+          ...pagedActiveAlertsMock,
+          first: false,
+          last: true,
+          pageable: {
+            ...pagedActiveAlertsMock.pageable,
+            offset: 60,
+            pageNumber: 3,
+          },
+        }
+        const listMetadata = generateListMetadata<AlertsListQueryParams>(pagedList, queryParams, 'alert')
+        expect(listMetadata.pagination.previous).toEqual({
+          href: `?page=3${urlSuffix}`,
+          text: 'Previous',
+        })
+        expect(listMetadata.pagination.next).toBeUndefined()
+        expect(listMetadata.pagination.pages).toEqual([
+          { number: '1', href: `?page=1${urlSuffix}`, current: false },
+          { number: '2', href: `?page=2${urlSuffix}`, current: false },
+          { number: '3', href: `?page=3${urlSuffix}`, current: false },
+          { number: '4', href: `?page=4${urlSuffix}`, current: true },
+        ])
+        expect(listMetadata.pagination.page).toEqual(4)
+        expect(listMetadata.pagination.viewAllUrl).toEqual(`?showAll=true${urlSuffix}`)
+      })
+    })
+
+    describe.each([
+      { scenario: 'with empty query params', queryParams: {}, urlSuffix: '' },
+      {
+        scenario: 'with query params provided',
+        queryParams: { sort: 'dateCreated,ASC', from: '01/01/2023' },
+        urlSuffix: '&sort=dateCreated%2CASC&from=01%2F01%2F2023',
+      },
+    ])('long paged list $scenario', ({ queryParams, urlSuffix }) => {
+      it.each([
+        { page: 1, expectedPages: [1, 2, null, 8] },
+        { page: 2, expectedPages: [1, 2, 3, null, 8] },
+        { page: 3, expectedPages: [1, 2, 3, 4, null, 8] },
+        { page: 4, expectedPages: [1, null, 3, 4, 5, null, 8] },
+        { page: 5, expectedPages: [1, null, 4, 5, 6, null, 8] },
+        { page: 6, expectedPages: [1, null, 5, 6, 7, 8] },
+        { page: 7, expectedPages: [1, null, 6, 7, 8] },
+        { page: 8, expectedPages: [1, null, 7, 8] },
+      ])('should paginate page $page', ({ page, expectedPages }) => {
+        const pagedList = {
+          ...pagedActiveAlertsMock,
+          first: page === 1,
+          last: page === 8,
+          pageable: {
+            ...pagedActiveAlertsMock.pageable,
+            offset: 20 * (page - 1),
+            pageNumber: page - 1,
+          },
+          totalPages: 8,
+          totalElements: 160,
+        }
+        const listMetadata = generateListMetadata<AlertsListQueryParams>(pagedList, queryParams, 'alert')
+
+        if (page === 1) {
+          expect(listMetadata.pagination.previous).toBeUndefined()
+          expect(listMetadata.pagination).toHaveProperty('next')
+        } else if (page === 8) {
+          expect(listMetadata.pagination).toHaveProperty('previous')
+          expect(listMetadata.pagination.next).toBeUndefined()
+        } else {
+          expect(listMetadata.pagination).toHaveProperty('previous')
+          expect(listMetadata.pagination).toHaveProperty('next')
+        }
+
+        expect(listMetadata.pagination.pages).toEqual(
+          expectedPages.map(expectedPage =>
+            expectedPage === null
+              ? { ellipsis: true }
+              : {
+                  number: `${expectedPage}`,
+                  href: `?page=${expectedPage}${urlSuffix}`,
+                  current: page === expectedPage,
+                },
+          ),
+        )
+      })
+    })
+
+    it('should default to no sorting', () => {
+      const listMetadata = generateListMetadata<AlertsListQueryParams>(emptyAlertsMock, {}, 'alert')
+      expect(listMetadata.sorting).toBeNull()
+    })
+
+    it.each([
+      { scenario: 'with empty query params', queryParams: {}, expectedSort: undefined },
+      {
+        scenario: 'with sort query param provided',
+        queryParams: { sort: 'dateCreated,DESC' },
+        expectedSort: 'dateCreated,DESC',
+      },
+      {
+        scenario: 'with several query params provided',
+        queryParams: { sort: 'dateCreated,DESC', from: '01/01/2023' },
+        expectedSort: 'dateCreated,DESC',
+      },
+    ])('should allow setting filtering & sorting options $scenario', ({ queryParams, expectedSort }) => {
+      const sortOptions: SortOption[] = [
+        { value: 'dateCreated,DESC', description: 'Start date (most recent)' },
+        { value: 'dateCreated,ASC', description: 'Start date (oldest)' },
+      ]
+      const listMetadata = generateListMetadata<AlertsListQueryParams>(
+        emptyAlertsMock,
+        queryParams,
+        'alert',
+        sortOptions,
+        'Sort by',
+      )
+
+      expect(listMetadata.filtering).toEqual({
+        ...queryParams,
+        queryParams: { sort: expectedSort },
+      })
+
+      expect(listMetadata.sorting).toEqual({
+        id: 'sort',
+        label: 'Sort by',
+        options: sortOptions,
+        queryParams: {
+          ...queryParams,
+          sort: undefined,
+        },
+        sort: expectedSort,
+      })
+    })
+
+    it('should allow enabling “Show all”', () => {
+      const listMetadata = generateListMetadata<AlertsListQueryParams>(
+        emptyAlertsMock,
+        {},
+        'alert',
+        [],
+        'Sort by',
+        true,
+      )
+      expect(listMetadata.pagination.enableShowAll).toBe(true)
     })
   })
 })

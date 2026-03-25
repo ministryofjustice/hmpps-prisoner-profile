@@ -1,6 +1,6 @@
 import SortParams from './SortParams'
 
-export default interface ListMetadata<TGeneric> {
+export interface ListMetadata<TGeneric> {
   filtering: {
     queryParams?: { [key: string]: string | number | boolean }
   } & TGeneric
@@ -15,7 +15,16 @@ export default interface ListMetadata<TGeneric> {
     totalPages: number
     totalElements: number
     elementsOnPage: number
-    pages: { href: string; text: string; selected: boolean; type?: string }[]
+    pages: ListMetadataPage[]
     viewAllUrl?: string
+    enableShowAll: boolean
   }
 }
+
+export type ListMetadataPage =
+  | {
+      number: string
+      href: string
+      current?: boolean
+    }
+  | { ellipsis: true }

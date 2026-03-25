@@ -3,7 +3,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { SortOption } from '../interfaces/SortParams'
 import HmppsError from '../interfaces/HmppsError'
-import ListMetadata from '../interfaces/ListMetadata'
+import type { ListMetadata, ListMetadataPage } from '../interfaces/ListMetadata'
 import config from '../config'
 import OverviewNonAssociation from '../services/interfaces/overviewPageService/OverviewNonAssociation'
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
@@ -224,26 +224,26 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
   itemDescription: string,
   sortOptions?: SortOption[],
   sortLabel?: string,
-  enableShowAll?: boolean,
+  enableShowAll: boolean = false,
 ): ListMetadata<T> => {
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
-  let pages = []
+  let pages: ListMetadataPage[] = []
 
   if (pagedList?.totalPages > 1 && pagedList?.totalPages < 8) {
     pages = [...Array(pagedList.totalPages).keys()].map(page => {
       return {
-        text: `${page + 1}`,
+        number: `${page + 1}`,
         href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
-        selected: currentPage === page + 1,
+        current: currentPage === page + 1,
       }
     })
   } else if (pagedList?.totalPages > 7) {
     pages.push({
-      text: '1',
-      href: [`?page=1`, query].filter(Boolean).join('&'),
-      selected: currentPage === 1,
+      number: '1',
+      href: ['?page=1', query].filter(Boolean).join('&'),
+      current: currentPage === 1,
     })
 
     const pageRange = [currentPage - 1, currentPage, currentPage + 1]
@@ -253,29 +253,23 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
     for (let i = 2; i < pagedList.totalPages; i++) {
       if (pageRange.includes(i)) {
         pages.push({
-          text: `${i}`,
+          number: `${i}`,
           href: [`?page=${i}`, query].filter(Boolean).join('&'),
-          selected: currentPage === i,
+          current: currentPage === i,
         })
       } else if (i < pageRange[0] && !preDots) {
-        pages.push({
-          text: '...',
-          type: 'dots',
-        })
+        pages.push({ ellipsis: true })
         preDots = true
       } else if (i > pageRange[2] && !postDots) {
-        pages.push({
-          text: '...',
-          type: 'dots',
-        })
+        pages.push({ ellipsis: true })
         postDots = true
       }
     }
 
     pages.push({
-      text: `${pagedList.totalPages}`,
+      number: `${pagedList.totalPages}`,
       href: [`?page=${pagedList.totalPages}`, query].filter(Boolean).join('&'),
-      selected: currentPage === pagedList.totalPages,
+      current: currentPage === pagedList.totalPages,
     })
   }
 
@@ -293,7 +287,7 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
         text: 'Previous',
       }
 
-  const viewAllUrl = [`?${mapToQueryString(queryParams)}`, 'showAll=true'].filter(Boolean).join('&')
+  const viewAllUrl = ['?showAll=true', query].filter(Boolean).join('&')
 
   return <ListMetadata<T>>{
     filtering: {
@@ -325,7 +319,7 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
       elementsOnPage: pagedList?.numberOfElements,
       pages,
       viewAllUrl,
-      enableShowAll: enableShowAll === undefined ? false : enableShowAll,
+      enableShowAll,
     },
   }
 }

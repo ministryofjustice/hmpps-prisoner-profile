@@ -1,7 +1,6 @@
-{% from '../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
-{% from '../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+{% from 'components/pagedList/macro.njk' import hmppsPagedList %}
 
-{{ hmppsPagedListHeader(listMetadata) }}
+{% call hmppsPagedList(listMetadata) %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <div class="hmpps-case-note-card-list" role="list" data-qa="visits-list">
@@ -35,7 +34,7 @@
                   <p class="govuk-body">{{ visit.prison }}</p>
                 </div>
               </div>
-            </div>  
+            </div>
           </div>
         </div>
         <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-6" aria-hidden="true">
@@ -43,4 +42,4 @@
     </div>
   </div>
 </div>
-{{ hmppsPagedListFooter(listMetadata) }}
+{% endcall %}

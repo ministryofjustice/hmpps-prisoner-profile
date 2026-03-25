@@ -1,8 +1,7 @@
-{% from '../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
-{% from '../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+{% from 'components/pagedList/macro.njk' import hmppsPagedList %}
 {% from './macros/alertCard.njk' import alertCard %}
 
-{{ hmppsPagedListHeader(listMetadata) }}
+{% call hmppsPagedList(listMetadata) %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <div class="hmpps-alert-card-list" role="list">
@@ -23,5 +22,4 @@
         {% endif %}
     </div>
 </div>
-{{ hmppsPagedListFooter(listMetadata) }}
-
+{% endcall %}

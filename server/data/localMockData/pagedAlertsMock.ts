@@ -1977,7 +1977,8 @@ export const emptyAlertsMock: PagedList<Alert> = {
     unpaged: false,
   },
   totalPages: 0,
-  last: false,
+  first: true,
+  last: true,
   totalElements: 0,
   size: 0,
   number: 0,
@@ -1986,7 +1987,6 @@ export const emptyAlertsMock: PagedList<Alert> = {
     sorted: true,
     unsorted: false,
   },
-  first: true,
   numberOfElements: 0,
   empty: true,
 }
