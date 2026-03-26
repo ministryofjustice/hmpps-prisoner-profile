@@ -4,7 +4,9 @@
 {% macro hmppsPagedList(listMetadata) %}
   {% set sorting = listMetadata.sorting %}
   {% set pagination = listMetadata.pagination %}
+
   {% set pluralItemName = pagination.totalElements | pluralise(pagination.itemDescription, { includeCount: false }) %}
+  {% set showPagination = pagination.totalPages > 1 and not pagination.showingAll %}
 
   {% set sortingBlock %}
     {% if sorting %}
@@ -13,7 +15,7 @@
   {% endset %}
 
   {% set paginationBlock %}
-    {% if pagination.totalPages > 1 and not pagination.showingAll %}
+    {% if showPagination %}
       {{ govukPagination({
         previous: pagination.previous,
         next: pagination.next,
@@ -36,7 +38,7 @@
   {% endset %}
 
   {% set viewAllBlock %}
-    {% if pagination.totalPages > 1 and not pagination.showingAll and pagination.enableShowAll %}
+    {% if showPagination and pagination.enableShowAll %}
       <p class="hmpps-paged-list__view-all">
         <a href="{{ pagination.viewAllUrl }}" class="govuk-link govuk-link--no-visited-state">
           View all {{ pluralItemName }}
