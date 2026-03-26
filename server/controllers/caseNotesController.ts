@@ -299,7 +299,11 @@ export default class CaseNotesController {
         } catch (error) {
           if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
-          } else throw error
+          } else {
+            // When there's an arbitrary error updating, flash data and show a warning.
+            req.flash('caseNoteText', text)
+            throw new CaseNoteNotSavedError('Case note could not be saved') // Handled by existing middleware
+          }
         }
       }
 

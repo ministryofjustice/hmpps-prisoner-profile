@@ -324,7 +324,7 @@ describe('Case Notes Controller', () => {
           refererUrl: 'http://referer',
         },
       } as unknown as Request
-      const addCaseNoteSpy = jest
+      jest
         .spyOn(controller.caseNotesService, 'addCaseNote')
         .mockRejectedValue({ responseStatus: 500 } as SanitisedError)
 
@@ -472,6 +472,30 @@ describe('Case Notes Controller', () => {
 
       expect(updateCaseNoteSpy).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
+    })
+
+    it('should throw CaseNoteNotSavedError for warningMiddleware to handle when updating fails', async () => {
+      const text = 'Note text'
+      const caseNoteId = 'abc123'
+
+      req = {
+        ...req,
+        params: {
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          caseNoteId,
+        },
+        body: {
+          text,
+          refererUrl: 'http://referer',
+        },
+      } as unknown as Request
+      jest
+        .spyOn(controller.caseNotesService, 'addCaseNoteAmendment')
+        .mockRejectedValue({ responseStatus: 500 } as SanitisedError)
+
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(pagedCaseNotesMock.content[0])
+
+      await expect(controller.postUpdate()(req, res, next)).rejects.toThrow(CaseNoteNotSavedError)
     })
   })
 })
