@@ -1,0 +1,26 @@
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+
+{% macro caseNoteNotSavedWarning(caseNoteNotSaved) %}
+    {% if caseNoteNotSaved %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                {{ mojAlert({
+                    variant: "warning",
+                    title: "We could not save this case note",
+                    showTitleAsHeading: true,
+                    dismissible: false,
+                    html: '
+                        <div class="govuk-width-container govuk-!-margin-bottom-3">
+                            The text you entered is still on the page, but it has not been saved because of a technical problem.
+                        </div>
+                        <div class="govuk-width-container govuk-!-margin-bottom-3">
+                            You will lose the text if you refresh the page, close this window or leave the page. 
+                        </div>
+                        <div class="govuk-width-container">
+                            You can try saving again. If the problem continues, try again later. 
+                        </div>'
+                }) }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}

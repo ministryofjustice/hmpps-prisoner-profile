@@ -3,6 +3,7 @@ import { warningMiddleware, warningRenderMiddleware } from './warningMiddleware'
 import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
 import ProblemSavingError from '../utils/problemSavingError'
+import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
 
 describe('nomisLockedMiddleware', () => {
   it('should flash isLocked, call the metricsService, and redirect when NomisLockedError happens', () => {
@@ -63,6 +64,30 @@ describe('nomisLockedMiddleware', () => {
     expect(next).not.toHaveBeenCalled()
   })
 
+  it('should flash caseNoteNotSaved and the request body then redirect when CaseNoteNotSavedError happens', () => {
+    const req = {
+      flash: jest.fn(),
+      body: { foo: 'bar' },
+      originalUrl: '/somePage',
+      middleware: { prisonerData: { prisonerNumber: 'A1234BC' } },
+    } as unknown as Request
+
+    const res = {
+      redirect: jest.fn(),
+      locals: { user: {} },
+    } as unknown as Response
+
+    const err = new CaseNoteNotSavedError('Issue saving case note')
+    const next = jest.fn()
+
+    warningMiddleware(null)(err, req, res, next)
+
+    expect(req.flash).toHaveBeenCalledWith('caseNoteNotSaved', 'true')
+    expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
+    expect(res.redirect).toHaveBeenCalledWith('/somePage')
+    expect(next).not.toHaveBeenCalled()
+  })
+
   it('should call next with the error for arbitrary errors', () => {
     const req = {
       flash: jest.fn(),
@@ -113,7 +138,7 @@ describe('warningRenderMiddleware', () => {
 
     expect(originalRender).toHaveBeenCalledWith(
       'someView',
-      { ...options, isLocked: true, problemSaving: true },
+      { ...options, isLocked: true, problemSaving: true, caseNoteNotSaved: true },
       callback,
     )
     expect(next).toHaveBeenCalled()
