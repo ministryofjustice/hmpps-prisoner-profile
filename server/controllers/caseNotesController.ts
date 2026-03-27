@@ -16,6 +16,7 @@ import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 import type { SelectOption } from '../interfaces/GovOptions'
+import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -182,7 +183,12 @@ export default class CaseNotesController {
         } catch (error) {
           if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
-          } else throw error
+          } else {
+            // When there's an arbitrary error saving, flash data and show a warning.
+            req.flash('caseNote', caseNote)
+            req.flash('addCaseNoteRefererUrl', refererUrl)
+            throw new CaseNoteNotSavedError('Case note could not be saved') // Handled by existing middleware
+          }
         }
       }
 
@@ -293,7 +299,11 @@ export default class CaseNotesController {
         } catch (error) {
           if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
-          } else throw error
+          } else {
+            // When there's an arbitrary error updating, flash data and show a warning.
+            req.flash('caseNoteText', text)
+            throw new CaseNoteNotSavedError('Case note could not be saved') // Handled by existing middleware
+          }
         }
       }
 

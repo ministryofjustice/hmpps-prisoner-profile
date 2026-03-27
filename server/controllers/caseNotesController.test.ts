@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { CaseNotesPermission, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
@@ -16,6 +17,7 @@ import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseN
 import { HmppsUser } from '../interfaces/HmppsUser'
 import CaseNotesPageData from '../services/interfaces/caseNotesService/CaseNotesPageData'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
 
 let req: Request
 let res: Response
@@ -302,6 +304,36 @@ describe('Case Notes Controller', () => {
       expect(addCaseNoteSpy).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
+
+    it('should throw CaseNoteNotSavedError for warningMiddleware to handle when saving fails', async () => {
+      const caseNoteForm = {
+        type: 'REPORTS',
+        subType: 'REP_IEP',
+        text: 'Note text',
+        date: '01/01/2023',
+        hours: '16',
+        minutes: '30',
+      }
+      req = {
+        ...req,
+        params: {
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        },
+        body: {
+          ...caseNoteForm,
+          refererUrl: 'http://referer',
+        },
+      } as unknown as Request
+      jest
+        .spyOn(controller.caseNotesService, 'addCaseNote')
+        .mockRejectedValue({ responseStatus: 500 } as SanitisedError)
+
+      jest
+        .spyOn(controller.caseNotesService, 'getCaseNoteTypesForUser')
+        .mockResolvedValue([{ code: 'REPORTS', description: 'Reports', subCodes: [] }])
+
+      await expect(controller.post()(req, res, next)).rejects.toThrow(CaseNoteNotSavedError)
+    })
   })
 
   describe('displayUpdateCaseNote', () => {
@@ -440,6 +472,30 @@ describe('Case Notes Controller', () => {
 
       expect(updateCaseNoteSpy).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
+    })
+
+    it('should throw CaseNoteNotSavedError for warningMiddleware to handle when updating fails', async () => {
+      const text = 'Note text'
+      const caseNoteId = 'abc123'
+
+      req = {
+        ...req,
+        params: {
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          caseNoteId,
+        },
+        body: {
+          text,
+          refererUrl: 'http://referer',
+        },
+      } as unknown as Request
+      jest
+        .spyOn(controller.caseNotesService, 'addCaseNoteAmendment')
+        .mockRejectedValue({ responseStatus: 500 } as SanitisedError)
+
+      jest.spyOn(controller.caseNotesService, 'getCaseNote').mockResolvedValue(pagedCaseNotesMock.content[0])
+
+      await expect(controller.postUpdate()(req, res, next)).rejects.toThrow(CaseNoteNotSavedError)
     })
   })
 })

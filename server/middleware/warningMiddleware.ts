@@ -3,6 +3,7 @@ import { NomisLockedError } from '../utils/nomisLockedError'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import ProblemSavingError from '../utils/problemSavingError'
+import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
 
 export function warningMiddleware(metricsService: MetricsService) {
   return (err: unknown, req: Request, res: Response, next: NextFunction) => {
@@ -25,6 +26,12 @@ export function warningMiddleware(metricsService: MetricsService) {
       return res.redirect(req.originalUrl)
     }
 
+    if (err instanceof CaseNoteNotSavedError) {
+      req.flash('caseNoteNotSaved', 'true')
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(req.originalUrl)
+    }
+
     return next(err)
   }
 }
@@ -32,9 +39,10 @@ export function warningMiddleware(metricsService: MetricsService) {
 export function warningRenderMiddleware(req: Request, res: Response, next: NextFunction) {
   const isLocked = req.flash('isLocked')[0] === 'true'
   const problemSaving = req.flash('problemSaving')[0] === 'true'
+  const caseNoteNotSaved = req.flash('caseNoteNotSaved')[0] === 'true'
   const originalRender = res.render.bind(res)
   res.render = (view: string, options?: object, callback?: (err: Error, html: string) => void) => {
-    return originalRender(view, { ...options, isLocked, problemSaving }, callback)
+    return originalRender(view, { ...options, isLocked, problemSaving, caseNoteNotSaved }, callback)
   }
   next()
 }

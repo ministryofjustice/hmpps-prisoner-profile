@@ -5,6 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "../../macros/caseNoteNotSavedWarning.njk" import caseNoteNotSavedWarning %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Add more details to a case note' %}
 {% block body %}
@@ -22,6 +23,8 @@
             classes: 'govuk-!-margin-bottom-6'
         })}}
     {% endif %}
+
+    {{ caseNoteNotSavedWarning(caseNoteNotSaved) }}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
