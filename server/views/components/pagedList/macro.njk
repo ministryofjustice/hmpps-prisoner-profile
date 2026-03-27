@@ -1,0 +1,66 @@
+{% from 'govuk/components/pagination/macro.njk' import govukPagination %}
+{% from 'macros/hmppsSortSelector.njk' import hmppsSortSelector %}
+
+{% macro hmppsPagedList(listMetadata) %}
+  {% set sorting = listMetadata.sorting %}
+  {% set pagination = listMetadata.pagination %}
+
+  {% set pluralItemName = pagination.totalElements | pluralise(pagination.itemDescription, { includeCount: false }) %}
+  {% set showPagination = pagination.totalPages > 1 and not pagination.showingAll %}
+
+  {% set sortingBlock %}
+    {% if sorting %}
+      {{ hmppsSortSelector(sorting) }}
+    {% endif %}
+  {% endset %}
+
+  {% set paginationBlock %}
+    {% if showPagination %}
+      {{ govukPagination({
+        previous: pagination.previous,
+        next: pagination.next,
+        items: pagination.pages
+      }) }}
+    {% endif %}
+  {% endset %}
+
+  {% set resultsBlock %}
+    <p class="hmpps-paged-list__results">
+      {% if pagination.totalElements %}
+        Showing <b>{{ pagination.offset + 1 }}</b>
+        to <b>{{ pagination.offset + pagination.elementsOnPage }}</b>
+        of <b>{{ pagination.totalElements }}</b>
+      {% else %}
+        <b>0</b>
+      {% endif %}
+      {{ pluralItemName }}
+    </p>
+  {% endset %}
+
+  {% set viewAllBlock %}
+    {% if showPagination and pagination.enableShowAll %}
+      <p class="hmpps-paged-list__view-all">
+        <a href="{{ pagination.viewAllUrl }}" class="govuk-link govuk-link--no-visited-state">
+          View all {{ pluralItemName }}
+        </a>
+      </p>
+    {% endif %}
+  {% endset %}
+
+  <div class="hmpps-paged-list">
+    <div class="hmpps-paged-list__header">
+      {{ sortingBlock | safe }}
+      {{ paginationBlock | safe }}
+      {{ resultsBlock | safe }}
+      {{ viewAllBlock | safe }}
+    </div>
+
+    {{ caller() }}
+
+    <div class="hmpps-paged-list__footer">
+      {{ paginationBlock | safe }}
+      {{ resultsBlock | safe }}
+      {{ viewAllBlock | safe }}
+    </div>
+  </div>
+{% endmacro %}

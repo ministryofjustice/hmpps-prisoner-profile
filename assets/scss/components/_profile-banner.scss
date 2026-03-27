@@ -31,7 +31,7 @@
     display: grid;
     grid-template-columns: 135px 1fr 1fr;
     grid-template-rows: 0fr 1fr;
-    gap: 0 0;
+    gap: 0;
     grid-template-areas:
       'photo name name'
       'photo info info';

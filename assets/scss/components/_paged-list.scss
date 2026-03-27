@@ -1,0 +1,67 @@
+$hmpps-paged-list-min-size: 870px;
+
+.hmpps-paged-list {
+  container-type: inline-size;
+}
+
+.hmpps-paged-list__header, .hmpps-paged-list__footer {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    ". paged-list-results"
+    ". paged-list-view-all";
+  grid-auto-flow: column;
+  align-content: stretch;
+  justify-content: stretch;
+  align-items: end;
+
+  @container (width < #{$hmpps-paged-list-min-size}) {
+    grid-template-columns: auto;
+    grid-template-rows: repeat(4, auto);
+    grid-template-areas:
+      "."
+      "."
+      "paged-list-results"
+      "paged-list-view-all";
+  }
+
+  .hmpps-sort-selector .govuk-form-group, .govuk-pagination, .hmpps-paged-list__results, .hmpps-paged-list__view-all {
+    margin-bottom: govuk-spacing(4);
+  }
+
+  .hmpps-paged-list__results {
+    grid-area: paged-list-results;
+  }
+
+  .hmpps-paged-list__view-all {
+    grid-area: paged-list-view-all;
+  }
+
+  .hmpps-paged-list__results, .hmpps-paged-list__view-all {
+    padding-bottom: govuk-spacing(2);
+    justify-self: end;
+
+    @container (width < #{$hmpps-paged-list-min-size}) {
+      padding-bottom: revert;
+      justify-self: start;
+    }
+  }
+
+  @media print {
+    .hmpps-sort-selector, .govuk-pagination, .hmpps-paged-list__view-all {
+      display: none;
+    }
+  }
+}
+
+.hmpps-paged-list__header {
+  margin-bottom: govuk-spacing(5);
+  border-bottom: 1px solid govuk-colour('mid-grey');
+}
+
+.hmpps-paged-list__footer {
+  @media print {
+    display: none;
+  }
+}

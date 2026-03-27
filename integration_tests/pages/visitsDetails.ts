@@ -1,8 +1,8 @@
-import Page, { PageElement } from './page'
-import HmppsPagination from './pageElements/hmppsPagination'
+import Page, { type PageElement } from './page'
+import PagedList from './pageElements/pagedList'
 
 export default class VisitsDetails extends Page {
-  public pagination: HmppsPagination = new HmppsPagination()
+  public pagedList = new PagedList()
 
   constructor(title: string) {
     super(title)
@@ -16,5 +16,5 @@ export default class VisitsDetails extends Page {
 
   filterType = (): PageElement => cy.get('#type')
 
-  filterApplyButton = (): PageElement => cy.get('[data-qa=apply-filter-button]')
+  filterApplyButton = (): PageElement => cy.getDataQa('apply-filter-button')
 }

@@ -1,6 +1,6 @@
 import AlertTypeFilter from './AlertsMetadata'
 import HmppsError from '../../../interfaces/HmppsError'
-import ListMetadata from '../../../interfaces/ListMetadata'
+import type { ListMetadata } from '../../../interfaces/ListMetadata'
 import PagedList, { AlertsListQueryParams } from '../../../data/interfaces/prisonApi/PagedList'
 import { Alert } from '../../../data/interfaces/alertsApi/Alert'
 

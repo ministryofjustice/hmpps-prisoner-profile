@@ -1,6 +1,7 @@
 .hmpps-side-filter {
   background-color: govuk-colour('light-grey');
   padding: 30px 15px;
+  @include govuk-responsive-margin(4, "bottom");
 
   &__header {
     font-size: 24px;

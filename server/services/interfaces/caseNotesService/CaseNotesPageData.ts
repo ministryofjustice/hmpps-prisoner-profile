@@ -1,5 +1,5 @@
 import HmppsError from '../../../interfaces/HmppsError'
-import ListMetadata from '../../../interfaces/ListMetadata'
+import type { ListMetadata } from '../../../interfaces/ListMetadata'
 import CaseNote, { CaseNoteAmendment } from '../../../data/interfaces/caseNotesApi/CaseNote'
 import CaseNoteType from '../../../data/interfaces/caseNotesApi/CaseNoteType'
 import PagedList, { CaseNotesListQueryParams } from '../../../data/interfaces/prisonApi/PagedList'

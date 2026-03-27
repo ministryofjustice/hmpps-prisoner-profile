@@ -23,16 +23,16 @@ context('Visits details', () => {
     })
 
     it('Displays the pagination correctly', () => {
-      page.pagination.paginationPreviousLink().should('not.exist')
-      page.pagination.paginationCurrentPage().contains('1')
-      page.pagination.paginationNextLink().should('exist')
-      page.pagination.paginationHeaderPageLink().should('have.length', 1)
-      page.pagination.paginationFooterPageLink().should('have.length', 1)
+      page.pagedList.headerPreviousLink.should('not.exist')
+      page.pagedList.headerCurrentPage.contains('1')
+      page.pagedList.headerNextLink.should('exist')
+      page.pagedList.headerPageLinks.should('have.length', 2)
+      page.pagedList.footerPageLinks.should('have.length', 2)
     })
 
     it('Displays the pagination summary correctly', () => {
-      page.pagination.paginationSummaryHeader().contains('Showing 1 to 20 of 28 results')
-      page.pagination.paginationSummaryFooter().contains('Showing 1 to 20 of 28 results')
+      page.pagedList.headerResults.contains('Showing 1 to 20 of 28 results')
+      page.pagedList.footerResults.contains('Showing 1 to 20 of 28 results')
     })
   })
 
@@ -52,11 +52,8 @@ context('Visits details', () => {
     })
 
     it('Displays no pagination or pagination summary', () => {
-      page.pagination.paginationHeader().should('not.exist')
-      page.pagination.paginationFooter().should('not.exist')
-      page.pagination.paginationSummaryHeader().should('not.exist')
-      page.pagination.paginationSummaryFooter().should('not.exist')
-      page.pagination.viewAllLink().should('not.exist')
+      page.pagedList.header.should('not.exist')
+      page.pagedList.footer.should('not.exist')
     })
   })
 
@@ -77,7 +74,7 @@ context('Visits details', () => {
       page = Page.verifyOnPageWithTitle(VisitDetailsPage, 'John Saunders’ visits')
     })
 
-    it('Displays the case notes and filters results', () => {
+    it('Displays the visits and filters results', () => {
       page.visits().should('have.length', 20)
       page.filterType().select('Social')
       page.filterApplyButton().click()
