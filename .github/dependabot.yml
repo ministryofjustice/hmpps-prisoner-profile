@@ -21,7 +21,7 @@ updates:
         versions:
           - ">=9"
     cooldown:
-      default-days: 5
+      default-days: 7
       exclude:
         - "@ministryofjustice/*"
     schedule:
@@ -34,7 +34,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     cooldown:
-      default-days: 5
+      default-days: 7
       exclude:
         - "ministryofjustice/*"
     schedule:
@@ -43,7 +43,7 @@ updates:
 
   - package-ecosystem: pre-commit
     cooldown:
-      default-days: 5
+      default-days: 7
     directory: /
     schedule:
       interval: weekly
