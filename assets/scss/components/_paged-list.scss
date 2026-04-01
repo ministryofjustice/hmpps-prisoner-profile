@@ -46,6 +46,11 @@ $hmpps-paged-list-min-size: 870px;
       padding-bottom: revert;
       justify-self: start;
     }
+
+    @include govuk-media-query($until: tablet) {
+      text-align: center;
+      width: 100%;
+    }
   }
 
   @media print {
