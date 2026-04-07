@@ -56,6 +56,7 @@ export default function editRouter(services: Services): Router {
   const {
     cityOrTownOfBirthController,
     heightController,
+    nationalityController,
     shoeSizeController,
     smokerOrVaperController,
     weightController,
@@ -393,11 +394,11 @@ export default function editRouter(services: Services): Router {
     path: 'nationality',
     edit: {
       audit: Page.EditNationality,
-      method: personalController.nationality().edit,
+      method: nationalityController.nationality().edit,
     },
     submit: {
       audit: Page.PostEditNationality,
-      method: personalController.nationality().submit,
+      method: nationalityController.nationality().submit,
       validation: {
         validators: [nationalityValidator],
         redirectBackOnError: true,
