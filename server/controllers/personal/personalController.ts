@@ -5,13 +5,7 @@ import CareNeedsService from '../../services/careNeedsService'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import type { RadioOption, SelectOption } from '../../interfaces/GovOptions'
-import {
-  apostrophe,
-  convertToTitleCase,
-  formatName,
-  objectToRadioOptions,
-  objectToSelectOptions,
-} from '../../utils/utils'
+import { apostrophe, formatName, objectToRadioOptions, objectToSelectOptions } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import {
   changeContactDetailsLinkEnabled,
@@ -24,7 +18,6 @@ import {
   addPhoneNumberFieldData,
   changeEmailAddressTextFieldData,
   changePhoneNumberFieldData,
-  cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
   domesticStatusFieldData,
@@ -140,29 +133,6 @@ export default class PersonalController {
         changeContactLinkEnabled,
       })
     }
-  }
-
-  cityOrTownOfBirthTextInput = () =>
-    this.textInput(
-      () => cityOrTownOfBirthFieldData,
-      this.getCityOrTownOfBirth.bind(this),
-      this.setCityOrTownOfBirth.bind(this),
-    )
-
-  private async getCityOrTownOfBirth(req: Request): Promise<string> {
-    return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
-  }
-
-  private async setCityOrTownOfBirth(
-    req: Request,
-    res: Response,
-    _fieldData: TextFieldData,
-    value: string,
-  ): Promise<void> {
-    const { prisonerNumber } = req.params
-    const { clientToken } = req.middleware
-    const user = res.locals.user as PrisonUser
-    await this.personalPageService.updateCityOrTownOfBirth(clientToken, user, prisonerNumber, value)
   }
 
   /**
