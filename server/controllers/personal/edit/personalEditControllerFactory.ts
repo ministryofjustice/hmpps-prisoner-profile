@@ -7,6 +7,7 @@ import EyeColourController from './eyeColour/eyeColourController'
 import HeightController from './height/heightController'
 import NationalityController from './nationality/nationalityController'
 import PhysicalCharacteristicsController from './physicalCharacteristics/physicalCharacteristicsController'
+import ReligionController from './religion/religionController'
 import ShoeSizeController from './shoeSize/shoeSizeController'
 import SmokerOrVaperController from './smokerOrVaper/smokerOrVaperController'
 import WeightController from './weight/weightController'
@@ -23,6 +24,7 @@ export default function personalEditControllerFactory(
     heightController: new HeightController(personalPageService, auditService),
     nationalityController: new NationalityController(personalPageService, auditService),
     physicalCharacteristicsController: new PhysicalCharacteristicsController(personalPageService, auditService),
+    religionController: new ReligionController(personalPageService, auditService),
     shoeSizeController: new ShoeSizeController(personalPageService, auditService),
     smokerOrVaperController: new SmokerOrVaperController(personalPageService, auditService),
     weightController: new WeightController(personalPageService, auditService),
