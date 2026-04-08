@@ -62,6 +62,7 @@ export default function editRouter(services: Services): Router {
     nationalityController,
     physicalCharacteristicsController,
     religionController,
+    sexualOrientationController,
     shoeSizeController,
     smokerOrVaperController,
     weightController,
@@ -434,11 +435,11 @@ export default function editRouter(services: Services): Router {
     path: 'sexual-orientation',
     edit: {
       audit: Page.EditSexualOrientation,
-      method: personalController.sexualOrientation().edit,
+      method: sexualOrientationController.sexualOrientation().edit,
     },
     submit: {
       audit: Page.PostEditSexualOrientation,
-      method: personalController.sexualOrientation().submit,
+      method: sexualOrientationController.sexualOrientation().submit,
     },
     requiredPermission: PersonProtectedCharacteristicsPermission.edit_sexual_orientation,
   })
