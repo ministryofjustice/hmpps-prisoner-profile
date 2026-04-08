@@ -38,7 +38,12 @@ export default function setUpWebSecurity(): Router {
     (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
   ]
 
-  const formAction = ["'self'", config.apis.hmppsAuth.externalUrl, config.serviceUrls.digitalPrison]
+  const formAction = [
+    "'self'",
+    config.apis.hmppsAuth.externalUrl,
+    config.serviceUrls.digitalPrison,
+    config.serviceUrls.dpsHomepage,
+  ]
   const imgSrc = ["'self'", 'data:', ...googleDomains]
   const fontSrc = ["'self'"]
 
