@@ -55,6 +55,7 @@ export default function editRouter(services: Services): Router {
 
   const {
     cityOrTownOfBirthController,
+    eyeColourController,
     heightController,
     nationalityController,
     physicalCharacteristicsController,
@@ -298,11 +299,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColour().edit,
+      method: eyeColourController.eyeColour().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColour().submit,
+      method: eyeColourController.eyeColour().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -311,11 +312,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour-individual',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColourIndividual().edit,
+      method: eyeColourController.eyeColourIndividual().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColourIndividual().submit,
+      method: eyeColourController.eyeColourIndividual().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
