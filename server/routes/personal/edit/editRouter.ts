@@ -53,8 +53,13 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { cityOrTownOfBirthController, heightController, shoeSizeController, smokerOrVaperController, weightController } =
-    personalEditControllerFactory(services.personalPageService, services.auditService)
+  const {
+    cityOrTownOfBirthController,
+    heightController,
+    shoeSizeController,
+    smokerOrVaperController,
+    weightController,
+  } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
     services.personalPageService,
