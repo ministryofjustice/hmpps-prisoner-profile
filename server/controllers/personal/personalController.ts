@@ -5,7 +5,7 @@ import CareNeedsService from '../../services/careNeedsService'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import type { RadioOption, SelectOption } from '../../interfaces/GovOptions'
-import { apostrophe, formatName, objectToRadioOptions, objectToSelectOptions } from '../../utils/utils'
+import { apostrophe, formatName, objectToRadioOptions } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import {
   changeContactDetailsLinkEnabled,
