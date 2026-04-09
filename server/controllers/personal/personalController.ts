@@ -12,7 +12,6 @@ import {
 } from '../../utils/featureFlags'
 import config from '../../config'
 
-
 export default class PersonalController {
   constructor(
     private readonly personalPageService: PersonalPageService,
