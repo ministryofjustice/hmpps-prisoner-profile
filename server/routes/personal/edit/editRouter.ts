@@ -53,10 +53,8 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { heightController, shoeSizeController, weightController } = personalEditControllerFactory(
-    services.personalPageService,
-    services.auditService,
-  )
+  const { cityOrTownOfBirthController, heightController, shoeSizeController, weightController } =
+    personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const personalController = new PersonalController(
     services.personalPageService,
@@ -350,11 +348,11 @@ export default function editRouter(services: Services): Router {
     path: 'city-or-town-of-birth',
     edit: {
       audit: Page.EditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput().edit,
+      method: cityOrTownOfBirthController.cityOrTownOfBirth().edit,
     },
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput().submit,
+      method: cityOrTownOfBirthController.cityOrTownOfBirth().submit,
       validation: {
         validators: [
           textFieldLengthValidator({
