@@ -5,7 +5,7 @@
 
 repos:
   - repo: https://github.com/ministryofjustice/devsecops-hooks
-    rev: v1.4.1
+    rev: v1.6.0
     hooks:
       - id: baseline
         env:
