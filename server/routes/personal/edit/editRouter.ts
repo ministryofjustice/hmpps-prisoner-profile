@@ -61,6 +61,7 @@ export default function editRouter(services: Services): Router {
     heightController,
     nationalityController,
     physicalCharacteristicsController,
+    religionController,
     shoeSizeController,
     smokerOrVaperController,
     weightController,
@@ -415,11 +416,11 @@ export default function editRouter(services: Services): Router {
     path: 'religion',
     edit: {
       audit: Page.EditReligion,
-      method: personalController.religion().edit,
+      method: religionController.religion().edit,
     },
     submit: {
       audit: Page.PostEditReligion,
-      method: personalController.religion().submit,
+      method: religionController.religion().submit,
       validation: {
         validators: [religionValidator],
         redirectBackOnError: true,
