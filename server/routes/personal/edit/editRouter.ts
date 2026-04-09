@@ -55,6 +55,7 @@ export default function editRouter(services: Services): Router {
 
   const {
     cityOrTownOfBirthController,
+    dietAndFoodAllergiesController,
     eyeColourController,
     heightController,
     nationalityController,
@@ -338,11 +339,11 @@ export default function editRouter(services: Services): Router {
     path: 'diet-and-food-allergies',
     edit: {
       audit: Page.EditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().edit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().edit,
     },
     submit: {
       audit: Page.PostEditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().submit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().submit,
       validation: {
         validators: [dietAndFoodAllergiesValidator],
         redirectBackOnError: true,
