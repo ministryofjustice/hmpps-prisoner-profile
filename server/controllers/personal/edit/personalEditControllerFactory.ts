@@ -5,6 +5,7 @@ import CountryOfBirthController from './countryOfBirth/countryOfBirthController'
 import DietAndFoodAllergiesController from './dietAndFoodAllergies/dietAndFoodAllergiesController'
 import DomesticStatusController from './domesticStatus/domesticStatusController'
 import EyeColourController from './eyeColour/eyeColourController'
+import GlobalNumbersController from './globalNumbers/globalNumbersController'
 import HeightController from './height/heightController'
 import NationalityController from './nationality/nationalityController'
 import NumberOfChildrenController from './numberOfChildren/numberOfChildrenController'
@@ -25,6 +26,7 @@ export default function personalEditControllerFactory(
     dietAndFoodAllergiesController: new DietAndFoodAllergiesController(personalPageService, auditService),
     domesticStatusController: new DomesticStatusController(personalPageService, auditService),
     eyeColourController: new EyeColourController(personalPageService, auditService),
+    globalNumbersController: new GlobalNumbersController(personalPageService, auditService),
     heightController: new HeightController(personalPageService, auditService),
     nationalityController: new NationalityController(personalPageService, auditService),
     numberOfChildrenController: new NumberOfChildrenController(personalPageService, auditService),

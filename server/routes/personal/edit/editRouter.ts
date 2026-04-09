@@ -59,6 +59,7 @@ export default function editRouter(services: Services): Router {
     dietAndFoodAllergiesController,
     domesticStatusController,
     eyeColourController,
+    globalNumbersController,
     heightController,
     nationalityController,
     numberOfChildrenController,
@@ -480,11 +481,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-phone-number',
     edit: {
       audit: Page.AddPhoneNumber,
-      method: personalController.globalNumbers().add.edit,
+      method: globalNumbersController.globalNumbers().add.edit,
     },
     submit: {
       audit: Page.PostAddPhoneNumber,
-      method: personalController.globalNumbers().add.submit,
+      method: globalNumbersController.globalNumbers().add.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
@@ -497,11 +498,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-phone-number/:phoneNumberId',
     edit: {
       audit: Page.EditPhoneNumber,
-      method: personalController.globalNumbers().edit.edit,
+      method: globalNumbersController.globalNumbers().edit.edit,
     },
     submit: {
       audit: Page.PostEditPhoneNumber,
-      method: personalController.globalNumbers().edit.submit,
+      method: globalNumbersController.globalNumbers().edit.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
