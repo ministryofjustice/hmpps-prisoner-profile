@@ -8,7 +8,7 @@ import HeightController from './height/heightController'
 import NationalityController from './nationality/nationalityController'
 import PhysicalCharacteristicsController from './physicalCharacteristics/physicalCharacteristicsController'
 import ReligionController from './religion/religionController'
-import SexualOrientationController from "./sexualOrientation/sexualOrientationController";
+import SexualOrientationController from './sexualOrientation/sexualOrientationController'
 import ShoeSizeController from './shoeSize/shoeSizeController'
 import SmokerOrVaperController from './smokerOrVaper/smokerOrVaperController'
 import WeightController from './weight/weightController'
