@@ -3,9 +3,9 @@ import PersonalPageService from '../../../../services/personalPageService'
 import { AuditService } from '../../../../services/auditService'
 import { countryOfBirthFieldData } from '../../fieldData'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
-import { objectToRadioOptions, objectToSelectOptions } from '../../../../utils/utils'
+import { formatName, objectToRadioOptions, objectToSelectOptions } from '../../../../utils/utils'
+import { NameFormatStyle } from '../../../../data/enums/nameFormatStyle'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
 import { EditControllerRequestHandlers } from '../../../interfaces/EditControllerRequestHandlers'
 
@@ -18,21 +18,18 @@ export default class CountryOfBirthController extends PersonalEditController {
   }
 
   countryOfBirth(): EditControllerRequestHandlers {
-    const { fieldName, auditEditPageLoad, pageTitle, redirectAnchor } = countryOfBirthFieldData
+    const { fieldName } = countryOfBirthFieldData
 
     return {
-      edit: async (req, res) => {
-        const { clientToken, prisonerNumber, prisonId, naturalPrisonerName, miniBannerData } = getCommonRequestData(
-          req,
-          res,
-        )
-        const { inmateDetail } = req.middleware
-        const requestBodyFlash = requestBodyFromFlash<{
-          autocompleteField: string
-          autocompleteError: string
-          radioField: string
-        }>(req)
-        const errors = req.flash('errors')
+      edit: async (req, res, next) => {
+        const { inmateDetail, prisonerData, clientToken } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const { autocompleteField, autocompleteError, radioField } =
+          requestBodyFromFlash<{
+            autocompleteField: string
+            autocompleteError: string
+            radioField: string
+          }>(req) || {}
 
         const countryReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
@@ -40,8 +37,8 @@ export default class CountryOfBirthController extends PersonalEditController {
         )
 
         const fieldValue =
-          requestBodyFlash?.autocompleteField ||
-          requestBodyFlash?.radioField ||
+          autocompleteField ||
+          radioField ||
           countryReferenceData.find(country => country.code === inmateDetail.birthCountryCode)?.code
 
         const countriesAsRadioOptions = ['ENG', 'SCOT', 'WALES', 'NI']
@@ -52,28 +49,17 @@ export default class CountryOfBirthController extends PersonalEditController {
           val => !countriesAsRadioOptions.includes(val),
         )
 
-        await this.auditService.sendPageView({
-          user: res.locals.user,
-          prisonerNumber,
-          prisonId,
-          correlationId: req.id,
-          page: auditEditPageLoad,
-        })
-
-        res.render('pages/edit/radioFieldWithAutocomplete', {
-          pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: `What country was ${naturalPrisonerName} born in?`,
-          errors,
+        return this.editRadioFieldsWithAutocomplete({
+          formTitle: `What country was ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} born in?`,
+          fieldData: countryOfBirthFieldData,
           radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
           autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
           autocompleteSelected: fieldValue === 'OTHER',
           autocompleteOptionTitle: 'A country outside the UK',
           autocompleteOptionLabel: 'Country',
           autocompleteOptionHint: 'Start typing to select country.',
-          autocompleteError: requestBodyFlash?.autocompleteError,
-          redirectAnchor,
-          miniBannerData,
-        })
+          autocompleteError,
+        })(req, res, next)
       },
 
       submit: async (req, res) => {
