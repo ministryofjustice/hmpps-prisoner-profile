@@ -20,9 +20,7 @@ import {
   medicalDietCodesMock,
   personalisedDietCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
-import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
-import { objectToRadioOptions } from '../../utils/utils'
 import {
   PersonalRelationshipsDomesticStatusMock,
   PersonalRelationshipsNumberOfChildrenMock,
