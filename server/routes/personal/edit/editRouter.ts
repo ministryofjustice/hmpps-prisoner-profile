@@ -59,6 +59,7 @@ export default function editRouter(services: Services): Router {
     dietAndFoodAllergiesController,
     domesticStatusController,
     eyeColourController,
+    globalEmailsController,
     globalNumbersController,
     heightController,
     nationalityController,
@@ -516,11 +517,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-email-address',
     edit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.edit,
+      method: globalEmailsController.globalEmails().add.edit,
     },
     submit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.submit,
+      method: globalEmailsController.globalEmails().add.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
@@ -533,11 +534,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-email-address/:emailAddressId',
     edit: {
       audit: Page.EditEmailAddress,
-      method: personalController.globalEmails().edit.edit,
+      method: globalEmailsController.globalEmails().edit.edit,
     },
     submit: {
       audit: Page.PostEditEmailAddress,
-      method: personalController.globalEmails().edit.submit,
+      method: globalEmailsController.globalEmails().edit.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
