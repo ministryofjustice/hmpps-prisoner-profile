@@ -60,6 +60,7 @@ export default function editRouter(services: Services): Router {
     eyeColourController,
     heightController,
     nationalityController,
+    numberOfChildrenController,
     physicalCharacteristicsController,
     religionController,
     sexualOrientationController,
@@ -448,11 +449,11 @@ export default function editRouter(services: Services): Router {
     path: 'children',
     edit: {
       audit: Page.EditNumberOfChildren,
-      method: personalController.numberOfChildren().edit,
+      method: numberOfChildrenController.numberOfChildren().edit,
     },
     submit: {
       audit: Page.PostEditNumberOfChildren,
-      method: personalController.numberOfChildren().submit,
+      method: numberOfChildrenController.numberOfChildren().submit,
       validation: {
         validators: [numberOfChildrenValidator],
         redirectBackOnError: true,
