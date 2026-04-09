@@ -55,6 +55,7 @@ export default function editRouter(services: Services): Router {
 
   const {
     cityOrTownOfBirthController,
+    countryOfBirthController,
     dietAndFoodAllergiesController,
     eyeColourController,
     heightController,
@@ -380,11 +381,11 @@ export default function editRouter(services: Services): Router {
     path: 'country-of-birth',
     edit: {
       audit: Page.EditCountryOfBirth,
-      method: personalController.countryOfBirth().edit,
+      method: countryOfBirthController.countryOfBirth().edit,
     },
     submit: {
       audit: Page.PostEditCountryOfBirth,
-      method: personalController.countryOfBirth().submit,
+      method: countryOfBirthController.countryOfBirth().submit,
       validation: {
         validators: [countryOfBirthValidator],
         redirectBackOnError: true,
