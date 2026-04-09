@@ -6,11 +6,7 @@ import { AuditService, Page, PostAction } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import {
-  domesticStatusFieldData,
-  numberOfChildrenFieldData,
-  sexualOrientationFieldData,
-} from './fieldData'
+import { domesticStatusFieldData, numberOfChildrenFieldData, sexualOrientationFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
