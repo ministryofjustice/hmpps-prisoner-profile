@@ -3,6 +3,7 @@ import { AuditService } from '../../../services/auditService'
 import CityOrTownOfBirthController from './cityOrTownOfBirth/cityOrTownOfBirthController'
 import CountryOfBirthController from './countryOfBirth/countryOfBirthController'
 import DietAndFoodAllergiesController from './dietAndFoodAllergies/dietAndFoodAllergiesController'
+import DomesticStatusController from './domesticStatus/domesticStatusController'
 import EyeColourController from './eyeColour/eyeColourController'
 import HeightController from './height/heightController'
 import NationalityController from './nationality/nationalityController'
@@ -22,6 +23,7 @@ export default function personalEditControllerFactory(
     cityOrTownOfBirthController: new CityOrTownOfBirthController(personalPageService, auditService),
     countryOfBirthController: new CountryOfBirthController(personalPageService, auditService),
     dietAndFoodAllergiesController: new DietAndFoodAllergiesController(personalPageService, auditService),
+    domesticStatusController: new DomesticStatusController(personalPageService, auditService),
     eyeColourController: new EyeColourController(personalPageService, auditService),
     heightController: new HeightController(personalPageService, auditService),
     nationalityController: new NationalityController(personalPageService, auditService),

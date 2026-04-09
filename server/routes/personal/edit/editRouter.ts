@@ -57,6 +57,7 @@ export default function editRouter(services: Services): Router {
     cityOrTownOfBirthController,
     countryOfBirthController,
     dietAndFoodAllergiesController,
+    domesticStatusController,
     eyeColourController,
     heightController,
     nationalityController,
@@ -466,11 +467,11 @@ export default function editRouter(services: Services): Router {
     path: 'marital-status',
     edit: {
       audit: Page.EditDomesticStatus,
-      method: personalController.domesticStatus().edit,
+      method: domesticStatusController.domesticStatus().edit,
     },
     submit: {
       audit: Page.PostEditDomesticStatus,
-      method: personalController.domesticStatus().submit,
+      method: domesticStatusController.domesticStatus().submit,
     },
     requiredPermission: PersonalRelationshipsPermission.edit_domestic_status,
   })
