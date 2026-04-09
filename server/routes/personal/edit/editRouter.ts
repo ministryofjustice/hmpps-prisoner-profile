@@ -53,7 +53,7 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { heightController, shoeSizeController } = personalEditControllerFactory(
+  const { heightController, shoeSizeController, weightController } = personalEditControllerFactory(
     services.personalPageService,
     services.auditService,
   )
@@ -190,11 +190,11 @@ export default function editRouter(services: Services): Router {
     path: 'weight',
     edit: {
       audit: Page.EditWeight,
-      method: personalController.weight().metric.edit,
+      method: weightController.weight().metric.edit,
     },
     submit: {
       audit: Page.PostEditWeight,
-      method: personalController.weight().metric.submit,
+      method: weightController.weight().metric.submit,
       validation: {
         validators: [weightMetricValidator],
         redirectBackOnError: true,
@@ -207,11 +207,11 @@ export default function editRouter(services: Services): Router {
     path: 'weight/imperial',
     edit: {
       audit: Page.EditWeight,
-      method: personalController.weight().imperial.edit,
+      method: weightController.weight().imperial.edit,
     },
     submit: {
       audit: Page.PostEditWeight,
-      method: personalController.weight().imperial.submit,
+      method: weightController.weight().imperial.submit,
       validation: {
         validators: [weightImperialValidator],
         redirectBackOnError: true,
