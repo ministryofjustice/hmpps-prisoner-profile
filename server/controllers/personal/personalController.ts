@@ -5,7 +5,6 @@ import CareNeedsService from '../../services/careNeedsService'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import type { RadioOption, SelectOption } from '../../interfaces/GovOptions'
-import { apostrophe, objectToRadioOptions } from '../../utils/utils'
 import {
   changeContactDetailsLinkEnabled,
   editProfileEnabled,
@@ -17,7 +16,6 @@ import {
   addPhoneNumberFieldData,
   changeEmailAddressTextFieldData,
   changePhoneNumberFieldData,
-  domesticStatusFieldData,
   FieldData,
   RadioFieldData,
   TextFieldData,
@@ -273,63 +271,6 @@ export default class PersonalController {
         redirectAnchor,
         miniBannerData,
       })
-    }
-  }
-
-  domesticStatus(): PersonalControllerRequestHandlers {
-    const { fieldName } = domesticStatusFieldData
-
-    return {
-      edit: async (req, res, next) => {
-        const { prisonerNumber } = req.params
-        const { clientToken, naturalPrisonerName } = getCommonRequestData(req, res)
-        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const domesticStatusReferenceData = await this.personalPageService.getDomesticStatusReferenceData(clientToken)
-
-        const options = domesticStatusReferenceData.filter(it => it.code !== 'N')
-        const preferNotToSayOption = domesticStatusReferenceData.find(it => it.code === 'N')
-
-        const fieldValue =
-          requestBodyFlash?.radioField ||
-          (await this.personalPageService.getDomesticStatus(clientToken, prisonerNumber))?.domesticStatusCode
-
-        const radioOptions = [
-          ...objectToRadioOptions(options, 'code', 'description', fieldValue),
-          { divider: 'Or' },
-          ...objectToRadioOptions(
-            [{ ...preferNotToSayOption, description: 'They prefer not to say' }],
-            'code',
-            'description',
-            fieldValue,
-          ),
-        ]
-
-        return this.editRadioFields(
-          `What is ${apostrophe(naturalPrisonerName)} marital or civil partnership status?`,
-          domesticStatusFieldData,
-          radioOptions,
-        )(req, res, next)
-      },
-
-      submit: async (req, res) => {
-        const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const radioField = req.body.radioField || null
-        const previousValue = (await this.personalPageService.getDomesticStatus(clientToken, prisonerNumber))
-          ?.domesticStatusCode
-
-        return this.submit({
-          req,
-          res,
-          prisonerNumber,
-          submit: async () => {
-            await this.personalPageService.updateDomesticStatus(clientToken, user, prisonerNumber, radioField)
-          },
-          fieldData: domesticStatusFieldData,
-          auditDetails: { fieldName, previous: previousValue, updated: radioField },
-        })
-      },
     }
   }
 
