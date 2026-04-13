@@ -43,7 +43,6 @@ import { phoneNumberValidator } from '../../../validators/personal/phoneNumberVa
 import { populateEditPageData } from '../../../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
 import { personalPageBasePath } from '../personalRouter'
-import PersonalController from '../../../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
 import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
 import { parameterGuard } from '../../../middleware/parameterGuard'
@@ -59,6 +58,7 @@ export default function editRouter(services: Services): Router {
     dietAndFoodAllergiesController,
     domesticStatusController,
     eyeColourController,
+    globalEmailsController,
     globalNumbersController,
     heightController,
     nationalityController,
@@ -70,12 +70,6 @@ export default function editRouter(services: Services): Router {
     smokerOrVaperController,
     weightController,
   } = personalEditControllerFactory(services.personalPageService, services.auditService)
-
-  const personalController = new PersonalController(
-    services.personalPageService,
-    services.careNeedsService,
-    services.auditService,
-  )
 
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
@@ -516,11 +510,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-email-address',
     edit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.edit,
+      method: globalEmailsController.globalEmails().add.edit,
     },
     submit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.submit,
+      method: globalEmailsController.globalEmails().add.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
@@ -533,11 +527,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-email-address/:emailAddressId',
     edit: {
       audit: Page.EditEmailAddress,
-      method: personalController.globalEmails().edit.edit,
+      method: globalEmailsController.globalEmails().edit.edit,
     },
     submit: {
       audit: Page.PostEditEmailAddress,
-      method: personalController.globalEmails().edit.submit,
+      method: globalEmailsController.globalEmails().edit.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
