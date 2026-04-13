@@ -408,7 +408,12 @@ export default {
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
-    changeContactDetailsLinkEnabled: toBoolean(get('CHANGE_CONTACT_DETAILS_LINK_ENABLED', 'false')),
+
+    changeContactDetailsLink: {
+      enabledPrisons: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
