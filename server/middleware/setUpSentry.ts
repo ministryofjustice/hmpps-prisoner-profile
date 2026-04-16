@@ -17,6 +17,13 @@ export function setUpSentry() {
       release: config.gitRef,
       sendDefaultPii: false,
 
+      ignoreErrors: [
+        // ignore timeouts; already logged in Application Insights
+        /Timeout of .* exceeded/,
+        // ignore auth errors; already logged in Application Insights
+        'Failed to obtain access token',
+      ],
+
       beforeSend(event) {
         if (event.user) {
           // Don't send PII:
