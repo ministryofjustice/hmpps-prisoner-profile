@@ -4,7 +4,7 @@
  * there's no overlap.
  */
 export const getErrorStatus = (error: unknown): number | undefined => {
-  if (typeof error === 'object' && error !== null) {
+  if (error && typeof error === 'object') {
     if ('status' in error && typeof error.status === 'number') {
       return error.status
     }
@@ -15,6 +15,8 @@ export const getErrorStatus = (error: unknown): number | undefined => {
   return undefined
 }
 
-export const errorHasStatus = (error: unknown, status: number): boolean => {
-  return getErrorStatus(error) === status
+/** Returns true if error has any of the provided status codes */
+export const errorHasStatus = (error: unknown, ...statuses: number[]): boolean => {
+  const status = getErrorStatus(error)
+  return (status && statuses.includes(status)) ?? false
 }

@@ -1,3 +1,4 @@
+import { NotFound } from 'http-errors'
 import NotFoundError from './notFoundError'
 import ServerError from './serverError'
 import { errorHasStatus, getErrorStatus } from './errorHelpers'
@@ -40,8 +41,12 @@ describe('Error helpers', () => {
       ['Generic Error', new Error('problem'), 400, false],
       ['undefined', undefined, 400, false],
       ['null', null, 400, false],
-    ])('Gets the correct error code: %s', (_, err, status, expected) => {
-      expect(errorHasStatus(err, status)).toEqual(expected)
+    ])('Checks error code: %s', (_, err, status, expected) => {
+      expect(errorHasStatus(err, status)).toBe(expected)
+    })
+
+    it('Checks error code against a list', () => {
+      expect(errorHasStatus(new NotFound(), 400, 404)).toBe(true)
     })
   })
 })
