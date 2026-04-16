@@ -32,11 +32,12 @@ export function setUpSentry() {
         if (errorHasStatus(error, 404)) {
           return null
         }
-        if (error instanceof SanitisedError) {
+        if (error instanceof SanitisedError && error.data) {
+          // add extra context from third-party apis when available
           event.contexts = {
             ...event.contexts,
             DPS: {
-              sanitisedError: error.data?.userMessage ?? error.data?.developerMessage,
+              sanitisedError: error.data.userMessage ?? error.data.developerMessage,
             },
           }
         }
