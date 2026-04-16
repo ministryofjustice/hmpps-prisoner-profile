@@ -32,7 +32,7 @@ const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
   // circuit will stay closed regardless of failures if there is less than this many requests in the window
   volumeThreshold: Number(get('CIRCUIT_BREAKER_DEFAULT_VOLUME_THRESHOLD', 5)),
   // ignore 404s
-  errorFilter: (error: SanitisedError<unknown>) => error?.responseStatus === 404,
+  errorFilter: (error: SanitisedError) => error?.responseStatus === 404,
 }
 
 export default {
