@@ -20,10 +20,11 @@ export function setUpSentry() {
       beforeSend(event) {
         if (event.user) {
           // Don't send PII:
-          delete event.user.username
-          delete event.request.data
-          delete event.request.cookies
-          delete event.request.headers
+          delete event.user?.email
+          delete event.user?.username
+          delete event.request?.data
+          delete event.request?.cookies
+          delete event.request?.headers
         }
         return event
       },
