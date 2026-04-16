@@ -194,28 +194,6 @@ export default class PersonalPageService {
     return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
-  private transformPhysicalAttributes(
-    physicalAttributesDto: CorePersonPhysicalAttributesDto,
-  ): CorePersonPhysicalAttributes {
-    return {
-      height: physicalAttributesDto.height,
-      weight: physicalAttributesDto.weight,
-      hairCode: physicalAttributesDto.hair?.code,
-      hairDescription: physicalAttributesDto.hair?.description,
-      facialHairCode: physicalAttributesDto.facialHair?.code,
-      facialHairDescription: physicalAttributesDto.facialHair?.description,
-      faceCode: physicalAttributesDto.face?.code,
-      faceDescription: physicalAttributesDto.face?.description,
-      buildCode: physicalAttributesDto.build?.code,
-      buildDescription: physicalAttributesDto.build?.description,
-      leftEyeColourCode: physicalAttributesDto.leftEyeColour?.code,
-      leftEyeColourDescription: physicalAttributesDto.leftEyeColour?.description,
-      rightEyeColourCode: physicalAttributesDto.rightEyeColour?.code,
-      rightEyeColourDescription: physicalAttributesDto.rightEyeColour?.description,
-      shoeSize: physicalAttributesDto.shoeSize,
-    }
-  }
-
   async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
     const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
@@ -426,6 +404,200 @@ export default class PersonalPageService {
     }
   }
 
+  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[] | null> {
+    if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+    const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
+    return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
+  }
+
+  async getReferenceDataCodes(clientToken: string, domain: ReferenceDataDomain) {
+    return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
+  }
+
+  async getReferenceData(clientToken: string, domain: CorePersonRecordReferenceDataDomain, code: string) {
+    return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
+  }
+
+  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
+    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
+    const response = await healthAndMedicationApiClient.updateSmokerStatus(prisonerNumber, {
+      smokerStatus: smokerOrVaper,
+    })
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateCityOrTownOfBirth(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    cityOrTownOfBirth: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['cityOrTownOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateCountryOfBirth(clientToken: string, user: PrisonUser, prisonerNumber: string, countryOfBirth: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateCountryOfBirth(prisonerNumber, countryOfBirth)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['countryOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateNationality(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    nationality: string,
+    otherNationalities: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateNationality(prisonerNumber, nationality, otherNationalities)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['nationality', 'otherNationalities'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateReligion(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    religionCode: string,
+    reasonForChange?: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['religion'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateSexualOrientation(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    sexualOrientation: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateSexualOrientation(prisonerNumber, sexualOrientation)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['sexualOrientation'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async getNumberOfChildren(clientToken: string, prisonerNumber: string) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    return personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
+  }
+
+  async updateNumberOfChildren(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    numberOfChildren: number,
+  ) {
+    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
+    const response = personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
+      numberOfChildren,
+      requestedBy: user.username,
+    })
+
+    this.metricsService.trackPersonalRelationshipsUpdate({
+      fieldsUpdated: ['numberOfChildren'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
+  }
+
+  async getNextOfKinAndEmergencyContacts(clientToken: string, prisonerNumber: string) {
+    return this.nextOfKinService.getNextOfKinEmergencyContacts(clientToken, prisonerNumber)
+  }
+
+  async getDomesticStatus(clientToken: string, prisonerNumber: string) {
+    return this.domesticStatusService.getDomesticStatus(clientToken, prisonerNumber)
+  }
+
+  async updateDomesticStatus(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    domesticStatusCode: string,
+  ) {
+    return this.domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, {
+      domesticStatusCode,
+      requestedBy: user.username,
+    })
+  }
+
+  async getDomesticStatusReferenceData(clientToken: string) {
+    return this.domesticStatusService.getReferenceData(clientToken)
+  }
+
+  private transformPhysicalAttributes(
+    physicalAttributesDto: CorePersonPhysicalAttributesDto,
+  ): CorePersonPhysicalAttributes {
+    return {
+      height: physicalAttributesDto.height,
+      weight: physicalAttributesDto.weight,
+      hairCode: physicalAttributesDto.hair?.code,
+      hairDescription: physicalAttributesDto.hair?.description,
+      facialHairCode: physicalAttributesDto.facialHair?.code,
+      facialHairDescription: physicalAttributesDto.facialHair?.description,
+      faceCode: physicalAttributesDto.face?.code,
+      faceDescription: physicalAttributesDto.face?.description,
+      buildCode: physicalAttributesDto.build?.code,
+      buildDescription: physicalAttributesDto.build?.description,
+      leftEyeColourCode: physicalAttributesDto.leftEyeColour?.code,
+      leftEyeColourDescription: physicalAttributesDto.leftEyeColour?.description,
+      rightEyeColourCode: physicalAttributesDto.rightEyeColour?.code,
+      rightEyeColourDescription: physicalAttributesDto.rightEyeColour?.description,
+      shoeSize: physicalAttributesDto.shoeSize,
+    }
+  }
+
   // TODO: Remove this once edit profile is live
   private addressSummary(addresses: OldAddresses): GovSummaryItem[] {
     const addressSummary: GovSummaryItem[] = []
@@ -588,9 +760,7 @@ export default class PersonalPageService {
     return (
       (dietAndAllergy &&
         dietAndAllergy[field]?.value
-          ?.map(({ value: { id, description }, comment }) =>
-            field === 'foodAllergies' ? { id, description } : { id, description, comment },
-          )
+          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
           .sort((a, b) => {
             if (a.id?.endsWith('OTHER')) return 1
             if (b.id?.endsWith('OTHER')) return -1
@@ -786,177 +956,5 @@ export default class PersonalPageService {
           ) || 'Needs to be warned',
       }
     })
-  }
-
-  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[] | null> {
-    if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
-    const curiousApiToken = await this.curiousApiTokenBuilder()
-    const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
-    return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
-  }
-
-  async getReferenceDataCodes(clientToken: string, domain: ReferenceDataDomain) {
-    return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
-  }
-
-  async getReferenceData(clientToken: string, domain: CorePersonRecordReferenceDataDomain, code: string) {
-    return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
-  }
-
-  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
-    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
-    const response = await healthAndMedicationApiClient.updateSmokerStatus(prisonerNumber, {
-      smokerStatus: smokerOrVaper,
-    })
-
-    this.metricsService.trackPrisonPersonUpdate({
-      fieldsUpdated: ['smokerOrVaper'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateCityOrTownOfBirth(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    cityOrTownOfBirth: string,
-  ) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
-
-    this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['cityOrTownOfBirth'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateCountryOfBirth(clientToken: string, user: PrisonUser, prisonerNumber: string, countryOfBirth: string) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateCountryOfBirth(prisonerNumber, countryOfBirth)
-
-    this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['countryOfBirth'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateNationality(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    nationality: string,
-    otherNationalities: string,
-  ) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateNationality(prisonerNumber, nationality, otherNationalities)
-
-    this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['nationality', 'otherNationalities'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateReligion(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    religionCode: string,
-    reasonForChange?: string,
-  ) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
-
-    this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['religion'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateSexualOrientation(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    sexualOrientation: string,
-  ) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateSexualOrientation(prisonerNumber, sexualOrientation)
-
-    this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['sexualOrientation'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async getNumberOfChildren(clientToken: string, prisonerNumber: string) {
-    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
-    return personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
-  }
-
-  async updateNumberOfChildren(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    numberOfChildren: number,
-  ) {
-    const personalRelationshipsApiClient = this.personalRelationshipsApiClientBuilder(clientToken)
-    const response = personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, {
-      numberOfChildren,
-      requestedBy: user.username,
-    })
-
-    this.metricsService.trackPersonalRelationshipsUpdate({
-      fieldsUpdated: ['numberOfChildren'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
-  }
-
-  async getNextOfKinAndEmergencyContacts(clientToken: string, prisonerNumber: string) {
-    return this.nextOfKinService.getNextOfKinEmergencyContacts(clientToken, prisonerNumber)
-  }
-
-  async getDomesticStatus(clientToken: string, prisonerNumber: string) {
-    return this.domesticStatusService.getDomesticStatus(clientToken, prisonerNumber)
-  }
-
-  async updateDomesticStatus(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    domesticStatusCode: string,
-  ) {
-    return this.domesticStatusService.updateDomesticStatus(clientToken, user, prisonerNumber, {
-      domesticStatusCode,
-      requestedBy: user.username,
-    })
-  }
-
-  async getDomesticStatusReferenceData(clientToken: string) {
-    return this.domesticStatusService.getReferenceData(clientToken)
   }
 }
