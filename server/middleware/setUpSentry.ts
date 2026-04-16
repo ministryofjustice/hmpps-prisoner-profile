@@ -3,6 +3,7 @@
 import * as Sentry from '@sentry/node'
 import express from 'express'
 import config from '../config'
+import { errorHasStatus } from '../utils/errorHelpers'
 
 export function setUpSentry() {
   if (config.sentry.dsn) {
@@ -24,7 +25,13 @@ export function setUpSentry() {
         'Failed to obtain access token',
       ],
 
-      beforeSend(event) {
+      beforeSend(event, hint) {
+        const error = hint.originalException
+        // ignore 404 errors, wherever they originate
+        if (errorHasStatus(error, 404)) {
+          return null
+        }
+
         if (event.user) {
           // Don't send PII:
           delete event.user?.email
