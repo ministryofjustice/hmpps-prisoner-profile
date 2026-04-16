@@ -32,18 +32,29 @@ export function setUpSentry() {
           return null
         }
 
+        // Don’t send PII
+        if (event.transaction) {
+          event.transaction = anonymisePrisonerNumbers(event.transaction)
+        }
+        if (event.request?.url) {
+          event.request.url = anonymisePrisonerNumbers(event.request.url)
+        }
         if (event.user) {
-          // Don't send PII:
           delete event.user?.email
           delete event.user?.username
           delete event.request?.data
           delete event.request?.cookies
           delete event.request?.headers
         }
+
         return event
       },
     })
   }
+}
+
+function anonymisePrisonerNumbers(urlLike: string | undefined): string | undefined {
+  return urlLike?.replaceAll(/[A-Z]\d{4}[A-Z]{2}/gi, ':prisonerNumber') ?? urlLike
 }
 
 export function setUpSentryErrorHandler(app: express.Express): void {
