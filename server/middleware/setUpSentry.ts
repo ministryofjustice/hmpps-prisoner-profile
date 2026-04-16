@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 
-import * as Sentry from '@sentry/node'
 import express from 'express'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
+import * as Sentry from '@sentry/node'
 import config from '../config'
 import { errorHasStatus } from '../utils/errorHelpers'
 
@@ -30,6 +31,14 @@ export function setUpSentry() {
         // ignore 404 errors, wherever they originate
         if (errorHasStatus(error, 404)) {
           return null
+        }
+        if (error instanceof SanitisedError) {
+          event.contexts = {
+            ...event.contexts,
+            DPS: {
+              sanitisedError: error.data?.userMessage ?? error.data?.developerMessage,
+            },
+          }
         }
 
         // Don’t send PII
