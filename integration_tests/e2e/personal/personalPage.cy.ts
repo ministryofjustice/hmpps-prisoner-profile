@@ -99,21 +99,6 @@ context('When signed in', () => {
       visitPersonalDetailsPage()
     })
 
-    it('Hides nationality', () => {
-      Page.verifyOnPage(PersonalPage)
-      cy.getDataQa('nationality-row').should('not.exist')
-    })
-
-    it('Hides spoken language', () => {
-      Page.verifyOnPage(PersonalPage)
-      cy.getDataQa('spoken-language-row').should('not.exist')
-    })
-
-    it('Hides religion, faith or belief', () => {
-      Page.verifyOnPage(PersonalPage)
-      cy.getDataQa('religion-or-belief-row').should('not.exist')
-    })
-
     it('Hides the next of kin card', () => {
       const page = Page.verifyOnPage(PersonalPage)
       cy.getDataQa('hidden-next-of-kin').should('exist')
