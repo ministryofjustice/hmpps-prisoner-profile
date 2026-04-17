@@ -44,10 +44,10 @@ export function setUpSentry() {
 
         // Don’t send PII
         if (event.transaction) {
-          event.transaction = anonymisePrisonerNumbers(event.transaction)
+          event.transaction = anonymise(event.transaction)
         }
         if (event.request?.url) {
-          event.request.url = anonymisePrisonerNumbers(event.request.url)
+          event.request.url = anonymise(event.request.url)
         }
         if (event.user) {
           delete event.user?.email
@@ -63,8 +63,24 @@ export function setUpSentry() {
   }
 }
 
-function anonymisePrisonerNumbers(urlLike: string | undefined): string | undefined {
-  return urlLike?.replaceAll(/[A-Z]\d{4}[A-Z]{2}/gi, ':prisonerNumber') ?? urlLike
+/** Replaces sensitive data in URL-like text, eg. transaction name and request url */
+export function anonymise(urlLike: string | undefined): string | undefined {
+  if (!urlLike) {
+    return urlLike
+  }
+  const replacements: [RegExp, string][] = [
+    // prisoner number
+    [/[A-Z]\d{4}[A-Z]{2}/gi, ':prisonerNumber'],
+
+    // address autosuggest lookup
+    [/\/api\/addresses\/find\/[A-Za-z0-9.+%' _-]+/, '/api/addresses/find/:query'],
+  ]
+  return replacements.reduce((anonymisedUrlLike, [match, replacement]) => {
+    if (match.global) {
+      return anonymisedUrlLike.replaceAll(match, replacement)
+    }
+    return anonymisedUrlLike.replace(match, replacement)
+  }, urlLike)
 }
 
 export function setUpSentryErrorHandler(app: express.Express): void {
