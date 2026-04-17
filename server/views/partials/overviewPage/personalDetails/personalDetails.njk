@@ -10,9 +10,13 @@
       <dl class="govuk-summary-list govuk-summary-list--no-border">
         {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'Not entered', "date-of-birth") }}
         {{ summaryListRow("Age", age, "age") }}
-        {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
-        {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
-        {{ summaryListRow("Religion, faith or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
+        {% if isInUsersCaseLoad(prisonId, user) %}
+          {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
+          {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
+        {% endif %}
+        {% if isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions) %}
+          {{ summaryListRow("Religion, faith or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
+        {% endif %}
       </dl>
     </div>
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
