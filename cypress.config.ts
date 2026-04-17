@@ -38,10 +38,7 @@ import personApi from './integration_tests/mockApis/personApi'
 
 function preprocessorOptions() {
   const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
-  const options = webpackPreprocessor.defaultOptions as typeof webpackPreprocessor.defaultOptions & {
-    typescript: string
-    webpackOptions: { resolve: { alias: Record<string, string> } }
-  }
+  const options: Parameters<typeof webpackPreprocessor>[0] = { ...webpackPreprocessor.defaultOptions }
   options.typescript = require.resolve('typescript')
   options.webpackOptions.resolve.alias = {
     bunyan: path.join(replacementModulesPath, 'bunyan.ts'),
