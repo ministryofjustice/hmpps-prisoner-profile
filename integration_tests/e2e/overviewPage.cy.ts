@@ -59,15 +59,18 @@ context('Overview Page', () => {
       })
 
       it('Hides nationality', () => {
-        cy.getDataQa('nationality-row').should('not.exist')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().nationality().should('not.exist')
       })
   
       it('Hides spoken language', () => {
-        cy.getDataQa('spoken-language-row').should('not.exist')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().spokenLanguage().should('not.exist')
       })
   
       it('Hides religion, faith or belief', () => {
-        cy.getDataQa('religion-or-belief-row').should('not.exist')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().religionOrBelief().should('not.exist')
       })
 
       it('Does not display the facial images link', () => {
