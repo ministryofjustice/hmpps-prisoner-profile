@@ -106,7 +106,7 @@
     "aws-sdk-client-mock": "^4.1.0",
     "cheerio": "^1.2.0",
     "cookie-session": "^2.1.1",
-    "cypress": "15.13.1",
+    "cypress": "15.14.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
     "del": "8.0.1",
