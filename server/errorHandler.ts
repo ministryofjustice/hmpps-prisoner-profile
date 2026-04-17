@@ -28,7 +28,7 @@ export default function createErrorHandler(production: boolean) {
 
     res.locals.hideBackLink = true
 
-    if (errorHasStatus(error, 404) || errorHasStatus(error, 403)) {
+    if (errorHasStatus(error, 403, 404)) {
       res.status(getErrorStatus(error))
       return res.render('notFound', { url: req.headers.referer || '/' })
     }
