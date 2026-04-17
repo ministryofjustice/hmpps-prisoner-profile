@@ -100,17 +100,17 @@ context('When signed in', () => {
     })
 
     it('Hides nationality', () => {
-      const page = Page.verifyOnPage(PersonalPage)
+      Page.verifyOnPage(PersonalPage)
       cy.getDataQa('nationality-row').should('not.exist')
     })
 
     it('Hides spoken language', () => {
-      const page = Page.verifyOnPage(PersonalPage)
+      Page.verifyOnPage(PersonalPage)
       cy.getDataQa('spoken-language-row').should('not.exist')
     })
 
     it('Hides religion, faith or belief', () => {
-      const page = Page.verifyOnPage(PersonalPage)
+      Page.verifyOnPage(PersonalPage)
       cy.getDataQa('religion-or-belief-row').should('not.exist')
     })
 
