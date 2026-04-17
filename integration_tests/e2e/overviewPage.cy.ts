@@ -62,12 +62,12 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().nationality().should('not.exist')
       })
-  
+
       it('Hides spoken language', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().spokenLanguage().should('not.exist')
       })
-  
+
       it('Hides religion, faith or belief', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().religionOrBelief().should('not.exist')
