@@ -1,10 +1,8 @@
-import { formatMoney } from '../../utils/utils'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import AccountBalances from '../interfaces/prisonApi/AccountBalances'
 import VisitSummary from '../interfaces/prisonApi/VisitSummary'
 import VisitBalances from '../interfaces/prisonApi/VisitBalances'
 import Assessment from '../interfaces/prisonApi/Assessment'
-import { formatDate } from '../../utils/dateHelpers'
 import AdjudicationSummary from '../interfaces/adjudicationsApi/AdjudicationsSummary'
 
 export const accountBalancesMock: AccountBalances = {
@@ -72,10 +70,10 @@ export const assessmentsMock: Assessment[] = [
 export const moneySummaryDataMock: MiniSummaryData = {
   heading: 'Money',
   topLabel: 'Spends',
-  topContent: formatMoney(240.51),
+  topContent: '£240.51',
   topClass: 'big',
   bottomLabel: 'Private cash',
-  bottomContentLine1: formatMoney(35.0),
+  bottomContentLine1: '£35.00',
   bottomClass: 'big',
   linkLabel: 'Transactions and savings',
 } as MiniSummaryData
@@ -94,7 +92,7 @@ export const adjudicationsSummaryDataMock: MiniSummaryData = {
 export const visitsSummaryDataMock: MiniSummaryData = {
   heading: 'Visits',
   topLabel: 'Next visit date',
-  topContent: formatDate('2023-09-15', 'short'),
+  topContent: '15/09/2023',
   topClass: 'big',
   bottomLabel: 'Remaining visits',
   bottomContentLine1: 6,
@@ -106,7 +104,7 @@ export const visitsSummaryDataMock: MiniSummaryData = {
 export const categorySummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Category',
   bottomContentLine1: 'B',
-  bottomContentLine3: `Next review: ${formatDate('2023-02-19', 'short')}`,
+  bottomContentLine3: 'Next review: 19/02/2023',
   bottomClass: 'small',
   linkLabel: 'Category',
 } as MiniSummaryData
@@ -115,7 +113,7 @@ export const incentiveSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Incentives: since last review',
   bottomContentLine1: 'Positive behaviours: 1',
   bottomContentLine2: 'Negative behaviours: 1',
-  bottomContentLine3: `Next review by: ${formatDate('2024-01-01', 'short')}`,
+  bottomContentLine3: 'Next review by: 01/01/2024',
   bottomClass: 'small',
   linkLabel: 'Incentive level details',
 } as MiniSummaryData
@@ -137,7 +135,7 @@ export const incentiveSummaryErrorMock: MiniSummaryData = {
 export const csraSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'CSRA',
   bottomContentLine1: 'Standard',
-  bottomContentLine3: `Last review: ${formatDate('2021-02-19', 'short')}`,
+  bottomContentLine3: 'Last review: 19/02/2021',
   bottomClass: 'small',
   linkLabel: 'CSRA history',
 } as MiniSummaryData

@@ -3,7 +3,6 @@ import AlertsPage from '../../pages/alertsPage'
 import NotFoundPage from '../../pages/notFoundPage'
 import { Role } from '../../../server/data/enums/role'
 import AddAlertPage from '../../pages/addAlertPage'
-import { formatDate } from '../../../server/utils/dateHelpers'
 
 const visitAlertsPage = (): AlertsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
@@ -40,7 +39,9 @@ context('Add Alert Page', () => {
           addAlertPage.typeField().contains('Choose alert type')
           addAlertPage.subTypeField().contains('Choose alert code')
           addAlertPage.textField().should('have.value', '')
-          addAlertPage.dateField().should('have.value', formatDate(new Date().toISOString(), 'short'))
+          cy.task<string>('formatDate', { date: new Date(), style: 'short' }).then(formattedDate => {
+            addAlertPage.dateField().should('have.value', formattedDate)
+          })
         })
 
         it('should use the right url for back and cancel', () => {

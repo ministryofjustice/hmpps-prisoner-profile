@@ -3,7 +3,6 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { calculateAge, unavailableApiErrorMessage } from '../../server/utils/utils'
 import {
   mockContactDetailStaffContacts,
   mockContactDetailYouthEstate,
@@ -224,11 +223,9 @@ context('Overview Page', () => {
       it('Displays the prisoner personal details', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
-        const expectedAge = calculateAge('1990-10-12')
-        overviewPage
-          .personalDetails()
-          .age()
-          .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
+        cy.task('calculateAge', '1990-10-12').then(({ years, months }: { years: number; months: number }) => {
+          overviewPage.personalDetails().age().should('include.text', `${years} years, ${months} month`)
+        })
         overviewPage.personalDetails().nationality().should('include.text', 'Stateless')
         overviewPage.personalDetails().spokenLanguage().should('include.text', 'Welsh')
 
@@ -951,7 +948,7 @@ context('Overview Page', () => {
       overviewPage.offencesHeader().should('not.exist')
       nextCourtAppearance.location().should('contain.text', 'Test court location')
       cy.get('[data-qa=release-dates-unavailable]').should('exist')
-      latestCalculation.placeHolderText().should('contain.text', unavailableApiErrorMessage)
+      latestCalculation.placeHolderText().should('contain.text', 'This information is currently unavailable')
     })
   })
 

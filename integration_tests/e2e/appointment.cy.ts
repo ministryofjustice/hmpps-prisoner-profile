@@ -7,13 +7,13 @@ import { ConfirmationPage } from '../pages/appointments/confirmationPage'
 import { PrePostAppointmentPage } from '../pages/appointments/prePostAppointmentPage'
 import { PrePostConfirmationPage } from '../pages/appointments/prePostConfirmationPage'
 import { MovementSlip } from '../pages/appointments/movementSlip'
-import { formatDate } from '../../server/utils/dateHelpers'
 import type VideoLinkReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import type ReferenceCode from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import type PrisonerSchedule from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
-import CreateVideoBookingRequest, {
-  type VideoBookingSearchRequest,
-  type VideoLinkBooking,
+import type CreateVideoBookingRequest from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
+import type {
+  VideoBookingSearchRequest,
+  VideoLinkBooking,
 } from '../../server/data/interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import type { AppointmentDefaults, AppointmentDetails } from '../../server/data/interfaces/whereaboutsApi/Appointment'
 import { appointmentTypesMock } from '../../server/data/localMockData/appointmentTypesMock'
@@ -39,9 +39,20 @@ const today = now.toISOString().split('T')[0]
 const todayDisplay = today.split('-').reverse().join('/')
 const tomorrow = addDays(now, 1).toISOString().split('T')[0]
 const tomorrowDisplay = tomorrow.split('-').reverse().join('/')
+let formattedTomorrow: string
+let twoWeeksHence: string
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
+
+before(() => {
+  cy.task<string>('formatDate', { date: tomorrow, style: 'long' }).then(formattedDate => {
+    formattedTomorrow = formattedDate
+  })
+  cy.task<string>('formatDate', { date: addWeeks(addDays(now, 1), 2), style: 'long' }).then(formattedDate => {
+    twoWeeksHence = formattedDate
+  })
+})
 
 beforeEach(() => {
   cy.task('reset')
@@ -472,7 +483,7 @@ context('Add appointment', () => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
             expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[2]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
             expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
           })
@@ -483,11 +494,11 @@ context('Add appointment', () => {
           page.summaryListRecurring.element.should('not.exist')
           page.summaryListProbation.element.should('not.exist')
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 11:05 to 12:15`,
           reason: 'Adjudication Review',
           comments: 'Comment x',
-        },
+        }),
       },
       {
         scenarioName: 'of type OIC that’s recurring',
@@ -505,10 +516,7 @@ context('Add appointment', () => {
           page.lastRecurringAppointmentDate.should('be.hidden')
           page.recurringCountInput.type('3')
           page.lastRecurringAppointmentDate.should('be.visible')
-          page.lastRecurringAppointmentDate.should(
-            'contain.text',
-            formatDate(addWeeks(addDays(now, 1), 2).toISOString(), 'long'),
-          )
+          page.lastRecurringAppointmentDate.should('contain.text', twoWeeksHence)
           page.commentsTextArea.type('Repeats thrice')
 
           cy.task('stubCreateAppointment', {
@@ -524,7 +532,7 @@ context('Add appointment', () => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Adjudication Review' })
             expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[2]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[3]).to.contain({ key: 'Start time', value: '11:05' })
             expect(rows[4]).to.contain({ key: 'End time', value: '12:15' })
           })
@@ -535,7 +543,7 @@ context('Add appointment', () => {
             expect(rows[2]).to.contain({ key: 'Number added', value: '3' })
             expect(rows[3]).to.contain({
               key: 'Last appointment',
-              value: formatDate(addWeeks(addDays(now, 1), 2).toISOString(), 'long'),
+              value: twoWeeksHence,
             })
           })
           page.summaryListComments.rows.then(rows => {
@@ -544,11 +552,11 @@ context('Add appointment', () => {
           })
           page.summaryListProbation.element.should('not.exist')
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 11:05 to 12:15`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 11:05 to 12:15`,
           reason: 'Adjudication Review',
           comments: 'Repeats thrice',
-        },
+        }),
       },
       {
         scenarioName: 'of type VLLA',
@@ -569,7 +577,7 @@ context('Add appointment', () => {
             expect(rows).to.have.lengthOf(5)
             expect(rows[0]).to.contain({ key: 'Type', value: 'Video Link - Legal Appointment' })
             expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-            expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[2]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[3]).to.contain({ key: 'Start time', value: '14:00' })
             expect(rows[4]).to.contain({ key: 'End time', value: '15:00' })
           })
@@ -580,10 +588,10 @@ context('Add appointment', () => {
           page.summaryListRecurring.element.should('not.exist')
           page.summaryListProbation.element.should('not.exist')
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 14:00 to 15:00`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 14:00 to 15:00`,
           reason: 'Video Link - Legal Appointment',
-        },
+        }),
       },
       {
         scenarioName: 'of type VLPM',
@@ -614,7 +622,7 @@ context('Add appointment', () => {
             expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
             expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
             expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
-            expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[7]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
             expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
           })
@@ -626,11 +634,11 @@ context('Add appointment', () => {
           page.summaryListRecurring.element.should('not.exist')
           page.summaryListComments.element.should('not.exist')
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 17:30 to 18:30`,
           reason: 'Video Link - Probation Meeting',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'of type VLPM with unknown officer',
@@ -661,7 +669,7 @@ context('Add appointment', () => {
             expect(rows[4]).to.contain({ key: 'Email address', value: 'Not yet known' })
             expect(rows[5]).to.contain({ key: 'UK phone number', value: 'Not yet known' })
             expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
-            expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[7]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
             expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
           })
@@ -673,11 +681,11 @@ context('Add appointment', () => {
           page.summaryListRecurring.element.should('not.exist')
           page.summaryListComments.element.should('not.exist')
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 17:30 to 18:30`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 17:30 to 18:30`,
           reason: 'Video Link - Probation Meeting',
           comments: 'Prisoner note',
-        },
+        }),
       },
     ]
     for (const {
@@ -803,7 +811,7 @@ context('Add appointment', () => {
           page.summaryList.rows.then(rows => {
             expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
-            expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[1]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '12:30' })
             expect(rows[3]).to.contain({ key: 'Court hearing end time', value: '13:10' })
             expect(rows[4]).to.contain({ key: 'Notes for prison staff', value: 'Staff note' })
@@ -826,7 +834,7 @@ context('Add appointment', () => {
           page.summaryList.rows.then(rows => {
             expect(rows).to.have.lengthOf(6)
             expect(rows[0]).to.contain({ key: 'Location', value: 'Local name two' })
-            expect(rows[1]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+            expect(rows[1]).to.contain({ key: 'Date', value: formattedTomorrow })
             expect(rows[2]).to.contain({ key: 'Court hearing start time', value: '11:05' })
             expect(rows[3]).to.contain({ key: 'Court hearing end time', value: '11:45' })
             expect(rows[4]).to.contain({ key: 'Notes for prison staff', value: 'None entered' })
@@ -940,11 +948,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'pre briefings',
@@ -1008,11 +1016,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'post briefings',
@@ -1076,11 +1084,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'pre & post briefings',
@@ -1158,11 +1166,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'number for CVP address',
@@ -1214,11 +1222,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'video link URL',
@@ -1270,11 +1278,11 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: 'None entered' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
       {
         scenarioName: 'guest pin',
@@ -1326,14 +1334,15 @@ context('Add appointment', () => {
             expect(rows[3]).to.contain({ key: 'Guest pin', value: '556677' })
           })
         },
-        movementSlipExpectation: {
-          dateAndTime: `${formatDate(tomorrow, 'long')} 12:30 to 13:10`,
+        movementSlipExpectation: () => ({
+          dateAndTime: `${formattedTomorrow} 12:30 to 13:10`,
           reason: 'Video Link - Court Hearing',
           comments: 'Prisoner note',
-        },
+        }),
       },
     ]
     for (const { scenarioName, setupScenario, expectations, movementSlipExpectation } of step2Scenarios) {
+      // eslint-disable-next-line no-loop-func
       it(`should allow creating a VLB appointment with ${scenarioName} and generate a movement slip`, () => {
         stubSchedules({ date: tomorrow })
         stubLocation(today)
@@ -1379,7 +1388,7 @@ context('Add appointment', () => {
           expect(rows[0]).to.contain({ key: 'Name', value: 'John Saunders' })
           expect(rows[1]).to.contain({ key: 'Prison', value: 'Moorland (HMP & YOI)' })
           expect(rows[2]).to.contain({ key: 'Prison room', value: 'Local name two' })
-          expect(rows[3]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+          expect(rows[3]).to.contain({ key: 'Date', value: formattedTomorrow })
           expect(rows[4]).to.contain({ key: 'Start time', value: '12:30' })
           expect(rows[5]).to.contain({ key: 'End time', value: '13:10' })
         })
@@ -1660,7 +1669,7 @@ context('Edit appointment', () => {
         expect(rows).to.have.lengthOf(7)
         expect(rows[0]).to.contain({ key: 'Court', value: 'Leeds Court' })
         expect(rows[1]).to.contain({ key: 'Location', value: 'Local name two' })
-        expect(rows[2]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[2]).to.contain({ key: 'Date', value: formattedTomorrow })
         expect(rows[3]).to.contain({ key: 'Court hearing start time', value: '17:30' })
         expect(rows[4]).to.contain({ key: 'Court hearing end time', value: '18:30' })
         expect(rows[5]).to.contain({ key: 'Notes for prison staff', value: 'Different staff info' })
@@ -1718,7 +1727,7 @@ context('Edit appointment', () => {
         expect(rows[0]).to.contain({ key: 'Name', value: 'John Saunders' })
         expect(rows[1]).to.contain({ key: 'Prison', value: 'Moorland (HMP & YOI)' })
         expect(rows[2]).to.contain({ key: 'Prison room', value: 'Local name two' })
-        expect(rows[3]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[3]).to.contain({ key: 'Date', value: formattedTomorrow })
         expect(rows[4]).to.contain({ key: 'Start time', value: '17:30' })
         expect(rows[5]).to.contain({ key: 'End time', value: '18:30' })
       })
@@ -1821,7 +1830,7 @@ context('Edit appointment', () => {
         expect(rows[4]).to.contain({ key: 'Email address', value: 'officer@example.com' })
         expect(rows[5]).to.contain({ key: 'UK phone number', value: '02000000000' })
         expect(rows[6]).to.contain({ key: 'Meeting type', value: 'Parole Report' })
-        expect(rows[7]).to.contain({ key: 'Date', value: formatDate(tomorrow, 'long') })
+        expect(rows[7]).to.contain({ key: 'Date', value: formattedTomorrow })
         expect(rows[8]).to.contain({ key: 'Start time', value: '17:30' })
         expect(rows[9]).to.contain({ key: 'End time', value: '18:30' })
       })
@@ -1943,7 +1952,7 @@ interface Scenario<P1 extends Page | null, P2 extends Page> {
 }
 
 interface MovementSlipScenario {
-  movementSlipExpectation: {
+  movementSlipExpectation(): {
     dateAndTime: string
     reason: string
     comments?: string
@@ -1951,16 +1960,17 @@ interface MovementSlipScenario {
 }
 
 function expectCorrectMovementSlip(expected: MovementSlipScenario['movementSlipExpectation']): Cypress.Chainable {
+  const { dateAndTime, reason, comments } = expected()
   const movementSlip = Page.verifyOnPage(MovementSlip)
   movementSlip.shouldNotShowPageChrome()
   movementSlip.labels.should('deep.equal', [
     { title: 'Name', description: 'John Saunders' },
     { title: 'Prison number', description: 'G6123VU' },
     { title: 'Cell location', description: '1-1-035' },
-    { title: 'Date and time', description: expected.dateAndTime },
+    { title: 'Date and time', description: dateAndTime },
     { title: 'Moving to', description: 'Local name two' },
-    { title: 'Reason', description: expected.reason },
-    { title: 'Comments', description: expected.comments ?? '--' },
+    { title: 'Reason', description: reason },
+    { title: 'Comments', description: comments ?? '--' },
     { title: 'Created by', description: 'John Smith' },
   ])
   return cy.end()

@@ -3,7 +3,6 @@ import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
 import AddCaseNotePage from '../pages/addCaseNotePage'
-import { formatDate } from '../../server/utils/dateHelpers'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -40,7 +39,9 @@ context('Add Case Note Page', () => {
         addCaseNotePage.typeField().contains('Choose type')
         addCaseNotePage.subTypeField().contains('Choose sub-type')
         addCaseNotePage.textField().should('have.value', '')
-        addCaseNotePage.dateField().should('have.value', formatDate(new Date().toISOString(), 'short'))
+        cy.task<string>('formatDate', { date: new Date(), style: 'short' }).then(formattedDate => {
+          addCaseNotePage.dateField().should('have.value', formattedDate)
+        })
         addCaseNotePage.hoursField().should('have.value', new Date().getHours().toString().padStart(2, '0'))
         addCaseNotePage.minutesField().should('have.value', new Date().getMinutes().toString().padStart(2, '0'))
       })

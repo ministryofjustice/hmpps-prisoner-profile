@@ -5,7 +5,7 @@ import NotFoundPage from '../pages/notFoundPage'
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
-const prisonerName = 'John Saunders'
+const possessivePrisonerName = 'John Saunders’'
 
 context('X-ray body scans - Permissions', () => {
   const visitPage = prisonerDataOverrides => {
@@ -17,7 +17,7 @@ context('X-ray body scans - Permissions', () => {
   permissionsTests({
     prisonerNumber,
     visitPage,
-    pageWithTitleToDisplay: { page: XrayBodyScans, title: prisonerName },
+    pageWithTitleToDisplay: { page: XrayBodyScans, title: possessivePrisonerName },
   })
 })
 
@@ -32,12 +32,12 @@ context('X-Ray body scans', () => {
 
   it('Displays the page', () => {
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
-    Page.verifyOnPageWithTitle(XrayBodyScans, prisonerName)
+    Page.verifyOnPageWithTitle(XrayBodyScans, possessivePrisonerName)
   })
 
   it('Displays the body scans', () => {
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
-    const page = Page.verifyOnPageWithTitle(XrayBodyScans, prisonerName)
+    const page = Page.verifyOnPageWithTitle(XrayBodyScans, possessivePrisonerName)
     page.bodyScan(1).date().should('include.text', new Date().getFullYear())
     page.bodyScan(1).comment().should('include.text', 'There was a body scan')
   })
