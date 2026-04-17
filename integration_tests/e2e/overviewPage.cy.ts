@@ -58,6 +58,21 @@ context('Overview Page', () => {
         visitOverviewPage()
       })
 
+      it('Hides nationality', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().nationality().should('not.exist')
+      })
+
+      it('Hides spoken language', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().spokenLanguage().should('not.exist')
+      })
+
+      it('Hides religion, faith or belief', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.personalDetails().religionOrBelief().should('not.exist')
+      })
+
       it('Does not display the facial images link', () => {
         cy.get('[data-qa=prisoner-photo-link]').should('not.exist')
       })
