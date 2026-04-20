@@ -3,7 +3,6 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
 import { Role } from '../../server/data/enums/role'
-import { formatDateISO } from '../../server/utils/dateHelpers'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -52,7 +51,7 @@ context('Profile banner', () => {
           bookingId: 1102484,
           caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
         })
-        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+        cy.task('stubGetLatestArrivalDate', new Date())
       })
 
       it('Does not display the new arrival banner (24 hours)', () => {
@@ -78,7 +77,7 @@ context('Profile banner', () => {
             },
           ],
         })
-        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+        cy.task('stubGetLatestArrivalDate', subDays(new Date(), 2))
       })
 
       it('Does not display the new arrival banner (72 hours)', () => {
@@ -97,7 +96,7 @@ context('Profile banner', () => {
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
         })
-        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 3)))
+        cy.task('stubGetLatestArrivalDate', subDays(new Date(), 3))
       })
 
       it('Hides the banner', () => {
@@ -124,7 +123,7 @@ context('Profile banner', () => {
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
         })
-        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+        cy.task('stubGetLatestArrivalDate', subDays(new Date(), 2))
       })
 
       it('Hides the banner', () => {
@@ -151,7 +150,7 @@ context('Profile banner', () => {
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
         })
-        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+        cy.task('stubGetLatestArrivalDate', new Date())
       })
 
       it('Hides the banner', () => {

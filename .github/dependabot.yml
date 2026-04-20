@@ -9,9 +9,6 @@ updates:
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
-      - dependency-name: "typescript"
-        versions:
-          - ">=6"
       # TODO: remove once styles are adapted to work with breaking changes in v6
       - dependency-name: "govuk-frontend"
         versions:
