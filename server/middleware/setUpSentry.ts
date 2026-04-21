@@ -4,7 +4,7 @@ import express from 'express'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import * as Sentry from '@sentry/node'
 import config from '../config'
-import { errorHasStatus } from '../utils/errorHelpers'
+import NotFoundError from '../utils/notFoundError'
 
 export function setUpSentry() {
   if (config.sentry.dsn) {
@@ -28,12 +28,14 @@ export function setUpSentry() {
 
       beforeSend(event, hint) {
         const error = hint.originalException
-        // ignore 404 errors, wherever they originate
-        if (errorHasStatus(error, 404)) {
+
+        // ignore 404 errors as long as they are explicitly thrown in application code
+        if (error instanceof NotFoundError) {
           return null
         }
+
+        // add extra context from third-party apis when available
         if (error instanceof SanitisedError && error.data) {
-          // add extra context from third-party apis when available
           const sanitisedError = anonymise(error.data.userMessage || error.data.developerMessage)
           if (sanitisedError) {
             event.contexts = {
