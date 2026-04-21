@@ -1,8 +1,11 @@
+import type { Readable } from 'node:stream'
 import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
-import { Readable } from 'stream'
+import * as Sentry from '@sentry/node'
 import CircuitBreaker from 'opossum'
 import appConfig from '../config'
+import { anonymise, anonymisedErrorMessage } from '../middleware/setUpSentry'
+import { getErrorStatus } from '../utils/errorHelpers'
 import logger, { warnLevelLogger } from '../../logger'
 
 interface ErrorHandler<Response, ErrorData> {
@@ -84,6 +87,38 @@ export default abstract class RestClient extends HmppsRestClient {
     }
   }
 
+  protected addSentryBreadcrumb(path: string, method: string, error: SanitisedError): void {
+    if (appConfig.sentry.dsn) {
+      const breadcrumb: Record<string, unknown> = {
+        api: this.name,
+        url: `${this.config.url}${anonymise(path)}`,
+        'http.method': method,
+        status_code: getErrorStatus(error) ?? 500,
+      }
+      const sanitisedError = anonymisedErrorMessage(error)
+      if (sanitisedError) {
+        breadcrumb.sanitisedError = sanitisedError
+      }
+      Sentry.addBreadcrumb({
+        type: 'http',
+        category: 'http',
+        level: 'error',
+        message: `${this.name} request failed`,
+        data: breadcrumb,
+      })
+    }
+  }
+
+  protected handleError<Response, ErrorData>(path: string, method: string, error: SanitisedError<ErrorData>): Response {
+    this.addSentryBreadcrumb(path, method, error)
+    return super.handleError(path, method, error)
+  }
+
+  protected logError<ErrorData>(path: string, method: string, error: SanitisedError<ErrorData>): void {
+    this.addSentryBreadcrumb(path, method, error)
+    return super.logError(path, method, error)
+  }
+
   // Overridden get function to enforce use of token and the circuit breaker
   async get<Response = unknown, ErrorData = unknown>(
     {
@@ -157,9 +192,11 @@ export default abstract class RestClient extends HmppsRestClient {
     return this.get<Response, ErrorData>(
       {
         ...options,
-        errorHandler: (_path, _method, error): null => {
-          if (error.responseStatus === 404) return null
-          throw error
+        errorHandler: (path, method, error): null => {
+          if (error.responseStatus === 404) {
+            return null
+          }
+          return this.handleError(path, method, error)
         },
       },
       this.token,
@@ -202,7 +239,7 @@ export default abstract class RestClient extends HmppsRestClient {
     })
   }
 
-  async requestMultipart<T>(
+  protected async requestMultipart<T>(
     method: 'POST' | 'PUT',
     {
       path = null,

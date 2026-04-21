@@ -35,8 +35,8 @@ export function setUpSentry() {
         }
 
         // add extra context from third-party apis when available
-        if (error instanceof SanitisedError && error.data) {
-          const sanitisedError = anonymise(error.data.userMessage || error.data.developerMessage)
+        if (error instanceof SanitisedError) {
+          const sanitisedError = anonymisedErrorMessage(error)
           if (sanitisedError) {
             event.contexts = {
               ...event.contexts,
@@ -87,6 +87,11 @@ export function anonymise(text: string | undefined): string | undefined {
     }
     return anonymisedText.replace(match, replacement)
   }, text)
+}
+
+export function anonymisedErrorMessage(error: SanitisedError): string | undefined {
+  const { data }: { data?: { userMessage?: string; developerMessage?: string } } = error
+  return data && anonymise(data.userMessage || data.developerMessage)
 }
 
 export function setUpSentryErrorHandler(app: express.Express): void {
