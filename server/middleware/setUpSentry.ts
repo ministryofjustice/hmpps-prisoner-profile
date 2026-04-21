@@ -34,11 +34,15 @@ export function setUpSentry() {
         }
         if (error instanceof SanitisedError && error.data) {
           // add extra context from third-party apis when available
-          event.contexts = {
-            ...event.contexts,
-            DPS: {
-              sanitisedError: error.data.userMessage ?? error.data.developerMessage,
-            },
+          const sanitisedError = anonymise(error.data.userMessage || error.data.developerMessage)
+          if (sanitisedError) {
+            event.contexts = {
+              ...event.contexts,
+              DPS: {
+                ...event.contexts?.DPS,
+                sanitisedError,
+              },
+            }
           }
         }
 
@@ -63,10 +67,10 @@ export function setUpSentry() {
   }
 }
 
-/** Replaces sensitive data in URL-like text, eg. transaction name and request url */
-export function anonymise(urlLike: string | undefined): string | undefined {
-  if (!urlLike) {
-    return urlLike
+/** Replaces sensitive data, eg. in event’s transaction name and request url */
+export function anonymise(text: string | undefined): string | undefined {
+  if (!text) {
+    return text
   }
   const replacements: [RegExp, string][] = [
     // prisoner number
@@ -75,12 +79,12 @@ export function anonymise(urlLike: string | undefined): string | undefined {
     // address autosuggest lookup
     [/\/api\/addresses\/find\/[A-Za-z0-9.+%' _-]+/, '/api/addresses/find/:query'],
   ]
-  return replacements.reduce((anonymisedUrlLike, [match, replacement]) => {
+  return replacements.reduce((anonymisedText, [match, replacement]) => {
     if (match.global) {
-      return anonymisedUrlLike.replaceAll(match, replacement)
+      return anonymisedText.replaceAll(match, replacement)
     }
-    return anonymisedUrlLike.replace(match, replacement)
-  }, urlLike)
+    return anonymisedText.replace(match, replacement)
+  }, text)
 }
 
 export function setUpSentryErrorHandler(app: express.Express): void {
