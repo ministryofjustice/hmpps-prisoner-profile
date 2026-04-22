@@ -1,6 +1,6 @@
+import type { Readable } from 'node:stream'
 import { ApiConfig, RestClient as HmppsRestClient, SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ErrorLogger } from '@ministryofjustice/hmpps-rest-client/dist/main/types/Errors'
-import { Readable } from 'stream'
 import CircuitBreaker from 'opossum'
 import appConfig from '../config'
 import logger, { warnLevelLogger } from '../../logger'
@@ -157,9 +157,11 @@ export default abstract class RestClient extends HmppsRestClient {
     return this.get<Response, ErrorData>(
       {
         ...options,
-        errorHandler: (_path, _method, error): null => {
-          if (error.responseStatus === 404) return null
-          throw error
+        errorHandler: (path, method, error): null => {
+          if (error.responseStatus === 404) {
+            return null
+          }
+          return this.handleError(path, method, error)
         },
       },
       this.token,
@@ -202,7 +204,7 @@ export default abstract class RestClient extends HmppsRestClient {
     })
   }
 
-  async requestMultipart<T>(
+  protected async requestMultipart<T>(
     method: 'POST' | 'PUT',
     {
       path = null,
