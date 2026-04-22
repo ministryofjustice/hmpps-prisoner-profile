@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@apollo/client": "4.1.7",
-    "@aws-sdk/client-sqs": "3.1029.0",
+    "@aws-sdk/client-sqs": "3.1030.0",
     "@contentful/rich-text-html-renderer": "17.2.2",
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.1",
