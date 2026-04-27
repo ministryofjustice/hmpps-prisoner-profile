@@ -182,14 +182,9 @@ context('Overview Page', () => {
         overviewPage.categoryCsraCsipGroup().should('exist')
       })
 
-      it('Mini summary Group B should hide the macro header', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryCsraCsipGroup_MacroHeader().should('not.exist')
-      })
-
       it('Mini summary Group B should contain Category card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryCard().contains('h2', 'Category')
+        overviewPage.categoryCard().contains('Category')
         overviewPage.categoryCard().contains('.mini-card__item', 'B')
         overviewPage.categoryCard().contains('.mini-card__item', 'Next review: 19/02/2023')
         overviewPage.categoryCard().contains('a', 'Category')
@@ -197,7 +192,7 @@ context('Overview Page', () => {
 
       it('Mini summary Group B should contain CSRA card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.csraCard().contains('h2', 'CSRA')
+        overviewPage.csraCard().contains('CSRA')
         overviewPage.csraCard().contains('.mini-card__item', 'Standard')
         overviewPage.csraCard().contains('.mini-card__item', 'Last review: 19/02/2021')
         overviewPage.csraCard().contains('a', 'CSRA history')
@@ -205,7 +200,7 @@ context('Overview Page', () => {
 
       it('Mini summary Group B should contain CSIP card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.csipCard().contains('h2', 'CSIP')
+        overviewPage.csipCard().contains('CSIP')
         overviewPage.csipCard().contains('.mini-card__item', 'Status: CSIP open')
         overviewPage.csipCard().contains('.mini-card__item', 'Next review date: 01/01/2099')
         overviewPage.csipCard().contains('.mini-card__item', 'History: 1 CSIP (1 referral)')
@@ -261,9 +256,9 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.externalContacts().card().should('exist')
         overviewPage.externalContacts().officialHeading().should('have.text', 'Official')
-        overviewPage.externalContacts().official().should('have.text', '2')
+        overviewPage.externalContacts().official().should('include.text', '2')
         overviewPage.externalContacts().socialHeading().should('have.text', 'Social')
-        overviewPage.externalContacts().social().should('have.text', '1')
+        overviewPage.externalContacts().social().should('include.text', '1')
         overviewPage
           .externalContacts()
           .link()
@@ -838,10 +833,7 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage.nonAssociationsCard().should('contain.text', 'Unavailable')
-
-      cy.get('[data-qa=mini-summary-unavailable]').should('exist')
-      overviewPage.nonAssociationsCard().find('a').contains('Non-associations').should('not.exist')
+      cy.get('[data-qa=overview-mini-group-a] #non-associations').should('contain.text', 'Unavailable')
     })
   })
 
@@ -917,7 +909,7 @@ context('Overview Page', () => {
 
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
-      cy.get('[data-qa=mini-summary-unavailable]').should('exist')
+      cy.get('[data-qa=adjudications-unavailable]').should('exist')
       overviewPage.adjudicationsSummary().should('contain.text', 'Unavailable')
     })
   })

@@ -1,0 +1,8 @@
+{% set showExternalContacts = isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)%}
+<div class="hmpps-full-width-print govuk-grid-column-{% if showExternalContacts %}two-thirds{% else %}full{% endif %}">
+  {% if isYouthPrisoner %}
+    {% include "partials/overviewPage/staffContacts/staffContactsYouthEstate.njk" %}
+  {% else %}
+    {% include "partials/overviewPage/staffContacts/staffContacts.njk" %}
+  {% endif %}
+</div>

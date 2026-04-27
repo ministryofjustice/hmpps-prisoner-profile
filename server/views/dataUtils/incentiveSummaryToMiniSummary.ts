@@ -7,20 +7,21 @@ import config from '../../config'
 import { formatDate } from '../../utils/dateHelpers'
 import { pluralise } from '../../utils/pluralise'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
-import { MiniCardData } from '../components/miniCard/miniCardData'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import { unavailablePlaceholder } from '../../utils/utils'
 import { Result } from '../../utils/result/result'
 
-export default (
-  incentiveSummary: Result<IncentiveSummary, Error>,
-  prisonerNumber: string,
-  prisonerDisplayName: string,
-  prisonerPermissions: PrisonerPermissions,
-): MiniCardData => {
+const mapper: MiniCardMapper<Result<IncentiveSummary, Error>, [string, string, PrisonerPermissions]> = (
+  incentiveSummary,
+  prisonerNumber,
+  prisonerDisplayName,
+  prisonerPermissions,
+) => {
   // if api call failed.
   if (incentiveSummary.status === 'rejected')
     return {
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [
         {
@@ -33,6 +34,7 @@ export default (
   if (!Object.values(incentiveSummary.getOrNull() || {}).some(value => value !== null))
     return {
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [
         {
@@ -48,6 +50,7 @@ export default (
   const { positiveBehaviourCount, negativeBehaviourCount, nextReviewDate, daysOverdue } = incentiveSummary.getOrNull()
 
   return {
+    id: 'incentives',
     heading: 'Incentives',
     label: 'Since last review',
     items: [
@@ -78,3 +81,5 @@ export default (
     linkLabel: 'Incentive level details',
   }
 }
+
+export default mapper

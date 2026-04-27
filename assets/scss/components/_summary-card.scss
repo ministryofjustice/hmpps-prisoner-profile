@@ -15,7 +15,8 @@
 
     h3,
     h2 {
-      line-height: 50px;
+      @include govuk-responsive-padding(2, 'top');
+      @include govuk-responsive-padding(2, 'bottom');
       font-size: 24px;
       font-weight: bold;
       margin: 0;

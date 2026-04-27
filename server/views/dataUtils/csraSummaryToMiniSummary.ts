@@ -1,15 +1,15 @@
 import { formatDate } from '../../utils/dateHelpers'
 import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
-import { MiniCardData } from '../components/miniCard/miniCardData'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 
-export default (
-  csraSummary: OverviewPageData['csraSummary'],
-  showCsraHistoryLink: boolean,
-  prisonerNumber: string,
-): MiniCardData => {
-  const { classification, assessmentDate } = csraSummary
-
+const mapper: MiniCardMapper<OverviewPageData['csraSummary'], [boolean, string]> = (
+  csraSummary,
+  showCsraHistoryLink,
+  prisonerNumber,
+) => {
+  const { classification, assessmentDate } = csraSummary || {}
   return {
+    id: 'csra',
     heading: 'CSRA',
     items: [
       {
@@ -32,3 +32,5 @@ export default (
       : {}),
   }
 }
+
+export default mapper

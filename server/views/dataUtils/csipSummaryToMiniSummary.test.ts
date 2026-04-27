@@ -1,4 +1,4 @@
-import currentCsipDetailToMiniCardContent from './currentCsipDetailToMiniCardContent'
+import csipSummaryToMiniSummary from './csipSummaryToMiniSummary'
 import { currentCsipDetailMock } from '../../data/localMockData/csipApi/currentCsipDetailMock'
 import config from '../../config'
 import { Result } from '../../utils/result/result'
@@ -6,11 +6,12 @@ import { apiErrorMessage } from '../../utils/utils'
 import CurrentCsipDetail from '../../data/interfaces/csipApi/csip'
 import { CsipStatus } from '../../data/enums/csipStatus'
 
-describe('currentCsipDetailToMiniCardContent', () => {
+describe('csipSummaryToMiniSummary', () => {
   it('should return a mini card detail object', () => {
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetailMock), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetailMock), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [
         { text: 'Status: CSIP open' },
@@ -24,11 +25,11 @@ describe('currentCsipDetailToMiniCardContent', () => {
 
   it('should return no CSIP history', () => {
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(
+    const miniSummary = csipSummaryToMiniSummary(
       Result.fulfilled({ ...currentCsipDetailMock, currentCsip: null }),
       prisonerNumber,
     )
-    expect(miniCardData).toEqual({
+    expect(miniSummary).toEqual({
       heading: 'CSIP',
       items: [{ text: 'No CSIP history' }],
     })
@@ -50,8 +51,9 @@ describe('currentCsipDetailToMiniCardContent', () => {
     }
 
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetail), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetail), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [{ text: 'Status: Referral pending' }, { text: 'No CSIP history', classes: 'hmpps-secondary-text' }],
       linkLabel: 'CSIP details',
@@ -75,8 +77,9 @@ describe('currentCsipDetailToMiniCardContent', () => {
     }
 
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetail), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetail), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [
         { text: 'Status: Referral submitted' },
@@ -104,8 +107,9 @@ describe('currentCsipDetailToMiniCardContent', () => {
     }
 
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetail), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetail), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [
         { text: 'Status: No further action' },
@@ -134,8 +138,9 @@ describe('currentCsipDetailToMiniCardContent', () => {
     }
 
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetail), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetail), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [
         { text: 'Status: CSIP closed' },
@@ -164,8 +169,9 @@ describe('currentCsipDetailToMiniCardContent', () => {
     }
 
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.fulfilled(currentCsipDetail), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.fulfilled(currentCsipDetail), prisonerNumber)
+    expect(miniSummary).toEqual({
+      id: 'csip',
       heading: 'CSIP',
       items: [
         { text: 'Status: CSIP open' },
@@ -182,14 +188,23 @@ describe('currentCsipDetailToMiniCardContent', () => {
     })
   })
 
-  it('should return api error message', () => {
+  it('should return api error message when rejected', () => {
     const prisonerNumber = 'A1234BC'
-    const miniCardData = currentCsipDetailToMiniCardContent(Result.rejected(null), prisonerNumber)
-    expect(miniCardData).toEqual({
+    const miniSummary = csipSummaryToMiniSummary(Result.rejected(null), prisonerNumber)
+    expect(miniSummary).toEqual({
       heading: 'CSIP',
       items: [{ text: apiErrorMessage }],
       linkLabel: 'CSIP details',
       linkHref: `${config.serviceUrls.csip}/manage-csips?query=${prisonerNumber}`,
+    })
+  })
+
+  it('should return no CSIP history when null', () => {
+    const prisonerNumber = 'A1234BC'
+    const miniSummary = csipSummaryToMiniSummary(null, prisonerNumber)
+    expect(miniSummary).toEqual({
+      heading: 'CSIP',
+      items: [{ text: 'No CSIP history' }],
     })
   })
 })

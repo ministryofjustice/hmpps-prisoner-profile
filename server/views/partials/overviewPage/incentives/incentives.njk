@@ -1,0 +1,5 @@
+{% if incentiveSummary and isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-half">
+    {{ miniCard(incentiveSummary | toIncentiveMiniSummary(prisonerNumber, prisonerDisplayName, prisonerPermissions), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}
+  </div>
+{% endif %}

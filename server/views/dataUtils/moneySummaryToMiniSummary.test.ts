@@ -14,6 +14,7 @@ describe('moneySummaryToMiniSummary', () => {
     const miniSummary = moneySummaryToMiniSummary(moneySummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Money',
+      id: 'money',
       topLabel: 'Spends',
       topContent: '£1.23',
       topClass: 'big',

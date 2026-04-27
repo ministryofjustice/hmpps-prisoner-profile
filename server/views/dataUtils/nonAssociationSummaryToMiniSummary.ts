@@ -1,14 +1,15 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import { Result } from '../../utils/result/result'
 import { unavailablePlaceholder } from '../../utils/utils'
 import config from '../../config'
 
-export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNumber: string): MiniSummaryData => {
+const mapper: MiniCardMapper<Result<NonAssociationSummary>, [string]> = (nonAssociationSummary, prisonerNumber) => {
   if (nonAssociationSummary.isFulfilled()) {
     const { prisonName, prisonCount, otherPrisonsCount } = nonAssociationSummary.getOrNull()
     return {
       heading: 'Non-associations',
+      id: 'non-associations',
       topLabel: `In ${prisonName}`,
       topContent: prisonCount,
       topClass: 'big',
@@ -22,6 +23,7 @@ export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNu
 
   return {
     heading: 'Non-associations',
+    id: 'non-associations',
     topLabel: `In establishment`,
     topContent: unavailablePlaceholder,
     topClass: 'small',
@@ -30,3 +32,5 @@ export default (nonAssociationSummary: Result<NonAssociationSummary>, prisonerNu
     bottomClass: 'small',
   }
 }
+
+export default mapper

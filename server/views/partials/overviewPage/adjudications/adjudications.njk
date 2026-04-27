@@ -1,0 +1,5 @@
+{% if adjudicationSummary and isGranted(PrisonerAdjudicationsPermission.read, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-half" data-qa="adjudications-summary">
+    {{ miniCard(adjudicationSummary | toAdjudicationsMiniSummary(prisonerNumber), '', adjudicationSummary.status != 'fulfilled') }}
+  </div>
+{% endif %}
