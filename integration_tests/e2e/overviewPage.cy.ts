@@ -833,7 +833,7 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      cy.get('[data-qa=overview-mini-group-a] #non-associations').should('contain.text', 'Unavailable')
+      cy.get('[data-qa=overview-mini-summary-group-a] #non-associations').should('contain.text', 'Unavailable')
     })
   })
 
