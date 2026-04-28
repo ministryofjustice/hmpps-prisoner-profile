@@ -365,6 +365,7 @@ export default {
     allocateKeyWorkers: get('ALLOCATE_KEY_WORKERS_UI_URL', 'http://localhost:3001', requiredInProduction),
     allocatePersonalOfficers: get('ALLOCATE_PERSONAL_OFFICERS_UI_URL', 'http://localhost:3001', requiredInProduction),
     externalMovements: get('EXTERNAL_MOVEMENTS_UI_URL', 'http://localhost:3001', requiredInProduction),
+    courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
