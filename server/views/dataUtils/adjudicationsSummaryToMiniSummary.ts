@@ -1,15 +1,19 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import { pluralise } from '../../utils/pluralise'
 import config from '../../config'
 import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 import { Result } from '../../utils/result/result'
 import { unavailablePlaceholder } from '../../utils/utils'
 
-export default (adjudicationSummary: Result<AdjudicationsOverviewSummary>, prisonerNumber: string): MiniSummaryData => {
+const mapper: MiniCardMapper<Result<AdjudicationsOverviewSummary>, [string]> = (
+  adjudicationSummary,
+  prisonerNumber,
+) => {
   if (adjudicationSummary.status === 'fulfilled') {
     const { adjudicationCount, activePunishments } = adjudicationSummary.getOrNull()
     return {
       heading: 'Adjudications',
+      id: 'adjudications',
       topLabel: 'Proven in last 3 months',
       topContent: adjudicationCount,
       topClass: 'big',
@@ -28,6 +32,7 @@ export default (adjudicationSummary: Result<AdjudicationsOverviewSummary>, priso
 
   return {
     heading: 'Adjudications',
+    id: 'adjudications',
     topLabel: 'Proven in last 3 months',
     topContent: unavailablePlaceholder,
     topClass: 'small',
@@ -36,3 +41,5 @@ export default (adjudicationSummary: Result<AdjudicationsOverviewSummary>, priso
     bottomClass: 'small',
   }
 }
+
+export default mapper

@@ -12,6 +12,7 @@ describe('visitsSummaryToMiniSummary', () => {
     const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
+      id: 'visits',
       topLabel: 'Next visit date',
       topContent: '01/01/2021',
       topClass: 'big',
@@ -34,6 +35,7 @@ describe('visitsSummaryToMiniSummary', () => {
     const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
+      id: 'visits',
       topLabel: 'Next visit date',
       topContent: 'None scheduled',
       topClass: 'small',
@@ -56,6 +58,7 @@ describe('visitsSummaryToMiniSummary', () => {
     const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
+      id: 'visits',
       topLabel: 'Next visit date',
       topContent: '01/01/2021',
       topClass: 'big',
@@ -78,6 +81,7 @@ describe('visitsSummaryToMiniSummary', () => {
     const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
+      id: 'visits',
       topLabel: 'Next visit date',
       topContent: 'None scheduled',
       topClass: 'small',

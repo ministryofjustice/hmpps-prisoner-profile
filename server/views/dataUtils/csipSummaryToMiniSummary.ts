@@ -3,12 +3,12 @@ import { CsipStatus } from '../../data/enums/csipStatus'
 import { pluralise } from '../../utils/pluralise'
 import { formatDate } from '../../utils/dateHelpers'
 import config from '../../config'
-import { MiniCardData } from '../components/miniCard/miniCardData'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import { Result } from '../../utils/result/result'
 import { apiErrorMessage } from '../../utils/utils'
 
-export default (currentCsipDetail: Result<CurrentCsipDetail>, prisonerNumber: string): MiniCardData => {
-  if (currentCsipDetail.status === 'rejected') {
+const mapper: MiniCardMapper<Result<CurrentCsipDetail>, [string]> = (currentCsipDetail, prisonerNumber) => {
+  if (currentCsipDetail?.status === 'rejected') {
     return {
       heading: 'CSIP',
       items: [
@@ -21,7 +21,7 @@ export default (currentCsipDetail: Result<CurrentCsipDetail>, prisonerNumber: st
     }
   }
 
-  const { currentCsip, totalOpenedCsipCount, totalReferralCount } = currentCsipDetail.value
+  const { currentCsip, totalOpenedCsipCount, totalReferralCount } = currentCsipDetail?.value || {}
   if (!currentCsip) return { heading: 'CSIP', items: [{ text: 'No CSIP history' }] }
 
   const { status, referralDate, nextReviewDate, closedDate, reviewOverdueDays } = currentCsip
@@ -55,6 +55,7 @@ export default (currentCsipDetail: Result<CurrentCsipDetail>, prisonerNumber: st
   }
 
   return {
+    id: 'csip',
     heading: 'CSIP',
     items: [
       {
@@ -98,3 +99,5 @@ export default (currentCsipDetail: Result<CurrentCsipDetail>, prisonerNumber: st
     linkLabel: 'CSIP details',
   }
 }
+
+export default mapper

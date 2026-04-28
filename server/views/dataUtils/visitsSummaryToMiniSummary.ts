@@ -1,4 +1,4 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import { formatDate } from '../../utils/dateHelpers'
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
 
@@ -10,11 +10,12 @@ const getPrivilegedVisitsDescription = (remainingPvo: number, remainingVo: numbe
   if (remainingVo) return 'No privileged visits'
   return ''
 }
-export default (visitSummary: VisitsOverviewSummary, prisonerNumber: string): MiniSummaryData => {
+const mapper: MiniCardMapper<VisitsOverviewSummary, [string]> = (visitSummary, prisonerNumber) => {
   const { remainingVo, remainingPvo, startDate } = visitSummary
 
   return {
     heading: 'Visits',
+    id: 'visits',
     topLabel: 'Next visit date',
     topContent: startDate ? formatDate(startDate, 'short') : 'None scheduled',
     topClass: startDate ? 'big' : 'small',
@@ -26,3 +27,5 @@ export default (visitSummary: VisitsOverviewSummary, prisonerNumber: string): Mi
     linkHref: `/prisoner/${prisonerNumber}/visits-details`,
   }
 }
+
+export default mapper

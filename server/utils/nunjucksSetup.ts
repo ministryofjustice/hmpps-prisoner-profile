@@ -53,8 +53,11 @@ import moneySummaryToMiniSummary from '../views/dataUtils/moneySummaryToMiniSumm
 import adjudicationsSummaryToMiniSummary from '../views/dataUtils/adjudicationsSummaryToMiniSummary'
 import visitsSummaryToMiniSummary from '../views/dataUtils/visitsSummaryToMiniSummary'
 import csraSummaryToMiniSummary from '../views/dataUtils/csraSummaryToMiniSummary'
+import csipSummaryToMiniSummary from '../views/dataUtils/csipSummaryToMiniSummary'
 import categorySummaryToMiniSummary from '../views/dataUtils/categorySummaryToMiniSummary'
 import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryToMiniSummary'
+import externalContactsSummaryToMiniSummary from '../views/dataUtils/externalContactsSummaryToMiniSummary'
+import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import summaryListRowWithOptionalChangeLink, {
   listToSummaryListRows,
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
@@ -65,9 +68,7 @@ import groupDistinguishingMarks, {
 } from '../views/dataUtils/groupDistinguishingMarksForView'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import { bodyPartLabels } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
-import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
 import { appInsightsWebAnalyticsEnabled, militaryHistoryEnabled } from './featureFlags'
-import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
@@ -210,14 +211,15 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
   njkEnv.addFilter('formatAddressDate', formatAddressDate)
   njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
-  njkEnv.addFilter('toMoneySummaryDisplay', moneySummaryToMiniSummary)
-  njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
-  njkEnv.addFilter('toNonAssociationSummaryDisplay', nonAssociationSummaryToMiniSummary)
-  njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
-  njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
-  njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
-  njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
-  njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
+  njkEnv.addFilter('toMoneyMiniSummary', moneySummaryToMiniSummary)
+  njkEnv.addFilter('toAdjudicationsMiniSummary', adjudicationsSummaryToMiniSummary)
+  njkEnv.addFilter('toNonAssociationMiniSummary', nonAssociationSummaryToMiniSummary)
+  njkEnv.addFilter('toVisitsMiniSummary', visitsSummaryToMiniSummary)
+  njkEnv.addFilter('toCsraMiniSummary', csraSummaryToMiniSummary)
+  njkEnv.addFilter('toCsipMiniSummary', csipSummaryToMiniSummary)
+  njkEnv.addFilter('toExternalContactsMiniSummary', externalContactsSummaryToMiniSummary)
+  njkEnv.addFilter('toCategoryMiniSummary', categorySummaryToMiniSummary)
+  njkEnv.addFilter('toIncentiveMiniSummary', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)

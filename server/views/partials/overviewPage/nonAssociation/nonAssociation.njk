@@ -1,0 +1,5 @@
+{% if nonAssociationSummary %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(nonAssociationSummary | toNonAssociationMiniSummary(prisonerNumber), '', nonAssociationSummary.status != 'fulfilled') }}
+  </div>
+{% endif %}

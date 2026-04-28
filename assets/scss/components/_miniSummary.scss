@@ -42,7 +42,9 @@
 
   .hmpps-mini-card__link {
     margin-top: auto;
-    margin-bottom: 12px;
+    padding-top: 15px;
+    margin-bottom: 15px;
+    border-top: 1px solid govuk-colour('light-grey');
   }
 }
 
@@ -54,11 +56,13 @@
   gap: 23px 0;
 
   .hmpps-summary-card {
+    display: flex;
+    flex-direction: column;
     height: 100%;
     margin-bottom: 0;
 
     &__no-header {
-      padding-top: 10px;
+      padding-top: 15px;
     }
 
     &__header {
@@ -66,21 +70,24 @@
     }
 
     &__body {
-      height: calc(100% - 60px);
+      flex: 1;
       min-height: 7rem;
 
       &:has(.hmpps-summary-card__no-header) {
-        height: calc(100% - 10px);
+        height: auto;
       }
 
       .card-body {
+        display: flex;
+        flex-direction: column;
         height: 100%;
-      }
 
-      .card-body .govuk-grid-column-full {
+        .govuk-grid-column-full {
           display: flex;
           flex-direction: column;
           height: 100%;
+          flex: 1;
+        }
       }
     }
 
@@ -88,7 +95,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      height: calc(100% - 23px);
+      flex: 1;
     }
 
     &__unavailable-message {
@@ -98,27 +105,27 @@
 
 }
 
-@media (min-width: 1181px) {
-  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third:nth-of-type(2) .hmpps-summary-card {
-    margin-left: -2px;
-    margin-right: -2px;
-  }
-}
-
-
-@media (max-width: 1180px) {
-  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
-    width: 50%;
-  }
-}
 
 @media (max-width: 751px) {
-  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third,
+  .hmpps-miniSummaryWrapper .govuk-grid-column-one-half,
+  .hmpps-miniSummaryWrapper .govuk-grid-column-two-thirds {
     width: 100%;
   }
 }
 
 .hmpps-three-quarters-responsive {
+  @media (max-width: 1100px) {
+    > .govuk-grid-column-three-quarters {
+      width: 100%;
+    }
+
+    > .govuk-grid-column-one-quarter {
+      width: 100%;
+      order: -1;
+    }
+  }
+
   @media (max-width: 751px) {
     .hmpps-miniSummaryWrapper {
       .govuk-grid-column-three-quarters,

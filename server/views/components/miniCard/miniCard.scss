@@ -6,7 +6,7 @@
   justify-items: flex-start;
   border: 1px solid govuk-colour('dark-grey');
   box-shadow: 0 5px govuk-colour('mid-grey');
-  min-height: calc(30px * var(--mini-card-lines, 4)); // can be overridden for each usage of .mini-card
+  min-height: 100%; // can be overridden for each usage of .mini-card
 
   &__heading {
     background-color: #f3f2f1;
@@ -33,7 +33,7 @@
   }
 
   &__item {
-    font-size: 19px;
+    @include govuk-font($size: 19);
     margin: 0 0 5px 0;
     display: flex;
     align-items: center;
@@ -52,10 +52,13 @@
   }
 
   &__link {
-    font-size: 19px;
+    @include govuk-font($size: 19);
     padding-left: 15px;
     padding-right: 15px;
-    margin: auto 0 12px 0;
+    margin-top: auto;
+    padding-top: 15px;
+    margin-bottom: 12px;
+    border-top: 1px solid govuk-colour('light-grey');
   }
 }
 
@@ -69,21 +72,19 @@
   padding: 10px 15px;
   border: 1px solid govuk-colour('dark-grey');
   box-shadow: 0 5px govuk-colour('mid-grey');
-  min-height: calc(30px * var(--mini-card-lines, 4)); // can be overridden for each usage of .mini-card
+  min-height: 100%; // can be overridden for each usage of .mini-card
 
   h2 {
-    font-size: 19px;
-    font-weight: bold;
+    @include govuk-font($size: 19, $weight: bold);
     margin: 0 0 5px 0;
   }
 
   &__item {
-    font-size: 19px;
+    @include govuk-font($size: 19);
     margin: 0 0 5px 0;
   }
 
   &__link {
-    font-size: 19px;
-    margin: auto 0 2px 0;
+    @include govuk-font($size: 19);
   }
 }

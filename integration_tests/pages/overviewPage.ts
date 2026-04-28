@@ -21,39 +21,16 @@ export default class OverviewPage extends Page {
 
   // Mini Summary
 
-  moneyVisitsNonAssociationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
+  moneyVisitsNonAssociationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]').first()
 
   moneyVisitsNonAssociationsGroup_MacroHeader = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]')
+    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]').first()
 
-  moneyCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
+  moneyCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]').find('#money')
 
-  visitsCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
+  visitsCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]').find('#visits')
 
-  nonAssociationsCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
-
-  categoryCsraCsipGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
-
-  categoryCsraCsipGroup_MacroHeader = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
-
-  categoryCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--categories')
-
-  adjudicationsSummary = (): PageElement => cy.get('[data-qa=adjudications-summary] > .hmpps-summary-card')
-
-  incentivesCard = (): PageElement => cy.get('.mini-card--incentives')
-
-  csraCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csra')
-
-  csipCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csip')
-
-  // Non Associations
+  nonAssociationsCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]').find(' #non-associations')
 
   nonAssociations = () => ({
     table: (): PageElement => cy.get('[data-qa=non-associations-table]'),
@@ -69,6 +46,42 @@ export default class OverviewPage extends Page {
     },
   })
 
+  contactsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]').first()
+
+  externalContacts = () => {
+    const card = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]').find('#external-contacts')
+    return {
+      card,
+      officialHeading: (): PageElement => card().findDataQa('external-contacts-bottom-label'),
+      official: (): PageElement => card().findDataQa('external-contacts-bottom-content-1'),
+      socialHeading: (): PageElement => card().findDataQa('external-contacts-top-label'),
+      social: (): PageElement => card().findDataQa('external-contacts-top-content'),
+      link: (): PageElement => card().findDataQa('external-contacts-link'),
+    }
+  }
+
+  staffContacts = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]').find('#staff-contacts')
+
+  resettlementWorkerName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(7) dd')
+
+  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(4) dd')
+
+  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
+
+  adjudicationsIncentivesGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').first()
+
+  adjudicationsSummary = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').find('#adjudications')
+
+  incentivesCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').find('#incentives')
+
+  categoryCsraCsipGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').first()
+
+  categoryCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#category')
+
+  csraCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#csra')
+
+  csipCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#csip')
+
   personalDetails = () => {
     const card = (): PageElement => cy.getDataQa('personal-details')
     return {
@@ -82,26 +95,6 @@ export default class OverviewPage extends Page {
       pncNumber: (): PageElement => card().findDataQa('pnc-number'),
     }
   }
-
-  externalContacts = () => {
-    const card = (): PageElement => cy.get('#external-contacts')
-    return {
-      card,
-      officialHeading: (): PageElement => card().findDataQa('external-contacts-official'),
-      official: (): PageElement => card().findDataQa('external-contacts-official-count'),
-      socialHeading: (): PageElement => card().findDataQa('external-contacts-social'),
-      social: (): PageElement => card().findDataQa('external-contacts-social-count'),
-      link: (): PageElement => card().findDataQa('external-contacts-link'),
-    }
-  }
-
-  staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
-
-  resettlementWorkerName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(7) dd')
-
-  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(4) dd')
-
-  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
 
   schedule = () => ({
     morning: () => ({

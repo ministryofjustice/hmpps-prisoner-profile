@@ -1,4 +1,4 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import { MiniCardData } from '../../views/components/miniCard/miniCardData'
 import AccountBalances from '../interfaces/prisonApi/AccountBalances'
 import VisitSummary from '../interfaces/prisonApi/VisitSummary'
 import VisitBalances from '../interfaces/prisonApi/VisitBalances'
@@ -67,7 +67,8 @@ export const assessmentsMock: Assessment[] = [
   } as Assessment,
 ]
 
-export const moneySummaryDataMock: MiniSummaryData = {
+export const moneySummaryDataMock: MiniCardData = {
+  id: 'money',
   heading: 'Money',
   topLabel: 'Spends',
   topContent: '£240.51',
@@ -76,9 +77,10 @@ export const moneySummaryDataMock: MiniSummaryData = {
   bottomContentLine1: '£35.00',
   bottomClass: 'big',
   linkLabel: 'Transactions and savings',
-} as MiniSummaryData
+}
 
-export const adjudicationsSummaryDataMock: MiniSummaryData = {
+export const adjudicationsSummaryDataMock: MiniCardData = {
+  id: 'adjudications',
   heading: 'Adjudications',
   topLabel: 'Proven in last 3 months',
   topContent: 4,
@@ -87,9 +89,10 @@ export const adjudicationsSummaryDataMock: MiniSummaryData = {
   bottomContentLine1: 'No active punishments',
   bottomClass: 'small',
   linkLabel: 'Adjudication history',
-} as MiniSummaryData
+}
 
-export const visitsSummaryDataMock: MiniSummaryData = {
+export const visitsSummaryDataMock: MiniCardData = {
+  id: 'visits',
   heading: 'Visits',
   topLabel: 'Next visit date',
   topContent: '15/09/2023',
@@ -99,43 +102,47 @@ export const visitsSummaryDataMock: MiniSummaryData = {
   bottomContentLine3: 'Including 2 privileged visits',
   bottomClass: 'small',
   linkLabel: 'Visits details',
-} as MiniSummaryData
+}
 
-export const categorySummaryDataMock: MiniSummaryData = {
-  bottomLabel: 'Category',
-  bottomContentLine1: 'B',
-  bottomContentLine3: 'Next review: 19/02/2023',
-  bottomClass: 'small',
+export const categorySummaryDataMock: MiniCardData = {
+  heading: 'Category',
+  items: [{ text: 'B' }, { text: 'Next review: 19/02/2023' }],
   linkLabel: 'Category',
-} as MiniSummaryData
+}
 
-export const incentiveSummaryDataMock: MiniSummaryData = {
-  bottomLabel: 'Incentives: since last review',
-  bottomContentLine1: 'Positive behaviours: 1',
-  bottomContentLine2: 'Negative behaviours: 1',
-  bottomContentLine3: 'Next review by: 01/01/2024',
-  bottomClass: 'small',
+export const incentiveSummaryDataMock: MiniCardData = {
+  id: 'incentives',
+  heading: 'Incentives: since last review',
+  items: [
+    { text: 'Positive behaviours: 1' },
+    { text: 'Negative behaviours: 1' },
+    { text: 'Next review by: 01/01/2024' },
+  ],
   linkLabel: 'Incentive level details',
-} as MiniSummaryData
+}
 
-export const incentiveSummaryNoDataMock: MiniSummaryData = {
-  bottomLabel: 'Incentives: since last review',
-  bottomContentLine1: 'John Saunders has no incentive level history',
-  bottomClass: 'small',
+export const incentiveSummaryNoDataMock: MiniCardData = {
+  id: 'incentives',
+  heading: 'Incentives: since last review',
+  items: [{ text: 'John Saunders has no incentive level history' }],
   linkLabel: 'Incentive level details',
-} as MiniSummaryData
+}
 
-export const incentiveSummaryErrorMock: MiniSummaryData = {
-  bottomLabel: 'Incentives: since last review',
-  bottomContentLine1: 'We cannot show these details right now',
-  bottomClass: 'small',
+export const incentiveSummaryErrorMock: MiniCardData = {
+  id: 'incentives',
+  heading: 'Incentives: since last review',
+  bottomContentError: 'We cannot show these details right now',
   linkLabel: 'Incentive level details',
-} as MiniSummaryData
+}
 
-export const csraSummaryDataMock: MiniSummaryData = {
-  bottomLabel: 'CSRA',
-  bottomContentLine1: 'Standard',
-  bottomContentLine3: 'Last review: 19/02/2021',
-  bottomClass: 'small',
+export const csraSummaryDataMock: MiniCardData = {
+  heading: 'CSRA',
+  items: [{ text: 'Standard' }, { text: 'Last review: 19/02/2021' }],
   linkLabel: 'CSRA history',
-} as MiniSummaryData
+}
+
+export const csipSummaryDataMock: MiniCardData = {
+  heading: 'CSIP',
+  items: [{ text: 'No CSIP history' }],
+  linkLabel: 'CSIP history',
+}

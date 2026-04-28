@@ -1,0 +1,8 @@
+{% set showExternalContacts = isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)%}
+{%- call conditionallyShow({
+  condition: showExternalContacts,
+  id: 'external-contacts',
+  visibleClasses: 'govuk-grid-column-one-third'
+}) -%}
+  {% include "partials/overviewPage/externalContacts/externalContactsSummary.njk" %}
+{%- endcall -%}
