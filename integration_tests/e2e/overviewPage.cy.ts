@@ -179,10 +179,73 @@ context('Overview Page', () => {
     context('Mini Summary B', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.contactsGroup().should('exist')
+      })
+
+      it('Displays the external contacts summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.externalContacts().card().should('exist')
+        overviewPage.externalContacts().officialHeading().should('have.text', 'Official')
+        overviewPage.externalContacts().official().should('include.text', '2')
+        overviewPage.externalContacts().socialHeading().should('have.text', 'Social')
+        overviewPage.externalContacts().social().should('include.text', '1')
+        overviewPage
+          .externalContacts()
+          .link()
+          .contains(
+            'a[href="http://localhost:9091/contacts/prisoner/G6123VU/contacts/list"]',
+            'Social and official contacts',
+          )
+      })
+
+      it('Displays the offender staff contact details', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.staffContacts().should('exist')
+        overviewPage.staffContacts().contains('dt', 'Key worker').next().should('contain.text', 'Dave Stevens')
+      })
+    })
+
+    context('Mini Summary C', () => {
+      it('Mini summary list is displayed', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.adjudicationsIncentivesGroup().should('exist')
+      })
+
+      it('Displays the adjudications summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.adjudicationsSummary().contains('h2', 'Adjudications')
+        overviewPage.adjudicationsSummary().contains('p', 'Proven in last 3 months')
+        overviewPage.adjudicationsSummary().contains('p', '4')
+        overviewPage.adjudicationsSummary().contains('p', 'Active')
+        overviewPage.adjudicationsSummary().contains('p', 'No active punishments')
+        overviewPage
+          .adjudicationsSummary()
+          .contains(
+            'a[href="http://localhost:3000/adjudications/adjudication-history/G6123VU"]',
+            'Adjudication history',
+          )
+      })
+
+      it('Displays the incentives summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.incentivesCard().contains('h2', 'Incentives')
+        overviewPage.incentivesCard().contains('p', 'Since last review')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 2')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
+        overviewPage
+          .incentivesCard()
+          .contains('a[href="http://localhost:3001/incentive-reviews/prisoner/G6123VU"]', 'Incentive level details')
+      })
+    })
+
+    context('Mini Summary D', () => {
+      it('Mini summary list is displayed', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.categoryCsraCsipGroup().should('exist')
       })
 
-      it('Mini summary Group B should contain Category card with correct data', () => {
+      it('Mini summary Group D should contain Category card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.categoryCard().contains('Category')
         overviewPage.categoryCard().contains('.mini-card__item', 'B')
@@ -190,7 +253,7 @@ context('Overview Page', () => {
         overviewPage.categoryCard().contains('a', 'Category')
       })
 
-      it('Mini summary Group B should contain CSRA card with correct data', () => {
+      it('Mini summary Group D should contain CSRA card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.csraCard().contains('CSRA')
         overviewPage.csraCard().contains('.mini-card__item', 'Standard')
@@ -198,7 +261,7 @@ context('Overview Page', () => {
         overviewPage.csraCard().contains('a', 'CSRA history')
       })
 
-      it('Mini summary Group B should contain CSIP card with correct data', () => {
+      it('Mini summary Group D should contain CSIP card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.csipCard().contains('CSIP')
         overviewPage.csipCard().contains('.mini-card__item', 'Status: CSIP open')
@@ -231,55 +294,6 @@ context('Overview Page', () => {
         overviewPage.personalDetails().religionOrBelief().should('include.text', 'Celestial Church of God')
         overviewPage.personalDetails().croNumber().should('include.text', '400862/08W')
         overviewPage.personalDetails().pncNumber().should('include.text', '08/359381C')
-      })
-    })
-
-    context('Adjudications', () => {
-      it('Displays the adjudications summary', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.adjudicationsSummary().contains('h2', 'Adjudications')
-        overviewPage.adjudicationsSummary().contains('p', 'Proven in last 3 months')
-        overviewPage.adjudicationsSummary().contains('p', '4')
-        overviewPage.adjudicationsSummary().contains('p', 'Active')
-        overviewPage.adjudicationsSummary().contains('p', 'No active punishments')
-        overviewPage
-          .adjudicationsSummary()
-          .contains(
-            'a[href="http://localhost:3000/adjudications/adjudication-history/G6123VU"]',
-            'Adjudication history',
-          )
-      })
-    })
-
-    context('External contacts', () => {
-      it('Displays the external contacts summary', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.externalContacts().card().should('exist')
-        overviewPage.externalContacts().officialHeading().should('have.text', 'Official')
-        overviewPage.externalContacts().official().should('include.text', '2')
-        overviewPage.externalContacts().socialHeading().should('have.text', 'Social')
-        overviewPage.externalContacts().social().should('include.text', '1')
-        overviewPage
-          .externalContacts()
-          .link()
-          .contains(
-            'a[href="http://localhost:9091/contacts/prisoner/G6123VU/contacts/list"]',
-            'Social and official contacts',
-          )
-      })
-    })
-
-    context('Incentives', () => {
-      it('Displays the incentives summary', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.incentivesCard().contains('h2', 'Incentives')
-        overviewPage.incentivesCard().contains('p', 'Since last review')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 2')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
-        overviewPage
-          .incentivesCard()
-          .contains('a[href="http://localhost:3001/incentive-reviews/prisoner/G6123VU"]', 'Incentive level details')
       })
     })
 
