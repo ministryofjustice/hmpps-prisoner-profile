@@ -106,6 +106,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS: "***"
+    HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
