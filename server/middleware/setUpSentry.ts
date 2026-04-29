@@ -51,18 +51,16 @@ export function setUpSentry() {
 
         // Don’t send PII
         if (event.transaction) {
-          event.transaction = anonymise(event.transaction)
+          event.transaction = anonymise(event.transaction)!
         }
         if (event.request?.url) {
-          event.request.url = anonymise(event.request.url)
+          event.request.url = anonymise(event.request.url)!
         }
-        if (event.user) {
-          delete event.user?.email
-          delete event.user?.username
-          delete event.request?.data
-          delete event.request?.cookies
-          delete event.request?.headers
-        }
+        delete event.user?.email
+        delete event.user?.username
+        delete event.request?.data
+        delete event.request?.cookies
+        delete event.request?.headers
 
         return event
       },
@@ -83,6 +81,9 @@ export function anonymise(text: string | undefined): string | undefined {
 
     // address autosuggest lookup
     [/\/api\/addresses\/find\/[A-Za-z0-9.+%' _-]+/, '/api/addresses/find/:query'],
+
+    // add url patterns here which might reveal user-entered sensitive details
+    // [/\/some-url\/[^/]+/, '/some-url/:query'],
   ]
   return replacements.reduce((anonymisedText, [match, replacement]) => {
     if (match.global) {
@@ -97,6 +98,7 @@ function anonymisedErrorMessage(data?: { userMessage?: string; developerMessage?
   return data && anonymise(data.userMessage || data.developerMessage)
 }
 
+/** Submit uncaught errors */
 export function setUpSentryErrorHandler(app: express.Express): void {
   if (config.sentry.dsn) {
     Sentry.setupExpressErrorHandler(app)
