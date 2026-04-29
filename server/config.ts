@@ -418,7 +418,7 @@ export default {
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
     dsn: get('SENTRY_DSN', null, requiredInProduction),
-    environment: get('SENTRY_ENVIRONMENT', 'local'),
+    environment: get('SENTRY_ENVIRONMENT', 'local', requiredInProduction),
   },
   readOnlyProfile: toBoolean(get('READ_ONLY_PROFILE', 'false')),
 }

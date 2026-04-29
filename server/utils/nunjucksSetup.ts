@@ -91,8 +91,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   try {
     const assetMetadataPath = path.resolve(__dirname, '../../assets/manifest.json')
     assetManifest = JSON.parse(fs.readFileSync(assetMetadataPath, 'utf8'))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_e) {
+  } catch {
     if (process.env.NODE_ENV !== 'test') {
       logger.error('Could not read asset manifest file')
     }
