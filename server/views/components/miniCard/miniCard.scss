@@ -4,8 +4,8 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-items: flex-start;
-  border: 1px solid govuk-colour('dark-grey');
-  box-shadow: 0 5px govuk-colour('mid-grey');
+  border: 1px solid govuk-colour("black", $variant: "tint-25");
+  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
   min-height: 100%; // can be overridden for each usage of .mini-card
 
   &__heading {
@@ -58,7 +58,7 @@
     margin-top: auto;
     padding-top: 15px;
     margin-bottom: 12px;
-    border-top: 1px solid govuk-colour('light-grey');
+    border-top: 1px solid govuk-colour("black", $variant: "tint-95");
   }
 }
 
@@ -70,8 +70,8 @@
   flex-wrap: nowrap;
   justify-items: flex-start;
   padding: 10px 15px;
-  border: 1px solid govuk-colour('dark-grey');
-  box-shadow: 0 5px govuk-colour('mid-grey');
+  border: 1px solid govuk-colour("black", $variant: "tint-25");
+  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
   min-height: 100%; // can be overridden for each usage of .mini-card
 
   h2 {

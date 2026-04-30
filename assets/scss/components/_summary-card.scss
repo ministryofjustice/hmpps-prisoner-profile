@@ -1,10 +1,10 @@
 .hmpps-summary-card {
-  border: 1px solid govuk-colour('dark-grey');
-  box-shadow: 0 5px govuk-colour('mid-grey');
+  border: 1px solid govuk-colour("black", $variant: "tint-25");
+  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
   @include govuk-responsive-margin(4, 'bottom');
 
   &__header {
-    background-color: govuk-colour('light-grey');
+    background-color: govuk-colour("black", $variant: "tint-95");
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
     @include govuk-responsive-margin(3, 'bottom');

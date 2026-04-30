@@ -159,7 +159,7 @@
 @property --body-part-tooltip-shadow-colour {
   syntax: "<color>";
   inherits: true;
-  initial-value: govuk-colour('dark-grey');
+  initial-value: govuk-colour("black", $variant: "tint-25");
 }
 @property --body-part-tooltip-background-colour {
   syntax: "<color>";
@@ -181,7 +181,7 @@
   $border-size: 1px;
   $pointer-size: 5px;
 
-  --body-part-tooltip-shadow-colour: #{govuk-colour('dark-grey')};
+  --body-part-tooltip-shadow-colour: #{govuk-colour("black", $variant: "tint-25")};
   --body-part-tooltip-background-colour: #{govuk-colour('white')};
   --body-part-tooltip-foreground-colour: #{$govuk-text-colour};
   --body-part-tooltip-border-colour: #{govuk-colour('blue')};

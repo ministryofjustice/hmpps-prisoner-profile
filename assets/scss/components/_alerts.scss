@@ -69,7 +69,7 @@
       justify-content: space-between;
       flex-basis: min-content;
       padding-bottom: 30px;
-      border-bottom: 1px solid govuk-colour('dark-grey');
+      border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
       margin-bottom: 30px;
 
       &__content {

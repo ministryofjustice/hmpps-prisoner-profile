@@ -54,7 +54,7 @@
   margin-top: 15px;
   margin-bottom: 50px;
   padding: 15px;
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour("black", $variant: "tint-95");
 
   h3 {
     margin-top: 0;

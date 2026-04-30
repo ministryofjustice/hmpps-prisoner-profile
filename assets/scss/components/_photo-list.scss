@@ -7,7 +7,7 @@
   }
 
   .hmpps-photo-list__main {
-    background-color: govuk-colour('light-grey');
+    background-color: govuk-colour("black", $variant: "tint-95");
     border: solid 1px $govuk-border-colour;
   }
 

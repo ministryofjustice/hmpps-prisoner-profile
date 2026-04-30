@@ -6,7 +6,7 @@
   gap: 20px;
 
   padding-bottom: 30px;
-  border-bottom: 1px solid govuk-colour('dark-grey');
+  border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
   margin-bottom: 30px;
 
   &__content {
@@ -58,7 +58,7 @@
 
     &:not(:last-of-type) {
       padding-bottom: 15px;
-      border-bottom: 1px dashed govuk-colour('mid-grey');
+      border-bottom: 1px dashed govuk-colour("black", $variant: "tint-80");
     }
   }
 
