@@ -24,6 +24,7 @@ import OffenderIdentifier from '../../../../data/interfaces/prisonApi/OffenderId
 import HmppsError from '../../../../interfaces/HmppsError'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { errorHasStatus } from '../../../../utils/errorHelpers'
+import { OffenderIdentifierType } from '../../../../data/interfaces/prisonApi/OffenderIdentifierType'
 
 export interface EditIdentityNumberSubmission {
   type?: string
@@ -122,6 +123,7 @@ export default class IdentityNumbersController {
           identifierType: type,
           errors,
           miniBannerData,
+          spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
         })
       },
       submit: async (req: Request, res: Response) => {
@@ -153,7 +155,10 @@ export default class IdentityNumbersController {
 
           if (!errors.length) {
             const request: UpdateIdentifierRequestDto = {
-              value: formValues.value,
+              value:
+                formValues.type === OffenderIdentifierType.NationalInsuranceNumber
+                  ? formValues.value?.toUpperCase()
+                  : formValues.value,
               comments: formValues.comment,
             }
             try {
@@ -297,7 +302,7 @@ export default class IdentityNumbersController {
           if (type && value.value) {
             return {
               type,
-              value: value.value,
+              value: type === OffenderIdentifierType.NationalInsuranceNumber ? value.value?.toUpperCase() : value.value,
               comments: value.comment,
             }
           }

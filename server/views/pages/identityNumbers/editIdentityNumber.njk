@@ -17,7 +17,8 @@
       },
       value: formValues.value,
       errorMessage: errors | findError('identifier-value-input'),
-      classes: "govuk-!-width-one-third"
+      classes: "govuk-!-width-one-third",
+      attributes: { spellcheck: spellcheck }
     }) }}
     {{ govukCharacterCount({
       id: "identifier-comments-input",

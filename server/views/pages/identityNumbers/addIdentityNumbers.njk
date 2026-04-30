@@ -22,7 +22,8 @@
     },
     value: option.value,
     errorMessage: errors | findError(option.id + "-value-input"),
-    classes: "govuk-!-width-one-third"
+    classes: "govuk-!-width-one-third",
+    attributes: { spellcheck: option.spellcheck }
   }) }}
   {{ govukCharacterCount({
     id: option.id + "-comments-input",
