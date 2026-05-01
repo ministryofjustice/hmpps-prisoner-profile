@@ -45,7 +45,7 @@
       color: #1c5791; // NB: custom colour for increased contrast
     }
     a:focus {
-      color: $govuk-text-colour;
+      color: govuk-functional-colour(text);
     }
   }
 }

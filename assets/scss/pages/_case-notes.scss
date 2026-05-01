@@ -22,7 +22,7 @@
   &__title {
     font-size: 24px;
     font-weight: bold;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-top: 5px;
     margin-bottom: 8px;
   }
@@ -37,7 +37,7 @@
   &__notes {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-bottom: 20px;
     max-width: 670px;
     word-break: break-word;
@@ -69,7 +69,7 @@
   &__metadata {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
   }
 
   &__header + &__metadata {

@@ -183,7 +183,7 @@
 
   --body-part-tooltip-shadow-colour: #{govuk-colour("black", $variant: "tint-25")};
   --body-part-tooltip-background-colour: #{govuk-colour('white')};
-  --body-part-tooltip-foreground-colour: #{$govuk-text-colour};
+  --body-part-tooltip-foreground-colour: #{govuk-functional-colour(text)};
   --body-part-tooltip-border-colour: #{govuk-colour('blue')};
 
   @media (forced-colors: active) and (prefers-color-scheme: dark) {
