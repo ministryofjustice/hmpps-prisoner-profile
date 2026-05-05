@@ -11,7 +11,7 @@
   dl {
     margin: 0;
     &:not(:last-of-type) {
-      border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
+      border-bottom: 1px solid govuk-functional-colour(template-background);
       margin-bottom: govuk-spacing(3);
     }
   }

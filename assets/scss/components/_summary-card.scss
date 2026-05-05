@@ -4,7 +4,7 @@
   @include govuk-responsive-margin(4, 'bottom');
 
   &__header {
-    background-color: govuk-colour("black", $variant: "tint-95");
+    background-color: govuk-functional-colour(template-background);;
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
     @include govuk-responsive-margin(3, 'bottom');

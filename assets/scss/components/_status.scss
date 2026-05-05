@@ -14,7 +14,7 @@
   height: 70px;
   max-width: 14em;
   padding: 0 15px;
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk-functional-colour(template-background);;
   border-left: 6px solid govuk-colour("black", $variant: "tint-80");
 
   p {
@@ -38,7 +38,7 @@
   }
 
   &--prominent {
-    background-color: govuk-tint(govuk-colour("blue"), 90%);
+    background-color: govuk-colour("blue", $variant: "tint-95");
     border-left-color: govuk-colour("blue", $variant: "tint-25");
 
     a, a:visited {

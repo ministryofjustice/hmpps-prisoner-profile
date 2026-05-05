@@ -1,5 +1,5 @@
 .hmpps-side-filter {
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk-functional-colour(template-background);;
   padding: 30px 15px;
   @include govuk-responsive-margin(4, "bottom");
 

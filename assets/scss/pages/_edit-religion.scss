@@ -1,4 +1,4 @@
 #current-religion-display {
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk-functional-colour(template-background);;
   width: fit-content;
 }
