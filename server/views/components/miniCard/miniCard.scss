@@ -9,7 +9,7 @@
   min-height: 100%; // can be overridden for each usage of .mini-card
 
   &__heading {
-    background-color: #f3f2f1;
+    background-color: govuk-functional-colour(template-background);
     padding-left: 15px;
     padding-right: 15px;
     margin-bottom: 10px;
