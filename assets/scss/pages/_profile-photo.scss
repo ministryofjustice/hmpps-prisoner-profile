@@ -7,29 +7,6 @@
   background-position-x: 1px;
 }
 
-.photo-feedback-banner {
-  border: 1px solid #594d00;
-  padding: 8px 8px 6px;
-  margin-bottom: 15px;
-  background: #fff7bf;
-
-  a,
-  a:visited {
-    color: #594d00 !important;
-  }
-
-  a:hover,
-  a:active {
-    color: #2f2900 !important;
-  }
-
-  p {
-    color: #594d00;
-    margin: 0;
-    @include govuk-font(16);
-  }
-}
-
 .hmpps-profile-photo {
   display: flex;
 

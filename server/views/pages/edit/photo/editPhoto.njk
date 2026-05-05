@@ -1,14 +1,8 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% extends "partials/layout.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set cropperTextHtml %}
   <label class="govuk-label govuk-label--m">Edit the image before uploading</label>
@@ -46,11 +40,6 @@
         classes: "govuk-!-margin-0",
         href: "/prisoner/" + prisonerNumber + ("/image/webcam" if webcamImage else "/image/new") | appendRefererToUrl(referer)
       }) }}
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% include '../../../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
     </div>
   </div>
   {% if errors.length > 0 %}
