@@ -4,7 +4,7 @@
   justify-content: space-between;
   flex-basis: min-content;
   padding-bottom: 30px;
-  border-bottom: 1px solid govuk-colour('dark-grey');
+  border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
   margin-bottom: 30px;
 
   &__content {
@@ -28,14 +28,14 @@
   &__title {
     font-size: 24px;
     font-weight: bold;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-bottom: 15px;
   }
 
   &__notes {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-bottom: 15px;
     word-break: break-word;
   }
@@ -43,7 +43,7 @@
   &__metadata {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
 
     span {
       font-weight: 700;
