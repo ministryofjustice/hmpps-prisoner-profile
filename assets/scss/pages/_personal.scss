@@ -316,10 +316,10 @@
 
 @keyframes greenToTransparent {
   0% {
-    background-color: govuk-tint(govuk-colour('green'), 80%);
+    background-color: govuk-colour("green", $variant: "tint-80");
   }
   80% {
-    background-color: govuk-tint(govuk-colour('green'), 80%);
+    background-color: govuk-colour("green", $variant: "tint-80");
   }
   100% {
     background-color: transparent;
@@ -342,7 +342,7 @@
   text-decoration: none;
   overflow-wrap: break-word;
   color: govuk-shade(govuk-colour('green'), 20%);
-  background-color: govuk-tint(govuk-colour('green'), 80%);
+  background-color: govuk-colour("green", $variant: "tint-80");
 
   > p {
     margin-bottom: auto;
@@ -358,7 +358,7 @@
   text-decoration: none;
   overflow-wrap: break-word;
   color: govuk-shade(govuk-colour('green'), 20%);
-  background-color: govuk-tint(govuk-colour('green'), 80%);
+  background-color: govuk-colour("green", $variant: "tint-80");
 
   > p {
     margin-bottom: auto;

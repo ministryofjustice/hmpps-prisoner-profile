@@ -62,7 +62,7 @@ $hmpps-paged-list-min-size: 870px;
 
 .hmpps-paged-list__header {
   margin-bottom: govuk-spacing(5);
-  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-bottom: 1px solid govuk-colour("black", $variant: "tint-80");
 }
 
 .hmpps-paged-list__footer {
