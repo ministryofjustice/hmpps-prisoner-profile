@@ -30,7 +30,7 @@
 
   .hmpps-mini-card__sub-text {
     margin-bottom: 10px;
-    color: govuk-colour('dark-grey');
+    color: govuk-colour("black", $variant: "tint-25");
   }
 
   .hmpps-mini-card__error {
@@ -44,7 +44,7 @@
     margin-top: auto;
     padding-top: 15px;
     margin-bottom: 15px;
-    border-top: 1px solid govuk-colour('light-grey');
+    border-top: 1px solid govuk-colour("black", $variant: "tint-95");
   }
 }
 
