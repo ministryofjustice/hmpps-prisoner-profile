@@ -1,11 +1,17 @@
-.hmpps-sidebar li {
-  @include govuk-responsive-margin(2, 'bottom');
-}
+.hmpps-sidebar {
+  li {
+    @include govuk-responsive-margin(2, 'bottom');
+  }
 
-.hmpps-sidebar li::before {
-  list-style-type: none;
-  content: "—";
-  @include govuk-responsive-margin(2, 'right');
+  li::before {
+    list-style-type: none;
+    content: "—";
+    @include govuk-responsive-margin(2, 'right');
+  }
+
+  @media (max-width: 640px) {
+    font-size: 16px;
+  }
 }
 
 .hmpps-sidebar-single-link {
