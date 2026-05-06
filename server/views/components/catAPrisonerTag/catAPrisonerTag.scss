@@ -5,7 +5,7 @@
   height: 26px;
   padding: 6px 20px 0 20px;
   color: govuk-colour("white");
-  background-color: govuk-colour("bright-purple");
+  background-color: govuk-colour("magenta", $variant: "shade-25");
   text-decoration: none;
   font-weight: 700;
   overflow-wrap: break-word;

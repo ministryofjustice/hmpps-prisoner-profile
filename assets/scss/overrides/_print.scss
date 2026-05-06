@@ -59,7 +59,7 @@
 
     &:link,
     &:visited {
-      color: $govuk-text-colour;
+      color: govuk-functional-colour(text);
     }
 
     // Remove url from links in printed view within a table

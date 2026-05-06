@@ -14,8 +14,8 @@
   height: 70px;
   max-width: 14em;
   padding: 0 15px;
-  background-color: govuk-colour('light-grey');
-  border-left: 6px solid govuk-colour('mid-grey');
+  background-color: govuk-functional-colour(template-background);;
+  border-left: 6px solid govuk-colour("black", $variant: "tint-80");
 
   p {
     @include govuk-font($size: 19, $weight: 'bold');
@@ -25,7 +25,7 @@
 
   p + p {
     @include govuk-font($size: 16);
-    color: govuk-colour('dark-grey');
+    color: govuk-colour("black", $variant: "tint-25");
   }
 
   &--error {
@@ -38,14 +38,14 @@
   }
 
   &--prominent {
-    background-color: govuk-tint(govuk-colour("blue"), 90%);
-    border-left-color: govuk-colour('light-blue');
+    background-color: govuk-colour("blue", $variant: "tint-95");
+    border-left-color: govuk-colour("blue", $variant: "tint-25");
 
     a, a:visited {
       color: #1c5791; // NB: custom colour for increased contrast
     }
     a:focus {
-      color: $govuk-text-colour;
+      color: govuk-functional-colour(text);
     }
   }
 }
