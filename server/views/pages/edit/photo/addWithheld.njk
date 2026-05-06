@@ -35,7 +35,7 @@
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
-        <p class="govuk-body govuk-!-margin-bottom-2">The new facial image will appear on this person’s profile. You cannot delete an image after you’ve saved it.</p>
+        <p>The new facial image will appear on this person’s profile. You cannot delete an image after you’ve saved it.</p>
         <div class="govuk-!-margin-bottom-4">
           <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}"/>
         </div>
