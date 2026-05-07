@@ -8,8 +8,11 @@
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% macro identifierOptionHtml(option) %}
   {% if option.mostRecentExistingValue %}
+    {% set warningHtml %}
+      This person already has the {{ option.description }} <span data-qa="most-recent-existing-value">{{ option.mostRecentExistingValue }}</span>. Check if this is correct before adding a new one.
+    {% endset %}
     {{ govukWarningText({
-      text: "This person already has the " + option.description + " " + option.mostRecentExistingValue + ". Check if this is correct before adding a new one.",
+      html: warningHtml,
       iconFallbackText: "Warning",
       attributes: { 'data-qa': 'existing-id-warning'}
     }) }}
@@ -22,7 +25,8 @@
     },
     value: option.value,
     errorMessage: errors | findError(option.id + "-value-input"),
-    classes: "govuk-!-width-one-third"
+    classes: "govuk-!-width-one-third",
+    attributes: { spellcheck: option.spellcheck }
   }) }}
   {{ govukCharacterCount({
     id: option.id + "-comments-input",

@@ -22,6 +22,7 @@ import {
   formatMoney,
   formatName,
   formatNamePart,
+  formatNino,
   formatPhoneNumber,
   formatPomName,
   formatScheduleItem,
@@ -1194,6 +1195,19 @@ describe('utils', () => {
       ['Non-numeric characters', 'abc123', 'abc123'],
     ])('%s: formatPhoneNumber(%s)', (_: string, input: string, expected: string) => {
       expect(formatPhoneNumber(input)).toEqual(expected)
+    })
+  })
+
+  describe('formatNino', () => {
+    it.each([
+      ['Valid NINO no spaces', 'QQ123456C', 'QQ123456C'],
+      ['Valid NINO with spaces', 'QQ 12 34 56 C', 'QQ 12 34 56 C'],
+      ['Valid NINO lowercase', 'qq123456c', 'QQ123456C'],
+      ['Invalid length', 'QQ123456', 'QQ123456'],
+      ['Empty string', '', ''],
+      ['Null input', null, null],
+    ])('%s: formatNino(%s)', (_: string, input: string, expected: string) => {
+      expect(formatNino(input)).toEqual(expected)
     })
   })
 

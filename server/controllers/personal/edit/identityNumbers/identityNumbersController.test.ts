@@ -18,6 +18,7 @@ import {
 import { OffenderIdentifierType } from '../../../../data/interfaces/prisonApi/OffenderIdentifierType'
 import { capitaliseFirstLetter } from '../../../../utils/utils'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
+import OffenderIdentifier from '../../../../data/interfaces/prisonApi/OffenderIdentifier'
 
 const { prisonerNumber } = PrisonerMockDataA
 
@@ -243,6 +244,68 @@ describe('IdentityNumbersController', () => {
       expect(errors[0].href).toEqual('#prisonLegacySystem-value-input')
     })
 
+    it('should detect duplicates with case differences', async () => {
+      req.body = {
+        nationalInsurance: {
+          selected: 'nationalInsurance',
+          value: 'Aa123456a',
+        },
+      }
+      req.errors = []
+      jest
+        .spyOn(identityNumbersService, 'getIdentityNumbers')
+        .mockResolvedValue([
+          { type: OffenderIdentifierType.NationalInsuranceNumber, value: 'AA123456A' } as OffenderIdentifier,
+        ])
+
+      await action()(req, res, next)
+
+      expect(req.errors.length).toEqual(1)
+      expect(req.errors[0].text).toEqual(
+        'This National Insurance number already exists. Enter a different National Insurance number',
+      )
+    })
+
+    it('should normalise inputs to uppercase before saving', async () => {
+      req.body = {
+        nationalInsurance: {
+          selected: 'nationalInsurance',
+          value: 'aa123456a',
+        },
+      }
+      req.errors = []
+      jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue([])
+
+      await action()(req, res, next)
+
+      expect(identityNumbersService.addIdentityNumbers).toHaveBeenCalledWith(
+        'CLIENT_TOKEN',
+        expect.anything(),
+        'G6123VU',
+        [{ type: OffenderIdentifierType.NationalInsuranceNumber, value: 'AA123456A', comments: undefined }],
+      )
+    })
+
+    it('should NOT normalise other inputs to uppercase before saving', async () => {
+      req.body = {
+        pnc: {
+          selected: 'pnc',
+          value: '12/345678a',
+        },
+      }
+      req.errors = []
+      jest.spyOn(identityNumbersService, 'getIdentityNumbers').mockResolvedValue([])
+
+      await action()(req, res, next)
+
+      expect(identityNumbersService.addIdentityNumbers).toHaveBeenCalledWith(
+        'CLIENT_TOKEN',
+        expect.anything(),
+        'G6123VU',
+        [{ type: OffenderIdentifierType.PncNumber, value: '12/345678a', comments: undefined }],
+      )
+    })
+
     it('should redirect to the add justice numbers page if an error is encountered', async () => {
       req.errors = [{ text: 'Some error' }]
 
@@ -284,6 +347,7 @@ describe('IdentityNumbersController', () => {
       jest.spyOn(identityNumbersService, 'getIdentityNumber').mockResolvedValue({
         ...GetIdentifierMock,
         type,
+        value: type === OffenderIdentifierType.NationalInsuranceNumber ? ' Aa123456a ' : GetIdentifierMock.value,
       })
     })
 
@@ -294,7 +358,11 @@ describe('IdentityNumbersController', () => {
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
         pageTitle: `${typeLabel} - Prisoner personal details`,
         title: `Change John Saunders’ ${typeLabel}`,
-        formValues: { value: '2017/0239598Q', type, comment: 'Some comment' },
+        formValues: {
+          value: type === OffenderIdentifierType.NationalInsuranceNumber ? ' Aa123456a ' : '2017/0239598Q',
+          type,
+          comment: 'Some comment',
+        },
         identifierType: type,
         errors: [],
         miniBannerData: {
@@ -302,7 +370,9 @@ describe('IdentityNumbersController', () => {
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
           prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          prisonerPermissions: undefined,
         },
+        spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
       })
     })
 
@@ -319,8 +389,9 @@ describe('IdentityNumbersController', () => {
     })
 
     it('should populate the page data from the request flash', async () => {
+      const flashValue = type === OffenderIdentifierType.NationalInsuranceNumber ? ' Aa123456a ' : '2002/0073319Z'
       const flashValues: EditIdentityNumberSubmission = {
-        value: '2002/0073319Z',
+        value: flashValue,
         comment: 'Flash comment',
         type,
       }
@@ -335,7 +406,10 @@ describe('IdentityNumbersController', () => {
       expect(res.render).toHaveBeenCalledWith('pages/identityNumbers/editIdentityNumber', {
         pageTitle: `${typeLabel} - Prisoner personal details`,
         title: `Change John Saunders’ ${typeLabel}`,
-        formValues: flashValues,
+        formValues: {
+          ...flashValues,
+          value: flashValue,
+        },
         identifierType: type,
         errors: [],
         miniBannerData: {
@@ -343,7 +417,9 @@ describe('IdentityNumbersController', () => {
           prisonerName: 'Saunders, John',
           cellLocation: '1-1-035',
           prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+          prisonerPermissions: undefined,
         },
+        spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
       })
     })
   })
@@ -401,6 +477,48 @@ describe('IdentityNumbersController', () => {
           fieldName: `'${editPageUrl}-row'`,
         })
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal#${successRedirectAnchor}`)
+      })
+
+      it('should normalise NINO to uppercase when editing', async () => {
+        if (type !== OffenderIdentifierType.NationalInsuranceNumber) return
+
+        req.body = {
+          value: 'aa123456a',
+          comment: 'Some updated comment',
+          type,
+        }
+
+        await controller.idNumber().submit(req, res, next)
+
+        expect(identityNumbersService.updateIdentityNumber).toHaveBeenCalledWith(
+          'CLIENT_TOKEN',
+          expect.anything(),
+          'G6123VU',
+          offenderId,
+          seqId,
+          { value: 'AA123456A', comments: 'Some updated comment' },
+        )
+      })
+
+      it('should NOT normalise other inputs to uppercase when editing', async () => {
+        if (type === OffenderIdentifierType.NationalInsuranceNumber) return
+
+        req.body = {
+          value: '12/345678a',
+          comment: 'Some updated comment',
+          type,
+        }
+
+        await controller.idNumber().submit(req, res, next)
+
+        expect(identityNumbersService.updateIdentityNumber).toHaveBeenCalledWith(
+          'CLIENT_TOKEN',
+          expect.anything(),
+          'G6123VU',
+          offenderId,
+          seqId,
+          { value: '12/345678a', comments: 'Some updated comment' },
+        )
       })
 
       it('should detect duplicates of existing ids and redirect to the edit identity number page ', async () => {

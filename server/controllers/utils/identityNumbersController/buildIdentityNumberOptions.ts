@@ -11,6 +11,7 @@ export interface AddIdentityNumberOption {
   hint?: string
   value?: string
   comment?: string
+  spellcheck?: string
 }
 
 export interface AddIdentityNumberSubmission {
@@ -39,6 +40,7 @@ export function buildIdentityNumberOptions(
       value: formValues?.[id]?.value || undefined,
       comment: formValues?.[id]?.comment || undefined,
       mostRecentExistingValue,
+      spellcheck: id === 'nationalInsurance' ? 'false' : undefined,
     }
   })
 }

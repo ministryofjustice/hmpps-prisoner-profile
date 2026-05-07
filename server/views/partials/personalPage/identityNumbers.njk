@@ -7,7 +7,7 @@
 
   <dd class="govuk-summary-list__value {{ rowClasses }}" data-qa="{{ id }}">
     <div>
-      <p class="govuk-body">{{ identityNumber.value }}</p>
+      <p class="govuk-body" data-qa="identity-number-value">{{ identityNumber.value }}</p>
       {% if identityNumber.comment %}
         <p class="govuk-body-s">
           <strong>Comment</strong>
