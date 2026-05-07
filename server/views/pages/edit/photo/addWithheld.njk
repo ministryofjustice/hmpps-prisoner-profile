@@ -1,14 +1,9 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% extends "partials/layout.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -21,11 +16,6 @@
         text: "Back",
         href: "/prisoner/" + prisonerNumber +"/image/new" | appendRefererToUrl(referer)
       }) }}
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% include '../../../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
     </div>
   </div>
   {% if errors.length > 0 %}
@@ -45,7 +35,7 @@
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="{{ "" | appendRefererToUrl(referer) }}">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
-        <p class="govuk-body govuk-!-margin-bottom-2">The new facial image will appear on this person’s profile. You cannot delete an image after you’ve saved it.</p>
+        <p>The new facial image will appear on this person’s profile. You cannot delete an image after you’ve saved it.</p>
         <div class="govuk-!-margin-bottom-4">
           <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}"/>
         </div>
