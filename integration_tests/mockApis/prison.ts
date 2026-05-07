@@ -94,6 +94,7 @@ import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/Pa
 import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
 import PrisonerSchedule, { TimeSlot } from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
 import { loadFileAsBase64, stubGetWithBody } from './utils'
+import { formatDateISO } from '../../server/utils/dateHelpers'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1427,7 +1428,7 @@ export default {
     })
   },
 
-  stubGetLatestArrivalDate: (resp?: never) => {
+  stubGetLatestArrivalDate: (resp: string | Date = '2000-01-01') => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1438,7 +1439,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: resp ?? '2000-01-01',
+        jsonBody: resp instanceof Date ? formatDateISO(resp) : resp,
       },
     })
   },

@@ -1,4 +1,4 @@
-import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import type { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 
 export const mockOsAddresses: OsAddress[] = [
   {

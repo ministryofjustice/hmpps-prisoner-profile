@@ -6,7 +6,7 @@
   gap: 20px;
 
   padding-bottom: 30px;
-  border-bottom: 1px solid govuk-colour('dark-grey');
+  border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
   margin-bottom: 30px;
 
   &__content {
@@ -22,7 +22,7 @@
   &__title {
     font-size: 24px;
     font-weight: bold;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-top: 5px;
     margin-bottom: 8px;
   }
@@ -37,7 +37,7 @@
   &__notes {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     margin-bottom: 20px;
     max-width: 670px;
     word-break: break-word;
@@ -58,7 +58,7 @@
 
     &:not(:last-of-type) {
       padding-bottom: 15px;
-      border-bottom: 1px dashed govuk-colour('mid-grey');
+      border-bottom: 1px dashed govuk-colour("black", $variant: "tint-80");
     }
   }
 
@@ -69,7 +69,7 @@
   &__metadata {
     font-size: 19px;
     font-weight: 300;
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
   }
 
   &__header + &__metadata {

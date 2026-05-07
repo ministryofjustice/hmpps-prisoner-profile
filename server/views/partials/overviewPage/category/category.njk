@@ -1,0 +1,5 @@
+{% if isGranted(PersonPrisonCategoryPermission.read, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(categorySummary | toCategoryMiniSummary(prisonerInCaseLoad, bookingId), 'mini-card--categories') }}
+  </div>
+{% endif %}

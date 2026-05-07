@@ -43,7 +43,6 @@ import { phoneNumberValidator } from '../../../validators/personal/phoneNumberVa
 import { populateEditPageData } from '../../../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
 import { personalPageBasePath } from '../personalRouter'
-import PersonalController from '../../../controllers/personal/personalController'
 import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
 import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
 import { parameterGuard } from '../../../middleware/parameterGuard'
@@ -53,16 +52,24 @@ export default function editRouter(services: Services): Router {
   const router = Router()
   const { prisonPermissionsService } = services
 
-  const { heightController, shoeSizeController } = personalEditControllerFactory(
-    services.personalPageService,
-    services.auditService,
-  )
-
-  const personalController = new PersonalController(
-    services.personalPageService,
-    services.careNeedsService,
-    services.auditService,
-  )
+  const {
+    cityOrTownOfBirthController,
+    countryOfBirthController,
+    dietAndFoodAllergiesController,
+    domesticStatusController,
+    eyeColourController,
+    globalEmailsController,
+    globalNumbersController,
+    heightController,
+    nationalityController,
+    numberOfChildrenController,
+    physicalCharacteristicsController,
+    religionController,
+    sexualOrientationController,
+    shoeSizeController,
+    smokerOrVaperController,
+    weightController,
+  } = personalEditControllerFactory(services.personalPageService, services.auditService)
 
   const commonMiddleware: RequestHandler[] = [getPrisonerData(services), populateEditPageData()]
 
@@ -190,11 +197,11 @@ export default function editRouter(services: Services): Router {
     path: 'weight',
     edit: {
       audit: Page.EditWeight,
-      method: personalController.weight().metric.edit,
+      method: weightController.weight().metric.edit,
     },
     submit: {
       audit: Page.PostEditWeight,
-      method: personalController.weight().metric.submit,
+      method: weightController.weight().metric.submit,
       validation: {
         validators: [weightMetricValidator],
         redirectBackOnError: true,
@@ -207,11 +214,11 @@ export default function editRouter(services: Services): Router {
     path: 'weight/imperial',
     edit: {
       audit: Page.EditWeight,
-      method: personalController.weight().imperial.edit,
+      method: weightController.weight().imperial.edit,
     },
     submit: {
       audit: Page.PostEditWeight,
-      method: personalController.weight().imperial.submit,
+      method: weightController.weight().imperial.submit,
       validation: {
         validators: [weightImperialValidator],
         redirectBackOnError: true,
@@ -241,11 +248,11 @@ export default function editRouter(services: Services): Router {
     path: 'hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
-      method: personalController.physicalCharacteristicRadioField(hairFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(hairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditHairTypeOrColour,
-      method: personalController.physicalCharacteristicRadioField(hairFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(hairFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -254,11 +261,11 @@ export default function editRouter(services: Services): Router {
     path: 'facial-hair',
     edit: {
       audit: Page.EditFacialHair,
-      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(facialHairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFacialHair,
-      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(facialHairFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -267,11 +274,11 @@ export default function editRouter(services: Services): Router {
     path: 'face-shape',
     edit: {
       audit: Page.EditFaceShape,
-      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFaceShape,
-      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -280,11 +287,11 @@ export default function editRouter(services: Services): Router {
     path: 'build',
     edit: {
       audit: Page.EditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(buildFieldData).edit,
     },
     submit: {
       audit: Page.PostEditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
+      method: physicalCharacteristicsController.physicalCharacteristicRadioField(buildFieldData).submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -293,11 +300,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColour().edit,
+      method: eyeColourController.eyeColour().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColour().submit,
+      method: eyeColourController.eyeColour().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -306,11 +313,11 @@ export default function editRouter(services: Services): Router {
     path: 'eye-colour-individual',
     edit: {
       audit: Page.EditEyeColour,
-      method: personalController.eyeColourIndividual().edit,
+      method: eyeColourController.eyeColourIndividual().edit,
     },
     submit: {
       audit: Page.PostEditEyeColour,
-      method: personalController.eyeColourIndividual().submit,
+      method: eyeColourController.eyeColourIndividual().submit,
     },
     requiredPermission: CorePersonRecordPermission.edit_physical_characteristics,
   })
@@ -319,11 +326,11 @@ export default function editRouter(services: Services): Router {
     path: 'smoker-or-vaper',
     edit: {
       audit: Page.EditSmokerOrVaper,
-      method: personalController.smokerOrVaper().edit,
+      method: smokerOrVaperController.smokerOrVaper().edit,
     },
     submit: {
       audit: Page.PostEditSmokerOrVaper,
-      method: personalController.smokerOrVaper().submit,
+      method: smokerOrVaperController.smokerOrVaper().submit,
     },
     requiredPermission: PersonHealthAndMedicationPermission.edit_smoker,
   })
@@ -332,11 +339,11 @@ export default function editRouter(services: Services): Router {
     path: 'diet-and-food-allergies',
     edit: {
       audit: Page.EditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().edit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().edit,
     },
     submit: {
       audit: Page.PostEditDietAndFoodAllergies,
-      method: personalController.dietAndFoodAllergies().submit,
+      method: dietAndFoodAllergiesController.dietAndFoodAllergies().submit,
       validation: {
         validators: [dietAndFoodAllergiesValidator],
         redirectBackOnError: true,
@@ -350,11 +357,11 @@ export default function editRouter(services: Services): Router {
     path: 'city-or-town-of-birth',
     edit: {
       audit: Page.EditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput().edit,
+      method: cityOrTownOfBirthController.cityOrTownOfBirth().edit,
     },
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput().submit,
+      method: cityOrTownOfBirthController.cityOrTownOfBirth().submit,
       validation: {
         validators: [
           textFieldLengthValidator({
@@ -373,11 +380,11 @@ export default function editRouter(services: Services): Router {
     path: 'country-of-birth',
     edit: {
       audit: Page.EditCountryOfBirth,
-      method: personalController.countryOfBirth().edit,
+      method: countryOfBirthController.countryOfBirth().edit,
     },
     submit: {
       audit: Page.PostEditCountryOfBirth,
-      method: personalController.countryOfBirth().submit,
+      method: countryOfBirthController.countryOfBirth().submit,
       validation: {
         validators: [countryOfBirthValidator],
         redirectBackOnError: true,
@@ -390,11 +397,11 @@ export default function editRouter(services: Services): Router {
     path: 'nationality',
     edit: {
       audit: Page.EditNationality,
-      method: personalController.nationality().edit,
+      method: nationalityController.nationality().edit,
     },
     submit: {
       audit: Page.PostEditNationality,
-      method: personalController.nationality().submit,
+      method: nationalityController.nationality().submit,
       validation: {
         validators: [nationalityValidator],
         redirectBackOnError: true,
@@ -407,11 +414,11 @@ export default function editRouter(services: Services): Router {
     path: 'religion',
     edit: {
       audit: Page.EditReligion,
-      method: personalController.religion().edit,
+      method: religionController.religion().edit,
     },
     submit: {
       audit: Page.PostEditReligion,
-      method: personalController.religion().submit,
+      method: religionController.religion().submit,
       validation: {
         validators: [religionValidator],
         redirectBackOnError: true,
@@ -425,11 +432,11 @@ export default function editRouter(services: Services): Router {
     path: 'sexual-orientation',
     edit: {
       audit: Page.EditSexualOrientation,
-      method: personalController.sexualOrientation().edit,
+      method: sexualOrientationController.sexualOrientation().edit,
     },
     submit: {
       audit: Page.PostEditSexualOrientation,
-      method: personalController.sexualOrientation().submit,
+      method: sexualOrientationController.sexualOrientation().submit,
     },
     requiredPermission: PersonProtectedCharacteristicsPermission.edit_sexual_orientation,
   })
@@ -438,11 +445,11 @@ export default function editRouter(services: Services): Router {
     path: 'children',
     edit: {
       audit: Page.EditNumberOfChildren,
-      method: personalController.numberOfChildren().edit,
+      method: numberOfChildrenController.numberOfChildren().edit,
     },
     submit: {
       audit: Page.PostEditNumberOfChildren,
-      method: personalController.numberOfChildren().submit,
+      method: numberOfChildrenController.numberOfChildren().submit,
       validation: {
         validators: [numberOfChildrenValidator],
         redirectBackOnError: true,
@@ -455,11 +462,11 @@ export default function editRouter(services: Services): Router {
     path: 'marital-status',
     edit: {
       audit: Page.EditDomesticStatus,
-      method: personalController.domesticStatus().edit,
+      method: domesticStatusController.domesticStatus().edit,
     },
     submit: {
       audit: Page.PostEditDomesticStatus,
-      method: personalController.domesticStatus().submit,
+      method: domesticStatusController.domesticStatus().submit,
     },
     requiredPermission: PersonalRelationshipsPermission.edit_domestic_status,
   })
@@ -468,11 +475,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-phone-number',
     edit: {
       audit: Page.AddPhoneNumber,
-      method: personalController.globalNumbers().add.edit,
+      method: globalNumbersController.globalNumbers().add.edit,
     },
     submit: {
       audit: Page.PostAddPhoneNumber,
-      method: personalController.globalNumbers().add.submit,
+      method: globalNumbersController.globalNumbers().add.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
@@ -485,11 +492,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-phone-number/:phoneNumberId',
     edit: {
       audit: Page.EditPhoneNumber,
-      method: personalController.globalNumbers().edit.edit,
+      method: globalNumbersController.globalNumbers().edit.edit,
     },
     submit: {
       audit: Page.PostEditPhoneNumber,
-      method: personalController.globalNumbers().edit.submit,
+      method: globalNumbersController.globalNumbers().edit.submit,
       validation: {
         validators: [phoneNumberValidator],
         redirectBackOnError: true,
@@ -503,11 +510,11 @@ export default function editRouter(services: Services): Router {
     path: 'add-email-address',
     edit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.edit,
+      method: globalEmailsController.globalEmails().add.edit,
     },
     submit: {
       audit: Page.AddEmailAddress,
-      method: personalController.globalEmails().add.submit,
+      method: globalEmailsController.globalEmails().add.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,
@@ -520,11 +527,11 @@ export default function editRouter(services: Services): Router {
     path: 'change-email-address/:emailAddressId',
     edit: {
       audit: Page.EditEmailAddress,
-      method: personalController.globalEmails().edit.edit,
+      method: globalEmailsController.globalEmails().edit.edit,
     },
     submit: {
       audit: Page.PostEditEmailAddress,
-      method: personalController.globalEmails().edit.submit,
+      method: globalEmailsController.globalEmails().edit.submit,
       validation: {
         validators: [emailValidator],
         redirectBackOnError: true,

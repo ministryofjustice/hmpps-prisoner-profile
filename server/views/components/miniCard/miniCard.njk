@@ -1,35 +1,110 @@
 {% from "components/warningIcon/warningIcon.njk" import warningIcon %}
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+
 {% macro miniCard(content, classes, errored) %}
-<div class="mini-card {{ 'mini-card__no-header' if not content.heading }} {{ classes }}">
-    {% if content.heading %}
-        <div class="mini-card__heading">
-            <h2>{{ content.heading }}</h2>
-        </div>
-    {% endif %}
-    <div class="mini-card__body card-body">
-        {% if errored %}
-            <p class="hmpps-api-error-inset" data-qa="incentives-unavailable">
-                {{ unavailableApiErrorText }}
-            </p>
-        {% endif %}
-        {% if content.label %}
-            <p class="mini-card__label">{{ content.label }}</p>
-        {% endif %}
-        {% for item in content.items %}
-            <div class="mini-card__item {{ item.classes }}">
-                {% if item.showWarningIcon %}
-                    {{ warningIcon('mini-card__warning-icon') }}
+    {% if content.id === 'incentives' or content.items and not (content.topContent !== undefined or content.bottomContentLine1 !== undefined) %}
+        <div class="mini-card {{ 'mini-card__no-header' if not content.heading }} {{ classes }}" id="{{ content.id }}" data-qa="{{ content.id or 'mini-card' }}">
+            {% if content.heading %}
+                <div class="mini-card__heading">
+                    <h2 class="govuk-heading-m">{{ content.heading }}</h2>
+                </div>
+            {% endif %}
+            <div class="mini-card__body card-body">
+                {% if errored %}
+                    <p class="hmpps-api-error-inset" data-qa="{{ content.id or 'mini-card' }}-unavailable">
+                        {{ unavailableApiErrorText }}
+                    </p>
                 {% endif %}
-                {{ item.text }}
+                {% if content.label %}
+                    <p class="mini-card__label">{{ content.label }}</p>
+                {% endif %}
+                {% for item in content.items %}
+                    <div class="mini-card__item {{ item.classes }}">
+                        {% if item.showWarningIcon %}
+                            {{ warningIcon('mini-card__warning-icon') }}
+                        {% endif %}
+                        {{ item.text }}
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
-    {% if content.linkHref %}
-        <div class="mini-card__link">
-            <a href="{{ content.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
-                {{ content.linkLabel }}
-            </a>
+            {% if content.linkHref %}
+                <div class="mini-card__link">
+                    <a href="{{ content.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+                        {{ content.linkLabel }}
+                    </a>
+                </div>
+            {% endif %}
         </div>
+    {% else %}
+        {%- call summaryCard({title: content.heading, classes: classes, id: content.id}) -%}
+            <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not content.heading }}" data-qa="{{ content.id or 'mini-card' }}">
+                <div class="govuk-grid-column-full">
+                    {% if errored %}
+                        <p class="hmpps-api-error-inset" data-qa="{{ content.id or 'mini-card' }}-unavailable">
+                            {{ unavailableApiErrorText }}
+                        </p>
+                    {% endif %}
+
+                    {% if caller %}
+                        {{ caller() }}
+                    {% else %}
+                        {% if content.topLabel or content.topContent !== undefined %}
+                            {% if content.topLabel %}
+                                <p class="govuk-body card-label" data-qa="{{ content.id or 'mini-card' }}-top-label">{{ content.topLabel }}</p>
+                            {% endif %}
+                            {% if content.topContent !== undefined %}
+                                <p class="govuk-body hmpps-mini-card__{{ content.topClass }} {{ 'hmpps-mini-card__filler' if content.topClass === 'small' and not content.bottomLabel }}" data-qa="{{ content.id or 'mini-card' }}-top-content">
+                                    {{ content.topContent if content.topContent !== undefined else '&nbsp;' | safe }}
+                                </p>
+                            {% endif %}
+                            {% if content.bottomLabel or content.bottomContentLine1 !== undefined or content.items %}
+                                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3" aria-hidden="true" />
+                            {% endif %}
+                        {% endif %}
+
+                        {% if content.label %}
+                            <p class="govuk-body card-label" data-qa="{{ content.id or 'mini-card' }}-label">{{ content.label }}</p>
+                        {% endif %}
+
+                        {% if content.bottomLabel or content.bottomContentLine1 !== undefined %}
+                            <p class="govuk-body card-label" data-qa="{{ content.id or 'mini-card' }}-bottom-label">{{ content.bottomLabel }}</p>
+                            <p class="govuk-body hmpps-mini-card__{{ content.bottomClass }}" data-qa="{{ content.id or 'mini-card' }}-bottom-content-1">
+                                {% if content.bottomContentLine1Href %}
+                                    <a href="{{ content.bottomContentLine1Href }}" class="govuk-link govuk-link--no-visited-state">
+                                        {{ content.bottomContentLine1 }}
+                                    </a>
+                                {% else %}
+                                    {{ content.bottomContentLine1 }}
+                                {% endif %}
+                            </p>
+                            {% if content.bottomContentLine2 !== undefined %}
+                                <p class="govuk-body hmpps-mini-card__{{ content.bottomClass }}" data-qa="{{ content.id or 'mini-card' }}-bottom-content-2">
+                                    {{ content.bottomContentLine2 }}
+                                </p>
+                            {% endif %}
+                            {% if content.bottomContentLine3 !== undefined %}
+                                <p class="govuk-body hmpps-mini-card__sub-text" data-qa="{{ content.id or 'mini-card' }}-bottom-content-3">
+                                    {{ content.bottomContentLine3 }}
+                                </p>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if content.bottomContentError !== undefined %}
+                            <p class="govuk-body hmpps-mini-card__error" data-qa="{{ content.id or 'mini-card' }}-error">
+                                {{ content.bottomContentError }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if content.linkHref %}
+                        <p class="govuk-body hmpps-mini-card__link" data-qa="{{ content.id or 'mini-card' }}-link">
+                            <a href="{{ content.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+                                {{ content.linkLabel }}
+                            </a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        {%- endcall -%}
     {% endif %}
-</div>
 {% endmacro %}

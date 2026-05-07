@@ -1,4 +1,4 @@
-import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 import {
   CaseNotesPermission,
   PathfinderPermission,
@@ -60,7 +60,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterSharedData,
+          { services: availableServices } as SharedData,
           permissions,
         )
 
@@ -88,7 +88,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterSharedData,
+          { services: availableServices } as SharedData,
           permissions,
         )
 
@@ -119,7 +119,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterSharedData,
+          { services: availableServices } as SharedData,
           permissions,
         )
         expect(
@@ -282,7 +282,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterSharedData,
+          { services: availableServices } as SharedData,
           permissions,
         )
         expect(
@@ -320,7 +320,7 @@ describe('buildOverviewActions', () => {
               manageAllocationsEnabled,
             },
           },
-          { services: availableServices } as HeaderFooterSharedData,
+          { services: availableServices } as SharedData,
           permissions,
         )
         expect(
@@ -367,7 +367,11 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices, caseLoads: prisonUserMock.caseLoads, allocationJobResponsibilities: [] },
+          {
+            services: availableServices,
+            caseLoads: prisonUserMock.caseLoads,
+            allocationJobResponsibilities: [],
+          } as SharedData,
           permissions,
         )
         expect(

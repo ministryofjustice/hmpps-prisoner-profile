@@ -1,0 +1,6 @@
+{% set showCsraHistoryLink = isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions) %}
+{% if isGranted(PrisonerSpecificRisksPermission.read_csra_rating, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(csraSummary | toCsraMiniSummary(showCsraHistoryLink, prisonerNumber), 'mini-card--csra') }}
+  </div>
+{% endif %}

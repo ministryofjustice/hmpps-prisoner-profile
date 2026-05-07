@@ -14,6 +14,7 @@ describe('nonAssociationSummaryToMiniSummary', () => {
     const miniSummary = nonAssociationSummaryToMiniSummary(Result.fulfilled(nonAssociationSummary), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Non-associations',
+      id: 'non-associations',
       topLabel: `In Moorland (HMP & YOI)`,
       topContent: 1,
       topClass: 'big',
@@ -33,6 +34,7 @@ describe('nonAssociationSummaryToMiniSummary', () => {
     const miniSummary = nonAssociationSummaryToMiniSummary(Result.rejected(error), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Non-associations',
+      id: 'non-associations',
       topLabel: `In establishment`,
       topContent: unavailablePlaceholder,
       topClass: 'small',

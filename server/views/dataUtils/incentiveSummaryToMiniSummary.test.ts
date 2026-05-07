@@ -31,6 +31,7 @@ describe('incentiveSummaryToMiniSummary', () => {
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [
         { text: 'Positive behaviours: 1' },
@@ -82,6 +83,7 @@ describe('incentiveSummaryToMiniSummary', () => {
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [
         { text: 'Positive behaviours: 1' },
@@ -115,6 +117,7 @@ describe('incentiveSummaryToMiniSummary', () => {
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [{ text: 'John Doe has no incentive level history' }],
       linkLabel: 'Incentive level details',
@@ -133,6 +136,7 @@ describe('incentiveSummaryToMiniSummary', () => {
     )
     expect(miniSummary).toEqual({
       heading: 'Incentives',
+      id: 'incentives',
       label: 'Since last review',
       items: [
         {

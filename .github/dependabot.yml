@@ -9,14 +9,10 @@ updates:
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
-      # TODO: remove once styles are adapted to work with breaking changes in v6
-      - dependency-name: "govuk-frontend"
-        versions:
-          - ">=6"
-      # TODO: remove once govuk-frontend is updated
-      - dependency-name: "@ministryofjustice/frontend"
-        versions:
-          - ">=9"
+    cooldown:
+      default-days: 7
+      exclude:
+        - "@ministryofjustice/*"
     schedule:
       interval: weekly
       day: wednesday
@@ -25,6 +21,18 @@ updates:
         dependency-type: "development"
 
   - package-ecosystem: github-actions
+    directory: /
+    cooldown:
+      default-days: 7
+      exclude:
+        - "ministryofjustice/*"
+    schedule:
+      interval: weekly
+      day: wednesday
+
+  - package-ecosystem: pre-commit
+    cooldown:
+      default-days: 7
     directory: /
     schedule:
       interval: weekly

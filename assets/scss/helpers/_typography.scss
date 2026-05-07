@@ -1,5 +1,5 @@
 .hmpps-secondary-text {
-  color: govuk-colour('dark-grey');
+  color: govuk-colour("black", $variant: "tint-25");
 }
 
 .hmpps-red-text {
@@ -11,7 +11,7 @@
 }
 
 .hmpps-dark-grey-font {
-  color: govuk-colour('dark-grey');
+  color: govuk-colour("black", $variant: "tint-25");
 }
 
 .hmpps-white-font {

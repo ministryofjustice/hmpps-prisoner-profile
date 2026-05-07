@@ -70,6 +70,11 @@ import { mockAddressResponseDto } from '../data/localMockData/personIntegrationA
 import AddressService from './addressService'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
+import {
+  foodAllergyCodesMock,
+  medicalDietCodesMock,
+  personalisedDietCodesMock,
+} from '../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -105,7 +110,26 @@ describe('PersonalPageService', () => {
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
-      getHealthAndMedication: jest.fn(async () => healthAndMedicationMock),
+      getHealthAndMedication: jest.fn(async () => {
+        const responseWithOtherComments = structuredClone(healthAndMedicationMock)
+        responseWithOtherComments.dietAndAllergy.foodAllergies.value = [
+          { value: foodAllergyCodesMock[0] },
+          { value: foodAllergyCodesMock[1], comment: 'Other food allergy' },
+        ]
+
+        responseWithOtherComments.dietAndAllergy.medicalDietaryRequirements.value = [
+          { value: medicalDietCodesMock[0] },
+          { value: medicalDietCodesMock[1], comment: 'Other medical dietary requirement' },
+        ]
+
+        responseWithOtherComments.dietAndAllergy.personalisedDietaryRequirements.value = [
+          { value: personalisedDietCodesMock[0] },
+          { value: personalisedDietCodesMock[1], comment: 'Other personalised dietary requirement' },
+        ]
+
+        return responseWithOtherComments
+      }),
+
       updateDietAndAllergyData: jest.fn(async () => dietAndAllergyMock),
       updateSmokerStatus: jest.fn(async () => {}),
     }
@@ -328,7 +352,10 @@ describe('PersonalPageService', () => {
     describe('Diet and food allergies', () => {
       describe('Food allergies', () => {
         it('Maps the food allergies field', async () => {
-          const expectedValue = [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg' }]
+          const expectedValue = [
+            { id: 'FOOD_ALLERGY_EGG', description: 'Egg' },
+            { id: 'FOOD_ALLERGY_OTHER', description: 'Other', comment: 'Other food allergy' },
+          ]
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
@@ -340,7 +367,10 @@ describe('PersonalPageService', () => {
 
       describe('Medical diet', () => {
         it('Maps the medical diet field', async () => {
-          const expectedValue = [{ id: 'MEDICAL_DIET_COELIAC', description: 'Coeliac' }]
+          const expectedValue = [
+            { id: 'MEDICAL_DIET_COELIAC', description: 'Coeliac' },
+            { id: 'MEDICAL_DIET_OTHER', description: 'Other', comment: 'Other medical dietary requirement' },
+          ]
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
@@ -352,7 +382,10 @@ describe('PersonalPageService', () => {
 
       describe('Personalised diet', () => {
         it('Maps the personalised diet field', async () => {
-          const expectedValue = [{ id: 'PERSONALISED_DIET_VEGAN', description: 'Vegan' }]
+          const expectedValue = [
+            { id: 'PERSONALISED_DIET_VEGAN', description: 'Vegan' },
+            { id: 'PERSONALISED_DIET_OTHER', description: 'Other', comment: 'Other personalised dietary requirement' },
+          ]
 
           const response = await constructService().get('token', PrisonerMockDataA, {
             editProfileEnabled: false,
@@ -947,12 +980,17 @@ describe('PersonalPageService', () => {
 
       expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
-      expect(dietAndAllergyData.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
+      expect(dietAndAllergyData.foodAllergies).toEqual([
+        { description: 'Egg', id: 'FOOD_ALLERGY_EGG' },
+        { comment: 'Other food allergy', description: 'Other', id: 'FOOD_ALLERGY_OTHER' },
+      ])
       expect(dietAndAllergyData.medicalDietaryRequirements).toEqual([
         { description: 'Coeliac', id: 'MEDICAL_DIET_COELIAC' },
+        { comment: 'Other medical dietary requirement', description: 'Other', id: 'MEDICAL_DIET_OTHER' },
       ])
       expect(dietAndAllergyData.personalisedDietaryRequirements).toEqual([
         { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
+        { comment: 'Other personalised dietary requirement', description: 'Other', id: 'PERSONALISED_DIET_OTHER' },
       ])
       expect(dietAndAllergyData.cateringInstructions).toEqual('Some catering instructions.')
       expect(dietAndAllergyData.lastModifiedAt).toEqual('2 July 2024')

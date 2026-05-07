@@ -404,8 +404,7 @@ export default class NextOfKinController {
         })
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#next-of-kin`)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_error) {
+      } catch {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(

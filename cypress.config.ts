@@ -1,6 +1,5 @@
-import path from 'node:path'
 import { defineConfig } from 'cypress'
-import webpackPreprocessor from '@cypress/webpack-batteries-included-preprocessor'
+import tasks from './integration_tests/support/tasks'
 import { resetStubs } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
@@ -36,20 +35,6 @@ import personalRelationshipsApi from './integration_tests/mockApis/personalRelat
 import supportForAdditionalNeedsApi from './integration_tests/mockApis/supportForAdditionalNeedsApi'
 import personApi from './integration_tests/mockApis/personApi'
 
-function preprocessorOptions() {
-  const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
-  const options = webpackPreprocessor.defaultOptions as typeof webpackPreprocessor.defaultOptions & {
-    typescript: string
-    webpackOptions: { resolve: { alias: Record<string, string> } }
-  }
-  options.typescript = require.resolve('typescript')
-  options.webpackOptions.resolve.alias = {
-    bunyan: path.join(replacementModulesPath, 'bunyan.ts'),
-    'bunyan-format': path.join(replacementModulesPath, 'bunyan-format.ts'),
-  }
-  return options
-}
-
 export default defineConfig({
   viewportWidth: 1152,
   chromeWebSecurity: false,
@@ -66,9 +51,9 @@ export default defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on) {
-      on('file:preprocessor', webpackPreprocessor(preprocessorOptions()))
       on('task', {
         reset: resetStubs,
+        ...tasks,
         ...auth,
         ...tokenVerification,
         ...dpsPages,

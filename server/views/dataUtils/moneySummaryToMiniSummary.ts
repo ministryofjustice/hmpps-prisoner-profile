@@ -1,10 +1,11 @@
 import { formatMoney } from '../../utils/utils'
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
 
-export default (moneySummary: AccountBalances, prisonerNumber: string): MiniSummaryData => {
+const mapper: MiniCardMapper<AccountBalances, [string]> = (moneySummary, prisonerNumber) => {
   return {
     heading: 'Money',
+    id: 'money',
     topLabel: 'Spends',
     topContent: formatMoney(moneySummary.spends),
     topClass: 'big',
@@ -15,3 +16,5 @@ export default (moneySummary: AccountBalances, prisonerNumber: string): MiniSumm
     linkHref: `/prisoner/${prisonerNumber}/money/spends`,
   }
 }
+
+export default mapper

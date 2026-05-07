@@ -1,0 +1,5 @@
+{% if visitsSummary and isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(visitsSummary | toVisitsMiniSummary(prisonerNumber)) }}
+  </div>
+{% endif %}

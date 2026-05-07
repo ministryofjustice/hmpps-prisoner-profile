@@ -4,9 +4,7 @@ import { mockAddresses } from '../../../server/data/localMockData/addresses'
 import Page from '../../pages/page'
 import PersonalPage from '../../pages/personalPage'
 import { permissionsTests } from '../permissionsTests'
-import { formatDate } from '../../../server/utils/dateHelpers'
 import NotFoundPage from '../../pages/notFoundPage'
-import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 import {
   CountryReferenceDataCodesMock,
@@ -169,11 +167,9 @@ context('When signed in', () => {
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
         page.personalDetails().cityOrTownOfBirth().should('have.text', 'La La Land')
         page.personalDetails().countryOfBirth().should('have.text', 'England')
-        const expectedAge = calculateAge('1990-10-12')
-        page
-          .personalDetails()
-          .dateOfBirth()
-          .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
+        cy.task('calculateAge', '1990-10-12').then(({ years, months }: { years: number; months: number }) => {
+          page.personalDetails().dateOfBirth().should('include.text', `${years} years, ${months} month`)
+        })
         page
           .personalDetails()
           .nationality()
@@ -320,8 +316,9 @@ context('When signed in', () => {
         secondContact.relationship().should('include.text', 'Friend')
         secondContact.phoneNumber().should('include.text', '+44 1234567890')
         secondContact.additionalDetails().click()
-        const secondContactAge = calculateAge('1980-01-01')
-        secondContact.dateOfBirth().should('include.text', `1 January 1980 (${secondContactAge.years} years old`)
+        cy.task('calculateAge', '1980-01-01').then(({ years }: { years: number; months: number }) => {
+          secondContact.dateOfBirth().should('include.text', `1 January 1980 (${years} years old`)
+        })
         secondContact.address().should('include.text', 'Not entered')
 
         const thirdContact = page.contacts().contact(2)
@@ -331,8 +328,9 @@ context('When signed in', () => {
         thirdContact.relationship().should('include.text', 'Brother')
         thirdContact.phoneNumber().should('include.text', '01234 567890')
         thirdContact.additionalDetails().click()
-        const thirdContactAge = calculateAge('1987-10-25')
-        thirdContact.dateOfBirth().should('include.text', `25 October 1987 (${thirdContactAge.years} years old`)
+        cy.task('calculateAge', '1987-10-25').then(({ years }: { years: number; months: number }) => {
+          thirdContact.dateOfBirth().should('include.text', `25 October 1987 (${years} years old`)
+        })
         thirdContact.address().should('include.text', '99 Acacia Avenue')
         thirdContact.address().should('include.text', 'Newcastle Upon Tyne')
         thirdContact.address().should('include.text', 'S13 4FH')
@@ -648,7 +646,12 @@ context('When signed in', () => {
   })
 
   context('X-ray details', () => {
+    let startOfYearFormattedDate: string
+
     beforeEach(() => {
+      cy.task<string>('formatDate', { date: startOfYear(new Date()), style: 'long' }).then(formattedDate => {
+        startOfYearFormattedDate = formattedDate
+      })
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupComponentsData()
@@ -662,11 +665,7 @@ context('When signed in', () => {
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
         page.security().xrays().total().should('include.text', '10')
-        page
-          .security()
-          .xrays()
-          .since()
-          .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
+        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
       })
     })
 
@@ -676,11 +675,7 @@ context('When signed in', () => {
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
         page.security().xrays().total().should('include.text', '116')
-        page
-          .security()
-          .xrays()
-          .since()
-          .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
+        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
         page.security().xrays().warningMessage().should('exist')
       })
     })

@@ -1,4 +1,4 @@
-import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 import {
   CaseNotesPermission,
   isGranted,
@@ -26,7 +26,7 @@ export default (
   socNominal: Nominal | null,
   user: HmppsUser,
   config: typeof conf,
-  feComponentsSharedData: HeaderFooterSharedData | undefined,
+  feComponentsSharedData: SharedData | undefined,
   permissions: PrisonerPermissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []

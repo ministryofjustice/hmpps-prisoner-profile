@@ -1,20 +1,20 @@
 import { formatDate } from '../../utils/dateHelpers'
 import config from '../../config'
 import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
-import { MiniCardData } from '../components/miniCard/miniCardData'
+import { MiniCardMapper } from '../components/miniCard/miniCardData'
 
-export default (
-  categorySummary: OverviewPageData['categorySummary'],
-  prisonerInCaseLoad: boolean,
-  bookingId: number,
-): MiniCardData => {
-  const { codeDescription, nextReviewDate, userCanManage } = categorySummary
-
+const mapper: MiniCardMapper<OverviewPageData['categorySummary'], [boolean, number]> = (
+  categorySummary,
+  prisonerInCaseLoad,
+  bookingId,
+) => {
+  const { codeDescription, nextReviewDate, userCanManage } = categorySummary || {}
   return {
+    id: 'category',
     heading: 'Category',
     items: [
       {
-        text: codeDescription,
+        text: codeDescription || 'Not entered',
         classes: 'hmpps-mini-card__big',
       },
       ...(nextReviewDate
@@ -34,3 +34,5 @@ export default (
       : {}),
   }
 }
+
+export default mapper

@@ -10,6 +10,7 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, true, prisonerNumber)
     expect(miniSummary).toEqual({
+      id: 'csra',
       heading: 'CSRA',
       items: [{ text: 'Standard' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'CSRA history',
@@ -25,6 +26,7 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, true, prisonerNumber)
     expect(miniSummary).toEqual({
+      id: 'csra',
       heading: 'CSRA',
       items: [{ text: 'Not entered' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'CSRA history',
@@ -40,6 +42,7 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, false, prisonerNumber)
     expect(miniSummary).toEqual({
+      id: 'csra',
       heading: 'CSRA',
       items: [{ text: 'Standard' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
     })
@@ -53,6 +56,7 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, false, prisonerNumber)
     expect(miniSummary).toEqual({
+      id: 'csra',
       heading: 'CSRA',
       items: [{ text: 'Not entered' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
     })

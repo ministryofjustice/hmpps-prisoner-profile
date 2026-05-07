@@ -11,6 +11,7 @@ describe('categorySummaryToMiniSummary', () => {
     const bookingId = 12345
     const miniSummary = categorySummaryToMiniSummary(categorySummary, true, bookingId)
     expect(miniSummary).toEqual({
+      id: 'category',
       heading: 'Category',
       items: [
         { text: 'CODE', classes: 'hmpps-mini-card__big' },
@@ -30,6 +31,7 @@ describe('categorySummaryToMiniSummary', () => {
     const bookingId = 12345
     const miniSummary = categorySummaryToMiniSummary(categorySummary, true, bookingId)
     expect(miniSummary).toEqual({
+      id: 'category',
       heading: 'Category',
       items: [
         { text: 'CODE', classes: 'hmpps-mini-card__big' },
@@ -49,11 +51,24 @@ describe('categorySummaryToMiniSummary', () => {
     const bookingId = 12345
     const miniSummary = categorySummaryToMiniSummary(categorySummary, false, bookingId)
     expect(miniSummary).toEqual({
+      id: 'category',
       heading: 'Category',
       items: [
         { text: 'CODE', classes: 'hmpps-mini-card__big' },
         { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' },
       ],
+    })
+  })
+
+  it('should return default values if categorySummary is null', () => {
+    const bookingId = 12345
+    const miniSummary = categorySummaryToMiniSummary(null, true, bookingId)
+    expect(miniSummary).toEqual({
+      id: 'category',
+      heading: 'Category',
+      items: [{ text: 'Not entered', classes: 'hmpps-mini-card__big' }],
+      linkHref: 'http://localhost:3001/12345',
+      linkLabel: 'Category',
     })
   })
 })

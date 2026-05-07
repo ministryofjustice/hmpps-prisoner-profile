@@ -1,5 +1,4 @@
 import { Role } from '../../../../server/data/enums/role'
-import { hasLength } from '../../../../server/utils/utils'
 import EditPage, { CheckboxValue, RadioValue } from '../../../pages/editPages/editPage'
 import NotFoundPage from '../../../pages/notFoundPage'
 import Page from '../../../pages/page'
@@ -141,7 +140,7 @@ export function editPageTests<TPage extends EditPage>(options: {
         })
       })
 
-      if (hasLength(invalidInputs)) {
+      if (invalidInputs?.length > 0) {
         context('It handles invalid responses', () => {
           invalidInputs.forEach(({ testDescription, input, errorMessages }) => {
             it(`Handles invalid input: ${testDescription}`, () => {

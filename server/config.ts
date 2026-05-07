@@ -32,7 +32,7 @@ const defaultCircuitBreakerOptions: CircuitBreaker.Options = {
   // circuit will stay closed regardless of failures if there is less than this many requests in the window
   volumeThreshold: Number(get('CIRCUIT_BREAKER_DEFAULT_VOLUME_THRESHOLD', 5)),
   // ignore 404s
-  errorFilter: (error: SanitisedError<unknown>) => error?.responseStatus === 404,
+  errorFilter: (error: SanitisedError) => error?.responseStatus === 404,
 }
 
 export default {
@@ -408,12 +408,19 @@ export default {
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
-    changeContactDetailsLinkEnabled: toBoolean(get('CHANGE_CONTACT_DETAILS_LINK_ENABLED', 'false')),
+
+    changeContactDetailsLink: {
+      enabledPrisons: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
+    hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
     dsn: get('SENTRY_DSN', null, requiredInProduction),
-    environment: get('SENTRY_ENVIRONMENT', 'local'),
+    environment: get('SENTRY_ENVIRONMENT', 'local', requiredInProduction),
   },
   readOnlyProfile: toBoolean(get('READ_ONLY_PROFILE', 'false')),
 }

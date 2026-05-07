@@ -18,7 +18,7 @@
 
 {% block pageTitle %}{{ 'Error: ' if errors.length > 0 }}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
-{% block header %}
+{% block govukHeader %}
   {{ feComponents.header | safe }}
 {% endblock %}
 
@@ -80,6 +80,6 @@
 
 {% endblock %}
 
-{% block footer %}
+{% block govukFooter %}
   {{ feComponents.footer | safe }}
 {% endblock %}
