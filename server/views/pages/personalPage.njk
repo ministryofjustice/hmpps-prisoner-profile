@@ -1,3 +1,4 @@
+{% from "../macros/sidebarNav.njk" import sidebarNav %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% extends "./index.njk" %}
 {%
@@ -13,116 +14,54 @@
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 
 {% block body %}
-  <div class="govuk-grid-row">
-    <div class="govuk-width-container">
-      <h1 class="govuk-heading-l govuk-!-margin-top-5">Personal</h1>
-    </div>
-    {% if pageHasApiErrors and useCustomErrorBanner %}
+  {% if pageHasApiErrors and useCustomErrorBanner %}
+    <div class="govuk-grid-row">
       <div class="hmpps-api-error-banner govuk-!-margin-3">
         <p>Sorry, there is a problem with the service</p>
         <p>Some information on this page may be unavailable. Try again later.</p>
       </div>
-    {% endif %}
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
-      <ul class="govuk-list hmpps-sidebar">
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#personal-details">Personal details</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
-        {% if showNeurodiversity %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
-        {% endif %}
-        {% if inUserCaseload %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
-        {% endif %}
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        {% if inUserCaseload and editEnabled %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#phones-and-emails">Phone and email</a></li>
-        {% endif %}
-        {% if inUserCaseload %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
-        {% endif %}
-        {% if showSecurity %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
-        {% endif %}
-        {% if inUserCaseload %}
-          <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
-        {% endif %}
-      </ul>
     </div>
-    <div class="govuk-grid-column-three-quarters hmpps-profile--personal-content hmpps-full-width-print {{ 'new-arrival' if newArrival72 }}">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/personalDetails.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/identityNumbers.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/careNeeds.njk" %}
-        </div>
-      </div>
-      {%- call conditionallyShow({condition: showNeurodiversity, id: 'neurodiversity'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/neurodiversity.njk" %}
+  {% endif %}
+
+  {% set sections = [
+    { text: "Personal details", href: "#personal-details", template: "../partials/personalPage/personalDetails.njk" },
+    { text: "Identity numbers", href: "#identity-numbers", template: "../partials/personalPage/identityNumbers.njk" },
+    { text: "Care needs", href: "#care-needs", template: "../partials/personalPage/careNeeds.njk" },
+    { text: "Neurodiversity", href: "#neurodiversity", template: "../partials/personalPage/neurodiversity.njk", condition: showNeurodiversity },
+    { text: "Appearance", href: "#appearance", template: "../partials/personalPage/appearance.njk", condition: inUserCaseload },
+    { text: "Addresses", href: "#addresses", template: "../partials/personalPage/addresses.njk" if displayNewAddressesCard else "../partials/personalPage/oldAddresses.njk" },
+    { text: "Phone and email", href: "#phones-and-emails", template: "../partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
+    { text: "Next of kin", href: "#next-of-kin", template: "../partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "../partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
+    { text: "Security", href: "#security", template: "../partials/personalPage/security.njk", condition: showSecurity },
+    { text: "Property", href: "#property", template: "../partials/personalPage/property.njk", condition: inUserCaseload }
+  ] %}
+
+  {% set sidebar %}
+    {{ sidebarNav(sections) }}
+  {% endset %}
+
+  {% set content %}
+    <div class="hmpps-profile--personal-content hmpps-full-width-print {{ 'new-arrival' if newArrival72 }}">
+      {% for section in sections %}
+        {% set sectionHtml %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+              {% include section.template %}
+            </div>
           </div>
-        </div>
-      {%- endcall -%}
-      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'appearance'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/appearance.njk" %}
-          </div>
-        </div>
-      {%- endcall -%}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% if displayNewAddressesCard %}
-            {% include "../partials/personalPage/addresses.njk" %}
-          {% else %}
-            {% include "../partials/personalPage/oldAddresses.njk" %}
-          {% endif %}
-        </div>
-      </div>
-      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) and editEnabled, id: 'global-numbers-and-email-addresses'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/globalNumbersAndEmailAddresses.njk" %}
-          </div>
-        </div>
-      {%- endcall -%}
-      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% if personalRelationshipsApiReadEnabled %}
-              {% include "../partials/personalPage/nextOfKin.njk" %}
-            {% else %}
-              {% include "../partials/personalPage/oldNextOfKin.njk" %}
-            {% endif %}
-          </div>
-        </div>
-      {%- endcall -%}
-      {%- call conditionallyShow({condition: showSecurity, id: 'security'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/security.njk" %}
-          </div>
-        </div>
-      {%- endcall -%}
-      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'property'}) -%}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            {% include "../partials/personalPage/property.njk" %}
-          </div>
-        </div>
-      {%- endcall -%}
+        {% endset %}
+
+        {% if section.condition != null %}
+          {%- call conditionallyShow({condition: section.condition, id: section.id or section.href | replace('#', '')}) -%}
+            {{ sectionHtml | safe }}
+          {%- endcall -%}
+        {% else %}
+          {{ sectionHtml | safe }}
+        {% endif %}
+      {% endfor %}
     </div>
-  </div>
-  {% include "partials/backToTop.njk" %}
+  {% endset %}
+
+  {% set heading = "Personal" %}
+  {% include "../partials/sidebarPageLayout.njk" %}
 {% endblock %}
