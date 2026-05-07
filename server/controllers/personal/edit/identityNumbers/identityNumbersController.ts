@@ -123,7 +123,7 @@ export default class IdentityNumbersController {
           identifierType: type,
           errors,
           miniBannerData,
-          spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
+          spellcheck: 'false',
         })
       },
       submit: async (req: Request, res: Response) => {

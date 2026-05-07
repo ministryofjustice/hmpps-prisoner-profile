@@ -38,7 +38,8 @@
     maxlength: 240,
     rows: 3,
     errorMessage: errors | findError(option.id + "-comments-input"),
-    classes: "govuk-!-width-three-quarters"
+    classes: "govuk-!-width-three-quarters",
+    attributes: { spellcheck: option.spellcheck }
   }) }}
 {% endmacro %}
 {% set selectItems = [] %}

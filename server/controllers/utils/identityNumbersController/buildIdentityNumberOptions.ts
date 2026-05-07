@@ -40,7 +40,7 @@ export function buildIdentityNumberOptions(
       value: formValues?.[id]?.value || undefined,
       comment: formValues?.[id]?.comment || undefined,
       mostRecentExistingValue,
-      spellcheck: id === 'nationalInsurance' ? 'false' : undefined,
+      spellcheck: 'false',
     }
   })
 }

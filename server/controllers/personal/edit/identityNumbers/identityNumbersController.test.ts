@@ -160,6 +160,7 @@ describe('IdentityNumbersController', () => {
         mostRecentExistingValue: expect.any(String),
         value: '1234',
         comment: 'Some comment',
+        spellcheck: 'false',
       })
     })
   })
@@ -372,7 +373,7 @@ describe('IdentityNumbersController', () => {
           prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
           prisonerPermissions: undefined,
         },
-        spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
+        spellcheck: 'false',
       })
     })
 
@@ -419,7 +420,7 @@ describe('IdentityNumbersController', () => {
           prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
           prisonerPermissions: undefined,
         },
-        spellcheck: type === OffenderIdentifierType.NationalInsuranceNumber ? 'false' : undefined,
+        spellcheck: 'false',
       })
     })
   })
