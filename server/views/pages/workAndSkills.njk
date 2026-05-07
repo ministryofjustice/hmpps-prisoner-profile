@@ -1,3 +1,4 @@
+{% from "../macros/sidebarNav.njk" import sidebarNav %}
 {% extends "./index.njk" %}
 {% set breadCrumbs = [
   {
@@ -6,51 +7,46 @@
   }
 ] %}
 {% block body %}
-
   {% set prisonNamesById = prisonNamesById.value if prisonNamesById.isFulfilled() else {} %}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-      <h1 class="govuk-heading-l govuk-!-margin-top-5">Work and skills</h1>
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
-      <ul class="govuk-list hmpps-sidebar">
-        <li><a class="govuk-link" href="#functional-skills-level">Functional skills</a></li>
-        <li><a class="govuk-link" href="#courses-and-qualifications">Courses and qualifications</a></li>
-        <li><a class="govuk-link" href="#work-and-activities">Work and activities</a></li>
-        <li><a class="govuk-link" href="#goals">Goals</a></li>
-        <li><a class="govuk-link" href="#employability-skills">Employability skills</a></li>
-      </ul>
-    </div>
-    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-      <div class="govuk-grid-row" data-qa="courses-and-qualifications">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/functionalSkills/index.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/inPrisonCoursesAndQualifications/index.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/workAndActivities.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/goals/index.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/employabilitySkills.njk" %}
-        </div>
+  {% set sidebar %}
+    {{ sidebarNav([
+      { text: "Functional skills", href: "#functional-skills-level" },
+      { text: "Courses and qualifications", href: "#courses-and-qualifications" },
+      { text: "Work and activities", href: "#work-and-activities" },
+      { text: "Goals", href: "#goals" },
+      { text: "Employability skills", href: "#employability-skills" }
+    ]) }}
+  {% endset %}
+
+  {% set content %}
+    <div class="govuk-grid-row" data-qa="courses-and-qualifications">
+      <div class="govuk-grid-column-full">
+        {% include "../partials/workAndSkillsPage/functionalSkills/index.njk" %}
       </div>
     </div>
-  </div>
-  {% include "partials/backToTop.njk" %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% include "../partials/workAndSkillsPage/inPrisonCoursesAndQualifications/index.njk" %}
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% include "../partials/workAndSkillsPage/workAndActivities.njk" %}
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% include "../partials/workAndSkillsPage/goals/index.njk" %}
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% include "../partials/workAndSkillsPage/employabilitySkills.njk" %}
+      </div>
+    </div>
+  {% endset %}
+
+  {% set heading = "Work and skills" %}
+  {% include "../partials/sidebarPageLayout.njk" %}
 {% endblock %}
