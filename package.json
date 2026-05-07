@@ -119,7 +119,7 @@
     "jsonwebtoken": "^9.0.3",
     "lint-staged": "^16.4.0",
     "mocha-junit-reporter": "^2.2.1",
-    "nock": "15.0.0",
+    "nock": "14.0.13",
     "prettier": "^3.8.3",
     "prettier-plugin-jinja-template": "^2.1.0",
     "supertest": "^7.2.2",
