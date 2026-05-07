@@ -17,7 +17,8 @@
       },
       value: formValues.value,
       errorMessage: errors | findError('identifier-value-input'),
-      classes: "govuk-!-width-one-third"
+      classes: "govuk-!-width-one-third",
+      attributes: { spellcheck: spellcheck }
     }) }}
     {{ govukCharacterCount({
       id: "identifier-comments-input",
@@ -30,7 +31,8 @@
       maxlength: 240,
       rows: 3,
       errorMessage: errors | findError("identifier-comments-input"),
-      classes: "govuk-!-width-three-quarters"
+      classes: "govuk-!-width-three-quarters",
+      attributes: { spellcheck: spellcheck }
     }) }}
     <div class="govuk-button-group">
       {{ govukButton({

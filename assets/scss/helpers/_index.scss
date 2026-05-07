@@ -53,9 +53,9 @@
 }
 
 .hmpps-grey-details-card {
-  border-left: 5px solid govuk-colour('mid-grey');
+  border-left: 5px solid govuk-colour("black", $variant: "tint-80");
   margin: 0;
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-functional-colour(template-background);;
 }
 
 @include govuk-media-query($from: tablet) {

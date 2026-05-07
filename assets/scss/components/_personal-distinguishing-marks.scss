@@ -11,7 +11,7 @@
   dl {
     margin: 0;
     &:not(:last-of-type) {
-      border-bottom: 1px solid $govuk-canvas-background-colour;
+      border-bottom: 1px solid govuk-functional-colour(template-background);
       margin-bottom: govuk-spacing(3);
     }
   }
@@ -54,7 +54,7 @@
 
         &:not(:last-of-type) {
           padding-bottom: govuk-spacing(2);
-          border-bottom: 1px solid $govuk-canvas-background-colour;
+          border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
         }
       }
 
@@ -65,7 +65,7 @@
         &:not(:last-of-type) {
           padding-bottom: govuk-spacing(3);
           margin-bottom: govuk-spacing(3);
-          border-bottom: 1px solid $govuk-canvas-background-colour;
+          border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
         }
 
         dl {

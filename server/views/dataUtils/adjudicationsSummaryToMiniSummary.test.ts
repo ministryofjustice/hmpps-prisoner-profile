@@ -13,6 +13,7 @@ describe('adjudicationsSummaryToMiniSummary', () => {
     const miniSummary = adjudicationsSummaryToMiniSummary(Result.fulfilled(adjudicationsSummary), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Adjudications',
+      id: 'adjudications',
       topLabel: 'Proven in last 3 months',
       topContent: 1,
       topClass: 'big',
@@ -34,6 +35,7 @@ describe('adjudicationsSummaryToMiniSummary', () => {
     const miniSummary = adjudicationsSummaryToMiniSummary(Result.fulfilled(adjudicationsSummary), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Adjudications',
+      id: 'adjudications',
       topLabel: 'Proven in last 3 months',
       topContent: 1,
       topClass: 'big',
@@ -55,6 +57,7 @@ describe('adjudicationsSummaryToMiniSummary', () => {
     const miniSummary = adjudicationsSummaryToMiniSummary(Result.rejected(error), prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Adjudications',
+      id: 'adjudications',
       topLabel: 'Proven in last 3 months',
       topContent: unavailablePlaceholder,
       topClass: 'small',

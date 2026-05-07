@@ -1,5 +1,5 @@
 .hmpps-actions-block {
-  border: 1px solid govuk-colour('dark-grey');
+  border: 1px solid govuk-colour("black", $variant: "tint-25");
 
   h2 {
     padding: 15px;
@@ -26,7 +26,7 @@
       align-self: flex-start;
       margin-right: 15px;
 
-      @media (max-width: 1000px) {
+      @include govuk-media-query($until: tablet) {
         display: none;
       }
     }
@@ -34,7 +34,7 @@
     a {
       font-weight: 700;
 
-      @media (max-width: 1000px) {
+      @include govuk-media-query($until: tablet) {
         font-size: 16px;
       }
     }

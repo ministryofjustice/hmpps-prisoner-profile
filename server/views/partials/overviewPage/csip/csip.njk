@@ -1,0 +1,5 @@
+{% if isGranted(PersonInterventionsPermission.read_csip, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(currentCsipDetail | toCsipMiniSummary(prisonerNumber), 'mini-card--csip') }}
+  </div>
+{% endif %}

@@ -5,6 +5,7 @@ import { EditIdentityNumberSubmission } from '../../controllers/personal/edit/id
 import { OffenderIdentifierType } from '../../data/interfaces/prisonApi/OffenderIdentifierType'
 import { pncFormatValidator } from './identity-numbers/pncFormatValidator'
 import { croFormatValidator } from './identity-numbers/croFormatValidator'
+import ninoFormatValidator from './identity-numbers/ninoFormatValidator'
 
 const MAX_LENGTH = 20
 const MAX_COMMENT_LENGTH = 240
@@ -29,7 +30,17 @@ export const addIdentityNumbersValidator = (body: Record<string, AddIdentityNumb
         validatePnc(value.value, '#pnc-value-input', errors)
       }
 
-      if (key !== 'cro' && key !== 'pnc' && value.value && value.value.length > MAX_LENGTH) {
+      if (key === 'nationalInsurance') {
+        validateNino(value.value, '#nationalInsurance-value-input', errors)
+      }
+
+      if (
+        key !== 'cro' &&
+        key !== 'pnc' &&
+        key !== 'nationalInsurance' &&
+        value.value &&
+        value.value.length > MAX_LENGTH
+      ) {
         errors.push({
           text: `Enter the ${IdentifierMappings[key]?.description ?? 'ID number'} using ${MAX_LENGTH} characters or less`,
           href: `#${key}-value-input`,
@@ -64,10 +75,14 @@ export const editIdentityNumberValidator = (body: EditIdentityNumberSubmission) 
   if (body.type === OffenderIdentifierType.PncNumber) {
     validatePnc(body.value, '#identifier-value-input', errors)
   }
+  if (body.type === OffenderIdentifierType.NationalInsuranceNumber) {
+    validateNino(body.value, '#identifier-value-input', errors)
+  }
 
   if (
     body.type !== OffenderIdentifierType.CroNumber &&
     body.type !== OffenderIdentifierType.PncNumber &&
+    body.type !== OffenderIdentifierType.NationalInsuranceNumber &&
     body.value &&
     body.value.length > MAX_LENGTH
   ) {
@@ -98,4 +113,12 @@ const validateCro = (input: string, href: string, errors: HmppsError[]) => {
   }
 
   errors.push(...croFormatValidator(input, href))
+}
+
+const validateNino = (input: string, href: string, errors: HmppsError[]) => {
+  if (!input) {
+    return
+  }
+
+  errors.push(...ninoFormatValidator(input, href))
 }

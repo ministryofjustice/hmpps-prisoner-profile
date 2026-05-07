@@ -25,6 +25,7 @@ describe('buildIdentityNumberOptions', () => {
         label: 'First identifier',
         description: 'first identifier',
         selected: false,
+        spellcheck: 'false',
       },
       {
         id: 'two',
@@ -32,6 +33,7 @@ describe('buildIdentityNumberOptions', () => {
         description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
+        spellcheck: 'false',
       },
     ]
 
@@ -63,6 +65,7 @@ describe('buildIdentityNumberOptions', () => {
         description: 'first identifier',
         selected: false,
         mostRecentExistingValue: '123',
+        spellcheck: 'false',
       },
       {
         id: 'two',
@@ -70,6 +73,7 @@ describe('buildIdentityNumberOptions', () => {
         description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
+        spellcheck: 'false',
       },
     ]
 
@@ -98,6 +102,7 @@ describe('buildIdentityNumberOptions', () => {
         selected: true,
         value: '123',
         comment: 'Comment one',
+        spellcheck: 'false',
       },
       {
         id: 'two',
@@ -105,6 +110,7 @@ describe('buildIdentityNumberOptions', () => {
         description: 'second identifier',
         hint: 'Also contains letters',
         selected: false,
+        spellcheck: 'false',
       },
     ]
 

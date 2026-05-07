@@ -180,6 +180,28 @@ describe('AddIdentityNumbersValidator', () => {
     })
   })
 
+  describe('National Insurance validation', () => {
+    it.each([
+      [' Aa123456a ', true],
+      ['-Aa123456a-', false],
+      ['INVALID', false],
+    ])('%s', (nino, isValid) => {
+      const request = {
+        nationalInsurance: { selected: 'nationalInsurance', value: nino },
+      }
+
+      const errors = addIdentityNumbersValidator(request)
+
+      if (isValid) {
+        expect(errors.length).toEqual(0)
+      } else {
+        expect(errors.length).toEqual(1)
+        expect(errors[0].text).toEqual('Enter a valid National Insurance number in the correct format')
+        expect(errors[0].href).toEqual(`#nationalInsurance-value-input`)
+      }
+    })
+  })
+
   it('Does not validate unselected data', () => {
     const request = {
       pnc: { selected: 'pnc', value: 'BADVALUE' },
@@ -330,6 +352,29 @@ describe('EditIdentityNumberValidator', () => {
         expect(errors[0].text).toEqual(
           'Enter a CRO number in the correct format, exactly as it appears on the document',
         )
+        expect(errors[0].href).toEqual(`#identifier-value-input`)
+      }
+    })
+  })
+
+  describe('National Insurance validation', () => {
+    it.each([
+      [' Aa123456a ', true],
+      ['-Aa123456a-', false],
+      ['INVALID', false],
+    ])('%s', (nino, isValid) => {
+      const request = {
+        value: nino,
+        type: OffenderIdentifierType.NationalInsuranceNumber,
+      }
+
+      const errors = editIdentityNumberValidator(request)
+
+      if (isValid) {
+        expect(errors.length).toEqual(0)
+      } else {
+        expect(errors.length).toEqual(1)
+        expect(errors[0].text).toEqual('Enter a valid National Insurance number in the correct format')
         expect(errors[0].href).toEqual(`#identifier-value-input`)
       }
     })

@@ -1,0 +1,11 @@
+{% macro sidebarNav(links) %}
+  <ul class="govuk-list hmpps-sidebar">
+    {% for link in links %}
+      {% if link.condition == null or link.condition %}
+        <li>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ link.href }}">{{ link.text }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}

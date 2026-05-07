@@ -1,162 +1,134 @@
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "components/miniCard/miniCard.njk" import miniCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{%- call summaryCard({title: "Staff contacts"}) -%}
 
-    <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
-        <div class="govuk-grid-column-full">
+{% set staffContactsMissing = false %}
 
-            {% set staffContactsMissing = false %}
+{% if staffContacts.allocationPolicies.status === 'fulfilled' %}
+  {% set keyWorkerEnabled = staffContacts.allocationPolicies.value.keyWorkerEnabled %}
+  {% set personalOfficerEnabled = staffContacts.allocationPolicies.value.personalOfficerEnabled %}
+{% else %}
+  {% set keyWorkerEnabled = true %}
+  {% set personalOfficerEnabled = true %}
+  {% set staffContactsMissing = true %}
+{% endif %}
 
-            {% set keyWorkerHtml %}
-                <p class="govuk-body" data-qa="keyworker-details">
-                    {% if staffContacts.keyWorker.status === 'fulfilled' %}
-                        {% set keyWorker = staffContacts.keyWorker.value %}
-                        {{ keyWorker.name }}
-                        {% if(keyWorker.lastSession) %}
-                            - last session: {{ keyWorker.lastSession  }}
-                        {% else %}
-                            - No previous session
-                        {% endif %}
-                    {% else %}
-                        {{ unavailablePlaceholderText }}
-                        {% set staffContactsMissing = true %}
-                    {% endif %}
-                </p>
-            {% endset %}
+{% if staffContacts.keyWorker.status === 'fulfilled' %}
+  {% set keyWorker = staffContacts.keyWorker.value %}
+{% else %}
+  {% set keyWorker = unavailablePlaceholderText %}
+  {% set staffContactsMissing = true %}
+{% endif %}
 
-          {% if staffContacts.allocationPolicies.status === 'fulfilled' %}
-            {% set keyWorkerEnabled = staffContacts.allocationPolicies.value.keyWorkerEnabled %}
-            {% set personalOfficerEnabled = staffContacts.allocationPolicies.value.personalOfficerEnabled %}
-          {% else %}
-            {% set keyWorkerEnabled = true %}
-            {% set personalOfficerEnabled = true %}
-            {% set staffContactsMissing = true %}
-          {% endif %}
+{% if staffContacts.personalOfficer.status === 'fulfilled' %}
+  {% set personalOfficer = staffContacts.personalOfficer.value %}
+{% else %}
+  {% set personalOfficer = unavailablePlaceholderText %}
+  {% set staffContactsMissing = true %}
+{% endif %}
 
-          {% if staffContacts.keyWorker.status === 'fulfilled' %}
-            {% set keyWorker = staffContacts.keyWorker.value %}
-          {% else %}
-            {% set keyWorker = unavailablePlaceholderText %}
-            {% set staffContactsMissing = true %}
-          {% endif %}
+{% if staffContacts.lastSession.status === 'fulfilled' %}
+  {% set lastSession = staffContacts.lastSession.value %}
+{% else %}
+  {% set lastSession = unavailablePlaceholderText %}
+  {% set staffContactsMissing = true %}
+{% endif %}
 
-          {% if staffContacts.personalOfficer.status === 'fulfilled' %}
-            {% set personalOfficer = staffContacts.personalOfficer.value %}
-          {% else %}
-            {% set personalOfficer = unavailablePlaceholderText %}
-            {% set staffContactsMissing = true %}
-          {% endif %}
+{% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
+    {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
+{% else %}
+    {% set communityOffenderManager = unavailablePlaceholderText %}
+    {% set staffContactsMissing = true %}
+{% endif %}
 
-          {% if staffContacts.lastSession.status === 'fulfilled' %}
-            {% set lastSession = staffContacts.lastSession.value %}
-          {% else %}
-            {% set lastSession = unavailablePlaceholderText %}
-            {% set staffContactsMissing = true %}
-          {% endif %}
+{% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
+    {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
+{% else %}
+    {% set prisonOffenderManager = unavailablePlaceholderText %}
+    {% set staffContactsMissing = true %}
+{% endif %}
 
-          {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
-                {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
-            {% else %}
-                {% set communityOffenderManager = unavailablePlaceholderText %}
-                {% set staffContactsMissing = true %}
-            {% endif %}
+{% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
+    {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
+{% else %}
+    {% set coworkingPrisonOffenderManager = unavailablePlaceholderText %}
+    {% set staffContactsMissing = true %}
+{% endif %}
 
-            {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
-                {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
-            {% else %}
-                {% set prisonOffenderManager = unavailablePlaceholderText %}
-                {% set staffContactsMissing = true %}
-            {% endif %}
+{% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}
 
-            {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
-                {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
-            {% else %}
-                {% set coworkingPrisonOffenderManager = unavailablePlaceholderText %}
-                {% set staffContactsMissing = true %}
-            {% endif %}
+{%- call miniCard({
+    heading: "Staff contacts",
+    id: "staff-contacts",
+    linkHref: "/prisoner/" + prisonerNumber + "/professional-contacts" if not staffContactsMissing,
+    linkLabel: "Professional contacts"
+}, "staff-contacts-card", staffContactsMissing) -%}
 
-            {% set resettlementWorker = staffContacts.resettlementWorker or 'Not assigned' %}
-
-            {% if staffContactsMissing %}
-                <p class="hmpps-api-error-inset" data-qa="staff-contacts-unavailable">
-                    {{ unavailableApiErrorText }}
-                </p>
-            {% endif %}
-
-            {{ govukSummaryList({
-                classes: 'govuk-summary-list--no-border',
-                rows: [
-                    {
-                        key: {
-                            text: "Key worker"
-                        },
-                        value: {
-                          text: keyWorker
-                        }
-                    } if keyWorkerEnabled else null,
-                    {
-                        key: {
-                            text: "Personal officer"
-                        },
-                        value: {
-                            text: personalOfficer
-                        }
-                    } if personalOfficerEnabled else null,
-                    {
-                        key: {
-                            text: "Last key worker or personal officer session" if keyWorkerEnabled and personalOfficerEnabled else ("Last key worker session" if keyWorkerEnabled else "Last personal officer session")
-                        },
-                        value: {
-                            text: lastSession
-                        }
-                    } if keyWorkerEnabled or personalOfficerEnabled else null,
-                    {
-                        key: {
-                            text: "Prison offender manager"
-                        },
-                        value: {
-                            text: prisonOffenderManager,
-                            attributes: {
-                                "data-qa": "primary-pom-name"
-                            }
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Co-working prison offender manager"
-                        },
-                        value: {
-                            text: coworkingPrisonOffenderManager,
-                            attributes: {
-                                "data-qa": "secondary-pom-name"
-                            }
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Community offender manager"
-                        },
-                        value: {
-                            text: communityOffenderManager
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Resettlement worker"
-                        },
-                        value: {
-                            text: resettlementWorker
-                        }
+    {{ govukSummaryList({
+        classes: 'govuk-summary-list--no-border',
+        rows: [
+            {
+                key: {
+                    text: "Key worker"
+                },
+                value: {
+                  text: keyWorker
+                }
+            } if keyWorkerEnabled else null,
+            {
+                key: {
+                    text: "Personal officer"
+                },
+                value: {
+                    text: personalOfficer
+                }
+            } if personalOfficerEnabled else null,
+            {
+                key: {
+                    text: "Last key worker or personal officer session" if keyWorkerEnabled and personalOfficerEnabled else ("Last key worker session" if keyWorkerEnabled else "Last personal officer session")
+                },
+                value: {
+                    text: lastSession
+                }
+            } if keyWorkerEnabled or personalOfficerEnabled else null,
+            {
+                key: {
+                    text: "Prison offender manager"
+                },
+                value: {
+                    text: prisonOffenderManager,
+                    attributes: {
+                        "data-qa": "primary-pom-name"
                     }
-                ] | removeNullish | summaryListOneHalfWidth
-            }) }}
-        </div>
-    </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <p class="govuk-body">
-                <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/professional-contacts">Professional contacts</a>
-            </p>
-        </div>
-    </div>
+                }
+            },
+            {
+                key: {
+                    text: "Co-working prison offender manager"
+                },
+                value: {
+                    text: coworkingPrisonOffenderManager,
+                    attributes: {
+                        "data-qa": "secondary-pom-name"
+                    }
+                }
+            },
+            {
+                key: {
+                    text: "Community offender manager"
+                },
+                value: {
+                    text: communityOffenderManager
+                }
+            },
+            {
+                key: {
+                    text: "Resettlement worker"
+                },
+                value: {
+                    text: resettlementWorker
+                }
+            }
+        ] | removeNullish | summaryListOneHalfWidth
+    }) }}
+
 {%- endcall -%}
