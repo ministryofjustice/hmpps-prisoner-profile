@@ -20,7 +20,7 @@
   img {
     margin-right: 10px;
 
-    @media (max-width: 1000px) {
+    @include govuk-media-query($until: tablet) {
       display: none;
     }
   }
@@ -28,7 +28,7 @@
   a {
     font-weight: 700;
 
-    @media (max-width: 1000px) {
+    @include govuk-media-query($until: tablet) {
       font-size: 16px;
     }
   }
