@@ -1,15 +1,10 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
-{% from '../../../components/fileUploadWithPreview/macro.njk' import fileUploadWithPreview %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% extends "partials/layout.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "components/fileUploadWithPreview/macro.njk" import fileUploadWithPreview %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {% set fileHtml %}
 {{ fileUploadWithPreview("file") }}
 {% endset -%}
@@ -17,11 +12,6 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, nameClasses: "govuk-!-font-size-24" }) }}
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% include '../../../partials/edit/photo/photoUploadFeedbackBanner.njk' %}
     </div>
   </div>
   {% if errors.length > 0 %}
