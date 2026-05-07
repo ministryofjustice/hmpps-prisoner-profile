@@ -41,7 +41,7 @@ context('Add personal IDs', () => {
           '"nationalInsurance[selected]"': [
             {
               value: 'nationalInsurance',
-              conditionals: { textInputs: { 'nationalInsurance[value]': '1'.repeat(20) } },
+              conditionals: { textInputs: { 'nationalInsurance[value]': 'AA123456A' } },
             },
           ],
           '"parkrun[selected]"': [
@@ -107,6 +107,17 @@ context('Add personal IDs', () => {
         ],
       },
       {
+        testDescription: `Invalid National Insurance number value`,
+        input: {
+          checkboxInputs: {
+            '"nationalInsurance[selected]"': [
+              { value: 'nationalInsurance', conditionals: { textInputs: { 'nationalInsurance[value]': '123' } } },
+            ],
+          },
+        },
+        errorMessages: ['Enter a valid National Insurance number in the correct format'],
+      },
+      {
         testDescription: `value fields too long`,
         input: {
           checkboxInputs: {
@@ -116,7 +127,7 @@ context('Add personal IDs', () => {
             '"nationalInsurance[selected]"': [
               {
                 value: 'nationalInsurance',
-                conditionals: { textInputs: { 'nationalInsurance[value]': '1'.repeat(21) } },
+                conditionals: { textInputs: { 'nationalInsurance[value]': 'AA1234567' } },
               },
             ],
             '"parkrun[selected]"': [
@@ -139,7 +150,7 @@ context('Add personal IDs', () => {
         },
         errorMessages: [
           'Enter the driving licence number using 20 characters or less',
-          'Enter the National Insurance number using 20 characters or less',
+          'Enter a valid National Insurance number in the correct format',
           'Enter the parkrun number using 20 characters or less',
           'Enter the passport number using 20 characters or less',
           'Enter the staff ID card number using 20 characters or less',

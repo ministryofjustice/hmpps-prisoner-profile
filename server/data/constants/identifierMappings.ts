@@ -61,6 +61,7 @@ export const PersonalIdentifierMappings: Record<string, IdentifierMapping> = {
     description: 'National Insurance number',
     editPageUrl: 'national-insurance',
     redirectAnchor: 'national-insurance-number',
+    hint: 'A National Insurance number is 2 letters, 6 numbers, then A, B, C or D. For example, QQ 12 34 56 C',
   },
   parkrun: {
     type: OffenderIdentifierType.ParkrunNumber,
