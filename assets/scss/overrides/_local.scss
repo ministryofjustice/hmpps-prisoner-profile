@@ -115,3 +115,10 @@ a.govuk-tabs__tab {
     background-color: govuk-colour('blue');
   }
 }
+
+[data-qa="identity-number-value"],
+[data-qa="cro-number"],
+[data-qa="pnc-number"],
+[data-qa="most-recent-existing-value"] {
+  white-space: pre-wrap;
+}

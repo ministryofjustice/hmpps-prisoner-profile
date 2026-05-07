@@ -15,6 +15,7 @@ import {
   findError,
   formatMoney,
   formatName,
+  formatNino,
   formatPhoneNumber,
   formatScheduleItem,
   initialiseName,
@@ -232,6 +233,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
   njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
   njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
+  njkEnv.addFilter('formatNino', formatNino)
   njkEnv.addFilter('includes', arrayIncludes)
   njkEnv.addFilter('appendRefererToUrl', appendRefererToUrl)
   njkEnv.addFilter('sexualOrientationText', mapSexualOrientationText)

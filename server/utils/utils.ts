@@ -771,6 +771,13 @@ export const formatPhoneNumber = (phoneNumber: string): string => {
   return phoneNumber.trim()
 }
 
+export const formatNino = (nino: string): string => {
+  if (!nino) return nino
+  const cleaned = nino.toUpperCase()
+  if (cleaned.length !== 9) return nino
+  return cleaned
+}
+
 /**
  * Checks if a value is included in an array or matches a string.
  *
