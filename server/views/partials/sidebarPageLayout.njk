@@ -1,0 +1,30 @@
+{% if heading %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l govuk-!-margin-top-5">{{ heading }}</h1>
+    </div>
+  </div>
+{% endif %}
+
+<div class="govuk-grid-row {{ rowClasses | default('hmpps-three-quarters-responsive') }}">
+  {% set sidebarHtml %}
+    <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
+      {{ sidebar | safe }}
+    </div>
+  {% endset %}
+  {% set contentHtml %}
+    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
+      {{ content | safe }}
+    </div>
+  {% endset %}
+
+  {% if sidebarSide == 'right' %}
+    {{ contentHtml | safe }}
+    {{ sidebarHtml | safe }}
+  {% else %}
+    {{ sidebarHtml | safe }}
+    {{ contentHtml | safe }}
+  {% endif %}
+</div>
+
+{% include "./backToTop.njk" %}
