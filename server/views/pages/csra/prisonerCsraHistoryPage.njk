@@ -7,14 +7,14 @@
 ] %}
 
 {% block body %}
-    {% set title = (prisonerName.firstLast | apostrophe) + " CSRA history" %}
+    {% set titleHtml = (prisonerName.firstLast | apostrophe) + " CSRA history" %}
 
     {% set filterHtml %}
         {% include 'pages/csra/partials/csraFilter.njk' %}
     {% endset %}
 
     {% call hmppsFilteredListPage({
-        title: title,
+        titleHtml: titleHtml,
         hasContent: true,
         filterHtml: filterHtml,
         errors: errors

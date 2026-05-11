@@ -2,9 +2,9 @@
 {% from "macros/filteredListPage.njk" import hmppsFilteredListPage %}
 {% extends "../index.njk" %}
 {% block body %}
-    {% set title = 'Alerts' if alertSummaryData.apiUnavailable else (('Active' if activeTab else 'Inactive') + ' alerts') %}
+    {% set titleHtml = 'Alerts' if alertSummaryData.apiUnavailable else (('Active' if activeTab else 'Inactive') + ' alerts') %}
     {% set hasContent = (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
-    {% set emptyStateText = prisonerName.full + " does not have any " + ('active' if activeTab else 'inactive') + " alerts." %}
+    {% set emptyStateHtml = prisonerName.full + " does not have any " + ('active' if activeTab else 'inactive') + " alerts." %}
     {% set actionButton = { text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: addAlertLinkUrl } if addAlertLinkUrl %}
 
     {% set afterTitleHtml %}
@@ -23,14 +23,14 @@
     {% endset %}
 
     {% call hmppsFilteredListPage({
-        title: title,
+        titleHtml: titleHtml,
         titleId: "alerts",
         serviceUnavailable: alertSummaryData.apiUnavailable,
         serviceUnavailableMessage: "Alerts",
         afterTitleHtml: afterTitleHtml,
         actionButton: actionButton,
         hasContent: hasContent,
-        emptyStateText: emptyStateText,
+        emptyStateHtml: emptyStateHtml,
         emptyStateDataQa: "alerts-empty-state",
         filterHtml: filterHtml,
         errors: errors

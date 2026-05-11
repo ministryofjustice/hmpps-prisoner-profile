@@ -1,9 +1,9 @@
 {% from "macros/filteredListPage.njk" import hmppsFilteredListPage %}
 {% extends "../index.njk" %}
 {% block body %}
-    {% set title = "Case notes" %}
+    {% set titleHtml = "Case notes" %}
     {% set hasContent = (hasCaseNotes) or (errors.length > 0) %}
-    {% set emptyStateText = fullName + " does not have any case notes" %}
+    {% set emptyStateHtml = fullName + " does not have any case notes" %}
     {% set actionButton = { text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl } if isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
 
     {% set filterHtml %}
@@ -11,13 +11,13 @@
     {% endset %}
 
     {% call hmppsFilteredListPage({
-        title: title,
+        titleHtml: titleHtml,
         titleId: "caseNotes",
         serviceUnavailable: caseNotesApiUnavailable,
         serviceUnavailableMessage: "Case notes",
         actionButton: actionButton,
         hasContent: hasContent,
-        emptyStateText: emptyStateText,
+        emptyStateHtml: emptyStateHtml,
         emptyStateDataQa: "case-notes-empty-state",
         filterHtml: filterHtml,
         errors: errors

@@ -10,18 +10,18 @@
 %}
 
 {% block body %}
-    {% set title = (prisonerName.firstLast | apostrophe) + " visits" %}
+    {% set titleHtml = (prisonerName.firstLast | apostrophe) + " visits" %}
     {% set hasContent = hasVisits or hasNoVisitsForQuery %}
-    {% set emptyStateText = '<p class="govuk-body">There are no visits for this person.</p>' %}
+    {% set emptyStateHtml = '<p class="govuk-body">There are no visits for this person.</p>' %}
 
     {% set filterHtml %}
         {% include 'partials/visitsDetailsPage/filter.njk' %}
     {% endset %}
 
     {% call hmppsFilteredListPage({
-        title: title,
+        titleHtml: titleHtml,
         hasContent: hasContent,
-        emptyStateText: emptyStateText,
+        emptyStateHtml: emptyStateHtml,
         emptyStateDataQa: "visits-empty-state",
         filterHtml: filterHtml,
         errors: errors
