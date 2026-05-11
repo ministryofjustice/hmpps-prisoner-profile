@@ -1,3 +1,4 @@
+import type { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
@@ -161,7 +162,33 @@ describe('prisonerLocationHistoryService', () => {
 
     expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123456)
     expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith('abcdefg')
+    expect(locationsInsidePrisonApiClient.getLocationAttributes).toHaveBeenCalledWith('abcdefg')
     expect(res.locationAttributes).toEqual(locationAttributesForView)
+  })
+
+  it('Returns empty location attributes when looking up non-cell location in API ', async () => {
+    locationsInsidePrisonApiClient.getLocation = jest.fn().mockResolvedValue({
+      localName: 'Reception',
+      key: 'MDI-RECV',
+      specialistCellTypes: [],
+    })
+    locationsInsidePrisonApiClient.getLocationAttributes = jest
+      .fn()
+      .mockRejectedValue({ responseStatus: 404 } as SanitisedError)
+
+    const res = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'MDI',
+      '123457',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123457)
+    expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith('abcdefg')
+    expect(locationsInsidePrisonApiClient.getLocationAttributes).toHaveBeenCalledWith('abcdefg')
+    expect(res.locationAttributes).toEqual({ description: 'MDI-RECV', attributes: [] })
   })
 
   it('Should only include known specialist cell types', async () => {
