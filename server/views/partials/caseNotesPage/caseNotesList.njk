@@ -1,26 +1,16 @@
-{% from 'components/pagedList/macro.njk' import hmppsPagedList %}
+{% from 'macros/pagedListWithCards.njk' import hmppsPagedListWithCards %}
 {% from './macros/caseNoteCard.njk' import caseNoteCard %}
 
-{% call hmppsPagedList(listMetadata) %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <div class="hmpps-case-note-card-list" role="list">
-            {% for caseNote in pagedCaseNotes.content %}
-                {% set showAddMoreDetailsLink = isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
-                {{ caseNoteCard(caseNote, showAddMoreDetailsLink) }}
-            {% endfor %}
-        </div>
-        {% if not listMetadata.pagination.totalElements %}
-            <div>
-                <p>No case notes have been found for the selected filters.</p>
-                <p>You can:</p>
-                <ul>
-                    <li>select different types and/or sub types</li>
-                    <li>choose different dates</li>
-                    <li>clear filters to view all case notes</li>
-                </ul>
-            </div>
-        {% endif %}
-    </div>
-</div>
-{% endcall %}
+{{ hmppsPagedListWithCards(
+    listMetadata = listMetadata,
+    items = pagedCaseNotes.content,
+    listClass = "hmpps-case-note-card-list",
+    noResultsMessage = "No case notes have been found for the selected filters.",
+    suggestions = [
+        "select different types and/or sub types",
+        "choose different dates",
+        "clear filters to view all case notes"
+    ],
+    cardMacro = caseNoteCard,
+    cardParams = isGranted(CaseNotesPermission.edit, prisonerPermissions)
+) }}
