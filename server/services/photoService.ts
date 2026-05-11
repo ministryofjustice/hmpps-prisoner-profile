@@ -1,4 +1,4 @@
-import { compareDesc } from 'date-fns'
+import { compareAsc, compareDesc } from 'date-fns'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { formatDateTime } from '../utils/dateHelpers'
@@ -43,5 +43,14 @@ export default class PhotoService {
         withheldPhotoCategoryCodes.includes(prisonerData.category) || alertSummaryData.highPublicInterestPrisoner,
       placeholder: !inmateDetail.facialImageId,
     }
+  }
+
+  async getNewestActiveFacialImageId(prisonerNumber: string, clientToken: string): Promise<number | undefined> {
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const images = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
+    return images
+      .filter(i => i.imageView === 'FACE' && i.active) // Should only be one active. Just being safe.
+      .sort((a, b) => compareAsc(new Date(a.captureDateTime), new Date(b.captureDateTime)))
+      .pop()?.imageId
   }
 }
