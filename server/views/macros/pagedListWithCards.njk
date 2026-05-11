@@ -1,0 +1,28 @@
+{% from 'components/pagedList/macro.njk' import hmppsPagedList %}
+
+{% macro hmppsPagedListWithCards(listMetadata, items, listClass, noResultsMessage, suggestions, cardMacro, cardParams={}) %}
+    {% call hmppsPagedList(listMetadata) %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="{{ listClass }}" role="list">
+                {% for item in items %}
+                    {{ cardMacro(item, cardParams) }}
+                {% endfor %}
+            </div>
+            {% if not listMetadata.pagination.totalElements %}
+                <div>
+                    <p>{{ noResultsMessage }}</p>
+                    {% if suggestions %}
+                        <p>You can:</p>
+                        <ul>
+                            {% for suggestion in suggestions %}
+                                <li>{{ suggestion }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endcall %}
+{% endmacro %}
