@@ -1,5 +1,6 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import ImageDetails from '../data/interfaces/prisonApi/ImageDetails'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { imageDetailListMock, imageDetailMock } from '../data/localMockData/imageMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
@@ -108,6 +109,75 @@ describe('PhotoService', () => {
           alertSummaryData,
         ),
       ).toEqual({ withheld: false, placeholder: true })
+    })
+  })
+
+  describe('getNewestActiveFacialImageId', () => {
+    it('Returns the imageId of the active facial image', async () => {
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(prisonApiClient.getImagesForPrisoner).toHaveBeenCalledWith('A1234BC')
+      expect(res).toEqual(1680496)
+    })
+
+    it('Ignores non-facial images', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(
+        async () =>
+          [
+            { imageId: 1, imageView: 'SOMETHING_ELSE', active: true, captureDateTime: '2024-01-01T00:00:00' },
+            { imageId: 2, imageView: 'FACE', active: true, captureDateTime: '2023-01-01T00:00:00' },
+          ] as ImageDetails[],
+      )
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toEqual(2)
+    })
+
+    it('Ignores inactive facial images', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(
+        async () =>
+          [
+            { imageId: 1, imageView: 'FACE', active: false, captureDateTime: '2024-01-01T00:00:00' },
+            { imageId: 2, imageView: 'FACE', active: true, captureDateTime: '2023-01-01T00:00:00' },
+          ] as ImageDetails[],
+      )
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toEqual(2)
+    })
+
+    it('Returns the most recent when multiple active facial images exist (should not happen, though)', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(
+        async () =>
+          [
+            { imageId: 1, imageView: 'FACE', active: true, captureDateTime: '2022-01-01T00:00:00' },
+            { imageId: 2, imageView: 'FACE', active: true, captureDateTime: '2024-06-01T00:00:00' },
+            { imageId: 3, imageView: 'FACE', active: true, captureDateTime: '2023-03-01T00:00:00' },
+          ] as ImageDetails[],
+      )
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toEqual(2)
+    })
+
+    it('Returns undefined when there are no active facial images', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(
+        async () =>
+          [
+            { imageId: 1, imageView: 'FACE', active: false, captureDateTime: '2024-01-01T00:00:00' },
+            { imageId: 2, imageView: 'SOMETHING_ELSE', active: true, captureDateTime: '2023-01-01T00:00:00' },
+          ] as ImageDetails[],
+      )
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toBeUndefined()
+    })
+
+    it('Returns undefined when no images exist', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(async () => [] as ImageDetails[])
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toBeUndefined()
     })
   })
 })

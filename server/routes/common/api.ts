@@ -23,7 +23,7 @@ export default class CommonApiRoutes {
     private readonly metricsService: MetricsService,
   ) {}
 
-  private async serveFacialImage(imageId: string, fullSizeImage: boolean, req: Request, res: Response) {
+  private async streamFacialImage(imageId: string, fullSizeImage: boolean, req: Request, res: Response) {
     try {
       const data = await this.offenderService.getImage(req.middleware.clientToken, imageId, fullSizeImage)
       res.set('Cache-control', 'private, max-age=86400')
@@ -57,13 +57,13 @@ export default class CommonApiRoutes {
     const hasPermission = isGranted(CorePersonRecordPermission.read_photo, prisonerPermissions)
 
     if (hasPermission && imageQueryMatchesCurrent) {
-      this.serveFacialImage(imageIdQuery, fullSizeImage, req, res)
+      this.streamFacialImage(imageIdQuery, fullSizeImage, req, res)
     }
 
     if (hasPermission && !imageQueryMatchesCurrent) {
       this.photoService.getNewestActiveFacialImageId(prisonerNumber, req.middleware.clientToken).then(imageId => {
         if (imageId) {
-          this.serveFacialImage(imageId.toString(), fullSizeImage, req, res)
+          this.streamFacialImage(imageId.toString(), fullSizeImage, req, res)
         } else {
           res.redirect(placeHolderImage)
         }
