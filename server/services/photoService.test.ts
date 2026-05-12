@@ -179,5 +179,14 @@ describe('PhotoService', () => {
       const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
       expect(res).toBeUndefined()
     })
+
+    it('Returns undefined when an error occurs', async () => {
+      prisonApiClient.getImagesForPrisoner = jest.fn(async () => {
+        throw new Error('Error fetching images')
+      })
+      service = new PhotoService(() => prisonApiClient)
+      const res = await service.getNewestActiveFacialImageId('A1234BC', 'clientToken')
+      expect(res).toBeUndefined()
+    })
   })
 })

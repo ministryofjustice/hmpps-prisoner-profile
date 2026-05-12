@@ -46,11 +46,15 @@ export default class PhotoService {
   }
 
   async getNewestActiveFacialImageId(prisonerNumber: string, clientToken: string): Promise<number | undefined> {
-    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
-    const images = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
-    return images
-      .filter(i => i.imageView === 'FACE' && i.active) // Should only be one active. Just being safe.
-      .sort((a, b) => compareAsc(new Date(a.captureDateTime), new Date(b.captureDateTime)))
-      .pop()?.imageId
+    try {
+      const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+      const images = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
+      return images
+        .filter(i => i.imageView === 'FACE' && i.active) // Should only be one active. Just being safe.
+        .sort((a, b) => compareAsc(new Date(a.captureDateTime), new Date(b.captureDateTime)))
+        .pop()?.imageId
+    } catch {
+      return undefined
+    }
   }
 }
