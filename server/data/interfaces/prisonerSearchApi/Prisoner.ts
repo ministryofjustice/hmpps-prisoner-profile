@@ -124,6 +124,7 @@ export default interface Prisoner {
   marks?: BodyPartDetail[]
   newArrival24?: boolean
   newArrival72?: boolean
+  currentFacialImageId?: number
 }
 
 export interface Alias {
