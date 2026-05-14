@@ -15,7 +15,7 @@
 }
 
 .hmpps-sidebar-single-link {
-  background-color: govuk-functional-colour(template-background);;
+  background-color: govuk-colour("black", $variant: "tint-95");
   border-left: 4px solid $govuk-link-colour;
   h2 {
     padding: 14px 10px 12px 20px;
