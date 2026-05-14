@@ -1,4 +1,5 @@
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
@@ -40,10 +41,10 @@
 
     <div class="govuk-grid-row">
       {% if duplicateRecordApiFailure %}
-        <div class="hmpps-api-error-banner govuk-!-margin-3 govuk-!-margin-bottom-7">
-          <p>Some information on this page is currently unavailable</p>
-          <p>You may need to try again later.</p>
-        </div>
+        {{ hmppsError({
+          type: 'banner',
+          classes: 'govuk-!-margin-3 govuk-!-margin-bottom-7'
+        }) }}
       {% endif %}
 
       <div class="govuk-grid-column-two-thirds">
@@ -83,7 +84,10 @@
     <div class="govuk-grid-row govuk-!-margin-top-5">
       <div class="govuk-grid-column-full">
         {% if duplicateRecordApiFailure %}
-          <p class="hmpps-api-error-inset">{{ unavailableApiErrorText }}</p>
+          {{ hmppsError({
+            type: 'inset',
+            text: unavailableApiErrorText
+          }) }}
         {% else %}
           {% include '../partials/duplicateProfilesList.njk' %}
         {% endif %}

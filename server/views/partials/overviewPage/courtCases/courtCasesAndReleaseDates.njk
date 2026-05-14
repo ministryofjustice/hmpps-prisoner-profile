@@ -1,4 +1,5 @@
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {%- call summaryCard({title: "Court cases and release dates"}) -%}
@@ -64,9 +65,11 @@
           <p>There are no release dates calculated for {{ prisonerDisplayName }}</p>
         {% endif %}
       {% else %}
-        <p class="hmpps-api-error-inset" data-qa="release-dates-unavailable">
-            {{ unavailableApiErrorText }}
-        </p>
+        {{ hmppsError({
+          type: 'inset',
+          dataQa: 'release-dates-unavailable',
+          text: unavailableApiErrorText
+        }) }}
       {% endif %}
     </div>
 

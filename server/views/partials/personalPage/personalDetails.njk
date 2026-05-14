@@ -1,5 +1,6 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
@@ -90,9 +91,11 @@
       <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
   {% else %}
-    <p class="hmpps-api-error-inset" data-qa="health-and-medication-api-error">
-        {{ unavailableApiErrorText }}
-    </p>
+    {{ hmppsError({
+        type: 'inset',
+        dataQa: 'health-and-medication-api-error',
+        text: unavailableApiErrorText
+    }) }}
   {% endif %}
 
 {% endmacro %}
@@ -465,17 +468,12 @@
             </div>
           {% endif %}
         {% else %}
-          <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
-            data-qa="military-records">
-            <div class="govuk-summary-list__row govuk-!-border-none">
-              <dt class="govuk-summary-list__key">UK military service record</dt>
-              <dd class="govuk-summary-list__value govuk-!-padding-bottom-0">
-                <p class="hmpps-api-error-inset" data-qa="military-records-api-error">
-                  {{ unavailableApiErrorText }}
-                </p>
-              </dd>
-            </div>
-          </dl>
+          {{ hmppsError({
+              type: 'inset',
+              classes: 'govuk-!-margin-top-6',
+              dataQa: 'military-records-api-error',
+              text: unavailableApiErrorText
+          }) }}
         {% endif %}
       {% endif %}
     </div>

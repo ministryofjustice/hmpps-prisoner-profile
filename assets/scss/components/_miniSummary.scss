@@ -114,26 +114,16 @@
   }
 }
 
+.hmpps-filter-page-row,
 .hmpps-sidebar-page-row,
 .hmpps-three-quarters-responsive {
-  @media (max-width: 1100px) {
-    display: flex;
-    flex-direction: column;
+  @media (max-width: 960px) {
+    display: flex !important;
+    flex-direction: column !important;
 
     > .govuk-grid-column-three-quarters,
     > .govuk-grid-column-one-quarter {
-      width: 100%;
-    }
-  }
-}
-
-.hmpps-three-quarters-responsive {
-  @media (max-width: 751px) {
-    .hmpps-miniSummaryWrapper {
-      .govuk-grid-column-three-quarters,
-      .govuk-grid-column-one-quarter {
-        width: 50%;
-      }
+      width: 100% !important;
     }
   }
 }

@@ -1,5 +1,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% from "macros/hmppsError.njk" import hmppsError %}
 
 {% macro hmppsFilteredListPage(params) %}
     {% if not params.serviceUnavailable and params.errors.length > 0 %}
@@ -17,15 +18,16 @@
     </div>
 
     {% if params.serviceUnavailable %}
-        <div class="dps-banner dps-banner__error">
-            <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ params.serviceUnavailableMessage }} are currently unavailable</p>
-            <p>Reload the page or try again later. {{ params.serviceUnavailableMessage }} might still be available in other parts of DPS.</p>
-        </div>
+        {{ hmppsError({
+            type: 'service-unavailable',
+            isAre: 'are',
+            serviceName: params.serviceUnavailableMessage
+        }) }}
     {% else %}
         {{ params.afterTitleHtml | safe }}
 
         {% if params.actionButton %}
-            <div class="govuk-grid-row govuk-!-display-none-print">
+            <div class="govuk-grid-row hmpps-filter-page-row govuk-!-display-none-print">
                 <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Purely to force formatting --></div>
                 <div class="govuk-grid-column-three-quarters">
                     <div class="hmpps-action-header">
@@ -36,7 +38,7 @@
         {% endif %}
 
         {% if params.hasContent %}
-            <div class="govuk-grid-row">
+            <div class="govuk-grid-row hmpps-filter-page-row">
                 <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
                     {{ params.filterHtml | safe }}
                 </div>

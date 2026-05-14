@@ -1,5 +1,6 @@
 {% from "components/warningIcon/warningIcon.njk" import warningIcon %}
 {% from "macros/summaryCardMacro.njk" import summaryCard %}
+{% from "macros/hmppsError.njk" import hmppsError %}
 
 {% macro miniCard(content, classes, errored) %}
     {% if content.id === 'incentives' or content.items and not (content.topContent !== undefined or content.bottomContentLine1 !== undefined) %}
@@ -11,9 +12,11 @@
             {% endif %}
             <div class="mini-card__body card-body">
                 {% if errored %}
-                    <p class="hmpps-api-error-inset" data-qa="{{ content.id or 'mini-card' }}-unavailable">
-                        {{ unavailableApiErrorText }}
-                    </p>
+                    {{ hmppsError({
+                        type: 'inset',
+                        dataQa: (content.id or 'mini-card') + '-unavailable',
+                        text: unavailableApiErrorText
+                    }) }}
                 {% endif %}
                 {% if content.label %}
                     <p class="mini-card__label">{{ content.label }}</p>
@@ -40,9 +43,11 @@
             <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not content.heading }}" data-qa="{{ content.id or 'mini-card' }}">
                 <div class="govuk-grid-column-full">
                     {% if errored %}
-                        <p class="hmpps-api-error-inset" data-qa="{{ content.id or 'mini-card' }}-unavailable">
-                            {{ unavailableApiErrorText }}
-                        </p>
+                        {{ hmppsError({
+                            type: 'inset',
+                            dataQa: (content.id or 'mini-card') + '-unavailable',
+                            text: unavailableApiErrorText
+                        }) }}
                     {% endif %}
 
                     {% if caller %}

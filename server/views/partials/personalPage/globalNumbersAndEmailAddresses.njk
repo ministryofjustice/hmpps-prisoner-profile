@@ -1,5 +1,6 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set notEnteredTag %}
 <p class="govuk-body not-entered-tag">Not entered</p>
@@ -67,9 +68,12 @@
     </div>
   </div>
 {% else %}
-  <p class="hmpps-api-error-inset govuk-!-margin-bottom-3" data-qa="global-numbers-and-emails-api-error">
-    {{ unavailableApiErrorText }}
-  </p>
+  {{ hmppsError({
+    type: 'inset',
+    classes: 'govuk-!-margin-bottom-3',
+    dataQa: 'global-numbers-and-emails-api-error',
+    text: unavailableApiErrorText
+  }) }}
 {% endif %}
 
 {%- endcall -%}
