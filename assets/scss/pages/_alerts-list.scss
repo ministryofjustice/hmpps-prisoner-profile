@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  flex-basis: min-content;
+  flex-basis: auto;
   padding-bottom: 30px;
   border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
   margin-bottom: 30px;
@@ -13,8 +13,24 @@
     @media (max-width: 1152px) {
       max-width: 570px;
     }
+    @media (max-width: 960px) {
+      max-width: none;
+    }
     @media print {
       max-width: none;
+    }
+  }
+
+  @media (max-width: 960px) {
+    &__content,
+    &__link {
+      width: 100%;
+    }
+    &__link {
+      text-align: left;
+      a {
+        margin-top: 10px;
+      }
     }
   }
 

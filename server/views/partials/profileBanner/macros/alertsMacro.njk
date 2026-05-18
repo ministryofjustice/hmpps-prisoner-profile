@@ -1,6 +1,7 @@
 {% from "components/catAPrisonerTag/catAPrisonerTag.njk" import catAPrisonerTag %}
 {% from 'components/modal/modal.njk' import modal %}
 {% from "dps/components/alert-flag/macro.njk" import alertFlag %}
+{% from "macros/hmppsError.njk" import hmppsError %}
 
 {% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) %}
     {% set otherActiveCount = alertSummaryData.activeAlertCount - alertSummaryData.alertFlags.length %}
@@ -11,10 +12,13 @@
         {% endif %}
 
         {% if alertSummaryData.apiUnavailable %}
-            <div class="dps-banner dps-banner__error dps-banner__small govuk-!-margin-bottom-2">
-                <p class="govuk-!-font-weight-bold">Alerts are currently unavailable</p>
-                <p>Reload the page or try again later. Alerts might still be available in other parts of DPS.</p>
-            </div>
+        {{ hmppsError({
+                type: 'service-unavailable',
+                classes: 'govuk-!-margin-bottom-2',
+                serviceName: 'Alerts',
+                isAre: 'are',
+                small: true
+            }) }}
         {% else %}
             {% for alert in alertSummaryData.alertFlags %}
                 <li>

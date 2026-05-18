@@ -1,5 +1,6 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
     {% if info.bodyPart %}
@@ -190,12 +191,11 @@
           </div>
       </div>
     {% else %}
-      <div class="govuk-grid-row" data-qa="addresses">
-        <div class="govuk-grid-column-full">
-          <p class="hmpps-api-error-inset govuk-!-margin-bottom-3" data-qa="appearance-api-error">
-            {{ unavailableApiErrorText }}
-          </p>
-        </div>
-    </div>
+      {{ hmppsError({
+        type: 'inset',
+        classes: 'govuk-!-margin-bottom-3',
+        dataQa: 'appearance-api-error',
+        text: unavailableApiErrorText
+      }) }}
     {% endif %}
 {%- endcall -%}

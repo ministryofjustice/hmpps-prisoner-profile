@@ -1,4 +1,5 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
@@ -91,9 +92,9 @@
   actions: [{ text: 'Add a home address', href: 'personal/where-is-address' }]
     if editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions)
 }) %}
-  <div class="govuk-grid-row" data-qa="addresses">
-    <div class="govuk-grid-column-full">
-      {% if addresses.status === 'fulfilled' %}
+  {% if addresses.status === 'fulfilled' %}
+    <div class="govuk-grid-row" data-qa="addresses">
+      <div class="govuk-grid-column-full">
         {% if addresses.value.primaryOrPostal | length %}
           {% for address in addresses.value.primaryOrPostal %}
             {% if address.primaryAddress and address.postalAddress %}
@@ -122,11 +123,14 @@
             </a>
           </div>
         {% endif %}
-      {% else %}
-        <p class="hmpps-api-error-inset govuk-!-margin-bottom-3" data-qa="addresses-api-error">
-          {{ unavailableApiErrorText }}
-        </p>
-      {% endif %}
+      </div>
     </div>
-  </div>
+  {% else %}
+    {{ hmppsError({
+      type: 'inset',
+      classes: 'govuk-!-margin-bottom-3',
+      dataQa: 'addresses-api-error',
+      text: unavailableApiErrorText
+    }) }}
+  {% endif %}
 {% endcall %}

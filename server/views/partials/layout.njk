@@ -1,4 +1,5 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "macros/hmppsError.njk" import hmppsError %}
 {% extends "govuk/template.njk" %}
 {% block head %}
   {% include "./googleTagManagerHeadScripts.njk" %}
@@ -24,10 +25,7 @@
 
 {% block beforeContent %}
   {% if pageHasApiErrors and not useCustomErrorBanner %}
-    <div class="hmpps-api-error-banner">
-      <p>Sorry, there is a problem with the service</p>
-      <p>Some information on this page may be unavailable. Try again later.</p>
-    </div>
+    {{ hmppsError({ type: 'banner' }) }}
   {% endif %}
 
   {% if bannerText %}
