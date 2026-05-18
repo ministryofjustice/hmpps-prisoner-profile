@@ -11,9 +11,14 @@ import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contract
 import { Request, RequestHandler } from 'express'
 import { ApplicationInfo } from '../applicationInfo'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import config from '../config'
 
 const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info', 'GET /api/addresses/find']
-const dependencyPrefixesToIgnore = ['sqs', 'api.os.uk']
+const dependencyPrefixesToIgnore = ['sqs']
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const addressFindUrlPattern = new RegExp(`(${escapeRegExp(`${config.apis.osPlacesApi.url}/find?query=`)}).*`, 'g')
+const addressUprnUrlPattern = new RegExp(`(${escapeRegExp(`${config.apis.osPlacesApi.url}/uprn?uprn=`)}).*`, 'g')
 
 export type ContextObject = {
   ['http.ServerRequest']?: Request
@@ -37,6 +42,7 @@ export function buildAppInsightsClient({ applicationName, buildNumber }: Applica
     defaultClient.addTelemetryProcessor(parameterisePaths)
     defaultClient.addTelemetryProcessor(ignoredRequestsProcessor)
     defaultClient.addTelemetryProcessor(ignoredDependenciesProcessor)
+    defaultClient.addTelemetryProcessor(scrubAddressLookupDependencies)
     return defaultClient
   }
   return null
@@ -90,6 +96,18 @@ export function ignoredDependenciesProcessor(envelope: EnvelopeTelemetry) {
     if (dependencyData instanceof Contracts.RemoteDependencyData && dependencyData.success) {
       const { target } = dependencyData
       return dependencyPrefixesToIgnore.every(prefix => !target.startsWith(prefix))
+    }
+  }
+  return true
+}
+
+export function scrubAddressLookupDependencies(envelope: EnvelopeTelemetry) {
+  if (envelope.data.baseType === Contracts.TelemetryTypeString.Dependency) {
+    const dependencyData = envelope.data.baseData
+    if (dependencyData instanceof Contracts.RemoteDependencyData && dependencyData.data) {
+      dependencyData.data = dependencyData.data
+        .replace(addressFindUrlPattern, '$1ADDRESS_QUERY')
+        .replace(addressUprnUrlPattern, '$1ADDRESS_UPRN')
     }
   }
   return true

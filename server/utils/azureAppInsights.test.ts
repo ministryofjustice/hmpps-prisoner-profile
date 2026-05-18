@@ -1,6 +1,10 @@
 import { DataTelemetry, EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { Contracts } from 'applicationinsights'
-import { ignoredDependenciesProcessor, ignoredRequestsProcessor } from './azureAppInsights'
+import {
+  ignoredDependenciesProcessor,
+  ignoredRequestsProcessor,
+  scrubAddressLookupDependencies,
+} from './azureAppInsights'
 
 const createEnvelope = (properties: Record<string, string | boolean>, baseType = 'RequestData') =>
   ({
@@ -72,5 +76,42 @@ describe('azureAppInsights', () => {
         expect(ignoredDependenciesProcessor(envelope)).toBe(true)
       },
     )
+  })
+
+  describe('scrubAddressLookupDependencies', () => {
+    it('replaces the address lookup query string in dependency data', () => {
+      const envelope = createEnvelope({}, 'RemoteDependencyData')
+      const dependencyData = new Contracts.RemoteDependencyData()
+      dependencyData.data = 'https://api.os.uk/search/places/v1/find?query=123 The Street'
+      envelope.data.baseData = dependencyData
+
+      expect(scrubAddressLookupDependencies(envelope)).toBe(true)
+      expect(dependencyData.data).toBe('https://api.os.uk/search/places/v1/find?query=ADDRESS_QUERY')
+    })
+
+    it('replaces the address UPRN string in dependency data', () => {
+      const envelope = createEnvelope({}, 'RemoteDependencyData')
+      const dependencyData = new Contracts.RemoteDependencyData()
+      dependencyData.data = 'https://api.os.uk/search/places/v1/uprn?uprn=123'
+      envelope.data.baseData = dependencyData
+
+      expect(scrubAddressLookupDependencies(envelope)).toBe(true)
+      expect(dependencyData.data).toBe('https://api.os.uk/search/places/v1/uprn?uprn=ADDRESS_UPRN')
+    })
+
+    it('leaves unrelated dependency data untouched', () => {
+      const envelope = createEnvelope({}, 'RemoteDependencyData')
+      const dependencyData = new Contracts.RemoteDependencyData()
+      dependencyData.data = 'https://example.com/path?query=foo'
+      envelope.data.baseData = dependencyData
+
+      expect(scrubAddressLookupDependencies(envelope)).toBe(true)
+      expect(dependencyData.data).toBe('https://example.com/path?query=foo')
+    })
+
+    it('ignores non-dependency telemetry', () => {
+      const envelope = createEnvelope({}, 'RequestData')
+      expect(scrubAddressLookupDependencies(envelope)).toBe(true)
+    })
   })
 })
