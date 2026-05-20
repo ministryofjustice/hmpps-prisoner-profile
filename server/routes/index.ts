@@ -96,7 +96,7 @@ export default function routes(services: Services): Router {
   router.get(
     `/api${basePath}/image`,
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
-    getPrisonerData(services, { minimal: true }),
+    getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     services.commonApiRoutes.prisonerImage,
