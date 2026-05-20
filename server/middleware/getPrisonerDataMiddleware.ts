@@ -97,7 +97,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Provide additional commonly used data to the template
       res.locals = {
         ...res.locals,
-        prisonerImageUrl: `/api/prisoner/${prisonerData.prisonerNumber}/image?imageId=${inmateDetail.facialImageId}`,
+        prisonerImageUrl: `/api/prisoner/${prisonerData.prisonerNumber}/image?imageId=${inmateDetail.facialImageId}${inmateDetail.facialImageId ? '' : '&cache=v2'}`,
       }
     } catch (error) {
       logger.error(error, `Failed to retrieve get prisoner data: ${error.endpoint}`)
