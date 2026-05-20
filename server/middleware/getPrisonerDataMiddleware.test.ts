@@ -190,6 +190,14 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(res.locals.prisonerImageUrl).toEqual('/api/prisoner/G6123VU/image?imageId=1413311')
   })
 
+  it('should add a cachebusting query param for undefined imageIds', async () => {
+    prisonApiClient.getInmateDetail = jest.fn(async () => ({ ...inmateDetailMock, facialImageId: undefined }))
+
+    await getPrisonerData(services)(req, res, next)
+
+    expect(res.locals.prisonerImageUrl).toEqual('/api/prisoner/G6123VU/image?imageId=undefined&cache=v2')
+  })
+
   it('should set the newArrival24 flag if latest arrival date is today', async () => {
     const arrivalDate = new Date()
     const arrivalDateString = formatDateISO(arrivalDate)
