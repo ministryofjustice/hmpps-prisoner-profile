@@ -14,8 +14,8 @@ export default class OffenderService {
     return this.prisonClientBuilder(token).getPrisonerImage(offenderNumber, fullSizeImage)
   }
 
-  getImage(token: string, imageId: string, fullSizeImage = true): Promise<Readable> {
-    return this.prisonClientBuilder(token).getImage(imageId, fullSizeImage)
+  getImage(token: string, imageId: string): Promise<Readable> {
+    return this.prisonClientBuilder(token).getImage(imageId, true)
   }
 
   async getPrisonerNonAssociationOverview(clientToken: string, prisonerNumber: string): Promise<NonAssociationSummary> {
