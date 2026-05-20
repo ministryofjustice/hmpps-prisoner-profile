@@ -23,25 +23,11 @@ export default class CommonApiRoutes {
     private readonly metricsService: MetricsService,
   ) {}
 
-  private async streamFacialImage(imageId: string, fullSizeImage: boolean, req: Request, res: Response) {
-    try {
-      const data = await this.offenderService.getImage(req.middleware.clientToken, imageId, fullSizeImage)
-      res.set('Cache-control', 'private, max-age=86400')
-      res.removeHeader('pragma')
-      res.type('image/jpeg')
-      data.pipe(res)
-    } catch {
-      res.redirect(placeHolderImage)
-    }
-  }
-
   public prisonerImage: RequestHandler = (req: Request, res: Response) => {
     const { prisonerNumber } = req.params
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
-    const { prisonerData } = req.middleware
+    const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonerPermissions } = res.locals
-    const imageIdQuery = (req.query.imageId as string) || undefined
-    const currentFacialImageId = prisonerData.currentFacialImageId || undefined
 
     this.auditService
       .sendEvent({
@@ -53,25 +39,23 @@ export default class CommonApiRoutes {
       })
       .catch(error => logger.error(error))
 
-    const imageQueryMatchesCurrent = imageIdQuery && currentFacialImageId && +imageIdQuery === currentFacialImageId
-    const hasPermission = isGranted(CorePersonRecordPermission.read_photo, prisonerPermissions)
+    // If there's no photo ID then we don't need to call the API and can prevent the extra call
+    const { placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-    if (hasPermission && imageQueryMatchesCurrent) {
-      this.streamFacialImage(imageIdQuery, fullSizeImage, req, res)
-    }
-
-    if (hasPermission && !imageQueryMatchesCurrent) {
-      this.photoService.getNewestActiveFacialImageId(prisonerNumber, req.middleware.clientToken).then(imageId => {
-        if (imageId) {
-          this.streamFacialImage(imageId.toString(), fullSizeImage, req, res)
-        } else {
-          res.redirect(placeHolderImage)
-        }
-      })
-    }
-
-    if (!hasPermission) {
+    if (placeholder || !isGranted(CorePersonRecordPermission.read_photo, prisonerPermissions)) {
       res.redirect(placeHolderImage)
+    } else {
+      this.offenderService
+        .getPrisonerImage(req.middleware.clientToken, prisonerNumber, fullSizeImage)
+        .then(data => {
+          res.set('Cache-control', 'private, max-age=86400')
+          res.removeHeader('pragma')
+          res.type('image/jpeg')
+          data.pipe(res)
+        })
+        .catch(_error => {
+          res.redirect(placeHolderImage)
+        })
     }
   }
 
