@@ -191,7 +191,7 @@ describe('GetPrisonerDataMiddleware', () => {
   })
 
   it('should add a cachebusting query param for undefined imageIds', async () => {
-    prisonApiClient.getInmateDetail = jest.fn(async () => ({ ...inmateDetailMock, facialImageId: undefined }))
+    prisonApiClient.getInmateDetail = jest.fn(async () => ({ ...inmateDetailMock, facialImageId: undefined as number }))
 
     await getPrisonerData(services)(req, res, next)
 
