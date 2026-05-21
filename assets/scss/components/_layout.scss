@@ -1,0 +1,15 @@
+.hmpps-filter-page-row,
+.hmpps-sidebar-page-row,
+.hmpps-three-quarters-responsive,
+.hmpps-two-thirds-responsive {
+  @media (max-width: 960px) {
+    display: flex !important;
+    flex-direction: column !important;
+
+    > .govuk-grid-column-three-quarters,
+    > .govuk-grid-column-two-thirds,
+    > .govuk-grid-column-one-quarter {
+      width: 100% !important;
+    }
+  }
+}
