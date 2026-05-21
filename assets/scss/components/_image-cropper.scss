@@ -4,11 +4,17 @@ $hmpps-cropper-height: 276px;
 .hmpps-cropper-photo-container {
   border: 1px solid $govuk-border-colour;
   width: 100%;
-  @include govuk-responsive-padding(2);
+  @include govuk-responsive-padding(3);
   @include govuk-responsive-margin(6, 'bottom');
+  box-sizing: border-box;
 
   &__content {
     display: flex;
+
+    @media (max-width: 420px) {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
   }
 
   &__photo-preview {
@@ -21,6 +27,12 @@ $hmpps-cropper-height: 276px;
   &__description {
     @include govuk-responsive-padding(2, 'top');
     margin-left: 24px;
+    min-width: 0;
+    flex: 1;
+
+    @media (max-width: 420px) {
+      text-align: left;
+    }
 
     h2 {
       @include govuk-responsive-margin(3, 'bottom');
