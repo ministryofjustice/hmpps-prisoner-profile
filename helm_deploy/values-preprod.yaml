@@ -50,6 +50,7 @@ generic-service:
     ALLOCATE_KEY_WORKERS_UI_URL: "https://allocate-key-workers-preprod.hmpps.service.justice.gov.uk/key-worker"
     ALLOCATE_PERSONAL_OFFICERS_UI_URL: "https://allocate-key-workers-preprod.hmpps.service.justice.gov.uk/personal-officer"
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-preprod.hmpps.service.justice.gov.uk"
+    COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-preprod.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
