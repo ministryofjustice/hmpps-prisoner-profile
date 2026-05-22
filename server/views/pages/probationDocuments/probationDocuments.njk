@@ -145,7 +145,7 @@
       </article>
 
     {% elseif probationDocuments.reason.responseStatus === 403 %}
-      {% set errorTitle = 'You are not authorised to access this record' %}
+      {% set errorTitle = 'You are not authorised to access this information' %}
       {% set msg = 'Please contact this person’s community offender manager.' %}
     {% else %}
       {% set errorTitle = 'There is a problem' %}
