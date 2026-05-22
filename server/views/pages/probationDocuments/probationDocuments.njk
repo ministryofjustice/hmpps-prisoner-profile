@@ -9,12 +9,10 @@
 {% extends "../index.njk" %}
 {% set title = "Probation documents" %}
 {% set hideBackLink = true %}
-{%
-  set breadCrumbs = [
+{% set breadCrumbs = [
   { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
   { text: prisonerName.lastCommaFirst, href: "/prisoner/" + prisonerNumber }
-  ]
-%}
+] %}
 
 {% macro summary(conviction) %}
   <div>
@@ -55,7 +53,7 @@
         class="govuk-link"
         data-test="document-link"
         href="{{ dpsUrl }}/offenders/{{ prisonerNumber }}/probation-documents/{{ document.id }}/download"
-        >{{ document.name }}</a
+      >{{ document.name }}</a
       >
     </div>
     <div class="govuk-grid-column-full">{{ document.type }} created by {{ document.author }}</div>
@@ -69,30 +67,26 @@
   {% set rows = [] %}
 
   {% for document in documents %}
-    {%
-      set rows = (rows.push([
+    {% set rows = (rows.push([
       {
-      html: documentDetail(document, prisonerNumber)
+        html: documentDetail(document, prisonerNumber)
       },
       {
-      text: document.createdAt | formatDate
+        text: document.createdAt | formatDate
       }
-      ]), rows)
-    %}
+    ]), rows) %}
   {% endfor %}
 
-  {{
-    govukTable({
+  {{ govukTable({
     firstCellIsHeader: false,
     caption: caption,
     captionClasses: 'govuk-heading-m',
     head: [
-    { text: "Details" },
-    { text: "Date" }
+      { text: "Details" },
+      { text: "Date" }
     ],
     rows: rows
-    })
-  }}
+  }) }}
 {% endmacro %}
 
 {% macro convictionDocuments(conviction, prisonerNumber) %}
@@ -110,12 +104,10 @@
     {% set documents = probationDocuments.value.documents %}
 
     <article class="govuk-!-width-two-thirds">
-      {{
-        govukDetails({
+      {{ govukDetails({
         summaryText: "What to do if these details look incorrect",
         html: incorrectDetails(probationDetails)
-        })
-      }}
+      }) }}
     </article>
 
     {% if documents.offenderDocuments.length > 0 %}
@@ -124,51 +116,48 @@
     {% set convictionItems = [] %}
 
     {% for conviction in documents.convictions %}
-      {%
-        set convictionItems = (convictionItems.push(
+      {% set convictionItems = (convictionItems.push(
         {
           heading: { text: summaryTitle(conviction) },
           summary: { html: summary(conviction) },
           content: { html: convictionDocuments(conviction, prisonerNumber) }
         }
-      ), convictionItems)
-      %}
+      ), convictionItems) %}
     {% endfor %}
 
     <h3 class="govuk-heading-m govuk-!-margin-top-9 govuk-!-margin-bottom-0">Documents related to each sentence</h3>
-    {{
-    govukAccordion({
+    {{ govukAccordion({
       id: "accordion-default",
       items: convictionItems
-    })
-    }}
+    }) }}
 
   {% else %}
 
-    {% if probationDocuments.reason.status === 404 %}
+    {% if probationDocuments.reason.responseStatus === 404 %}
+      {% set errorTitle = 'There is a problem' %}
       {% set msg = 'We are unable to display documents for this prisoner because we cannot find the record in the probation system.' %}
 
       <article class="govuk-!-width-two-thirds">
-        {{
-        govukDetails({
+        {{ govukDetails({
           summaryText: "How to find probation documents",
           text: "If you think something is missing, ask a probation practitioner to update the record in the probation system."
-        })
-        }}
+        }) }}
       </article>
 
+    {% elseif probationDocuments.reason.responseStatus === 403 %}
+      {% set errorTitle = 'You are not authorised to access this record' %}
+      {% set msg = 'Please contact this person’s community offender manager.' %}
     {% else %}
+      {% set errorTitle = 'There is a problem' %}
       {% set msg = 'We cannot show these details right now. Try again later.' %}
     {% endif %}
 
-    {{
-      govukErrorSummary({
-      titleText: "There is a problem",
+    {{ govukErrorSummary({
+      titleText: errorTitle,
       errorList: [{text: msg}],
       attributes: { 'data-qa-errors': true },
       classes: 'govuk-!-width-two-thirds'
-      })
-    }}
+    }) }}
 
   {% endif %}
 
