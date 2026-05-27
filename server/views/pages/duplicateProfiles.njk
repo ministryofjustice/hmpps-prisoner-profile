@@ -49,12 +49,12 @@
 
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">Possible duplicate profiles for {{ prisonerName.firstLast }} </h1>
-        <p class="govuk-body">These profiles are separate records that may relate to the same person.</p>
+        <p class="govuk-body">These profiles are separate records that may relate to the same person. You should check
+          the profiles for any relevant information, but no further action is needed from you.</p>
 
         {% set whatDuplicateProfilesAreHtml %}
           <p class="govuk-body">A system check has identified these profiles as potential duplicates. They contain
-            matching information that
-            suggests they may belong to the same person.</p>
+            matching information that suggests they may belong to the same person.</p>
           <p class="govuk-body">In rare cases, these records may relate to different people.</p>
           <p class="govuk-body">If you are still unsure, you can also email the specialist support team in release
             accuracy support unit (RASU):
@@ -66,18 +66,9 @@
           html: whatDuplicateProfilesAreHtml
         }) }}
 
-        <h2 class="govuk-heading-m">What you should do</h2>
-        <p class="govuk-body">You should check these profiles for any relevant information.</p>
-        <p class="govuk-body">You do not need to report a duplicate. The App Support team will manually review and merge
-          records.</p>
-        <p class="govuk-body">If the banner on the Overview page does not appear next time you search for this person,
-          App
-          Support has either merged the profiles or decided they should stay separate.</p>
-
         <h2 class="govuk-heading-m">Profiles identified as possible duplicates</h2>
         <p class="govuk-body">You can only view profiles for prisoners in the establishments you’re authorised to
-          access,
-          including their inactive duplicate records.</p>
+          access, including their inactive duplicate records.</p>
       </div>
     </div>
 
@@ -91,6 +82,16 @@
         {% else %}
           {% include '../partials/duplicateProfilesList.njk' %}
         {% endif %}
+      </div>
+    </div>
+
+    <div class="govuk-grid-row hmpps-three-quarters-responsive">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">What happens next</h2>
+        <p class="govuk-body">You do not need to report a duplicate to the Helpdesk. The App Support team will check the
+          records and merge them if needed. You can keep working as normal while they do this.</p>
+        <p class="govuk-body">If the banner on the Overview page does not appear next time you search for this person,
+          either the profiles have been merged or App Support have decided they should stay separate.</p>
       </div>
     </div>
   {% endblock %}
