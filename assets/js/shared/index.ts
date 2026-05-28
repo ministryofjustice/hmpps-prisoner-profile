@@ -9,6 +9,7 @@ import { autocomplete } from './autocomplete'
 import { BackToTop } from './backToTop'
 import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
+import { FlashMessage } from './flashMessage'
 import { OpenCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
@@ -17,7 +18,7 @@ govukFrontend.initAll()
 mojFrontend.initAll()
 connectDps.initAll()
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   addAnotherButton()
   alertDynamicDropdowns()
   alertFlags()
@@ -27,5 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
   sortSelector()
   govukFrontend.createAll(BackToTop)
   govukFrontend.createAll(BodyParts)
+  govukFrontend.createAll(FlashMessage)
   govukFrontend.createAll(OpenCloseAll)
 })

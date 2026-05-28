@@ -1,10 +1,6 @@
 @keyframes flashMessageFadeOut {
   0% {
     opacity: 1;
-    visibility: visible;
-  }
-  80% {
-    opacity: 1;
   }
   100% {
     opacity: 0;
@@ -16,8 +12,7 @@
   z-index: 1;
   top: 75px;
   left: 50%;
-  opacity: 0;
-  animation: flashMessageFadeOut 3s;
+  animation: 1s ease-out 4s both flashMessageFadeOut;
 
   &--at-anchor {
     position: fixed;
@@ -31,10 +26,10 @@
     justify-content: center;
     text-align: center;
     padding: 10px 30px;
-    margin-bottom: 0;
+    margin: 0;
     background-color: $govuk-success-colour;
     color: govuk-colour("white");
-    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk-font($size: 19, $weight: "bold");
 
     &::before {
       content: url("/assets/images/tick-icon.svg");
