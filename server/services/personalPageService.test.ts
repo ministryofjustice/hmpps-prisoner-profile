@@ -141,7 +141,7 @@ describe('PersonalPageService', () => {
     prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
     prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
 
-    metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
+    metricsService = new MetricsService() as jest.Mocked<MetricsService>
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),

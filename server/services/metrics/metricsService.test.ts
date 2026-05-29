@@ -1,98 +1,89 @@
-import { TelemetryClient } from 'applicationinsights'
+import { telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
 import MetricsService from './metricsService'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 
-jest.mock('applicationinsights')
+jest.mock('@ministryofjustice/hmpps-azure-telemetry', () => ({
+  telemetry: {
+    trackEvent: jest.fn(),
+  },
+}))
 
 describe('Metrics Service', () => {
-  let telemetryClient: TelemetryClient
   let metricsService: MetricsService
+  const trackEventMock = telemetry.trackEvent as jest.Mock
 
   beforeEach(() => {
-    telemetryClient = new TelemetryClient() as jest.Mocked<TelemetryClient>
-    metricsService = new MetricsService(telemetryClient)
+    metricsService = new MetricsService()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    jest.resetAllMocks()
   })
 
   describe('trackPrisonPersonUpdate', () => {
-    it('should call telemetry client', async () => {
+    it('should call telemetry', () => {
       metricsService.trackPrisonPersonUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
         user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-prison-person-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-prison-person-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
       })
     })
   })
 
   describe('trackHealthAndMedicationsUpdate', () => {
-    it('should call telemetry client', async () => {
+    it('should call telemetry', () => {
       metricsService.trackHealthAndMedicationUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
         user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-health-and-medication-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-health-and-medication-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
       })
     })
   })
 
   describe('trackPersonCommunicationNeedsUpdate', () => {
-    it('should call telemetry client', async () => {
+    it('should call telemetry', () => {
       metricsService.trackPersonCommunicationNeedsUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
         user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-person-communication-needs-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-person-communication-needs-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
       })
     })
   })
 
   describe('trackPersonalRelationshipsUpdate', () => {
-    it('should call telemetry client', async () => {
+    it('should call telemetry', () => {
       metricsService.trackPersonalRelationshipsUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
         user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-personal-relationships-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-personal-relationships-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
       })
     })
   })
@@ -106,15 +97,12 @@ describe('Metrics Service', () => {
 
       metricsService.trackNomisLockedWarning(prisonerNumber, pageUrl, apiUrlCalled, user)
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-nomis-locked-warning-shown',
-        properties: {
-          prisonerNumber,
-          pageUrl,
-          apiUrlCalled,
-          username: user.username,
-          activeCaseLoad: user.activeCaseLoadId,
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-nomis-locked-warning-shown', {
+        prisonerNumber,
+        pageUrl,
+        apiUrlCalled,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
       })
     })
   })
@@ -128,39 +116,33 @@ describe('Metrics Service', () => {
 
       metricsService.trackFrontendError(prisonerNumber, pageUrl, error, user)
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-frontend-error-shown',
-        properties: {
-          prisonerNumber,
-          pageUrl,
-          error,
-          username: user.username,
-          activeCaseLoad: user.activeCaseLoadId,
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-frontend-error-shown', {
+        prisonerNumber,
+        pageUrl,
+        error,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
       })
     })
   })
 
   describe('trackPersonIntegrationUpdate', () => {
-    it('should call telemetry client', async () => {
+    it('should call telemetry', () => {
       metricsService.trackPersonIntegrationUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
         user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-person-integration-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-person-integration-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
       })
     })
 
-    it('should call telemetry client with additional properties', async () => {
+    it('should call telemetry with additional properties', () => {
       metricsService.trackPersonIntegrationUpdate({
         fieldsUpdated: ['field1', 'field2'],
         prisonerNumber: 'A1234AA',
@@ -168,15 +150,12 @@ describe('Metrics Service', () => {
         additionalProperties: { example: 'property' },
       })
 
-      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
-        name: 'prisoner-profile-person-integration-updated',
-        properties: {
-          prisonerNumber: 'A1234AA',
-          fieldsUpdated: ['field1', 'field2'],
-          username: 'USER1',
-          activeCaseLoad: 'MDI',
-          example: 'property',
-        },
+      expect(trackEventMock).toHaveBeenCalledWith('prisoner-profile-person-integration-updated', {
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: JSON.stringify(['field1', 'field2']),
+        username: 'USER1',
+        activeCaseLoad: 'MDI',
+        example: 'property',
       })
     })
   })

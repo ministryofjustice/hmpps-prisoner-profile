@@ -4,7 +4,6 @@ import multer from 'multer'
 import { getFrontendComponents, retrieveCaseLoadData } from '@ministryofjustice/hmpps-connect-dps-components'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
-import { appInsightsMiddleware } from './utils/azureAppInsights'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 
 import setUpAuthentication from './middleware/setUpAuthentication'
@@ -30,6 +29,7 @@ import { warningMiddleware, warningRenderMiddleware } from './middleware/warning
 import { distinguishingMarksMulterExceptions } from './routes/personal/edit/distinguishingMarksRouter'
 import unless from './utils/unless'
 import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
+import addUserMetadataToLogs from './middleware/addUserMetadataToLogs'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -39,7 +39,6 @@ export default function createApp(services: Services): express.Application {
   app.set('port', process.env.PORT || 3000)
 
   setUpSentry()
-  app.use(appInsightsMiddleware())
   app.use(setUpHealthChecks(services.dataAccess.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
@@ -78,6 +77,7 @@ export default function createApp(services: Services): express.Application {
   app.use(unless([distinguishingMarksMulterExceptions], setUpCsrf()))
 
   app.use(setUpCurrentUser())
+  app.use(addUserMetadataToLogs())
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
   app.use(apiErrorMiddleware())
