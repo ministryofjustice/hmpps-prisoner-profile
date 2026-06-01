@@ -1,5 +1,5 @@
 .hmpps-mini-banner {
-  background-color: govuk-functional-colour(template-background);;
+  background-color: govuk-colour("black", $variant: "tint-95");
   display: flex;
   flex-wrap: wrap;
   gap: 30px;

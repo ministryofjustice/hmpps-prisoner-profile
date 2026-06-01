@@ -1,0 +1,16 @@
+{% macro hmppsTabs(params) %}
+    <div class="govuk-tabs govuk-!-display-none-print">
+        <ul class="govuk-tabs__list">
+            {% for tab in params.tabs %}
+                {% if tab.visible %}
+                    {% set isSelected = (' govuk-tabs__list-item--selected' if params.currentUrlPath === tab.url) %}
+                    <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
+                        <a class="govuk-tabs__tab" href="{{ tab.url }}" data-qa="{{ params.testIdPrefix + tab.testId }}">
+                            {{ tab.text }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}

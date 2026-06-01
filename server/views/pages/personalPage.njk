@@ -1,5 +1,6 @@
 {% from "../macros/sidebarNav.njk" import sidebarNav %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
+{% from "../macros/hmppsError.njk" import hmppsError %}
 {% extends "./index.njk" %}
 {%
   set breadCrumbs = [
@@ -16,10 +17,7 @@
 {% block body %}
   {% if pageHasApiErrors and useCustomErrorBanner %}
     <div class="govuk-grid-row">
-      <div class="hmpps-api-error-banner govuk-!-margin-3">
-        <p>Sorry, there is a problem with the service</p>
-        <p>Some information on this page may be unavailable. Try again later.</p>
-      </div>
+      {{ hmppsError({ type: 'banner', classes: 'govuk-!-margin-3' }) }}
     </div>
   {% endif %}
 

@@ -1,0 +1,59 @@
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% from "macros/hmppsError.njk" import hmppsError %}
+
+{% macro hmppsFilteredListPage(params) %}
+    {% if not params.serviceUnavailable and params.errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: params.errors,
+            attributes: { 'data-qa-errors': true }
+        }) }}
+    {% endif %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1{% if params.titleId %} id="{{ params.titleId }}"{% endif %} class="govuk-heading-l govuk-!-margin-top-5">{{ params.titleHtml | safe }}</h1>
+        </div>
+    </div>
+
+    {% if params.serviceUnavailable %}
+        {{ hmppsError({
+            type: 'service-unavailable',
+            isAre: 'are',
+            serviceName: params.serviceUnavailableMessage
+        }) }}
+    {% else %}
+        {{ params.afterTitleHtml | safe }}
+
+        {% if params.actionButton %}
+            <div class="govuk-grid-row hmpps-filter-page-row govuk-!-display-none-print">
+                <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Purely to force formatting --></div>
+                <div class="govuk-grid-column-three-quarters">
+                    <div class="hmpps-action-header">
+                        {{ hmppsActionButton(params.actionButton) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if params.hasContent %}
+            <div class="govuk-grid-row hmpps-filter-page-row">
+                <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
+                    {{ params.filterHtml | safe }}
+                </div>
+                <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
+                    {{ caller() }}
+                </div>
+            </div>
+        {% else %}
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full" data-qa="{{ params.emptyStateDataQa }}">
+                    {{ params.emptyStateHtml | safe }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% include "partials/backToTop.njk" %}
+    {% endif %}
+{% endmacro %}

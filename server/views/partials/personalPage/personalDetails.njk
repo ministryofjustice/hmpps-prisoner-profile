@@ -1,5 +1,6 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
@@ -90,9 +91,11 @@
       <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
   {% else %}
-    <p class="hmpps-api-error-inset" data-qa="health-and-medication-api-error">
-        {{ unavailableApiErrorText }}
-    </p>
+    {{ hmppsError({
+        type: 'inset',
+        dataQa: 'health-and-medication-api-error',
+        text: unavailableApiErrorText
+    }) }}
   {% endif %}
 
 {% endmacro %}
@@ -170,6 +173,7 @@
                   options: {
                     anchor: "date-of-birth",
                     dataQa: "date-of-birth",
+                    visible: isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions),
                     changeHref: "personal/date-of-birth",
                     changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'dateOfBirth'
@@ -181,7 +185,7 @@
                   options: {
                     anchor: "city-or-town-of-birth",
                     dataQa: "city-or-town-of-birth",
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
                     changeHref: "personal/city-or-town-of-birth",
                     changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth'
@@ -193,7 +197,7 @@
                   options: {
                     anchor: "country-of-birth",
                     dataQa: "country-of-birth",
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
                     changeHref: "personal/country-of-birth",
                     changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'countryOfBirth'
@@ -205,7 +209,7 @@
                   options: {
                     anchor: "nationality",
                     dataQa: "nationality",
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions),
                     changeHref: "personal/nationality",
                     changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'nationality'
@@ -217,6 +221,7 @@
                   options: {
                     anchor: "ethnic-group",
                     dataQa: "ethnic-group",
+                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_ethnicity, prisonerPermissions),
                     changeHref: "personal/ethnic-group",
                     changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'ethnicity'
@@ -242,7 +247,7 @@
                   options: {
                     anchor: "sexual-orientation",
                     dataQa: "sexual-orientation",
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_sexual_orientation, prisonerPermissions),
                     changeHref: "personal/sexual-orientation",
                     changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_sexual_orientation, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'sexualOrientation'
@@ -254,7 +259,7 @@
                   options: {
                     anchor: "marriage-or-civil-partnership-status",
                     dataQa: "marriage-or-civil-partnership",
-                    visible: inUsersCaseLoad,
+                    visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_domestic_status, prisonerPermissions),
                     changeHref: "personal/marital-status",
                     changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_domestic_status, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'domesticStatus'
@@ -266,7 +271,7 @@
                   options: {
                     anchor: "number-of-children",
                     dataQa: "number-of-children",
-                    visible: inUsersCaseLoad,
+                    visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_number_of_children, prisonerPermissions),
                     changeHref: "personal/children",
                     changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_number_of_children, prisonerPermissions),
                     rowUpdated: flashMessage.fieldName === 'numberOfChildren'
@@ -300,7 +305,7 @@
                   options: {
                     anchor: "smoking-and-vaping",
                     dataQa: "smoker-or-vaper",
-                    visible: inUsersCaseLoad,
+                    visible: isGranted(PersonHealthAndMedicationPermission.read_smoker, prisonerPermissions),
                     changeLinkEnabled: editEnabled and isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
                     changeHref: 'personal/smoker-or-vaper',
                     rowUpdated: flashMessage.fieldName === 'smokerOrVaper'
@@ -463,17 +468,12 @@
             </div>
           {% endif %}
         {% else %}
-          <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
-            data-qa="military-records">
-            <div class="govuk-summary-list__row govuk-!-border-none">
-              <dt class="govuk-summary-list__key">UK military service record</dt>
-              <dd class="govuk-summary-list__value govuk-!-padding-bottom-0">
-                <p class="hmpps-api-error-inset" data-qa="military-records-api-error">
-                  {{ unavailableApiErrorText }}
-                </p>
-              </dd>
-            </div>
-          </dl>
+          {{ hmppsError({
+              type: 'inset',
+              classes: 'govuk-!-margin-top-6',
+              dataQa: 'military-records-api-error',
+              text: unavailableApiErrorText
+          }) }}
         {% endif %}
       {% endif %}
     </div>

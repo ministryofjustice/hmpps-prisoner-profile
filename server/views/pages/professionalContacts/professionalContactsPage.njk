@@ -1,6 +1,7 @@
 {% extends "../index.njk" %}
 
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "../../macros/arrayToLines.njk" import arrayToLines %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
@@ -88,11 +89,11 @@
         {% else %}
             {% set contactApiError = contactResult.reason %}
             {% call summaryCard({title: contactApiError.relationshipDescription | sentenceCase}) %}
-                <dl class="govuk-summary-list" >
-                    <div class="govuk-summary-list__row" data-qa="contact-api-error">
-                        {{ standardApiErrorText }}
-                    </div>
-                </dl>
+                {{ hmppsError({
+                    type: 'inset',
+                    dataQa: 'contact-api-error',
+                    text: standardApiErrorText
+                }) }}
             {% endcall %}
         {% endif %}
     {% endfor %}

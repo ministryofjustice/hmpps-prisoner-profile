@@ -1,5 +1,9 @@
-{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% extends "govuk/template.njk" %}
+
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "macros/hmppsError.njk" import hmppsError %}
+{% from "macros/hmppsFlashMessage.njk" import hmppsFlashMessage %}
+
 {% block head %}
   {% include "./googleTagManagerHeadScripts.njk" %}
   {% include "./appInsightsWebTracking.njk" %}
@@ -24,10 +28,7 @@
 
 {% block beforeContent %}
   {% if pageHasApiErrors and not useCustomErrorBanner %}
-    <div class="hmpps-api-error-banner">
-      <p>Sorry, there is a problem with the service</p>
-      <p>Some information on this page may be unavailable. Try again later.</p>
-    </div>
+    {{ hmppsError({ type: 'banner' }) }}
   {% endif %}
 
   {% if bannerText %}
@@ -35,9 +36,10 @@
   {% endif %}
 
   {% if flashMessage %}
-    <div class="hmpps-flash-message {{ 'hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
-      <p role="alert">{{ flashMessage.text }}</p>
-    </div>
+    {{ hmppsFlashMessage({
+      text: flashMessage.text,
+      anchored: flashMessage.fieldName
+    }) }}
   {% endif %}
 
   <div class="prisoner-profile-breadcrumbs govuk-!-display-none-print">

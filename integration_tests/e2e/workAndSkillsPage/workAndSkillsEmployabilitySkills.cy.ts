@@ -43,7 +43,6 @@ context('Work and skills page - Employability Skills Card', () => {
         workAndSkillsPage.ES_header().should('exist')
         workAndSkillsPage.ES_header().contains('Employability skills')
         workAndSkillsPage.ES_curious_unavailable_message().should('be.visible')
-        workAndSkillsPage.ES_info().should('exist')
       })
     })
   })

@@ -24,8 +24,12 @@
   }
 }
 
-.hmpps-employability-card {
-  .hmpps-summary-card__body > div:last-of-type {
+.hmpps-employability-card,
+.hmpps-functional-skills-card,
+#courses-and-qualifications,
+#goals,
+#work-and-activities {
+  .hmpps-summary-card__body > :last-child {
     margin-bottom: 10px;
   }
 }

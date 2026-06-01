@@ -1,5 +1,12 @@
 {% extends "../partials/layout.njk" %}
 
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+  }
+] %}
+
 {% set mainClasses = "govuk-body" %}
 {% block content %}
   {% include "../partials/profileBanner/profileBanner.njk" %}

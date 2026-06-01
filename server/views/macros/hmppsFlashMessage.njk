@@ -1,0 +1,7 @@
+{% macro hmppsFlashMessage(params) -%}
+
+  <div class="hmpps-flash-message {% if params.anchored %}hmpps-flash-message--at-anchor{% endif %}" data-module="hmpps-flash-message">
+    <p role="alert">{{ params.text }}</p>
+  </div>
+
+{%- endmacro %}

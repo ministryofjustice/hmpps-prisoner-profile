@@ -1,69 +1,27 @@
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "../../macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% from "macros/filteredListPage.njk" import hmppsFilteredListPage %}
 {% extends "../index.njk" %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-]%}
 {% block body %}
+    {% set titleHtml = "Case notes" %}
+    {% set hasContent = (hasCaseNotes) or (errors.length > 0) %}
+    {% set emptyStateHtml = fullName + " does not have any case notes" %}
+    {% set actionButton = { text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl } if isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
 
-    {% if caseNotesApiUnavailable %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">
-                <h1 id="caseNotes" class="govuk-heading-l govuk-!-margin-top-5">Case notes</h1>
-            </div>
-        </div>
+    {% set filterHtml %}
+        {% include 'partials/caseNotesPage/caseNotesFilter.njk' %}
+    {% endset %}
 
-        <div class="dps-banner dps-banner__error">
-            <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Case notes are currently unavailable</p>
-            <p>Reload the page or try again later. Case notes might still be available in other parts of DPS.</p>
-        </div>
-    {% else %}
-
-        {% if errors.length > 0 %}
-            {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errors,
-                attributes: { 'data-qa-errors': true }
-            })}}
-        {% endif %}
-
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">
-                <h1 id="caseNotes" class="govuk-heading-l govuk-!-margin-top-5">Case notes</h1>
-            </div>
-        </div>
-
-        <div class="govuk-grid-row govuk-!-display-none-print">
-            <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
-            <div class="govuk-grid-column-three-quarters">
-                {% if isGranted(CaseNotesPermission.edit, prisonerPermissions) %}
-                <div class="hmpps-action-header">
-                    {{ hmppsActionButton({ text: 'Add case note', iconName: 'add-case-note', id: 'add-case-note-action-button', url: addCaseNoteLinkUrl }) }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        {% if (hasCaseNotes) or (errors.length > 0) %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
-                {% include '../../partials/caseNotesPage/caseNotesFilter.njk' %}
-            </div>
-            <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-                {% include '../../partials/caseNotesPage/caseNotesList.njk' %}
-            </div>
-        </div>
-        {% else %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full" data-qa="case-notes-empty-state">
-                {{ fullName }} does not have any case notes
-            </div>
-        </div>
-        {% endif %}
-
-        {% include "partials/backToTop.njk" %}
-    {% endif %}
+    {% call hmppsFilteredListPage({
+        titleHtml: titleHtml,
+        titleId: "caseNotes",
+        serviceUnavailable: caseNotesApiUnavailable,
+        serviceUnavailableMessage: "Case notes",
+        actionButton: actionButton,
+        hasContent: hasContent,
+        emptyStateHtml: emptyStateHtml,
+        emptyStateDataQa: "case-notes-empty-state",
+        filterHtml: filterHtml,
+        errors: errors
+    }) %}
+        {% include 'partials/caseNotesPage/caseNotesList.njk' %}
+    {% endcall %}
 {% endblock %}

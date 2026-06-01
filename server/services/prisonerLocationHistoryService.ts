@@ -1,7 +1,9 @@
+import logger from '../../logger'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
+import { errorHasStatus } from '../utils/errorHelpers'
 import { formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
@@ -96,7 +98,14 @@ export default class PrisonerLocationHistoryService {
 
     const [location, locationAtrbts, locationHistory, agencyDetails, cellMoveReasonTypes] = await Promise.all([
       locationsInsidePrisonApiClient.getLocation(dpsLocationId),
-      locationsInsidePrisonApiClient.getLocationAttributes(dpsLocationId),
+      locationsInsidePrisonApiClient.getLocationAttributes(dpsLocationId).catch(error => {
+        if (errorHasStatus(error, 404)) {
+          // api returns 404 if location is not a cell
+          logger.warn(error, 'Cannot get location attributes')
+          return <never[]>[]
+        }
+        throw error
+      }),
       prisonApiClient.getHistoryForLocation(locationId, fromDate as string, toDate as string),
       prisonApiClient.getAgencyDetails(agencyId.toString()),
       prisonApiClient.getCellMoveReasonTypes(),

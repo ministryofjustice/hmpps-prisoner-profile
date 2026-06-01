@@ -1,3 +1,4 @@
+{% from "macros/hmppsTabs.njk" import hmppsTabs %}
 {% block body %}
 
     <div class="govuk-grid-row">
@@ -6,28 +7,15 @@
         </div>
     </div>
 
-    {% set tabs = [
-        { text: 'Spends', path: 'spends', visible: true, testId: 'spends' },
-        { text: 'Private cash', path: 'private-cash', visible: true, testId: 'privateCash' },
-        { text: 'Savings', path: 'savings', visible: true, testId: 'savings' },
-        { text: 'Damage obligations', path: 'damage-obligations', visible: showDamageObligationsTab, testId: 'damageObligations' }
-    ]
-    %}
-
-    <div class="govuk-tabs govuk-!-display-none-print">
-        <ul class="govuk-tabs__list">
-            {% for tab in tabs %}
-                {% if tab.visible %}
-                    {% set fullTabPath = '/prisoner/' + prisonerNumber + '/money/' + tab.path %}
-                    {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPath === fullTabPath) %}
-                    <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
-                        <a class="govuk-tabs__tab" href="{{ fullTabPath }}" data-qa="{{'money-tabs-' + tab.testId }}">
-                            {{ tab.text }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
+    {{ hmppsTabs({
+        currentUrlPath: currentUrlPath,
+        testIdPrefix: 'money-tabs-',
+        tabs: [
+            { text: 'Spends', url: '/prisoner/' + prisonerNumber + '/money/spends', visible: true, testId: 'spends' },
+            { text: 'Private cash', url: '/prisoner/' + prisonerNumber + '/money/private-cash', visible: true, testId: 'privateCash' },
+            { text: 'Savings', url: '/prisoner/' + prisonerNumber + '/money/savings', visible: true, testId: 'savings' },
+            { text: 'Damage obligations', url: '/prisoner/' + prisonerNumber + '/money/damage-obligations', visible: showDamageObligationsTab, testId: 'damageObligations' }
+        ]
+    }) }}
 
 {%  endblock %}

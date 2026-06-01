@@ -1,0 +1,35 @@
+{% macro hmppsError(params) %}
+    {%- if params.type === 'service-unavailable' -%}
+        <div class="dps-banner dps-banner__error{% if params.small %} dps-banner__small{% endif %}{% if params.classes %} {{ params.classes }}{% endif %}"{% if params.dataQa %} data-qa="{{ params.dataQa }}"{% endif %}>
+            <p class="govuk-!-font-weight-bold{% if not params.small %} govuk-!-margin-bottom-1{% endif %}">{{ params.serviceName }} {{ params.isAre }} currently unavailable</p>
+            <p>
+                {%- if params.text -%}
+                    {{ params.text }}
+                {%- else -%}
+                    Reload the page or try again later. {{ params.serviceName }} might still be available in other parts of DPS.
+                {%- endif -%}
+            </p>
+        </div>
+    {%- elif params.type === 'banner' -%}
+        <div class="hmpps-api-error-banner{% if params.classes %} {{ params.classes }}{% endif %}"{% if params.dataQa %} data-qa="{{ params.dataQa }}"{% endif %}>
+            {%- if params.text -%}
+                {%- if params.html -%}
+                    {{ params.text | safe }}
+                {%- else -%}
+                    <p>{{ params.text }}</p>
+                {%- endif -%}
+            {%- else -%}
+                <p>Sorry, there is a problem with the service</p>
+                <p>Some information on this page may be unavailable. Try again later.</p>
+            {%- endif -%}
+        </div>
+    {%- elif params.type === 'inset' -%}
+        <p class="hmpps-api-error-inset{% if params.classes %} {{ params.classes }}{% endif %}"{% if params.dataQa %} data-qa="{{ params.dataQa }}"{% endif %}>
+            {%- if params.text -%}
+                {{ params.text }}
+            {%- else -%}
+                This information is currently unavailable. Try again later.
+            {%- endif -%}
+        </p>
+    {%- endif -%}
+{% endmacro %}

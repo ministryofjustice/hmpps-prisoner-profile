@@ -1,6 +1,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/hmppsError.njk" import hmppsError %}
 
 {% macro additionalDetails(contact) %}
   <div class="contact-additional-details">
@@ -43,86 +44,89 @@
   ] if editEnabled and isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions)
 }) -%}
   {% if nextOfKinAndEmergencyContacts.status === 'fulfilled'  %}
-    {% set hasNextOfKin = nextOfKinAndEmergencyContacts.value.hasNextOfKin %}
-    {% set hasEmergencyContact = nextOfKinAndEmergencyContacts.value.hasEmergencyContact %}
-    {% set contacts = nextOfKinAndEmergencyContacts.value.contacts %}
-
-    {% if not hasNextOfKin %}
-      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
-        <div class="govuk-grid-column-full">
-          {% if newArrival72 %}
-            <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
-          {% endif %}
-          <h3 class="govuk-heading-m govuk-!-margin-bottom-1">No next of kin</h3>
-          <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
-        </div>
-      </div>
-    {% endif %}
-    {% if not hasNextOfKin and not hasEmergencyContact %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
-    {% endif %}
-    {% if not hasEmergencyContact %}
-      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
-        <div class="govuk-grid-column-full">
-          {% if newArrival72 %}
-            <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
-          {% endif %}
-          <h3 class="govuk-heading-m govuk-!-margin-bottom-1">No emergency contact</h3>
-          <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
-        </div>
-      </div>
-    {% endif %}
-    {% if hasNextOfKin !== hasEmergencyContact %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
-    {% endif %}
-    {% for contact in contacts %}
-      <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
-        <div class="govuk-grid-column-full">
-          <div class="contact-status-bar">
-            <div class="contact-type-pills">
-              {% if contact.isNextOfKin %}
-              <div class="contact-type-pill contact-type-pill--next-of-kin" data-qa="next-of-kin">
-                <span>Next of kin</span>
-              </div>
-              {% endif %}
-              {% if contact.isEmergencyContact %}
-              <div class="contact-type-pill contact-type-pill--emergency-contact" data-qa="emergency-contact">
-                <span>Emergency contact</span>
-              </div>
-              {% endif %}
-            </div>
-
-            {% if
-              editEnabled and 
-              changeContactLinkEnabled and
-              isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions) and
-              isGranted(PersonalRelationshipsPermission.edit_contacts, prisonerPermissions)
-            %}
-              <div class="contact-change-link"><a href="{{ generateContactChangeLink(prisonerNumber, contact) }}" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact details</a></div>
-            {% endif %}
-
-          </div>
-          <h3 class="govuk-heading-m govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
-          <p class="govuk-body-l govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
-          <p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-{{ "1" if not contact.extNumber else "0"}} {{ 'contact-phone-number__missing' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
-          {% if contact.extNumber %}<p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-phone-extension">{{ "Ext. " + contact.extNumber }}</p>{% endif %}
-          {{ govukDetails({
-            summaryText: "Additional details",
-            html: additionalDetails(contact)
-          }) }}
-        </div>
-      </div>
-      {% if not loop.last %}
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-api-error">
+    <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <p class="hmpps-api-error-inset govuk-!-margin-bottom-3">
-          {{ unavailableApiErrorText }}
-        </p>
+        {% set hasNextOfKin = nextOfKinAndEmergencyContacts.value.hasNextOfKin %}
+        {% set hasEmergencyContact = nextOfKinAndEmergencyContacts.value.hasEmergencyContact %}
+        {% set contacts = nextOfKinAndEmergencyContacts.value.contacts %}
+
+        {% if not hasNextOfKin %}
+          <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="next-of-kin-not-entered">
+            <div class="govuk-grid-column-full">
+              {% if newArrival72 %}
+                <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
+              {% endif %}
+              <h3 class="govuk-heading-m govuk-!-margin-bottom-1">No next of kin</h3>
+              <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
+            </div>
+          </div>
+        {% endif %}
+        {% if not hasNextOfKin and not hasEmergencyContact %}
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
+        {% endif %}
+        {% if not hasEmergencyContact %}
+          <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="emergency-contact-not-entered">
+            <div class="govuk-grid-column-full">
+              {% if newArrival72 %}
+                <div class="not-entered-tag not-entered-tag--heading govuk-!-margin-bottom-2">Not entered</div>
+              {% endif %}
+              <h3 class="govuk-heading-m govuk-!-margin-bottom-1">No emergency contact</h3>
+              <p class="govuk-!-margin-bottom-5">No contact details have been entered.</p>
+            </div>
+          </div>
+        {% endif %}
+        {% if hasNextOfKin !== hasEmergencyContact %}
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
+        {% endif %}
+        {% for contact in contacts %}
+          <div class="govuk-grid-row govuk-!-padding-top-0 govuk-!-padding-bottom-1" data-qa="contact-item">
+            <div class="govuk-grid-column-full">
+              <div class="contact-status-bar">
+                <div class="contact-type-pills">
+                  {% if contact.isNextOfKin %}
+                  <div class="contact-type-pill contact-type-pill--next-of-kin" data-qa="next-of-kin">
+                    <span>Next of kin</span>
+                  </div>
+                  {% endif %}
+                  {% if contact.isEmergencyContact %}
+                  <div class="contact-type-pill contact-type-pill--emergency-contact" data-qa="emergency-contact">
+                    <span>Emergency contact</span>
+                  </div>
+                  {% endif %}
+                </div>
+
+                {% if
+                  editEnabled and
+                  changeContactLinkEnabled and
+                  isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions) and
+                  isGranted(PersonalRelationshipsPermission.edit_contacts, prisonerPermissions)
+                %}
+                  <div class="contact-change-link"><a href="{{ generateContactChangeLink(prisonerNumber, contact) }}" class="govuk-link govuk-link--no-visited-state" data-qa="change-contact-details-link">Change contact details</a></div>
+                {% endif %}
+
+              </div>
+              <h3 class="govuk-heading-m govuk-!-margin-bottom-0" data-qa="contact-name">{{ contact.firstName | formatName(contact.middleNames, contact.lastName) }}</h3>
+              <p class="govuk-body-l govuk-!-margin-bottom-1" data-qa="contact-relationship">{{ contact.relationshipToPrisonerDescription }}</p>
+              <p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-{{ "1" if not contact.extNumber else "0"}} {{ 'contact-phone-number__missing' if not contact.phoneNumber }}" data-qa="contact-phone">{{ (contact.phoneNumber | formatPhoneNumber) or 'Phone number not entered' }}</p>
+              {% if contact.extNumber %}<p class="contact-phone-number govuk-!-margin-top-0 govuk-!-margin-bottom-1" data-qa="contact-phone-extension">{{ "Ext. " + contact.extNumber }}</p>{% endif %}
+              {{ govukDetails({
+                summaryText: "Additional details",
+                html: additionalDetails(contact)
+              }) }}
+            </div>
+          </div>
+          {% if not loop.last %}
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
+          {% endif %}
+        {% endfor %}
       </div>
     </div>
+  {% else %}
+    {{ hmppsError({
+      type: 'inset',
+      classes: 'govuk-!-margin-bottom-3',
+      dataQa: 'next-of-kin-api-error',
+      text: unavailableApiErrorText
+    }) }}
   {% endif %}
 {%- endcall -%}
