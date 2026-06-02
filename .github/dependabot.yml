@@ -1,7 +1,28 @@
 version: 2
+
+multi-ecosystem-groups:
+  infrastructure:
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "10:02"
+      timezone: "Europe/London"
+
 updates:
-  - package-ecosystem: npm
-    directory: /
+  # main dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "10:15"
+      timezone: "Europe/London"
+    cooldown:
+      default-days: 7
+      exclude:
+        - "@ministryofjustice/*"
+    groups:
+      development:
+        dependency-type: "development"
     ignore:
       - dependency-name: "@types/node"
         versions:
@@ -9,31 +30,45 @@ updates:
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
+
+  # infrastructure dependencies
+  - package-ecosystem: "docker"
+    multi-ecosystem-group: "infrastructure"
+    directory: "/"
+    patterns:
+      - "*"
     cooldown:
       default-days: 7
-      exclude:
-        - "@ministryofjustice/*"
-    schedule:
-      interval: weekly
-      day: wednesday
-    groups:
-      development:
-        dependency-type: "development"
-
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "docker-compose"
+    multi-ecosystem-group: "infrastructure"
+    directory: "/"
+    patterns:
+      - "*"
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "github-actions"
+    multi-ecosystem-group: "infrastructure"
+    directory: "/"
+    patterns:
+      - "*"
     cooldown:
       default-days: 7
       exclude:
         - "ministryofjustice/*"
-    schedule:
-      interval: weekly
-      day: wednesday
-
-  - package-ecosystem: pre-commit
+  - package-ecosystem: "helm"
+    multi-ecosystem-group: "infrastructure"
+    directories:
+      - "/helm_deploy/*"
+    patterns:
+      - "*"
     cooldown:
       default-days: 7
-    directory: /
-    schedule:
-      interval: weekly
-      day: wednesday
+      exclude:
+        - "https://ministryofjustice.github.io/hmpps-helm-charts/*"
+  - package-ecosystem: "pre-commit"
+    multi-ecosystem-group: "infrastructure"
+    directory: "/"
+    patterns:
+      - "*"
+    cooldown:
+      default-days: 7
