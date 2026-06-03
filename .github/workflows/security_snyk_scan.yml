@@ -3,7 +3,8 @@ name: Security Snyk dependency check
 on:
   workflow_dispatch:
   schedule:
-    - cron: "36 13 * * 1-5"
+    - cron: "36 13 * * MON-FRI"
+      timezone: "Europe/London"
 
 jobs:
   security-snyk-check:
@@ -12,7 +13,7 @@ jobs:
       actions: read
       security-events: write
     name: Project security Snyk dependency check
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_snyk_scan.yml@v2
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_snyk_scan.yml@v3
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
       subproject: ''
