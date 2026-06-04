@@ -44,7 +44,7 @@
     "@ministryofjustice/hmpps-connect-dps-components": "5.5.0",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "3.7.4",
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
-    "@ministryofjustice/hmpps-prison-permissions-lib": "2.6.0",
+    "@ministryofjustice/hmpps-prison-permissions-lib": "3.0.0",
     "@ministryofjustice/hmpps-rest-client": "1.2.1",
     "@sentry/node": "10.53.1",
     "@types/multer": "2.1.0",
