@@ -40,7 +40,7 @@
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.1",
     "@microsoft/applicationinsights-web": "3.4.1",
     "@ministryofjustice/frontend": "9.0.0",
-    "@ministryofjustice/hmpps-auth-clients": "2.0.0",
+    "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-connect-dps-components": "6.0.0",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "4.0.0",
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
@@ -74,7 +74,7 @@
     "opossum": "^9.0.0",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^6.0.0",
+    "redis": "6.0.0",
     "superagent": "^10.3.0",
     "url-value-parser": "^2.2.0"
   },
