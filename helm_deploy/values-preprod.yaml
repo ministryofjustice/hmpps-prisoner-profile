@@ -110,15 +110,11 @@ generic-service:
     HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
 
   allowlist:
-    sscl-blackpool: 31.121.5.27/32
-    sscl-azure: 51.142.106.199/32
-    sscl-york: 62.6.61.29/32
-    sscl-newcastle: 62.172.79.105/32
-    sscl-newport: 217.38.237.212/32
     groups:
       - internal
       - prisons
       - private_prisons
+      - sscl
 
   scheduledDowntime:
     enabled: true
