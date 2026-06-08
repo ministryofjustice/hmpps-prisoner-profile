@@ -1,0 +1,23 @@
+.notification-banner-yellow {
+  border: 1px solid #594d00;
+  padding: 8px 8px 6px;
+  margin-bottom: 15px;
+  background: #fff7bf;
+  @include govuk-font(16);
+
+  a,
+  a:visited {
+    color: #594d00 !important;
+  }
+
+  a:hover,
+  a:active {
+    color: #2f2900 !important;
+  }
+
+  p {
+    color: #594d00;
+    margin: 0;
+    font-size: inherit;
+  }
+}
