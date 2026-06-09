@@ -5,7 +5,7 @@
   background: #fff7bf;
   @include govuk-font(16);
 
-  a,
+  a:link,
   a:visited {
     color: #594d00 !important;
   }
