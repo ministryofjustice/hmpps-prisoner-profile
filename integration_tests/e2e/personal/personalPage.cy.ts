@@ -250,6 +250,16 @@ context('When signed in', () => {
         page.personalDetails().militaryRecords().dischargeLocation().should('include.text', 'Location 2')
         page.personalDetails().militaryRecords().dischargeDescription().should('include.text', 'Honourable')
       })
+
+      it('Displays the edit profile banner above personal details', () => {
+        cy.get('.hmpps-profile--personal-content').within(() => {
+          cy.get('.notification-banner-yellow').should('exist')
+          cy.get('.notification-banner-yellow').should(
+            'contain.text',
+            'You can now update personal information in DPS.',
+          )
+        })
+      })
     })
 
     context('Identity numbers card', () => {
