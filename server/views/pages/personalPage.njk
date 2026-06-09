@@ -40,6 +40,16 @@
 
   {% set content %}
     <div class="hmpps-profile--personal-content hmpps-full-width-print {{ 'new-arrival' if newArrival72 }}">
+      {% if showEditProfileBanner %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% set youCanNowAction = 'update personal information' %}
+            {% set moreInfoLink = 'https://justiceuk.sharepoint.com/sites/prisons-digital/SitePages/Prisoner%20Profile.aspx' %}
+            {% set giveFeedbackLink = 'https://www.smartsurvey.co.uk/s/WAKMI3/' %}
+            {% include "../partials/notificationBannerYellow.njk" %}
+          </div>
+        </div>
+      {% endif %}
       {% for section in sections %}
         {% set sectionHtml %}
           <div class="govuk-grid-row">
