@@ -11,7 +11,7 @@
 {% set hideBackLink = true %}
 {% set breadCrumbs = [
     { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: prisonerName.lastCommaFirst, href: "/prisoner/" + prisonerNumber },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
     { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
   ] %}
 {% block body %}
