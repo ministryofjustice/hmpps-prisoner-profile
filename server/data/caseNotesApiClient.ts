@@ -40,6 +40,7 @@ export default class CaseNotesApiRestClient extends RestClient implements CaseNo
       size: queryParams?.showAll ? 9999 : (queryParams?.size ?? 20),
       sort: queryParams?.sort,
     }
+    console.warn(request)
     return this.post(
       {
         path: `/search/case-notes/${prisonerNumber}`,
