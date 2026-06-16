@@ -307,7 +307,7 @@ const baseEmailAddressTextFieldData: Omit<
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
   redirectAnchor: 'phones-and-emails',
-  inputClasses: 'govuk-!-width-one-half',
+  inputClasses: 'govuk-!-width-two-thirds',
   inputType: 'email',
   spellcheck: false,
   submitButtonText: 'Save and return to profile',
