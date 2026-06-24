@@ -1,11 +1,14 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+
 {%- call summaryCard({title: "Security", id: "security"}) -%}
   <div class="govuk-grid-row" data-qa="security">
     <div class="govuk-grid-column-full">
       {% if security.xrays.total > 0 %}
         <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">
+          {# TODO: this 116 should not be hard-coded in a template file,
+                   rather api-driven or in config/business logic #}
           {% if security.xrays.total >= 116 %}
             <div
               class="govuk-grid-row hmpps-xray__warning govuk-!-margin-bottom-3"
@@ -49,6 +52,7 @@
           <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
         {% endif %}
       {% endif %}
+
       {% if security.interestToImmigration == "Yes" %}
         <div class="govuk-warning-text govuk-!-margin-bottom-3" data-qa="interest-to-immigration">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -63,6 +67,7 @@
           <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
         {% endif %}
       {% endif %}
+
       {% if security.travelRestrictions %}
         <div class="govuk-warning-text" data-qa="travel-restrictions">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
