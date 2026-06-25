@@ -1,5 +1,6 @@
 import { addDays, format, startOfToday } from 'date-fns'
-import { stubFor } from './wiremock'
+import type { SuperAgentRequest } from 'superagent'
+import { stubFor, stubPing } from './wiremock'
 import {
   accountBalancesMock,
   assessmentsMock,
@@ -99,16 +100,7 @@ import { formatDateISO } from '../../server/utils/dateHelpers'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
-  stubPrisonApiPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/prison/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubPrisonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/prison', httpStatus),
 
   stubAccountBalances: (bookingId: number) => {
     return stubFor({
