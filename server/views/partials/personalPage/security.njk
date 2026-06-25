@@ -1,5 +1,3 @@
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/summaryCardMacro.njk" import summaryCard %}
 
 {%- call summaryCard({title: "Security", id: "security"}) -%}
@@ -52,6 +50,35 @@
           <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
         {% endif %}
       {% endif %}
+
+      {# TODO: only shown to DPS developers: remove from here #}
+      {% if security.unsafeXrays.total %}
+        <div class="hmpps-xray hmpps-xray--unsafe govuk-!-margin-bottom-3">
+          <div class="hmpps-xray__total">
+            <div class="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+              <div class="govuk-grid-column-one-third">
+                <p class="hmpps-xray__label">X-ray body scans</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0">
+                  Since {{ security.unsafeXrays.since }}
+                </p>
+              </div>
+              <div class="govuk-grid-column-two-thirds">
+                <p class="hmpps-xray__total">
+                  {{ security.unsafeXrays.total }}
+                </p>
+              </div>
+            </div>
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-full">
+                <p>
+                  <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/x-ray-body-scans">All X-ray body scans</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {# TODO: only shown to DPS developers: remove to here #}
 
       {% if security.interestToImmigration == "Yes" %}
         <div class="govuk-warning-text govuk-!-margin-bottom-3" data-qa="interest-to-immigration">

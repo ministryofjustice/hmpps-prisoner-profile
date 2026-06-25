@@ -1,15 +1,14 @@
-{% from "../macros/sidebarNav.njk" import sidebarNav %}
-{% from "../macros/conditionallyShow.njk" import conditionallyShow %}
-{% from "../macros/hmppsError.njk" import hmppsError %}
 {% extends "./index.njk" %}
-{%
-  set breadCrumbs = [
+{% from "macros/sidebarNav.njk" import sidebarNav %}
+{% from "macros/conditionallyShow.njk" import conditionallyShow %}
+{% from "macros/hmppsError.njk" import hmppsError %}
+
+{% set breadCrumbs = [
   {
-  text: 'Digital Prison Services',
-  href:  "/" | prependBaseUrl
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
   }
-  ]
-%}
+] %}
 {% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
@@ -22,16 +21,16 @@
   {% endif %}
 
   {% set sections = [
-    { text: "Personal details", href: "#personal-details", template: "../partials/personalPage/personalDetails.njk" },
-    { text: "Identity numbers", href: "#identity-numbers", template: "../partials/personalPage/identityNumbers.njk" },
-    { text: "Care needs", href: "#care-needs", template: "../partials/personalPage/careNeeds.njk" },
-    { text: "Neurodiversity", href: "#neurodiversity", template: "../partials/personalPage/neurodiversity.njk", condition: showNeurodiversity },
-    { text: "Appearance", href: "#appearance", template: "../partials/personalPage/appearance.njk", condition: inUserCaseload },
-    { text: "Addresses", href: "#addresses", template: "../partials/personalPage/addresses.njk" if displayNewAddressesCard else "../partials/personalPage/oldAddresses.njk" },
-    { text: "Phone and email", href: "#phones-and-emails", template: "../partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
-    { text: "Next of kin", href: "#next-of-kin", template: "../partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "../partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
-    { text: "Security", href: "#security", template: "../partials/personalPage/security.njk", condition: showSecurity },
-    { text: "Property", href: "#property", template: "../partials/personalPage/property.njk", condition: inUserCaseload }
+    { text: "Personal details", href: "#personal-details", template: "partials/personalPage/personalDetails.njk" },
+    { text: "Identity numbers", href: "#identity-numbers", template: "partials/personalPage/identityNumbers.njk" },
+    { text: "Care needs", href: "#care-needs", template: "partials/personalPage/careNeeds.njk" },
+    { text: "Neurodiversity", href: "#neurodiversity", template: "partials/personalPage/neurodiversity.njk", condition: showNeurodiversity },
+    { text: "Appearance", href: "#appearance", template: "partials/personalPage/appearance.njk", condition: inUserCaseload },
+    { text: "Addresses", href: "#addresses", template: "partials/personalPage/addresses.njk" if displayNewAddressesCard else "partials/personalPage/oldAddresses.njk" },
+    { text: "Phone and email", href: "#phones-and-emails", template: "partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
+    { text: "Next of kin", href: "#next-of-kin", template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
+    { text: "Security", href: "#security", template: "partials/personalPage/security.njk", condition: showSecurity },
+    { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: inUserCaseload }
   ] %}
 
   {% set sidebar %}
@@ -46,7 +45,7 @@
             {% set youCanNowAction = 'update personal information' %}
             {% set moreInfoLink = 'https://justiceuk.sharepoint.com/sites/prisons-digital/SitePages/Prisoner%20Profile.aspx' %}
             {% set giveFeedbackLink = 'https://www.smartsurvey.co.uk/s/WAKMI3/' %}
-            {% include "../partials/notificationBannerYellow.njk" %}
+            {% include "partials/notificationBannerYellow.njk" %}
           </div>
         </div>
       {% endif %}
@@ -71,5 +70,5 @@
   {% endset %}
 
   {% set heading = "Personal" %}
-  {% include "../partials/sidebarPageLayout.njk" %}
+  {% include "partials/sidebarPageLayout.njk" %}
 {% endblock %}
