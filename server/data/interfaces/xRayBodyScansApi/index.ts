@@ -1,7 +1,7 @@
 export interface ScanCountRequest {
   prisonerNumber: string
-  fromStartDate?: Date | undefined
-  toStartDate?: Date | undefined
+  fromScanDate?: Date | undefined
+  toScanDate?: Date | undefined
 }
 
 export interface ScanCountResponse {

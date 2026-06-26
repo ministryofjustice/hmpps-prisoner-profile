@@ -24,16 +24,16 @@ describe('xRayBodyScansApiClient', () => {
     fakeXRayBodyScansApi
       .get(`/prisoner/${samplePrisonerNumber}/scan/count`)
       .query({
-        fromStartDate: '2026-05-01',
-        toStartDate: '2026-06-25',
+        fromScanDate: '2026-05-01',
+        toScanDate: '2026-06-25',
       })
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(200, scanCountResponseMock)
 
     const response = await xRayBodyScansApiClient.countScans({
       prisonerNumber: samplePrisonerNumber,
-      fromStartDate: new Date(2026, 4, 1),
-      toStartDate: new Date(2026, 5, 25),
+      fromScanDate: new Date(2026, 4, 1),
+      toScanDate: new Date(2026, 5, 25),
     })
     expect(response).toEqual(scanCountResponseMock)
   })

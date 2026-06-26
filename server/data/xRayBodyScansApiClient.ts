@@ -11,11 +11,11 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
 
   countScans(request: ScanCountRequest): Promise<ScanCountResponse> {
     const query: Record<string, string> = {}
-    if (request.fromStartDate) {
-      query.fromStartDate = formatDateISO(request.fromStartDate)
+    if (request.fromScanDate) {
+      query.fromScanDate = formatDateISO(request.fromScanDate)
     }
-    if (request.toStartDate) {
-      query.toStartDate = formatDateISO(request.toStartDate)
+    if (request.toScanDate) {
+      query.toScanDate = formatDateISO(request.toScanDate)
     }
     return this.get(
       {
