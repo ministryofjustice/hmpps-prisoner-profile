@@ -1,11 +1,12 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+
 {%- call summaryCard({title: "Security", id: "security"}) -%}
   <div class="govuk-grid-row" data-qa="security">
     <div class="govuk-grid-column-full">
       {% if security.xrays.total > 0 %}
         <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">
+          {# TODO: this 116 should not be hard-coded in a template file,
+                   rather api-driven or in config/business logic #}
           {% if security.xrays.total >= 116 %}
             <div
               class="govuk-grid-row hmpps-xray__warning govuk-!-margin-bottom-3"
@@ -49,6 +50,36 @@
           <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
         {% endif %}
       {% endif %}
+
+      {# TODO: only shown to DPS developers: remove from here #}
+      {% if security.unsafeXrays.total %}
+        <div class="hmpps-xray hmpps-xray--unsafe govuk-!-margin-bottom-3">
+          <div class="hmpps-xray__total">
+            <div class="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+              <div class="govuk-grid-column-one-third">
+                <p class="hmpps-xray__label">X-ray body scans</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0">
+                  Since {{ security.unsafeXrays.since }}
+                </p>
+              </div>
+              <div class="govuk-grid-column-two-thirds">
+                <p class="hmpps-xray__total">
+                  {{ security.unsafeXrays.total }}
+                </p>
+              </div>
+            </div>
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-full">
+                <p>
+                  <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/x-ray-body-scans">All X-ray body scans</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {# TODO: only shown to DPS developers: remove to here #}
+
       {% if security.interestToImmigration == "Yes" %}
         <div class="govuk-warning-text govuk-!-margin-bottom-3" data-qa="interest-to-immigration">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -63,6 +94,7 @@
           <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
         {% endif %}
       {% endif %}
+
       {% if security.travelRestrictions %}
         <div class="govuk-warning-text" data-qa="travel-restrictions">
           <span class="govuk-warning-text__icon" aria-hidden="true">!</span>

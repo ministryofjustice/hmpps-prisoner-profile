@@ -1,19 +1,11 @@
+import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody, stubPostWithResponse } from './utils'
-import { stubFor } from './wiremock'
+import { stubFor, stubPing } from './wiremock'
 import { PrisonerMockDataA, PrisonerOnRemandMockData } from '../../server/data/localMockData/prisoner'
 import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 
 export default {
-  stubPrisonerSearchPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/prisonersearch/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubPrisonerSearchPing: (httpStatus = 200): SuperAgentRequest => stubPing('/prisonersearch', httpStatus),
 
   stubPrisonerData: ({
     prisonerNumber,

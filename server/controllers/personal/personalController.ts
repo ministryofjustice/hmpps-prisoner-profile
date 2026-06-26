@@ -1,4 +1,6 @@
 import { RequestHandler } from 'express'
+import config from '../../config'
+import { Role } from '../../data/enums/role'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
@@ -10,7 +12,6 @@ import {
   editProfileSimulateFetch,
   editReligionEnabled,
 } from '../../utils/featureFlags'
-import config from '../../config'
 
 export default class PersonalController {
   constructor(
@@ -22,15 +23,18 @@ export default class PersonalController {
   displayPersonalPage(): RequestHandler {
     return async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
-      const { bookingId } = prisonerData
+      const { prisonId, prisonerNumber, bookingId } = prisonerData
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const { activeCaseLoadId } = user as PrisonUser
+      const { activeCaseLoadId, userRoles } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
 
-      const [personalPageData, careNeeds, xrays] = await Promise.all([
+      const showUnsafeXRayBodyScanData =
+        config.environment !== 'prod' && userRoles.includes(Role.DpsApplicationDeveloper)
+
+      const [personalPageData, careNeeds, xrays, unsafeXrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
           editProfileEnabled: editEnabled,
           simulateFetchEnabled,
@@ -40,12 +44,15 @@ export default class PersonalController {
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
+        showUnsafeXRayBodyScanData
+          ? this.careNeedsService.unsafeGetXrayBodyScanSummary(clientToken, prisonerNumber)
+          : Promise.resolve({ total: 0, since: '' }),
       ])
 
       await this.auditService.sendPageView({
         user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.Personal,
       })
@@ -63,7 +70,7 @@ export default class PersonalController {
             ? 'personal/eye-colour'
             : 'personal/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
-        security: { ...personalPageData.security, xrays },
+        security: { ...personalPageData.security, xrays, unsafeXrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
         displayNewAddressesCard: editEnabled,

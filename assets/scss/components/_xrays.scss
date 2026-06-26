@@ -29,4 +29,17 @@
       color: govuk-colour('white');
     }
   }
+
+  &.hmpps-xray--unsafe {
+    border: 0 dashed red;
+    border-top-width: 5px;
+    border-bottom-width: 5px;
+
+    &::before {
+      content: 'Do not use this information:';
+      display: block;
+      font-weight: bold;
+      color: red;
+    }
+  }
 }

@@ -687,6 +687,8 @@ context('When signed in', () => {
         page.security().xrays().total().should('include.text', '116')
         page.security().xrays().since().should('include.text', startOfYearFormattedDate)
         page.security().xrays().warningMessage().should('exist')
+
+        cy.get('.hmpps-xray--unsafe').should('not.exist')
       })
     })
   })
