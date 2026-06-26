@@ -97,10 +97,10 @@ export default class CareNeedsService {
     prisonerNumber: string,
   ): Promise<{ total: number; since: string }> {
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(token)
-    const { totalCount } = await xRayBodyScansApiClient.countScans({ prisonerNumber })
+    const { totalCount, fromScanDate } = await xRayBodyScansApiClient.countScans({ prisonerNumber })
     return {
       total: totalCount,
-      since: formatDate(startOfYear(new Date()).toISOString()),
+      since: formatDate(fromScanDate.toISOString()),
     }
   }
 

@@ -9,6 +9,8 @@ export interface ScanCountResponse {
   nomisCount: number
   dpsCount: number
   totalCount: number
+  fromScanDate: Date
+  toScanDate: Date
 }
 
 export interface XRayBodyScansApiClient {
