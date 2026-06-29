@@ -1,4 +1,5 @@
-import { stubFor } from './wiremock'
+import type { SuperAgentRequest } from 'superagent'
+import { stubFor, stubPing } from './wiremock'
 import type ReferenceCode from '../../server/data/interfaces/bookAVideoLinkApi/ReferenceCode'
 import Court, { type ProbationTeam } from '../../server/data/interfaces/bookAVideoLinkApi/Court'
 import CreateVideoBookingRequest, {
@@ -130,14 +131,5 @@ export default {
       },
     }),
 
-  stubBookAVideoLinkPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/bookavideolink/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubBookAVideoLinkPing: (httpStatus = 200): SuperAgentRequest => stubPing('/bookavideolink', httpStatus),
 }

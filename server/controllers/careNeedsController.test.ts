@@ -40,7 +40,7 @@ describe('Care needs controller', () => {
       render: jest.fn(),
       status: jest.fn(),
     } as unknown as Response
-    controller = new CareNeedsController(new CareNeedsService(null), auditServiceMock())
+    controller = new CareNeedsController(new CareNeedsService(null, null), auditServiceMock())
   })
 
   afterEach(() => {

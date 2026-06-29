@@ -1,18 +1,10 @@
+import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
-import { stubFor } from './wiremock'
+import { stubFor, stubPing } from './wiremock'
 import { PersonRecord } from '../../server/data/personApiClient'
 
 export default {
-  stubPersonApiPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/personRecord/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
 
   stubPersonApiGetRecord: ({
     prisonerNumber,

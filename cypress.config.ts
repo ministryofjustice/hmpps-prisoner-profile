@@ -34,6 +34,7 @@ import personCommunicationNeedsApi from './integration_tests/mockApis/personComm
 import personalRelationshipsApi from './integration_tests/mockApis/personalRelationshipsApi'
 import supportForAdditionalNeedsApi from './integration_tests/mockApis/supportForAdditionalNeedsApi'
 import personApi from './integration_tests/mockApis/personApi'
+import xRayBodyScansApi from './integration_tests/mockApis/xRayBodyScansApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -87,6 +88,7 @@ export default defineConfig({
         ...personalRelationshipsApi,
         ...supportForAdditionalNeedsApi,
         ...personApi,
+        ...xRayBodyScansApi,
       })
     },
     baseUrl: 'http://localhost:3007',

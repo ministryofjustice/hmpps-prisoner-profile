@@ -6,11 +6,15 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
-import CareNeedsService from './careNeedsService'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
+import { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
+import { scanCountResponseMock } from '../data/localMockData/xRayBodyScansMock'
+import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
+import CareNeedsService from './careNeedsService'
 
 describe('beliefService', () => {
   let prisonApiClient: PrisonApiClient
+  let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let careNeedsService: CareNeedsService
 
   beforeEach(() => {
@@ -21,7 +25,11 @@ describe('beliefService', () => {
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
       mockReferenceDomains(domain),
     )
-    careNeedsService = new CareNeedsService(() => prisonApiClient)
+    xRayBodyScansApiClient = xRayBodyScansApiClientMock()
+    careNeedsService = new CareNeedsService(
+      () => prisonApiClient,
+      () => xRayBodyScansApiClient,
+    )
   })
 
   const setPersonalCareNeedsMock = (careNeeds: PersonalCareNeed[]) => {
@@ -49,7 +57,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs without matching health codes', async () => {
+    it('Doesn’t map care needs without matching health codes', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -75,7 +83,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs with problem code NR', async () => {
+    it('Doesn’t map care needs with problem code NR', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -101,7 +109,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs with problem type BSCAN', async () => {
+    it('Doesn’t map care needs with problem type BSCAN', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -327,6 +335,24 @@ describe('beliefService', () => {
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(4)
         expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
+      })
+    })
+  })
+
+  describe('unsafeGetXrayBodyScanSummary', () => {
+    const now = new Date(2026, 5, 25, 12, 30, 45)
+    beforeAll(() => {
+      jest.useFakeTimers({ now })
+      jest.setSystemTime(now)
+    })
+
+    it('should return scan count and formatted start date', async () => {
+      xRayBodyScansApiClient.countScans.mockResolvedValueOnce(scanCountResponseMock)
+
+      const summary = await careNeedsService.unsafeGetXrayBodyScanSummary('token1', PrisonerMockDataA.prisonerNumber)
+      expect(summary).toEqual({
+        total: 6,
+        since: '1 January 2026',
       })
     })
   })

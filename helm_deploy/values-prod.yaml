@@ -85,6 +85,7 @@ generic-service:
     PERSONAL_RELATIONSHIPS_API_URL: 'https://personal-relationships-api.hmpps.service.justice.gov.uk'
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: 'true'

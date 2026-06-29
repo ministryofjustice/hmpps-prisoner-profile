@@ -338,6 +338,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('PERSON_API_TIMEOUT_DEADLINE', 3000))),
     },
+    xRayBodyScans: {
+      url: get('X_RAY_BODY_SCANS_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('X_RAY_BODY_SCANS_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('X_RAY_BODY_SCANSI_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('X_RAY_BODY_SCANS_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
