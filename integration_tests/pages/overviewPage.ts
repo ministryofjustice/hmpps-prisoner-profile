@@ -142,6 +142,7 @@ export default class OverviewPage extends Page {
       probationDocumentsInfoLink: (): PageElement => cy.get('[data-qa=probation-documents-info-link]'),
       pathfinderProfileInfoLink: (): PageElement => cy.get('[data-qa=pathfinder-profile-info-link]'),
       socProfileInfoLink: (): PageElement => cy.get('[data-qa=soc-profile-info-link]'),
+      incidentSummaryInfoLink: (): PageElement => cy.get('[data-qa=incident-summary-info-link]'),
     }),
   })
 
