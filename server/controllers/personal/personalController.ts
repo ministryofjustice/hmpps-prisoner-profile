@@ -79,7 +79,6 @@ export default class PersonalController {
         hasPersonalId,
         hasHomeOfficeId,
         useCustomErrorBanner: true,
-        showEditProfileBanner: editEnabled,
         changeContactLinkEnabled,
       })
     }
