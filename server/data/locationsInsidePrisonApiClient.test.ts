@@ -30,7 +30,7 @@ describe('locationsInsidePrisonApiClient', () => {
     it('Should return data from the API', async () => {
       const id = 'MDI'
       mockSuccessfulApiCall(
-        `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
+        `/locations/non-residential/prison/${id}/service/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
         locationsApiMock,
       )
       const output = await locationsInsidePrisonApiClient.getLocationsForAppointments(id)
