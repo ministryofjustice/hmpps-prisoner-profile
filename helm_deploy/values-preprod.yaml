@@ -104,6 +104,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
+    X_RAY_BODY_SCANS_ENABLED: "false"
 
   allowlist:
     groups:
