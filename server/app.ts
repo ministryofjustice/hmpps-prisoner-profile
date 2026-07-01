@@ -15,7 +15,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
-import routes, { standardGetPaths } from './routes'
+import routes, { nonStandardGetPath } from './routes'
 import type { Services } from './services'
 import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
@@ -77,23 +77,25 @@ export default function createApp(services: Services): express.Application {
   app.use(unless([distinguishingMarksMulterExceptions], setUpCsrf()))
 
   app.use(setUpCurrentUser())
-  app.use(addUserMetadataToLogs())
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
   app.use(apiErrorMiddleware())
-  app.get(standardGetPaths, bannerMiddleware(services))
+  app.use(unless([nonStandardGetPath], bannerMiddleware(services)))
 
-  app.get(
-    standardGetPaths,
-    getFrontendComponents({
-      logger,
-      componentApiConfig: config.apis.componentApi,
-      dpsUrl: config.serviceUrls.digitalPrison,
-      requestOptions: { includeSharedData: true },
-    }),
+  app.use(
+    unless(
+      [nonStandardGetPath],
+      getFrontendComponents({
+        logger,
+        componentApiConfig: config.apis.componentApi,
+        dpsUrl: config.serviceUrls.digitalPrison,
+        requestOptions: { includeSharedData: true },
+      }),
+    ),
   )
 
   app.use(retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }))
+  app.use(addUserMetadataToLogs())
   app.use(warningRenderMiddleware)
   app.use(routes(services))
   app.use(warningMiddleware(services.metricsService))
