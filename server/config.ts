@@ -340,6 +340,7 @@ export default {
     },
     xRayBodyScans: {
       url: get('X_RAY_BODY_SCANS_API_URL', 'http://localhost:8082', requiredInProduction),
+      enabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
       healthPath: '/health/ping',
       timeout: {
         response: Number(get('X_RAY_BODY_SCANS_TIMEOUT_RESPONSE', 3000)),
@@ -427,6 +428,7 @@ export default {
     },
 
     hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
+    xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
