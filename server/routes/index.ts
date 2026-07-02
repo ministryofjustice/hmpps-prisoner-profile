@@ -47,8 +47,8 @@ import DuplicateProfilesController from '../controllers/duplicateProfilesControl
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
 
-export function nonStandardGetPath(path: string): boolean {
-  return /^(\/api|\/save-backlink|\/$)/.test(path)
+export function standardGetPaths(path: string): boolean {
+  return !/^(\/api|\/save-backlink|\/$)/.test(path)
 }
 
 export default function routes(services: Services): Router {

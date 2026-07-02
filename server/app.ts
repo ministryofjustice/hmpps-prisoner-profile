@@ -15,7 +15,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
-import routes, { nonStandardGetPath } from './routes'
+import routes, { standardGetPaths } from './routes'
 import type { Services } from './services'
 import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
@@ -30,6 +30,7 @@ import { distinguishingMarksMulterExceptions } from './routes/personal/edit/dist
 import unless from './utils/unless'
 import { setUpSentry, setUpSentryErrorHandler } from './middleware/setUpSentry'
 import addUserMetadataToLogs from './middleware/addUserMetadataToLogs'
+import forGetRequestsMatching from './utils/forGetRequestsMatching'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -80,11 +81,11 @@ export default function createApp(services: Services): express.Application {
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
   app.use(apiErrorMiddleware())
-  app.use(unless([nonStandardGetPath], bannerMiddleware(services)))
+  app.use(forGetRequestsMatching([standardGetPaths], bannerMiddleware(services)))
 
   app.use(
-    unless(
-      [nonStandardGetPath],
+    forGetRequestsMatching(
+      [standardGetPaths],
       getFrontendComponents({
         logger,
         componentApiConfig: config.apis.componentApi,
