@@ -1,4 +1,4 @@
-import { TelemetryClient } from 'applicationinsights'
+import { telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 
 export interface DuplicatePrisonerInfo {
@@ -7,8 +7,6 @@ export interface DuplicatePrisonerInfo {
 }
 
 export default class MetricsService {
-  constructor(private readonly telemetryClient?: TelemetryClient) {}
-
   trackPrisonPersonUpdate({
     prisonerNumber,
     fieldsUpdated,
@@ -18,14 +16,11 @@ export default class MetricsService {
     fieldsUpdated: string[]
     user: PrisonUser
   }) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-prison-person-updated',
-      properties: {
-        prisonerNumber,
-        fieldsUpdated,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-prison-person-updated', {
+      prisonerNumber,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      fieldsUpdated: JSON.stringify(fieldsUpdated),
     })
   }
 
@@ -40,15 +35,12 @@ export default class MetricsService {
     user: PrisonUser
     additionalProperties?: T
   }) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-person-integration-updated',
-      properties: {
-        prisonerNumber,
-        fieldsUpdated,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-        ...additionalProperties,
-      },
+    telemetry.trackEvent('prisoner-profile-person-integration-updated', {
+      prisonerNumber,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      fieldsUpdated: JSON.stringify(fieldsUpdated),
+      ...additionalProperties,
     })
   }
 
@@ -61,14 +53,11 @@ export default class MetricsService {
     fieldsUpdated: string[]
     user: PrisonUser
   }) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-health-and-medication-updated',
-      properties: {
-        prisonerNumber,
-        fieldsUpdated,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-health-and-medication-updated', {
+      prisonerNumber,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      fieldsUpdated: JSON.stringify(fieldsUpdated),
     })
   }
 
@@ -81,14 +70,11 @@ export default class MetricsService {
     fieldsUpdated: string[]
     user: PrisonUser
   }) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-person-communication-needs-updated',
-      properties: {
-        prisonerNumber,
-        fieldsUpdated,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-person-communication-needs-updated', {
+      prisonerNumber,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      fieldsUpdated: JSON.stringify(fieldsUpdated),
     })
   }
 
@@ -101,40 +87,31 @@ export default class MetricsService {
     fieldsUpdated: string[]
     user: PrisonUser
   }) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-personal-relationships-updated',
-      properties: {
-        prisonerNumber,
-        fieldsUpdated,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-personal-relationships-updated', {
+      prisonerNumber,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      fieldsUpdated: JSON.stringify(fieldsUpdated),
     })
   }
 
   trackNomisLockedWarning(prisonerNumber: string, pageUrl: string, apiUrlCalled: string, user: PrisonUser) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-nomis-locked-warning-shown',
-      properties: {
-        prisonerNumber,
-        pageUrl,
-        apiUrlCalled,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-nomis-locked-warning-shown', {
+      prisonerNumber,
+      pageUrl,
+      apiUrlCalled,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
     })
   }
 
   trackFrontendError(prisonerNumber: string, pageUrl: string, error: string, user: PrisonUser) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-frontend-error-shown',
-      properties: {
-        prisonerNumber,
-        pageUrl,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-        error,
-      },
+    telemetry.trackEvent('prisoner-profile-frontend-error-shown', {
+      prisonerNumber,
+      pageUrl,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
+      error,
     })
   }
 
@@ -144,15 +121,12 @@ export default class MetricsService {
     duplicatesFound: DuplicatePrisonerInfo[],
     user: PrisonUser,
   ) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-duplicate-records-found',
-      properties: {
-        prisonerNumber,
-        prisonId,
-        duplicatesFound: JSON.stringify(duplicatesFound),
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-duplicate-records-found', {
+      prisonerNumber,
+      prisonId,
+      duplicatesFound: JSON.stringify(duplicatesFound),
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
     })
   }
 
@@ -162,15 +136,12 @@ export default class MetricsService {
     duplicatesRemoved: DuplicatePrisonerInfo[],
     user: PrisonUser,
   ) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-duplicate-records-ghost-establishment-filtered',
-      properties: {
-        prisonerNumber,
-        prisonId,
-        duplicatesRemoved: JSON.stringify(duplicatesRemoved),
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-duplicate-records-ghost-establishment-filtered', {
+      prisonerNumber,
+      prisonId,
+      duplicatesRemoved: JSON.stringify(duplicatesRemoved),
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
     })
   }
 
@@ -180,28 +151,22 @@ export default class MetricsService {
     duplicatesRemoved: DuplicatePrisonerInfo[],
     user: PrisonUser,
   ) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-duplicate-records-multiple-active-filtered',
-      properties: {
-        prisonerNumber,
-        prisonId,
-        duplicatesRemoved: JSON.stringify(duplicatesRemoved),
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-duplicate-records-multiple-active-filtered', {
+      prisonerNumber,
+      prisonId,
+      duplicatesRemoved: JSON.stringify(duplicatesRemoved),
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
     })
   }
 
   trackDuplicateRecordsApiFailure(prisonerNumber: string, prisonId: string, error: Error, user: PrisonUser) {
-    this.telemetryClient?.trackEvent({
-      name: 'prisoner-profile-duplicate-records-api-failure',
-      properties: {
-        prisonerNumber,
-        prisonId,
-        error: error.message,
-        username: user.username,
-        activeCaseLoad: user.activeCaseLoadId,
-      },
+    telemetry.trackEvent('prisoner-profile-duplicate-records-api-failure', {
+      prisonerNumber,
+      prisonId,
+      error: error.message,
+      username: user.username,
+      activeCaseLoad: user.activeCaseLoadId,
     })
   }
 }
