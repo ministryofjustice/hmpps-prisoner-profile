@@ -430,7 +430,7 @@ export default {
     hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
 
     xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
-    
+
     offencesMoved: {
       enabledPrisons: get('SHOW_CONFIRMED_RELEASE_DATE_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('SHOW_CONFIRMED_RELEASE_DATE_ENABLED_PRISONS_BY_DATE', []) as string[],
