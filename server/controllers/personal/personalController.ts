@@ -32,7 +32,7 @@ export default class PersonalController {
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
 
       const showUnsafeXRayBodyScanData =
-        config.environment !== 'prod' && userRoles.includes(Role.DpsApplicationDeveloper)
+        config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
 
       const [personalPageData, careNeeds, xrays, unsafeXrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -79,7 +79,6 @@ export default class PersonalController {
         hasPersonalId,
         hasHomeOfficeId,
         useCustomErrorBanner: true,
-        showEditProfileBanner: editEnabled,
         changeContactLinkEnabled,
       })
     }

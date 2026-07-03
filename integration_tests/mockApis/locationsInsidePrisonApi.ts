@@ -52,7 +52,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPath: `/locationsinsideprison/locations/prison/${prisonId}/non-residential-usage-type/APPOINTMENT`,
+        urlPath: `/locationsinsideprison/locations/non-residential/prison/${prisonId}/service/APPOINTMENT`,
         queryParameters: {
           sortByLocalName: { equalTo: 'true' },
           formatLocalName: { equalTo: 'true' },

@@ -79,7 +79,6 @@ export const services = () => {
     referenceDataStore,
     featureToggleStore,
     ephemeralDataStore,
-    telemetryClient,
     osPlacesApiClient,
     xRayBodyScansApiClientBuilder,
     curiousApiToken,
@@ -98,11 +97,10 @@ export const services = () => {
     prisonerSearchConfig: config.apis.prisonerSearchApi,
     authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
     logger,
-    telemetryClient,
     readOnly: config.readOnlyProfile,
   })
 
-  const metricsService = new MetricsService(telemetryClient)
+  const metricsService = new MetricsService()
   const featureToggleService = new FeatureToggleService(featureToggleStore)
   const ephemeralDataService = new EphemeralDataService(ephemeralDataStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)

@@ -43,6 +43,7 @@ generic-service:
     USE_OF_FORCE_UI_URL: "https://dev.use-of-force.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-dev.prison.service.justice.gov.uk"
     INCIDENT_REPORTING_UI_URL: "https://incident-reporting-dev.hmpps.service.justice.gov.uk"
+    PRISON_ROLL_COUNT_UI_URL: "https://prison-roll-count-dev.hmpps.service.justice.gov.uk"
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk"
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-dev.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
@@ -109,6 +110,7 @@ generic-service:
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
     PERSON_ENDPOINTS_ENABLED: "true"
     HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
+    X_RAY_BODY_SCANS_ENABLED: "true"
 
   allowlist:
     groups:
