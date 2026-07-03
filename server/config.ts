@@ -426,6 +426,12 @@ export default {
     },
 
     hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
+
+    offencesMoved: {
+      enabledPrisons: get('SHOW_CONFIRMED_RELEASE_DATE_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('SHOW_CONFIRMED_RELEASE_DATE_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('SHOW_CONFIRMED_RELEASE_DATE_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

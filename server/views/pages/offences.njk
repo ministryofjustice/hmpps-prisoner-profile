@@ -1,12 +1,31 @@
 {% from "../macros/sidebarNav.njk" import sidebarNav %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 {% extends "./index.njk" %}
+
+{% block body %}
+
+{% if offencesMoved(user.activeCaseLoadId) %}
+
+<div class="govuk-!-margin-top-3">
+  {{ mojAlert({
+    variant: "information",
+    title: "Offences information has moved",
+    showTitleAsHeading: true,
+    dismissible: false,
+    html: 'You can now view this person’s current confirmed release date on their Overview. ' +
+    'You can also access their related offences information. ' +
+    '<a href="/prisoner/' + prisonerNumber + '" class="govuk-link">Go to Overview</a>'
+  }) }}
+</div>
+
+{% else %}
+
 {% set breadCrumbs = [
   {
     text: 'Digital Prison Services',
     href:  "/" | prependBaseUrl
   }
 ] %}
-{% block body %}
   {% set sidebar %}
     {{ sidebarNav([
       { text: "Court cases and offences", href: "#courtCasesAccordion" },
@@ -28,4 +47,7 @@
 
   {% set heading = "Offences" %}
   {% include "../partials/sidebarPageLayout.njk" %}
+
+{% endif %}
+
 {% endblock %}

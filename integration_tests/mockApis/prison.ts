@@ -598,6 +598,41 @@ export default {
     })
   },
 
+  stubGetPrisonerSentenceDetailsNoConfirmedDate: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/sentences`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: { ...prisonerSentenceDetailsMock.sentenceDetail, confirmedReleaseDate: undefined },
+        },
+      },
+    })
+  },
+
+  stubGetPrisonerSentenceDetailsError: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/sentences`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: { error: 'Something went wrong' },
+      },
+    })
+  },
+
   stubGetCourtDateResultsSentenced: (prisonerNumber: string) => {
     return stubFor({
       request: {

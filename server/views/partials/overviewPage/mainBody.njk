@@ -55,9 +55,17 @@
 </div>
 
 {% if not options.showCourtCaseSummary %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full" data-qa="overview-offences">
-      {% include "./offences/offences.njk" %}
+  {% if offencesMoved(user.activeCaseLoadId) %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% include "./releaseDate/confirmedReleaseDate.njk" %}
+      </div>
     </div>
-  </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full" data-qa="overview-offences">
+        {% include "./offences/offences.njk" %}
+      </div>
+    </div>
+  {% endif %}
 {% endif %}

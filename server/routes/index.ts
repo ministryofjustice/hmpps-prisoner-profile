@@ -233,6 +233,7 @@ export default function routes(services: Services): Router {
         courtCaseData,
         releaseDates,
         activeTab: true,
+        prisonerNumber: prisonerData.prisonerNumber,
       })
     },
   )

@@ -1,6 +1,6 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import { editProfileEnabled, editProfileSimulateFetch } from './featureFlags'
+import { editProfileEnabled, editProfileSimulateFetch, offencesMoved } from './featureFlags'
 
 describe('featureToggles', () => {
   describe('editProfileEnabled', () => {
@@ -66,6 +66,60 @@ describe('featureToggles', () => {
       config.featureToggles.editProfile.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
 
       expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+  })
+
+  describe('offencesMoved', () => {
+    afterEach(() => {
+      config.featureToggles.offencesMoved.enabledPrisons = []
+      config.featureToggles.offencesMoved.enabledPrisonsByDate = []
+      config.featureToggles.offencesMoved.enabledPrisonsFrom = '2099-01-01T00:00:00'
+    })
+
+    it('is not enabled when prison is not listed', () => {
+      config.featureToggles.offencesMoved.enabledPrisons = ['LEI']
+
+      expect(offencesMoved('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled when prison is listed by date but date has not passed', () => {
+      config.featureToggles.offencesMoved.enabledPrisonsByDate = ['MDI']
+      config.featureToggles.offencesMoved.enabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(offencesMoved('MDI')).toBeFalsy()
+    })
+
+    it('is not enabled when wildcard used by date but date has not passed', () => {
+      config.featureToggles.offencesMoved.enabledPrisonsByDate = ['***']
+      config.featureToggles.offencesMoved.enabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(offencesMoved('MDI')).toBeFalsy()
+    })
+
+    it('is enabled when prison is permanently enabled', () => {
+      config.featureToggles.offencesMoved.enabledPrisons = ['MDI']
+
+      expect(offencesMoved('MDI')).toBeTruthy()
+    })
+
+    it('is enabled when wildcard used in permanently enabled list', () => {
+      config.featureToggles.offencesMoved.enabledPrisons = ['***']
+
+      expect(offencesMoved('MDI')).toBeTruthy()
+    })
+
+    it('is enabled when prison is listed by date and date has passed', () => {
+      config.featureToggles.offencesMoved.enabledPrisonsByDate = ['MDI']
+      config.featureToggles.offencesMoved.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(offencesMoved('MDI')).toBeTruthy()
+    })
+
+    it('is enabled when wildcard used by date and date has passed', () => {
+      config.featureToggles.offencesMoved.enabledPrisonsByDate = ['***']
+      config.featureToggles.offencesMoved.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(offencesMoved('MDI')).toBeTruthy()
     })
   })
 
