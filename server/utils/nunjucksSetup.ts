@@ -141,6 +141,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('generateContactChangeLink', generateContactChangeLink)
   njkEnv.addGlobal('hideSomePersonalOverviewInfo', config.featureToggles.hideSomePersonalOverviewInfo)
   njkEnv.addGlobal('offencesMoved', offencesMoved)
+  njkEnv.addGlobal('courtCaseReleaseDatesUrl', config.serviceUrls.courtCaseReleaseDates)
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('initialiseName', initialiseName)

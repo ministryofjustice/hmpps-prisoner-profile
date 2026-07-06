@@ -2,7 +2,7 @@
 {% from "../../../macros/hmppsError.njk" import hmppsError %}
 
 {%- call summaryCard({title: "Court cases and release dates"}) -%}
-  <div class="govuk-grid-row" data-qa="confirmed-release-date-non-omu">
+  <div class="govuk-grid-row" data-qa="confirmed-release-date-non-calculate">
     <div class="govuk-grid-column-full">
       {% if confirmedReleaseDate and confirmedReleaseDate.isFulfilled() %}
         {% set releaseDateValue = confirmedReleaseDate.getOrNull() %}
@@ -28,7 +28,7 @@
     </div>
 
     <div class="govuk-grid-column-full">
-      <p><a href="https://court-cases-release-dates.hmpps.service.justice.gov.uk/prisoner/{{ prisonerNumber }}/readonly-overview" class='govuk-link'>View court case, offence and all release date information</a></p>
+      <p><a href="{{ courtCaseReleaseDatesUrl }}/prisoner/{{ prisonerNumber }}/readonly-overview" class='govuk-link'>View court case, offence and all release date information</a></p>
     </div>
   </div>
 {%- endcall -%}

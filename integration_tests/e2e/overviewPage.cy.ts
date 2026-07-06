@@ -663,7 +663,7 @@ context('Overview Page', () => {
         overviewPage.courtCasesAndReleaseDates().card().should('not.exist')
       })
 
-      context('confirmed release date non-OMU card shows for enabled prison', () => {
+      context('confirmed release date card shows for users without calculate release date permissions', () => {
         const setupStubs = () => {
           cy.setupOverviewPageStubs({
             prisonerNumber: 'G6123VU',
@@ -678,10 +678,10 @@ context('Overview Page', () => {
           cy.task('stubGetPrisonerSentenceDetails', 'G6123VU')
           visitOverviewPage()
           const overviewPage = Page.verifyOnPage(OverviewPage)
-          overviewPage.confirmedReleaseDateNonOmu().card().should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().releaseDateLabel().should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().releaseDateValue().should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().viewCourtCaseLink().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateValue().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
           overviewPage.courtCasesAndReleaseDates().card().should('not.exist')
         })
 
@@ -690,11 +690,11 @@ context('Overview Page', () => {
           cy.task('stubGetPrisonerSentenceDetailsNoConfirmedDate', 'G6123VU')
           visitOverviewPage()
           const overviewPage = Page.verifyOnPage(OverviewPage)
-          overviewPage.confirmedReleaseDateNonOmu().card().should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().noReleaseDateMessage().should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().releaseDateLabel().should('not.exist')
-          overviewPage.confirmedReleaseDateNonOmu().releaseDateValue().should('not.exist')
-          overviewPage.confirmedReleaseDateNonOmu().viewCourtCaseLink().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().noReleaseDateMessage().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateValue().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
         })
 
         it('should display unavailable error when the call fails', () => {
@@ -702,10 +702,10 @@ context('Overview Page', () => {
           cy.task('stubGetPrisonerSentenceDetailsError', 'G6123VU')
           visitOverviewPage()
           const overviewPage = Page.verifyOnPage(OverviewPage)
-          overviewPage.confirmedReleaseDateNonOmu().card().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
           cy.get('[data-qa="confirmed-release-date-unavailable"]').should('exist')
-          overviewPage.confirmedReleaseDateNonOmu().releaseDateLabel().should('not.exist')
-          overviewPage.confirmedReleaseDateNonOmu().viewCourtCaseLink().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
         })
       })
 

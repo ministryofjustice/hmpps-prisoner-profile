@@ -78,7 +78,8 @@ export default class OverviewController {
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
     const supportForAdditionalNeedsApiClient = this.supportForAdditionalNeedsApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
-    const showConfirmedReleaseDateNonOmu = !showCourtCaseSummary && offencesMoved((user as PrisonUser).activeCaseLoadId)
+    const showConfirmedReleaseDateNonCalculate =
+      !showCourtCaseSummary && offencesMoved((user as PrisonUser).activeCaseLoadId)
 
     const [
       pathfinderNominal,
@@ -107,7 +108,7 @@ export default class OverviewController {
       showCourtCaseSummary
         ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      showConfirmedReleaseDateNonOmu
+      showConfirmedReleaseDateNonCalculate
         ? Result.wrap(this.offenderService.getConfirmedReleaseDate(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       isGranted(PrisonerMoneyPermission.read, prisonerPermissions)

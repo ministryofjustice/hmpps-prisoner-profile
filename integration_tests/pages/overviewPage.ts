@@ -195,8 +195,9 @@ export default class OverviewPage extends Page {
 
   alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
 
-  confirmedReleaseDateNonOmu = () => ({
-    card: (): PageElement => cy.get('[data-qa="confirmed-release-date-non-omu"]'),
+  // Confirmed release dates for users without calculate release date permissions.
+  confirmedReleaseDateNonCalculate = () => ({
+    card: (): PageElement => cy.get('[data-qa="confirmed-release-date-non-calculate"]'),
     releaseDateLabel: (): PageElement => cy.get('[data-qa="confirmed-release-date-label"]'),
     releaseDateValue: (): PageElement => cy.get('[data-qa="confirmed-release-date-value"]'),
     noReleaseDateMessage: (): PageElement => cy.get('[data-qa="confirmed-release-date-none"]'),
