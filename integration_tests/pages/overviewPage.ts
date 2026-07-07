@@ -195,6 +195,15 @@ export default class OverviewPage extends Page {
 
   alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
 
+  // Confirmed release dates for users without calculate release date permissions.
+  confirmedReleaseDateNonCalculate = () => ({
+    card: (): PageElement => cy.get('[data-qa="confirmed-release-date-non-calculate"]'),
+    releaseDateLabel: (): PageElement => cy.get('[data-qa="confirmed-release-date-label"]'),
+    releaseDateValue: (): PageElement => cy.get('[data-qa="confirmed-release-date-value"]'),
+    noReleaseDateMessage: (): PageElement => cy.get('[data-qa="confirmed-release-date-none"]'),
+    viewCourtCaseLink: (): PageElement => cy.contains('View court case, offence and all release date information'),
+  })
+
   courtCasesAndReleaseDates = () => ({
     card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),
     courtCasesCount: (): PageElement => cy.get('[data-qa="overview-court-cases-count"]'),

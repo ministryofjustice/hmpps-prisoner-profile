@@ -62,7 +62,6 @@ ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
 APPOINTMENTS_URL=https://activities-dev.prison.service.justice.gov.uk/appointments
 ASSESS_FOR_EARLY_RELEASE_UI_URL=https:https://assess-for-early-release-dev.hmpps.service.justice.gov.uk
 BOOK_A_VIDEO_LINK_API_URL=https://book-a-video-link-api-dev.prison.service.justice.gov.uk
-CALCULATE_RELEASE_DATES_UI_URL=https://calculate-release-dates-dev.hmpps.service.justice.gov.uk
 CASE_NOTES_API_URL=https://dev.offender-case-notes.service.justice.gov.uk
 COMPONENT_API_LATEST=true
 COMPONENT_API_URL=https://frontend-components-dev.hmpps.service.justice.gov.uk

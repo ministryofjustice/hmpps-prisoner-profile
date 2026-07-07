@@ -8,6 +8,7 @@ import {
   PrisonerPermissions,
   PrisonerVisitsAndVisitorsPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import config from '../config'
 import OverviewController from './overviewController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import {
@@ -669,6 +670,25 @@ describe('overviewController', () => {
             confirmedReleaseDate: 'CnRD',
             conditionalReleaseDate: 'CdRD',
           },
+        }),
+      )
+    })
+  })
+
+  describe('confirmedReleaseDate', () => {
+    it('should pass the confirmed release date Result to the view', async () => {
+      config.featureToggles.offencesMoved.enabledPrisons = ['***']
+      offenderService.getConfirmedReleaseDate = jest.fn().mockResolvedValue('2026-02-07')
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          confirmedReleaseDate: expect.objectContaining({
+            status: 'fulfilled',
+            value: '2026-02-07',
+          }),
         }),
       )
     })

@@ -20,6 +20,7 @@ export default interface OverviewPageData {
   overviewInfoLinks: { text: string; url: string; dataQA: string }[]
   prisonerDisplayName: string
   prisonerInCaseLoad: boolean
+  prisonerNumber: string
   bookingId: number
   moneySummary: AccountBalances | null
   adjudicationSummary: Result<AdjudicationsOverviewSummary>
@@ -47,6 +48,7 @@ export default interface OverviewPageData {
     showCourtCaseSummary: boolean
   }
   actionsMayBeMissing: boolean
+  confirmedReleaseDate: Result<string> | null
 }
 
 export interface CourtCaseSummary {
