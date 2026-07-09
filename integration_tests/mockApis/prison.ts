@@ -96,6 +96,7 @@ import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/priso
 import PrisonerSchedule, { TimeSlot } from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
 import { loadFileAsBase64, stubGetWithBody } from './utils'
 import { formatDateISO } from '../../server/utils/dateHelpers'
+import Belief from '../../server/data/interfaces/prisonApi/Belief'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1329,7 +1330,7 @@ export default {
     })
   },
 
-  stubBeliefHistory: (bookingId?: number) => {
+  stubBeliefHistory: ({ bookingId, beliefHistory }: { bookingId?: number; beliefHistory?: Belief[] } = {}) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1340,7 +1341,9 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: bookingId ? beliefHistoryMock : beliefHistoryAllBookingsMock,
+        jsonBody:
+          beliefHistory ||
+          (bookingId ? beliefHistoryMock.map(belief => ({ ...belief, bookingId })) : beliefHistoryAllBookingsMock),
       },
     })
   },
