@@ -5,7 +5,7 @@
 {% set age = personalDetails.personalDetailsMain.age.years + " years, " + personalDetails.personalDetailsMain.age.months | pluralise('month') if personalDetails.personalDetailsMain.age else "Not entered" %}
 {% set inCaseload = isInUsersCaseLoad(prisonId, user) %}
 {% set grantedReligion = isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions) %}
-{% set moveEthnicGroup = hideSomePersonalOverviewInfo and ((not inCaseload) or (not grantedReligion)) %}
+{% set moveEthnicGroup = ((not inCaseload) or (not grantedReligion)) %}
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
@@ -15,17 +15,11 @@
         {% if moveEthnicGroup %}
           {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup or 'Not entered', "ethnic-group") }}
         {% endif %}
-        {% if hideSomePersonalOverviewInfo %}
-          {% if inCaseload %}
-            {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
-            {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
-          {% endif %}
-          {% if grantedReligion %}
-            {{ summaryListRow("Religion, faith or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
-          {% endif %}
-        {% else %}
+        {% if inCaseload %}
           {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
           {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
+        {% endif %}
+        {% if grantedReligion %}
           {{ summaryListRow("Religion, faith or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
         {% endif %}
       </dl>
