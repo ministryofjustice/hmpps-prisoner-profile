@@ -232,13 +232,11 @@ describe('ShoeSizeController', () => {
         })
 
         it('Keeps the inputs empty when no height exists', async () => {
-          personalPageService.getPhysicalAttributes = jest.fn(
-            async (): Promise<CorePersonPhysicalAttributes> => ({
-              ...corePersonPhysicalAttributesMock,
-              height: undefined,
-              weight: undefined,
-            }),
-          )
+          personalPageService.getPhysicalAttributes = jest.fn(async (): Promise<CorePersonPhysicalAttributes> => ({
+            ...corePersonPhysicalAttributesMock,
+            height: undefined,
+            weight: undefined,
+          }))
           const req = {
             params: { prisonerNumber },
             flash: (): string[] => [],
