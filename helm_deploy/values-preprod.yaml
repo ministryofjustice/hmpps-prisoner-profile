@@ -107,7 +107,8 @@ generic-service:
 
   allowlist:
     groups:
-      - internal
+      - digital_staff_and_mojo
+      - moj_cloud_platform
       - prisons
       - private_prisons
       - sscl
