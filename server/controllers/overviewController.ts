@@ -12,6 +12,7 @@ import {
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 
 import { mapHeaderData } from '../mappers/headerMappers'
+import { PrisonUser } from '../interfaces/HmppsUser'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
 import { formatName, isInUsersCaseLoad } from '../utils/utils'
@@ -42,6 +43,7 @@ import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
+import { offencesMoved } from '../utils/featureFlags'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -76,6 +78,8 @@ export default class OverviewController {
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
     const supportForAdditionalNeedsApiClient = this.supportForAdditionalNeedsApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+    const showConfirmedReleaseDateNonCalculate =
+      !showCourtCaseSummary && offencesMoved((user as PrisonUser).activeCaseLoadId)
 
     const [
       pathfinderNominal,
@@ -83,6 +87,7 @@ export default class OverviewController {
       nextCourtAppearance,
       activeCourtCasesCount,
       latestReleaseDate,
+      confirmedReleaseDate,
       moneySummary,
       adjudicationSummary,
       visitsSummary,
@@ -102,6 +107,9 @@ export default class OverviewController {
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
       showCourtCaseSummary
         ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
+      showConfirmedReleaseDateNonCalculate
+        ? Result.wrap(this.offenderService.getConfirmedReleaseDate(clientToken, prisonerNumber), apiErrorCallback)
         : null,
       isGranted(PrisonerMoneyPermission.read, prisonerPermissions)
         ? this.moneyService.getAccountBalances(clientToken, bookingId)
@@ -177,6 +185,7 @@ export default class OverviewController {
       statuses: getOverviewStatuses(prisonerData, inmateDetail, hasNeedsForAdditionalSupport, scheduledTransfers),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
+      prisonerNumber: prisonerData.prisonerNumber,
       bookingId: prisonerData.bookingId,
       personalDetails: getPersonalDetails(prisonerData, inmateDetail),
       staffContacts,
@@ -194,6 +203,7 @@ export default class OverviewController {
         showCourtCaseSummary,
       },
       actionsMayBeMissing: !(socNominal.isFulfilled() && pathfinderNominal.isFulfilled()),
+      confirmedReleaseDate,
     }
 
     res.render('pages/overviewPage', { ...viewData, useCustomErrorBanner: true })

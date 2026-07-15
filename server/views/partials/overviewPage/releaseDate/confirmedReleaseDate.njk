@@ -1,0 +1,34 @@
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+{% from "macros/hmppsError.njk" import hmppsError %}
+
+{%- call summaryCard({title: "Court cases and release dates"}) -%}
+  <div class="govuk-grid-row" data-qa="confirmed-release-date-non-calculate">
+    <div class="govuk-grid-column-full">
+      {% if confirmedReleaseDate and confirmedReleaseDate.isFulfilled() %}
+        {% set releaseDateValue = confirmedReleaseDate.getOrNull() %}
+        {% if releaseDateValue %}
+          <h3 data-qa="confirmed-release-date-label" class="govuk-heading-s govuk-!-margin-bottom-1">Current confirmed release date</h3>
+          <p class="govuk-!-font-size-36 govuk-!-margin-bottom-2" data-qa="confirmed-release-date-value">{{ releaseDateValue | formatDate('long') }}</p>
+          <p class="govuk-body" data-qa="confirmed-release-date-subject-to-change">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="court-cases-inline-icon">
+              <path fill="currentColor" d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0m0 4.902a1.5 1.5 0 0 1 1.5 1.497 1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1-1.5-1.5A1.5 1.5 0 0 1 12 4.902m-1.3 5.099h2.6V19h-2.6z"/>
+            </svg>
+            This date is subject to change.
+          </p>
+        {% else %}
+          <h3 data-qa="confirmed-release-date-none" class="govuk-heading-s govuk-!-margin-bottom-2">There are no release dates calculated for {{ prisonerDisplayName }}</h3>
+        {% endif %}
+      {% else %}
+        {{ hmppsError({
+          type: 'inset',
+          dataQa: 'confirmed-release-date-unavailable',
+          text: unavailableApiErrorText
+        }) }}
+      {% endif %}
+    </div>
+
+    <div class="govuk-grid-column-full">
+      <p><a href="{{ courtCaseReleaseDatesUrl }}/prisoner/{{ prisonerNumber }}/readonly-overview" class='govuk-link'>View court case, offence and all release date information</a></p>
+    </div>
+  </div>
+{%- endcall -%}

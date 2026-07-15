@@ -28,7 +28,6 @@ generic-service:
 
     # UI Service urls
     ASSESS_FOR_EARLY_RELEASE_UI_URL: 'https://assess-for-early-release.hmpps.service.justice.gov.uk'
-    CALCULATE_RELEASE_DATES_UI_URL: 'https://calculate-release-dates.hmpps.service.justice.gov.uk'
     CREATE_AND_VARY_A_LICENCE_UI_URL: 'https://create-and-vary-a-licence.hmpps.service.justice.gov.uk'
     DPS_HOME_PAGE_URL: 'https://dps.prison.service.justice.gov.uk'
     DPS_CORE_URL: 'https://digital.prison.service.justice.gov.uk'
@@ -103,10 +102,12 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: 'false'
     APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS: 'HEI,NMI,LCI,RNI,MHI'
     HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
+    X_RAY_BODY_SCANS_ENABLED: "false"
 
   allowlist:
     groups:
-      - internal
+      - digital_staff_and_mojo
+      - moj_cloud_platform
       - prisons
       - private_prisons
       - home_office

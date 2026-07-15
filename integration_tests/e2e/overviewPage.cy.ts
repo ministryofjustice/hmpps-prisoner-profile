@@ -663,6 +663,52 @@ context('Overview Page', () => {
         overviewPage.courtCasesAndReleaseDates().card().should('not.exist')
       })
 
+      context('confirmed release date card shows for users without calculate release date permissions', () => {
+        const setupStubs = () => {
+          cy.setupOverviewPageStubs({
+            prisonerNumber: 'G6123VU',
+            bookingId: 1102484,
+            caseLoads: [{ caseLoadId: 'HLI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+          })
+          cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
+        }
+
+        it('should display the confirmed release date when there is one', () => {
+          setupStubs()
+          cy.task('stubGetPrisonerSentenceDetails', 'G6123VU')
+          visitOverviewPage()
+          const overviewPage = Page.verifyOnPage(OverviewPage)
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateValue().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
+          overviewPage.courtCasesAndReleaseDates().card().should('not.exist')
+        })
+
+        it('should display no release dates when there is no data', () => {
+          setupStubs()
+          cy.task('stubGetPrisonerSentenceDetailsNoConfirmedDate', 'G6123VU')
+          visitOverviewPage()
+          const overviewPage = Page.verifyOnPage(OverviewPage)
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().noReleaseDateMessage().should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateValue().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
+        })
+
+        it('should display unavailable error when the call fails', () => {
+          setupStubs()
+          cy.task('stubGetPrisonerSentenceDetailsError', 'G6123VU')
+          visitOverviewPage()
+          const overviewPage = Page.verifyOnPage(OverviewPage)
+          overviewPage.confirmedReleaseDateNonCalculate().card().should('exist')
+          cy.get('[data-qa="confirmed-release-date-unavailable"]').should('exist')
+          overviewPage.confirmedReleaseDateNonCalculate().releaseDateLabel().should('not.exist')
+          overviewPage.confirmedReleaseDateNonCalculate().viewCourtCaseLink().should('exist')
+        })
+      })
+
       it('should display main offence and conditional release date if there is no confirmed release date and hide the next court appearance', () => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })

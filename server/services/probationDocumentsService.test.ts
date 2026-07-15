@@ -41,12 +41,10 @@ describe('probationDocumentsService', () => {
     })
 
     it('Handles no documents being returned', async () => {
-      deliusApiClient.getProbationDocuments = jest.fn(
-        async (): Promise<ProbationDocuments> => ({
-          ...mockProbationDocumentsResponse,
-          documents: undefined,
-        }),
-      )
+      deliusApiClient.getProbationDocuments = jest.fn(async (): Promise<ProbationDocuments> => ({
+        ...mockProbationDocumentsResponse,
+        documents: undefined,
+      }))
 
       const response = await service.getDocuments('token', 'ABC')
       expect(response).toEqual(

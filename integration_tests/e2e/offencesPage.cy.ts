@@ -248,4 +248,29 @@ context('Offences Page Sentenced', () => {
       Page.verifyOnPage(NotFoundPage)
     })
   })
+
+  context('offences moved banner for enabled prisons', () => {
+    beforeEach(() => {
+      cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'HLI' } })
+      cy.task('stubComponentsData', {
+        caseLoads: [{ caseLoadId: 'HLI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+      })
+      cy.task('stubUserCaseLoads', [
+        { caseLoadId: 'HLI', currentlyActive: true, description: '', type: '', caseloadFunction: '' },
+      ])
+      visitOffencesPage()
+    })
+
+    it('should display offences moved banner', () => {
+      cy.contains('Offences information has moved').should('exist')
+    })
+
+    it('should display a link to the overview page', () => {
+      cy.contains('Go to Overview').should('have.attr', 'href', `/prisoner/${prisonerNumber}`)
+    })
+
+    it('should not display the old content', () => {
+      cy.get('[data-qa="court-cases-and-offences"]').should('not.exist')
+    })
+  })
 })

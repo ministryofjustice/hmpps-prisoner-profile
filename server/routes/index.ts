@@ -47,7 +47,9 @@ import DuplicateProfilesController from '../controllers/duplicateProfilesControl
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
 
-export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
+export function standardGetPaths(path: string): boolean {
+  return !/^(\/api|\/save-backlink|\/$)/.test(path)
+}
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -233,6 +235,7 @@ export default function routes(services: Services): Router {
         courtCaseData,
         releaseDates,
         activeTab: true,
+        prisonerNumber: prisonerData.prisonerNumber,
       })
     },
   )
