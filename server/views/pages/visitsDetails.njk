@@ -4,10 +4,15 @@
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
-  { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-  { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber }
-  ]
-%}
+    { 
+      text: 'Digital Prison Services', 
+      href:  "/" | prependBaseUrl 
+    },
+    { 
+      text: prisonerName.lastCommaFirst, 
+      href: "/prisoner/" + prisonerNumber 
+    }
+  ] %}
 
 {% block body %}
     {% set titleHtml = (prisonerName.firstLast | apostrophe) + " visits" %}
