@@ -61,4 +61,15 @@ export default class HealthAndMedicationApiRestClient extends RestClient impleme
       ),
     )
   }
+
+  completeMerge(prisonerNumber: string): Promise<void> {
+    return handleNomisLockedError(() =>
+      this.put(
+        {
+          path: `/prisoners/${prisonerNumber}/merge-completion`,
+        },
+        this.token,
+      ),
+    )
+  }
 }

@@ -51,6 +51,7 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
 
 const mockHealthAndMedication = (): HealthAndMedication => ({
   dietAndAllergy: mockDietAndAllergy(),
+  pendingMerges: [],
 })
 
 const baseUrl = '/healthAndMedication'
@@ -101,9 +102,9 @@ export default {
     overrides = {},
   }: {
     prisonerNumber: string
-    overrides: Partial<HealthAndMedication>
+    overrides: Partial<DietAndAllergy>
   }) =>
-    stubPutWithResponse<HealthAndMedication>({
+    stubPutWithResponse<DietAndAllergy>({
       path: `${baseUrl}/prisoners/${prisonerNumber}/diet-and-allergy`,
       responseBody: {
         ...mockDietAndAllergy(),
@@ -114,6 +115,12 @@ export default {
   stubSmokerStatusUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubPutWithResponse<void>({
       path: `${baseUrl}/prisoners/${prisonerNumber}/smoker`,
+      responseBody: null,
+    }),
+
+  stubCompleteMerge: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/prisoners/${prisonerNumber}/merge-completion`,
       responseBody: null,
     }),
 }
