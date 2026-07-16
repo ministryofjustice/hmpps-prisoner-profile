@@ -4,19 +4,26 @@
 
 {% set age = personalDetails.personalDetailsMain.age.years + " years, " + personalDetails.personalDetailsMain.age.months | pluralise('month') if personalDetails.personalDetailsMain.age else "Not entered" %}
 {% set inCaseload = isInUsersCaseLoad(prisonId, user) %}
+{% set grantedDateOfBirth = isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions) %}
+{% set grantedNationality = isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions) and inCaseload %}
+{% set grantedLanguage = isGranted(PersonCommunicationNeedsPermission.read_language, prisonerPermissions) and inCaseload %}
 {% set grantedReligion = isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions) %}
 {% set moveEthnicGroup = ((not inCaseload) or (not grantedReligion)) %}
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
       <dl class="govuk-summary-list govuk-summary-list--no-border">
-        {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'Not entered', "date-of-birth") }}
-        {{ summaryListRow("Age", age, "age") }}
+        {% if grantedDateOfBirth %}
+          {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'Not entered', "date-of-birth") }}
+          {{ summaryListRow("Age", age, "age") }}
+        {% endif %}
         {% if moveEthnicGroup %}
           {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup or 'Not entered', "ethnic-group") }}
         {% endif %}
-        {% if inCaseload %}
+        {% if grantedNationality %}
           {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'Not entered', "nationality") }}
+        {% endif %}
+        {% if grantedLanguage %}
           {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'Not entered', "spoken-language") }}
         {% endif %}
         {% if grantedReligion %}
