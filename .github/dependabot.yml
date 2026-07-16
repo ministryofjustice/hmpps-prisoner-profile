@@ -30,6 +30,10 @@ updates:
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
+      - dependency-name: "typescript"
+        # TODO: remove once dependent libs are updated for v7
+        versions:
+          - ">=7"
 
   # infrastructure dependencies
   - package-ecosystem: "docker"
