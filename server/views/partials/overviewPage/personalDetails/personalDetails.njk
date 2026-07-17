@@ -5,10 +5,10 @@
 {% set age = personalDetails.personalDetailsMain.age.years + " years, " + personalDetails.personalDetailsMain.age.months | pluralise('month') if personalDetails.personalDetailsMain.age else "Not entered" %}
 {% set inCaseload = isInUsersCaseLoad(prisonId, user) %}
 {% set grantedDateOfBirth = isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions) %}
-{% set grantedNationality = isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions) and inCaseload %}
-{% set grantedLanguage = isGranted(PersonCommunicationNeedsPermission.read_language, prisonerPermissions) and inCaseload %}
+{% set grantedNationality = isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions) %}
+{% set grantedLanguage = isGranted(PersonCommunicationNeedsPermission.read_language, prisonerPermissions) %}
 {% set grantedReligion = isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions) %}
-{% set moveEthnicGroup = ((not inCaseload) or (not grantedReligion)) %}
+{% set moveEthnicGroup = not (grantedNationality and grantedLanguage and grantedReligion) %}
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
