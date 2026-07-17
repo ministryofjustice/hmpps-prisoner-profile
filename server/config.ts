@@ -426,8 +426,6 @@ export default {
       enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
-
     xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
 
     offencesMoved: {

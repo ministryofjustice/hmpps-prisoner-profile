@@ -139,7 +139,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
   njkEnv.addGlobal('bodyPartLabels', bodyPartLabels)
   njkEnv.addGlobal('generateContactChangeLink', generateContactChangeLink)
-  njkEnv.addGlobal('hideSomePersonalOverviewInfo', config.featureToggles.hideSomePersonalOverviewInfo)
   njkEnv.addGlobal('offencesMoved', offencesMoved)
   njkEnv.addGlobal('courtCaseReleaseDatesUrl', config.serviceUrls.courtCaseReleaseDates)
 
