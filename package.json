@@ -128,13 +128,14 @@
     "uuid": "14.0.1"
   },
   "overrides": {
-    "brace-expansion": "5.0.7",
-    "diff": "^8.0.3",
-    "serialize-javascript": "^7.0.3",
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/core": "2.8.0",
     "@opentelemetry/resources": "2.8.0",
     "@opentelemetry/sdk-trace-base": "2.8.0",
-    "@opentelemetry/sdk-trace-web": "2.8.0"
+    "@opentelemetry/sdk-trace-web": "2.8.0",
+    "brace-expansion": "5.0.7",
+    "diff": "^9.0.0",
+    "js-yaml": "^5.1.0",
+    "serialize-javascript": "^7.0.3"
   }
 }
