@@ -52,7 +52,7 @@ import {
   DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
-  ReferenceDataCode,
+  ReferenceDataSelection,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { militaryHistoryEnabled } from '../utils/featureFlags'
@@ -103,8 +103,7 @@ export default class PersonalPageService {
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    const response = apiClient.getHealthAndMedication(prisonerNumber)
-    return response
+    return apiClient.getHealthAndMedication(prisonerNumber)
   }
 
   async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
@@ -187,6 +186,11 @@ export default class PersonalPageService {
     })
 
     return response
+  }
+
+  async completeMerge(token: string, prisonerNumber: string): Promise<void> {
+    const apiClient = this.healthAndMedicationApiClientBuilder(token)
+    await apiClient.completeMerge(prisonerNumber)
   }
 
   async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PersonIntegrationDistinguishingMark[]> {
@@ -581,14 +585,14 @@ export default class PersonalPageService {
 
   private mapDietAndAllergy = (
     healthAndMedication: HealthAndMedication,
-    field: keyof Omit<DietAndAllergy, 'cateringInstructions'>,
+    field: 'foodAllergies' | 'medicalDietaryRequirements' | 'personalisedDietaryRequirements',
   ) => {
     const dietAndAllergy = healthAndMedication?.dietAndAllergy
 
     return (
       (dietAndAllergy &&
-        dietAndAllergy[field]?.value
-          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+        (dietAndAllergy[field] as ValueWithMetadata<ReferenceDataSelection[]>)?.value
+          ?.map(({ value: { id, description }, comment }: ReferenceDataSelection) => ({ id, description, comment }))
           .sort((a, b) => {
             if (a.id?.endsWith('OTHER')) return 1
             if (b.id?.endsWith('OTHER')) return -1
@@ -608,9 +612,11 @@ export default class PersonalPageService {
   private latestModificationDetails = (healthAndMedication: HealthAndMedication) => {
     const dietAndAllergy = healthAndMedication?.dietAndAllergy
 
-    const metadata = (dietAndAllergy ? Object.values(dietAndAllergy) : null) as ValueWithMetadata<
-      string | ReferenceDataCode[]
-    >[]
+    const metadata = (
+      dietAndAllergy
+        ? Object.values(dietAndAllergy).filter(v => typeof v === 'object' && v !== null && 'lastModifiedAt' in v)
+        : null
+    ) as ValueWithMetadata<string | ReferenceDataSelection[]>[]
 
     const mostRecentUpdate =
       metadata?.sort((a, b) => {
