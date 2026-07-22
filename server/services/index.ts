@@ -3,6 +3,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 import { PermissionsService as PrisonPermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { OsPlacesAddressService } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import { telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -97,6 +98,7 @@ export const services = () => {
     prisonerSearchConfig: config.apis.prisonerSearchApi,
     authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
     logger,
+    telemetryClient: telemetry,
     readOnly: config.readOnlyProfile,
   })
 
