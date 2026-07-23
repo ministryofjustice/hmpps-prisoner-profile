@@ -659,6 +659,16 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
+    context('With none', () => {
+      it('Displays the xray count and date', () => {
+        cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 0 })
+        visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
+        page.security().xrays().total().should('include.text', '0')
+        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
+      })
+    })
+
     context('With less than the limit', () => {
       it('Displays the xray count and date', () => {
         cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 10 })

@@ -9,7 +9,6 @@
     href:  "/" | prependBaseUrl
   }
 ] %}
-{% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 
@@ -29,7 +28,7 @@
     { text: "Addresses", href: "#addresses", template: "partials/personalPage/addresses.njk" if displayNewAddressesCard else "partials/personalPage/oldAddresses.njk" },
     { text: "Phone and email", href: "#phones-and-emails", template: "partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
     { text: "Next of kin", href: "#next-of-kin", template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
-    { text: "Security", href: "#security", template: "partials/personalPage/security.njk", condition: showSecurity },
+    { text: "Security", href: "#security", template: "partials/personalPage/security.njk" },
     { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: inUserCaseload }
   ] %}
 

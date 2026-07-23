@@ -12,7 +12,7 @@ import { scanCountResponseMock } from '../data/localMockData/xRayBodyScansMock'
 import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
 import CareNeedsService from './careNeedsService'
 
-describe('beliefService', () => {
+describe('careNeedsService', () => {
   let prisonApiClient: PrisonApiClient
   let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let careNeedsService: CareNeedsService
@@ -304,11 +304,11 @@ describe('beliefService', () => {
     })
 
     describe('Given no x-ray care needs', () => {
-      it('Returns no xray security information', async () => {
+      it('Returns x-ray security information', async () => {
         setPersonalCareNeedsForXrayBodyScansMock([])
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(0)
-        expect(xrays.since).toBeUndefined()
+        expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
       })
     })
 

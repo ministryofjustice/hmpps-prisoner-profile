@@ -3,52 +3,50 @@
 {%- call summaryCard({title: "Security", id: "security"}) -%}
   <div class="govuk-grid-row" data-qa="security">
     <div class="govuk-grid-column-full">
-      {% if security.xrays.total > 0 %}
-        <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">
-          {# TODO: this 116 should not be hard-coded in a template file,
+      <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">
+        {# TODO: this 116 should not be hard-coded in a template file,
                    rather api-driven or in config/business logic #}
-          {% if security.xrays.total >= 116 %}
-            <div
-              class="govuk-grid-row hmpps-xray__warning govuk-!-margin-bottom-3"
-              data-qa="xray-limit-reached-message"
-            >
-              <div class="govuk-grid-column-full">
-                <div class="govuk-warning-text govuk-!-margin-bottom-1 govuk-!-margin-top-1">
-                  <span class="govuk-warning-text__icon hmpps-xray__warning-icon" aria-hidden="true">!</span>
-                  <div class="govuk-warning-text__text">
-                    <strong>
-                      <span class="govuk-visually-hidden">Warning</span>
-                      Do not scan - annual body scan limit reached
-                    </strong>
-                  </div>
+        {% if security.xrays.total >= 116 %}
+          <div
+            class="govuk-grid-row hmpps-xray__warning govuk-!-margin-bottom-3"
+            data-qa="xray-limit-reached-message"
+          >
+            <div class="govuk-grid-column-full">
+              <div class="govuk-warning-text govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                <span class="govuk-warning-text__icon hmpps-xray__warning-icon" aria-hidden="true">!</span>
+                <div class="govuk-warning-text__text">
+                  <strong>
+                    <span class="govuk-visually-hidden">Warning</span>
+                    Do not scan - annual body scan limit reached
+                  </strong>
                 </div>
               </div>
             </div>
-          {% endif %}
-          <div class="hmpps-xray__total">
-            <div class="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-1">
-              <div class="govuk-grid-column-one-third">
-                <p class="govuk-body hmpps-xray__label">X-ray body scans</p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" data-qa="xrays-since">
-                  Since {{ security.xrays.since | formatDate }}
-                </p>
-              </div>
-              <div class="govuk-grid-column-two-thirds">
-                <p class="govuk-body hmpps-xray__total" data-qa="total-xrays">{{ security.xrays.total }}</p>
-              </div>
+          </div>
+        {% endif %}
+        <div class="hmpps-xray__total">
+          <div class="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+            <div class="govuk-grid-column-one-third">
+              <p class="govuk-body hmpps-xray__label">X-ray body scans</p>
+              <p class="govuk-body-s govuk-!-margin-bottom-0" data-qa="xrays-since">
+                Since {{ security.xrays.since | formatDate }}
+              </p>
             </div>
-            <div class="govuk-grid-row">
-              <div class="govuk-grid-column-full">
-                <p class="govuk-body">
-                  <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/x-ray-body-scans">All X-ray body scans</a>
-                </p>
-              </div>
+            <div class="govuk-grid-column-two-thirds">
+              <p class="govuk-body hmpps-xray__total" data-qa="total-xrays">{{ security.xrays.total }}</p>
+            </div>
+          </div>
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+              <p class="govuk-body">
+                <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/x-ray-body-scans">All X-ray body scans</a>
+              </p>
             </div>
           </div>
         </div>
-        {% if security.interestToImmigration == "Yes" %}
-          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
-        {% endif %}
+      </div>
+      {% if security.interestToImmigration == "Yes" %}
+        <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" aria-hidden="true" />
       {% endif %}
 
       {# TODO: only shown to DPS developers: remove from here #}
