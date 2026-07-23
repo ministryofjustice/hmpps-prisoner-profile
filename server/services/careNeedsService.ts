@@ -76,7 +76,6 @@ export default class CareNeedsService {
    */
   public async getXrayBodyScanSummary(token: string, bookingId: number): Promise<{ total: number; since?: string }> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
-
     const healthCodes = await prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health)
 
     const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(
@@ -171,7 +170,7 @@ export default class CareNeedsService {
       .filter(need => isSameYear(new Date(need.startDate), yearStart))
     return {
       total: xrayNeeds.length,
-      since: xrayNeeds.length > 0 ? yearStart.toISOString() : undefined,
+      since: yearStart.toISOString(),
     }
   }
 }
