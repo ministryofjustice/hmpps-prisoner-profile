@@ -96,7 +96,7 @@ export default class CareNeedsService {
     prisonerNumber: string,
   ): Promise<{ total: number; since: string }> {
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(token)
-    const { totalCount, fromScanDate } = await xRayBodyScansApiClient.countScans({ prisonerNumber })
+    const { totalCount, fromScanDate } = await xRayBodyScansApiClient.getScanSummary({ prisonerNumber })
     return {
       total: totalCount,
       since: formatDate(fromScanDate.toISOString()),
