@@ -1,8 +1,20 @@
 import type CircuitBreaker from 'opossum'
 import config from '../config'
 import { formatDateISO } from '../utils/dateHelpers'
-import type { ScanSummaryRequest, ScanSummaryResponse, XRayBodyScansApiClient } from './interfaces/xRayBodyScansApi'
+import type {
+  ListScansRequest,
+  ScanResponse,
+  ScanSummaryRequest,
+  ScanSummaryResponse,
+  XRayBodyScansApiClient,
+} from './interfaces/xRayBodyScansApi'
 import RestClient, { type Request } from './restClient'
+
+interface RawScanResponse extends Omit<ScanResponse, 'mergedAt' | 'createdAt' | 'lastModifiedAt'> {
+  mergedAt: string | null
+  createdAt: string
+  lastModifiedAt: string
+}
 
 interface RawScanSummaryResponse extends Omit<ScanSummaryResponse, 'fromScanDate' | 'toScanDate'> {
   fromScanDate: string
@@ -12,6 +24,27 @@ interface RawScanSummaryResponse extends Omit<ScanSummaryResponse, 'fromScanDate
 export default class XRayBodyScansApiRestClient extends RestClient implements XRayBodyScansApiClient {
   constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
     super('X-ray Body Scans API', config.apis.xRayBodyScans, token, circuitBreaker)
+  }
+
+  async listScans(prisonerNumber: string, filters?: ListScansRequest): Promise<ScanResponse[]> {
+    const query: Record<string, string | string[] | number> = {
+      ...(filters ?? {}),
+      fromScanDate: filters.fromScanDate ? formatDateISO(filters.fromScanDate) : undefined,
+      toScanDate: filters.toScanDate ? formatDateISO(filters.toScanDate) : undefined,
+    }
+    const response = await this.get<RawScanResponse[]>(
+      {
+        path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan`,
+        query,
+      },
+      this.token,
+    )
+    return response.map(scan => ({
+      ...scan,
+      mergedAt: scan.mergedAt ? new Date(scan.mergedAt) : null,
+      createdAt: new Date(scan.createdAt),
+      lastModifiedAt: new Date(scan.lastModifiedAt),
+    }))
   }
 
   async getScanSummary(request: ScanSummaryRequest): Promise<ScanSummaryResponse> {
@@ -24,7 +57,7 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     }
     const response = await this.get<RawScanSummaryResponse>(
       {
-        path: `/prisoner/${request.prisonerNumber}/scan/summary`,
+        path: `/prisoner/${encodeURIComponent(request.prisonerNumber)}/scan/summary`,
         query,
       },
       this.token,
