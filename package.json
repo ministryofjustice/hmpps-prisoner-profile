@@ -47,7 +47,7 @@
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
     "@ministryofjustice/hmpps-prison-permissions-lib": "4.2.0",
     "@ministryofjustice/hmpps-rest-client": "2.2.0",
-    "@sentry/node": "10.65.0",
+    "@sentry/node": "10.66.0",
     "@types/multer": "2.2.0",
     "accessible-autocomplete": "^3.0.1",
     "agentkeepalive": "^4.6.0",
