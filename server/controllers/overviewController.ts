@@ -77,7 +77,7 @@ export default class OverviewController {
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
     const supportForAdditionalNeedsApiClient = this.supportForAdditionalNeedsApiClientBuilder(clientToken)
-    const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+    const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
     const showConfirmedReleaseDateNonCalculate =
       !showCourtCaseSummary && offencesMoved((user as PrisonUser).activeCaseLoadId)
 
