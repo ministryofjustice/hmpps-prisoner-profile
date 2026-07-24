@@ -1,10 +1,10 @@
 import type CircuitBreaker from 'opossum'
 import config from '../config'
 import { formatDateISO } from '../utils/dateHelpers'
-import type { ScanCountRequest, ScanCountResponse, XRayBodyScansApiClient } from './interfaces/xRayBodyScansApi'
+import type { ScanSummaryRequest, ScanSummaryResponse, XRayBodyScansApiClient } from './interfaces/xRayBodyScansApi'
 import RestClient, { type Request } from './restClient'
 
-interface RawScanCountResponse extends Omit<ScanCountResponse, 'fromScanDate' | 'toScanDate'> {
+interface RawScanSummaryResponse extends Omit<ScanSummaryResponse, 'fromScanDate' | 'toScanDate'> {
   fromScanDate: string
   toScanDate: string
 }
@@ -14,7 +14,7 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     super('X-ray Body Scans API', config.apis.xRayBodyScans, token, circuitBreaker)
   }
 
-  async countScans(request: ScanCountRequest): Promise<ScanCountResponse> {
+  async getScanSummary(request: ScanSummaryRequest): Promise<ScanSummaryResponse> {
     const query: Record<string, string> = {}
     if (request.fromScanDate) {
       query.fromScanDate = formatDateISO(request.fromScanDate)
@@ -22,9 +22,9 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     if (request.toScanDate) {
       query.toScanDate = formatDateISO(request.toScanDate)
     }
-    const response = await this.get<RawScanCountResponse>(
+    const response = await this.get<RawScanSummaryResponse>(
       {
-        path: `/prisoner/${request.prisonerNumber}/scan/count`,
+        path: `/prisoner/${request.prisonerNumber}/scan/summary`,
         query,
       },
       this.token,
