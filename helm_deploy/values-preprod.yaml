@@ -103,6 +103,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     X_RAY_BODY_SCANS_ENABLED: "false"
+    OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
 
   allowlist:
     groups:
