@@ -1,6 +1,7 @@
 import type { XRayBodyScansApiClient } from '../../server/data/interfaces/xRayBodyScansApi'
 
 export const xRayBodyScansApiClientMock = (): jest.Mocked<XRayBodyScansApiClient> => ({
+  listScans: jest.fn(),
   getScanSummary: jest.fn(),
 })
 
