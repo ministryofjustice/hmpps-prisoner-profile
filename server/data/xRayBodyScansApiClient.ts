@@ -50,7 +50,7 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     }))
   }
 
-  async getScanSummary(prisonerNumber: string, request: ScanSummaryRequest): Promise<ScanSummaryResponse> {
+  async getScanSummary(prisonerNumber: string, request: ScanSummaryRequest = {}): Promise<ScanSummaryResponse> {
     const query: Record<string, string> = {}
     if (request.fromScanDate) {
       query.fromScanDate = formatDateISO(request.fromScanDate)
