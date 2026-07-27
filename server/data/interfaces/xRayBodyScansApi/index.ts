@@ -1,23 +1,61 @@
-export interface ScanCountRequest {
-  prisonerNumber: string
+import type { PageRequest } from '../PageRequest'
+
+export interface ListScansRequest extends PageRequest<'scanDate'> {
   fromScanDate?: Date | undefined
   toScanDate?: Date | undefined
 }
 
-export interface ScanCountResponse {
+export interface ScanResponse {
+  id: string
+  prisonerNumber: string
+  prisonId: string
+  scanDate: Date
+  justification: string
+  justificationDescription: string
+  outcome: string
+  outcomeDescription: string
+  typeOfFind: string | null
+  typeOfFindDescription: string | null
+  caseNoteId: string | null
+  mergedFromPrisonerNumber: string | null
+  mergedAt: Date | null
+  createdAt: Date
+  createdBy: string
+  lastModifiedAt: Date
+  lastModifiedBy: string
+}
+
+export interface ScanSummaryRequest {
+  fromScanDate?: Date | undefined
+  toScanDate?: Date | undefined
+}
+
+export interface ScanSummaryResponse {
   prisonerNumber: string
   nomisCount: number
   dpsCount: number
   totalCount: number
+  positiveCount: number
+  negativeCount: number
+  inconclusiveCount: number
+  annualLimit: number
+  remainingScans: number
   fromScanDate: Date
   toScanDate: Date
 }
 
 export interface XRayBodyScansApiClient {
   /**
-   * Returns the total number of x-ray body scans for the given prisoner in specified
-   * date range or this calendar year.
-   * If the prisoner is not found, the count will default to zero.
+   * Returns recorded x-ray body scans for the given prisoner.
+   * If the prisoner is not found, the list is empty.
+   * Ensure the prisoner exists prior to use.
    */
-  countScans(request: ScanCountRequest): Promise<ScanCountResponse>
+  listScans(prisonerNumber: string, request?: ListScansRequest): Promise<ScanResponse[]>
+
+  /**
+   * Returns a summary of x-ray body scans for the given prisoner in specified
+   * date range or this calendar year.
+   * If the prisoner is not found, the counts will default to zero.
+   */
+  getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse>
 }

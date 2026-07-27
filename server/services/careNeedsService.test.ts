@@ -8,7 +8,7 @@ import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
-import { scanCountResponseMock } from '../data/localMockData/xRayBodyScansMock'
+import { scanSummaryResponseMock } from '../data/localMockData/xRayBodyScansMock'
 import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
 import CareNeedsService from './careNeedsService'
 
@@ -347,7 +347,7 @@ describe('careNeedsService', () => {
     })
 
     it('should return scan count and formatted start date', async () => {
-      xRayBodyScansApiClient.countScans.mockResolvedValueOnce(scanCountResponseMock)
+      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(scanSummaryResponseMock)
 
       const summary = await careNeedsService.unsafeGetXrayBodyScanSummary('token1', PrisonerMockDataA.prisonerNumber)
       expect(summary).toEqual({
