@@ -7,13 +7,16 @@
   </section>
 </div>
 
-{% if options.showCourtCaseSummary %}
+{% call conditionallyShow({
+  id: 'ccard-edit',
+  condition: options.showCourtCaseSummary
+}) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "./courtCases/courtCasesAndReleaseDates.njk" %}
     </div>
   </div>
-{% endif %}
+{% endcall %}
 
 <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="overview-mini-summary-group-a">
   {% include "./money/money.njk" %}
@@ -45,27 +48,39 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {%- call conditionallyShow({
+    {% call conditionallyShow({
       id: 'overview-schedule',
       condition: isGranted(PrisonerSchedulePermission.read_schedule, prisonerPermissions)
-    }) -%}
+    }) %}
       {% include "./schedule/schedule.njk" %}
-    {%- endcall -%}
+    {% endcall %}
   </div>
 </div>
 
-{% if not options.showCourtCaseSummary %}
-  {% if offencesMoved(user.activeCaseLoadId) %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {% include "./releaseDate/confirmedReleaseDate.njk" %}
-      </div>
+{% call conditionallyShow({
+  id: 'ccard-readonly',
+  condition: (
+  not options.showCourtCaseSummary
+  and offencesMoved(user.activeCaseLoadId)
+  and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+  )
+}) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "./releaseDate/confirmedReleaseDate.njk" %}
     </div>
-  {% else %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full" data-qa="overview-offences">
-        {% include "./offences/offences.njk" %}
-      </div>
+  </div>
+{% endcall %}
+
+
+{# TODO: remove this once we have fully moved the offences tab data away to CCARD: #}
+{% call conditionallyShow({
+  id: 'old-offences-card',
+  condition: not options.showCourtCaseSummary and not offencesMoved(user.activeCaseLoadId)
+}) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" data-qa="overview-offences">
+      {% include "./offences/offences.njk" %}
     </div>
-  {% endif %}
-{% endif %}
+  </div>
+{% endcall %}
