@@ -1,33 +1,73 @@
+import { formatISO } from 'date-fns'
 import type { SuperAgentRequest } from 'superagent'
 import { stubFor, stubPing } from './wiremock'
-import type { ScanCountResponse } from '../../server/data/interfaces/xRayBodyScansApi'
+import type {
+  ListScansRequest,
+  ScanResponse,
+  ScanSummaryRequest,
+  ScanSummaryResponse,
+} from '../../server/data/interfaces/xRayBodyScansApi'
+
+function dateFilters(request: { fromScanDate?: Date; toScanDate?: Date }): Record<string, { equalTo: string }> {
+  const queryParameters: Record<string, { equalTo: string }> = {}
+  if (request.fromScanDate) {
+    queryParameters.fromScanDate = { equalTo: formatISO(request.fromScanDate, { representation: 'date' }) }
+  }
+  if (request.toScanDate) {
+    queryParameters.toScanDate = { equalTo: formatISO(request.toScanDate, { representation: 'date' }) }
+  }
+  return queryParameters
+}
 
 export default {
   stubXRayBodyScanPing: (httpStatus = 200): SuperAgentRequest => stubPing('/xRayBodyScans', httpStatus),
 
-  stubXRayBodyScanCounts({
+  stubXRayBodyListScans({
+    prisonerNumber,
     response,
-    fromScanDate,
-    toScanDate,
+    request,
   }: {
-    response: ScanCountResponse
-    /** date filter query string: need not match response’s range and usually not provided */
-    fromScanDate?: Date
-    /** date filter query string: need not match response’s range and usually not provided */
-    toScanDate?: Date
+    prisonerNumber: string
+    response: ScanResponse[]
+    request?: ListScansRequest
   }): SuperAgentRequest {
-    const queryParameters: Record<string, { equalTo: string }> = {}
-    if (fromScanDate) {
-      queryParameters.fromScanDate = { equalTo: fromScanDate.toISOString().split('T')[0] }
-    }
-    if (toScanDate) {
-      queryParameters.fromScanDate = { equalTo: toScanDate.toISOString().split('T')[0] }
-    }
-
+    const queryParameters = dateFilters(request)
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/xRayBodyScans/prisoner/${response.prisonerNumber}/scan/count`,
+        urlPath: `/xRayBodyScans/prisoner/${prisonerNumber}/scan`,
+        queryParameters,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response.map(scan => ({
+          ...scan,
+          scanDate: formatISO(scan.scanDate, { representation: 'date' }),
+          mergedAt: scan.mergedAt ? formatISO(scan.mergedAt) : null,
+          createdAt: formatISO(scan.createdAt),
+          lastModifiedAt: formatISO(scan.lastModifiedAt),
+        })),
+      },
+    })
+  },
+
+  stubXRayBodyScanCounts({
+    prisonerNumber,
+    response,
+    request,
+  }: {
+    prisonerNumber: string
+    response: ScanSummaryResponse
+    request?: ScanSummaryRequest
+  }): SuperAgentRequest {
+    const queryParameters = dateFilters(request)
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/xRayBodyScans/prisoner/${prisonerNumber}/scan/count`,
         queryParameters,
       },
       response: {
@@ -37,8 +77,8 @@ export default {
         },
         jsonBody: {
           ...response,
-          fromScanDate: response.fromScanDate.toISOString().split('T')[0],
-          toScanDate: response.toScanDate.toISOString().split('T')[0],
+          fromScanDate: formatISO(response.fromScanDate, { representation: 'date' }),
+          toScanDate: formatISO(response.toScanDate, { representation: 'date' }),
         },
       },
     })

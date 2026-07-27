@@ -36,8 +36,7 @@ describe('xRayBodyScansApiClient', () => {
 
     const fromScanDate = new Date(2026, 0, 1, 12)
     const toScanDate = new Date(2026, 5, 25, 12)
-    const response = await xRayBodyScansApiClient.getScanSummary({
-      prisonerNumber: samplePrisonerNumber,
+    const response = await xRayBodyScansApiClient.getScanSummary(samplePrisonerNumber, {
       fromScanDate,
       toScanDate,
     })
