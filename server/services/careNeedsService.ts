@@ -1,11 +1,9 @@
 import { isSameYear, startOfYear } from 'date-fns'
-import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { HealthDomainReferenceCode, PersonalCareNeed } from '../data/interfaces/prisonApi/PersonalCareNeeds'
 import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustment'
-import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 
 export interface CareNeed {
   type: string
@@ -37,10 +35,7 @@ export interface XrayBodyScanSummary {
 }
 
 export default class CareNeedsService {
-  constructor(
-    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly xRayBodyScansApiClientBuilder: RestClientBuilder<XRayBodyScansApiClient>,
-  ) {}
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   /**
    * Handle request for personal care needs
@@ -61,6 +56,7 @@ export default class CareNeedsService {
   /**
    * Handle request for x-ray body scans
    *
+   * @deprecated will be removed
    * @param token
    * @param bookingId
    */
@@ -76,6 +72,7 @@ export default class CareNeedsService {
   /**
    * Handle request for x-ray body scan summary
    *
+   * @deprecated will be removed
    * @param token
    * @param bookingId
    */
@@ -88,21 +85,6 @@ export default class CareNeedsService {
       healthCodes.map(({ code }) => code),
     )
     return this.toXrayBodyScanSummary(personalCareNeeds)
-  }
-
-  /**
-   * X-ray body scans in this calendar year.
-   * Will replace `getXrayBodyScanSummary` method.
-   *
-   * WARNING: do not use in production
-   */
-  public async unsafeGetXrayBodyScanSummary(token: string, prisonerNumber: string): Promise<XrayBodyScanSummary> {
-    const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(token)
-    const { totalCount, fromScanDate } = await xRayBodyScansApiClient.getScanSummary(prisonerNumber)
-    return {
-      total: totalCount,
-      since: formatDate(fromScanDate.toISOString()),
-    }
   }
 
   private toCareNeeds(

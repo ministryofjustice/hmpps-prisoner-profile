@@ -269,6 +269,7 @@ export default function routes(services: Services): Router {
     },
   )
 
+  // TODO: redirect to xrbs-ui
   router.get(
     `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),

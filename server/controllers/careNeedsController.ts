@@ -34,6 +34,7 @@ export default class CareNeedsController {
     })
   }
 
+  // TODO: remove in preference to a redirect to xrbs-ui
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
     const { bookingId } = prisonerData
