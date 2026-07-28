@@ -31,6 +31,11 @@ export interface XrayBodyScan {
   scanDate: string
 }
 
+export interface XrayBodyScanSummary {
+  total: number
+  since: string
+}
+
 export default class CareNeedsService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
@@ -74,7 +79,7 @@ export default class CareNeedsService {
    * @param token
    * @param bookingId
    */
-  public async getXrayBodyScanSummary(token: string, bookingId: number): Promise<{ total: number; since?: string }> {
+  public async getXrayBodyScanSummary(token: string, bookingId: number): Promise<XrayBodyScanSummary> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const healthCodes = await prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health)
 
@@ -91,10 +96,7 @@ export default class CareNeedsService {
    *
    * WARNING: do not use in production
    */
-  public async unsafeGetXrayBodyScanSummary(
-    token: string,
-    prisonerNumber: string,
-  ): Promise<{ total: number; since: string }> {
+  public async unsafeGetXrayBodyScanSummary(token: string, prisonerNumber: string): Promise<XrayBodyScanSummary> {
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(token)
     const { totalCount, fromScanDate } = await xRayBodyScansApiClient.getScanSummary(prisonerNumber)
     return {
@@ -163,7 +165,7 @@ export default class CareNeedsService {
       }))
   }
 
-  private toXrayBodyScanSummary(personalCareNeeds: PersonalCareNeed[]): { total: number; since?: string } {
+  private toXrayBodyScanSummary(personalCareNeeds: PersonalCareNeed[]): XrayBodyScanSummary {
     const yearStart = startOfYear(new Date())
     const xrayNeeds = personalCareNeeds
       ?.filter(need => need.problemType === HealthDomainReferenceCode.XRayBodyScan)
