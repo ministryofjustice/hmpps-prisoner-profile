@@ -35,6 +35,8 @@ export interface ScanSummaryResponse {
   inconclusiveCount: number
   annualLimit: number
   remainingScans: number
+  nearingScanLimit: boolean
+  atScanLimit: boolean
   fromScanDate: Date
   toScanDate: Date
 }

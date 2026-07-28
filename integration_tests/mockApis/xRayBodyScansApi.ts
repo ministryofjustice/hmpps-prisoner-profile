@@ -49,7 +49,7 @@ export default {
     })
   },
 
-  stubXRayBodyScanCounts({
+  stubXRayBodyScanSummary({
     prisonerNumber,
     response,
   }: {
