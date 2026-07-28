@@ -1,12 +1,7 @@
 import { formatISO } from 'date-fns'
 import type { SuperAgentRequest } from 'superagent'
 import { stubFor, stubPing } from './wiremock'
-import type {
-  ListScansRequest,
-  ScanResponse,
-  ScanSummaryRequest,
-  ScanSummaryResponse,
-} from '../../server/data/interfaces/xRayBodyScansApi'
+import type { ListScansRequest, ScanResponse, ScanSummaryResponse } from '../../server/data/interfaces/xRayBodyScansApi'
 
 function dateFilters(request: { fromScanDate?: Date; toScanDate?: Date }): Record<string, { equalTo: string }> {
   const queryParameters: Record<string, { equalTo: string }> = {}
@@ -57,18 +52,14 @@ export default {
   stubXRayBodyScanCounts({
     prisonerNumber,
     response,
-    request,
   }: {
     prisonerNumber: string
     response: ScanSummaryResponse
-    request?: ScanSummaryRequest
   }): SuperAgentRequest {
-    const queryParameters = dateFilters(request)
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/xRayBodyScans/prisoner/${prisonerNumber}/scan/count`,
-        queryParameters,
+        urlPath: `/xRayBodyScans/prisoner/${prisonerNumber}/scan/summary`,
       },
       response: {
         status: 200,

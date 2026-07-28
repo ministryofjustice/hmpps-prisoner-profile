@@ -4,7 +4,6 @@ import { formatDateISO } from '../utils/dateHelpers'
 import type {
   ListScansRequest,
   ScanResponse,
-  ScanSummaryRequest,
   ScanSummaryResponse,
   XRayBodyScansApiClient,
 } from './interfaces/xRayBodyScansApi'
@@ -50,18 +49,10 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     }))
   }
 
-  async getScanSummary(prisonerNumber: string, request: ScanSummaryRequest = {}): Promise<ScanSummaryResponse> {
-    const query: Record<string, string> = {}
-    if (request.fromScanDate) {
-      query.fromScanDate = formatDateISO(request.fromScanDate)
-    }
-    if (request.toScanDate) {
-      query.toScanDate = formatDateISO(request.toScanDate)
-    }
+  async getScanSummary(prisonerNumber: string): Promise<ScanSummaryResponse> {
     const response = await this.get<RawScanSummaryResponse>(
       {
         path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan/summary`,
-        query,
       },
       this.token,
     )
