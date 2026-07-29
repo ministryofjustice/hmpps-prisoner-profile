@@ -7,7 +7,7 @@ import PrisonerNonAssociations from './interfaces/nonAssociationsApi/PrisonerNon
 
 export default class NonAssociationsApiRestClient extends RestClient implements NonAssociationsApiClient {
   constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
-    super('Non associations API', config.apis.nonAssociationsApi, token, circuitBreaker)
+    super('Non-associations API', config.apis.nonAssociationsApi, token, circuitBreaker)
   }
 
   getPrisonerNonAssociations(

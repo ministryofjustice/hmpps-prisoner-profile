@@ -23,10 +23,6 @@ describe('xRayBodyScansApiClient', () => {
   it('getScanSummary should return data from api', async () => {
     fakeXRayBodyScansApi
       .get(`/prisoner/${samplePrisonerNumber}/scan/summary`)
-      .query({
-        fromScanDate: '2026-01-01',
-        toScanDate: '2026-06-25',
-      })
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(200, {
         ...scanSummaryResponseMock,
@@ -36,10 +32,7 @@ describe('xRayBodyScansApiClient', () => {
 
     const fromScanDate = new Date(2026, 0, 1, 12)
     const toScanDate = new Date(2026, 5, 25, 12)
-    const response = await xRayBodyScansApiClient.getScanSummary(samplePrisonerNumber, {
-      fromScanDate,
-      toScanDate,
-    })
+    const response = await xRayBodyScansApiClient.getScanSummary(samplePrisonerNumber)
     expect(response).toEqual({
       ...scanSummaryResponseMock,
       fromScanDate,
