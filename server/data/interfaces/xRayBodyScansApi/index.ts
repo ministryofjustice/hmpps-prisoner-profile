@@ -1,4 +1,5 @@
 import type { PageRequest } from '../PageRequest'
+import type { PageResponse } from '../PageResponse'
 
 export interface ListScansRequest extends PageRequest<'scanDate'> {
   fromScanDate?: Date | undefined
@@ -47,7 +48,7 @@ export interface XRayBodyScansApiClient {
    * If the prisoner is not found, the list is empty.
    * Ensure the prisoner exists prior to use.
    */
-  listScans(prisonerNumber: string, request?: ListScansRequest): Promise<ScanResponse[]>
+  listScans(prisonerNumber: string, request?: ListScansRequest): Promise<PageResponse<ScanResponse>>
 
   /**
    * Returns a summary of x-ray body scans for the given prisoner for this calendar year.

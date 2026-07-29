@@ -1,6 +1,7 @@
 import type CircuitBreaker from 'opossum'
 import config from '../config'
 import { formatDateISO } from '../utils/dateHelpers'
+import type { PageResponse } from './interfaces/PageResponse'
 import type {
   ListScansRequest,
   ScanResponse,
@@ -26,27 +27,30 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     super('X-ray Body Scans API', config.apis.xRayBodyScans, token, circuitBreaker)
   }
 
-  async listScans(prisonerNumber: string, request?: ListScansRequest): Promise<ScanResponse[]> {
+  async listScans(prisonerNumber: string, request?: ListScansRequest): Promise<PageResponse<ScanResponse>> {
     const query: object = {
       ...(request ?? {}),
       fromScanDate: request?.fromScanDate ? formatDateISO(request.fromScanDate) : undefined,
       toScanDate: request?.toScanDate ? formatDateISO(request.toScanDate) : undefined,
     }
-    const response = await this.get<RawScanResponse[]>(
+    const response = await this.get<PageResponse<RawScanResponse>>(
       {
         path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan`,
         query,
       },
       this.token,
     )
-    return response.map(scan => ({
-      ...scan,
-      // using midday in order to avoid daylight saving switches:
-      scanDate: new Date(`${scan.scanDate}T12:00:00`),
-      mergedAt: scan.mergedAt ? new Date(scan.mergedAt) : null,
-      createdAt: new Date(scan.createdAt),
-      lastModifiedAt: new Date(scan.lastModifiedAt),
-    }))
+    return {
+      ...response,
+      content: response.content.map(scan => ({
+        ...scan,
+        // using midday in order to avoid daylight saving switches:
+        scanDate: new Date(`${scan.scanDate}T12:00:00`),
+        mergedAt: scan.mergedAt ? new Date(scan.mergedAt) : null,
+        createdAt: new Date(scan.createdAt),
+        lastModifiedAt: new Date(scan.lastModifiedAt),
+      })),
+    }
   }
 
   async getScanSummary(prisonerNumber: string): Promise<ScanSummaryResponse> {
