@@ -10,7 +10,7 @@ export type Result<T, E = Error> = PromiseSettledResult<T> & {
   handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => R1 | R2
   getOrThrow: () => T
   getOrHandle: <R>(handler: (e: E) => R) => T | R
-  getOrNull: () => T
+  getOrNull: () => T | null
   toPromiseSettledResult: () => PromiseSettledResult<T>
 }
 
@@ -92,7 +92,7 @@ export const Result = {
       throw error
     },
     getOrHandle: <R>(handler: (e: E) => R) => handler(error),
-    getOrNull: () => null as T,
+    getOrNull: () => null as T | null,
     toPromiseSettledResult: () => ({ status: 'rejected', reason: error }),
   }),
 }
