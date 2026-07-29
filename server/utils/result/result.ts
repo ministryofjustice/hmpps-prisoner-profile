@@ -5,7 +5,7 @@
  */
 export type Result<T, E = Error> = PromiseSettledResult<T> & {
   isFulfilled: () => boolean
-  map: <R, E2>(map: (value: T) => R, mapError?: (error: E) => E2) => Result<R, E2>
+  map: <R, E2 = E>(map: (value: T) => R, mapError?: (error: E) => E2) => Result<R, E2>
   mapAsync: <R>(map: (value: T) => Promise<R>) => Promise<Result<R>>
   handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => R1 | R2
   getOrThrow: () => T
