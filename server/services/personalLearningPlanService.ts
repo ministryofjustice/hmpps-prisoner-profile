@@ -1,4 +1,7 @@
-import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
+import {
+  PersonalLearningPlanActionPlan,
+  PersonalLearningPlanEmployabilitySkill,
+} from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 
 /**
  * Abstract class defining the Personal Learning Plan service methods.
@@ -9,4 +12,9 @@ import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPla
  */
 export default abstract class PersonalLearningPlanService {
   abstract getPrisonerActionPlan(prisonerNumber: string, systemToken: string): Promise<PersonalLearningPlanActionPlan>
+
+  abstract getEmployabilitySkills(
+    prisonerNumber: string,
+    systemToken: string,
+  ): Promise<Array<PersonalLearningPlanEmployabilitySkill>>
 }

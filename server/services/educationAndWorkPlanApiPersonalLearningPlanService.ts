@@ -1,10 +1,14 @@
 import { RestClientBuilder } from '../data'
 import EducationAndWorkPlanApiClient from '../data/interfaces/educationAndWorkPlanApi/EducationAndWorkPlanApiClient'
-import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
+import {
+  PersonalLearningPlanActionPlan,
+  PersonalLearningPlanEmployabilitySkill,
+} from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 import toPersonalLearningPlanActionPlan from './mappers/personalLearningPlanActionPlanMapper'
 import logger from '../../logger'
 import PersonalLearningPlanService from './personalLearningPlanService'
 import { errorHasStatus } from '../utils/errorHelpers'
+import toPersonalLearningPlanEmployabilitySkills from './mappers/personalLearningPlanEmployabilitySkillsMapper'
 
 /**
  * Implementation of [PersonalLearningPlanService] that uses the [EducationAndWorkPlanApiClient] as data source
@@ -25,6 +29,23 @@ export default class EducationAndWorkPlanApiPersonalLearningPlanService extends 
       }
       logger.error('Error calling the Education And Work Plan API to get the prisoner action plan', error)
       return { problemRetrievingData: true } as PersonalLearningPlanActionPlan
+    }
+  }
+
+  async getEmployabilitySkills(
+    prisonerNumber: string,
+    systemToken: string,
+  ): Promise<Array<PersonalLearningPlanEmployabilitySkill>> {
+    try {
+      const employabilitySkills =
+        await this.educationAndWorkPlanApiClientBuilder(systemToken).getEmployabilitySkills(prisonerNumber)
+      return toPersonalLearningPlanEmployabilitySkills(employabilitySkills)
+    } catch (error) {
+      if (errorHasStatus(error, 404)) {
+        return []
+      }
+      logger.error(`Error calling the Education And Work Plan API to get the prisoner's employability skills`, error)
+      throw error
     }
   }
 }
