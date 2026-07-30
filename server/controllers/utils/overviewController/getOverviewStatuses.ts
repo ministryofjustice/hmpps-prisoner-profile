@@ -1,9 +1,9 @@
-import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
-import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
-import { Result } from '../../../utils/result/result'
-import { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
-import { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
-import { OverviewStatus } from '../../interfaces/OverviewPageData'
+import type { Result } from '../../../utils/result/result'
+import type { OverviewStatus } from '../../interfaces/OverviewPageData'
+import type Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
+import type InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
+import type { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
+import type { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
 import {
   getProfileInformationValue,
   ProfileInformationType,
@@ -24,7 +24,7 @@ export default function getOverviewStatuses(
   ].filter(Boolean)
 }
 
-function getLocationStatus(prisonerData: Prisoner): OverviewStatus {
+function getLocationStatus(prisonerData: Prisoner): OverviewStatus | null {
   if (prisonerData.inOutStatus === 'IN') {
     return { label: `In ${prisonerData.prisonName}` }
   }
@@ -40,7 +40,7 @@ function getLocationStatus(prisonerData: Prisoner): OverviewStatus {
   return null
 }
 
-function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus {
+function getListenerStatus(inmateDetail: InmateDetail): OverviewStatus | null {
   const recognised = getProfileInformationValue(
     ProfileInformationType.RecognisedListener,
     inmateDetail.profileInformation,
@@ -80,11 +80,12 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
   })
 }
 
-function getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[] | null): OverviewStatus {
+function getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[] | null): OverviewStatus | null {
   return (
-    scheduledTransfers?.length > 0 && {
+    (scheduledTransfers?.length > 0 && {
       label: 'Scheduled transfer',
       subText: `To ${scheduledTransfers[0].eventLocation}`,
-    }
+    }) ??
+    null
   )
 }
