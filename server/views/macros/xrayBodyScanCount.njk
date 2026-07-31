@@ -1,0 +1,15 @@
+{% macro xrayBodyScanCount(xrayBodyScanSummary) %}
+  <div class="xray-body-scan-count {% if xrayBodyScanSummary.atScanLimit %}xray-body-scan-count--at-limit{% elseif xrayBodyScanSummary.nearingScanLimit %}xray-body-scan-count--nearing-limit{% endif %}">
+    <div class="xray-body-scan-count__number">
+      {{ xrayBodyScanSummary.totalCount }}
+      <span class="govuk-visually-hidden">scans this year.</span>
+    </div>
+    {% if xrayBodyScanSummary.atScanLimit %}
+      <strong class="xray-body-scan-count__limit-warning">Scan limit reached</strong>
+      No more scans allowed this year<span class="govuk-visually-hidden">.</span>
+    {% elseif xrayBodyScanSummary.nearingScanLimit %}
+      <strong class="xray-body-scan-count__limit-warning">Near scan limit</strong>
+      {{ xrayBodyScanSummary.remainingScans }} scans left this year<span class="govuk-visually-hidden">.</span>
+    {% endif %}
+  </div>
+{% endmacro %}
