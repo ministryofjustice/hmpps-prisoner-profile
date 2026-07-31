@@ -19,7 +19,7 @@ import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
 import { Result } from '../utils/result/result'
-import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 
 jest.mock('./mappers/curiousGoalsMapper')
 jest.mock('./educationAndWorkPlanApiPersonalLearningPlanService')
