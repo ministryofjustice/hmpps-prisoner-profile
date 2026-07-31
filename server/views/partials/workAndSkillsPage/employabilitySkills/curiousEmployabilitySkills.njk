@@ -1,4 +1,4 @@
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {%- call summaryCard({title: "Employability skills", id: "employability-skills", classes: "hmpps-employability-card"}) -%}
     {% if learnerEmployabilitySkills.status === 'fulfilled'  %}
         {% set employabilitySkills = learnerEmployabilitySkills.value %}
@@ -32,7 +32,7 @@
             </div>
         {% endif %}
     {% else %}
-        {% include './curiousApiError.njk' %}
+        {% include '../curiousApiError.njk' %}
     {% endif %}
 
 {%- endcall -%}
