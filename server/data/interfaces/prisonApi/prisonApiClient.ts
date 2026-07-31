@@ -204,7 +204,7 @@ export interface PrisonApiClient {
 
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null>
 
-  getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
+  getBeliefHistory(prisonerNumber: string): Promise<Belief[]>
 
   getVisitsForBookingWithVisitors(
     bookingId: number,
