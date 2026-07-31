@@ -62,7 +62,8 @@ describe('WorkAndSkillsService', () => {
   const personalLearningPlanService = new EducationAndWorkPlanApiPersonalLearningPlanService(
     null,
   ) as jest.Mocked<EducationAndWorkPlanApiPersonalLearningPlanService>
-  personalLearningPlanService.getPrisonerActionPlan = jest.fn().mockReturnValue(null)
+  personalLearningPlanService.getPrisonerActionPlan.mockResolvedValue(null)
+  personalLearningPlanService.getEmployabilitySkills.mockResolvedValue([])
 
   const workAndSkillsPageServiceConstruct = jest.fn(() => {
     return new WorkAndSkillsPageService(
@@ -124,6 +125,7 @@ describe('WorkAndSkillsService', () => {
 
   const expectedWorkAndSkills: WorkAndSkillsData = {
     learnerEmployabilitySkills: Result.fulfilled(learnerEmployabilitySkills),
+    employabilitySkills: Result.fulfilled([]),
     curiousGoals: Result.fulfilled(expectedCuriousGoals),
     workAndSkillsPrisonerName: ' ',
     offenderActivitiesHistory: expectedActivitiesHistory,

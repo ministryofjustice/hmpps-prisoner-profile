@@ -1,0 +1,7 @@
+{% from "../../macros/hmppsError.njk" import hmppsError %}
+{{ hmppsError({
+    type: 'service-unavailable',
+    dataQa: 'lwp-unavailable-message',
+    serviceName: 'Learning and work progress',
+    isAre: 'is'
+}) }}
