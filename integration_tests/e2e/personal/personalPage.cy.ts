@@ -68,7 +68,6 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubAllPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
-      cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
       cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)

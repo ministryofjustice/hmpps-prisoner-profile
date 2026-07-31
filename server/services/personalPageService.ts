@@ -273,7 +273,6 @@ export default class PersonalPageService {
       oldAddressList,
       offenderContacts,
       identifiers,
-      beliefs,
       learnerNeurodivergence,
       healthAndMedication,
       nextOfKinAndEmergencyContacts,
@@ -286,7 +285,6 @@ export default class PersonalPageService {
       !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
-      prisonApiClient.getBeliefHistory(prisonerNumber),
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
       Result.wrap(this.getHealthAndMedication(token, prisonerNumber), getOptions.apiErrorCallback),
       getOptions.personalRelationshipsApiReadEnabled
@@ -419,7 +417,7 @@ export default class PersonalPageService {
         ),
       },
       learnerNeurodivergence,
-      hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
+      hasCurrentBelief: inmateDetail.religion !== null,
       distinguishingMarks,
       militaryRecords: militaryRecords.map(records => records?.filter(record => record.militarySeq === 1)), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
