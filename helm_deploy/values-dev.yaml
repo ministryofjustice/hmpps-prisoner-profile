@@ -110,6 +110,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
+    DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "false"
 
   allowlist:
     groups:

@@ -43,3 +43,6 @@ export const personDuplicateRecordsEnabled: FeatureFlagMethod = scheduledFeature
 )
 
 export const offencesMoved: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.offencesMoved)
+
+export const displayEmployabilitySkillsFromLwp: FeatureFlagMethod = () =>
+  config.featureToggles.displayEmployabilitySkillsFromLwp
