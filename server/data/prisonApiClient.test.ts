@@ -520,22 +520,10 @@ describe('prisonApiClient', () => {
   })
 
   describe('getBeliefHistory', () => {
-    it('Should return data from the API for a specific booking', async () => {
+    it('Should return data from the API', async () => {
       const prisonerNumber = 'AB1234C'
-      const bookingId = 123456
-      mockSuccessfulPrisonApiCall(
-        `/api/offenders/${prisonerNumber}/belief-history?bookingId=${bookingId}`,
-        beliefHistoryMock,
-      )
-      const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
-      expect(output).toEqual(beliefHistoryMock)
-    })
-
-    it('Should return data from the API across all bookings', async () => {
-      const prisonerNumber = 'AB1234C'
-      const bookingId: number = null
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/belief-history`, beliefHistoryMock)
-      const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
+      const output = await prisonApiClient.getBeliefHistory(prisonerNumber)
       expect(output).toEqual(beliefHistoryMock)
     })
   })
