@@ -53,9 +53,13 @@ import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSch
 import { supportForAdditionalNeedsApiClientMock } from '../../tests/mocks/supportForAdditionalNeedsApiClientMock'
 import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
 import { prisonerHasNeedsMock } from '../data/localMockData/supportForAdditionalNeedsMock'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
+import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
+import { mockScanSummaryResponse } from '../data/localMockData/xRayBodyScansMock'
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import { emptyPageResponse } from '../data/localMockData/pageResponse'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
@@ -89,6 +93,7 @@ describe('overviewController', () => {
   let pathfinderApiClient: PathfinderApiClient
   let manageSocCasesApiClient: ManageSocCasesApiClient
   let supportForAdditionalNeedsApiClient: jest.Mocked<SupportForAdditionalNeedsApiClient>
+  let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let auditService: AuditService
   let offencesService: OffencesService
   let adjudicationsService: AdjudicationsService
@@ -125,6 +130,7 @@ describe('overviewController', () => {
     pathfinderApiClient = pathfinderApiClientMock() as PathfinderApiClient
     manageSocCasesApiClient = manageSocCasesApiClientMock() as ManageSocCasesApiClient
     supportForAdditionalNeedsApiClient = supportForAdditionalNeedsApiClientMock()
+    xRayBodyScansApiClient = xRayBodyScansApiClientMock()
     auditService = auditServiceMock() as AuditService
     offencesService = offencesServiceMock() as OffencesService
     adjudicationsService = adjudicationsServiceMock() as AdjudicationsService
@@ -136,10 +142,15 @@ describe('overviewController', () => {
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
 
+    config.featureToggles.xRayBodyScansEnabled = true
+    xRayBodyScansApiClient.getScanSummary.mockResolvedValue(mockScanSummaryResponse(offenderNo, 0, 0, 0, 0, 0))
+    xRayBodyScansApiClient.listScans.mockResolvedValue(emptyPageResponse())
+
     controller = new OverviewController(
       () => pathfinderApiClient,
       () => manageSocCasesApiClient,
       () => supportForAdditionalNeedsApiClient,
+      () => xRayBodyScansApiClient,
       auditService,
       offencesService,
       moneyService,
@@ -573,7 +584,7 @@ describe('overviewController', () => {
                 label: 'Additional needs',
                 subText: 'View support for additional needs',
                 subTextHref: expect.any(String),
-                prominent: true,
+                style: 'prominent',
               },
               { label: 'Recognised listener' },
             ],
@@ -593,7 +604,7 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               {
                 label: 'Additional needs information is currently unavailable. Try again later.',
-                error: true,
+                style: 'error',
               },
               { label: 'Recognised listener' },
             ],
@@ -634,6 +645,81 @@ describe('overviewController', () => {
             }),
           )
         })
+      })
+    })
+
+    describe('x-ray body scan limit', () => {
+      let resWithDpsDevRole: Response
+      beforeEach(() => {
+        resWithDpsDevRole = {
+          ...res,
+          locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
+        } as unknown as Response
+      })
+
+      it('should not be checked without DPS app dev role', async () => {
+        await controller.displayOverview(req, res)
+        expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
+      })
+
+      it.each([
+        { scenario: 'under the limit', dpsCount: 50 },
+        { scenario: 'nearing the limit', dpsCount: 100 },
+      ])('should not display when scans are $scenario', async ({ dpsCount }) => {
+        const summary = mockScanSummaryResponse(offenderNo, 0, dpsCount, 0, dpsCount, 0)
+        xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
+
+        await controller.displayOverview(req, resWithDpsDevRole)
+
+        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
+          }),
+        )
+      })
+
+      it('should display when scans are at the limit', async () => {
+        const summary = mockScanSummaryResponse(offenderNo, 10, 110, 2, 108, 10)
+        xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
+
+        await controller.displayOverview(req, resWithDpsDevRole)
+
+        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              { label: 'Recognised listener' },
+              {
+                label: expect.stringContaining('Scans in'),
+                subText: 'Scan limit reached',
+                subTextHref: 'http://localhost:3001/prisoner/A1234BC/scans',
+                style: 'warning',
+              },
+            ],
+          }),
+        )
+      })
+
+      it('should indicate an error when API fails', async () => {
+        xRayBodyScansApiClient.getScanSummary.mockRejectedValueOnce('Server Error')
+
+        await controller.displayOverview(req, resWithDpsDevRole)
+
+        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+          'pages/overviewPage',
+          expect.objectContaining({
+            statuses: [
+              { label: 'In Moorland (HMP & YOI)' },
+              { label: 'Recognised listener' },
+              {
+                label: 'Scan limit information is currently unavailable. Try again later.',
+                style: 'error',
+              },
+            ],
+          }),
+        )
       })
     })
   })

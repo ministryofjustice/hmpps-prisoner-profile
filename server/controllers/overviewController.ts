@@ -15,11 +15,13 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
+import { Role } from '../data/enums/role'
 import { formatName, isInUsersCaseLoad } from '../utils/utils'
-import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
-import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
-import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
-import { RestClientBuilder } from '../data'
+import type { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
+import type { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
+import type { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportForAdditionalNeedsApi/supportForAdditionalNeedsApiClient'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
+import type { RestClientBuilder } from '../data'
 import buildOverviewActions from './utils/overviewController/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
@@ -40,6 +42,7 @@ import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfo
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
+import { mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
@@ -53,6 +56,7 @@ export default class OverviewController {
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
     private readonly supportForAdditionalNeedsApiClientBuilder: RestClientBuilder<SupportForAdditionalNeedsApiClient>,
+    private readonly xRayBodyScansApiClientBuilder: RestClientBuilder<XRayBodyScansApiClient>,
     private readonly auditService: AuditService,
     private readonly offencesService: OffencesService,
     private readonly moneyService: MoneyService,
@@ -68,6 +72,7 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response) {
     const { apiErrorCallback, user, prisonerPermissions } = res.locals
+    const { activeCaseLoadId, userRoles } = user as PrisonUser
     const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
@@ -77,9 +82,11 @@ export default class OverviewController {
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
     const supportForAdditionalNeedsApiClient = this.supportForAdditionalNeedsApiClientBuilder(clientToken)
+    const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
-    const showConfirmedReleaseDateNonCalculate =
-      !showCourtCaseSummary && offencesMoved((user as PrisonUser).activeCaseLoadId)
+    const showConfirmedReleaseDateNonCalculate = !showCourtCaseSummary && offencesMoved(activeCaseLoadId)
+    const showUnsafeXRayBodyScanData =
+      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
 
     const [
       pathfinderNominal,
@@ -100,6 +107,7 @@ export default class OverviewController {
       nonAssociationSummary,
       currentCsipDetail,
       externalContactsSummary,
+      xrayBodyScanSummary,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -138,6 +146,12 @@ export default class OverviewController {
         : null,
       isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
         ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
+        : null,
+      showUnsafeXRayBodyScanData
+        ? Result.wrap(
+            xRayBodyScansApiClient.getScanSummary(prisonerNumber).then(mapXrayBodyScanSummary),
+            apiErrorCallback,
+          )
         : null,
     ])
 
@@ -182,7 +196,13 @@ export default class OverviewController {
         isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
-      statuses: getOverviewStatuses(prisonerData, inmateDetail, hasNeedsForAdditionalSupport, scheduledTransfers),
+      statuses: getOverviewStatuses(
+        prisonerData,
+        inmateDetail,
+        hasNeedsForAdditionalSupport,
+        scheduledTransfers,
+        xrayBodyScanSummary,
+      ),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       prisonerNumber: prisonerData.prisonerNumber,
@@ -191,6 +211,7 @@ export default class OverviewController {
       staffContacts,
       isYouthPrisoner,
       prisonName,
+      xrayBodyScanSummary,
       offencesOverview: {
         ...offencesOverview,
         imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,

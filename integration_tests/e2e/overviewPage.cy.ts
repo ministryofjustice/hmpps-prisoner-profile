@@ -9,6 +9,7 @@ import {
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
+import { mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -105,7 +106,10 @@ context('Overview Page', () => {
   context('Given prisoner is within the users case load', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth()
+      cy.setupUserAuth({
+        // TODO: remove entire parameter once XRBS no longer relies on DPS dev role
+        roles: [Role.PrisonUser, Role.DpsApplicationDeveloper],
+      })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -340,6 +344,20 @@ context('Overview Page', () => {
           .find('a')
           .should('have.attr', 'href', 'http://localhost:9091/supportForAdditionalNeedsUI/profile/G6123VU/overview')
           .and('have.text', 'View support for additional needs')
+      })
+
+      it('Displays x-ray body scan limit reached', () => {
+        const response = mockScanSummaryResponse('G6123VU', 0, 116, 0, 0, 0)
+        cy.task('stubXRayBodyScanSummary', { prisonerNumber: 'G6123VU', response })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.statusList().find('li').should('have.length', 4)
+        overviewPage.statusList().should('contain.text', `Scans in ${response.fromScanDate.getFullYear()}`)
+        overviewPage
+          .statusList()
+          .find('a')
+          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans')
+          .and('have.text', 'Scan limit reached')
       })
     })
 
@@ -1029,6 +1047,40 @@ context('Overview Page', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.sideBar().actions().referToPathfinderActionLink().should('not.exist')
       cy.get('[data-qa=actions-unavailable]').should('exist')
+    })
+  })
+
+  context('Given API call to x-ray body scans api fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.GlobalSearch, Role.DpsApplicationDeveloper],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      const errorResponse = {
+        status: 500,
+        errorCode: null,
+        userMessage: 'An unexpected error occurred',
+        developerMessage: 'An unexpected error occurred',
+        moreInfo: null,
+      }
+      cy.task('stubXRayBodyScanSummary', { prisonerNumber: 'G6123VU', response: errorResponse })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the status list', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage.statusList().find('li').should('have.length', 4)
+      overviewPage
+        .statusList()
+        .find('li')
+        .eq(3)
+        .should('contain.text', 'Scan limit information is currently unavailable')
     })
   })
 })

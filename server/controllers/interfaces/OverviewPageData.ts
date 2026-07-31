@@ -1,17 +1,18 @@
-import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
-import HmppsAction from './HmppsAction'
-import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
-import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
-import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
-import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
-import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
-import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
-import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
-import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
-import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import { Result } from '../../utils/result/result'
+import HmppsAction from './HmppsAction'
 import CurrentCsipDetail from '../../data/interfaces/csipApi/csip'
 import { PersonalRelationshipsContactCount } from '../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
+import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
+import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
+import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
+import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
+import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
+import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
+import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
+import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
+import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
+import { XrayBodyScanSummary } from '../utils/overviewController/mapXrayBodyScanData'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -35,6 +36,7 @@ export default interface OverviewPageData {
   staffContacts: YouthStaffContacts | StaffContacts
   isYouthPrisoner: boolean
   prisonName: string
+  xrayBodyScanSummary: Result<XrayBodyScanSummary> | null
   offencesOverview: {
     mainOffenceDescription: string
     fullStatus: FullStatus
@@ -76,8 +78,7 @@ export interface OverviewStatus {
   label: string
   subText?: string
   subTextHref?: string
-  error?: boolean
-  prominent?: boolean
+  style?: undefined | 'prominent' | 'warning' | 'error'
 }
 
 interface PersonalDetails {

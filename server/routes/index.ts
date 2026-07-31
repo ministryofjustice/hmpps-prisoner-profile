@@ -71,6 +71,7 @@ export default function routes(services: Services): Router {
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
     services.dataAccess.supportForAdditionalNeedsApiClientBuilder,
+    services.dataAccess.xRayBodyScansApiClientBuilder,
     services.auditService,
     services.offencesService,
     services.moneyService,
@@ -313,7 +314,7 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PersonProtectedCharacteristicsPermission.read_religion_and_belief],
     }),
-    async (req, res, next) => {
+    async (req, res) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
     },
   )

@@ -4,6 +4,7 @@ import type Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import type InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import type { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import type { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
+import type { XrayBodyScanSummary } from './mapXrayBodyScanData'
 import {
   getProfileInformationValue,
   ProfileInformationType,
@@ -15,12 +16,14 @@ export default function getOverviewStatuses(
   inmateDetail: InmateDetail,
   hasNeedsForAdditionalSupport: Result<HasNeed>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
+  xrayBodyScanSummary: Result<XrayBodyScanSummary> | null,
 ): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
     getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
     getListenerStatus(inmateDetail),
     getScheduledTransferStatus(scheduledTransfers),
+    getXrayBodyScanLimitReachedStatus(xrayBodyScanSummary),
   ].filter(Boolean)
 }
 
@@ -66,7 +69,7 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
           label: 'Additional needs',
           subText: 'View support for additional needs',
           subTextHref: value.url,
-          prominent: true,
+          style: 'prominent',
         }
       }
       return null
@@ -74,7 +77,7 @@ function getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport: Result<Ha
     rejected(): OverviewStatus {
       return {
         label: 'Additional needs information is currently unavailable. Try again later.',
-        error: true,
+        style: 'error',
       }
     },
   })
@@ -87,5 +90,31 @@ function getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[]
       subText: `To ${scheduledTransfers[0].eventLocation}`,
     }) ??
     null
+  )
+}
+
+function getXrayBodyScanLimitReachedStatus(
+  xrayBodyScanSummary: Result<XrayBodyScanSummary> | null,
+): OverviewStatus | null {
+  return (
+    xrayBodyScanSummary?.handle({
+      fulfilled(summary): OverviewStatus | null {
+        return summary.atScanLimit
+          ? {
+              label: `Scans in ${summary.fromScanDate.getFullYear()}`,
+              subText: 'Scan limit reached',
+              subTextHref: summary.viewHistoryUrl,
+              style: 'warning',
+            }
+          : null
+      },
+
+      rejected(): OverviewStatus {
+        return {
+          label: 'Scan limit information is currently unavailable. Try again later.',
+          style: 'error',
+        }
+      },
+    }) ?? null
   )
 }
