@@ -29,7 +29,7 @@
     { text: "Phone and email", href: "#phones-and-emails", template: "partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
     { text: "Next of kin", href: "#next-of-kin", template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
     { text: "Security", href: "#security", template: "partials/personalPage/security.njk" },
-    { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: inUserCaseload }
+    { text: "Property", href: "#property", template: "partials/personalPage/propertySummary.njk" if propertySummary else "partials/personalPage/property.njk", condition: inUserCaseload }
   ] %}
 
   {% set sidebar %}

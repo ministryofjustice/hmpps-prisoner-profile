@@ -93,6 +93,19 @@ export default class PersonalPage extends Page {
     }
   }
 
+  propertySummary = () => {
+    const cardData = dataQa => cy.get('[data-qa=property-summary]').find(`[data-qa=${dataQa}]`)
+    return {
+      containerCount: () => cardData('property-container-count'),
+      dueForTransferIn: () => cardData('due-for-transfer-in'),
+      dueForTransferOut: () => cardData('due-for-transfer-out'),
+      overdueForDisposal: () => cardData('overdue-for-disposal'),
+      overdueForReturn: () => cardData('overdue-for-return'),
+      containersLink: () => cardData('property-containers-link'),
+      historyLink: () => cardData('property-history-link'),
+    }
+  }
+
   addresses = () => {
     const primaryAndPostalAddress = () => cy.get('#hmpps-address-primary-and-postal')
     const summaryListValues = () => primaryAndPostalAddress().find('.govuk-summary-list__value')
