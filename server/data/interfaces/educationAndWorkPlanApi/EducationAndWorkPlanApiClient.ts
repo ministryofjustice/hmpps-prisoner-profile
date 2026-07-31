@@ -1,3 +1,4 @@
+import GetEmployabilitySkillResponses from './GetEmployabilitySkillResponses'
 import GetGoalsResponse from './GetGoalsResponse'
 
 /**
@@ -5,4 +6,5 @@ import GetGoalsResponse from './GetGoalsResponse'
  */
 export default interface EducationAndWorkPlanApiClient {
   getAllGoals(prisonerNumber: string): Promise<GetGoalsResponse>
+  getEmployabilitySkills(prisonerNumber: string): Promise<GetEmployabilitySkillResponses>
 }
