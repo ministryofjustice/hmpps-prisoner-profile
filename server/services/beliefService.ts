@@ -10,9 +10,8 @@ export default class BeliefService {
    *
    * @param token
    * @param prisonerNumber
-   * @param bookingId
    */
-  public async getBeliefHistory(token: string, prisonerNumber: string, bookingId?: number): Promise<Belief[]> {
-    return this.prisonApiClientBuilder(token).getBeliefHistory(prisonerNumber, bookingId)
+  public async getBeliefHistory(token: string, prisonerNumber: string): Promise<Belief[]> {
+    return this.prisonApiClientBuilder(token).getBeliefHistory(prisonerNumber)
   }
 }
