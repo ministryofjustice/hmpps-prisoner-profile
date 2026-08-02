@@ -2,8 +2,6 @@ import Belief from '../interfaces/prisonApi/Belief'
 
 export const beliefHistoryMock: Belief[] = [
   {
-    bookingId: 1,
-    beliefId: 1,
     beliefCode: 'SCIE',
     beliefDescription: 'Scientologist',
     startDate: '2024-01-01',
@@ -13,8 +11,6 @@ export const beliefHistoryMock: Belief[] = [
     addedByLastName: 'Kirk',
   },
   {
-    bookingId: 1,
-    beliefId: 2,
     beliefCode: 'RC',
     beliefDescription: 'Roman Catholic',
     startDate: '2024-01-01',
@@ -31,8 +27,6 @@ export const beliefHistoryMock: Belief[] = [
 
 export const beliefHistoryOverrideMock: Belief[] = [
   {
-    bookingId: 1,
-    beliefId: 1,
     beliefCode: 'OTH',
     beliefDescription: 'Other',
     startDate: '2024-01-01',
@@ -42,8 +36,6 @@ export const beliefHistoryOverrideMock: Belief[] = [
     addedByLastName: 'Kirk',
   },
   {
-    bookingId: 1,
-    beliefId: 2,
     beliefCode: 'RC',
     beliefDescription: 'Roman Catholic',
     startDate: '2024-01-01',
@@ -60,8 +52,6 @@ export const beliefHistoryOverrideMock: Belief[] = [
 
 export const beliefHistoryAllBookingsMock: Belief[] = [
   {
-    bookingId: 1102484,
-    beliefId: 3,
     beliefCode: 'CCOG',
     beliefDescription: 'Celestial Church of God',
     startDate: '2022-01-01',
@@ -71,8 +61,6 @@ export const beliefHistoryAllBookingsMock: Belief[] = [
     addedByLastName: 'Kirk',
   },
   {
-    bookingId: 1,
-    beliefId: 1,
     beliefCode: 'SCIE',
     beliefDescription: 'Scientologist',
     startDate: '2024-01-01',
@@ -86,8 +74,6 @@ export const beliefHistoryAllBookingsMock: Belief[] = [
     updatedDate: '2024-02-03',
   },
   {
-    bookingId: 1,
-    beliefId: 2,
     beliefCode: 'RC',
     beliefDescription: 'Roman Catholic',
     startDate: '2024-01-01',

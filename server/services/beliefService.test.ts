@@ -16,7 +16,7 @@ describe('beliefService', () => {
 
       const service = new BeliefService(() => prisonApiClient)
 
-      const response = await service.getBeliefHistory('token', 'A1234AA', 123456)
+      const response = await service.getBeliefHistory('token', 'A1234AA')
 
       expect(response).toEqual(beliefHistoryMock)
     })

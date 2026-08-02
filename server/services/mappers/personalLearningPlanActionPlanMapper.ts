@@ -2,7 +2,7 @@ import { parseISO } from 'date-fns'
 import {
   PersonalLearningPlanActionPlan,
   PersonalLearningPlanGoal,
-} from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+} from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 import GoalResponse from '../../data/interfaces/educationAndWorkPlanApi/GoalResponse'
 import dateComparator from '../../utils/dateComparator'
 import GetGoalsResponse from '../../data/interfaces/educationAndWorkPlanApi/GetGoalsResponse'

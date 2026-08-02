@@ -1,7 +1,7 @@
 import {
   PersonalLearningPlanActionPlan,
   PersonalLearningPlanGoal,
-} from '../../services/interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+} from '../../services/interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 
 const aValidPersonalLearningPlanActionPlan = (options?: {
   prisonerNumber?: string
