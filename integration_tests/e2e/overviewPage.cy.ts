@@ -11,7 +11,7 @@ import {
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
-import { mockScanSummaryResponse, scanResponseMock } from '../../server/data/localMockData/xRayBodyScansMock'
+import { mockScanResponse, mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -327,7 +327,7 @@ context('Overview Page', () => {
       it('should show scan count for someone with no scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 0, 0, 0, 0),
+          response: mockScanSummaryResponse('G6123VU'),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -403,7 +403,10 @@ context('Overview Page', () => {
       })
 
       it('should show basic details of latest scan', () => {
-        cy.task('stubXRayBodyListScans', { prisonerNumber: 'G6123VU', response: pageResponse([scanResponseMock]) })
+        cy.task('stubXRayBodyListScans', {
+          prisonerNumber: 'G6123VU',
+          response: pageResponse([mockScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
+        })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', 'Item detected')

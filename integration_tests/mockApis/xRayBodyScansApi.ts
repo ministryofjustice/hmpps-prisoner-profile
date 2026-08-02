@@ -66,7 +66,7 @@ export default {
 
   stubXRayBodyScanSummary({
     prisonerNumber,
-    response = mockScanSummaryResponse('G6123VU', 0, 0, 0, 0, 0),
+    response = mockScanSummaryResponse('G6123VU'),
   }: {
     prisonerNumber: string
     response: ScanSummaryResponse | ErrorResponse
