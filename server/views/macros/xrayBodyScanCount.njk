@@ -1,7 +1,7 @@
 {% macro xrayBodyScanCount(xrayBodyScanSummary) %}
   <div class="xray-body-scan-count {% if xrayBodyScanSummary.atScanLimit %}xray-body-scan-count--at-limit{% elseif xrayBodyScanSummary.nearingScanLimit %}xray-body-scan-count--nearing-limit{% endif %}">
     <div class="xray-body-scan-count__number">
-      {{ xrayBodyScanSummary.totalCount }}
+      <span>{{ xrayBodyScanSummary.totalCount }}</span>
       <span class="govuk-visually-hidden">scans this year.</span>
     </div>
     {% if xrayBodyScanSummary.atScanLimit %}

@@ -5,6 +5,7 @@ import { PersonalRelationshipsContactCount } from '../../data/interfaces/persona
 import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
 import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
 import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
+import { ScanResponse } from '../../data/interfaces/xRayBodyScansApi'
 import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
 import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
@@ -37,6 +38,7 @@ export default interface OverviewPageData {
   isYouthPrisoner: boolean
   prisonName: string
   xrayBodyScanSummary: Result<XrayBodyScanSummary> | null
+  xrayBodyScanLatest: Result<ScanResponse> | null
   offencesOverview: {
     mainOffenceDescription: string
     fullStatus: FullStatus

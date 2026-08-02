@@ -42,7 +42,7 @@ import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfo
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
-import { mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
+import { mapLatestXrayBodyScan, mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
@@ -108,6 +108,7 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
       xrayBodyScanSummary,
+      xrayBodyScanLatest,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -150,6 +151,14 @@ export default class OverviewController {
       showUnsafeXRayBodyScanData
         ? Result.wrap(
             xRayBodyScansApiClient.getScanSummary(prisonerNumber).then(mapXrayBodyScanSummary),
+            apiErrorCallback,
+          )
+        : null,
+      showUnsafeXRayBodyScanData
+        ? Result.wrap(
+            xRayBodyScansApiClient
+              .listScans(prisonerNumber, { size: 1, sort: 'scanDate,DESC' })
+              .then(mapLatestXrayBodyScan),
             apiErrorCallback,
           )
         : null,
@@ -212,6 +221,7 @@ export default class OverviewController {
       isYouthPrisoner,
       prisonName,
       xrayBodyScanSummary,
+      xrayBodyScanLatest,
       offencesOverview: {
         ...offencesOverview,
         imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,
