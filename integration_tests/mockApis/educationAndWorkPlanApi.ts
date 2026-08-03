@@ -95,9 +95,90 @@ const stubGetLwpAllGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): Sup
     },
   })
 
+const stubGetLwpEmployabilitySkills = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/employability-skills`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        employabilitySkills: [
+          {
+            createdBy: 'A_DPS_USER',
+            createdByDisplayName: 'Alex Smith',
+            createdAt: '2026-02-10T08:00:19.685085Z',
+            createdAtPrison: 'WDI',
+            updatedBy: 'A_DPS_USER',
+            updatedByDisplayName: 'Alex Smith',
+            updatedAt: '2026-02-10T08:00:19.685097Z',
+            updatedAtPrison: 'WDI',
+            employabilitySkillType: 'TEAMWORK',
+            employabilitySkillRating: 'QUITE_CONFIDENT',
+            evidence: 'Shown a reasonable attempt at working collaboratively in teams during group therapy sessions.',
+          },
+          {
+            createdBy: 'A_DPS_USER',
+            createdByDisplayName: 'Alex Smith',
+            createdAt: '2026-02-10T08:03:58.359194Z',
+            createdAtPrison: 'WDI',
+            updatedBy: 'A_DPS_USER',
+            updatedByDisplayName: 'Alex Smith',
+            updatedAt: '2026-02-10T08:03:58.359204Z',
+            updatedAtPrison: 'WDI',
+            employabilitySkillType: 'TEAMWORK',
+            employabilitySkillRating: 'VERY_CONFIDENT',
+            evidence: 'He is now very confident',
+          },
+        ],
+      },
+    },
+  })
+
+const stubGetLwpEmployabilitySkillsForPrisonerWithNoEmployabilitySkills = (
+  prisonerNumber = 'G6123VU',
+): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/employability-skills`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        employabilitySkills: [],
+      },
+    },
+  })
+
+const stubGetLwpEmployabilitySkills500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/employability-skills`,
+    },
+    response: {
+      status: 500,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        status: 500,
+        errorCode: null,
+        userMessage: 'An unexpected error occurred',
+        developerMessage: 'An unexpected error occurred',
+        moreInfo: null,
+      },
+    },
+  })
+
 export default {
   stubGetLwpAllGoals,
   stubGetLwpAllGoalsForPrisonerWithNoGoals,
   stubGetLwpAllGoals500Error,
   stubGetLwpAllGoalsPrisonerHasNoPlanYet,
+  stubGetLwpEmployabilitySkills,
+  stubGetLwpEmployabilitySkillsForPrisonerWithNoEmployabilitySkills,
+  stubGetLwpEmployabilitySkills500Error,
 }
