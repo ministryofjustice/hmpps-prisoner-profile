@@ -3,12 +3,6 @@
 {% from "macros/conditionallyShow.njk" import conditionallyShow %}
 {% from "macros/hmppsError.njk" import hmppsError %}
 
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-] %}
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 

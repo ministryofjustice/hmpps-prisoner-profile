@@ -1,11 +1,5 @@
 {% from "../macros/sidebarNav.njk" import sidebarNav %}
 {% extends "./index.njk" %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-] %}
 {% block body %}
   {% set prisonNamesById = prisonNamesById.value if prisonNamesById.isFulfilled() else {} %}
 

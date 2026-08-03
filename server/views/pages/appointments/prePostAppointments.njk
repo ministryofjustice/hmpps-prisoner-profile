@@ -9,6 +9,8 @@
 
 {% extends "../../partials/layout.njk" %}
 
+{% set breadcrumbParent = { text: 'Schedule', href: '/prisoner/' + prisonerNumber + '/schedule' } %}
+
 {% macro appointment(params) %}
     <div class="govuk-grid-row">
         <div>
