@@ -1,7 +1,6 @@
 import { format, startOfToday, sub } from 'date-fns'
 import type { AllQualificationsDTO } from 'curiousApiClient'
 import { stubFor } from './wiremock'
-import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
 import aValidLearnerGoals from '../../server/data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../../server/data/localMockData/learnerNeurodivergenceMock'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
@@ -13,39 +12,6 @@ import { LearnerAssessmentsMock } from '../../server/data/localMockData/learnerA
 import { LearnerQualificationsMock } from '../../server/data/localMockData/learnerQualificationsMock'
 
 export default {
-  stubGetLearnerEmployabilitySkills: ({
-    prisonerNumber,
-    error = false,
-  }: {
-    prisonerNumber: string
-    error: boolean
-  }) => {
-    const response = error
-      ? {
-          status: 500,
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-          jsonBody: {
-            errorCode: 'VC5001',
-            errorMessage: 'Service unavailable',
-            httpStatusCode: 500,
-          },
-        }
-      : {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          jsonBody: learnerEmployabilitySkills,
-        }
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/curiousApi/learnerEmployabilitySkills/${prisonerNumber}`,
-      },
-      response,
-    })
-  },
-
   stubGetCuriousGoals: (prisonerNumber = 'G6123VU') => {
     const responseBodyForPrisonerWithGoals = aValidLearnerGoals({ prn: prisonerNumber })
 
