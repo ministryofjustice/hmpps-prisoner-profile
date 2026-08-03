@@ -5,22 +5,7 @@
 
 {% set title = "Location history" %}
 
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  },
-  {
-    text: breadcrumbPrisonerName,
-    href: "/prisoner/" + prisonerNumber
-  },
-  {
-    text: 'Location details',
-    href: '/prisoner/' + prisonerNumber + '/location-details'
-  }
-]
-%}
+{% set breadcrumbParent = { text: 'Location details', href: '/prisoner/' + prisonerNumber + '/location-details' } %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
 
