@@ -45,7 +45,7 @@ export default class XrayBodyScansCard {
   }
 
   get historyLink(): PageElement<HTMLAnchorElement> {
-    return this.container.find('a').contains('View scan history')
+    return this.container.find('a').contains('Check body scan details')
   }
 
   shouldShowSummaryIsUnavailable(): Cypress.Chainable<unknown> {
