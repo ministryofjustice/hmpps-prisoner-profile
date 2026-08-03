@@ -4,6 +4,7 @@ import { Role } from '../../data/enums/role'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
+import PrisonerPropertyService from '../../services/prisonerPropertyService'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
@@ -11,6 +12,7 @@ import {
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
+  propertySummaryTileEnabled,
 } from '../../utils/featureFlags'
 
 export default class PersonalController {
@@ -18,6 +20,7 @@ export default class PersonalController {
     private readonly personalPageService: PersonalPageService,
     private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
+    private readonly prisonerPropertyService: PrisonerPropertyService,
   ) {}
 
   displayPersonalPage(): RequestHandler {
@@ -34,7 +37,7 @@ export default class PersonalController {
       const showUnsafeXRayBodyScanData =
         config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
 
-      const [personalPageData, careNeeds, xrays, unsafeXrays] = await Promise.all([
+      const [personalPageData, careNeeds, xrays, unsafeXrays, propertySummary] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
           editProfileEnabled: editEnabled,
           simulateFetchEnabled,
@@ -47,6 +50,7 @@ export default class PersonalController {
         showUnsafeXRayBodyScanData
           ? this.careNeedsService.unsafeGetXrayBodyScanSummary(clientToken, prisonerNumber)
           : Promise.resolve({ total: 0, since: '' }),
+        this.getPropertySummary(clientToken, prisonerNumber, prisonId),
       ])
 
       await this.auditService.sendPageView({
@@ -80,7 +84,20 @@ export default class PersonalController {
         hasHomeOfficeId,
         useCustomErrorBanner: true,
         changeContactLinkEnabled,
+        propertySummary,
+        propertyUiUrl: config.serviceUrls.prisonerProperty,
       })
     }
+  }
+
+  /**
+   * The property summary card replaces the NOMIS-backed property card, but only for prisons the
+   * property service has been switched on for. Returns null in every other case — including any
+   * failure talking to the property service — so the Personal page falls back to the existing card.
+   */
+  private async getPropertySummary(clientToken: string, prisonerNumber: string, prisonId: string) {
+    if (!propertySummaryTileEnabled()) return null
+    if (!(await this.prisonerPropertyService.isPrisonActive(clientToken, prisonId))) return null
+    return this.prisonerPropertyService.getPropertySummary(clientToken, prisonerNumber)
   }
 }

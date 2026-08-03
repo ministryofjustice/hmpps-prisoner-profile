@@ -35,6 +35,7 @@ import ContentfulService from './contentfulService'
 import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
+import PrisonerPropertyService from './prisonerPropertyService'
 import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
@@ -82,6 +83,7 @@ export const services = () => {
     ephemeralDataStore,
     osPlacesApiClient,
     xRayBodyScansApiClientBuilder,
+    prisonerPropertyApiClientBuilder,
     curiousApiToken,
     tokenStore,
   } = dataAccess
@@ -168,6 +170,7 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(caseNotesApiClientBuilder, incentivesApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder, xRayBodyScansApiClientBuilder)
+  const prisonerPropertyService = new PrisonerPropertyService(prisonerPropertyApiClientBuilder)
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder, metricsService)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
@@ -276,6 +279,7 @@ export const services = () => {
     featureToggleService,
     ephemeralDataService,
     careNeedsService,
+    prisonerPropertyService,
     distinguishingMarksService,
     csipService,
     militaryRecordsService,

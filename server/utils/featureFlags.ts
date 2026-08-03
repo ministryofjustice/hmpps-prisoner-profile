@@ -46,3 +46,5 @@ export const offencesMoved: FeatureFlagMethod = scheduledFeatureFlag(config.feat
 
 export const displayEmployabilitySkillsFromLwp: FeatureFlagMethod = () =>
   config.featureToggles.displayEmployabilitySkillsFromLwp
+
+export const propertySummaryTileEnabled: FeatureFlagMethod = () => config.featureToggles.propertySummaryTileEnabled

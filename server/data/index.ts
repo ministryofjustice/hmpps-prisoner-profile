@@ -44,6 +44,7 @@ import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestCl
 import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
 import PersonApiRestClient from './personApiClient'
 import XRayBodyScansApiRestClient from './xRayBodyScansApiClient'
+import PrisonerPropertyApiRestClient from './prisonerPropertyApiClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
@@ -92,6 +93,7 @@ const circuitBreakers = {
   ),
   personApi: circuitBreakerBuilder('personApi', config.apis.personApi),
   xRayBodyScans: circuitBreakerBuilder('xRayBodyScans', config.apis.xRayBodyScans),
+  prisonerProperty: circuitBreakerBuilder('prisonerPropertyApi', config.apis.prisonerPropertyApi),
 }
 
 export const dataAccess = {
@@ -152,6 +154,8 @@ export const dataAccess = {
   personApiClientBuilder: (token: string) => new PersonApiRestClient(token, circuitBreakers.personApi),
   xRayBodyScansApiClientBuilder: (token: string) =>
     new XRayBodyScansApiRestClient(token, circuitBreakers.xRayBodyScans),
+  prisonerPropertyApiClientBuilder: (token: string) =>
+    new PrisonerPropertyApiRestClient(token, circuitBreakers.prisonerProperty),
   tokenStore,
 }
 

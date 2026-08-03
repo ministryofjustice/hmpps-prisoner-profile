@@ -4,3 +4,43 @@
     @include govuk-responsive-margin(1, 'bottom');
   }
 }
+
+.hmpps-property-summary {
+  &__heading {
+    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  &__count {
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  &__warning {
+    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk-responsive-margin(1, 'bottom');
+    color: govuk-colour('red');
+  }
+
+  // Circular exclamation mark matching the GOV.UK warning icon, sized to sit inline with the text
+  // rather than dominate the card the way govuk-warning-text does.
+  &__warning-icon {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    margin-right: govuk-spacing(1);
+    border: 2px solid govuk-colour('red');
+    border-radius: 50%;
+    color: govuk-colour('red');
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  &__link {
+    @include govuk-responsive-margin(4, 'top');
+    @include govuk-responsive-margin(0, 'bottom');
+  }
+}
