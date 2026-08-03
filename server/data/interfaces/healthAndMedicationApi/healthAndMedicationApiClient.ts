@@ -44,10 +44,13 @@ export interface DietAndAllergy {
   medicalDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
   personalisedDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
   cateringInstructions?: ValueWithMetadata<string>
+  topLevelLocation?: string
+  lastAdmissionDate?: string
 }
 
 export interface HealthAndMedication {
   dietAndAllergy?: DietAndAllergy
+  pendingMerges: HealthAndMedication[]
 }
 
 export interface DietAndAllergyUpdate {
@@ -75,4 +78,6 @@ export interface HealthAndMedicationApiClient {
   ): Promise<DietAndAllergy>
 
   updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void>
+
+  completeMerge(prisonerNumber: string): Promise<void>
 }
