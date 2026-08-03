@@ -73,14 +73,14 @@ export default class WorkAndSkillsPage extends Page {
 
   ES_heading = (): PageElement => cy.get('#employability-skills > .hmpps-summary-card__body > .govuk-heading-s')
 
-  ES_info = (): PageElement => cy.get('#employability-skills .hmpps-summary-card__body > p').first()
+  ES_add_employability_skills_link = (): PageElement =>
+    cy.get('#employability-skills > .hmpps-summary-card__body [data-qa=add-employability-skills]')
 
-  ES_skillOne = (): PageElement => cy.get('.govuk-grid-column-one-third > .govuk-body')
+  ES_view_employability_skills_link = (): PageElement =>
+    cy.get('#employability-skills > .hmpps-summary-card__body [data-qa=view-employability-skills]')
 
-  ES_skillLevelOne = (): PageElement => cy.get('.govuk-grid-column-two-thirds > p')
-
-  ES_curious_unavailable_message = (): PageElement =>
-    cy.get('#employability-skills [data-qa=curious-unavailable-message]')
+  ES_lwp_unavailable_message = (): PageElement =>
+    cy.get('#employability-skills > .hmpps-summary-card__body [data-qa=lwp-unavailable-message]')
 
   // Goals card
   GoalsInfo = (): PageElement => cy.get('[data-qa="goals-info-text"]')
