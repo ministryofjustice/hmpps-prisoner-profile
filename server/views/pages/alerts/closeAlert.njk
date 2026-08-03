@@ -7,6 +7,7 @@
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
 {% extends "../index.njk" %}
+{% set breadcrumbParent = { text: 'Alerts', href: '/prisoner/' + prisonerNumber + '/alerts/active' } %}
 
 {% set anotherDateHtml %}
     <div data-qa="another-date-section">

@@ -7,6 +7,7 @@
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "../../macros/caseNoteNotSavedWarning.njk" import caseNoteNotSavedWarning %}
 {% extends "../index.njk" %}
+{% set breadcrumbParent = { text: 'Case notes', href: '/prisoner/' + prisonerNumber + '/case-notes' } %}
 {% set pageTitle = 'Add more details to a case note' %}
 {% block body %}
     <div class="govuk-grid-row">
