@@ -1,23 +1,10 @@
 {% extends "../index.njk" %}
 
+{% set breadcrumbParent = { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" } %}
+
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'Personal',
-        href: "/prisoner/" + prisonerNumber + "/personal"
-    }
-] %}
 
 {% block body %}
 <div class="govuk-grid-row">

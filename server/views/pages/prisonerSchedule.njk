@@ -3,19 +3,7 @@
 
 {% extends "./index.njk" %}
 
-{% set title = 'Schedule' %}
 {% set htmlClasses = "printed-page" %}
-
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  },
-  {
-    text: breadcrumbPrisonerName,
-    href: "/prisoner/" + prisonerNumber
-  }
-] %}
 
 {% block body %}
 

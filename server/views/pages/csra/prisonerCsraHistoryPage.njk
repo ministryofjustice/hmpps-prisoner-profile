@@ -1,11 +1,6 @@
 {% from "macros/filteredListPage.njk" import hmppsFilteredListPage %}
 {% extends "../index.njk" %}
 
-{% set breadCrumbs = [
-    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber }
-] %}
-
 {% block body %}
     {% set titleHtml = (prisonerName.firstLast | apostrophe) + " CSRA history" %}
 

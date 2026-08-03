@@ -3,16 +3,7 @@
 {%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  },
-  {
-    text: breadcrumbPrisonerName,
-    href: "/prisoner/" + prisonerNumber
-  }
-] %}
+{% set breadcrumbParent = { text: 'Work and skills', href: '/prisoner/' + prisonerNumber + '/work-and-skills' } %}
 
 {% block body %}
   <div class="govuk-grid-row">

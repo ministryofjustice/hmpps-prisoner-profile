@@ -20,12 +20,6 @@
 
 {% else %}
 
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-] %}
   {% set sidebar %}
     {{ sidebarNav([
       { text: "Court cases and offences", href: "#courtCasesAccordion" },
