@@ -4,6 +4,7 @@
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 
 {% extends "../index.njk" %}
+{% set breadcrumbParent = { text: 'Alerts', href: '/prisoner/' + prisonerNumber + '/alerts/active' } %}
 
 {% block body %}
 

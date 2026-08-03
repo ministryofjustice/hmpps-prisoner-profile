@@ -6,16 +6,6 @@
 
 {% extends "partials/layout.njk" %}
 
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  },
-  {
-    text: breadcrumbPrisonerName,
-    href: "/prisoner/" + prisonerNumber
-  }
-] %}
 
 {% set pageHasApiErrors = true %}
 

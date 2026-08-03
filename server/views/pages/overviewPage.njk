@@ -1,12 +1,6 @@
 {% extends "./index.njk" %}
 {% from "../macros/hmppsError.njk" import hmppsError %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-] %}
 {% block body %}
   {% if pageHasApiErrors and useCustomErrorBanner %}
     <div class="govuk-grid-row">
