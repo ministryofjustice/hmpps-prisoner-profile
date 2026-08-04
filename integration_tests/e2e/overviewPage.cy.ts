@@ -327,7 +327,7 @@ context('Overview Page', () => {
       it('should show scan count for someone with no scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU'),
+          response: mockScanSummaryResponse({ prisonerNumber: 'G6123VU' }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -339,7 +339,14 @@ context('Overview Page', () => {
       it('should show scan count for someone not near the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 10, 1, 9, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 10,
+            positiveCount: 1,
+            negativeCount: 9,
+            inconclusiveCount: 0,
+          }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -351,7 +358,14 @@ context('Overview Page', () => {
       it('should show scan count for someone near the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 101, 1, 99, 1),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 101,
+            positiveCount: 1,
+            negativeCount: 99,
+            inconclusiveCount: 1,
+          }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -363,7 +377,14 @@ context('Overview Page', () => {
       it('should show scan count for someone at the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 116, 10, 106, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 116,
+            positiveCount: 10,
+            negativeCount: 106,
+            inconclusiveCount: 0,
+          }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -375,7 +396,14 @@ context('Overview Page', () => {
       it('should not normally show legacy data note', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 1, 0, 1, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 1,
+            positiveCount: 0,
+            negativeCount: 1,
+            inconclusiveCount: 0,
+          }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -385,7 +413,14 @@ context('Overview Page', () => {
       it('should show legacy data note if there were NOMIS scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 1, 0, 0, 0, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 1,
+            dpsCount: 0,
+            positiveCount: 0,
+            negativeCount: 0,
+            inconclusiveCount: 0,
+          }),
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -454,7 +489,14 @@ context('Overview Page', () => {
       })
 
       it('Displays x-ray body scan limit reached', () => {
-        const response = mockScanSummaryResponse('G6123VU', 0, 116, 0, 0, 0)
+        const response = mockScanSummaryResponse({
+          prisonerNumber: 'G6123VU',
+          nomisCount: 0,
+          dpsCount: 116,
+          positiveCount: 0,
+          negativeCount: 0,
+          inconclusiveCount: 0,
+        })
         cy.task('stubXRayBodyScanSummary', { prisonerNumber: 'G6123VU', response })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)

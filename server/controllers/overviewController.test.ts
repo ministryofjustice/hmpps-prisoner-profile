@@ -660,7 +660,14 @@ describe('overviewController', () => {
         { scenario: 'under the limit', dpsCount: 50 },
         { scenario: 'nearing the limit', dpsCount: 100 },
       ])('should not display when scans are $scenario', async ({ dpsCount }) => {
-        const summary = mockScanSummaryResponse(offenderNo, 0, dpsCount, 0, dpsCount, 0)
+        const summary = mockScanSummaryResponse({
+          prisonerNumber: offenderNo,
+          nomisCount: 0,
+          dpsCount,
+          positiveCount: 0,
+          negativeCount: dpsCount,
+          inconclusiveCount: 0,
+        })
         xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
 
         await controller.displayOverview(req, resWithDpsDevRole)
@@ -674,7 +681,14 @@ describe('overviewController', () => {
       })
 
       it('should display when scans are at the limit', async () => {
-        const summary = mockScanSummaryResponse(offenderNo, 10, 110, 2, 108, 10)
+        const summary = mockScanSummaryResponse({
+          prisonerNumber: offenderNo,
+          nomisCount: 10,
+          dpsCount: 110,
+          positiveCount: 2,
+          negativeCount: 108,
+          inconclusiveCount: 10,
+        })
         xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
 
         await controller.displayOverview(req, resWithDpsDevRole)
@@ -899,7 +913,16 @@ describe('overviewController', () => {
     })
 
     it('should get scan summary from api', async () => {
-      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(mockScanSummaryResponse(offenderNo, 1, 2, 0, 1, 1))
+      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(
+        mockScanSummaryResponse({
+          prisonerNumber: offenderNo,
+          nomisCount: 1,
+          dpsCount: 2,
+          positiveCount: 0,
+          negativeCount: 1,
+          inconclusiveCount: 1,
+        }),
+      )
 
       await controller.displayOverview(req, resWithDpsDevRole)
 
@@ -920,6 +943,7 @@ describe('overviewController', () => {
               remainingScans: 113,
               nearingScanLimit: false,
               atScanLimit: false,
+              relevantAlerts: null,
               fromScanDate: expect.any(Date),
               toScanDate: expect.any(Date),
               recordScanUrl: expect.stringMatching('/prisoner/A1234BC/create-scan$'),
