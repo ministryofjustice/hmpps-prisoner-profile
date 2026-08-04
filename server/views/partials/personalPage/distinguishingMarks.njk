@@ -40,7 +40,7 @@
                                                     <a data-qa="mark-images-link"
                                                        href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
                                                        class='govuk-link govuk-link--no-visited-state'
-                                                    >All images</a></p>
+                                                    >All images<span class="govuk-visually-hidden"> of {{ type }} on {{ mark.location }}</span></a></p>
                                             </div>
                                         {% endif %}
                                     {% endif %}
