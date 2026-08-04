@@ -31,11 +31,11 @@
         <div class="govuk-!-margin-bottom-2">
           {% for requirement in dietAndAllergy.medicalDietaryRequirements %}
             <span class="govuk-!-display-block">
-                {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
-                    {{ requirement.description }}: {{ requirement.comment }}
-                {% else %}
-                    {{ requirement.description }}
-                {% endif %}
+              {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
+                {{ requirement.description }}: {{ requirement.comment }}
+              {% else %}
+                {{ requirement.description }}
+              {% endif %}
             </span>
           {% endfor %}
         </div>
@@ -64,52 +64,52 @@
       {% endif %}
 
       {% if dietAndAllergy.cateringInstructions.length > 0 %}
-          <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
-          <div class="govuk-!-margin-bottom-2">
-              <span class="govuk-!-display-block">{{ dietAndAllergy.cateringInstructions }}</span>
-          </div>
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+        <div class="govuk-!-margin-bottom-2">
+          <span class="govuk-!-display-block">{{ dietAndAllergy.cateringInstructions }}</span>
+        </div>
       {% endif %}
 
       <span class="govuk-hint last-updated-summary">
-          {% set dietAndAllergyUpdateDate %}
-              {% if dietAndAllergy.lastModifiedAt.length > 0 %}
-                  on {{ dietAndAllergy.lastModifiedAt }}
-              {% endif %}
-          {% endset %}
+        {% set dietAndAllergyUpdateDate %}
+          {% if dietAndAllergy.lastModifiedAt.length > 0 %}
+            on {{ dietAndAllergy.lastModifiedAt }}
+          {% endif %}
+        {% endset %}
 
-          {% set dietAndAllergyUpdateLocation %}
-              {% if dietAndAllergy.lastModifiedPrison.length > 0 %}
-                  {{ dietAndAllergy.lastModifiedPrison }}
-              {% else %}
-                  Unknown
-              {% endif %}
-          {% endset %}
+        {% set dietAndAllergyUpdateLocation %}
+          {% if dietAndAllergy.lastModifiedPrison.length > 0 %}
+            {{ dietAndAllergy.lastModifiedPrison }}
+          {% else %}
+            Unknown
+          {% endif %}
+        {% endset %}
 
-          Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
+        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
       </span>
     {% else %}
       <span class="govuk-!-margin-top-1">Not entered</span>
     {% endif %}
   {% else %}
     {{ hmppsError({
-        type: 'inset',
-        dataQa: 'health-and-medication-api-error',
-        text: unavailableApiErrorText
+      type: 'inset',
+      dataQa: 'health-and-medication-api-error',
+      text: unavailableApiErrorText
     }) }}
   {% endif %}
 
 {% endmacro %}
 
 {% macro nationalitiesHtml(personalDetails) %}
-    {% if personalDetails.nationality === 'Not entered' %}
-        <span class="not-entered-tag">{{ personalDetails.nationality }}</span>
-    {% else %}
-        {{ personalDetails.nationality }}
-        {% if personalDetails.otherNationalities.length > 0 %}
-            <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Other nationalities</span>
-            {{ personalDetails.otherNationalities }}
-        {% endif %}
+  {% if personalDetails.nationality === 'Not entered' %}
+    <span class="not-entered-tag">{{ personalDetails.nationality }}</span>
+  {% else %}
+    {{ personalDetails.nationality }}
+    {% if personalDetails.otherNationalities.length > 0 %}
+      <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Other nationalities</span>
+      {{ personalDetails.otherNationalities }}
     {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
@@ -118,32 +118,32 @@
       {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-0',
         rows: toSummaryListRows([
-            {
-              key: "Name",
-              value: personalDetails.fullName,
-              options: {
-                anchor: "name",
-                dataQa: "full-name",
-                changeHref: "personal/change-name",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
-                rowUpdated: flashMessage.fieldName === 'fullName'
-              }
-            },
-            {
-              key: "Aliases",
-              value: "Not entered" if aliases.length == 0,
-              options: {
-                anchor: "aliases",
-                dataQa: "aliases",
-                changeText: 'Add an alias',
-                changeHref: "personal/enter-alias-details",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
-                activateHiddenText: false,
-                rowUpdated: flashMessage.fieldName === 'aliases',
-                hideIfEmpty: false,
-                classes: 'hmpps-alias-row'
-              }
+          {
+            key: "Name",
+            value: personalDetails.fullName,
+            options: {
+              anchor: "name",
+              dataQa: "full-name",
+              changeHref: "personal/change-name",
+              changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
+              rowUpdated: flashMessage.fieldName === 'fullName'
             }
+          },
+          {
+            key: "Aliases",
+            value: "Not entered" if aliases.length == 0,
+            options: {
+              anchor: "aliases",
+              dataQa: "aliases",
+              changeText: 'Add an alias',
+              changeHref: "personal/enter-alias-details",
+              changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
+              activateHiddenText: false,
+              rowUpdated: flashMessage.fieldName === 'aliases',
+              hideIfEmpty: false,
+              classes: 'hmpps-alias-row'
+            }
+          }
         ])
       }) }}
 
@@ -165,192 +165,192 @@
 
       {{
         govukSummaryList({
-            classes: listClasses,
-            rows: toSummaryListRows([
-                {
-                  key: "Date of birth",
-                  value: dateOfBirthText,
-                  options: {
-                    anchor: "date-of-birth",
-                    dataQa: "date-of-birth",
-                    visible: isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions),
-                    changeHref: "personal/date-of-birth",
-                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'dateOfBirth'
-                  }
-                },
-                {
-                  key: "City or town of birth",
-                  value: personalDetails.cityOrTownOfBirth,
-                  options: {
-                    anchor: "city-or-town-of-birth",
-                    dataQa: "city-or-town-of-birth",
-                    visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
-                    changeHref: "personal/city-or-town-of-birth",
-                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth'
-                  }
-                },
-                {
-                  key: "Country of birth",
-                  value: personalDetails.countryOfBirth,
-                  options: {
-                    anchor: "country-of-birth",
-                    dataQa: "country-of-birth",
-                    visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
-                    changeHref: "personal/country-of-birth",
-                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'countryOfBirth'
-                  }
-                },
-                {
-                  key: "Nationality",
-                  value: nationalitiesHtml(personalDetails),
-                  options: {
-                    anchor: "nationality",
-                    dataQa: "nationality",
-                    visible: isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions),
-                    changeHref: "personal/nationality",
-                    changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'nationality'
-                  }
-                },
-                {
-                  key: "Ethnic group",
-                  value: personalDetails.ethnicGroup,
-                  options: {
-                    anchor: "ethnic-group",
-                    dataQa: "ethnic-group",
-                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_ethnicity, prisonerPermissions),
-                    changeHref: "personal/ethnic-group",
-                    changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'ethnicity'
-                  }
-                },
-                {
-                  key: "Religion, faith or belief",
-                  value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.justice.prisonNumber),
-                  options: {
-                    anchor: "religion-faith-or-belief",
-                    dataQa: "religion-or-belief",
-                    html: true,
-                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions),
-                    changeHref: "personal/religion",
-                    changeLinkEnabled: editReligionEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_religion_and_belief, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'religion'
-                  }
-                },
-                { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
-                {
-                  key: "Sexual orientation",
-                  value: personalDetails.sexualOrientation | sexualOrientationText,
-                  options: {
-                    anchor: "sexual-orientation",
-                    dataQa: "sexual-orientation",
-                    visible: isGranted(PersonProtectedCharacteristicsPermission.read_sexual_orientation, prisonerPermissions),
-                    changeHref: "personal/sexual-orientation",
-                    changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_sexual_orientation, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'sexualOrientation'
-                  }
-                },
-                {
-                  key: "Marriage or civil partnership status",
-                  value: personalDetails.marriageOrCivilPartnership,
-                  options: {
-                    anchor: "marriage-or-civil-partnership-status",
-                    dataQa: "marriage-or-civil-partnership",
-                    visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_domestic_status, prisonerPermissions),
-                    changeHref: "personal/marital-status",
-                    changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_domestic_status, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'domesticStatus'
-                  }
-                },
-                {
-                  key: "Number of children",
-                  value: personalDetails.numberOfChildren,
-                  options: {
-                    anchor: "number-of-children",
-                    dataQa: "number-of-children",
-                    visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_number_of_children, prisonerPermissions),
-                    changeHref: "personal/children",
-                    changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_number_of_children, prisonerPermissions),
-                    rowUpdated: flashMessage.fieldName === 'numberOfChildren'
-                  }
-                }
-            ])
+          classes: listClasses,
+          rows: toSummaryListRows([
+            {
+              key: "Date of birth",
+              value: dateOfBirthText,
+              options: {
+                anchor: "date-of-birth",
+                dataQa: "date-of-birth",
+                visible: isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions),
+                changeHref: "personal/date-of-birth",
+                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'dateOfBirth'
+              }
+            },
+            {
+              key: "City or town of birth",
+              value: personalDetails.cityOrTownOfBirth,
+              options: {
+                anchor: "city-or-town-of-birth",
+                dataQa: "city-or-town-of-birth",
+                visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
+                changeHref: "personal/city-or-town-of-birth",
+                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth'
+              }
+            },
+            {
+              key: "Country of birth",
+              value: personalDetails.countryOfBirth,
+              options: {
+                anchor: "country-of-birth",
+                dataQa: "country-of-birth",
+                visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
+                changeHref: "personal/country-of-birth",
+                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'countryOfBirth'
+              }
+            },
+            {
+              key: "Nationality",
+              value: nationalitiesHtml(personalDetails),
+              options: {
+                anchor: "nationality",
+                dataQa: "nationality",
+                visible: isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions),
+                changeHref: "personal/nationality",
+                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'nationality'
+              }
+            },
+            {
+              key: "Ethnic group",
+              value: personalDetails.ethnicGroup,
+              options: {
+                anchor: "ethnic-group",
+                dataQa: "ethnic-group",
+                visible: isGranted(PersonProtectedCharacteristicsPermission.read_ethnicity, prisonerPermissions),
+                changeHref: "personal/ethnic-group",
+                changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'ethnicity'
+              }
+            },
+            {
+              key: "Religion, faith or belief",
+              value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.justice.prisonNumber),
+              options: {
+                anchor: "religion-faith-or-belief",
+                dataQa: "religion-or-belief",
+                html: true,
+                visible: isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions),
+                changeHref: "personal/religion",
+                changeLinkEnabled: editReligionEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_religion_and_belief, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'religion'
+              }
+            },
+            { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
+            {
+              key: "Sexual orientation",
+              value: personalDetails.sexualOrientation | sexualOrientationText,
+              options: {
+                anchor: "sexual-orientation",
+                dataQa: "sexual-orientation",
+                visible: isGranted(PersonProtectedCharacteristicsPermission.read_sexual_orientation, prisonerPermissions),
+                changeHref: "personal/sexual-orientation",
+                changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_sexual_orientation, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'sexualOrientation'
+              }
+            },
+            {
+              key: "Marriage or civil partnership status",
+              value: personalDetails.marriageOrCivilPartnership,
+              options: {
+                anchor: "marriage-or-civil-partnership-status",
+                dataQa: "marriage-or-civil-partnership",
+                visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_domestic_status, prisonerPermissions),
+                changeHref: "personal/marital-status",
+                changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_domestic_status, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'domesticStatus'
+              }
+            },
+            {
+              key: "Number of children",
+              value: personalDetails.numberOfChildren,
+              options: {
+                anchor: "number-of-children",
+                dataQa: "number-of-children",
+                visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_number_of_children, prisonerPermissions),
+                changeHref: "personal/children",
+                changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_number_of_children, prisonerPermissions),
+                rowUpdated: flashMessage.fieldName === 'numberOfChildren'
+              }
+            }
+          ])
         })
       }}
       {% include "./languages.njk" %}
       {{
         govukSummaryList({
-            classes: listClasses,
-            rows: toSummaryListRows([
-                {
-                  key: "Diet and food allergies",
-                  value:
-                  dietAndFoodAllergiesHtml(personalDetails.dietAndAllergy),
-                  options: {
-                    anchor: "diet-and-food-allergies",
-                    dataQa: "diet-and-food-allergies",
-                    changeLinkEnabled:
-                      personalDetails.dietAndAllergy.status == "fulfilled" and
-                      isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
-                    changeHref: 'personal/diet-and-food-allergies',
-                    rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies'
-                  }
-                },
-                {
-                  key: "Smoking and vaping",
-                  value: personalDetails.smokerOrVaper,
-                  options: {
-                    anchor: "smoking-and-vaping",
-                    dataQa: "smoker-or-vaper",
-                    visible: isGranted(PersonHealthAndMedicationPermission.read_smoker, prisonerPermissions),
-                    changeLinkEnabled: editEnabled and isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
-                    changeHref: 'personal/smoker-or-vaper',
-                    rowUpdated: flashMessage.fieldName === 'smokerOrVaper'
-                  }
-                },
-                {
-                  key: "Youth offender",
-                  value: personalDetails.youthOffender,
-                  options: {
-                    anchor: "youth-offender",
-                    dataQa: "youth-offender",
-                    visible: inUsersCaseLoad
-                  }
-                },
-                {
-                  key: "Domestic abuse perpetrator",
-                  value: personalDetails.domesticAbusePerpetrator,
-                  options: {
-                    anchor: "domestic-abuse-perpetrator",
-                    dataQa: "domestic-abuse-perpetrator",
-                    hideIfEmpty: true,
-                    visible: inUsersCaseLoad
-                  }
-                },
-                {
-                  key: "Domestic abuse victim",
-                  value: personalDetails.domesticAbuseVictim,
-                  options: {
-                    anchor: "domestic-abuse-victim",
-                    dataQa: "domestic-abuse-victim",
-                    hideIfEmpty: true,
-                    visible: inUsersCaseLoad
-                  }
-                },
-                {
-                  key: "Social care needed",
-                  value: personalDetails.socialCareNeeded,
-                  options: {
-                    anchor: "social-care-needed",
-                    dataQa: "social-care-needed",
-                    hideIfEmpty: true,
-                    visible: inUsersCaseLoad
-                  }
-                }
-            ])
+          classes: listClasses,
+          rows: toSummaryListRows([
+            {
+              key: "Diet and food allergies",
+              value:
+              dietAndFoodAllergiesHtml(personalDetails.dietAndAllergy),
+              options: {
+                anchor: "diet-and-food-allergies",
+                dataQa: "diet-and-food-allergies",
+                changeLinkEnabled:
+                  personalDetails.dietAndAllergy.status == "fulfilled" and
+                  isGranted(PersonHealthAndMedicationPermission.edit_diet, prisonerPermissions),
+                changeHref: 'personal/diet-and-food-allergies',
+                rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies'
+              }
+            },
+            {
+              key: "Smoking and vaping",
+              value: personalDetails.smokerOrVaper,
+              options: {
+                anchor: "smoking-and-vaping",
+                dataQa: "smoker-or-vaper",
+                visible: isGranted(PersonHealthAndMedicationPermission.read_smoker, prisonerPermissions),
+                changeLinkEnabled: editEnabled and isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
+                changeHref: 'personal/smoker-or-vaper',
+                rowUpdated: flashMessage.fieldName === 'smokerOrVaper'
+              }
+            },
+            {
+              key: "Youth offender",
+              value: personalDetails.youthOffender,
+              options: {
+                anchor: "youth-offender",
+                dataQa: "youth-offender",
+                visible: inUsersCaseLoad
+              }
+            },
+            {
+              key: "Domestic abuse perpetrator",
+              value: personalDetails.domesticAbusePerpetrator,
+              options: {
+                anchor: "domestic-abuse-perpetrator",
+                dataQa: "domestic-abuse-perpetrator",
+                hideIfEmpty: true,
+                visible: inUsersCaseLoad
+              }
+            },
+            {
+              key: "Domestic abuse victim",
+              value: personalDetails.domesticAbuseVictim,
+              options: {
+                anchor: "domestic-abuse-victim",
+                dataQa: "domestic-abuse-victim",
+                hideIfEmpty: true,
+                visible: inUsersCaseLoad
+              }
+            },
+            {
+              key: "Social care needed",
+              value: personalDetails.socialCareNeeded,
+              options: {
+                anchor: "social-care-needed",
+                dataQa: "social-care-needed",
+                hideIfEmpty: true,
+                visible: inUsersCaseLoad
+              }
+            }
+          ])
         })
       }}
 
@@ -359,103 +359,103 @@
           {% if militaryRecords.value.length > 0 %}
             <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"
                 data-qa="military-records">
-                <div class="govuk-summary-list__row govuk-!-border-none">
-                    <dt class="govuk-summary-list__key">UK military service record</dt>
-                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border govuk-!-padding-bottom-0">
-                        <span class="anchor-center" id="military-service-information"></span>
-                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
-                        <div class="govuk-!-margin-bottom-2">
-                            <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
-                                {{ summaryListRow("Service number", militaryRecords.value[0].serviceNumber | d('Not entered'), "service-number") }}
-                                {{ summaryListRow("Branch", militaryRecords.value[0].militaryBranchDescription | d('Not entered'), "branch") }}
-                                {{ summaryListRow("Unit", militaryRecords.value[0].unitNumber | d('Not entered'), "unit-number") }}
-                                {{ summaryListRow("Rank at discharge", militaryRecords.value[0].militaryRankDescription | d('Not entered'), "rank") }}
-                                {{ summaryListRow("Comments", militaryRecords.value[0].description | d('Not entered'), "comments") }}
-                            </dl>
-                        </div>
-                        <span class="anchor-center" id="military-enlistment"></span>
-                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
-                        <div>
-                            <dl class="govuk-summary-list--sub-list">
-                                {{ summaryListRow("Date", militaryRecords.value[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
-                                {{ summaryListRow("Location", militaryRecords.value[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
-                            </dl>
-                        </div>
-                    </dd>
-                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
-                            <a class="govuk-link govuk-link--no-visited-state"
-                              href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.value[0].militarySeq }}">
-                                Change<span class="govuk-visually-hidden"> service information</span>
-                            </a>
-                        {% endif %}
-                    </dd>
-                </div>
+              <div class="govuk-summary-list__row govuk-!-border-none">
+                <dt class="govuk-summary-list__key">UK military service record</dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border govuk-!-padding-bottom-0">
+                  <span class="anchor-center" id="military-service-information"></span>
+                  <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
+                  <div class="govuk-!-margin-bottom-2">
+                    <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
+                      {{ summaryListRow("Service number", militaryRecords.value[0].serviceNumber | d('Not entered'), "service-number") }}
+                      {{ summaryListRow("Branch", militaryRecords.value[0].militaryBranchDescription | d('Not entered'), "branch") }}
+                      {{ summaryListRow("Unit", militaryRecords.value[0].unitNumber | d('Not entered'), "unit-number") }}
+                      {{ summaryListRow("Rank at discharge", militaryRecords.value[0].militaryRankDescription | d('Not entered'), "rank") }}
+                      {{ summaryListRow("Comments", militaryRecords.value[0].description | d('Not entered'), "comments") }}
+                    </dl>
+                  </div>
+                  <span class="anchor-center" id="military-enlistment"></span>
+                  <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
+                  <div>
+                    <dl class="govuk-summary-list--sub-list">
+                      {{ summaryListRow("Date", militaryRecords.value[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
+                      {{ summaryListRow("Location", militaryRecords.value[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
+                    </dl>
+                  </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                  {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords.value[0].militarySeq }}">
+                      Change<span class="govuk-visually-hidden"> service information</span>
+                    </a>
+                  {% endif %}
+                </dd>
+              </div>
 
-                <div class="govuk-summary-list__row govuk-!-border-none">
-                    <dt class="govuk-summary-list__key"></dt>
-                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                        <span class="anchor-center" id="military-conflict"></span>
-                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
-                        <div>
-                            <div class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
-                                 data-qa="conflict">
-                                {{ militaryRecords.value[0].warZoneDescription | d('Not entered') }}
-                            </div>
-                        </div>
-                    </dd>
-                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
-                            <a class="govuk-link govuk-link--no-visited-state"
-                              href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                        class="govuk-visually-hidden"> conflict</span></a>
-                        {% endif %}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row  govuk-!-border-none">
-                    <dt class="govuk-summary-list__key"></dt>
-                    <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                        <span class="anchor-center" id="military-disciplinary-action"></span>
-                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
-                        <div>
-                            <div class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
-                                 data-qa="disciplinary-action">
-                                {{ militaryRecords.value[0].disciplinaryActionDescription | d('Not entered') }}
-                            </div>
-                        </div>
-                    </dd>
-                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
-                            <a class="govuk-link govuk-link--no-visited-state"
-                              href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                        class="govuk-visually-hidden"> disciplinary action</span></a>
-                        {% endif %}
-                    </dd>
-                </div>
-                <div class="govuk-summary-list__row govuk-!-border-none">
-                    <dt class="govuk-summary-list__key"></dt>
-                    <dd class="govuk-summary-list__value">
-                        <span class="anchor-center" id="military-discharge"></span>
-                        <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
-                        <div>
-                            <dl class="govuk-summary-list--sub-list">
-                                {{ summaryListRow("Date", militaryRecords.value[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
-                                {{ summaryListRow("Location", militaryRecords.value[0].dischargeLocation | d('Not entered'), "discharge-location") }}
-                                {{ summaryListRow("Type", militaryRecords.value[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
-                                {% if militaryRecords.value[0].endDate %}
-                                    {{ summaryListRow("Length of service", militaryRecords.value[0].startDate | lengthOfService(militaryRecords.value[0].endDate), "length-of-service") }}
-                                {% endif %}
-                            </dl>
-                        </div>
-                    </dd>
-                    <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
-                        {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
-                            <a class="govuk-link govuk-link--no-visited-state"
-                              href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.value[0].militarySeq }}">Change<span
-                                        class="govuk-visually-hidden"> discharge</span></a>
-                        {% endif %}
-                    </dd>
-                </div>
+              <div class="govuk-summary-list__row govuk-!-border-none">
+                <dt class="govuk-summary-list__key"></dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                  <span class="anchor-center" id="military-conflict"></span>
+                  <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
+                  <div>
+                    <div class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                         data-qa="conflict">
+                      {{ militaryRecords.value[0].warZoneDescription | d('Not entered') }}
+                    </div>
+                  </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                  {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                              class="govuk-visually-hidden"> conflict</span></a>
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row  govuk-!-border-none">
+                <dt class="govuk-summary-list__key"></dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+                  <span class="anchor-center" id="military-disciplinary-action"></span>
+                  <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
+                  <div>
+                    <div class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                         data-qa="disciplinary-action">
+                      {{ militaryRecords.value[0].disciplinaryActionDescription | d('Not entered') }}
+                    </div>
+                  </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+                  {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/disciplinary-action/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                              class="govuk-visually-hidden"> disciplinary action</span></a>
+                  {% endif %}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-!-border-none">
+                <dt class="govuk-summary-list__key"></dt>
+                <dd class="govuk-summary-list__value">
+                  <span class="anchor-center" id="military-discharge"></span>
+                  <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
+                  <div>
+                    <dl class="govuk-summary-list--sub-list">
+                      {{ summaryListRow("Date", militaryRecords.value[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
+                      {{ summaryListRow("Location", militaryRecords.value[0].dischargeLocation | d('Not entered'), "discharge-location") }}
+                      {{ summaryListRow("Type", militaryRecords.value[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
+                      {% if militaryRecords.value[0].endDate %}
+                        {{ summaryListRow("Length of service", militaryRecords.value[0].startDate | lengthOfService(militaryRecords.value[0].endDate), "length-of-service") }}
+                      {% endif %}
+                    </dl>
+                  </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
+                  {% if isGranted(CorePersonRecordPermission.edit_military_history, prisonerPermissions) %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/discharge-details/{{ militaryRecords.value[0].militarySeq }}">Change<span
+                              class="govuk-visually-hidden"> discharge</span></a>
+                  {% endif %}
+                </dd>
+              </div>
             </dl>
           {% endif %}
           {% if militaryRecords.value.length === 0
@@ -469,10 +469,10 @@
           {% endif %}
         {% else %}
           {{ hmppsError({
-              type: 'inset',
-              classes: 'govuk-!-margin-top-6',
-              dataQa: 'military-records-api-error',
-              text: unavailableApiErrorText
+            type: 'inset',
+            classes: 'govuk-!-margin-top-6',
+            dataQa: 'military-records-api-error',
+            text: unavailableApiErrorText
           }) }}
         {% endif %}
       {% endif %}
