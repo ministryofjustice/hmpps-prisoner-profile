@@ -1,0 +1,35 @@
+@property --xray-body-scan-count-accent-colour {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #{govuk-functional-colour(border)};
+}
+
+.xray-body-scan-count {
+  --xray-body-scan-count-accent-colour: #{govuk-functional-colour(border)};
+  border-left: $govuk-border-width solid var(--xray-body-scan-count-accent-colour);
+  padding-left: $govuk-border-width-wide;
+  @include govuk-responsive-margin(2, 'bottom');
+
+  .xray-body-scan-count__number, .xray-body-scan-count__limit-warning {
+    display: block;
+  }
+
+  @include govuk-font($size: 16);
+  .xray-body-scan-count__number {
+    @include govuk-font($size: 36);
+  }
+}
+
+.xray-body-scan-count--nearing-limit, .xray-body-scan-count--at-limit {
+  .xray-body-scan-count__number, .xray-body-scan-count__limit-warning {
+    color: var(--xray-body-scan-count-accent-colour);
+  }
+}
+
+.xray-body-scan-count--nearing-limit {
+  --xray-body-scan-count-accent-colour: #{govuk-colour('orange', $variant: 'shade-25')};
+}
+
+.xray-body-scan-count--at-limit {
+  --xray-body-scan-count-accent-colour: #{govuk-colour('red', $variant: 'shade-25')};
+}

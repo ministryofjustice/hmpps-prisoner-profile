@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import type { Response, SuperAgentRequest } from 'superagent'
 
 import { getMatchingRequests, stubFor, stubPing } from './wiremock'
+import { Role } from '../../server/data/enums/role'
 import tokenVerification from './tokenVerification'
 
 export interface UserToken {
@@ -18,7 +19,7 @@ const createToken = (userToken: UserToken) => {
     user_id: userToken.userId || 231232,
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: userToken.roles || ['ROLE_PRISON'],
+    authorities: userToken.roles || [Role.PrisonUser],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }

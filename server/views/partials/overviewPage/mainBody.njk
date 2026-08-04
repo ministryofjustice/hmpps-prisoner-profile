@@ -58,6 +58,13 @@
 </div>
 
 {% call conditionallyShow({
+  id: 'xray-body-scan-card',
+  condition: xrayBodyScanSummary
+}) %}
+  {% include './xrayBodyScansCard.njk' %}
+{% endcall %}
+
+{% call conditionallyShow({
   id: 'ccard-readonly',
   condition: (
   not options.showCourtCaseSummary
