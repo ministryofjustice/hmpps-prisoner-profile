@@ -21,7 +21,14 @@ describe('xRayBodyScansApiClient', () => {
   })
 
   it('getScanSummary should return data from api', async () => {
-    const scanSummaryResponseMock = mockScanSummaryResponse('G6123VU', 4, 2, 1, 1, 0)
+    const scanSummaryResponseMock = mockScanSummaryResponse({
+      prisonerNumber: 'G6123VU',
+      nomisCount: 4,
+      dpsCount: 2,
+      positiveCount: 1,
+      negativeCount: 1,
+      inconclusiveCount: 0,
+    })
 
     fakeXRayBodyScansApi
       .get(`/prisoner/${samplePrisonerNumber}/scan/summary`)

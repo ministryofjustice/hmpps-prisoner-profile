@@ -5,7 +5,10 @@ import type { PageResponse } from './interfaces/PageResponse'
 import type {
   ListScansRequest,
   ScanResponse,
+  ScanSummaryRequest,
   ScanSummaryResponse,
+  ScanSummaryResponseWithAlerts,
+  ScanSummaryResponseWithoutAlerts,
   XRayBodyScansApiClient,
 } from './interfaces/xRayBodyScansApi'
 import RestClient, { type Request } from './restClient'
@@ -53,10 +56,23 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     }
   }
 
-  async getScanSummary(prisonerNumber: string): Promise<ScanSummaryResponse> {
+  async getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts: true },
+  ): Promise<ScanSummaryResponseWithAlerts>
+
+  async getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts?: false },
+  ): Promise<ScanSummaryResponseWithoutAlerts>
+
+  async getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse>
+
+  async getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse> {
     const response = await this.get<RawScanSummaryResponse>(
       {
         path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan/summary`,
+        query: request,
       },
       this.token,
     )

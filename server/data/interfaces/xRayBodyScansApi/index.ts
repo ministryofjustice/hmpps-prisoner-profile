@@ -26,6 +26,10 @@ export interface ScanResponse {
   lastModifiedBy: string
 }
 
+export interface ScanSummaryRequest {
+  includeAlerts?: boolean
+}
+
 export interface ScanSummaryResponse {
   prisonerNumber: string
   nomisCount: number
@@ -38,8 +42,25 @@ export interface ScanSummaryResponse {
   remainingScans: number
   nearingScanLimit: boolean
   atScanLimit: boolean
+  relevantAlerts: AlertResponse[] | null
   fromScanDate: Date
   toScanDate: Date
+}
+
+export interface ScanSummaryResponseWithoutAlerts extends ScanSummaryResponse {
+  relevantAlerts: null
+}
+
+export interface ScanSummaryResponseWithAlerts extends ScanSummaryResponse {
+  relevantAlerts: AlertResponse[]
+}
+
+export interface AlertResponse {
+  id: string
+  type: string
+  typeDescription: string
+  code: string
+  codeDescription: string
 }
 
 export interface ErrorResponse {
@@ -60,7 +81,16 @@ export interface XRayBodyScansApiClient {
 
   /**
    * Returns a summary of x-ray body scans for the given prisoner for this calendar year.
+   * Optionally includes relevant alerts.
    * If the prisoner is not found, the counts will default to zero.
    */
-  getScanSummary(prisonerNumber: string): Promise<ScanSummaryResponse>
+  getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts: true },
+  ): Promise<ScanSummaryResponseWithAlerts>
+  getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts?: false },
+  ): Promise<ScanSummaryResponseWithoutAlerts>
+  getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse>
 }
