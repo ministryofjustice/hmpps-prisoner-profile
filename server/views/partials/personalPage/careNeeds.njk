@@ -9,7 +9,7 @@
   {% if info.reasonableAdjustments.length > 0 %}
     <details class="govuk-details" data-module="govuk-details" data-qa="reasonable-adjustments-list">
       <summary class="govuk-details__summary govuk-!-display-none-print">
-        <span class="govuk-details__summary-text">Support given</span>
+        <span class="govuk-details__summary-text">Support given<span class="govuk-visually-hidden"> for {{ info.description }}</span></span>
       </summary>
       {% for adjustment in info.reasonableAdjustments %}
         <div class="govuk-details__text" data-qa="reasonable-adjustment">
