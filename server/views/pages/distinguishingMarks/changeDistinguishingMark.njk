@@ -14,7 +14,7 @@
             <th>Body part</th>
             <td>{{ mark | toBodyPartDescription }}</td>
             <td>
-                <a href="{{ basePath }}/body-part" class="govuk-link govuk-link--no-visited-state">Change</a>
+                <a href="{{ basePath }}/body-part" class="govuk-link govuk-link--no-visited-state">Change<span class="govuk-visually-hidden"> body part</span></a>
             </td>
         </tr>
         {% if mark | toBodyPartDescription !== 'Neck' and mark | toBodyPartDescription !== 'Back' %}
@@ -22,7 +22,7 @@
                 <th>Location</th>
                 <td>{{ mark | toMarkLocationDescription }}</td>
                 <td>
-                    <a href="{{ basePath }}/location?bodyPart={{ mark | toBodyPartToken }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+                    <a href="{{ basePath }}/location?bodyPart={{ mark | toBodyPartToken }}" class="govuk-link govuk-link--no-visited-state">Change<span class="govuk-visually-hidden"> location</span></a>
                 </td>
             </tr>
         {% endif %}
@@ -30,7 +30,7 @@
             <th>Description</th>
             <td>{{ mark.comment | default("Not entered", true) }}</td>
             <td>
-                <a href="{{ basePath }}/description" class="govuk-link govuk-link--no-visited-state">Change</a>
+                <a href="{{ basePath }}/description" class="govuk-link govuk-link--no-visited-state">Change<span class="govuk-visually-hidden"> description</span></a>
             </td>
         </tr>
         <tr data-qa="photos">
@@ -43,7 +43,7 @@
                                 src="/api/distinguishing-mark-image/{{ photoDetails.id }}?nocache={{ currentTimeMillis() }}"
                                 alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}"/>
                             <div class="mark-changeable-image__overlay">
-                                <a href="{{ basePath }}/photo/{{ photoDetails.id }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+                                <a href="{{ basePath }}/photo/{{ photoDetails.id }}" class="govuk-link govuk-link--no-visited-state">Change<span class="govuk-visually-hidden"> photo {{ loop.index }}</span></a>
                             </div>
                         </div>
                     {% endfor %}

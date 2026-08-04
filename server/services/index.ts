@@ -81,7 +81,6 @@ export const services = () => {
     featureToggleStore,
     ephemeralDataStore,
     osPlacesApiClient,
-    xRayBodyScansApiClientBuilder,
     curiousApiToken,
     tokenStore,
   } = dataAccess
@@ -167,7 +166,7 @@ export const services = () => {
   const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(caseNotesApiClientBuilder, incentivesApiClientBuilder)
-  const careNeedsService = new CareNeedsService(prisonApiClientBuilder, xRayBodyScansApiClientBuilder)
+  const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder, metricsService)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(

@@ -31,17 +31,15 @@ export function mockScanResponse(
   }
 }
 
-export const scanResponseMock = mockScanResponse('G6123VU', new Date(2026, 6, 20, 12))
-
 export const annualLimit = 116
 export const nearingLimitThreshold = 100
 
 export function mockScanSummaryResponse(
   prisonerNumber: string,
-  nomisCount = 4,
-  dpsCount = 2,
-  positiveCount = 1,
-  negativeCount = 1,
+  nomisCount = 0,
+  dpsCount = 0,
+  positiveCount = 0,
+  negativeCount = 0,
   inconclusiveCount = 0,
 ): ScanSummaryResponse {
   const totalCount = nomisCount + dpsCount
@@ -64,5 +62,3 @@ export function mockScanSummaryResponse(
     toScanDate: today,
   }
 }
-
-export const scanSummaryResponseMock = mockScanSummaryResponse('G6123VU')

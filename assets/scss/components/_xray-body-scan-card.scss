@@ -1,0 +1,28 @@
+.xray-body-scan-card__columns {
+  margin: 0 #{-$govuk-gutter-half};
+
+  @media #{govuk-from-breakpoint(tablet)} {
+    display: flex;
+  }
+}
+
+.xray-body-scan-card__column {
+  box-sizing: border-box;
+  padding: 0 $govuk-gutter-half;
+
+  @media #{govuk-from-breakpoint(tablet)} {
+    flex-grow: 1;
+    width: 50%;
+  }
+}
+
+.xray-body-scan-card__summary {
+  @media #{govuk-from-breakpoint(tablet)} {
+    display: flex;
+    flex-direction: column;
+
+    .xray-body-scan-count {
+      flex-grow: 1;
+    }
+  }
+}
