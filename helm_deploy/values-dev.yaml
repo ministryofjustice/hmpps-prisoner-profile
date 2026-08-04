@@ -113,7 +113,7 @@ generic-service:
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
     DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "false"
-    PROPERTY_SUMMARY_TILE_ENABLED: "false"
+    PROPERTY_SUMMARY_TILE_ENABLED: "true"
 
   allowlist:
     groups:
