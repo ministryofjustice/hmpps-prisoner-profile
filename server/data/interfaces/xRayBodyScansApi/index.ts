@@ -42,6 +42,14 @@ export interface ScanSummaryResponse {
   toScanDate: Date
 }
 
+export interface ErrorResponse {
+  status: number
+  errorCode?: string
+  userMessage?: string
+  developerMessage?: string
+  moreInfo?: string
+}
+
 export interface XRayBodyScansApiClient {
   /**
    * Returns recorded x-ray body scans for the given prisoner.
