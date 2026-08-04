@@ -107,19 +107,17 @@
       {% endif %}
 
         {% if showAdditionalIdRow and identityNumberEditEnabled %}
-          {%- call identityNumbersList() -%}
-            <div class="govuk-summary-list__row additional-identity-numbers-row" data-qa="additional-identity-numbers-heading">
-              <div>
-                <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional identity numbers</h3>
-                {% if not hasPersonalId %}
-                  <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/personal-id-numbers">Add personal ID numbers</a><br />
-                {% endif %}
-                {% if not hasHomeOfficeId %}
-                  <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/home-office-id-numbers">Add Home Office ID numbers</a><br />
-                {% endif %}
-              </div>
+          <div class="additional-identity-numbers-row" data-qa="additional-identity-numbers-heading">
+            <div>
+              <h3 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional identity numbers</h3>
+              {% if not hasPersonalId %}
+                <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/personal-id-numbers">Add personal ID numbers</a><br />
+              {% endif %}
+              {% if not hasHomeOfficeId %}
+                <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/home-office-id-numbers">Add Home Office ID numbers</a><br />
+              {% endif %}
             </div>
-          {%- endcall -%}
+          </div>
         {% endif %}
     </div>
   </div>
