@@ -362,20 +362,20 @@ context('When signed in', () => {
         page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
 
         page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
-        const scarsDetailHeaders = page
+        page
           .appearance()
           .personIntegrationDistinguishingMarks()
           .scarsDetail()
           .content()
-          .find('dt')
+          .find('.personal-distinguishing-marks__row__mark__row__key')
+          .should('have.length', 2)
+          .each((element, index) => {
+            const expectedHeaders = ['Location', 'Description']
+            const expectedTexts = ['Arm (general)', 'Horrible arm scar']
 
-        scarsDetailHeaders.each((element, index) => {
-          const expectedHeaders = ['Location', 'Description']
-          const expectedTexts = ['Arm (general)', 'Horrible arm scar']
-
-          cy.wrap(element).should('include.text', expectedHeaders[index])
-          cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
-        })
+            cy.wrap(element).should('include.text', expectedHeaders[index])
+            cy.wrap(element.next('span')).should('include.text', expectedTexts[index])
+          })
         page
           .appearance()
           .personIntegrationDistinguishingMarks()
