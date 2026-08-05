@@ -1,22 +1,30 @@
-{% from "../macros/sidebarNav.njk" import sidebarNav %}
+{% from "macros/sidebarNav.njk" import sidebarNav %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 {% extends "./index.njk" %}
 
 {% block body %}
 
 {% if offencesMoved(user.activeCaseLoadId) %}
+  {# NB: needs to match the conditional logic for ccard-readonly in partials/overviewPage/mainBody.njk #}
+  {% set canOnlyReadReleaseDate = (
+    not isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
+    and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+  ) %}
 
-<div class="govuk-!-margin-top-3">
-  {{ mojAlert({
-    variant: "information",
-    title: "Offences information has moved",
-    showTitleAsHeading: true,
-    dismissible: false,
-    html: 'You can now view this person’s current confirmed release date on their Overview. ' +
-    'You can also access their related offences information. ' +
-    '<a href="/prisoner/' + prisonerNumber + '" class="govuk-link">Go to Overview</a>'
-  }) }}
-</div>
+  <div class="govuk-!-margin-top-3">
+    {% set offencesMovedMessage %}
+      You can now view this person’s current confirmed release date on their Overview.
+      You can also access their related offences information.
+      <a href="/prisoner/{{ prisonerNumber }}{% if canOnlyReadReleaseDate %}#confirmed-release-date-non-calculate{% endif %}">Go to Overview</a>
+    {% endset %}
+    {{ mojAlert({
+      variant: "information",
+      title: "Offences information has moved",
+      showTitleAsHeading: true,
+      dismissible: false,
+      html: offencesMovedMessage
+    }) }}
+  </div>
 
 {% else %}
 
@@ -30,17 +38,17 @@
   {% set content %}
     <div class="govuk-grid-row" data-qa="court-cases-and-offences">
       <div class="govuk-grid-column-full" id="courtCasesAccordion">
-        {% include "../partials/offencesPage/courtCasesAndOffences.njk" %}
+        {% include "partials/offencesPage/courtCasesAndOffences.njk" %}
       </div>
 
       <div class="govuk-grid-column-full">
-        {% include "../partials/offencesPage/releaseDates.njk" %}
+        {% include "partials/offencesPage/releaseDates.njk" %}
       </div>
     </div>
   {% endset %}
 
   {% set heading = "Offences" %}
-  {% include "../partials/sidebarPageLayout.njk" %}
+  {% include "partials/sidebarPageLayout.njk" %}
 
 {% endif %}
 

@@ -67,9 +67,9 @@
 {% call conditionallyShow({
   id: 'ccard-readonly',
   condition: (
-  not options.showCourtCaseSummary
-  and offencesMoved(user.activeCaseLoadId)
-  and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+    not options.showCourtCaseSummary
+    and offencesMoved(user.activeCaseLoadId)
+    and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
   )
 }) %}
   <div class="govuk-grid-row">
