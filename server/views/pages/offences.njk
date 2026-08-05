@@ -5,12 +5,17 @@
 {% block body %}
 
 {% if offencesMoved(user.activeCaseLoadId) %}
+  {# NB: needs to match the conditional logic for ccard-readonly in partials/overviewPage/mainBody.njk #}
+  {% set canOnlyReadReleaseDate = (
+    not isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
+    and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
+  ) %}
 
   <div class="govuk-!-margin-top-3">
     {% set offencesMovedMessage %}
       You can now view this person’s current confirmed release date on their Overview.
       You can also access their related offences information.
-      <a href="/prisoner/{{ prisonerNumber }}">Go to Overview</a>
+      <a href="/prisoner/{{ prisonerNumber }}{% if canOnlyReadReleaseDate %}#confirmed-release-date-non-calculate{% endif %}">Go to Overview</a>
     {% endset %}
     {{ mojAlert({
       variant: "information",
