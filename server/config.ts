@@ -417,6 +417,9 @@ export default {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('PERSON_DUPLICATE_RECORDS_ENABLED_FROM', '2099-01-01T00:00:00'),
+      // Manual overrides for duplicate prisoner records to be used for demoing and testing:
+      // Provided as a JSON array of arrays string, e.g. [["A1234BC","B5678DE","C9012FG"]]
+      overrides: JSON.parse(get('PERSON_DUPLICATE_RECORDS_OVERRIDES', '[]') as string) as string[][],
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
