@@ -5,6 +5,7 @@ import type { PageResponse } from '../../server/data/interfaces/PageResponse'
 import { emptyPageResponse } from '../../server/data/localMockData/pageResponse'
 import type {
   ErrorResponse,
+  LegacyScanResponse,
   ListScansRequest,
   ScanResponse,
   ScanSummaryResponse,
@@ -31,7 +32,7 @@ export default {
     request,
   }: {
     prisonerNumber: string
-    response: PageResponse<ScanResponse> | ErrorResponse
+    response: PageResponse<ScanResponse | LegacyScanResponse> | ErrorResponse
     request?: ListScansRequest
   }): SuperAgentRequest {
     const queryParameters = dateFilters(request)
@@ -39,13 +40,20 @@ export default {
       'content' in response
         ? {
             ...response,
-            content: response.content.map(scan => ({
-              ...scan,
-              scanDate: formatISO(scan.scanDate, { representation: 'date' }),
-              mergedAt: scan.mergedAt ? formatISO(scan.mergedAt) : null,
-              createdAt: formatISO(scan.createdAt),
-              lastModifiedAt: formatISO(scan.lastModifiedAt),
-            })),
+            content: response.content.map(scan =>
+              scan.source === 'NOMIS'
+                ? {
+                    ...scan,
+                    scanDate: scan.scanDate ? formatISO(scan.scanDate, { representation: 'date' }) : null,
+                  }
+                : {
+                    ...scan,
+                    scanDate: formatISO(scan.scanDate, { representation: 'date' }),
+                    mergedAt: scan.mergedAt ? formatISO(scan.mergedAt) : null,
+                    createdAt: formatISO(scan.createdAt),
+                    lastModifiedAt: formatISO(scan.lastModifiedAt),
+                  },
+            ),
           }
         : response
     return stubFor({

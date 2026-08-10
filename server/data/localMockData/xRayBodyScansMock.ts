@@ -1,15 +1,16 @@
 import { startOfToday, startOfYear, subDays } from 'date-fns'
 import type {
   AlertResponse,
+  LegacyScanResponse,
   ScanResponse,
   ScanSummaryResponse,
   ScanSummaryResponseWithAlerts,
   ScanSummaryResponseWithoutAlerts,
 } from '../interfaces/xRayBodyScansApi'
 
-const sampleId = '019f94a7-17cd-746f-b1df-5d4848da42e1'
 const today = startOfToday()
 
+const sampleId = '019f94a7-17cd-746f-b1df-5d4848da42e1'
 export function mockScanResponse(
   prisonerNumber: string,
   scanDate: Date = subDays(today, 1),
@@ -17,6 +18,7 @@ export function mockScanResponse(
   createdBy = 'abc12a',
 ): ScanResponse {
   return {
+    source: 'DPS',
     id: sampleId,
     prisonerNumber,
     prisonId,
@@ -34,6 +36,21 @@ export function mockScanResponse(
     createdBy,
     lastModifiedAt: new Date(),
     lastModifiedBy: createdBy,
+  }
+}
+
+const sampleLegacyId = '715262'
+export function mockLegacyScanResponse(
+  prisonerNumber: string,
+  scanDate: Date | null = subDays(today, 10),
+  scanDetails: string | null = null,
+): LegacyScanResponse {
+  return {
+    source: 'NOMIS',
+    id: sampleLegacyId,
+    prisonerNumber,
+    scanDate,
+    scanDetails,
   }
 }
 

@@ -32,9 +32,13 @@ export default class XrayBodyScansCard {
     return this.container.find('p[data-qa="xray-body-scan-card__no-scans"]')
   }
 
-  shouldShowLatestScan(date: string, outcome: string): Cypress.Chainable<unknown> {
+  shouldShowLatestScan(date: string, outcome: string | null): Cypress.Chainable<unknown> {
     this.latestScanDate.should('contain.text', date)
-    this.latestScanOutcome.should('contain.text', outcome)
+    if (outcome === null) {
+      this.latestScanOutcome.should('not.exist')
+    } else {
+      this.latestScanOutcome.should('contain.text', outcome)
+    }
     return this.noScansNote.should('not.exist')
   }
 
