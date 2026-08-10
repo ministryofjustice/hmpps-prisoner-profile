@@ -11,7 +11,11 @@ import {
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
-import { mockScanResponse, mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
+import {
+  mockLegacyScanResponse,
+  mockScanResponse,
+  mockScanSummaryResponse,
+} from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -437,7 +441,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.shouldShowNoScans()
       })
 
-      it('should show basic details of latest scan', () => {
+      it('should show basic details of latest scan if from DPS', () => {
         cy.task('stubXRayBodyListScans', {
           prisonerNumber: 'G6123VU',
           response: pageResponse([mockScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
@@ -445,6 +449,26 @@ context('Overview Page', () => {
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', 'Item detected')
+      })
+
+      it('should show date of latest scan if from NOMIS', () => {
+        cy.task('stubXRayBodyListScans', {
+          prisonerNumber: 'G6123VU',
+          response: pageResponse([mockLegacyScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', null)
+      })
+
+      it('should not show date of latest scan if from NOMIS but no date was recorded', () => {
+        cy.task('stubXRayBodyListScans', {
+          prisonerNumber: 'G6123VU',
+          response: pageResponse([mockLegacyScanResponse('G6123VU', null)]),
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowNoScans()
       })
 
       it('should link to scan history', () => {

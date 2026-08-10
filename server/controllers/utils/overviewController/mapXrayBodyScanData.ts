@@ -1,6 +1,6 @@
 import config from '../../../config'
 import type { PageResponse } from '../../../data/interfaces/PageResponse'
-import type { ScanResponse, ScanSummaryResponse } from '../../../data/interfaces/xRayBodyScansApi'
+import type { LegacyScanResponse, ScanResponse, ScanSummaryResponse } from '../../../data/interfaces/xRayBodyScansApi'
 
 /** Extended response from xray body scans api for overview page card */
 export interface XrayBodyScanSummary extends ScanSummaryResponse {
@@ -18,6 +18,8 @@ export function mapXrayBodyScanSummary(summaryResponse: ScanSummaryResponse): Xr
   }
 }
 
-export function mapLatestXrayBodyScan(listResponse: PageResponse<ScanResponse>): ScanResponse | null {
+export function mapLatestXrayBodyScan(
+  listResponse: PageResponse<ScanResponse | LegacyScanResponse>,
+): ScanResponse | LegacyScanResponse | null {
   return listResponse?.content?.[0] ?? null
 }

@@ -45,7 +45,7 @@
               text: unavailableApiErrorText
             }) }}
 
-          {% elseif xrayBodyScanLatest %}
+          {% elseif xrayBodyScanLatest and xrayBodyScanLatest.scanDate %}
 
             <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-date">
               {{ xrayBodyScanLatest.scanDate | formatDate('short') }}
