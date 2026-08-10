@@ -177,6 +177,9 @@ context('Add Case Note Page', () => {
       it('Displays Page Not Found', () => {
         cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/add-case-note' })
         Page.verifyOnPage(NotFoundPage)
+        cy.get('.govuk-breadcrumbs__link').should('have.length', 1)
+        cy.get('.govuk-breadcrumbs__link').first().should('contain.text', 'Digital Prison Services')
+        cy.get('.govuk-breadcrumbs__link').should('not.contain.text', 'Saunders, John')
       })
     })
   })
