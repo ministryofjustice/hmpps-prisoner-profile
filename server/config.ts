@@ -437,8 +437,6 @@ export default {
       enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('OFFENCES_MOVED_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
-
-    displayEmployabilitySkillsFromLwp: toBoolean(get('DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

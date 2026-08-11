@@ -12,7 +12,6 @@ import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMo
 import WorkAndSkillsPageService, { WorkAndSkillsData } from './workAndSkillsPageService'
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
-import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
@@ -48,7 +47,6 @@ describe('WorkAndSkillsService', () => {
       longTermGoals: ['A long term goal'],
     })
     return {
-      getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
       getLearnerEducationPage: jest.fn(),
       getLearnerGoals: jest.fn(async () => learnerGoals),
       getLearnerNeurodivergence: jest.fn(),
@@ -124,7 +122,6 @@ describe('WorkAndSkillsService', () => {
   }
 
   const expectedWorkAndSkills: WorkAndSkillsData = {
-    learnerEmployabilitySkills: Result.fulfilled(learnerEmployabilitySkills),
     employabilitySkills: Result.fulfilled([]),
     curiousGoals: Result.fulfilled(expectedCuriousGoals),
     workAndSkillsPrisonerName: ' ',
@@ -203,41 +200,6 @@ describe('WorkAndSkillsService', () => {
         expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
       })
     })
-
-    describe('Learner employability skills', () => {
-      beforeEach(() => {
-        jest.clearAllMocks()
-        curiousApiClient = curiousApiClientMock()
-      })
-
-      it('should handle a 404 from the Curious API, which is presented to the service as null', async () => {
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
-        curiousApiClient.getLearnerEmployabilitySkills = jest.fn().mockReturnValue(null)
-
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-
-        responseAssertions(res, {
-          ...expectedWorkAndSkills,
-          learnerEmployabilitySkills: Result.fulfilled(null),
-        })
-      })
-
-      it('should handle Curious API failure', async () => {
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
-        const apiErrorCallback = jest.fn()
-        curiousApiClient.getLearnerEmployabilitySkills = jest.fn().mockRejectedValue(curiousApiError)
-
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner, apiErrorCallback)
-
-        responseAssertions(res, {
-          ...expectedWorkAndSkills,
-          learnerEmployabilitySkills: Result.rejected(curiousApiError),
-        })
-        expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
-      })
-    })
   })
 
   const responseAssertions = (actual: WorkAndSkillsData, expected: WorkAndSkillsData = expectedWorkAndSkills) => {
@@ -248,7 +210,5 @@ describe('WorkAndSkillsService', () => {
 
     expect(actual.curiousGoals.isFulfilled()).toEqual(expected.curiousGoals.isFulfilled())
     expect(actual.curiousGoals.getOrNull()).toEqual(expected.curiousGoals.getOrNull())
-    expect(actual.learnerEmployabilitySkills.isFulfilled()).toEqual(expected.learnerEmployabilitySkills.isFulfilled())
-    expect(actual.learnerEmployabilitySkills.getOrNull()).toEqual(expected.learnerEmployabilitySkills.getOrNull())
   }
 })

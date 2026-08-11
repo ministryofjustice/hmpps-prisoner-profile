@@ -105,7 +105,6 @@ generic-service:
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     X_RAY_BODY_SCANS_ENABLED: "false"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
-    DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "true"
 
   allowlist:
     groups:
