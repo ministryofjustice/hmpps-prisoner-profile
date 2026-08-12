@@ -526,7 +526,7 @@ context('Overview Page', () => {
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().find('li').should('have.length', 4)
-        overviewPage.statusList().should('contain.text', `Scans in ${response.fromScanDate.getFullYear()}`)
+        overviewPage.statusList().should('contain.text', `X-ray body scans in ${response.fromScanDate.getFullYear()}`)
         overviewPage
           .statusList()
           .find('a')
