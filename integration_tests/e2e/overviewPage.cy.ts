@@ -320,14 +320,6 @@ context('Overview Page', () => {
     })
 
     context('X-ray body scans card', () => {
-      it('should have an action to record a new scan', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.xrayBodyScansCard.cardActions
-          .find('a')
-          .should('contain.text', 'Record a new scan')
-          .and('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan')
-      })
-
       it('should show scan count for someone with no scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
@@ -477,6 +469,15 @@ context('Overview Page', () => {
           'have.attr',
           'href',
           'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans',
+        )
+      })
+
+      it('should link to record a new scan', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.recordLink.should(
+          'have.attr',
+          'href',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan',
         )
       })
     })

@@ -3,19 +3,8 @@
 
 {% if xrayBodyScanSummary and xrayBodyScanLatest %}
   {% set xrayBodyScanSummary = xrayBodyScanSummary.getOrNull() %}
-  {% set summaryCardActions = [] %}
-  {% if xrayBodyScanSummary and xrayBodyScanSummary.recordScanUrl %}
-    {% set _ = summaryCardActions.push({
-      text: 'Record a new scan',
-      href: xrayBodyScanSummary.recordScanUrl
-    }) %}
-  {% endif %}
 
-  {% call summaryCard({
-    title: 'X-ray body scans',
-    id: 'xray-body-scan-card',
-    actions: summaryCardActions
-  }) %}
+  {% call summaryCard({ title: 'X-ray body scans', id: 'xray-body-scan-card' }) %}
     {% if xrayBodyScanSummary %}
       <div class="xray-body-scan-card__columns">
         <div class="xray-body-scan-card__column xray-body-scan-card__summary" data-qa="xxray-body-scan-card__summary">
@@ -72,6 +61,11 @@
 
       <p>
         <a href="{{ xrayBodyScanSummary.viewHistoryUrl }}">Check body scan details</a>
+
+        {# TODO: add permission check that XRBS service is enabled in … relevant caseload #}
+        <a href="{{ xrayBodyScanSummary.recordScanUrl }}" class="govuk-!-margin-left-3">
+          Record a new scan
+        </a>
       </p>
 
     {% else %}
