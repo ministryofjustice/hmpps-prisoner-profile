@@ -8,10 +8,6 @@ export default class XrayBodyScansCard {
     return cy.get(this.selector)
   }
 
-  get cardActions(): PageElement<HTMLUListElement> {
-    return this.container.find('.hmpps-summary-card__actions')
-  }
-
   get scanCount(): XrayBodyScanCount {
     return new XrayBodyScanCount('.xray-body-scan-count')
   }
@@ -50,6 +46,10 @@ export default class XrayBodyScansCard {
 
   get historyLink(): PageElement<HTMLAnchorElement> {
     return this.container.find('a').contains('Check body scan details')
+  }
+
+  get recordLink(): PageElement<HTMLAnchorElement> {
+    return this.container.find('a').contains('Record a new scan')
   }
 
   shouldShowSummaryIsUnavailable(): Cypress.Chainable<unknown> {

@@ -4,7 +4,6 @@ import type { LegacyScanResponse, ScanResponse, ScanSummaryResponse } from '../.
 
 /** Extended response from xray body scans api for overview page card */
 export interface XrayBodyScanSummary extends ScanSummaryResponse {
-  // TODO: assuming that anyone can create a records
   recordScanUrl: string
   viewHistoryUrl: string
 }

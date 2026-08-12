@@ -704,7 +704,7 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               { label: 'Recognised listener' },
               {
-                label: expect.stringContaining('Scans in'),
+                label: expect.stringContaining('X-ray body scans in'),
                 subText: 'Scan limit reached',
                 subTextHref: 'http://localhost:3001/prisoner/A1234BC/scans',
                 style: 'warning',
