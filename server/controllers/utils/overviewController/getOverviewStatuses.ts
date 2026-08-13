@@ -111,7 +111,7 @@ function getXrayBodyScanLimitReachedStatus(
 
       rejected(): OverviewStatus {
         return {
-          label: 'Scan limit information is currently unavailable. Try again later.',
+          label: 'X-ray body scan limit information is currently unavailable. Try again later.',
           style: 'error',
         }
       },

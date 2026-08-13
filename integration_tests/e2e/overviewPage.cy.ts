@@ -1269,7 +1269,7 @@ context('Overview Page', () => {
         .statusList()
         .find('li')
         .eq(3)
-        .should('contain.text', 'Scan limit information is currently unavailable')
+        .should('contain.text', 'X-ray body scan limit information is currently unavailable')
 
       overviewPage.xrayBodyScansCard.shouldShowSummaryIsUnavailable()
     })
