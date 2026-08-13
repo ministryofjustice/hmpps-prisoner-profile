@@ -8,7 +8,12 @@ export default class XrayBodyScanCount {
   }
 
   shouldDisplayCountOf(count: number): Cypress.Chainable<unknown> {
-    return this.container.find('.xray-body-scan-count__number').find('span').eq(0).should('contain.text', count)
+    return this.container
+      .find('.xray-body-scan-count__number')
+      .find('span')
+      .eq(0)
+      .should('contain.text', count)
+      .and('have.attr', 'aria-label', count > 0 ? `${count} scans this year` : 'No scans recorded')
   }
 
   private get warningContainer(): PageElement<HTMLDivElement> {
