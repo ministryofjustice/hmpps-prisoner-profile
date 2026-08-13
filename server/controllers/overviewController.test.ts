@@ -950,7 +950,7 @@ describe('overviewController', () => {
               relevantAlerts: null,
               fromScanDate: expect.any(Date),
               toScanDate: expect.any(Date),
-              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/create-scan$'),
+              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
               viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scans$'),
             },
           }),

@@ -12,7 +12,7 @@ export function mapXrayBodyScanSummary(summaryResponse: ScanSummaryResponse): Xr
   const urlPrefix = `${config.serviceUrls.xRayBodyScansUi}/prisoner/${summaryResponse.prisonerNumber}`
   return {
     ...summaryResponse,
-    recordScanUrl: `${urlPrefix}/create-scan`,
+    recordScanUrl: `${urlPrefix}/record-scan`,
     viewHistoryUrl: `${urlPrefix}/scans`,
   }
 }

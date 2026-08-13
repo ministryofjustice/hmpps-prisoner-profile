@@ -477,7 +477,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.recordLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan',
         )
       })
     })
