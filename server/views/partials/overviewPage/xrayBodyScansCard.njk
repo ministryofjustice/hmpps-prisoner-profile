@@ -21,13 +21,13 @@
         </div>
 
         <div class="xray-body-scan-card__column">
-          <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
-            Last scan date
-          </h3>
           {% set xrayBodyScanLatestError = not xrayBodyScanLatest.isFulfilled() %}
           {% set xrayBodyScanLatest = xrayBodyScanLatest.getOrNull() %}
           {% if xrayBodyScanLatestError %}
 
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+              Last scan date
+            </h3>
             {{ hmppsError({
               type: 'inset',
               dataQa: 'xray-body-scan-card--latest-unavailable',
@@ -36,6 +36,9 @@
 
           {% elseif xrayBodyScanLatest and xrayBodyScanLatest.scanDate %}
 
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+              Last scan date
+            </h3>
             <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-date">
               {{ xrayBodyScanLatest.scanDate | formatDate('short') }}
             </p>
@@ -48,12 +51,6 @@
                 {{ xrayBodyScanLatest.outcomeDescription }}
               </p>
             {% endif %}
-
-          {% else %}
-
-            <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__no-scans">
-              No scans recorded
-            </p>
 
           {% endif %}
         </div>

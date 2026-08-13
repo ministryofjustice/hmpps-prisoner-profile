@@ -24,24 +24,17 @@ export default class XrayBodyScansCard {
     return this.container.find('p[data-qa="xray-body-scan-card__latest-outcome"]')
   }
 
-  private get noScansNote(): PageElement<HTMLParagraphElement> {
-    return this.container.find('p[data-qa="xray-body-scan-card__no-scans"]')
-  }
-
   shouldShowLatestScan(date: string, outcome: string | null): Cypress.Chainable<unknown> {
     this.latestScanDate.should('contain.text', date)
     if (outcome === null) {
-      this.latestScanOutcome.should('not.exist')
-    } else {
-      this.latestScanOutcome.should('contain.text', outcome)
+      return this.latestScanOutcome.should('not.exist')
     }
-    return this.noScansNote.should('not.exist')
+    return this.latestScanOutcome.should('contain.text', outcome)
   }
 
   shouldShowNoScans(): Cypress.Chainable<unknown> {
     this.latestScanDate.should('not.exist')
-    this.latestScanOutcome.should('not.exist')
-    return this.noScansNote.should('contain.text', 'No scans recorded')
+    return this.latestScanOutcome.should('not.exist')
   }
 
   get historyLink(): PageElement<HTMLAnchorElement> {
