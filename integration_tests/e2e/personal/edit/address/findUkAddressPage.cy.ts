@@ -39,6 +39,11 @@ context('Find UK Address', () => {
         input: {},
         errorMessages: ['Enter a UK address'],
       },
+      {
+        testDescription: 'Invalid address entered',
+        input: { textInputs: { 'address-autosuggest-input': '123 Fake Street' } },
+        errorMessages: ['This is not a valid address'],
+      },
     ],
     redirectUrl: '/prisoner/G6123VU/personal/confirm-address',
   })

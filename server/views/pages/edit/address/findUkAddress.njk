@@ -14,7 +14,7 @@
       <div id="address-hint" class="govuk-hint">Enter three or more characters of a postcode or address</div>
       <div id="address-input">
         {{ addressAutosuggest({
-          value: inputValue,
+          inputValue: inputValue,
           errorMessage: errors | findError('address-autosuggest-input')
         }) }}
       </div>
