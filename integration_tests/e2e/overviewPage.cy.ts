@@ -477,7 +477,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.recordLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan',
         )
       })
     })
@@ -1269,7 +1269,7 @@ context('Overview Page', () => {
         .statusList()
         .find('li')
         .eq(3)
-        .should('contain.text', 'Scan limit information is currently unavailable')
+        .should('contain.text', 'X-ray body scan limit information is currently unavailable')
 
       overviewPage.xrayBodyScansCard.shouldShowSummaryIsUnavailable()
     })

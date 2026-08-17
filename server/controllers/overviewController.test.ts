@@ -726,7 +726,7 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               { label: 'Recognised listener' },
               {
-                label: 'Scan limit information is currently unavailable. Try again later.',
+                label: 'X-ray body scan limit information is currently unavailable. Try again later.',
                 style: 'error',
               },
             ],
@@ -950,7 +950,7 @@ describe('overviewController', () => {
               relevantAlerts: null,
               fromScanDate: expect.any(Date),
               toScanDate: expect.any(Date),
-              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/create-scan$'),
+              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
               viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scans$'),
             },
           }),
