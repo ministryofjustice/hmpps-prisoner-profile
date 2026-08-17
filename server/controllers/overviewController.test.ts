@@ -56,7 +56,11 @@ import { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supportFo
 import { prisonerHasNeedsMock } from '../data/localMockData/supportForAdditionalNeedsMock'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
-import { mockScanResponse, mockScanSummaryResponse } from '../data/localMockData/xRayBodyScansMock'
+import {
+  mockLegacyScanResponse,
+  mockScanResponse,
+  mockScanSummaryResponse,
+} from '../data/localMockData/xRayBodyScansMock'
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
@@ -700,7 +704,7 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               { label: 'Recognised listener' },
               {
-                label: expect.stringContaining('Scans in'),
+                label: expect.stringContaining('X-ray body scans in'),
                 subText: 'Scan limit reached',
                 subTextHref: 'http://localhost:3001/prisoner/A1234BC/scans',
                 style: 'warning',
@@ -722,7 +726,7 @@ describe('overviewController', () => {
               { label: 'In Moorland (HMP & YOI)' },
               { label: 'Recognised listener' },
               {
-                label: 'Scan limit information is currently unavailable. Try again later.',
+                label: 'X-ray body scan limit information is currently unavailable. Try again later.',
                 style: 'error',
               },
             ],
@@ -946,7 +950,7 @@ describe('overviewController', () => {
               relevantAlerts: null,
               fromScanDate: expect.any(Date),
               toScanDate: expect.any(Date),
-              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/create-scan$'),
+              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
               viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scans$'),
             },
           }),
@@ -954,7 +958,7 @@ describe('overviewController', () => {
       )
     })
 
-    it('should get latest scan from api', async () => {
+    it('should handle latest DPS scan from api', async () => {
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([mockScanResponse(offenderNo)]))
 
       await controller.displayOverview(req, resWithDpsDevRole)
@@ -965,6 +969,8 @@ describe('overviewController', () => {
           xrayBodyScanLatest: expect.objectContaining({
             status: 'fulfilled',
             value: expect.objectContaining({
+              source: 'DPS',
+              id: expect.any(String),
               prisonerNumber: offenderNo,
               prisonId: 'MDI',
               scanDate: expect.any(Date),
@@ -974,6 +980,28 @@ describe('overviewController', () => {
               outcomeDescription: 'Item detected',
               typeOfFind: 'INORGANIC',
               typeOfFindDescription: 'Inorganic',
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('should handle latest NOMIS scan from api', async () => {
+      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([mockLegacyScanResponse(offenderNo)]))
+
+      await controller.displayOverview(req, resWithDpsDevRole)
+
+      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          xrayBodyScanLatest: expect.objectContaining({
+            status: 'fulfilled',
+            value: expect.objectContaining({
+              source: 'NOMIS',
+              id: expect.any(String),
+              prisonerNumber: offenderNo,
+              scanDate: expect.any(Date),
+              scanDetails: null,
             }),
           }),
         }),

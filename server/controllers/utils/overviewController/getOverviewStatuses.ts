@@ -101,7 +101,7 @@ function getXrayBodyScanLimitReachedStatus(
       fulfilled(summary): OverviewStatus | null {
         return summary.atScanLimit
           ? {
-              label: `Scans in ${summary.fromScanDate.getFullYear()}`,
+              label: `X-ray body scans in ${summary.fromScanDate.getFullYear()}`,
               subText: 'Scan limit reached',
               subTextHref: summary.viewHistoryUrl,
               style: 'warning',
@@ -111,7 +111,7 @@ function getXrayBodyScanLimitReachedStatus(
 
       rejected(): OverviewStatus {
         return {
-          label: 'Scan limit information is currently unavailable. Try again later.',
+          label: 'X-ray body scan limit information is currently unavailable. Try again later.',
           style: 'error',
         }
       },

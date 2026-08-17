@@ -6,7 +6,15 @@ export interface ListScansRequest extends PageRequest<'scanDate'> {
   toScanDate?: Date | undefined
 }
 
-export interface ScanResponse {
+export interface UnifiedScanResponse {
+  source: 'DPS' | 'NOMIS'
+  id: string
+  prisonerNumber: string
+  scanDate: Date | null
+}
+
+export interface ScanResponse extends UnifiedScanResponse {
+  source: 'DPS'
   id: string
   prisonerNumber: string
   prisonId: string
@@ -24,6 +32,14 @@ export interface ScanResponse {
   createdBy: string
   lastModifiedAt: Date
   lastModifiedBy: string
+}
+
+export interface LegacyScanResponse extends UnifiedScanResponse {
+  source: 'NOMIS'
+  id: string
+  prisonerNumber: string
+  scanDate: Date | null
+  scanDetails: string | null
 }
 
 export interface ScanSummaryRequest {
@@ -73,11 +89,14 @@ export interface ErrorResponse {
 
 export interface XRayBodyScansApiClient {
   /**
-   * Returns recorded x-ray body scans for the given prisoner.
+   * Returns x-ray body scans recorded in DPS or NOMIS for the given prisoner.
    * If the prisoner is not found, the list is empty.
    * Ensure the prisoner exists prior to use.
    */
-  listScans(prisonerNumber: string, request?: ListScansRequest): Promise<PageResponse<ScanResponse>>
+  listScans(
+    prisonerNumber: string,
+    request?: ListScansRequest,
+  ): Promise<PageResponse<ScanResponse | LegacyScanResponse>>
 
   /**
    * Returns a summary of x-ray body scans for the given prisoner for this calendar year.

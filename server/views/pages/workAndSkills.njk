@@ -36,11 +36,7 @@
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {% if displayEmployabilitySkillsFromLwp() %}
-          {% include "../partials/workAndSkillsPage/employabilitySkills/lwpEmployabilitySkills.njk" %}
-        {% else %}
-          {% include "../partials/workAndSkillsPage/employabilitySkills/curiousEmployabilitySkills.njk" %}
-        {% endif %}
+        {% include "../partials/workAndSkillsPage/employabilitySkills/lwpEmployabilitySkills.njk" %}
       </div>
     </div>
   {% endset %}

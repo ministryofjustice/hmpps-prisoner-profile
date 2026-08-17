@@ -1,7 +1,6 @@
 import nock from 'nock'
 import config from '../config'
 import CuriousApiClient from './curiousApiClient'
-import { learnerEmployabilitySkills } from './localMockData/learnerEmployabilitySkills'
 import aValidLearnerGoals from './localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
 import { LearnerAssessmentsMock } from './localMockData/learnerAssessmentsMock'
@@ -21,18 +20,6 @@ describe('curiousApiClient', () => {
   afterEach(() => {
     jest.resetAllMocks()
     nock.cleanAll()
-  })
-
-  describe('getLearnerEmployabilitySkills', () => {
-    it('should return data from api', async () => {
-      fakeCuriousApi
-        .get('/learnerEmployabilitySkills/G6123VU')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, learnerEmployabilitySkills)
-
-      const output = await curiousApiClient.getLearnerEmployabilitySkills('G6123VU')
-      expect(output).toEqual(learnerEmployabilitySkills)
-    })
   })
 
   describe('getLearnerGoals', () => {

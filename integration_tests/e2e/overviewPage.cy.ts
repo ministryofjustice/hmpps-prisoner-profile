@@ -11,7 +11,11 @@ import {
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
-import { mockScanResponse, mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
+import {
+  mockLegacyScanResponse,
+  mockScanResponse,
+  mockScanSummaryResponse,
+} from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -316,14 +320,6 @@ context('Overview Page', () => {
     })
 
     context('X-ray body scans card', () => {
-      it('should have an action to record a new scan', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.xrayBodyScansCard.cardActions
-          .find('a')
-          .should('contain.text', 'Record a new scan')
-          .and('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan')
-      })
-
       it('should show scan count for someone with no scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
@@ -437,7 +433,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.shouldShowNoScans()
       })
 
-      it('should show basic details of latest scan', () => {
+      it('should show basic details of latest scan if from DPS', () => {
         cy.task('stubXRayBodyListScans', {
           prisonerNumber: 'G6123VU',
           response: pageResponse([mockScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
@@ -447,12 +443,41 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', 'Item detected')
       })
 
+      it('should show date of latest scan if from NOMIS', () => {
+        cy.task('stubXRayBodyListScans', {
+          prisonerNumber: 'G6123VU',
+          response: pageResponse([mockLegacyScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', null)
+      })
+
+      it('should not show date of latest scan if from NOMIS but no date was recorded', () => {
+        cy.task('stubXRayBodyListScans', {
+          prisonerNumber: 'G6123VU',
+          response: pageResponse([mockLegacyScanResponse('G6123VU', null)]),
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowNoScans()
+      })
+
       it('should link to scan history', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.xrayBodyScansCard.historyLink.should(
           'have.attr',
           'href',
           'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans',
+        )
+      })
+
+      it('should link to record a new scan', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.recordLink.should(
+          'have.attr',
+          'href',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan',
         )
       })
     })
@@ -501,7 +526,7 @@ context('Overview Page', () => {
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().find('li').should('have.length', 4)
-        overviewPage.statusList().should('contain.text', `Scans in ${response.fromScanDate.getFullYear()}`)
+        overviewPage.statusList().should('contain.text', `X-ray body scans in ${response.fromScanDate.getFullYear()}`)
         overviewPage
           .statusList()
           .find('a')
@@ -1244,7 +1269,7 @@ context('Overview Page', () => {
         .statusList()
         .find('li')
         .eq(3)
-        .should('contain.text', 'Scan limit information is currently unavailable')
+        .should('contain.text', 'X-ray body scan limit information is currently unavailable')
 
       overviewPage.xrayBodyScansCard.shouldShowSummaryIsUnavailable()
     })
