@@ -1,8 +1,10 @@
 {% extends "./editPage.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% macro otherHtml(type, sequence, comment) %}
   {{ govukCharacterCount({
     id: type + "-other",
@@ -40,8 +42,63 @@
     errorMessage: errors | findError("medical-nutrient-deficiency")
   }) }}
 {% endmacro %}
+{% macro groupedList(items) %}
+  <ul class="govuk-list">
+    {% for item in items %}
+      <li>
+        {% if item.value %}{{ item.value.description }}{% if item.comment %}: {{ item.comment }}{% endif %}{% else %}{{ item }}{% endif %}
+        {% if not loop.last %}<hr class="govuk-section-break govuk-section-break--visible">{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Diet and food allergies</h1>
+
+  {% if hasPendingMerges %}
+    {{ mojAlert({
+      variant: "warning",
+      title: "Review additional diet and food allergies information",
+      showTitleAsHeading: true,
+      html: 'This person has additional dietary information from a previous profile. You must review this information, update their details if necessary and confirm the review is complete.'
+    }) }}
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">How to review and update the additional information</h2>
+    <p class="govuk-body">To make sure {{ prisonerName.firstLast }}’s current diet and food allergies information is accurate:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>read the additional information</li>
+      <li>decide whether any information is missing from their current information</li>
+      <li>add relevant details by using the checkboxes and text boxes</li>
+      <li>confirm the review is complete, or choose to continue it later</li>
+    </ul>
+
+    <p class="govuk-body">Once you confirm the review is complete:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the additional information will no longer be shown</li>
+      <li>any details you saved will stay this person’s profile</li>
+    </ul>
+
+    <p class="govuk-body govuk-!-margin-bottom-6">You can still save updates while reviewing this information.</p>
+
+    <div class="diet-and-food-allergies-additional-info">
+      <h2 class="govuk-heading-m">Additional diet and food allergies information</h2>
+      {% set sectionsShown = false %}
+      {% for section in [
+        { title: 'Medical diet', items: groupedPendingMerges.medicalDietaryRequirements },
+        { title: 'Food allergies', items: groupedPendingMerges.foodAllergies },
+        { title: 'Personalised diet', items: groupedPendingMerges.personalisedDietaryRequirements },
+        { title: 'Catering instructions', items: groupedPendingMerges.cateringInstructions }
+      ] %}
+        {% if section.items.length > 0 %}
+          {% if sectionsShown %}<hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-4 govuk-!-margin-bottom-4">{% endif %}
+          <h3 class="govuk-heading-s">{{ section.title }}</h3>
+          {{ groupedList(section.items) }}
+          {% set sectionsShown = true %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
     <div class="govuk-form-group">
@@ -176,6 +233,48 @@
       },
       errorMessage: errors | findError("catering-instructions")
     }) }}
+
+    {% if hasPendingMerges %}
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      {{ govukRadios({
+        name: "reviewStatus",
+        fieldset: {
+          legend: {
+            text: "Have you reviewed and updated the additional diet and food allergies information for " + prisonerName.firstLast + "?",
+            isPageHeading: false,
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [
+          {
+            value: "COMPLETE",
+            text: "Yes, I have reviewed and updated the information",
+            checked: reviewStatus === "COMPLETE",
+            hint: {
+              text: "The additional information will no longer appear"
+            }
+          },
+          {
+            value: "INCOMPLETE",
+            text: "I have made some updates but need more time",
+            checked: reviewStatus === "INCOMPLETE",
+            hint: {
+              text: "The additional information will still be shown until you confirm the review is complete"
+            }
+          },
+          {
+            value: "NOT_STARTED",
+            text: "No, I have not started reviewing this information",
+            checked: reviewStatus === "NOT_STARTED",
+            hint: {
+              text: "The additional information will remain available until you complete the review"
+            }
+          }
+        ],
+        errorMessage: errors | findError("reviewStatus")
+      }) }}
+    {% endif %}
+
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Save",
@@ -189,4 +288,4 @@
         data-qa="edit-cancel-button">Cancel</a>
     </div>
   </form>
-</div></div>{% endblock %}
+{% endblock %}

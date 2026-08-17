@@ -41,4 +41,5 @@ export const dietAndAllergyMock: DietAndAllergy = {
 
 export const healthAndMedicationMock: HealthAndMedication = {
   dietAndAllergy: dietAndAllergyMock,
+  pendingMerges: [],
 }

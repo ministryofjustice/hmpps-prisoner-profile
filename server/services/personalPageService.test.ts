@@ -32,6 +32,7 @@ import {
   ReligionReferenceDataCodesMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import {
+  HealthAndMedication,
   HealthAndMedicationApiClient,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
@@ -132,6 +133,7 @@ describe('PersonalPageService', () => {
 
       updateDietAndAllergyData: jest.fn(async () => dietAndAllergyMock),
       updateSmokerStatus: jest.fn(async () => {}),
+      completeMerge: jest.fn(),
     }
 
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
@@ -1003,6 +1005,7 @@ describe('PersonalPageService', () => {
           ...dietAndAllergyMock,
           cateringInstructions: undefined as ValueWithMetadata<string>,
         },
+        pendingMerges: [] as HealthAndMedication[],
       }))
 
       const {

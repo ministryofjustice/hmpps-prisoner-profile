@@ -127,14 +127,24 @@ describe('DietAndFoodAllergiesController', () => {
         await action(req, res, next)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
-          pageTitle: expect.anything(),
+          pageTitle: 'Diet and food allergies - Prisoner personal details',
           miniBannerData: {
             cellLocation: '1-1-035',
             prisonerName: 'Saunders, John',
             prisonerNumber,
             prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+            prisonerPermissions: undefined,
           },
           errors: [],
+          hasPendingMerges: false,
+          groupedPendingMerges: {
+            foodAllergies: [],
+            medicalDietaryRequirements: [],
+            personalisedDietaryRequirements: [],
+            cateringInstructions: [],
+          },
+          cateringInstructions: undefined,
+          reviewStatus: undefined,
           ...editOptions({ selections: [] }),
         })
       })
@@ -150,14 +160,22 @@ describe('DietAndFoodAllergiesController', () => {
         expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), prisonerNumber)
 
         expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
-          pageTitle: expect.anything(),
+          pageTitle: 'Diet and food allergies - Prisoner personal details',
           miniBannerData: {
             cellLocation: '1-1-035',
             prisonerName: 'Saunders, John',
             prisonerNumber,
             prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
+            prisonerPermissions: undefined,
           },
           errors: [],
+          hasPendingMerges: false,
+          groupedPendingMerges: {
+            foodAllergies: [],
+            medicalDietaryRequirements: [],
+            personalisedDietaryRequirements: [],
+            cateringInstructions: [],
+          },
           ...editOptions({
             selections: [
               { value: medicalDietCodesMock[0].id },
@@ -166,6 +184,7 @@ describe('DietAndFoodAllergiesController', () => {
             ],
           }),
           cateringInstructions: 'Some catering instructions.',
+          reviewStatus: undefined,
         })
       })
 
@@ -329,9 +348,13 @@ describe('DietAndFoodAllergiesController', () => {
           details: {
             fieldName: 'dietAndFoodAllergies',
             previous: {
-              medicalDietaryRequirements: [{ value: medicalDietCodesMock[0].id }],
-              foodAllergies: [{ value: foodAllergyCodesMock[0].id }],
-              personalisedDietaryRequirements: [{ value: personalisedDietCodesMock[0].id }],
+              medicalDietaryRequirements: [
+                { value: medicalDietCodesMock[0].id, comment: undefined } as ReferenceDataIdSelection,
+              ],
+              foodAllergies: [{ value: foodAllergyCodesMock[0].id, comment: undefined } as ReferenceDataIdSelection],
+              personalisedDietaryRequirements: [
+                { value: personalisedDietCodesMock[0].id, comment: undefined } as ReferenceDataIdSelection,
+              ],
               cateringInstructions: 'Some catering instructions.',
             },
             updated: {
