@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express'
 import config from '../../config'
-import { Role } from '../../data/enums/role'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 import PersonalPageService from '../../services/personalPageService'
 import CareNeedsService from '../../services/careNeedsService'
@@ -28,16 +27,13 @@ export default class PersonalController {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { prisonId, prisonerNumber, bookingId } = prisonerData
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const { activeCaseLoadId, userRoles } = user as PrisonUser
+      const { activeCaseLoadId } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
 
-      const showUnsafeXRayBodyScanData =
-        config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
-
-      const [personalPageData, careNeeds, xrays, unsafeXrays, propertySummary] = await Promise.all([
+      const [personalPageData, careNeeds, xrays, propertySummary] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
           editProfileEnabled: editEnabled,
           simulateFetchEnabled,
@@ -47,9 +43,6 @@ export default class PersonalController {
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
-        showUnsafeXRayBodyScanData
-          ? this.careNeedsService.unsafeGetXrayBodyScanSummary(clientToken, prisonerNumber)
-          : Promise.resolve({ total: 0, since: '' }),
         this.getPropertySummary(clientToken, prisonerNumber, prisonId),
       ])
 
@@ -74,7 +67,7 @@ export default class PersonalController {
             ? 'personal/eye-colour'
             : 'personal/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
-        security: { ...personalPageData.security, xrays, unsafeXrays },
+        security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
         displayNewAddressesCard: editEnabled,

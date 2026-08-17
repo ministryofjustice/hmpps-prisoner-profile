@@ -5,17 +5,7 @@
 {% extends "../../partials/layout.njk" %}
 
 {% set mainClasses = "govuk-body" %}
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    }
-] %}
+{% set breadcrumbParent = { text: 'Schedule', href: "/prisoner/" + prisonerNumber + "/schedule" } %}
 
 {% block content %}
     {% block body %}

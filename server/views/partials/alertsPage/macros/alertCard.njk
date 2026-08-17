@@ -14,13 +14,13 @@
     </div>
     <div class="hmpps-alert-card-list-item__link">
         {% if alert.addMoreDetailsLinkUrl %}
-        <a href="{{ alert.addMoreDetailsLinkUrl }}" data-qa="add-more-details-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Add more details</a>
+        <a href="{{ alert.addMoreDetailsLinkUrl }}" data-qa="add-more-details-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Add more details<span class="govuk-visually-hidden"> to {{ alert.alertCode.description }} alert created on {{ alert.activeFrom | formatDate }}{% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }}{% endif %}</span></a>
         {% endif %}
         {% if alert.closeAlertLinkUrl %}
-        <a href="{{ alert.closeAlertLinkUrl }}" data-qa="close-alert-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Close alert</a>
+        <a href="{{ alert.closeAlertLinkUrl }}" data-qa="close-alert-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Close alert<span class="govuk-visually-hidden"> for {{ alert.alertCode.description }} alert created on {{ alert.activeFrom | formatDate }}{% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }}{% endif %}</span></a>
         {% endif %}
         {% if alert.changeEndDateLinkUrl %}
-        <a href="{{ alert.changeEndDateLinkUrl }}" data-qa="change-end-date-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Change end date</a>
+        <a href="{{ alert.changeEndDateLinkUrl }}" data-qa="change-end-date-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Change end date<span class="govuk-visually-hidden"> for {{ alert.alertCode.description }} alert created on {{ alert.activeFrom | formatDate }}{% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }}{% endif %}</span></a>
         {% endif %}
     </div>
 </div>

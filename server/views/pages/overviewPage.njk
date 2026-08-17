@@ -1,12 +1,6 @@
 {% extends "./index.njk" %}
-{% from "../macros/hmppsError.njk" import hmppsError %}
-{% from "../macros/conditionallyShow.njk" import conditionallyShow %}
-{% set breadCrumbs = [
-  {
-    text: 'Digital Prison Services',
-    href:  "/" | prependBaseUrl
-  }
-] %}
+{% from "macros/hmppsError.njk" import hmppsError %}
+{% from "macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
   {% if pageHasApiErrors and useCustomErrorBanner %}
     <div class="govuk-grid-row">
@@ -16,15 +10,15 @@
 
   {% set sidebar %}
     {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'overview-side-bar'}) -%}
-      {% include "../partials/overviewPage/sideBar.njk" %}
+      {% include "partials/overviewPage/sideBar.njk" %}
     {%- endcall -%}
   {% endset %}
 
   {% set content %}
-    {% include "../partials/overviewPage/mainBody.njk" %}
+    {% include "partials/overviewPage/mainBody.njk" %}
   {% endset %}
 
   {% set sidebarSide = "right" %}
   {% set heading = "Overview" %}
-  {% include "../partials/sidebarPageLayout.njk" %}
+  {% include "partials/sidebarPageLayout.njk" %}
 {% endblock %}

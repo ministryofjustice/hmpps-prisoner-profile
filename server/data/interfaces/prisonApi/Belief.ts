@@ -1,6 +1,4 @@
 export default interface Belief {
-  bookingId: number
-  beliefId: number
   beliefCode: string
   beliefDescription: string
   startDate: string

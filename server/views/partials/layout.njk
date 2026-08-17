@@ -43,26 +43,29 @@
   {% endif %}
 
   <div class="prisoner-profile-breadcrumbs govuk-!-display-none-print">
+    {% if not breadCrumbs %}
+      {% set breadCrumbs = [
+        { text: 'Digital Prison Services', href: "/" | prependBaseUrl },
+        { text: breadcrumbPrisonerName | default(prisonerName.lastCommaFirst | default(prisonerName)), href: '/prisoner/' + prisonerNumber } if prisonerNumber and pageTitle != 'Overview' and isGranted(PrisonerBasePermission.read, prisonerPermissions) else null,
+        breadcrumbParent
+      ] | removeNullish %}
+    {% endif %}
 
-    {% if refererUrl %}
-      <div class="prisoner-profile-breadcrumbs__back">
-        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="referer-back-link">
-          Back
-        </a>
-      </div>
-    {% elseif user.backLink and not hideBackLink %}
-      <div class="prisoner-profile-breadcrumbs__search">
-        <a href="{{ user.backLink.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">
-          {{ user.backLink.text }}
+    {% set showBack = refererUrl and not breadCrumbs | length %}
+    {% if not hideBackLink and (showBack or user.backLink) %}
+      <div class="prisoner-profile-breadcrumbs__{{ 'back' if showBack else 'search' }}">
+        <a href="{{ refererUrl if showBack else user.backLink.url }}"
+          class="govuk-link govuk-link--no-visited-state"
+          data-qa="{{ 'referer-back-link' if showBack else 'back-link' }}">{{ 'Back' if showBack else user.backLink.text }}
         </a>
       </div>
     {% endif %}
 
-    <div class="prisoner-profile-breadcrumbs__breadcrumbs">
-      {{ govukBreadcrumbs({
-        items: breadCrumbs | default([])
-      }) }}
-    </div>
+    {% if breadCrumbs | length %}
+      <div class="prisoner-profile-breadcrumbs__breadcrumbs">
+        {{ govukBreadcrumbs({ items: breadCrumbs }) }}
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
 

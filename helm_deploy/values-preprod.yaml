@@ -52,6 +52,7 @@ generic-service:
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-preprod.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_UI_URL: "https://prisoner-property-preprod.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-preprod.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-preprod.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
@@ -106,7 +107,6 @@ generic-service:
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     X_RAY_BODY_SCANS_ENABLED: "false"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
-    DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "false"
     PROPERTY_SUMMARY_TILE_ENABLED: "false"
 
   allowlist:

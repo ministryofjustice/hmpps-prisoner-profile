@@ -9,16 +9,18 @@ import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import PersonalLearningPlanService from './personalLearningPlanService'
-import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+import {
+  PersonalLearningPlanActionPlan,
+  PersonalLearningPlanEmployabilitySkill,
+} from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
-import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmployabilitySkills'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { Result } from '../utils/result/result'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 
 export interface WorkAndSkillsData {
-  learnerEmployabilitySkills: Result<LearnerEmployabilitySkills>
+  employabilitySkills: Result<Array<PersonalLearningPlanEmployabilitySkill>>
   curiousGoals: Result<CuriousGoals>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
@@ -55,13 +57,13 @@ export default class WorkAndSkillsPageService {
     const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
 
     const [
-      learnerEmployabilitySkills,
+      employabilitySkills,
       curiousGoals,
       offenderActivitiesHistory,
       unacceptableAbsences,
       personalLearningPlanActionPlan,
     ] = await Promise.all([
-      this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient, apiErrorCallback),
+      this.getLwpEmployabilitySkills(prisonerNumber, token, apiErrorCallback),
       this.getCuriousGoals(prisonerNumber, curiousApiClient, apiErrorCallback),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
       this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
@@ -69,7 +71,7 @@ export default class WorkAndSkillsPageService {
     ])
 
     return {
-      learnerEmployabilitySkills,
+      employabilitySkills,
       curiousGoals,
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
@@ -131,12 +133,12 @@ export default class WorkAndSkillsPageService {
     return { activitiesHistory }
   }
 
-  private async getLearnerEmployabilitySkills(
+  private async getLwpEmployabilitySkills(
     prisonerNumber: string,
-    curiousApiClient: CuriousApiClient,
+    token: string,
     apiErrorCallback: (error: Error) => void,
-  ): Promise<Result<LearnerEmployabilitySkills>> {
-    return Result.wrap(curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber), apiErrorCallback)
+  ) {
+    return Result.wrap(this.personalLearningPlanService.getEmployabilitySkills(prisonerNumber, token), apiErrorCallback)
   }
 
   private async getCuriousGoals(

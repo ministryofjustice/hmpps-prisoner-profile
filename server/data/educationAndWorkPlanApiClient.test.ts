@@ -2,6 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
 import { aValidGetGoalsResponseWithOneGoal } from './localMockData/getGoalsResponse'
+import aValidGetEmployabilitySkillResponses from './localMockData/getEmployabilitySkillResponses'
 
 describe('educationAndWorkPlanApiClient', () => {
   const systemToken = 'a-system-token'
@@ -51,6 +52,49 @@ describe('educationAndWorkPlanApiClient', () => {
       // When
       try {
         await educationAndWorkPlanClient.getAllGoals(prisonerNumber)
+      } catch (e) {
+        // Then
+        expect(nock.isDone()).toBe(true)
+        expect(e.responseStatus).toEqual(501)
+        expect(e.data).toEqual(expectedResponseBody)
+      }
+    })
+  })
+
+  describe('getEmployabilitySkills', () => {
+    it('should get employability skills', async () => {
+      // Given
+      const prisonerNumber = 'A1234BC'
+
+      const expectedGetEmployabilitySkillsResponse = aValidGetEmployabilitySkillResponses()
+      educationAndWorkPlanApi //
+        .get(`/action-plans/${prisonerNumber}/employability-skills`)
+        .reply(200, expectedGetEmployabilitySkillsResponse)
+
+      // When
+      const actual = await educationAndWorkPlanClient.getEmployabilitySkills(prisonerNumber)
+
+      // Then
+      expect(nock.isDone()).toBe(true)
+      expect(actual).toEqual(expectedGetEmployabilitySkillsResponse)
+    })
+
+    it('should not get employability skills given API returns error response', async () => {
+      // Given
+      const prisonerNumber = 'A1234BC'
+
+      const expectedResponseBody = {
+        status: 501,
+        userMessage: 'An unexpected error occurred',
+        developerMessage: 'An unexpected error occurred',
+      }
+      educationAndWorkPlanApi //
+        .get(`/action-plans/${prisonerNumber}/employability-skills`)
+        .reply(501, expectedResponseBody)
+
+      // When
+      try {
+        await educationAndWorkPlanClient.getEmployabilitySkills(prisonerNumber)
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)

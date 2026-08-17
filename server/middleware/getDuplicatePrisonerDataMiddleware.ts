@@ -5,6 +5,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import { DuplicatePrisonerInfo } from '../services/metrics/metricsService'
 import logger from '../../logger'
+import config from '../config'
 
 export const GHOST_PRISON_ID = 'ZZGHI'
 
@@ -38,13 +39,19 @@ export default function getDuplicatePrisonerData(services: Services): RequestHan
       const personApiClient = services.dataAccess.personApiClientBuilder(req.middleware.clientToken)
       const personRecord = await personApiClient.getRecord(prisonerNumber)
 
-      if (!personRecord || !personRecord.identifiers?.prisonNumbers?.length) {
+      // Allows a manual configuration of duplicate prisoners to facilitate demonstrating the feature:
+      const overriddenPrisonNumbers = config.featureToggles.personDuplicateRecords.overrides
+        .find(group => group.includes(prisonerNumber))
+        ?.filter(number => number !== prisonerNumber)
+
+      if (!overriddenPrisonNumbers && (!personRecord || !personRecord.identifiers?.prisonNumbers?.length)) {
         req.middleware = { ...req.middleware, duplicatePrisonerData: [] }
         return next()
       }
 
+      const prisonerNumbers = overriddenPrisonNumbers ?? personRecord.identifiers.prisonNumbers
       const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
-      const prisonerSearchResults = await prisonerSearchClient.findByNumbers(personRecord.identifiers.prisonNumbers)
+      const prisonerSearchResults = await prisonerSearchClient.findByNumbers(prisonerNumbers)
 
       const allDuplicates = prisonerSearchResults.filter(
         (p: Prisoner) => p.prisonerNumber && p.prisonerNumber !== prisonerNumber,

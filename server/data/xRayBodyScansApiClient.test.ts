@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import XRayBodyScansApiClient from './xRayBodyScansApiClient'
-import { scanSummaryResponseMock } from './localMockData/xRayBodyScansMock'
+import { mockScanSummaryResponse } from './localMockData/xRayBodyScansMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const samplePrisonerNumber = 'G6123VU'
@@ -21,6 +21,15 @@ describe('xRayBodyScansApiClient', () => {
   })
 
   it('getScanSummary should return data from api', async () => {
+    const scanSummaryResponseMock = mockScanSummaryResponse({
+      prisonerNumber: 'G6123VU',
+      nomisCount: 4,
+      dpsCount: 2,
+      positiveCount: 1,
+      negativeCount: 1,
+      inconclusiveCount: 0,
+    })
+
     fakeXRayBodyScansApi
       .get(`/prisoner/${samplePrisonerNumber}/scan/summary`)
       .matchHeader('authorization', `Bearer ${token.access_token}`)

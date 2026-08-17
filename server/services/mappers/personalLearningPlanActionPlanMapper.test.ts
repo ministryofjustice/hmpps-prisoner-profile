@@ -2,7 +2,7 @@ import { parseISO, startOfDay } from 'date-fns'
 import toPersonalLearningPlanActionPlan from './personalLearningPlanActionPlanMapper'
 import { aValidGetGoalsResponse } from '../../data/localMockData/getGoalsResponse'
 import aValidGoalResponse from '../../data/localMockData/goalResponse'
-import { PersonalLearningPlanActionPlan } from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+import { PersonalLearningPlanActionPlan } from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanViewModels'
 
 describe('personalLearningPlanActionPlanMapper', () => {
   it('should map GetGoalsResponse to a PersonalLearningPlanActionPlan', () => {

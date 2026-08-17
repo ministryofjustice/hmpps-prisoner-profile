@@ -56,7 +56,6 @@ describe('PersonalController', () => {
       careNeedsService = {
         getCareNeedsAndAdjustments: jest.fn(async (): Promise<CareNeed[]> => []),
         getXrayBodyScanSummary: jest.fn(async () => ({ total: 0, since: '' })),
-        unsafeGetXrayBodyScanSummary: jest.fn(async () => ({ total: 0, since: '' })),
       } as unknown as CareNeedsService
 
       prisonerPropertyService = {

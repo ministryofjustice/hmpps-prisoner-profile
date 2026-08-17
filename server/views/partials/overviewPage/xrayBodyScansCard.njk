@@ -1,0 +1,78 @@
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+{% from "macros/xrayBodyScanCount.njk" import xrayBodyScanCount %}
+
+{% if xrayBodyScanSummary and xrayBodyScanLatest %}
+  {% set xrayBodyScanSummary = xrayBodyScanSummary.getOrNull() %}
+
+  {% call summaryCard({ title: 'X-ray body scans', id: 'xray-body-scan-card' }) %}
+    {% if xrayBodyScanSummary %}
+      <div class="xray-body-scan-card__columns">
+        <div class="xray-body-scan-card__column xray-body-scan-card__summary" data-qa="xxray-body-scan-card__summary">
+          <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+            Scans in {{ xrayBodyScanSummary.fromScanDate.getFullYear() }}
+          </h3>
+          {{ xrayBodyScanCount(xrayBodyScanSummary) }}
+
+          {% if xrayBodyScanSummary.nomisCount > 0 %}
+            <p class="govuk-!-margin-top-3 govuk-!-font-size-16 hmpps-secondary-text">
+              Scan total includes DPS and legacy records<span class="govuk-visually-hidden">.</span>
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="xray-body-scan-card__column">
+          {% set xrayBodyScanLatestError = not xrayBodyScanLatest.isFulfilled() %}
+          {% set xrayBodyScanLatest = xrayBodyScanLatest.getOrNull() %}
+          {% if xrayBodyScanLatestError %}
+
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+              Last scan date
+            </h3>
+            {{ hmppsError({
+              type: 'inset',
+              dataQa: 'xray-body-scan-card--latest-unavailable',
+              text: unavailableApiErrorText
+            }) }}
+
+          {% elseif xrayBodyScanLatest and xrayBodyScanLatest.scanDate %}
+
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+              Last scan date
+            </h3>
+            <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-date">
+              {{ xrayBodyScanLatest.scanDate | formatDate('short') }}
+            </p>
+
+            {% if xrayBodyScanLatest.outcomeDescription %}
+              <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+                Result
+              </h3>
+              <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-outcome">
+                {{ xrayBodyScanLatest.outcomeDescription }}
+              </p>
+            {% endif %}
+
+          {% endif %}
+        </div>
+      </div>
+
+      <p>
+        <a href="{{ xrayBodyScanSummary.viewHistoryUrl }}">Check body scan details</a>
+
+        {# TODO: add permission check that XRBS service is enabled in … relevant caseload #}
+        <a href="{{ xrayBodyScanSummary.recordScanUrl }}" class="govuk-!-margin-left-3">
+          Record a new scan
+        </a>
+      </p>
+
+    {% else %}
+
+      {{ hmppsError({
+        type: 'inset',
+        dataQa: 'xray-body-scan-card--summary-unavailable',
+        text: unavailableApiErrorText
+      }) }}
+
+    {% endif %}
+  {% endcall %}
+{% endif %}

@@ -27,7 +27,7 @@
             <a
               href="/prisoner/{{ csra.offenderNo }}/csra-review?assessmentSeq={{ csra.assessmentSeq }}&bookingId={{ csra.bookingId }}"
               class="govuk-link govuk-link--no-visited-state"
-              >View details</a
+              >View details<span class="govuk-visually-hidden"> for {{ csra.classification }} assessment on {{ csra.assessmentDate | formatDate('short') }}</span></a
             >
           </div>
         </div>

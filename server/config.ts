@@ -387,6 +387,7 @@ export default {
     allocatePersonalOfficers: get('ALLOCATE_PERSONAL_OFFICERS_UI_URL', 'http://localhost:3001', requiredInProduction),
     externalMovements: get('EXTERNAL_MOVEMENTS_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
+    xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
     prisonerProperty: get('PRISONER_PROPERTY_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
@@ -428,6 +429,9 @@ export default {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('PERSON_DUPLICATE_RECORDS_ENABLED_FROM', '2099-01-01T00:00:00'),
+      // Manual overrides for duplicate prisoner records to be used for demoing and testing:
+      // Provided as a JSON array of arrays string, e.g. [["A1234BC","B5678DE","C9012FG"]]
+      overrides: JSON.parse(get('PERSON_DUPLICATE_RECORDS_OVERRIDES', '[]') as string) as string[][],
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
@@ -445,8 +449,6 @@ export default {
       enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('OFFENCES_MOVED_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
-
-    displayEmployabilitySkillsFromLwp: toBoolean(get('DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP', 'false')),
 
     // Kill switch for the property summary card. Which prisons actually see it is decided by the
     // property service's own rollout (its /info activeAgencies), so this is only an on/off for the
