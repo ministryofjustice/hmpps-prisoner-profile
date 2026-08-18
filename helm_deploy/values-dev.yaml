@@ -52,6 +52,7 @@ generic-service:
     ALLOCATE_KEY_WORKERS_UI_URL: "https://allocate-key-workers-dev.hmpps.service.justice.gov.uk/key-worker"
     ALLOCATE_PERSONAL_OFFICERS_UI_URL: "https://allocate-key-workers-dev.hmpps.service.justice.gov.uk/personal-officer"
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-dev.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_UI_URL: "https://prisoner-property-dev.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-dev.hmpps.service.justice.gov.uk"
 
@@ -88,6 +89,7 @@ generic-service:
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_API_URL: "https://prisoner-property-api-dev.hmpps.service.justice.gov.uk"
 
     # Circuit Breaker
     CIRCUIT_BREAKER_DEFAULT_THRESHOLD: 80
@@ -111,6 +113,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
+    PROPERTY_SUMMARY_TILE_ENABLED: "true"
 
   allowlist:
     groups:

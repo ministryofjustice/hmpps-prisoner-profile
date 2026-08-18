@@ -348,6 +348,17 @@ export default {
       },
       agent: new AgentConfig(Number(get('X_RAY_BODY_SCANS_TIMEOUT_DEADLINE', 3000))),
     },
+    // Deliberately no healthPath: setUpHealthChecks registers every api config that declares one, and
+    // this api only backs a single optional card. An outage there degrades to the existing property
+    // card and must not be able to turn the profile's /health red.
+    prisonerPropertyApi: {
+      url: get('PRISONER_PROPERTY_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PRISONER_PROPERTY_API_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('PRISONER_PROPERTY_API_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('PRISONER_PROPERTY_API_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -377,6 +388,7 @@ export default {
     externalMovements: get('EXTERNAL_MOVEMENTS_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
+    prisonerProperty: get('PRISONER_PROPERTY_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -437,6 +449,11 @@ export default {
       enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('OFFENCES_MOVED_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
+
+    // Kill switch for the property summary card. Which prisons actually see it is decided by the
+    // property service's own rollout (its /info activeAgencies), so this is only an on/off for the
+    // whole feature.
+    propertySummaryTileEnabled: toBoolean(get('PROPERTY_SUMMARY_TILE_ENABLED', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

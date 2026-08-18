@@ -1,0 +1,49 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+
+{# Summary counts from the prisoner property service, shown in place of the NOMIS-backed property
+   card for prisons that service has been switched on for. See partials/personalPage/property.njk
+   for the card this replaces. #}
+
+{% set hasContainers = (propertySummary.heldInCurrentEstablishment + propertySummary.heldInOtherEstablishments) > 0 %}
+
+{%- call summaryCard({title: "Property", id: "property"}) -%}
+  <div class="govuk-grid-row" data-qa="property-summary">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body hmpps-property-summary__heading" data-qa="property-container-count">
+        {{ propertySummary.heldInCurrentEstablishment | pluralise("property container") }}{% if propertySummary.currentEstablishmentName %} in {{ propertySummary.currentEstablishmentName }}{% endif %}
+      </p>
+
+      <p class="govuk-body hmpps-property-summary__count" data-qa="due-for-transfer-in">
+        Due for transfer in: {{ propertySummary.dueForTransferIn }}
+      </p>
+      <p class="govuk-body hmpps-property-summary__count" data-qa="due-for-transfer-out">
+        Due for transfer out: {{ propertySummary.dueForTransferOut }}
+      </p>
+
+      {% if propertySummary.overdueForDisposal > 0 %}
+        <p class="govuk-body hmpps-property-summary__warning" data-qa="overdue-for-disposal">
+          <span class="hmpps-property-summary__warning-icon" aria-hidden="true">!</span>
+          <span class="govuk-visually-hidden">Warning</span>
+          {{ propertySummary.overdueForDisposal }} overdue for disposal
+        </p>
+      {% endif %}
+      {% if propertySummary.overdueForReturn > 0 %}
+        <p class="govuk-body hmpps-property-summary__warning" data-qa="overdue-for-return">
+          <span class="hmpps-property-summary__warning-icon" aria-hidden="true">!</span>
+          <span class="govuk-visually-hidden">Warning</span>
+          {{ propertySummary.overdueForReturn }} overdue for return
+        </p>
+      {% endif %}
+
+      <p class="govuk-body hmpps-property-summary__link">
+        {% if hasContainers %}
+          <a class="govuk-link govuk-link--no-visited-state" data-qa="property-containers-link"
+             href="{{ propertyUiUrl }}/prisoner/{{ prisonerNumber }}">Property containers</a>
+        {% else %}
+          <a class="govuk-link govuk-link--no-visited-state" data-qa="property-history-link"
+             href="{{ propertyUiUrl }}/prisoner/{{ prisonerNumber }}/history">Property history</a>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+{%- endcall -%}

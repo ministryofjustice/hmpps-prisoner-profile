@@ -48,6 +48,7 @@ generic-service:
     ALLOCATE_KEY_WORKERS_UI_URL: 'https://allocate-key-workers.hmpps.service.justice.gov.uk/key-worker'
     ALLOCATE_PERSONAL_OFFICERS_UI_URL: 'https://allocate-key-workers.hmpps.service.justice.gov.uk/personal-officer'
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_UI_URL: "https://prisoner-property.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans.hmpps.service.justice.gov.uk"
 
@@ -86,6 +87,7 @@ generic-service:
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_API_URL: "https://prisoner-property-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: 'true'
@@ -103,6 +105,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: 'false'
     APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS: 'HEI,NMI,LCI,RNI,MHI'
     X_RAY_BODY_SCANS_ENABLED: "false"
+    PROPERTY_SUMMARY_TILE_ENABLED: "false"
 
   allowlist:
     groups:
