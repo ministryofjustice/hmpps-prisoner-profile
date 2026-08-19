@@ -75,6 +75,7 @@ generic-service:
     LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk
     NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
+    CELL_MOVEMENTS_API_URL: "https://change-someones-cell-api-dev.hmpps.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"

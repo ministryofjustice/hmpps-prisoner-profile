@@ -1,6 +1,5 @@
 import type { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -11,21 +10,16 @@ import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { inmateDetailMock, inmateDetailMockOverride } from '../data/localMockData/inmateDetailMock'
-import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
-import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
-import CellMoveReason from '../data/interfaces/whereaboutsApi/CellMoveReason'
-import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
+import { CellMovementReasonMock } from '../data/localMockData/cellMovementReasonMock'
+import { CellMovementReason, CellMovementsApiClient } from '../data/interfaces/cellMovementsApi'
 import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
 import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
 import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
 import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
-import { findCaseNotesMock } from '../data/localMockData/findCaseNotesMock'
-import { caseNotesApiClientMock } from '../../tests/mocks/caseNotesApiClientMock'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
-  let whereaboutsApiClient: WhereaboutsApiClient
-  let caseNotesApiClient: CaseNotesApiClient
+  let cellMovementsApiClient: CellMovementsApiClient
   let service: PrisonerLocationHistoryService
   const locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()
   const nomisSyncPrisonerMappingApiClient: NomisSyncPrisonerMappingApiClient = nomisSyncPrisonerMappingApiClientMock()
@@ -34,12 +28,8 @@ describe('prisonerLocationHistoryService', () => {
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    caseNotesApiClient = caseNotesApiClientMock()
-    whereaboutsApiClient = {
-      getAppointment: jest.fn(),
-      getCellMoveReason: jest.fn(),
-      getUnacceptableAbsences: jest.fn(),
-      createAppointments: jest.fn(),
+    cellMovementsApiClient = {
+      getCellMovementReason: jest.fn(),
     }
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
@@ -51,12 +41,10 @@ describe('prisonerLocationHistoryService', () => {
     prisonApiClient.getUserCaseLoads = jest.fn().mockResolvedValue(CaseLoadsDummyDataA)
     prisonApiClient.getCellMoveReasonTypes = jest.fn().mockResolvedValue(getCellMoveReasonTypesMock)
     prisonApiClient.getInmateDetail = jest.fn().mockResolvedValue(inmateDetailMock)
-    whereaboutsApiClient.getCellMoveReason = jest.fn().mockResolvedValue(CellMoveReasonMock)
-    caseNotesApiClient.getCaseNote = jest.fn().mockResolvedValue(findCaseNotesMock.content[0])
+    cellMovementsApiClient.getCellMovementReason = jest.fn().mockResolvedValue(CellMovementReasonMock)
 
     const prisonApiClientBuilder = () => prisonApiClient
-    const caseNotesApiClientBuilder = () => caseNotesApiClient
-    const whereaboutsApiClientBuilder = () => whereaboutsApiClient
+    const cellMovementsApiClientBuilder = () => cellMovementsApiClient
     const locationsInsidePrisonApiClientBuilder = () => locationsInsidePrisonApiClient
     const nomisSyncPrisonerMappingApiClientBuilder = () => nomisSyncPrisonerMappingApiClient
 
@@ -86,8 +74,7 @@ describe('prisonerLocationHistoryService', () => {
 
     service = new PrisonerLocationHistoryService(
       prisonApiClientBuilder,
-      whereaboutsApiClientBuilder,
-      caseNotesApiClientBuilder,
+      cellMovementsApiClientBuilder,
       locationsInsidePrisonApiClientBuilder,
       nomisSyncPrisonerMappingApiClientBuilder,
     )
@@ -278,9 +265,9 @@ describe('prisonerLocationHistoryService', () => {
       )
     })
 
-    describe('Given no cell move reason', () => {
+    describe('Given no cell movement recorded for the bed assignment', () => {
       it('Returns null', async () => {
-        whereaboutsApiClient.getCellMoveReason = jest.fn(async (): Promise<CellMoveReason> => null)
+        cellMovementsApiClient.getCellMovementReason = jest.fn(async (): Promise<CellMovementReason> => null)
         const res = await service.getPrisonerLocationHistory(
           'token',
           PrisonerMockDataA,
@@ -294,43 +281,38 @@ describe('prisonerLocationHistoryService', () => {
       })
     })
 
-    describe('Given a cell move reason', () => {
-      describe('and no relevant case note', () => {
-        it('Returns null', async () => {
-          caseNotesApiClient.getCaseNote = jest.fn(async (): Promise<CaseNote> => null)
-          const res = await service.getPrisonerLocationHistory(
-            'token',
-            PrisonerMockDataA,
-            'LEI',
-            'locationId',
-            '2023-01-01',
-            '2024-01-01',
-          )
+    describe('Given a cell movement without an explanation', () => {
+      it('Returns null', async () => {
+        // A migrated movement whose case note is gone: the movement exists but commentText is null.
+        cellMovementsApiClient.getCellMovementReason = jest
+          .fn()
+          .mockResolvedValue({ ...CellMovementReasonMock, commentText: null })
+        const res = await service.getPrisonerLocationHistory(
+          'token',
+          PrisonerMockDataA,
+          'LEI',
+          'locationId',
+          '2023-01-01',
+          '2024-01-01',
+        )
 
-          expect(res.whatHappenedDetails).toEqual(null)
-        })
+        expect(res.whatHappenedDetails).toEqual(null)
       })
+    })
 
-      describe('and a relevant case note', () => {
-        it('Returns the text of the case note', async () => {
-          const res = await service.getPrisonerLocationHistory(
-            'token',
-            PrisonerMockDataA,
-            'LEI',
-            'locationId',
-            '2023-01-01',
-            '2024-01-01',
-          )
+    describe('Given a cell movement with an explanation', () => {
+      it('Returns the explanation, in one call with no case-notes hop', async () => {
+        const res = await service.getPrisonerLocationHistory(
+          'token',
+          PrisonerMockDataA,
+          'LEI',
+          'locationId',
+          '2023-01-01',
+          '2024-01-01',
+        )
 
-          expect(whereaboutsApiClient.getCellMoveReason).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, 10, true)
-          expect(caseNotesApiClient.getCaseNote).toHaveBeenCalledWith(
-            PrisonerMockDataA.prisonerNumber,
-            PrisonerMockDataA.prisonId,
-            CellMoveReasonMock.cellMoveReason.caseNoteId.toString(),
-            true,
-          )
-          expect(res.whatHappenedDetails).toEqual(findCaseNotesMock.content[0].text)
-        })
+        expect(cellMovementsApiClient.getCellMovementReason).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, 10, true)
+        expect(res.whatHappenedDetails).toEqual(CellMovementReasonMock.commentText)
       })
     })
   })

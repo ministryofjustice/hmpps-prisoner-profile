@@ -45,7 +45,6 @@ describe('Appointment Service', () => {
     whereaboutsApiClient = {
       getAppointment: jest.fn(),
       createAppointments: jest.fn(async () => [savedAppointmentMock]),
-      getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
     }
     bookAVideoLinkApiClient = {

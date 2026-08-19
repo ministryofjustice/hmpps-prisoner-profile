@@ -293,9 +293,7 @@ Cypress.Commands.add(
     cy.task('stubGetCellMoveReasonTypes')
     cy.task('stubInmateDetail', { bookingId })
     cy.task('stubStaffDetails', staffId)
-    cy.task('stubGetCellMoveReason', bookingId)
-    cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 2 })
-    cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 0 })
+    cy.task('stubGetCellMovementReason', bookingId)
     cy.task('stubGetAgency', { agencyId: prisonId })
     cy.task('stubUserCaseLoads', caseLoads)
     cy.task('stubAssessments', bookingId)
@@ -330,6 +328,7 @@ Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
   cy.task('stubBookAVideoLinkPing', httpStatus)
   cy.task('stubPersonApiPing', httpStatus)
   cy.task('stubXRayBodyScanPing', httpStatus)
+  cy.task('stubCellMovementsApiPing', httpStatus)
 })
 
 Cypress.Commands.add(
