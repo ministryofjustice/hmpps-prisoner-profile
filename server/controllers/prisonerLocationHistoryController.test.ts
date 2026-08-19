@@ -20,6 +20,8 @@ describe('Specific Prisoner Location History', () => {
   let req: Request
   let res: Response
   let controller: PrisonerLocationHistoryController
+  let historyForLocationMock: ReturnType<typeof mockHistoryForLocation>
+  let cellMovementReasonMock: typeof CellMovementReasonMock | null
 
   beforeEach(() => {
     req = {
@@ -56,12 +58,14 @@ describe('Specific Prisoner Location History', () => {
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-    prisonApiClient.getHistoryForLocation = jest.fn().mockResolvedValue(mockHistoryForLocation())
+    historyForLocationMock = mockHistoryForLocation()
+    prisonApiClient.getHistoryForLocation = jest.fn().mockImplementation(async () => historyForLocationMock)
     prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(agencyDetailsMock)
     prisonApiClient.getUserCaseLoads = jest.fn().mockResolvedValue(CaseLoadsDummyDataA)
     prisonApiClient.getCellMoveReasonTypes = jest.fn().mockResolvedValue(getCellMoveReasonTypesMock)
     prisonApiClient.getInmateDetail = jest.fn().mockResolvedValue(inmateDetailMock)
-    cellMovementsApiClient.getCellMovementReason = jest.fn().mockResolvedValue(CellMovementReasonMock)
+    cellMovementReasonMock = CellMovementReasonMock
+    cellMovementsApiClient.getCellMovementReason = jest.fn().mockImplementation(async () => cellMovementReasonMock)
 
     nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest
       .fn()
@@ -115,6 +119,25 @@ describe('Specific Prisoner Location History', () => {
           locationName: undefined,
           locationSharingHistory: [],
         })
+      })
+
+      it('should show the reason for the move even when no explanation was recorded', async () => {
+        // The reason code comes from prison-api's bed assignment history, independent of whether a
+        // cell movement (and its explanation) was ever recorded through DPS.
+        historyForLocationMock = mockHistoryForLocation([{ bookingId: PrisonerMockDataA.bookingId }])
+        cellMovementReasonMock = null
+
+        await controller.displayPrisonerLocationHistory(req, res, PrisonerMockDataA)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/prisonerLocationHistory.njk',
+          expect.objectContaining({
+            locationDetails: expect.objectContaining({
+              reasonForMove: 'Some description',
+              whatHappened: 'Not entered',
+            }),
+          }),
+        )
       })
     })
   })
