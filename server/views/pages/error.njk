@@ -2,9 +2,9 @@
 
 {% set pageTitle = "Error" %}
 {% set mainClasses = "govuk-body" %}
+{% set breadCrumbs = [{ text: 'Digital Prison Services', href: "/" | prependBaseUrl }] %}
 
 {% block content %}
-
   <h1 class="govuk-heading-l">{{ message }}</h1>
 
   {% if paraContent %}

@@ -8,11 +8,6 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% extends "../index.njk" %}
 {% set title = "Probation documents" %}
-{% set hideBackLink = true %}
-{% set breadCrumbs = [
-  { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-  { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber }
-] %}
 
 {% macro summary(conviction) %}
   <div>

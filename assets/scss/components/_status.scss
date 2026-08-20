@@ -48,4 +48,16 @@
       color: govuk-functional-colour(text);
     }
   }
+
+  &--warning {
+    background-color: govuk-colour("red", $variant: "tint-95");
+    border-left-color: govuk-colour("red", $variant: "shade-25");
+
+    a, a:visited {
+      color: govuk-colour("red", $variant: "shade-25");
+    }
+    a:focus {
+      color: govuk-functional-colour(text);
+    }
+  }
 }

@@ -1,21 +1,7 @@
 {% extends "../index.njk" %}
+{% set breadcrumbParent = { text: 'CSRA history', href: "/prisoner/" + prisonerNumber + "/csra-history" } %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from '../../macros/csraTag.njk' import csraTag %}
-
-{% set breadCrumbs = [
-    {
-        text: 'Digital Prison Services',
-        href:  "/" | prependBaseUrl
-    },
-    {
-        text: breadcrumbPrisonerName,
-        href: "/prisoner/" + prisonerNumber
-    },
-    {
-        text: 'CSRA history',
-        href: "/prisoner/" + prisonerNumber + "/csra-history"
-    }
-] %}
 
 {% block body %}
     <div class="govuk-grid-row">

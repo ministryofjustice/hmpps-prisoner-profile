@@ -7,14 +7,10 @@ import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi
 import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
-import { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
-import { scanSummaryResponseMock } from '../data/localMockData/xRayBodyScansMock'
-import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
 import CareNeedsService from './careNeedsService'
 
 describe('careNeedsService', () => {
   let prisonApiClient: PrisonApiClient
-  let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let careNeedsService: CareNeedsService
 
   beforeEach(() => {
@@ -25,11 +21,7 @@ describe('careNeedsService', () => {
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
       mockReferenceDomains(domain),
     )
-    xRayBodyScansApiClient = xRayBodyScansApiClientMock()
-    careNeedsService = new CareNeedsService(
-      () => prisonApiClient,
-      () => xRayBodyScansApiClient,
-    )
+    careNeedsService = new CareNeedsService(() => prisonApiClient)
   })
 
   const setPersonalCareNeedsMock = (careNeeds: PersonalCareNeed[]) => {
@@ -335,24 +327,6 @@ describe('careNeedsService', () => {
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(4)
         expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
-      })
-    })
-  })
-
-  describe('unsafeGetXrayBodyScanSummary', () => {
-    const now = new Date(2026, 5, 25, 12, 30, 45)
-    beforeAll(() => {
-      jest.useFakeTimers({ now })
-      jest.setSystemTime(now)
-    })
-
-    it('should return scan count and formatted start date', async () => {
-      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(scanSummaryResponseMock)
-
-      const summary = await careNeedsService.unsafeGetXrayBodyScanSummary('token1', PrisonerMockDataA.prisonerNumber)
-      expect(summary).toEqual({
-        total: 6,
-        since: '1 January 2026',
       })
     })
   })

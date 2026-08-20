@@ -13,6 +13,8 @@
 
 {% extends "../../partials/layout.njk" %}
 
+{% set breadcrumbParent = { text: 'Schedule', href: '/prisoner/' + prisonerNumber + '/schedule' } %}
+
 {% set recurringHtml %}
     <div data-qa="recurring-inputs">
         {{ govukSelect({

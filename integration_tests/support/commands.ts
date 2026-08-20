@@ -95,6 +95,8 @@ Cypress.Commands.add(
     cy.task('stubGetCurrentCsip', { prisonerNumber, ...(reviewOverdueDays && { reviewOverdueDays }) })
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
+    cy.task('stubXRayBodyScanSummary', { prisonerNumber })
+    cy.task('stubXRayBodyListScans', { prisonerNumber })
   },
 )
 
