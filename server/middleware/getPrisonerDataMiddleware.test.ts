@@ -116,12 +116,10 @@ describe('GetPrisonerDataMiddleware', () => {
   )
 
   it('should return NotFoundError if prisonerData.prisonerNumber is undefined', async () => {
-    prisonerSearchApiClient.getPrisonerDetails = jest.fn(
-      async (): Promise<Prisoner> => ({
-        ...PrisonerMockDataA,
-        prisonerNumber: undefined,
-      }),
-    )
+    prisonerSearchApiClient.getPrisonerDetails = jest.fn(async (): Promise<Prisoner> => ({
+      ...PrisonerMockDataA,
+      prisonerNumber: undefined,
+    }))
 
     await getPrisonerData(services)(req, res, next)
 

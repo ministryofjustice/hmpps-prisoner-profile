@@ -48,7 +48,7 @@ describe('Case Notes Controller', () => {
       params: { prisonerNumber: 'G6123VU' },
       query: {
         page: '0',
-        sort: 'dateCreated,ASC',
+        sort: 'createdAt,ASC',
         type: 'ACP',
         subType: 'ASSESSMENT',
         startDate: '01/01/2023',
@@ -109,7 +109,7 @@ describe('Case Notes Controller', () => {
         prisonerData: PrisonerMockDataA,
         queryParams: {
           page: 0,
-          sort: 'dateCreated,ASC',
+          sort: 'createdAt,ASC',
           type: 'ACP',
           subType: 'ASSESSMENT',
           startDate: '01/01/2023',
@@ -158,7 +158,7 @@ describe('Case Notes Controller', () => {
         prisonerData: PrisonerMockDataA,
         queryParams: {
           page: 0,
-          sort: 'dateCreated,ASC',
+          sort: 'createdAt,ASC',
           type: 'ACP',
           subType: 'ASSESSMENT',
           startDate: '01/01/2023',
@@ -232,6 +232,20 @@ describe('Case Notes Controller', () => {
         prisonerThumbnailImageUrl: '/api/prisoner/G6123VU/image?imageId=1413311&fullSizeImage=false',
       },
       errors: undefined,
+    })
+  })
+
+  describe('mapSortParam', () => {
+    it.each([
+      ['createdAt,ASC', 'createdAt,ASC'],
+      ['occurredAt,DESC', 'occurredAt,DESC'],
+      ['creationDateTime,ASC', 'createdAt,ASC'],
+      ['occurrenceDateTime,DESC', 'occurredAt,DESC'],
+      ['anythingElse,XYZ', 'createdAt,DESC'],
+      [undefined, 'createdAt,DESC'],
+    ])('maps %s to %s', (input, expected) => {
+      // eslint-disable-next-line dot-notation
+      expect(controller['mapSortParam'](input)).toEqual(expected)
     })
   })
 

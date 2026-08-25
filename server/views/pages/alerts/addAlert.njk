@@ -5,6 +5,7 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% extends "../index.njk" %}
+{% set breadcrumbParent = { text: 'Alerts', href: '/prisoner/' + prisonerNumber + '/alerts/active' } %}
 {% set pageTitle = 'Create an alert' %}
 {% block body %}
 

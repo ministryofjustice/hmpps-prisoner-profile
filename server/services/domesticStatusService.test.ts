@@ -34,7 +34,7 @@ describe('DomesticStatusService', () => {
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     jest.spyOn(referenceDataService, 'getActiveReferenceDataCodes').mockResolvedValue([])
 
-    metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
+    metricsService = new MetricsService() as jest.Mocked<MetricsService>
     jest.spyOn(metricsService, 'trackPersonalRelationshipsUpdate').mockImplementation()
 
     domesticStatusService = new DomesticStatusService(

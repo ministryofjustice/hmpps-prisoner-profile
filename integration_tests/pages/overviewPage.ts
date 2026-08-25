@@ -1,4 +1,5 @@
-import Page, { PageElement } from './page'
+import Page, { type PageElement } from './page'
+import XrayBodyScansCard from './pageElements/xrayBodyScansCard'
 
 export default class OverviewPage extends Page {
   constructor() {
@@ -195,6 +196,19 @@ export default class OverviewPage extends Page {
   alertModalBody = (): PageElement => this.alertModal().get('[data-modal-body]')
 
   alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
+
+  get xrayBodyScansCard(): XrayBodyScansCard {
+    return new XrayBodyScansCard('#xray-body-scan-card')
+  }
+
+  // Confirmed release dates for users without calculate release date permissions.
+  confirmedReleaseDateNonCalculate = () => ({
+    card: (): PageElement => cy.get('[data-qa="confirmed-release-date-non-calculate"]'),
+    releaseDateLabel: (): PageElement => cy.get('[data-qa="confirmed-release-date-label"]'),
+    releaseDateValue: (): PageElement => cy.get('[data-qa="confirmed-release-date-value"]'),
+    noReleaseDateMessage: (): PageElement => cy.get('[data-qa="confirmed-release-date-none"]'),
+    viewCourtCaseLink: (): PageElement => cy.contains('View court case, offence and all release date information'),
+  })
 
   courtCasesAndReleaseDates = () => ({
     card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),

@@ -27,7 +27,7 @@ export default class LocationsInsidePrisonApiRestClient extends RestClient imple
   async getLocationsForAppointments(id: string): Promise<LocationsApiLocation[]> {
     return this.get(
       {
-        path: `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
+        path: `/locations/non-residential/prison/${id}/service/APPOINTMENT?sortByLocalName=true&formatLocalName=true&filterParents=false`,
       },
       this.token,
     )

@@ -32,3 +32,27 @@ export interface PersonalLearningPlanGoal {
   updatedByDisplayName: string
   targetCompletionDate: Date
 }
+
+export interface PersonalLearningPlanEmployabilitySkill {
+  employabilitySkillType:
+    | 'TEAMWORK'
+    | 'TIMEKEEPING'
+    | 'COMMUNICATION'
+    | 'PLANNING'
+    | 'ORGANISATION'
+    | 'PROBLEM_SOLVING'
+    | 'INITIATIVE'
+    | 'ADAPTABILITY'
+    | 'RELIABILITY'
+    | 'CREATIVITY'
+  employabilitySkillRating: 'NOT_CONFIDENT' | 'LITTLE_CONFIDENCE' | 'QUITE_CONFIDENT' | 'VERY_CONFIDENT'
+  evidence: string
+  sessionType?: 'CIAG_INDUCTION' | 'CIAG_REVIEW' | 'EDUCATION_REVIEW' | 'INDUSTRIES_REVIEW'
+  sessionTypeDescription?: string
+  createdAt: Date
+  createdBy: string
+  createdByDisplayName: string
+  updatedAt: Date
+  updatedBy: string
+  updatedByDisplayName: string
+}

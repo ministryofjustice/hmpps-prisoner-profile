@@ -1,6 +1,6 @@
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
-{% from "../../../macros/hmppsError.njk" import hmppsError %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/summaryCardMacro.njk" import summaryCard %}
+{% from "macros/hmppsError.njk" import hmppsError %}
 
 {%- call summaryCard({title: "Court cases and release dates"}) -%}
   <div class="govuk-grid-row" data-qa="court-cases-release-dates">

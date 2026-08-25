@@ -19,6 +19,8 @@ a.govuk-tabs__tab {
 
 .govuk-summary-list__key {
   width: 41%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .govuk-summary-list__value {

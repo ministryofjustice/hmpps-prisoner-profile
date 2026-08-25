@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
-import { Response } from 'superagent'
+import type { Response, SuperAgentRequest } from 'superagent'
 
-import { getMatchingRequests, stubFor } from './wiremock'
+import { getMatchingRequests, stubFor, stubPing } from './wiremock'
+import { Role } from '../../server/data/enums/role'
 import tokenVerification from './tokenVerification'
 
 export interface UserToken {
@@ -18,7 +19,7 @@ const createToken = (userToken: UserToken) => {
     user_id: userToken.userId || 231232,
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: userToken.roles || ['ROLE_PRISON'],
+    authorities: userToken.roles || [Role.PrisonUser],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -30,8 +31,7 @@ const getSignInUrl = (): Promise<string> =>
   getMatchingRequests({
     method: 'GET',
     urlPath: '/auth/oauth/authorize',
-  }).then(data => {
-    const { requests } = data.body
+  }).then(requests => {
     const stateValue = requests[requests.length - 1].queryParams.state.values[0]
     return `/sign-in/callback?code=codexxxx&state=${stateValue}&client_id=clientid`
   })
@@ -41,17 +41,6 @@ const favicon = () =>
     request: {
       method: 'GET',
       urlPattern: '/favicon.ico',
-    },
-    response: {
-      status: 200,
-    },
-  })
-
-const ping = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/auth/health/ping',
     },
     response: {
       status: 200,
@@ -130,7 +119,7 @@ const token = (userToken: UserToken) =>
 
 export default {
   getSignInUrl,
-  stubAuthPing: ping,
+  stubAuthPing: (httpStatus = 200): SuperAgentRequest => stubPing('/auth', httpStatus),
   stubSignIn: (userToken: UserToken): Promise<[Response, Response, Response, Response, Response, Response]> =>
     Promise.all([
       favicon(),

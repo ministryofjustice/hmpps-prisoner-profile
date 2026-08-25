@@ -3,6 +3,7 @@ import { nonAssociationsApiClientMock } from '../../tests/mocks/nonAssociationsA
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import OffenderService from './offenderService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import ServerError from '../utils/serverError'
 
 describe('offenderService', () => {
@@ -11,9 +12,43 @@ describe('offenderService', () => {
 
   beforeEach(() => {
     nonAssociationsApi = nonAssociationsApiClientMock()
+    prisonApi = prisonApiClientMock()
   })
   afterEach(() => {
     jest.restoreAllMocks()
+  })
+
+  describe('getConfirmedReleaseDate', () => {
+    it('should return the confirmed release date from sentence details', async () => {
+      prisonApi.getPrisonerSentenceDetails = jest.fn().mockResolvedValue({
+        sentenceDetail: { confirmedReleaseDate: '2026-02-07' },
+      })
+
+      const offenderService = new OffenderService(
+        () => prisonApi,
+        () => nonAssociationsApi,
+      )
+
+      const result = await offenderService.getConfirmedReleaseDate('token', 'A1234BC')
+
+      expect(result).toEqual('2026-02-07')
+      expect(prisonApi.getPrisonerSentenceDetails).toHaveBeenCalledWith('A1234BC')
+    })
+
+    it('should return undefined when no confirmed release date is set', async () => {
+      prisonApi.getPrisonerSentenceDetails = jest.fn().mockResolvedValue({
+        sentenceDetail: {},
+      })
+
+      const offenderService = new OffenderService(
+        () => prisonApi,
+        () => nonAssociationsApi,
+      )
+
+      const result = await offenderService.getConfirmedReleaseDate('token', 'A1234BC')
+
+      expect(result).toBeUndefined()
+    })
   })
 
   describe('getPrisonerNonAssociationOverview', () => {

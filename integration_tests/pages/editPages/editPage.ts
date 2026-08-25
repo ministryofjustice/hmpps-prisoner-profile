@@ -1,8 +1,7 @@
 import Page, { PageElement } from '../page'
 
 export type CheckboxValue =
-  | string
-  | { value: string; subValues?: string[]; conditionals?: { textInputs: { [key: string]: string } } }
+  string | { value: string; subValues?: string[]; conditionals?: { textInputs: { [key: string]: string } } }
 
 export type RadioValue = string | { value: string; conditionals?: { textInputs: { [key: string]: string } } }
 

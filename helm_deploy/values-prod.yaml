@@ -28,7 +28,6 @@ generic-service:
 
     # UI Service urls
     ASSESS_FOR_EARLY_RELEASE_UI_URL: 'https://assess-for-early-release.hmpps.service.justice.gov.uk'
-    CALCULATE_RELEASE_DATES_UI_URL: 'https://calculate-release-dates.hmpps.service.justice.gov.uk'
     CREATE_AND_VARY_A_LICENCE_UI_URL: 'https://create-and-vary-a-licence.hmpps.service.justice.gov.uk'
     DPS_HOME_PAGE_URL: 'https://dps.prison.service.justice.gov.uk'
     DPS_CORE_URL: 'https://digital.prison.service.justice.gov.uk'
@@ -40,6 +39,7 @@ generic-service:
     USE_OF_FORCE_UI_URL: 'https://use-of-force.service.justice.gov.uk'
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: 'https://welcome.prison.service.justice.gov.uk'
     INCIDENT_REPORTING_UI_URL: "https://incident-reporting.hmpps.service.justice.gov.uk"
+    PRISON_ROLL_COUNT_UI_URL: "https://prison-roll-count.hmpps.service.justice.gov.uk"
     LEARNING_AND_WORK_PROGRESS_UI_URL: 'https://learning-and-work-progress.hmpps.service.justice.gov.uk'
     CHANGE_SOMEONES_CELL_UI_URL: 'https://change-someones-cell.prison.service.justice.gov.uk'
     INCENTIVES_UI_URL: 'https://incentives-ui.hmpps.service.justice.gov.uk'
@@ -49,6 +49,7 @@ generic-service:
     ALLOCATE_PERSONAL_OFFICERS_UI_URL: 'https://allocate-key-workers.hmpps.service.justice.gov.uk/personal-officer'
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: 'https://activities.prison.service.justice.gov.uk/activities'
@@ -84,6 +85,7 @@ generic-service:
     PERSONAL_RELATIONSHIPS_API_URL: 'https://personal-relationships-api.hmpps.service.justice.gov.uk'
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: 'true'
@@ -94,26 +96,20 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: 'true'
     USE_OF_FORCE_DISABLED_PRISONS: 'FYI,WNI,WYI'
 
-    EDIT_PROFILE_ENABLED_PRISONS: "HEI,NMI,LCI,RNI,MHI,SUI,ONI,LII,NSI,SKI,WTI"
-    EDIT_PROFILE_ENABLED_PRISONS_BY_DATE: "***"
-    EDIT_PROFILE_ENABLED_FROM: "2026-06-16T08:00:00"
-
-    CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS_BY_DATE: "HEI,NMI,LCI,RNI,MHI,SUI,ONI,LII,NSI,SKI,WTI"
-    CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM: "2026-04-15T10:30:00"
-
-    PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS: '***'
-
     EDIT_PROFILE_SIMULATE_FETCH: 'false'
     MILITARY_HISTORY_ENABLED_FROM: '2025-03-18T00:00:00'
     MANAGE_ALLOCATIONS_ENABLED: 'true'
     EDIT_RELIGION_ENABLED_FROM: '2025-06-10T00:00:00'
     PERSON_ENDPOINTS_ENABLED: 'false'
     APPLICATIONINSIGHTS_WEB_ANALYTICS_ENABLED_PRISONS: 'HEI,NMI,LCI,RNI,MHI'
-    HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
+    X_RAY_BODY_SCANS_ENABLED: "false"
+    OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE: 'HLI'
+    OFFENCES_MOVED_ENABLED_FROM: '2026-08-20T10:00:00'
 
   allowlist:
     groups:
-      - internal
+      - digital_staff_and_mojo
+      - moj_cloud_platform
       - prisons
       - private_prisons
       - home_office

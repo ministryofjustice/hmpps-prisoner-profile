@@ -41,3 +41,5 @@ export const changeContactDetailsLinkEnabled: FeatureFlagMethod = (activeCaseLoa
 export const personDuplicateRecordsEnabled: FeatureFlagMethod = scheduledFeatureFlag(
   config.featureToggles.personDuplicateRecords,
 )
+
+export const offencesMoved: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.offencesMoved)

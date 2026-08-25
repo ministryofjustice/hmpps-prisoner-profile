@@ -6,10 +6,10 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
-import CareNeedsService from './careNeedsService'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
+import CareNeedsService from './careNeedsService'
 
-describe('beliefService', () => {
+describe('careNeedsService', () => {
   let prisonApiClient: PrisonApiClient
   let careNeedsService: CareNeedsService
 
@@ -49,7 +49,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs without matching health codes', async () => {
+    it('Doesn’t map care needs without matching health codes', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -75,7 +75,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs with problem code NR', async () => {
+    it('Doesn’t map care needs with problem code NR', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -101,7 +101,7 @@ describe('beliefService', () => {
       expect(careNeeds.length).toEqual(0)
     })
 
-    it('Doesnt map care needs with problem type BSCAN', async () => {
+    it('Doesn’t map care needs with problem type BSCAN', async () => {
       setPersonalCareNeedsMock([
         {
           personalCareNeedId: 1,
@@ -296,11 +296,11 @@ describe('beliefService', () => {
     })
 
     describe('Given no x-ray care needs', () => {
-      it('Returns no xray security information', async () => {
+      it('Returns x-ray security information', async () => {
         setPersonalCareNeedsForXrayBodyScansMock([])
         const xrays = await careNeedsService.getXrayBodyScanSummary('token', PrisonerMockDataA.bookingId)
         expect(xrays.total).toEqual(0)
-        expect(xrays.since).toBeUndefined()
+        expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
       })
     })
 

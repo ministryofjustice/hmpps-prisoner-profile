@@ -39,4 +39,11 @@ export default class OffenderService {
       otherPrisonsCount,
     }
   }
+
+  async getConfirmedReleaseDate(token: string, prisonerNumber: string) {
+    const prisonApiClient = this.prisonClientBuilder(token)
+    const releaseDates = await prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
+    const { confirmedReleaseDate } = releaseDates.sentenceDetail
+    return confirmedReleaseDate
+  }
 }

@@ -299,13 +299,16 @@ export const domesticStatusFieldData: RadioFieldData = {
   redirectAnchor: 'marriage-or-civil-partnership-status',
 }
 
-const baseEmailAddressTextFieldData = {
+const baseEmailAddressTextFieldData: Omit<
+  TextFieldData,
+  'url' | 'pageTitle' | 'auditEditPageLoad' | 'auditEditPostAction'
+> = {
   fieldName: 'emailAddress',
   successFlashFieldName: 'Email address',
   hintText: 'For example name@email.co.uk',
   redirectAnchor: 'phones-and-emails',
-  inputClasses: 'govuk-!-width-one-half',
-  inputType: 'email' as TextInputType,
+  inputClasses: 'govuk-!-width-two-thirds',
+  inputType: 'email',
   spellcheck: false,
   submitButtonText: 'Save and return to profile',
 }

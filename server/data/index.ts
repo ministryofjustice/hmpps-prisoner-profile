@@ -3,7 +3,6 @@
  * Do appinsights first as it does some magic instrumentation work, i.e. it affects other 'require's
  * In particular, applicationinsights automatically collects bunyan logs
  */
-import { buildAppInsightsClient, initialiseAppInsights } from '../utils/azureAppInsights'
 import { OsPlacesApiClient } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import AllocationManagerApiClient from './allocationManagerApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
@@ -23,7 +22,7 @@ import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
-import applicationInfo from '../applicationInfo'
+import applicationInfoSupplier from '../applicationInfo'
 import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
 import PrisonRegisterStore from './prisonRegisterStore/prisonRegisterStore'
 import CalculateReleaseDatesApiClient from './calculateReleaseDatesApiClient'
@@ -44,16 +43,16 @@ import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
 import PersonApiRestClient from './personApiClient'
+import XRayBodyScansApiRestClient from './xRayBodyScansApiClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
 import { ApiConfig } from '@ministryofjustice/hmpps-rest-client'
 
-initialiseAppInsights()
-const telemetryClient = buildAppInsightsClient(applicationInfo())
-
 type RestClientBuilder<T> = (token: string) => T
 type CuriousRestClientBuilder<T> = (token: CuriousApiToken) => T
+
+const applicationInfo = applicationInfoSupplier()
 
 const tokenStore = config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore()
 
@@ -92,10 +91,11 @@ const circuitBreakers = {
     config.apis.supportForAdditionalNeeds,
   ),
   personApi: circuitBreakerBuilder('personApi', config.apis.personApi),
+  xRayBodyScans: circuitBreakerBuilder('xRayBodyScans', config.apis.xRayBodyScans),
 }
 
 export const dataAccess = {
-  applicationInfo: applicationInfo(),
+  applicationInfo,
   allocationManagerApiClientBuilder: (token: string) =>
     new AllocationManagerApiClient(token, circuitBreakers.allocationManager),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token, circuitBreakers.caseNotes),
@@ -142,7 +142,6 @@ export const dataAccess = {
   csipApiClientBuilder: (token: string) => new CsipApiRestClient(token, circuitBreakers.csip),
   healthAndMedicationApiClientBuilder: (token: string) =>
     new HealthAndMedicationApiRestClient(token, circuitBreakers.healthAndMedication),
-  telemetryClient,
   osPlacesApiClient: new OsPlacesApiClient(logger, config.apis.osPlacesApi),
   personCommunicationNeedsApiClientBuilder: (token: string) =>
     new PersonCommunicationNeedsApiRestClient(token, circuitBreakers.personCommunicationNeeds),
@@ -151,6 +150,8 @@ export const dataAccess = {
   personalRelationshipsApiClientBuilder: (token: string) =>
     new PersonalRelationshipsApiRestClient(token, circuitBreakers.personalRelationships),
   personApiClientBuilder: (token: string) => new PersonApiRestClient(token, circuitBreakers.personApi),
+  xRayBodyScansApiClientBuilder: (token: string) =>
+    new XRayBodyScansApiRestClient(token, circuitBreakers.xRayBodyScans),
   tokenStore,
 }
 

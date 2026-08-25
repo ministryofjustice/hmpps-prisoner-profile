@@ -28,6 +28,28 @@ describe('Back Link Controller', () => {
     expect(res.redirect).toHaveBeenCalled()
   })
 
+  it('should save back link to session for the prison-roll-count service using its default text', () => {
+    const req = {
+      query: {
+        service: 'prison-roll-count',
+        returnPath: '/in-reception',
+        redirectPath: '/prisoner/Q1234QQ',
+      },
+      session: {},
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      redirect: jest.fn(),
+    } as unknown as Response
+    saveBackLink()(req, res, next)
+
+    expect(req.session.userBackLink).toEqual({
+      url: `${config.serviceUrls.prisonRollCount}/in-reception`,
+      text: 'Back to Establishment roll',
+    })
+    expect(res.redirect).toHaveBeenCalled()
+  })
+
   it('should save back link to flash when called from WPIP directly to add case note', () => {
     const req = {
       query: {

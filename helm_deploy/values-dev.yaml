@@ -31,7 +31,6 @@ generic-service:
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"
     ASSESS_FOR_EARLY_RELEASE_UI_URL: "https://assess-for-early-release-dev.hmpps.service.justice.gov.uk"
-    CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
     DPS_HOME_PAGE_URL: "https://dps-dev.prison.service.justice.gov.uk"
     DPS_CORE_URL: "https://digital-dev.prison.service.justice.gov.uk"
@@ -43,6 +42,7 @@ generic-service:
     USE_OF_FORCE_UI_URL: "https://dev.use-of-force.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-dev.prison.service.justice.gov.uk"
     INCIDENT_REPORTING_UI_URL: "https://incident-reporting-dev.hmpps.service.justice.gov.uk"
+    PRISON_ROLL_COUNT_UI_URL: "https://prison-roll-count-dev.hmpps.service.justice.gov.uk"
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk"
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-dev.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
@@ -53,6 +53,7 @@ generic-service:
     ALLOCATE_PERSONAL_OFFICERS_UI_URL: "https://allocate-key-workers-dev.hmpps.service.justice.gov.uk/personal-officer"
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-dev.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-dev.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
@@ -86,6 +87,7 @@ generic-service:
     PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-dev.hmpps.service.justice.gov.uk"
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record-dev.hmpps.service.justice.gov.uk"
+    X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk"
 
     # Circuit Breaker
     CIRCUIT_BREAKER_DEFAULT_THRESHOLD: 80
@@ -102,16 +104,13 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
 
-    EDIT_PROFILE_ENABLED_PRISONS: "***"
-    CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS: "***"
-
     EDIT_PROFILE_SIMULATE_FETCH: "false"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
     MANAGE_ALLOCATIONS_ENABLED: "true"
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
     PERSON_ENDPOINTS_ENABLED: "true"
-    PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS: "***"
-    HIDE_SOME_PERSONAL_OVERVIEW_INFO: "true"
+    OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
+    X_RAY_BODY_SCANS_ENABLED: "true"
 
   allowlist:
     groups:

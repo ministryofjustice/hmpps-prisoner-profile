@@ -34,7 +34,7 @@ export default class CaseNotesController {
       const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { user, prisonerPermissions } = res.locals
 
-      queryParams.sort = (req.query.sort as string) || 'createdAt,DESC'
+      queryParams.sort = this.mapSortParam(req.query.sort as string)
       if (req.query.page) queryParams.page = +req.query.page
       if (req.query.type) queryParams.type = req.query.type as string
       if (req.query.subType) queryParams.subType = req.query.subType as string
@@ -90,6 +90,25 @@ export default class CaseNotesController {
         addCaseNoteLinkUrl: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
       })
     }
+  }
+
+  // Legacy support for sort param. Provides default if not recognised.
+  private mapSortParam(sort: string): string {
+    const oldSortFields: Record<string, string> = {
+      creationDateTime: 'createdAt',
+      occurrenceDateTime: 'occurredAt',
+    }
+    const sortFields = ['createdAt', 'occurredAt']
+    const defaultSort = 'createdAt,DESC'
+
+    if (!sort) return defaultSort
+
+    const [fieldInParam, direction] = sort.split(',')
+    const field = oldSortFields[fieldInParam] || fieldInParam
+
+    if (!sortFields.includes(field)) return defaultSort
+
+    return `${field},${direction}`
   }
 
   public displayAddCaseNote(): RequestHandler {

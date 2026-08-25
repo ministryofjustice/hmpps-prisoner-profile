@@ -1,17 +1,10 @@
-import { stubFor } from './wiremock'
+import type { SuperAgentRequest } from 'superagent'
+import { stubFor, stubPing } from './wiremock'
 import type NomisSyncLocation from '../../server/data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 
 export default {
-  stubNomisSyncPrisonerMappingApiPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/nomissyncprisonermapping/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubNomisSyncPrisonerMappingApiPing: (httpStatus = 200): SuperAgentRequest =>
+    stubPing('/nomissyncprisonermapping', httpStatus),
 
   stubGetMappingUsingNomisLocationId: ({
     nomisLocationId,

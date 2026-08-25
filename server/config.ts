@@ -338,6 +338,16 @@ export default {
       },
       agent: new AgentConfig(Number(get('PERSON_API_TIMEOUT_DEADLINE', 3000))),
     },
+    xRayBodyScans: {
+      url: get('X_RAY_BODY_SCANS_API_URL', 'http://localhost:8082', requiredInProduction),
+      enabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('X_RAY_BODY_SCANS_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('X_RAY_BODY_SCANSI_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('X_RAY_BODY_SCANS_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -349,8 +359,8 @@ export default {
     manageSocCases: get('MANAGE_SOC_CASES_UI_URL', 'http://localhost:3001', requiredInProduction),
     welcomePeopleIntoPrison: get('WELCOME_PEOPLE_INTO_PRISON_UI_URL', 'http://localhost:3001', requiredInProduction),
     incidentReporting: get('INCIDENT_REPORTING_UI_URL', 'http://localhost:3001', requiredInProduction),
+    prisonRollCount: get('PRISON_ROLL_COUNT_UI_URL', 'http://localhost:3001', requiredInProduction),
     createAndVaryALicence: get('CREATE_AND_VARY_A_LICENCE_UI_URL', 'http://localhost:3001', requiredInProduction),
-    calculateReleaseDates: get('CALCULATE_RELEASE_DATES_UI_URL', 'http://localhost:3001', requiredInProduction),
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -366,6 +376,7 @@ export default {
     allocatePersonalOfficers: get('ALLOCATE_PERSONAL_OFFICERS_UI_URL', 'http://localhost:3001', requiredInProduction),
     externalMovements: get('EXTERNAL_MOVEMENTS_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
+    xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -406,6 +417,9 @@ export default {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('PERSON_DUPLICATE_RECORDS_ENABLED_FROM', '2099-01-01T00:00:00'),
+      // Manual overrides for duplicate prisoner records to be used for demoing and testing:
+      // Provided as a JSON array of arrays string, e.g. [["A1234BC","B5678DE","C9012FG"]]
+      overrides: JSON.parse(get('PERSON_DUPLICATE_RECORDS_OVERRIDES', '[]') as string) as string[][],
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
@@ -416,7 +430,13 @@ export default {
       enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    hideSomePersonalOverviewInfo: toBoolean(get('HIDE_SOME_PERSONAL_OVERVIEW_INFO', 'true')),
+    xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
+
+    offencesMoved: {
+      enabledPrisons: get('OFFENCES_MOVED_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('OFFENCES_MOVED_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

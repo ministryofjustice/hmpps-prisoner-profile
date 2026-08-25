@@ -27,7 +27,7 @@ export default class ChangeEndDatePage extends Page {
 
   cancelButton = (): PageElement => cy.get('[data-qa=cancel-button]')
 
-  backLink = (): PageElement => cy.get('[data-qa=referer-back-link]')
+  backLink = (): PageElement => cy.get('.govuk-breadcrumbs__link').last()
 
   errorBlock = (): PageElement => cy.get('.govuk-error-summary')
 }

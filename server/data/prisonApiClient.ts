@@ -545,11 +545,10 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]> {
+  async getBeliefHistory(prisonerNumber: string): Promise<Belief[]> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/belief-history`,
-        query: bookingId ? `bookingId=${bookingId}` : undefined,
       },
       this.token,
     )

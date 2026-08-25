@@ -68,7 +68,6 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubAllPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
-      cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
       cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
@@ -250,16 +249,6 @@ context('When signed in', () => {
         page.personalDetails().militaryRecords().dischargeLocation().should('include.text', 'Location 2')
         page.personalDetails().militaryRecords().dischargeDescription().should('include.text', 'Honourable')
       })
-
-      it('Displays the edit profile banner above personal details', () => {
-        cy.get('.hmpps-profile--personal-content').within(() => {
-          cy.get('.notification-banner-yellow').should('exist')
-          cy.get('.notification-banner-yellow').should(
-            'contain.text',
-            'You can now update personal information in DPS.',
-          )
-        })
-      })
     })
 
     context('Identity numbers card', () => {
@@ -373,20 +362,20 @@ context('When signed in', () => {
         page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
 
         page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
-        const scarsDetailHeaders = page
+        page
           .appearance()
           .personIntegrationDistinguishingMarks()
           .scarsDetail()
           .content()
-          .find('dt')
+          .find('.personal-distinguishing-marks__row__mark__row__key')
+          .should('have.length', 2)
+          .each((element, index) => {
+            const expectedHeaders = ['Location', 'Description']
+            const expectedTexts = ['Arm (general)', 'Horrible arm scar']
 
-        scarsDetailHeaders.each((element, index) => {
-          const expectedHeaders = ['Location', 'Description']
-          const expectedTexts = ['Arm (general)', 'Horrible arm scar']
-
-          cy.wrap(element).should('include.text', expectedHeaders[index])
-          cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
-        })
+            cy.wrap(element).should('include.text', expectedHeaders[index])
+            cy.wrap(element.next('span')).should('include.text', expectedTexts[index])
+          })
         page
           .appearance()
           .personIntegrationDistinguishingMarks()
@@ -667,6 +656,16 @@ context('When signed in', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+    })
+
+    context('With none', () => {
+      it('Displays the xray count and date', () => {
+        cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 0 })
+        visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
+        page.security().xrays().total().should('include.text', '0')
+        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
+      })
     })
 
     context('With less than the limit', () => {

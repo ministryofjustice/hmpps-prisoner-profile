@@ -1,7 +1,7 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "../../macros/otherLanguagesText.njk" import otherLanguagesText %}
 
-{% if inUsersCaseLoad %}
+{% if isGranted(PersonCommunicationNeedsPermission.read_language, prisonerPermissions) %}
   <dl
     class="govuk-summary-list hmpps-languages govuk-summary-list--bottom-border govuk-!-margin-bottom-0 {{ 'row-updated' if flashMessage.fieldName === 'languages' }}"
     data-qa="languages"

@@ -1,5 +1,6 @@
 import { addDays, format, startOfToday } from 'date-fns'
-import { stubFor } from './wiremock'
+import type { SuperAgentRequest } from 'superagent'
+import { stubFor, stubPing } from './wiremock'
 import {
   accountBalancesMock,
   assessmentsMock,
@@ -95,20 +96,12 @@ import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/priso
 import PrisonerSchedule, { TimeSlot } from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
 import { loadFileAsBase64, stubGetWithBody } from './utils'
 import { formatDateISO } from '../../server/utils/dateHelpers'
+import Belief from '../../server/data/interfaces/prisonApi/Belief'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
-  stubPrisonApiPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/prison/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubPrisonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/prison', httpStatus),
 
   stubAccountBalances: (bookingId: number) => {
     return stubFor({
@@ -602,6 +595,41 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: prisonerSentenceDetailsMock,
+      },
+    })
+  },
+
+  stubGetPrisonerSentenceDetailsNoConfirmedDate: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/sentences`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: { ...prisonerSentenceDetailsMock.sentenceDetail, confirmedReleaseDate: undefined },
+        },
+      },
+    })
+  },
+
+  stubGetPrisonerSentenceDetailsError: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/sentences`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: { error: 'Something went wrong' },
       },
     })
   },
@@ -1302,7 +1330,7 @@ export default {
     })
   },
 
-  stubBeliefHistory: (bookingId?: number) => {
+  stubBeliefHistory: ({ bookingId, beliefHistory }: { bookingId?: number; beliefHistory?: Belief[] } = {}) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1313,7 +1341,9 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: bookingId ? beliefHistoryMock : beliefHistoryAllBookingsMock,
+        jsonBody:
+          beliefHistory ||
+          (bookingId ? beliefHistoryMock.map(belief => ({ ...belief, bookingId })) : beliefHistoryAllBookingsMock),
       },
     })
   },

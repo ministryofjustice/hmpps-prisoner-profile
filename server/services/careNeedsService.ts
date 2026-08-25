@@ -29,6 +29,11 @@ export interface XrayBodyScan {
   scanDate: string
 }
 
+export interface XrayBodyScanSummary {
+  total: number
+  since: string
+}
+
 export default class CareNeedsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
@@ -51,6 +56,7 @@ export default class CareNeedsService {
   /**
    * Handle request for x-ray body scans
    *
+   * @deprecated will be removed
    * @param token
    * @param bookingId
    */
@@ -66,12 +72,12 @@ export default class CareNeedsService {
   /**
    * Handle request for x-ray body scan summary
    *
+   * @deprecated will be removed
    * @param token
    * @param bookingId
    */
-  public async getXrayBodyScanSummary(token: string, bookingId: number): Promise<{ total: number; since?: string }> {
+  public async getXrayBodyScanSummary(token: string, bookingId: number): Promise<XrayBodyScanSummary> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
-
     const healthCodes = await prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health)
 
     const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(
@@ -141,14 +147,14 @@ export default class CareNeedsService {
       }))
   }
 
-  private toXrayBodyScanSummary(personalCareNeeds: PersonalCareNeed[]): { total: number; since?: string } {
+  private toXrayBodyScanSummary(personalCareNeeds: PersonalCareNeed[]): XrayBodyScanSummary {
     const yearStart = startOfYear(new Date())
     const xrayNeeds = personalCareNeeds
       ?.filter(need => need.problemType === HealthDomainReferenceCode.XRayBodyScan)
       .filter(need => isSameYear(new Date(need.startDate), yearStart))
     return {
       total: xrayNeeds.length,
-      since: xrayNeeds.length > 0 ? yearStart.toISOString() : undefined,
+      since: yearStart.toISOString(),
     }
   }
 }

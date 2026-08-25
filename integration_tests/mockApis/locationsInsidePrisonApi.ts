@@ -1,19 +1,12 @@
-import { stubFor } from './wiremock'
+import type { SuperAgentRequest } from 'superagent'
+import { stubFor, stubPing } from './wiremock'
 import type LocationsApiLocation from '../../server/data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
 import { locationsApiMock } from '../../server/data/localMockData/locationsMock'
 
 export default {
-  stubLocationsInsidePrisonApiPing: (httpStatus: number) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: '/locationsinsideprison/health/ping',
-      },
-      response: {
-        status: httpStatus,
-      },
-    }),
+  stubLocationsInsidePrisonApiPing: (httpStatus = 200): SuperAgentRequest =>
+    stubPing('/locationsinsideprison', httpStatus),
 
   stubGetLocation: ({ dpsLocationId, response }: { dpsLocationId: string; response?: LocationsApiLocation }) =>
     stubFor({
@@ -59,7 +52,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPath: `/locationsinsideprison/locations/prison/${prisonId}/non-residential-usage-type/APPOINTMENT`,
+        urlPath: `/locationsinsideprison/locations/non-residential/prison/${prisonId}/service/APPOINTMENT`,
         queryParameters: {
           sortByLocalName: { equalTo: 'true' },
           formatLocalName: { equalTo: 'true' },

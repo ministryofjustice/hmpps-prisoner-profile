@@ -1,10 +1,12 @@
-import OffencesPage from '../pages/offencesPage'
+import { Role } from '../../server/data/enums/role'
 import Page from '../pages/page'
-import { permissionsTests } from './permissionsTests'
+import OffencesPage from '../pages/offencesPage'
 import NotFoundPage from '../pages/notFoundPage'
+import { permissionsTests } from './permissionsTests'
+
+const prisonerNumber = 'G6123VU'
 
 context('Offenses page - Permissions', () => {
-  const prisonerNumber = 'G6123VU'
   const visitPage = prisonerDataOverrides => {
     cy.setupPermissionsCheckStubs({ prisonerNumber, prisonerDataOverrides })
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
@@ -19,15 +21,13 @@ context('Offences Page Sentenced', () => {
     cy.signIn({ redirectPath: '/prisoner/G6123VU/offences' })
   }
 
-  const prisonerNumber = 'G6123VU'
-
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupComponentsData()
     cy.setupPermissionsCheckStubs({ prisonerNumber })
     cy.setupBannerStubs({ prisonerNumber })
-    cy.setupOffencesPageSentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    cy.setupOffencesPageSentencedStubs({ prisonerNumber, bookingId: 1102484 })
   })
 
   it('Offences page is displayed', () => {
@@ -154,7 +154,7 @@ context('Offences Page Sentenced', () => {
   })
   context('Unsentenced Counts', () => {
     beforeEach(() => {
-      cy.setupOffencesPageUnsentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.setupOffencesPageUnsentencedStubs({ prisonerNumber, bookingId: 1102484 })
       visitOffencesPage()
     })
 
@@ -246,6 +246,52 @@ context('Offences Page Sentenced', () => {
     it('Offences page should go to 404 not found page', () => {
       cy.visit(`/prisoner/asudhsdudhid/offences`, { failOnStatusCode: false })
       Page.verifyOnPage(NotFoundPage)
+    })
+  })
+
+  context('offences moved banner for enabled prisons', () => {
+    function visitWhenOffencesMoved() {
+      cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'HLI' } })
+      cy.task('stubComponentsData', {
+        caseLoads: [{ caseLoadId: 'HLI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+      })
+      cy.task('stubUserCaseLoads', [
+        { caseLoadId: 'HLI', currentlyActive: true, description: '', type: '', caseloadFunction: '' },
+      ])
+      visitOffencesPage()
+    }
+
+    beforeEach(visitWhenOffencesMoved)
+
+    it('should display offences moved banner', () => {
+      cy.contains('Offences information has moved').should('exist')
+    })
+
+    context('should display a link to the overview page', () => {
+      it('anchored to release date card for users who cannot edit them', () => {
+        cy.contains('Go to Overview').should(
+          'have.attr',
+          'href',
+          `/prisoner/${prisonerNumber}#confirmed-release-date-non-calculate`,
+        )
+      })
+
+      it('not anchored to anything for for users who can edit release dates', () => {
+        cy.clearAllCookies()
+        cy.task('reset')
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ReleaseDatesCalculator] })
+        cy.setupComponentsData()
+        cy.setupPermissionsCheckStubs({ prisonerNumber })
+        cy.setupBannerStubs({ prisonerNumber })
+        cy.setupOffencesPageSentencedStubs({ prisonerNumber, bookingId: 1102484 })
+        visitWhenOffencesMoved()
+
+        cy.contains('Go to Overview').should('have.attr', 'href', `/prisoner/${prisonerNumber}`)
+      })
+    })
+
+    it('should not display the old content', () => {
+      cy.get('[data-qa="court-cases-and-offences"]').should('not.exist')
     })
   })
 })

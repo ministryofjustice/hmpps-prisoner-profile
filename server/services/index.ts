@@ -3,6 +3,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 import { PermissionsService as PrisonPermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { OsPlacesAddressService } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import { telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -79,7 +80,6 @@ export const services = () => {
     referenceDataStore,
     featureToggleStore,
     ephemeralDataStore,
-    telemetryClient,
     osPlacesApiClient,
     curiousApiToken,
     tokenStore,
@@ -97,11 +97,11 @@ export const services = () => {
     prisonerSearchConfig: config.apis.prisonerSearchApi,
     authenticationClient: new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore),
     logger,
-    telemetryClient,
+    telemetryClient: telemetry,
     readOnly: config.readOnlyProfile,
   })
 
-  const metricsService = new MetricsService(telemetryClient)
+  const metricsService = new MetricsService()
   const featureToggleService = new FeatureToggleService(featureToggleStore)
   const ephemeralDataService = new EphemeralDataService(ephemeralDataStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)

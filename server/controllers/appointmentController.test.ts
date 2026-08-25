@@ -172,14 +172,12 @@ describe('Appointment Controller', () => {
       auditServiceMock(),
     )
 
-    appointmentService.getAddAppointmentRefData = jest.fn(
-      async (): Promise<AddAppointmentRefData> => ({
-        appointmentTypes: appointmentTypesMock,
-        locations: locationsApiMock,
-        probationTeams: probationTeamsMock,
-        meetingTypes: probationMeetingTypes,
-      }),
-    )
+    appointmentService.getAddAppointmentRefData = jest.fn(async (): Promise<AddAppointmentRefData> => ({
+      appointmentTypes: appointmentTypesMock,
+      locations: locationsApiMock,
+      probationTeams: probationTeamsMock,
+      meetingTypes: probationMeetingTypes,
+    }))
 
     appointmentService.getPrePostAppointmentRefData = jest.fn(async (): Promise<PrePostAppointmentRefData> => {
       return {
