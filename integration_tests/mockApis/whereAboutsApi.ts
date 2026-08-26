@@ -4,7 +4,6 @@ import type {
   AppointmentDetails,
   SavedAppointment,
 } from '../../server/data/interfaces/whereaboutsApi/Appointment'
-import { CellMoveReasonMock } from '../../server/data/localMockData/getCellMoveReasonMock'
 import { appointmentMock, savedAppointmentMock } from '../../server/data/localMockData/appointmentMock'
 
 export default {
@@ -43,22 +42,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: response,
-      },
-    })
-  },
-
-  stubGetCellMoveReason: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/whereabouts/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/2`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: CellMoveReasonMock,
       },
     })
   },
