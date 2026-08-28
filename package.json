@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@apollo/client": "4.2.12",
-    "@aws-sdk/client-sqs": "3.1110.0",
+    "@aws-sdk/client-sqs": "3.1115.0",
     "@contentful/rich-text-html-renderer": "17.2.3",
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.3",
@@ -42,10 +42,10 @@
     "@ministryofjustice/frontend": "10.0.1",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "^1.0.2",
-    "@ministryofjustice/hmpps-connect-dps-components": "6.3.2",
+    "@ministryofjustice/hmpps-connect-dps-components": "6.3.3",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "4.4.0",
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
-    "@ministryofjustice/hmpps-prison-permissions-lib": "4.2.1",
+    "@ministryofjustice/hmpps-prison-permissions-lib": "4.3.0",
     "@ministryofjustice/hmpps-rest-client": "2.2.0",
     "@sentry/node": "10.70.0",
     "@types/multer": "2.2.0",
@@ -84,7 +84,7 @@
     "@ministryofjustice/frontend-types": "2.0.1",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
-    "@tsconfig/node24": "^24.0.4",
+    "@tsconfig/node24": "^24.0.5",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",
@@ -105,7 +105,7 @@
     "aws-sdk-client-mock": "^4.1.0",
     "cheerio": "^1.2.0",
     "cookie-session": "^2.1.1",
-    "cypress": "15.20.1",
+    "cypress": "15.21.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
     "del": "8.0.1",
@@ -125,7 +125,7 @@
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
     "typescript": "6.0.3",
-    "uuid": "14.0.1"
+    "uuid": "14.0.2"
   },
   "overrides": {
     "@opentelemetry/api": "1.9.0",
