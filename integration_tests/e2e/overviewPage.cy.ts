@@ -468,7 +468,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.historyLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview',
         )
       })
 
@@ -530,7 +530,7 @@ context('Overview Page', () => {
         overviewPage
           .statusList()
           .find('a')
-          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans')
+          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview')
           .and('have.text', 'Scan limit reached')
       })
     })
