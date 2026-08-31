@@ -602,6 +602,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.sideBar().moreInfo().socProfileInfoLink().should('not.exist')
       })
+
+      it('should display incident summary link', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.sideBar().moreInfo().incidentSummaryInfoLink().should('exist')
+      })
     })
   })
 
