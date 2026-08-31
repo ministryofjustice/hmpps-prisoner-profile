@@ -58,7 +58,7 @@
     "connect-flash": "^0.1.1",
     "connect-redis": "^10.0.0",
     "contentful": "11.12.9",
-    "cropperjs": "2.1.1",
+    "cropperjs": "2.2.0",
     "csrf-sync": "^4.2.1",
     "date-fns": "^4.4.0",
     "express": "^5.2.1",
