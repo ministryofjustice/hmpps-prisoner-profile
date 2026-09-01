@@ -1,3 +1,5 @@
+@use 'govuk-frontend/dist/govuk/settings/global-styles' with ($govuk-global-styles: true);
+
 @use '@ministryofjustice/frontend/moj/all' as * with (
   $moj-page-width: 1170px,
 );
