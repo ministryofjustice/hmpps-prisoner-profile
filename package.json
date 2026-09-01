@@ -39,11 +39,11 @@
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.3",
     "@microsoft/applicationinsights-web": "3.4.3",
-    "@ministryofjustice/frontend": "10.0.1",
+    "@ministryofjustice/frontend": "11.0.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "^1.0.2",
     "@ministryofjustice/hmpps-connect-dps-components": "6.3.3",
-    "@ministryofjustice/hmpps-connect-dps-shared-items": "4.4.0",
+    "@ministryofjustice/hmpps-connect-dps-shared-items": "5.0.0",
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
     "@ministryofjustice/hmpps-prison-permissions-lib": "4.3.0",
     "@ministryofjustice/hmpps-rest-client": "2.2.0",
@@ -128,6 +128,9 @@
     "uuid": "14.0.2"
   },
   "overrides": {
+    "@ministryofjustice/frontend-types": {
+      "@ministryofjustice/frontend": "$@ministryofjustice/frontend"
+    },
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/core": "2.8.0",
     "@opentelemetry/resources": "2.8.0",

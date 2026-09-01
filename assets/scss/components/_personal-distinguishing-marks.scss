@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .personal-distinguishing-marks {
   display: grid;
   grid-template-columns: 30% 70%;

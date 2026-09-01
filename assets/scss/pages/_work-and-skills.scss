@@ -1,5 +1,7 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-goal-container {
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
   margin-bottom: 15px;
 
   dl {

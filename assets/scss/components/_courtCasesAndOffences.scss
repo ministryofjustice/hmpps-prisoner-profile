@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 #court-cases-sentence-details {
   .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
     visibility: hidden;

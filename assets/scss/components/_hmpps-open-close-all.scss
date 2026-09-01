@@ -1,9 +1,11 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-open-close-all {
   &__button {
     appearance: none;
     background: none;
     border: none;
-    color: $govuk-link-colour;
+    color: govuk-functional-colour(link);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;

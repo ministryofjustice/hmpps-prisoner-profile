@@ -1,6 +1,8 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-photo-list {
   .hmpps-photo-list__item {
-    border-bottom: solid 1px $govuk-border-colour;
+    border-bottom: solid 1px govuk-functional-colour(border);
     display: flex;
     @include govuk-responsive-margin(4, 'bottom');
     @include govuk-responsive-padding(2);

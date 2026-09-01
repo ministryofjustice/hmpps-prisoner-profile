@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 @keyframes flashMessageFadeOut {
   0% {
     opacity: 1;

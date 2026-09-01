@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-sidebar {
   li {
     @include govuk-responsive-margin(2, 'bottom');

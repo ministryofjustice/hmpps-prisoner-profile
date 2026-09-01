@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use '@ministryofjustice/frontend/moj/base' as *;
 
 .prisoner-schedule {
   &__day {

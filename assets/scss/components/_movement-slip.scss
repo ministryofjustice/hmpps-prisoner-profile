@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .movement-slip {
   margin-bottom: govuk-spacing(6);
   padding: 0 govuk-spacing(6) govuk-spacing(3);
@@ -11,7 +13,9 @@
     border-top: 1px solid;
 
     &__values {
-      @extend .govuk-body;
+      @include govuk-font($size: 19);
+      margin-top: 0;
+      color: govuk-functional-colour(text);
       margin-bottom: govuk-spacing(3);
       flex: 1 0 33.333%;
       box-sizing: border-box;
