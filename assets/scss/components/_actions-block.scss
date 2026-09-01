@@ -43,6 +43,6 @@
   }
 
   li:not(:last-of-type) {
-    border-bottom: 2px solid $govuk-border-colour;
+    border-bottom: 2px solid govuk-functional-colour(border);
   }
 }

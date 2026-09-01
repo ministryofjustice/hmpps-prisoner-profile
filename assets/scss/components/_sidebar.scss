@@ -18,10 +18,10 @@
 
 .hmpps-sidebar-single-link {
   background-color: govuk-colour("black", $variant: "tint-95");
-  border-left: 4px solid $govuk-link-colour;
+  border-left: 4px solid govuk-functional-colour(link);
   h2 {
     padding: 14px 10px 12px 20px;
-    color: $govuk-link-colour;
+    color: govuk-functional-colour(link);
     font-size: 18px;
   }
 }

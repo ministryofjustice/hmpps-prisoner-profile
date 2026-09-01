@@ -82,7 +82,7 @@
 
           p {
             margin: 0;
-            color: $govuk-link-colour;
+            color: govuk-functional-colour(link);
             text-decoration: underline;
           }
         }
@@ -218,7 +218,7 @@
   }
 
   .hmpps-profile-banner-tabs {
-    border-bottom: 2px solid $govuk-border-colour;
+    border-bottom: 2px solid govuk-functional-colour(border);
 
     nav {
       padding: 10px 15px 0 15px;

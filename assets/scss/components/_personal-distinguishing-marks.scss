@@ -25,7 +25,7 @@
 
   &__row {
     margin-bottom: govuk-spacing(3);
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
 
     &__empty {
       display: flex;

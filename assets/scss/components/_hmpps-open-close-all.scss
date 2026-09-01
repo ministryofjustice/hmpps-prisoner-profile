@@ -14,14 +14,14 @@
     margin-bottom: govuk-spacing(3);
 
     &:hover {
-      color: $govuk-link-hover-colour;
+      color: govuk-functional-colour(link-hover);
     }
 
     &:focus, &:active {
       outline: 3px solid transparent;
-      box-shadow: 0 -2px $govuk-focus-colour,0 4px $govuk-focus-text-colour;
-      color: $govuk-focus-text-colour;
-      background-color: $govuk-focus-colour;
+      box-shadow: 0 -2px govuk-functional-colour(focus),0 4px govuk-functional-colour(focus-text);
+      color: govuk-functional-colour(focus-text);
+      background-color: govuk-functional-colour(focus);
       text-decoration: none;
     }
   }

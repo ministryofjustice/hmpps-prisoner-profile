@@ -41,7 +41,7 @@
     list-style: none;
     padding-left: 15px;
     padding-right: 15px;
-    border-right: 1px solid $govuk-link-colour;
+    border-right: 1px solid govuk-functional-colour(link);
 
     &:first-child {
       padding-left: 0;

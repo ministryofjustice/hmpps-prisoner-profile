@@ -41,7 +41,7 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px $govuk-focus-colour;
+    box-shadow: 0 0 0 3px govuk-functional-colour(focus);
   }
 
   header {

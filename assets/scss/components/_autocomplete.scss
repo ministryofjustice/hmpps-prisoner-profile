@@ -7,7 +7,7 @@
 .autocomplete__hint,
 .autocomplete__input {
   -webkit-appearance: none;
-  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
+  border: $govuk-border-width-form-element solid govuk-functional-colour(input-border);
   border-radius: 0; /* Safari 10 on iOS adds implicit border rounding. */
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -21,10 +21,10 @@
   position: relative;
 
   .govuk-form-group--error & {
-    border-color: $govuk-error-colour;
+    border-color: govuk-functional-colour(error);
 
     &:focus {
-      border-color: $govuk-input-border-colour;
+      border-color: govuk-functional-colour(input-border);
     }
   }
 
