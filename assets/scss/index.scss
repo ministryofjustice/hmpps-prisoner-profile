@@ -2,7 +2,6 @@
   $moj-page-width: 1170px,
 );
 
-@use 'govuk-frontend/dist/govuk/helpers/font-faces--internal' as font-faces;
 @use 'govuk-frontend/dist/govuk/index' as *;
 @use '@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
 @use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all';
