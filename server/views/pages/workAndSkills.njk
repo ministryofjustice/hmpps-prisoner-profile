@@ -1,6 +1,12 @@
 {% from "../macros/sidebarNav.njk" import sidebarNav %}
+{% from "../macros/hmppsError.njk" import hmppsError %}
 {% extends "./index.njk" %}
 {% block body %}
+  {% if pageHasApiErrors and useCustomErrorBanner %}
+    <div class="govuk-grid-row">
+      {{ hmppsError({ type: 'banner', classes: 'govuk-!-margin-3' }) }}
+    </div>
+  {% endif %}
   {% set prisonNamesById = prisonNamesById.value if prisonNamesById.isFulfilled() else {} %}
 
   {% set sidebar %}

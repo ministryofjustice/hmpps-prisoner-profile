@@ -204,6 +204,7 @@ export default function routes(services: Services): Router {
         hasAnyLwpGoals,
         hasActiveLwpGoals,
         problemRetrievingPrisonerGoalData,
+        useCustomErrorBanner: true,
       })
     },
   )
