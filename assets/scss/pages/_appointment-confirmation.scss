@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .appointment-details-list {
   .govuk-summary-list__key,
   .govuk-summary-list__value,
@@ -13,5 +15,3 @@
   }
 
 }
-
-

@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .personal-distinguishing-marks {
   display: grid;
   grid-template-columns: 30% 70%;
@@ -23,7 +25,7 @@
 
   &__row {
     margin-bottom: govuk-spacing(3);
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
 
     &__empty {
       display: flex;

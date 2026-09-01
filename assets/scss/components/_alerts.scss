@@ -1,8 +1,23 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+@use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/dps/components/alert-flag/alert-flag' as *;
+
 @use 'sass:color';
+
+@mixin govuk-list {
+  @include govuk-font($size: 19);
+  margin-top: 0;
+  padding-left: 0;
+  list-style-type: none;
+  color: govuk-functional-colour(text);
+
+  > li {
+    margin-bottom: govuk-spacing(1);
+  }
+}
 
 .alerts-list {
   min-height: 50px;
-  @extend %govuk-list;
+  @include govuk-list;
   margin: 17px 15px 13px 150px;
 
   display: flex;
@@ -24,7 +39,7 @@
 }
 
 .alerts-list-no-flex {
-  @extend %govuk-list;
+  @include govuk-list;
   margin-bottom: 0;
 }
 
@@ -83,7 +98,7 @@
       &__sub-title {
         font-size: 16px;
         font-weight: bold;
-        color: $govuk-secondary-text-colour;
+        color: govuk-functional-colour(secondary-text);
         margin-bottom: 15px;
       }
 

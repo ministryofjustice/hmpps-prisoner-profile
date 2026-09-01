@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-contact {
   @include govuk-responsive-margin(2, 'top');
 

@@ -1,8 +1,10 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 $hmpps-cropper-width: 221px;
 $hmpps-cropper-height: 276px;
 
 .hmpps-cropper-photo-container {
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   width: 100%;
   @include govuk-responsive-padding(3);
   @include govuk-responsive-margin(6, 'bottom');
@@ -59,14 +61,14 @@ $hmpps-cropper-height: 276px;
   }
 
   cropper-selection {
-    outline: 1px solid $govuk-focus-colour;
+    outline: 1px solid govuk-functional-colour(focus);
     border: 1px solid govuk-functional-colour(text);
   }
 
   $handles: 'n-resize', 'ne-resize', 'e-resize', 'se-resize', 's-resize', 'sw-resize', 'w-resize', 'nw-resize';
   @each $handle in $handles {
     cropper-handle[action='#{$handle}']::after {
-      background-color: $govuk-focus-colour;
+      background-color: govuk-functional-colour(focus);
     }
   }
 }
