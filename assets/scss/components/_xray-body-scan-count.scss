@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 @property --xray-body-scan-count-accent-colour {
   syntax: '<color>';
   inherits: true;

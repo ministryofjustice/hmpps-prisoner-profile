@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-summary-card {
   border: 1px solid govuk-colour("black", $variant: "tint-25");
   box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
@@ -39,7 +41,7 @@
     list-style: none;
     padding-left: 15px;
     padding-right: 15px;
-    border-right: 1px solid $govuk-link-colour;
+    border-right: 1px solid govuk-functional-colour(link);
 
     &:first-child {
       padding-left: 0;

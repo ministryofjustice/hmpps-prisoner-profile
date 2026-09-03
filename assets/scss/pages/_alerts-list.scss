@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-alert-card-list-item {
   display: flex;
   flex-wrap: wrap;
@@ -37,7 +39,7 @@
   &__sub-title {
     font-size: 16px;
     font-weight: bold;
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     margin-bottom: 15px;
   }
 
