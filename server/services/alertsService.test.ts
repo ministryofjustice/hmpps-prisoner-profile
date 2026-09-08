@@ -108,6 +108,18 @@ describe('Alerts Service', () => {
       })
     })
 
+    describe('Get active alert by code', () => {
+      it('should return the matching active alert', async () => {
+        alertsApiClientSpy.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+        alertsService = new AlertsService(() => alertsApiClientSpy)
+
+        const alert = await alertsService.getActiveAlertByCode('TOKEN', 'AA1234A', 'AS')
+
+        expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith('AA1234A', { isActive: true, size: 9999 })
+        expect(alert.alertCode.code).toEqual('AS')
+      })
+    })
+
     describe('Get Alert Details', () => {
       it('should call Alerts API tp get alert details', async () => {
         alertsApiClientSpy.getAlertDetails = jest.fn(async () => alertDetailsMock)

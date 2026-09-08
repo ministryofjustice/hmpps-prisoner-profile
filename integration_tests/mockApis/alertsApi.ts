@@ -10,6 +10,18 @@ import {
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
 import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
 
+const duplicateAlert = {
+  ...alertDetailsExpiresMock,
+  prisonNumber: 'G6123VU',
+  alertCode: {
+    ...alertDetailsExpiresMock.alertCode,
+    alertTypeCode: 'A',
+    alertTypeDescription: 'AAA',
+    code: 'A1',
+    description: 'AAA111',
+  },
+}
+
 export default {
   stubActiveAlerts: (resp = pagedActiveAlertsMock) => {
     return stubFor({
@@ -214,6 +226,45 @@ export default {
         jsonBody: pagedActiveAlertsMock.content[0],
       },
     })
+  },
+
+  stubCreateAlertConflict: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts`,
+      },
+      response: {
+        status: 409,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { status: 409, userMessage: 'An active alert already exists' },
+      },
+    })
+  },
+
+  stubDuplicateAlert: () => {
+    return Promise.all([
+      stubFor({
+        request: {
+          method: 'GET',
+          urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
+          queryParameters: { isActive: { equalTo: 'true' }, size: { equalTo: '9999' } },
+        },
+        response: {
+          status: 200,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: { ...pagedActiveAlertsMock, content: [duplicateAlert] },
+        },
+      }),
+      stubFor({
+        request: { method: 'GET', urlPattern: `/alertsApi/alerts/${duplicateAlert.alertUuid}` },
+        response: {
+          status: 200,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: duplicateAlert,
+        },
+      }),
+    ])
   },
 
   stubUpdateAlert: () => {
