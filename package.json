@@ -5,7 +5,6 @@
   "repository": "git@github.com:ministryofjustice/hmpps-prisoner-profile.git",
   "license": "MIT",
   "scripts": {
-    "postinstall": "patch-package",
     "prepare": "hmpps-precommit-hooks-prepare",
     "watch-ts": "tsc -w",
     "build": "node esbuild/esbuild",
