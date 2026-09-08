@@ -68,7 +68,7 @@
     "http-errors": "^2.0.1",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "1.13.12",
-    "multer": "^2.2.0",
+    "multer": "^2.3.0",
     "nocache": "^4.0.0",
     "nunjucks": "^3.2.4",
     "opossum": "10.0.0",
