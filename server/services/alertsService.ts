@@ -173,9 +173,9 @@ export default class AlertsService {
 
   public async getActiveAlertByCode(clientToken: string, prisonerNumber: string, alertCode: string) {
     const alertsApiClient = this.alertsApiClientBuilder(clientToken)
-    const alerts = await alertsApiClient.getAlerts(prisonerNumber, { isActive: true, size: 9999 })
+    const alerts = await alertsApiClient.getAlerts(prisonerNumber, { isActive: true, alertCode })
 
-    return alerts.content.find(alert => alert.alertCode.code === alertCode)
+    return alerts.content[0]
   }
 
   public async getAlertDetails(token: string, alertId: string) {

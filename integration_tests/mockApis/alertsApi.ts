@@ -248,7 +248,7 @@ export default {
         request: {
           method: 'GET',
           urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
-          queryParameters: { isActive: { equalTo: 'true' }, size: { equalTo: '9999' } },
+          queryParameters: { isActive: { equalTo: 'true' }, alertCode: { equalTo: 'A1' } },
         },
         response: {
           status: 200,

@@ -115,7 +115,7 @@ describe('Alerts Service', () => {
 
         const alert = await alertsService.getActiveAlertByCode('TOKEN', 'AA1234A', 'AS')
 
-        expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith('AA1234A', { isActive: true, size: 9999 })
+        expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith('AA1234A', { isActive: true, alertCode: 'AS' })
         expect(alert.alertCode.code).toEqual('AS')
       })
     })
