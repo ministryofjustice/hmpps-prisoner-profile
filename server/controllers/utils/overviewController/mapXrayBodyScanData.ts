@@ -13,7 +13,7 @@ export function mapXrayBodyScanSummary(summaryResponse: ScanSummaryResponse): Xr
   return {
     ...summaryResponse,
     recordScanUrl: `${urlPrefix}/record-scan`,
-    viewHistoryUrl: `${urlPrefix}/scans`,
+    viewHistoryUrl: `${urlPrefix}/scan-overview`,
   }
 }
 

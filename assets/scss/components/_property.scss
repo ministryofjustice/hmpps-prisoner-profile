@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-property {
   .hmpps-property__container-type {
     @include govuk-font($size: 19, $weight: 'bold');

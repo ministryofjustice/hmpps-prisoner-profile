@@ -18,4 +18,8 @@ export default class AddAlertPage extends Page {
   backLink = (): PageElement => cy.get('.govuk-breadcrumbs__link').last()
 
   errorBlock = (): PageElement => cy.get('.govuk-error-summary')
+
+  duplicateAlertError = (): PageElement => cy.get('[data-qa=duplicate-alert-error]')
+
+  alertModal = (): PageElement => cy.get('#duplicate-alert-details')
 }

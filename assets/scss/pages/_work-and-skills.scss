@@ -1,5 +1,7 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-goal-container {
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
   margin-bottom: 15px;
 
   dl {
@@ -37,7 +39,7 @@
 .hmpps-functional-skills-card {
   dl.govuk-summary-list {
     @include govuk-responsive-padding(3, 'bottom');
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
 
     div.govuk-summary-list__row {
       border-bottom: none;

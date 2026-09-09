@@ -706,7 +706,7 @@ describe('overviewController', () => {
               {
                 label: expect.stringContaining('X-ray body scans in'),
                 subText: 'Scan limit reached',
-                subTextHref: 'http://localhost:3001/prisoner/A1234BC/scans',
+                subTextHref: 'http://localhost:3001/prisoner/A1234BC/scan-overview',
                 style: 'warning',
               },
             ],
@@ -951,7 +951,7 @@ describe('overviewController', () => {
               fromScanDate: expect.any(Date),
               toScanDate: expect.any(Date),
               recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
-              viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scans$'),
+              viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview$'),
             },
           }),
         }),
