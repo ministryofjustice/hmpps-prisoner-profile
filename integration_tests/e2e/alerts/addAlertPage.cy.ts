@@ -89,6 +89,39 @@ context('Add Alert Page', () => {
             .should('contain.text', 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023')
         })
       })
+
+      context('Attempting to add an alert created by another user', () => {
+        beforeEach(() => {
+          cy.task('stubCreateAlertConflict')
+          cy.task('stubDuplicateAlert')
+          addAlertPage.typeField().select('AAA')
+          addAlertPage.subTypeField().select('AAA111')
+          addAlertPage.textField().type('Information to retain')
+          addAlertPage.saveButton().click()
+        })
+
+        it('should show the duplicate alert banner and preserve the form', () => {
+          addAlertPage.duplicateAlertError().should('contain.text', 'This alert already exists')
+          addAlertPage.typeField().should('have.value', 'A')
+          addAlertPage.subTypeField().should('have.value', 'A1')
+          addAlertPage.textField().should('have.value', 'Information to retain')
+        })
+
+        it('should open the existing alert in a modal', () => {
+          addAlertPage.duplicateAlertError().contains('View existing alert').click()
+          addAlertPage.alertModal().should('be.visible').and('contain.text', 'Alert details')
+          addAlertPage.alertModal().should('contain.text', 'AAA').and('contain.text', 'AAA111')
+          addAlertPage.alertModal().should('contain.text', 'Set fire to his cell while in a double cell')
+          addAlertPage.alertModal().should('contain.text', 'Start date').and('contain.text', '22 August 2011')
+          addAlertPage.alertModal().should('contain.text', 'End date').and('contain.text', '23 August 2199')
+          addAlertPage.alertModal().should('contain.text', 'Created by').and('contain.text', 'James T Kirk')
+        })
+
+        it('should navigate to add more details for the existing alert', () => {
+          addAlertPage.duplicateAlertError().contains('Add details to the alert').click()
+          cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/7/add-more-details')
+        })
+      })
     })
 
     context('As a user without prisoner in their caseload', () => {
