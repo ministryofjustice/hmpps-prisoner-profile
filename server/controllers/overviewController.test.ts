@@ -9,7 +9,6 @@ import {
   PrisonerVisitsAndVisitorsPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
-import { emptyPageResponse, pageResponse } from '../data/localMockData/pageResponse'
 import OverviewController from './overviewController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import {
@@ -113,7 +112,7 @@ describe('overviewController', () => {
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
-        prisonerData: PrisonerMockDataA,
+        prisonerData: { ...PrisonerMockDataA, prisonerNumber: offenderNo },
         inmateDetail: inmateDetailMock,
         alertSummaryData: {
           alertFlags: [],
@@ -897,12 +896,10 @@ describe('overviewController', () => {
     it('should not call api without DPS app dev role', async () => {
       await controller.displayOverview(req, res)
       expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
-      expect(xRayBodyScansApiClient.listScans).not.toHaveBeenCalled()
-      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+      expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
           xrayBodyScanSummary: null,
-          xrayBodyScanLatest: null,
         }),
       )
     })
@@ -916,17 +913,21 @@ describe('overviewController', () => {
       } as unknown as Response
     })
 
-    it('should get scan summary from api', async () => {
-      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(
-        mockScanSummaryResponse({
-          prisonerNumber: offenderNo,
-          nomisCount: 1,
-          dpsCount: 2,
-          positiveCount: 0,
-          negativeCount: 1,
-          inconclusiveCount: 1,
-        }),
-      )
+    it.each([
+      { scenario: 'no latest scan', latestScan: null },
+      { scenario: 'latest scan from DPS', latestScan: mockScanResponse(offenderNo) },
+      { scenario: 'latest scan from NOMIS', latestScan: mockLegacyScanResponse(offenderNo) },
+    ])('should get scan summary from api with $scenario', async ({ latestScan }) => {
+      const scanSummary = mockScanSummaryResponse({
+        prisonerNumber: offenderNo,
+        nomisCount: 1,
+        dpsCount: 2,
+        positiveCount: 0,
+        negativeCount: 1,
+        inconclusiveCount: 1,
+        latestScan,
+      })
+      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(scanSummary)
 
       await controller.displayOverview(req, resWithDpsDevRole)
 
@@ -936,89 +937,26 @@ describe('overviewController', () => {
           xrayBodyScanSummary: expect.objectContaining({
             status: 'fulfilled',
             value: {
-              prisonerNumber: offenderNo,
-              nomisCount: 1,
-              dpsCount: 2,
-              totalCount: 3,
-              positiveCount: 0,
-              negativeCount: 1,
-              inconclusiveCount: 1,
-              annualLimit: 116,
-              remainingScans: 113,
-              nearingScanLimit: false,
-              atScanLimit: false,
-              relevantAlerts: null,
-              fromScanDate: expect.any(Date),
-              toScanDate: expect.any(Date),
+              ...scanSummary,
               recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
               viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview$'),
             },
           }),
         }),
       )
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledWith(offenderNo, { includeLatestScan: true })
     })
 
-    it('should handle latest DPS scan from api', async () => {
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([mockScanResponse(offenderNo)]))
-
+    it('should indicate an error when API fails', async () => {
+      xRayBodyScansApiClient.getScanSummary.mockRejectedValueOnce('Server Error')
       await controller.displayOverview(req, resWithDpsDevRole)
 
       expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          xrayBodyScanLatest: expect.objectContaining({
-            status: 'fulfilled',
-            value: expect.objectContaining({
-              source: 'DPS',
-              id: expect.any(String),
-              prisonerNumber: offenderNo,
-              prisonId: 'MDI',
-              scanDate: expect.any(Date),
-              justification: 'REASONABLE_SUSPICION',
-              justificationDescription: 'Reasonable suspicion',
-              outcome: 'POSITIVE',
-              outcomeDescription: 'Item detected',
-              typeOfFind: 'INORGANIC',
-              typeOfFindDescription: 'Inorganic',
-            }),
-          }),
-        }),
-      )
-    })
-
-    it('should handle latest NOMIS scan from api', async () => {
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([mockLegacyScanResponse(offenderNo)]))
-
-      await controller.displayOverview(req, resWithDpsDevRole)
-
-      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          xrayBodyScanLatest: expect.objectContaining({
-            status: 'fulfilled',
-            value: expect.objectContaining({
-              source: 'NOMIS',
-              id: expect.any(String),
-              prisonerNumber: offenderNo,
-              scanDate: expect.any(Date),
-              scanDetails: null,
-            }),
-          }),
-        }),
-      )
-    })
-
-    it('should handle no latest scan from api', async () => {
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(emptyPageResponse())
-
-      await controller.displayOverview(req, resWithDpsDevRole)
-
-      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          xrayBodyScanLatest: expect.objectContaining({
-            status: 'fulfilled',
-            value: null,
+          xrayBodyScanSummary: expect.objectContaining({
+            status: 'rejected',
+            reason: expect.any(String),
           }),
         }),
       )
