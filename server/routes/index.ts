@@ -90,7 +90,11 @@ export default function routes(services: Services): Router {
     services.auditService,
   )
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
-  const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
+  const careNeedsController = new CareNeedsController(
+    services.careNeedsService,
+    services.dataAccess.xRayBodyScansApiClientBuilder,
+    services.auditService,
+  )
   const duplicateProfilesController = new DuplicateProfilesController(
     services.prisonPermissionsService,
     services.auditService,

@@ -1,4 +1,30 @@
-import { ContactDetail } from '../interfaces/prisonApi/StaffContacts'
+import type { Contact, ContactDetail } from '../interfaces/prisonApi/StaffContacts'
+
+export function mockPrisonerContact(overrides?: Partial<Contact>): Contact {
+  return {
+    lastName: 'Smith',
+    firstName: 'John',
+    middleName: 'Paul',
+    contactType: 'O',
+    contactTypeDescription: 'Responsible Officer',
+    relationship: 'PROBATION',
+    relationshipDescription: 'Probation Officer',
+    commentText: 'Some comment',
+    emergencyContact: false,
+    nextOfKin: false,
+    relationshipId: 1,
+    personId: 1,
+    activeFlag: true,
+    expiryDate: '2020-01-01',
+    approvedVisitorFlag: false,
+    canBeContactedFlag: true,
+    awareOfChargesFlag: false,
+    contactRootOffenderId: 1,
+    bookingId: 1,
+    createDateTime: '2020-01-01',
+    ...overrides,
+  }
+}
 
 export const mockContactDetail: ContactDetail = {
   bookingId: 0,

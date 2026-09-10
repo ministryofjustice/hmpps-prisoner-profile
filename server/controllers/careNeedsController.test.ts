@@ -1,13 +1,17 @@
 import type { Request, Response } from 'express'
 import config from '../config'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { careNeedsMock } from '../data/localMockData/careNeedsMock'
+import { pageResponse } from '../data/localMockData/pageResponse'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
+import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
+import { Role } from '../data/enums/role'
 import CareNeedsController from './careNeedsController'
 import CareNeedsService from '../services/careNeedsService'
-import { careNeedsMock, xrayBodyScansMock } from '../data/localMockData/careNeedsMock'
+import { mockLegacyScanResponse, mockScanResponse } from '../data/localMockData/xRayBodyScansMock'
 
 describe('Care needs controller', () => {
   const prisonerNumber = 'G6123VU'
@@ -17,6 +21,7 @@ describe('Care needs controller', () => {
   // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
   let resWithDpsDevRole: Response
 
+  let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let controller: CareNeedsController
 
   let xRayBodyScansWasEnabled: boolean = false
@@ -59,7 +64,9 @@ describe('Care needs controller', () => {
         },
       },
     } as unknown as Response
-    controller = new CareNeedsController(new CareNeedsService(null), auditServiceMock())
+
+    xRayBodyScansApiClient = xRayBodyScansApiClientMock()
+    controller = new CareNeedsController(new CareNeedsService(null), () => xRayBodyScansApiClient, auditServiceMock())
   })
 
   afterEach(() => {
@@ -83,32 +90,35 @@ describe('Care needs controller', () => {
 
   describe('displayXrayBodyScans', () => {
     it('should call the service and render the page', async () => {
-      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans').mockResolvedValue(xrayBodyScansMock)
+      const pageOfScans = pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)])
+      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageOfScans)
 
       await controller.displayXrayBodyScans(req, res)
+
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
-        bodyScans: xrayBodyScansMock,
+        pageOfScans,
       })
+      expect(xRayBodyScansApiClient.listScans).toHaveBeenCalledWith(prisonerNumber, { size: 200 })
     })
 
     it('should render the page when the x-ray body scans service is enabled but user doesn’t have DPS app dev role', async () => {
-      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans').mockResolvedValue(xrayBodyScansMock)
+      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
 
       await controller.displayXrayBodyScans(req, res)
+
       expect(res.render).toHaveBeenCalled()
       expect(res.redirect).not.toHaveBeenCalled()
     })
 
     it('should redirect to x-ray body scans service when enabled and user has DPS app dev role', async () => {
       config.featureToggles.xRayBodyScansEnabled = true
-      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans')
 
       await controller.displayXrayBodyScans(req, resWithDpsDevRole)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching('/prisoner/G6123VU/scan-overview$'))
-      expect(controller.careNeedsService.getXrayBodyScans).not.toHaveBeenCalled()
+      expect(xRayBodyScansApiClient.listScans).not.toHaveBeenCalled()
     })
   })
 })

@@ -64,11 +64,6 @@ import HmppsError from '../interfaces/HmppsError'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 import config from '../config'
-import {
-  xrayCareNeedsASCMock,
-  xrayCareNeedsDESCMock,
-  xrayCareNeedsMock,
-} from '../data/localMockData/personalCareNeedsMock'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
@@ -80,6 +75,7 @@ import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
 import { emptyAlertsMock, pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { mockPrisonerContact } from '../data/localMockData/contactDetail'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -581,28 +577,25 @@ describe('utils', () => {
   })
 
   describe('sortArrayOfObjectsByDate', () => {
-    it('Should return array of objects sorted in ascending order', () => {
-      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
-        xrayCareNeedsASCMock.personalCareNeeds,
-      )
-    })
-    it('Should return array of objects sorted in descending order', () => {
-      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
-        xrayCareNeedsDESCMock.personalCareNeeds,
-      )
-    })
-  })
+    const unsortedContacts = [
+      mockPrisonerContact({ createDateTime: '2020-01-11' }),
+      mockPrisonerContact({ createDateTime: '2020-01-02' }),
+      mockPrisonerContact({ createDateTime: '2020-01-07' }),
+    ]
 
-  describe('sortArrayOfObjectsByDate', () => {
     it('Should return array of objects sorted in ascending order', () => {
-      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
-        xrayCareNeedsASCMock.personalCareNeeds,
-      )
+      expect(
+        sortArrayOfObjectsByDate(unsortedContacts, 'createDateTime', SortType.ASC).map(
+          contact => contact.createDateTime,
+        ),
+      ).toEqual(['2020-01-02', '2020-01-07', '2020-01-11'])
     })
     it('Should return array of objects sorted in descending order', () => {
-      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
-        xrayCareNeedsDESCMock.personalCareNeeds,
-      )
+      expect(
+        sortArrayOfObjectsByDate(unsortedContacts, 'createDateTime', SortType.DESC).map(
+          contact => contact.createDateTime,
+        ),
+      ).toEqual(['2020-01-11', '2020-01-07', '2020-01-02'])
     })
   })
 

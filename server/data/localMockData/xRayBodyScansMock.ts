@@ -43,7 +43,7 @@ const sampleLegacyId = '715262'
 export function mockLegacyScanResponse(
   prisonerNumber: string,
   scanDate: Date | null = subDays(today, 10),
-  scanDetails: string | null = null,
+  scanDetails: string | null = 'Intelligence - negative',
 ): LegacyScanResponse {
   return {
     source: 'NOMIS',

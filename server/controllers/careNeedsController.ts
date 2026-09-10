@@ -1,15 +1,17 @@
 import type { Request, Response } from 'express'
 import config from '../config'
 import logger from '../../logger'
-import { sortArrayOfObjectsByDate, SortType } from '../utils/utils'
 import { type AuditService, Page } from '../services/auditService'
 import type CareNeedsService from '../services/careNeedsService'
+import type { RestClientBuilder } from '../data'
 import { Role } from '../data/enums/role'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class CareNeedsController {
   constructor(
     readonly careNeedsService: CareNeedsService,
+    private readonly xRayBodyScansApiClientBuilder: RestClientBuilder<XRayBodyScansApiClient>,
     private readonly auditService: AuditService,
   ) {}
 
@@ -52,7 +54,8 @@ export default class CareNeedsController {
       return
     }
 
-    const bodyScans = await this.careNeedsService.getXrayBodyScans(clientToken, prisonerData.bookingId)
+    const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
+    const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
 
     await this.auditService.sendPageView({
       user: res.locals.user,
@@ -64,7 +67,7 @@ export default class CareNeedsController {
 
     res.render('pages/xrayBodyScans', {
       pageTitle: 'X-ray body scans',
-      bodyScans: sortArrayOfObjectsByDate(bodyScans, 'scanDate', SortType.DESC),
+      pageOfScans,
     })
   }
 }
