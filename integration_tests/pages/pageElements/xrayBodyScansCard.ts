@@ -48,8 +48,4 @@ export default class XrayBodyScansCard {
   shouldShowSummaryIsUnavailable(): Cypress.Chainable<unknown> {
     return this.container.find('[data-qa="xray-body-scan-card--summary-unavailable"]').should('exist')
   }
-
-  shouldShowLatestScanIsUnavailable(): Cypress.Chainable<unknown> {
-    return this.container.find('[data-qa="xray-body-scan-card--latest-unavailable"]').should('exist')
-  }
 }
