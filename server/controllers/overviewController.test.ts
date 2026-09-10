@@ -108,7 +108,11 @@ describe('overviewController', () => {
   let csipService: CsipService
   let contactsService: ContactsService
 
+  let xRayBodyScansWasEnabled: boolean = false
+
   beforeEach(() => {
+    xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
+
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
@@ -145,8 +149,6 @@ describe('overviewController', () => {
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
 
-    config.featureToggles.xRayBodyScansEnabled = true
-
     controller = new OverviewController(
       () => pathfinderApiClient,
       () => manageSocCasesApiClient,
@@ -164,6 +166,10 @@ describe('overviewController', () => {
       csipService,
       contactsService,
     )
+  })
+
+  afterEach(() => {
+    config.featureToggles.xRayBodyScansEnabled = xRayBodyScansWasEnabled
   })
 
   describe('moneySummary', () => {
@@ -653,6 +659,8 @@ describe('overviewController', () => {
       // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
       let resWithDpsDevRole: Response
       beforeEach(() => {
+        config.featureToggles.xRayBodyScansEnabled = true
+
         resWithDpsDevRole = {
           ...res,
           locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
@@ -893,6 +901,10 @@ describe('overviewController', () => {
   })
 
   describe('x-ray body scans card', () => {
+    beforeEach(() => {
+      config.featureToggles.xRayBodyScansEnabled = true
+    })
+
     it('should not call api without DPS app dev role', async () => {
       await controller.displayOverview(req, res)
       expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
@@ -911,6 +923,14 @@ describe('overviewController', () => {
         ...res,
         locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
       } as unknown as Response
+    })
+
+    it('should not load when disabled', async () => {
+      config.featureToggles.xRayBodyScansEnabled = false
+
+      await controller.displayOverview(req, resWithDpsDevRole)
+
+      expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
     })
 
     it.each([

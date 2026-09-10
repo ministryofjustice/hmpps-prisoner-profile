@@ -1,35 +1,62 @@
+{% extends "partials/layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+
 {% set breadcrumbParent = { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" } %}
-{% set scanRows = [] %}
-{% for scan in bodyScans %}
-  {%
-    set scanRows = (scanRows.push(
-    [
-    { text: scan.scanDate | formatDate, classes: 'govuk-!-width-one-quarter' },
-    { text: scan.comment, classes: 'govuk-!-width-three-quarters' }
-    ]
-    ), scanRows)
-  %}
-{% endfor %}
-{% extends "../partials/layout.njk" %}
+
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} X-ray body scans</h1>
-      {% if bodyScans.length > 0 %}
-        {{
-          govukTable({
-          firstCellIsHeader: false,
-          head: [{text: 'Date'}, {text: 'Comments'}],
-          rows: scanRows
-          })
-        }}
-      {% else %}
-        <p class="govuk-body">No X-ray body scans have been entered.</p>
-      {% endif %}
-      <p class="govuk-body">
-        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/personal">Return to the prisoner’s profile</a>
-      </p>
+  <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} X-ray body scans</h1>
+
+  {% if showingDpsAndNomisScans %}
+    <p class="govuk-body-s hmpps-secondary-text" data-qa="mixed-scans-note">
+      Scan information includes DPS and legacy records
+    </p>
+  {% endif %}
+
+  {% if error %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ mojAlert({
+          variant: "error",
+          text: "The scan history could not be loaded. Try again. If the problem continues, try again later.",
+          role: "alert"
+        }) }}
+      </div>
     </div>
-  </div>
+
+  {% elseif pageOfScans.numberOfElements > 0 %}
+    {% set prisonNamesById = prisonNamesById.value if prisonNamesById and prisonNamesById.isFulfilled() else {} %}
+
+    {% set tableRows = [] %}
+    {% for scan in pageOfScans.content %}
+      {% if scan.source == "DPS" %}
+        {% set prisonName = prisonNamesById[scan.prisonId] | default(scan.prisonId) %}
+        {% set details %}
+          {{ prisonName }} – {{ scan.justificationDescription }} – {{ scan.outcomeDescription }}
+        {% endset %}
+      {% else %}
+        {% set details = scan.scanDetails %}
+      {% endif %}
+
+      {% set _ = tableRows.push([
+        { text: scan.scanDate | formatDate, classes: 'govuk-!-width-one-quarter' },
+        { html: details, classes: 'govuk-!-width-three-quarters' }
+      ]) %}
+    {% endfor %}
+
+    {{ govukTable({
+      firstCellIsHeader: false,
+      head: [{text: 'Date'}, {text: 'Comments'}],
+      rows: tableRows
+    }) }}
+  {% else %}
+
+    <p>No X-ray body scans have been entered.</p>
+
+  {% endif %}
+
+  <p>
+    <a href="/prisoner/{{ prisonerNumber }}/personal">Return to the prisoner’s profile</a>
+  </p>
 {% endblock %}
