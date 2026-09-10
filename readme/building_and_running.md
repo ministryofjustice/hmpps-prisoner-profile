@@ -109,6 +109,7 @@ CSIP_API_URL=https://csip-api-dev.hmpps.service.justice.gov.uk
 SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL=https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk
 PERSON_API_URL=https://hmpps-person-record-dev.hmpps.service.justice.gov.uk
 X_RAY_BODY_SCANS_API_URL=https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk
+TRANSFER_SCHEDULER_UI_URL=https://transfer-scheduler-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>
