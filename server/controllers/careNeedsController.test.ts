@@ -1,4 +1,5 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+import config from '../config'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
@@ -13,9 +14,16 @@ describe('Care needs controller', () => {
 
   let req: Request
   let res: Response
+  // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
+  let resWithDpsDevRole: Response
+
   let controller: CareNeedsController
 
+  let xRayBodyScansWasEnabled: boolean = false
+
   beforeEach(() => {
+    xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
+
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
@@ -37,13 +45,26 @@ describe('Care needs controller', () => {
           token: 'TOKEN',
         },
       },
+      redirect: jest.fn(),
       render: jest.fn(),
       status: jest.fn(),
+    } as unknown as Response
+    resWithDpsDevRole = {
+      ...res,
+      locals: {
+        ...res.locals,
+        user: {
+          ...res.locals.user,
+          userRoles: [Role.PrisonUser, Role.DpsApplicationDeveloper],
+        },
+      },
     } as unknown as Response
     controller = new CareNeedsController(new CareNeedsService(null), auditServiceMock())
   })
 
   afterEach(() => {
+    config.featureToggles.xRayBodyScansEnabled = xRayBodyScansWasEnabled
+
     const spy = jest.spyOn(Date, 'now')
     spy.mockRestore()
   })
@@ -69,6 +90,25 @@ describe('Care needs controller', () => {
         pageTitle: 'X-ray body scans',
         bodyScans: xrayBodyScansMock,
       })
+    })
+
+    it('should render the page when the x-ray body scans service is enabled but user doesn’t have DPS app dev role', async () => {
+      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans').mockResolvedValue(xrayBodyScansMock)
+
+      await controller.displayXrayBodyScans(req, res)
+      expect(res.render).toHaveBeenCalled()
+      expect(res.redirect).not.toHaveBeenCalled()
+    })
+
+    it('should redirect to x-ray body scans service when enabled and user has DPS app dev role', async () => {
+      config.featureToggles.xRayBodyScansEnabled = true
+      jest.spyOn(controller.careNeedsService, 'getXrayBodyScans')
+
+      await controller.displayXrayBodyScans(req, resWithDpsDevRole)
+
+      expect(res.render).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching('/prisoner/G6123VU/scan-overview$'))
+      expect(controller.careNeedsService.getXrayBodyScans).not.toHaveBeenCalled()
     })
   })
 })

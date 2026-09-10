@@ -1,8 +1,11 @@
-import { Request, Response } from 'express'
-import { sortArrayOfObjectsByDate, SortType } from '../utils/utils'
-import { AuditService, Page } from '../services/auditService'
+import type { Request, Response } from 'express'
+import config from '../config'
 import logger from '../../logger'
-import CareNeedsService from '../services/careNeedsService'
+import { sortArrayOfObjectsByDate, SortType } from '../utils/utils'
+import { type AuditService, Page } from '../services/auditService'
+import type CareNeedsService from '../services/careNeedsService'
+import { Role } from '../data/enums/role'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class CareNeedsController {
   constructor(
@@ -34,12 +37,22 @@ export default class CareNeedsController {
     })
   }
 
-  // TODO: remove in preference to a redirect to xrbs-ui
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
-    const { bookingId } = prisonerData
+    const { user } = res.locals
+    const { userRoles } = user as PrisonUser
 
-    const bodyScans = await this.careNeedsService.getXrayBodyScans(clientToken, bookingId)
+    // TODO: make this obey service’s active agencies
+    const showUnsafeXRayBodyScanData =
+      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
+
+    if (showUnsafeXRayBodyScanData) {
+      // TODO: move redirect to router level once enabled everywhere
+      res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerData.prisonerNumber}/scan-overview`)
+      return
+    }
+
+    const bodyScans = await this.careNeedsService.getXrayBodyScans(clientToken, prisonerData.bookingId)
 
     await this.auditService.sendPageView({
       user: res.locals.user,
