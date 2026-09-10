@@ -7,12 +7,14 @@
   <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} X-ray body scans</h1>
 
   {% if pageOfScans.numberOfElements > 0 %}
+    {% set prisonNamesById = prisonNamesById.value if prisonNamesById and prisonNamesById.isFulfilled() else {} %}
 
     {% set tableRows = [] %}
     {% for scan in pageOfScans.content %}
       {% if scan.source == "DPS" %}
+        {% set prisonName = prisonNamesById[scan.prisonId] | default(scan.prisonId) %}
         {% set details %}
-          {{ scan.justificationDescription }} – {{ scan.outcomeDescription }}
+          {{ prisonName }} – {{ scan.justificationDescription }} – {{ scan.outcomeDescription }}
         {% endset %}
       {% else %}
         {% set details = scan.scanDetails %}
@@ -20,7 +22,7 @@
 
       {% set _ = tableRows.push([
         { text: scan.scanDate | formatDate, classes: 'govuk-!-width-one-quarter' },
-        { text: details, classes: 'govuk-!-width-three-quarters' }
+        { html: details, classes: 'govuk-!-width-three-quarters' }
       ]) %}
     {% endfor %}
 

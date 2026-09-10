@@ -28,6 +28,7 @@ context('X-ray body scans', () => {
     cy.setupUserAuth()
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
+    cy.task('stubGetAllPrisons')
   })
 
   it('Displays the page when there are no scans', () => {
@@ -42,18 +43,30 @@ context('X-ray body scans', () => {
     cy.task('stubXRayBodyListScans', {
       prisonerNumber,
       request: { size: 200 },
-      response: pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)]),
+      response: pageResponse([
+        mockScanResponse(prisonerNumber),
+        {
+          ...mockScanResponse(prisonerNumber),
+          prisonId: 'ZZGHI',
+          justification: 'INTELLIGENCE',
+          justificationDescription: 'Intelligence-led',
+          outcome: 'NEGATIVE',
+          outcomeDescription: 'No item detected',
+        },
+        mockLegacyScanResponse(prisonerNumber),
+      ]),
     })
 
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
     const page = Page.verifyOnPageWithTitle(XrayBodyScans, possessivePrisonerName)
     page.bodyScansHistory.then(bodyScansHistory => {
-      expect(bodyScansHistory).to.have.lengthOf(2)
+      expect(bodyScansHistory).to.have.lengthOf(3)
       const year = `${new Date().getFullYear()}`
       expect(bodyScansHistory[0].date).to.contain(year)
-      expect(bodyScansHistory[1].date).to.contain(year)
-      expect(bodyScansHistory[0].comments).to.equal('Reasonable suspicion – Item detected')
-      expect(bodyScansHistory[1].comments).to.equal('Intelligence - negative')
+      expect(bodyScansHistory[2].date).to.contain(year)
+      expect(bodyScansHistory[0].comments).to.equal('Moorland (HMP & YOI) – Reasonable suspicion – Item detected')
+      expect(bodyScansHistory[1].comments).to.equal('ZZGHI – Intelligence-led – No item detected')
+      expect(bodyScansHistory[2].comments).to.equal('Intelligence - negative')
     })
   })
 

@@ -89,6 +89,10 @@ describe('Care needs controller', () => {
   })
 
   describe('displayXrayBodyScans', () => {
+    beforeEach(() => {
+      res.locals.prisonNamesById = { BXI: 'Brixton (HMP)', MDI: 'Moorland (HMP & YOI)' }
+    })
+
     it('should call the service and render the page', async () => {
       const pageOfScans = pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)])
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageOfScans)

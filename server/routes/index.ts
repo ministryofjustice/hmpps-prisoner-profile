@@ -281,6 +281,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services, { minimal: true }),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    retrievePrisonNamesById(services.prisonService),
     async (req, res) => {
       return careNeedsController.displayXrayBodyScans(req, res)
     },
