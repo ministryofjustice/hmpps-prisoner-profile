@@ -5,6 +5,10 @@ export default class XrayBodyScans extends Page {
     super(`${possessivePrisonerName} X-ray body scans`)
   }
 
+  get mixedScansNote(): PageElement<HTMLParagraphElement> {
+    return cy.getDataQa('mixed-scans-note')
+  }
+
   get bodyScansTable(): PageElement<HTMLTableElement> {
     return cy.get('.govuk-table')
   }

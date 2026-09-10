@@ -102,6 +102,7 @@ describe('Care needs controller', () => {
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
         pageOfScans,
+        showingDpsAndNomisScans: false,
       })
       expect(xRayBodyScansApiClient.listScans).toHaveBeenCalledWith(prisonerNumber, { size: 200 })
     })
@@ -111,7 +112,11 @@ describe('Care needs controller', () => {
 
       await controller.displayXrayBodyScans(req, res)
 
-      expect(res.render).toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans: expect.objectContaining({ content: [] }),
+        showingDpsAndNomisScans: false,
+      })
       expect(res.redirect).not.toHaveBeenCalled()
     })
 

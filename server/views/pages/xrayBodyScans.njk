@@ -6,6 +6,12 @@
 {% block content %}
   <h1 class="govuk-heading-l">{{ prisonerName.firstLast | apostrophe }} X-ray body scans</h1>
 
+  {% if showingDpsAndNomisScans %}
+    <p class="govuk-body-s hmpps-secondary-text" data-qa="mixed-scans-note">
+      Scan information includes DPS and legacy records
+    </p>
+  {% endif %}
+
   {% if pageOfScans.numberOfElements > 0 %}
     {% set prisonNamesById = prisonNamesById.value if prisonNamesById and prisonNamesById.isFulfilled() else {} %}
 

@@ -59,6 +59,7 @@ context('X-ray body scans', () => {
 
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
     const page = Page.verifyOnPageWithTitle(XrayBodyScans, possessivePrisonerName)
+    page.mixedScansNote.should('contain.text', 'Scan information includes DPS and legacy records')
     page.bodyScansHistory.then(bodyScansHistory => {
       expect(bodyScansHistory).to.have.lengthOf(3)
       const year = `${new Date().getFullYear()}`

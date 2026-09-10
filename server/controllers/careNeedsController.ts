@@ -56,6 +56,10 @@ export default class CareNeedsController {
 
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
     const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
+    const showingDpsAndNomisScans =
+      config.featureToggles.xRayBodyScansEnabled &&
+      pageOfScans.content.some(scan => scan.source === 'DPS') &&
+      pageOfScans.content.some(scan => scan.source === 'NOMIS')
 
     await this.auditService.sendPageView({
       user: res.locals.user,
@@ -68,6 +72,7 @@ export default class CareNeedsController {
     res.render('pages/xrayBodyScans', {
       pageTitle: 'X-ray body scans',
       pageOfScans,
+      showingDpsAndNomisScans,
     })
   }
 }
