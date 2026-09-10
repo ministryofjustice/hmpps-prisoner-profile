@@ -9,6 +9,10 @@ export default class XrayBodyScans extends Page {
     return cy.getDataQa('mixed-scans-note')
   }
 
+  get alert(): PageElement<HTMLDivElement> {
+    return cy.get('.moj-alert')
+  }
+
   get bodyScansTable(): PageElement<HTMLTableElement> {
     return cy.get('.govuk-table')
   }

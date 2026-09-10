@@ -1,5 +1,6 @@
 {% extends "partials/layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 
 {% set breadcrumbParent = { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" } %}
 
@@ -12,7 +13,19 @@
     </p>
   {% endif %}
 
-  {% if pageOfScans.numberOfElements > 0 %}
+  {% if error %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ mojAlert({
+          variant: "error",
+          text: "The scan history could not be loaded. Try again. If the problem continues, try again later.",
+          role: "alert"
+        }) }}
+      </div>
+    </div>
+
+  {% elseif pageOfScans.numberOfElements > 0 %}
     {% set prisonNamesById = prisonNamesById.value if prisonNamesById and prisonNamesById.isFulfilled() else {} %}
 
     {% set tableRows = [] %}

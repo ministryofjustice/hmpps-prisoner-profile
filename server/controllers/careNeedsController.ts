@@ -54,25 +54,35 @@ export default class CareNeedsController {
       return
     }
 
-    const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
-    const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
-    const showingDpsAndNomisScans =
-      config.featureToggles.xRayBodyScansEnabled &&
-      pageOfScans.content.some(scan => scan.source === 'DPS') &&
-      pageOfScans.content.some(scan => scan.source === 'NOMIS')
+    try {
+      const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
+      const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
+      const showingDpsAndNomisScans =
+        config.featureToggles.xRayBodyScansEnabled &&
+        pageOfScans.content.some(scan => scan.source === 'DPS') &&
+        pageOfScans.content.some(scan => scan.source === 'NOMIS')
 
-    await this.auditService.sendPageView({
-      user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
-      correlationId: req.id,
-      page: Page.XRayBodyScans,
-    })
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.XRayBodyScans,
+      })
 
-    res.render('pages/xrayBodyScans', {
-      pageTitle: 'X-ray body scans',
-      pageOfScans,
-      showingDpsAndNomisScans,
-    })
+      res.render('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans,
+        showingDpsAndNomisScans,
+      })
+    } catch (error) {
+      logger.error(error, 'X-ray body scans did not load')
+      res.render('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans: null,
+        showingDpsAndNomisScans: false,
+        error: true,
+      })
+    }
   }
 }

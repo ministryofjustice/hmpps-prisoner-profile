@@ -120,6 +120,20 @@ describe('Care needs controller', () => {
       expect(res.redirect).not.toHaveBeenCalled()
     })
 
+    it('should show an error message if loading x-ray body scans failed', async () => {
+      xRayBodyScansApiClient.listScans.mockRejectedValueOnce({ status: 500, message: 'Internal Server Error' })
+
+      await controller.displayXrayBodyScans(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans: null,
+        showingDpsAndNomisScans: false,
+        error: true,
+      })
+      expect(res.redirect).not.toHaveBeenCalled()
+    })
+
     it('should redirect to x-ray body scans service when enabled and user has DPS app dev role', async () => {
       config.featureToggles.xRayBodyScansEnabled = true
 
