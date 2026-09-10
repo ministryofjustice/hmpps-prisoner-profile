@@ -43,7 +43,7 @@ export class AppointmentPage extends Page {
     this.officerEmailInput.should('be.hidden')
     this.officerTelephoneInput.should('be.hidden')
     this.meetingTypeRadioButtons.fieldset.should('be.hidden')
-    return cy.end()
+    return cy.wrap(null)
   }
 
   get dateField(): PageElement<HTMLInputElement> {
@@ -63,7 +63,7 @@ export class AppointmentPage extends Page {
   selectStartTime(hours: string, minutes: string): Cypress.Chainable {
     this.startTimeHoursField.select(hours)
     this.startTimeMinutesField.select(minutes)
-    return cy.end()
+    return cy.wrap(null)
   }
 
   endTimeHoursField = new SelectElement('#endTime-hours')
@@ -79,7 +79,7 @@ export class AppointmentPage extends Page {
   selectEndTime(hours: string, minutes: string): Cypress.Chainable {
     this.endTimeHoursField.select(hours)
     this.endTimeMinutesField.select(minutes)
-    return cy.end()
+    return cy.wrap(null)
   }
 
   offenderEventsTable = new ScheduledEventsTable('#offender-events')

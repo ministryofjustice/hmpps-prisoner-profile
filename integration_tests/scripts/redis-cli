@@ -1,9 +1,3 @@
 #!/bin/bash
 
-# First check to see if the -N flag is supported for the flavour of netcat available:
-cat <(echo SET test pass) | nc -N localhost 6379
-if [ $? -eq 0 ]; then
-  cat <(echo $1) | nc -N localhost 6379
-else
-  cat <(echo $1) | nc localhost 6379
-fi
+printf '%s\n' "$1" | sed 's/\\"/"/g' | nc -w 1 localhost 6379
