@@ -204,15 +204,16 @@ export default class PersonalPage extends Page {
     const cardData = () => cy.getDataQa('security')
     const xraySection = () => cardData().findDataQa('security-xrays')
     return {
-      get section() {
+      get card() {
         return cardData()
       },
-      interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
-      travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
+      get interestToImmigration() {
+        return cardData().findDataQa('interest-to-immigration')
+      },
+      get travelRestrictions() {
+        return cardData().findDataQa('travel-restrictions')
+      },
       xrays: {
-        get section() {
-          return xraySection()
-        },
         get total() {
           return xraySection().findDataQa('total-xrays')
         },

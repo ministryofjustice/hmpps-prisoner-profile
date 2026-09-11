@@ -527,9 +527,9 @@ context('When signed in', () => {
     context('Security', () => {
       it('Displays the security warnings', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.security.interestToImmigration().should('be.visible')
-        page.security.travelRestrictions().should('be.visible')
-        page.security.travelRestrictions().should('include.text', 'some travel restrictions')
+        page.security.interestToImmigration.should('be.visible')
+        page.security.travelRestrictions.should('be.visible')
+        page.security.travelRestrictions.should('include.text', 'some travel restrictions')
       })
     })
 
@@ -658,12 +658,12 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
-    it('indicates that x-ray body scans have moved to the overview page', () => {
+    it('Says that x-ray body scans have moved to the overview page', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       visitPersonalDetailsPage()
       const page = Page.verifyOnPage(PersonalPage)
-      page.security.section.should('contain.text', 'X-ray body scan information has moved')
-      page.security.section.find('a').should('have.attr', 'href', '/prisoner/G6123VU#xray-body-scan-card')
+      page.security.card.should('contain.text', 'X-ray body scan information has moved')
+      page.security.card.find('a').should('have.attr', 'href', '/prisoner/G6123VU#xray-body-scan-card')
     })
 
     context('With none', () => {
