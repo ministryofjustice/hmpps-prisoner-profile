@@ -1,10 +1,11 @@
-import { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { UUID } from 'crypto'
-import HmppsError from '../../interfaces/HmppsError'
-import { HmppsUser } from '../../interfaces/HmppsUser'
-import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
-import { AlertSummaryData } from '../../data/interfaces/alertsApi/Alert'
-import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import type { UUID } from 'node:crypto'
+import type { SharedData } from '@ministryofjustice/hmpps-connect-dps-components'
+import type { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import type HmppsError from '../../interfaces/HmppsError'
+import type { HmppsUser } from '../../interfaces/HmppsUser'
+import type { AlertSummaryData } from '../../data/interfaces/alertsApi/Alert'
+import type InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import type Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -44,6 +45,13 @@ export declare global {
     }
 
     interface Locals {
+      feComponents: {
+        header: string
+        footer: string
+        cssIncludes: string[]
+        jsIncludes: string[]
+        sharedData: SharedData
+      }
       user: HmppsUser
       prisonerPermissions?: PrisonerPermissions
     }
