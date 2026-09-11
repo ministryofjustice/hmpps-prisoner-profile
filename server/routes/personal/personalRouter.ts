@@ -17,6 +17,7 @@ export default function personalRouter(services: Services): Router {
     services.personalPageService,
     services.careNeedsService,
     services.auditService,
+    services.prisonerPropertyService,
   )
 
   router.get(
