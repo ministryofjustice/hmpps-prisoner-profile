@@ -200,16 +200,29 @@ export default class PersonalPage extends Page {
     }
   }
 
-  security = () => {
+  get security() {
     const cardData = () => cy.getDataQa('security')
+    const xraySection = () => cardData().findDataQa('security-xrays')
     return {
+      get section() {
+        return cardData()
+      },
       interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
       travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
-      xrays: () => ({
-        total: () => cardData().findDataQa('security-xrays').findDataQa('total-xrays'),
-        since: () => cardData().findDataQa('security-xrays').findDataQa('xrays-since'),
-        warningMessage: () => cardData().findDataQa('security-xrays').findDataQa('xray-limit-reached-message'),
-      }),
+      xrays: {
+        get section() {
+          return xraySection()
+        },
+        get total() {
+          return xraySection().findDataQa('total-xrays')
+        },
+        get since() {
+          return xraySection().findDataQa('xrays-since')
+        },
+        get warningMessage() {
+          return xraySection().findDataQa('xray-limit-reached-message')
+        },
+      },
     }
   }
 

@@ -1,8 +1,6 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import config from '../../config'
-import { PrisonUser } from '../../interfaces/HmppsUser'
-import PersonalPageService from '../../services/personalPageService'
-import CareNeedsService from '../../services/careNeedsService'
+import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
@@ -10,7 +8,10 @@ import {
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
+  isXrayBodyScansServiceEnabled,
 } from '../../utils/featureFlags'
+import CareNeedsService from '../../services/careNeedsService'
+import PersonalPageService from '../../services/personalPageService'
 
 export default class PersonalController {
   constructor(
@@ -29,6 +30,7 @@ export default class PersonalController {
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
+      const xrayBodyScansServiceEnabled = isXrayBodyScansServiceEnabled(res)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -39,7 +41,7 @@ export default class PersonalController {
           personEndpointsEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
-        this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
+        xrayBodyScansServiceEnabled ? null : this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
 
       await this.auditService.sendPageView({
@@ -73,6 +75,7 @@ export default class PersonalController {
         hasHomeOfficeId,
         useCustomErrorBanner: true,
         changeContactLinkEnabled,
+        xrayBodyScansServiceEnabled,
       })
     }
   }
