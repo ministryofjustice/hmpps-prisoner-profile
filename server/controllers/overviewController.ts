@@ -15,7 +15,6 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { Role } from '../data/enums/role'
 import { formatName, isInUsersCaseLoad } from '../utils/utils'
 import type { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import type { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
@@ -45,8 +44,8 @@ import getCategorySummary from './utils/overviewController/getCategorySummary'
 import { mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
+import { isXrayBodyScansServiceEnabled, offencesMoved } from '../utils/featureFlags'
 import ContactsService from '../services/contactsService'
-import { offencesMoved } from '../utils/featureFlags'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -72,7 +71,7 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response) {
     const { apiErrorCallback, user, prisonerPermissions } = res.locals
-    const { activeCaseLoadId, userRoles } = user as PrisonUser
+    const { activeCaseLoadId } = user as PrisonUser
     const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
@@ -86,9 +85,7 @@ export default class OverviewController {
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
     const showConfirmedReleaseDateNonCalculate = !showCourtCaseSummary && offencesMoved(activeCaseLoadId)
 
-    // TODO: make this obey service’s active agencies
-    const showUnsafeXRayBodyScanData =
-      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
+    const xrayBodyScansServiceEnabled = isXrayBodyScansServiceEnabled(res)
 
     const [
       pathfinderNominal,
@@ -149,7 +146,7 @@ export default class OverviewController {
       isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
         ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      showUnsafeXRayBodyScanData
+      xrayBodyScansServiceEnabled
         ? Result.wrap(
             xRayBodyScansApiClient
               .getScanSummary(prisonerNumber, { includeLatestScan: true })
