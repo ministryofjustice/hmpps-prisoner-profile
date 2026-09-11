@@ -91,6 +91,7 @@ export interface AlertsApiQueryParams extends QueryParams {
   activeFromEnd?: string
   activeFromStart?: string
   alertType?: string | string[]
+  alertCode?: string | string[]
   showAll?: boolean
 }
 

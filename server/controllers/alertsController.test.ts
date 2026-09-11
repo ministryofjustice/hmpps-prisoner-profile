@@ -301,6 +301,24 @@ describe('Alerts Controller', () => {
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })
+
+    it('should preserve the form and show the existing alert when creating a duplicate', async () => {
+      req.body = alertFormMock
+      const conflict = Object.assign(new Error('Conflict'), { status: 409 })
+      jest.spyOn(controller.alertsService, 'createAlert').mockRejectedValue(conflict)
+      jest.spyOn(controller.alertsService, 'getActiveAlertByCode').mockResolvedValue(alertDetailsMock)
+
+      await controller.post()(req, res, next)
+
+      expect(controller.alertsService.getActiveAlertByCode).toHaveBeenCalledWith(
+        'CLIENT_TOKEN',
+        'G6123VU',
+        alertFormMock.alertCode,
+      )
+      expect(req.flash).toHaveBeenCalledWith('alert', alertFormMock)
+      expect(req.flash).toHaveBeenCalledWith('duplicateAlertId', alertDetailsMock.alertUuid)
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/add-alert')
+    })
   })
 
   describe('Alert details page', () => {

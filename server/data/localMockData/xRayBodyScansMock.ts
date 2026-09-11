@@ -43,7 +43,7 @@ const sampleLegacyId = '715262'
 export function mockLegacyScanResponse(
   prisonerNumber: string,
   scanDate: Date | null = subDays(today, 10),
-  scanDetails: string | null = null,
+  scanDetails: string | null = 'Intelligence - negative',
 ): LegacyScanResponse {
   return {
     source: 'NOMIS',
@@ -64,6 +64,7 @@ interface ScanSummaryMockOptions {
   positiveCount?: number
   negativeCount?: number
   inconclusiveCount?: number
+  latestScan?: ScanResponse | LegacyScanResponse | null
   relevantAlerts?: AlertResponse[] | null
 }
 
@@ -81,6 +82,7 @@ export function mockScanSummaryResponse({
   positiveCount = 0,
   negativeCount = 0,
   inconclusiveCount = 0,
+  latestScan = null,
   relevantAlerts = null,
 }: ScanSummaryMockOptions): ScanSummaryResponse {
   const totalCount = nomisCount + dpsCount
@@ -99,6 +101,7 @@ export function mockScanSummaryResponse({
     remainingScans,
     nearingScanLimit,
     atScanLimit,
+    latestScan: latestScan ?? null,
     relevantAlerts,
     fromScanDate: startOfYear(today),
     toScanDate: today,

@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-mini-banner {
   background-color: govuk-colour("black", $variant: "tint-95");
   display: flex;

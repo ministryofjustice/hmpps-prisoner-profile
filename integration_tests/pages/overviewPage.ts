@@ -190,11 +190,11 @@ export default class OverviewPage extends Page {
   // Alert Flags
   alertFlags = (): PageElement => cy.get('[data-qa="alert-flags"]')
 
-  alertModal = (): PageElement => cy.get('[data-module="modal"]')
+  alertModal = (): PageElement => cy.get('[data-module="hmpps-modal"]')
 
-  alertModalBody = (): PageElement => this.alertModal().get('[data-modal-body]')
+  alertModalBody = (): PageElement => this.alertModal().get('.hmpps-modal__content')
 
-  alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
+  alertModalClose = (): PageElement => this.alertModal().get('.hmpps-modal__trigger-hide')
 
   get xrayBodyScansCard(): XrayBodyScansCard {
     return new XrayBodyScansCard('#xray-body-scan-card')

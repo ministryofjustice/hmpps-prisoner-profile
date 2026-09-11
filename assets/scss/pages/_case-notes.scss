@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-case-note-card-list-item {
   display: flex;
   flex-wrap: wrap;
@@ -15,7 +17,7 @@
   &__sub-title {
     font-size: 16px;
     font-weight: 300;
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     margin-bottom: 15px;
   }
 
@@ -30,7 +32,7 @@
   &__amendments-header {
     font-size: 19px;
     font-weight: bold;
-    color: govuk-colour('black');
+    color: govuk-functional-colour(text);
     margin-top: 15px;
   }
 

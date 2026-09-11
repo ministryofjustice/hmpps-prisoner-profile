@@ -1,6 +1,6 @@
-{% from "components/catAPrisonerTag/catAPrisonerTag.njk" import catAPrisonerTag %}
-{% from 'components/modal/modal.njk' import modal %}
 {% from "dps/components/alert-flag/macro.njk" import alertFlag %}
+{% from "dps/components/modal/macro.njk" import hmppsModal %}
+{% from "components/catAPrisonerTag/catAPrisonerTag.njk" import catAPrisonerTag %}
 {% from "macros/hmppsError.njk" import hmppsError %}
 
 {% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) %}
@@ -12,13 +12,13 @@
         {% endif %}
 
         {% if alertSummaryData.apiUnavailable %}
-        {{ hmppsError({
-                type: 'service-unavailable',
-                classes: 'govuk-!-margin-bottom-2',
-                serviceName: 'Alerts',
-                isAre: 'are',
-                small: true
-            }) }}
+          {{ hmppsError({
+              type: 'service-unavailable',
+              classes: 'govuk-!-margin-bottom-2',
+              serviceName: 'Alerts',
+              isAre: 'are',
+              small: true
+          }) }}
         {% else %}
             {% for alert in alertSummaryData.alertFlags %}
                 <li>
@@ -39,12 +39,9 @@
         {% endif %}
     </ul>
 
-    {{ modal({
+    {{ hmppsModal({
         id: "alert-details",
         title: "Alert details",
-        classes: "alert-details-modal",
-        close: {
-            label: "Close"
-        }
+        classes: "alert-details-modal"
     }) }}
 {% endmacro %}

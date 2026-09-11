@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-actions-block {
   border: 1px solid govuk-colour("black", $variant: "tint-25");
 
@@ -41,6 +43,6 @@
   }
 
   li:not(:last-of-type) {
-    border-bottom: 2px solid $govuk-border-colour;
+    border-bottom: 2px solid govuk-functional-colour(border);
   }
 }

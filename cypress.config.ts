@@ -20,6 +20,7 @@ import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfileDeliusApi'
 import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
+import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import prisonRegisterApi from './integration_tests/mockApis/prisonRegisterApi'
 import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateReleaseDatesApi'
 import contentful from './integration_tests/mockApis/contentful'
@@ -75,6 +76,7 @@ export default defineConfig({
         ...nonAssociationsApi,
         ...prisonerProfileDeliusApi,
         ...whereAboutsApi,
+        ...cellMovementsApi,
         ...prisonRegisterApi,
         ...calcluateReleaseDatesApi,
         ...contentful,
@@ -97,6 +99,5 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
-    allowCypressEnv: false,
   },
 })

@@ -1,10 +1,10 @@
-import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
-import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
-import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
-import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
-import { UserToken } from './mockApis/auth'
-import { ReferenceDataCode } from '../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
+import type { UserToken } from './mockApis/auth'
+import type { ReferenceDataCode } from '../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import type CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
+import type VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
+import type Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
 
 declare global {
   namespace Cypress {
@@ -79,9 +79,9 @@ declare global {
         services?: Service[]
       }): Chainable<AUTWindow>
 
-      getDataQa(id: string): Chainable<JQuery<HTMLElement>>
+      getDataQa<Element = HTMLElement>(id: string): Chainable<JQuery<Element>>
 
-      findDataQa(id: string): Chainable<JQuery<HTMLElement>>
+      findDataQa<Element = HTMLElement>(id: string): Chainable<JQuery<Element>>
 
       setupPrisonerSchedulePageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
 

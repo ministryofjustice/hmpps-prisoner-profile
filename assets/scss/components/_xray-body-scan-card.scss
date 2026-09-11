@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .xray-body-scan-card__columns {
   margin: 0 #{-$govuk-gutter-half};
 

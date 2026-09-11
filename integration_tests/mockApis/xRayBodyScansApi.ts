@@ -8,6 +8,7 @@ import type {
   LegacyScanResponse,
   ListScansRequest,
   ScanResponse,
+  ScanSummaryRequest,
   ScanSummaryResponse,
 } from '../../server/data/interfaces/xRayBodyScansApi'
 import { mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
@@ -40,20 +41,7 @@ export default {
       'content' in response
         ? {
             ...response,
-            content: response.content.map(scan =>
-              scan.source === 'NOMIS'
-                ? {
-                    ...scan,
-                    scanDate: scan.scanDate ? formatISO(scan.scanDate, { representation: 'date' }) : null,
-                  }
-                : {
-                    ...scan,
-                    scanDate: formatISO(scan.scanDate, { representation: 'date' }),
-                    mergedAt: scan.mergedAt ? formatISO(scan.mergedAt) : null,
-                    createdAt: formatISO(scan.createdAt),
-                    lastModifiedAt: formatISO(scan.lastModifiedAt),
-                  },
-            ),
+            content: response.content.map(scan => scanToRawScan(scan)),
           }
         : response
     return stubFor({
@@ -75,14 +63,24 @@ export default {
   stubXRayBodyScanSummary({
     prisonerNumber,
     response = mockScanSummaryResponse({ prisonerNumber: 'G6123VU' }),
+    request,
   }: {
     prisonerNumber: string
     response: ScanSummaryResponse | ErrorResponse
+    request?: ScanSummaryRequest
   }): SuperAgentRequest {
+    const queryParameters: Record<string, { equalTo: string }> = {}
+    if (request?.includeLatestScan) {
+      queryParameters.includeLatestScan = { equalTo: 'true' }
+    }
+    if (request?.includeAlerts) {
+      queryParameters.includeAlerts = { equalTo: 'true' }
+    }
     const jsonBody: object =
       'fromScanDate' in response
         ? {
             ...response,
+            latestScan: response.latestScan ? scanToRawScan(response.latestScan) : null,
             fromScanDate: formatISO(response.fromScanDate, { representation: 'date' }),
             toScanDate: formatISO(response.toScanDate, { representation: 'date' }),
           }
@@ -91,6 +89,7 @@ export default {
       request: {
         method: 'GET',
         urlPath: `/xRayBodyScansApi/prisoner/${prisonerNumber}/scan/summary`,
+        queryParameters,
       },
       response: {
         status: ('status' in response && response.status) || 200,
@@ -101,4 +100,19 @@ export default {
       },
     })
   },
+}
+
+function scanToRawScan(scan: ScanResponse | LegacyScanResponse) {
+  return scan.source === 'NOMIS'
+    ? {
+        ...scan,
+        scanDate: scan.scanDate ? formatISO(scan.scanDate, { representation: 'date' }) : null,
+      }
+    : {
+        ...scan,
+        scanDate: formatISO(scan.scanDate, { representation: 'date' }),
+        mergedAt: scan.mergedAt ? formatISO(scan.mergedAt) : null,
+        createdAt: formatISO(scan.createdAt),
+        lastModifiedAt: formatISO(scan.lastModifiedAt),
+      }
 }

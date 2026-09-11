@@ -1,6 +1,5 @@
 import config from '../../../config'
-import type { PageResponse } from '../../../data/interfaces/PageResponse'
-import type { LegacyScanResponse, ScanResponse, ScanSummaryResponse } from '../../../data/interfaces/xRayBodyScansApi'
+import type { ScanSummaryResponse } from '../../../data/interfaces/xRayBodyScansApi'
 
 /** Extended response from xray body scans api for overview page card */
 export interface XrayBodyScanSummary extends ScanSummaryResponse {
@@ -12,13 +11,8 @@ export function mapXrayBodyScanSummary(summaryResponse: ScanSummaryResponse): Xr
   const urlPrefix = `${config.serviceUrls.xRayBodyScansUi}/prisoner/${summaryResponse.prisonerNumber}`
   return {
     ...summaryResponse,
-    recordScanUrl: `${urlPrefix}/create-scan`,
-    viewHistoryUrl: `${urlPrefix}/scans`,
+    // TODO: make this obey service’s active agencies
+    recordScanUrl: `${urlPrefix}/record-scan`,
+    viewHistoryUrl: `${urlPrefix}/scan-overview`,
   }
-}
-
-export function mapLatestXrayBodyScan(
-  listResponse: PageResponse<ScanResponse | LegacyScanResponse>,
-): ScanResponse | LegacyScanResponse | null {
-  return listResponse?.content?.[0] ?? null
 }

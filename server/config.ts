@@ -167,6 +167,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
+    cellMovementsApi: {
+      url: get('CELL_MOVEMENTS_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('CELL_MOVEMENTS_API_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('CELL_MOVEMENTS_API_TIMEOUT_SECONDS', 3000)),
+      },
+      agent: new AgentConfig(Number(get('CELL_MOVEMENTS_API_TIMEOUT_DEADLINE', 3000))),
+    },
     bookAVideoLinkApi: {
       url: get('BOOK_A_VIDEO_LINK_API_URL', 'http://localhost:8082', requiredInProduction),
       healthPath: '/health/ping',
@@ -389,6 +398,7 @@ export default {
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
     prisonerProperty: get('PRISONER_PROPERTY_UI_URL', 'http://localhost:3001', requiredInProduction),
+    transferScheduler: get('TRANSFER_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),

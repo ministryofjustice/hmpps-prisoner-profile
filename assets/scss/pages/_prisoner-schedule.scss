@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use '@ministryofjustice/frontend/moj/base' as *;
 
 .prisoner-schedule {
   &__day {
@@ -27,7 +28,7 @@
 
       @media print {
         padding-left: govuk-spacing(3);
-        border-left: 1px solid $govuk-border-colour;
+        border-left: 1px solid govuk-functional-colour(border);
       }
     }
   }

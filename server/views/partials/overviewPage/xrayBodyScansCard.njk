@@ -1,7 +1,7 @@
 {% from "macros/summaryCardMacro.njk" import summaryCard %}
 {% from "macros/xrayBodyScanCount.njk" import xrayBodyScanCount %}
 
-{% if xrayBodyScanSummary and xrayBodyScanLatest %}
+{% if xrayBodyScanSummary %}
   {% set xrayBodyScanSummary = xrayBodyScanSummary.getOrNull() %}
 
   {% call summaryCard({ title: 'X-ray body scans', id: 'xray-body-scan-card' }) %}
@@ -21,34 +21,21 @@
         </div>
 
         <div class="xray-body-scan-card__column">
-          {% set xrayBodyScanLatestError = not xrayBodyScanLatest.isFulfilled() %}
-          {% set xrayBodyScanLatest = xrayBodyScanLatest.getOrNull() %}
-          {% if xrayBodyScanLatestError %}
-
-            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
-              Last scan date
-            </h3>
-            {{ hmppsError({
-              type: 'inset',
-              dataQa: 'xray-body-scan-card--latest-unavailable',
-              text: unavailableApiErrorText
-            }) }}
-
-          {% elseif xrayBodyScanLatest and xrayBodyScanLatest.scanDate %}
+          {% if xrayBodyScanSummary.latestScan and xrayBodyScanSummary.latestScan.scanDate %}
 
             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
               Last scan date
             </h3>
             <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-date">
-              {{ xrayBodyScanLatest.scanDate | formatDate('short') }}
+              {{ xrayBodyScanSummary.latestScan.scanDate | formatDate('short') }}
             </p>
 
-            {% if xrayBodyScanLatest.outcomeDescription %}
+            {% if xrayBodyScanSummary.latestScan.outcomeDescription %}
               <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                 Result
               </h3>
               <p class="govuk-!-margin-bottom-1" data-qa="xray-body-scan-card__latest-outcome">
-                {{ xrayBodyScanLatest.outcomeDescription }}
+                {{ xrayBodyScanSummary.latestScan.outcomeDescription }}
               </p>
             {% endif %}
 

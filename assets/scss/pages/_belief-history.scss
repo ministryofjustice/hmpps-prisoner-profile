@@ -1,10 +1,12 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .belief-card {
 
   padding-bottom: 30px;
-  border-top: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
 
   &:last-of-type {
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
     margin-bottom: 30px;
   }
 

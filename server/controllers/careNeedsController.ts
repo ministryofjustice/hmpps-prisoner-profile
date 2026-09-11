@@ -1,12 +1,17 @@
-import { Request, Response } from 'express'
-import { sortArrayOfObjectsByDate, SortType } from '../utils/utils'
-import { AuditService, Page } from '../services/auditService'
+import type { Request, Response } from 'express'
+import config from '../config'
 import logger from '../../logger'
-import CareNeedsService from '../services/careNeedsService'
+import { type AuditService, Page } from '../services/auditService'
+import type CareNeedsService from '../services/careNeedsService'
+import type { RestClientBuilder } from '../data'
+import { Role } from '../data/enums/role'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class CareNeedsController {
   constructor(
     readonly careNeedsService: CareNeedsService,
+    private readonly xRayBodyScansApiClientBuilder: RestClientBuilder<XRayBodyScansApiClient>,
     private readonly auditService: AuditService,
   ) {}
 
@@ -34,24 +39,50 @@ export default class CareNeedsController {
     })
   }
 
-  // TODO: remove in preference to a redirect to xrbs-ui
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
-    const { bookingId } = prisonerData
+    const { user } = res.locals
+    const { userRoles } = user as PrisonUser
 
-    const bodyScans = await this.careNeedsService.getXrayBodyScans(clientToken, bookingId)
+    // TODO: make this obey service’s active agencies
+    const showUnsafeXRayBodyScanData =
+      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
 
-    await this.auditService.sendPageView({
-      user: res.locals.user,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
-      correlationId: req.id,
-      page: Page.XRayBodyScans,
-    })
+    if (showUnsafeXRayBodyScanData) {
+      // TODO: move redirect to router level once enabled everywhere
+      res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerData.prisonerNumber}/scan-overview`)
+      return
+    }
 
-    res.render('pages/xrayBodyScans', {
-      pageTitle: 'X-ray body scans',
-      bodyScans: sortArrayOfObjectsByDate(bodyScans, 'scanDate', SortType.DESC),
-    })
+    try {
+      const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
+      const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
+      const showingDpsAndNomisScans =
+        config.featureToggles.xRayBodyScansEnabled &&
+        pageOfScans.content.some(scan => scan.source === 'DPS') &&
+        pageOfScans.content.some(scan => scan.source === 'NOMIS')
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.XRayBodyScans,
+      })
+
+      res.render('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans,
+        showingDpsAndNomisScans,
+      })
+    } catch (error) {
+      logger.error(error, 'X-ray body scans did not load')
+      res.render('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans: null,
+        showingDpsAndNomisScans: false,
+        error: true,
+      })
+    }
   }
 }

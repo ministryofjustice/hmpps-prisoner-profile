@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-address-field {
   max-width: 630px;
 
@@ -11,16 +13,16 @@
 }
 
 .address-metadata {
-  border-top: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
   padding-top: 15px;
   font-size: 16px;
   font-weight: 300;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .address-section-divider {
   padding-bottom: 30px;
-  border-bottom: 3px solid $govuk-border-colour;
+  border-bottom: 3px solid govuk-functional-colour(border);
 }
 
 .address-cards {

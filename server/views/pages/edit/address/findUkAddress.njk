@@ -11,10 +11,10 @@
       <h1 class="govuk-label-wrapper">
         <label class="govuk-label govuk-label--l" for="address-autosuggest-input">{{ formTitle }}</label>
       </h1>
-      <div id="address-hint" class="govuk-hint">Start typing a postcode or address</div>
+      <div id="address-hint" class="govuk-hint">Enter three or more characters of a postcode or address.</div>
       <div id="address-input">
         {{ addressAutosuggest({
-          value: inputValue,
+          inputValue: inputValue,
           errorMessage: errors | findError('address-autosuggest-input')
         }) }}
       </div>

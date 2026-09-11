@@ -67,6 +67,7 @@ export const services = () => {
     adjudicationsApiClientBuilder,
     nonAssociationsApiClientBuilder,
     whereaboutsApiClientBuilder,
+    cellMovementsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
@@ -160,8 +161,7 @@ export const services = () => {
   )
   const prisonerLocationHistoryService = new PrisonerLocationHistoryService(
     prisonApiClientBuilder,
-    whereaboutsApiClientBuilder,
-    caseNotesApiClientBuilder,
+    cellMovementsApiClientBuilder,
     locationsInsidePrisonApiClientBuilder,
     nomisSyncPrisonMappingClientBuilder,
   )
