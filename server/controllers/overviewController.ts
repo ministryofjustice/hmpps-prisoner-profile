@@ -42,7 +42,7 @@ import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfo
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
-import { mapLatestXrayBodyScan, mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
+import { mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
@@ -85,6 +85,8 @@ export default class OverviewController {
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
     const showConfirmedReleaseDateNonCalculate = !showCourtCaseSummary && offencesMoved(activeCaseLoadId)
+
+    // TODO: make this obey service’s active agencies
     const showUnsafeXRayBodyScanData =
       config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
 
@@ -108,7 +110,6 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
       xrayBodyScanSummary,
-      xrayBodyScanLatest,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -150,15 +151,9 @@ export default class OverviewController {
         : null,
       showUnsafeXRayBodyScanData
         ? Result.wrap(
-            xRayBodyScansApiClient.getScanSummary(prisonerNumber).then(mapXrayBodyScanSummary),
-            apiErrorCallback,
-          )
-        : null,
-      showUnsafeXRayBodyScanData
-        ? Result.wrap(
             xRayBodyScansApiClient
-              .listScans(prisonerNumber, { size: 1, sort: 'scanDate,DESC' })
-              .then(mapLatestXrayBodyScan),
+              .getScanSummary(prisonerNumber, { includeLatestScan: true })
+              .then(mapXrayBodyScanSummary),
             apiErrorCallback,
           )
         : null,
@@ -221,7 +216,6 @@ export default class OverviewController {
       isYouthPrisoner,
       prisonName,
       xrayBodyScanSummary,
-      xrayBodyScanLatest,
       offencesOverview: {
         ...offencesOverview,
         imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,

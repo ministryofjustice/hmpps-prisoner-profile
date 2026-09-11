@@ -235,44 +235,6 @@ describe('careNeedsService', () => {
     })
   })
 
-  describe('getXrayBodyScans', () => {
-    it('Gets only care needs with problem type BSCAN', async () => {
-      setPersonalCareNeedsForXrayBodyScansMock([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'BSC5.5',
-          problemStatus: 'ON',
-          commentText: 'Xray scan',
-          problemType: 'BSCAN',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferencesMock([
-        {
-          description: 'Code reference description',
-          code: 'BSCAN',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const careNeeds = await careNeedsService.getXrayBodyScans('token', PrisonerMockDataA.bookingId)
-      expect(careNeeds.length).toEqual(1)
-      expect(careNeeds[0].comment).toEqual('Xray scan')
-    })
-  })
-
   describe('getXrayBodyScanSummary', () => {
     const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
       personalCareNeedId: 1,

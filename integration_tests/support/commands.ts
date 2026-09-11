@@ -96,7 +96,6 @@ Cypress.Commands.add(
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
     cy.task('stubXRayBodyScanSummary', { prisonerNumber })
-    cy.task('stubXRayBodyListScans', { prisonerNumber })
   },
 )
 
@@ -157,11 +156,11 @@ Cypress.Commands.add('setupUserAuth', (options = {}) => {
 })
 
 Cypress.Commands.add('seedRedisEntry', ({ key, value }) => {
-  cy.exec(`./integration_tests/scripts/redis-cli "SET ${key} '${JSON.stringify(value).replaceAll('"', '\\"')}'"`)
+  cy.task('redisCli', `SET ${key} '${JSON.stringify(value).replaceAll('"', '\\"')}'`)
 })
 
 Cypress.Commands.add('refreshReferenceData', domain => {
-  cy.exec(`./integration_tests/scripts/redis-cli "SET reference_data_${domain} '${JSON.stringify([])}'"`)
+  cy.task('redisCli', `SET reference_data_${domain} '${JSON.stringify([])}'`)
 })
 
 Cypress.Commands.add('setupComponentsData', (options = {}) => {

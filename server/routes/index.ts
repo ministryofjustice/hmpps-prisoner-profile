@@ -90,7 +90,11 @@ export default function routes(services: Services): Router {
     services.auditService,
   )
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
-  const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
+  const careNeedsController = new CareNeedsController(
+    services.careNeedsService,
+    services.dataAccess.xRayBodyScansApiClientBuilder,
+    services.auditService,
+  )
   const duplicateProfilesController = new DuplicateProfilesController(
     services.prisonPermissionsService,
     services.auditService,
@@ -271,13 +275,13 @@ export default function routes(services: Services): Router {
     },
   )
 
-  // TODO: redirect to xrbs-ui
   router.get(
     `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services, { minimal: true }),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    retrievePrisonNamesById(services.prisonService),
     async (req, res) => {
       return careNeedsController.displayXrayBodyScans(req, res)
     },

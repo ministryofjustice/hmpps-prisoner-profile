@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { formatDate } from '../../server/utils/dateHelpers'
 import { calculateAge } from '../../server/utils/utils'
 
@@ -21,5 +22,9 @@ export default {
 
   calculateAge(dob: string | Date) {
     return calculateAge(dob instanceof Date ? dob.toISOString().split('T')[0] : dob)
+  },
+
+  redisCli(command: string) {
+    return execFileSync('bash', ['integration_tests/scripts/redis-cli', command], { encoding: 'utf8' })
   },
 }
