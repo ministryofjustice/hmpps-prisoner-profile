@@ -1,6 +1,6 @@
 import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
-import CaseLoad from '../../interfaces/prisonApi/CaseLoad'
+import type CaseLoad from '../../interfaces/prisonApi/CaseLoad'
 
 export const componentsHeaderMock: Component = {
   html: '',
@@ -50,5 +50,12 @@ export const componentsServicesMock: Service[] = [
     description: 'Add a temporary absence',
     href: 'http://localhost:3001/externalMovements',
     navEnabled: true,
+  },
+  {
+    id: 'x-ray-body-scans',
+    heading: 'X-ray body scans',
+    description: 'X-ray body scans API',
+    href: 'http://localhost:3001/xRayBodyScansApi',
+    navEnabled: false,
   },
 ]

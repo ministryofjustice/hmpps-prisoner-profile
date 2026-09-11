@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import type { Locals, Request, Response } from 'express'
 import {
   PersonalRelationshipsPermission,
   PersonPrisonCategoryPermission,
@@ -9,7 +9,7 @@ import {
   PrisonerVisitsAndVisitorsPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
-import OverviewController from './overviewController'
+import type { HmppsUser } from '../interfaces/HmppsUser'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import {
   inmateDetailMock,
@@ -63,26 +63,48 @@ import {
 import ContactsService from '../services/contactsService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import OverviewController from './overviewController'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
 const prisonerPermissions = {} as PrisonerPermissions
 
 const getResLocals = ({
-  userRoles = ['CELL_MOVE'],
+  userRoles = [Role.CellMove],
   caseLoads = CaseLoadsDummyDataA,
 }: {
-  userRoles?: string[]
+  userRoles?: Role[]
   caseLoads?: CaseLoad[]
-} = {}) => {
+} = {}): Locals => {
   return {
+    feComponents: {
+      header: 'DPS header',
+      footer: 'DPS footer',
+      cssIncludes: [],
+      jsIncludes: [],
+      sharedData: {
+        caseLoads: [],
+        activeCaseLoad: {},
+        services: [
+          {
+            id: 'x-ray-body-scans',
+            heading: 'X-ray body scans',
+            description: 'X-ray body scans API',
+            href: 'http://localhost:3001/xRayBodyScansApi',
+            navEnabled: false,
+          },
+        ],
+        allocationJobResponsibilities: [],
+        cspDirectives: {},
+      },
+    },
     user: {
       authSource: 'nomis',
       userRoles,
       staffId: 487023,
       caseLoads,
       token: 'USER_TOKEN',
-    },
+    } as HmppsUser,
     prisonerPermissions,
   }
 }
@@ -923,6 +945,14 @@ describe('overviewController', () => {
         ...res,
         locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
       } as unknown as Response
+    })
+
+    it('should not call api if service is not enabled in active case load', async () => {
+      resWithDpsDevRole.locals.feComponents.sharedData.services = []
+
+      await controller.displayOverview(req, resWithDpsDevRole)
+
+      expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
     })
 
     it('should not load when disabled', async () => {

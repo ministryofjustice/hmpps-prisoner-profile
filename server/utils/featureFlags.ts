@@ -4,6 +4,7 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
+import { isServiceEnabled } from './isServiceEnabled'
 
 interface ScheduledFeatureFlag {
   enabledPrisons: string[]
@@ -50,5 +51,9 @@ export const offencesMoved: FeatureFlagMethod = scheduledFeatureFlag(config.feat
 export function isXrayBodyScansServiceEnabled(res: Response): boolean {
   const { user } = res.locals
   const { userRoles } = user as PrisonUser
-  return config.featureToggles.xRayBodyScansEnabled && userRoles?.includes(Role.DpsApplicationDeveloper)
+  return (
+    config.featureToggles.xRayBodyScansEnabled &&
+    isServiceEnabled('x-ray-body-scans', res.locals.feComponents?.sharedData) &&
+    userRoles?.includes(Role.DpsApplicationDeveloper)
+  )
 }
