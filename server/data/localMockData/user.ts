@@ -5,6 +5,7 @@ export const prisonUserMock: PrisonUser = {
   authSource: 'nomis',
   username: 'JSMITH_GEN',
   userId: '1111',
+  userUuid: '11111111-1111-1111-1111-111111111111',
   staffId: 1111,
   name: 'JOHN SMITH',
   displayName: 'John Smith',

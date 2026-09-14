@@ -61,6 +61,7 @@ const user: HmppsUser = {
   displayName: 'A Name',
   userRoles: [Role.PrisonUser],
   userId: '487023',
+  userUuid: '11111111-1111-1111-1111-111111111111',
   staffId: 487023,
   caseLoads: CaseLoadsDummyDataA,
   token: 'USER_TOKEN',

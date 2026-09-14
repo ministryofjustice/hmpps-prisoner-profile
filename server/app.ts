@@ -1,4 +1,5 @@
 import express from 'express'
+import { telemetryMiddleware } from '@ministryofjustice/hmpps-azure-telemetry'
 
 import multer from 'multer'
 import { getFrontendComponents, retrieveCaseLoadData } from '@ministryofjustice/hmpps-connect-dps-components'
@@ -96,7 +97,7 @@ export default function createApp(services: Services): express.Application {
   )
 
   app.use(retrieveCaseLoadData({ logger, prisonApiConfig: config.apis.prisonApi }))
-  app.use(addUserMetadataToLogs())
+  app.use(telemetryMiddleware.addUserMetadataToTelemetry())
   app.use(warningRenderMiddleware)
   app.use(routes(services))
   app.use(warningMiddleware(services.metricsService))
