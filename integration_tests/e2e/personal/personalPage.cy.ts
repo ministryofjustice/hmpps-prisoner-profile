@@ -527,9 +527,9 @@ context('When signed in', () => {
     context('Security', () => {
       it('Displays the security warnings', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.security().interestToImmigration().should('be.visible')
-        page.security().travelRestrictions().should('be.visible')
-        page.security().travelRestrictions().should('include.text', 'some travel restrictions')
+        page.security.interestToImmigration.should('be.visible')
+        page.security.travelRestrictions.should('be.visible')
+        page.security.travelRestrictions.should('include.text', 'some travel restrictions')
       })
     })
 
@@ -658,13 +658,21 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
+    it('Says that x-ray body scans have moved to the overview page', () => {
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+      visitPersonalDetailsPage()
+      const page = Page.verifyOnPage(PersonalPage)
+      page.security.card.should('contain.text', 'X-ray body scan information has moved')
+      page.security.card.find('a').should('have.attr', 'href', '/prisoner/G6123VU#xray-body-scan-card')
+    })
+
     context('With none', () => {
       it('Displays the xray count and date', () => {
         cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 0 })
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
-        page.security().xrays().total().should('include.text', '0')
-        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
+        page.security.xrays.total.should('include.text', '0')
+        page.security.xrays.since.should('include.text', startOfYearFormattedDate)
       })
     })
 
@@ -673,8 +681,8 @@ context('When signed in', () => {
         cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 10 })
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
-        page.security().xrays().total().should('include.text', '10')
-        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
+        page.security.xrays.total.should('include.text', '10')
+        page.security.xrays.since.should('include.text', startOfYearFormattedDate)
       })
     })
 
@@ -683,9 +691,9 @@ context('When signed in', () => {
         cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 116 })
         visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
-        page.security().xrays().total().should('include.text', '116')
-        page.security().xrays().since().should('include.text', startOfYearFormattedDate)
-        page.security().xrays().warningMessage().should('exist')
+        page.security.xrays.total.should('include.text', '116')
+        page.security.xrays.since.should('include.text', startOfYearFormattedDate)
+        page.security.xrays.warningMessage.should('exist')
       })
     })
   })

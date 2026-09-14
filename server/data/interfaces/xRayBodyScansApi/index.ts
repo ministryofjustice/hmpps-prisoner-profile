@@ -23,8 +23,6 @@ export interface ScanResponse extends UnifiedScanResponse {
   justificationDescription: string
   outcome: string
   outcomeDescription: string
-  typeOfFind: string | null
-  typeOfFindDescription: string | null
   caseNoteId: string | null
   mergedFromPrisonerNumber: string | null
   mergedAt: Date | null

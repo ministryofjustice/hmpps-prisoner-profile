@@ -1,7 +1,7 @@
-import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
-import PersonalPageService from '../../services/personalPageService'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { PersonalRelationshipsDomesticStatusMock } from '../../data/localMockData/personalRelationshipsApiMock'
+import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
+import type PersonalPageService from '../../services/personalPageService'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService

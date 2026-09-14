@@ -1,17 +1,17 @@
 import type { Request, Response } from 'express'
 import config from '../config'
+import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { careNeedsMock } from '../data/localMockData/careNeedsMock'
 import { pageResponse } from '../data/localMockData/pageResponse'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { mockLegacyScanResponse, mockScanResponse } from '../data/localMockData/xRayBodyScansMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
 import { Role } from '../data/enums/role'
-import CareNeedsController from './careNeedsController'
 import CareNeedsService from '../services/careNeedsService'
-import { mockLegacyScanResponse, mockScanResponse } from '../data/localMockData/xRayBodyScansMock'
+import CareNeedsController from './careNeedsController'
 
 describe('Care needs controller', () => {
   const prisonerNumber = 'G6123VU'
@@ -43,6 +43,27 @@ describe('Care needs controller', () => {
     } as unknown as Request
     res = {
       locals: {
+        feComponents: {
+          header: 'DPS header',
+          footer: 'DPS footer',
+          cssIncludes: [],
+          jsIncludes: [],
+          sharedData: {
+            caseLoads: [],
+            activeCaseLoad: {},
+            services: [
+              {
+                id: 'x-ray-body-scans',
+                heading: 'X-ray body scans',
+                description: 'X-ray body scans API',
+                href: 'http://localhost:3001/xRayBodyScansApi',
+                navEnabled: false,
+              },
+            ],
+            allocationJobResponsibilities: [],
+            cspDirectives: {},
+          },
+        },
         user: {
           activeCaseLoadId: 'MDI',
           userRoles: [Role.PrisonUser],
@@ -111,6 +132,21 @@ describe('Care needs controller', () => {
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
 
       await controller.displayXrayBodyScans(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        pageOfScans: expect.objectContaining({ content: [] }),
+        showingDpsAndNomisScans: false,
+      })
+      expect(res.redirect).not.toHaveBeenCalled()
+    })
+
+    it('should render the page when the x-ray body scans service is not enabled in active case load', async () => {
+      config.featureToggles.xRayBodyScansEnabled = true
+      resWithDpsDevRole.locals.feComponents.sharedData.services = []
+      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
+
+      await controller.displayXrayBodyScans(req, resWithDpsDevRole)
 
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',

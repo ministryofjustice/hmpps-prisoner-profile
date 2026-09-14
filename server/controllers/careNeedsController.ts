@@ -4,9 +4,8 @@ import logger from '../../logger'
 import { type AuditService, Page } from '../services/auditService'
 import type CareNeedsService from '../services/careNeedsService'
 import type { RestClientBuilder } from '../data'
-import { Role } from '../data/enums/role'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
-import { PrisonUser } from '../interfaces/HmppsUser'
+import { isXrayBodyScansServiceEnabled } from '../utils/featureFlags'
 
 export default class CareNeedsController {
   constructor(
@@ -41,14 +40,9 @@ export default class CareNeedsController {
 
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
-    const { user } = res.locals
-    const { userRoles } = user as PrisonUser
 
-    // TODO: make this obey service’s active agencies
-    const showUnsafeXRayBodyScanData =
-      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
-
-    if (showUnsafeXRayBodyScanData) {
+    const xrayBodyScansServiceEnabled = isXrayBodyScansServiceEnabled(res)
+    if (xrayBodyScansServiceEnabled) {
       // TODO: move redirect to router level once enabled everywhere
       res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerData.prisonerNumber}/scan-overview`)
       return
