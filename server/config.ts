@@ -415,6 +415,12 @@ export default {
 
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
+    editAddressSpecificPhoneNumbers: {
+      enabledPrisons: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
     healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),

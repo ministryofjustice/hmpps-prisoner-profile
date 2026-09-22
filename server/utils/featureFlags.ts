@@ -30,6 +30,10 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
 
 export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
 
+export const editAddressSpecificPhoneNumbersEnabled: FeatureFlagMethod = scheduledFeatureFlag(
+  config.featureToggles.editAddressSpecificPhoneNumbers,
+)
+
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 
 export const editReligionEnabled: FeatureFlagMethod = () => true
