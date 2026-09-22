@@ -5,6 +5,79 @@
     {% if duplicateRecordsFound %}
       {% include "../../partials/overviewPage/duplicatePrisonerBanner.njk" %}
     {% endif %}
+
+    {% set searchSuggestions = [
+      { text: "pay your self assessment tax bill", url: "https://www.gov.uk/pay-self-assessment-tax-bill" },
+      { text: "personal tax account", url: "https://www.gov.uk/personal-tax-account" },
+      { text: "car tax", url: "https://www.gov.uk/vehicle-tax" },
+      { text: "file your self assessment tax return online", url: "https://www.gov.uk/log-in-file-self-assessment-tax-return" },
+      { text: "check car tax", url: "https://www.gov.uk/check-vehicle-tax" },
+      { text: "cheddar cheese", url: "https://www.cheese.com/cheddar/" },
+      { text: "stilton cheese", url: "https://www.cheese.com/stilton/" },
+      { text: "brie cheese", url: "https://www.cheese.com/brie/" },
+      { text: "gouda cheese", url: "https://www.cheese.com/gouda/" },
+      { text: "red leicester cheese", url: "https://www.cheese.com/red-leicester/" },
+      { text: "wensleydale cheese", url: "https://www.cheese.com/wensleydale/" }
+    ] %}
+
+    <div class="govuk-grid-row govuk-!-display-none-print" data-profile-banner-search>
+      <div class="govuk-grid-column-full">
+        <div class="hmpps-profile-banner-search" role="search">
+          <label class="hmpps-profile-banner-search__label" for="profile-banner-search-input">Search</label>
+
+          <div class="hmpps-profile-banner-search__container">
+            <div class="hmpps-profile-banner-search__box">
+              <div class="hmpps-profile-banner-search__field">
+                <input
+                  id="profile-banner-search-input"
+                  class="hmpps-profile-banner-search__input"
+                  type="search"
+                  name="q"
+                  value=""
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="profile-banner-search-results"
+                  aria-expanded="false"
+                />
+
+                <button type="button" class="hmpps-profile-banner-search__clear" hidden>
+                  <span class="govuk-visually-hidden">Clear search</span>
+                  <svg class="hmpps-profile-banner-search__clear-icon" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path d="M1.6 0L0 1.6L6.4 8L0 14.4L1.6 16L8 9.6L14.4 16L16 14.4L9.6 8L16 1.6L14.4 0L8 6.4L1.6 0Z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <button type="submit" class="hmpps-profile-banner-search__submit">
+                <span class="govuk-visually-hidden">Search</span>
+                <svg class="hmpps-profile-banner-search__submit-icon" width="27" height="27" viewBox="0 0 27 27" fill="none" aria-hidden="true" focusable="false">
+                  <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                  <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                </svg>
+              </button>
+            </div>
+
+            <ul id="profile-banner-search-results" class="hmpps-profile-banner-search__results" role="listbox" hidden>
+              {% for suggestion in searchSuggestions %}
+                <li class="hmpps-profile-banner-search__result" role="option" data-search-text="{{ suggestion.text }}" hidden>
+                  <a href="{{ suggestion.url }}">
+                    <svg class="hmpps-profile-banner-search__result-icon" width="20" height="20" viewBox="0 0 27 27" fill="none" aria-hidden="true" focusable="false">
+                      <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                      <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                    </svg>
+                    <span class="hmpps-profile-banner-search__result-text">{{ suggestion.text }}</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     {% include "./profileBannerTabs.njk" %}
   </div>
 {% endif %}

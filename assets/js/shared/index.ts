@@ -12,6 +12,7 @@ import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { FlashMessage } from './flashMessage'
 import { OpenCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
+import { profileBannerSearch } from './profileBannerSearch'
 import { sortSelector } from './sortSelector'
 
 govukFrontend.initAll()
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   autocomplete()
   fileUploadWithPreview()
   printPage()
+  profileBannerSearch()
   sortSelector()
   govukFrontend.createAll(BackToTop)
   govukFrontend.createAll(BodyParts)

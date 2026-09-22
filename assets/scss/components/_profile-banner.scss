@@ -25,6 +25,207 @@
   padding: 0 15px;
   overflow-wrap: anywhere;
 
+  .hmpps-profile-banner-search {
+    position: relative;
+    padding: govuk-spacing(5) govuk-spacing(6) govuk-spacing(6);
+    background-color: govuk-colour('blue');
+
+    @media (max-width: 640px) {
+      padding: govuk-spacing(4) govuk-spacing(3) govuk-spacing(5);
+    }
+
+    &__label {
+      display: block;
+      margin-bottom: govuk-spacing(2);
+      color: govuk-colour('white');
+      font-family: $govuk-font-family;
+      font-size: 1.1875rem;
+      font-weight: 700;
+      line-height: 1.3157894737;
+    }
+
+    &__container {
+      position: relative;
+    }
+
+    &__box {
+      display: flex;
+      align-items: stretch;
+      min-height: 50px;
+    }
+
+    &__field {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+      background-color: govuk-colour('white');
+
+      &:focus-within {
+        z-index: 2;
+        outline: $govuk-focus-width solid govuk-colour('yellow');
+        outline-offset: 0;
+        box-shadow: inset 0 0 0 2px govuk-colour('black');
+      }
+    }
+
+    &__input {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 50px;
+      margin: 0;
+      padding: govuk-spacing(1) govuk-spacing(2);
+      border: 0;
+      border-radius: 0;
+      appearance: none;
+      background-color: transparent;
+      color: govuk-colour('black');
+      font-family: $govuk-font-family;
+      font-size: 1.1875rem;
+      line-height: 1.3157894737;
+
+      &:focus {
+        outline: 0;
+        box-shadow: none;
+      }
+
+      // Suppress the browser's own search affordances so only the GOV.UK styled controls show
+      &::-webkit-search-cancel-button,
+      &::-webkit-search-decoration,
+      &::-webkit-search-results-button {
+        display: none;
+        appearance: none;
+      }
+    }
+
+    &__clear {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      align-self: stretch;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      color: govuk-colour('black');
+      cursor: pointer;
+
+      &:focus {
+        outline: $govuk-focus-width solid govuk-colour('yellow');
+        outline-offset: 0;
+        background-color: govuk-colour('yellow');
+      }
+
+      &[hidden] {
+        display: none;
+      }
+    }
+
+    &__clear-icon {
+      pointer-events: none;
+    }
+
+    &__submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 50px;
+      align-self: stretch;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background-color: govuk-colour('blue', $variant: 'tint-80');
+      color: govuk-colour('blue');
+      cursor: pointer;
+
+      &:hover {
+        background-color: govuk-colour('blue', $variant: 'tint-50');
+      }
+
+      &:focus {
+        z-index: 2;
+        outline: $govuk-focus-width solid govuk-colour('yellow');
+        outline-offset: 0;
+        background-color: govuk-colour('yellow');
+        color: govuk-colour('black');
+      }
+    }
+
+    &__submit-icon {
+      pointer-events: none;
+    }
+
+    &__results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background-color: govuk-colour('white');
+      border: 1px solid govuk-colour('black', $variant: 'tint-80');
+      border-top: 0;
+
+      &[hidden] {
+        display: none;
+      }
+    }
+
+    &__result {
+      padding: 0;
+
+      & + & {
+        border-top: 1px solid govuk-colour('black', $variant: 'tint-80');
+      }
+
+      &[hidden] {
+        display: none;
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        padding: govuk-spacing(2) govuk-spacing(3);
+        color: govuk-colour('black');
+        font-family: $govuk-font-family;
+        font-size: 1.1875rem;
+        line-height: 1.3157894737;
+        text-decoration: none;
+
+        &:hover {
+          background-color: govuk-colour('black', $variant: 'tint-95');
+          text-decoration: underline;
+        }
+
+        &:focus {
+          outline: $govuk-focus-width solid govuk-colour('yellow');
+          outline-offset: -#{$govuk-focus-width};
+          background-color: govuk-colour('yellow');
+          color: govuk-colour('black');
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &__result-icon {
+      flex-shrink: 0;
+      margin-right: govuk-spacing(2);
+      color: govuk-colour('black', $variant: 'tint-25');
+    }
+
+    &__result-text {
+      overflow-wrap: anywhere;
+    }
+  }
+
   .hmpps-profile-banner-top {
     padding: 30px 30px 15px 30px;
     min-height: 130px;
