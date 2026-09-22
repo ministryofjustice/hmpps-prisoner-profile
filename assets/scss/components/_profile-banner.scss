@@ -27,25 +27,41 @@
 
   .hmpps-profile-banner-search {
     position: relative;
-    padding: govuk-spacing(5) govuk-spacing(6) govuk-spacing(6);
+    display: flex;
+    align-items: flex-start;
+    padding: govuk-spacing(2) govuk-spacing(6) govuk-spacing(2);
     background-color: govuk-colour('blue');
 
     @media (max-width: 640px) {
+      display: block;
       padding: govuk-spacing(4) govuk-spacing(3) govuk-spacing(5);
     }
 
     &__label {
-      display: block;
-      margin-bottom: govuk-spacing(2);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      min-height: 50px;
+      margin-right: govuk-spacing(4);
+      margin-bottom: 0;
       color: govuk-colour('white');
       font-family: $govuk-font-family;
       font-size: 1.1875rem;
       font-weight: 700;
       line-height: 1.3157894737;
+      white-space: nowrap;
+
+      @media (max-width: 640px) {
+        display: block;
+        min-height: 0;
+        margin-right: 0;
+        margin-bottom: govuk-spacing(2);
+      }
     }
 
     &__container {
-      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     &__box {
@@ -162,11 +178,6 @@
     }
 
     &__results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 10;
       margin: 0;
       padding: 0;
       list-style: none;

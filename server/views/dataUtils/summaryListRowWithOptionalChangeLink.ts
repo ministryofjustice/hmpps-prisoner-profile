@@ -94,7 +94,7 @@ const summaryListRowWithOptionalChangeLink = (
     ...options.classes,
   ].join(' ')
 
-  const anchorSpan = options.anchor ? `<span class="anchor-center" id="${options.anchor}"></span>` : ''
+  const anchorSpan = options.anchor ? `<span id="${options.anchor}"></span>` : ''
   const keyResult = options.dataQa
     ? {
         html: `<div>${anchorSpan}<span data-qa="${rowHidden ? 'hidden-' : ''}${options.dataQa}-key">${key}</span></div>`,
