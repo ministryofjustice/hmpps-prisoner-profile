@@ -27,7 +27,7 @@ context('X-ray body scans', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.setupComponentsData()
+    cy.setupComponentsData({ services: [] }) // removing xrbs service access
     cy.setupBannerStubs({ prisonerNumber })
     cy.task('stubGetAllPrisons')
   })

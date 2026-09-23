@@ -658,7 +658,8 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
     })
 
-    it('Says that x-ray body scans have moved to the overview page', () => {
+    it('Says that x-ray body scans have moved to the overview page when feature flag is on', () => {
+      // TODO: remove once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       visitPersonalDetailsPage()
       const page = Page.verifyOnPage(PersonalPage)
