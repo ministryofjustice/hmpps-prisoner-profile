@@ -91,7 +91,7 @@ context('X-ray body scans', () => {
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
     const page = Page.verifyOnPageWithTitle(XrayBodyScans, possessivePrisonerName)
     page.mixedScansNote.should('not.exist')
-    page.alert.should('contain.text', 'The scan history could not be loaded')
+    page.alert.should('contain.text', 'There is a problem loading the scan history')
     page.bodyScansTable.should('not.exist')
   })
 
