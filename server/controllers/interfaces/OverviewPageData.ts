@@ -5,7 +5,7 @@ import { PersonalRelationshipsContactCount } from '../../data/interfaces/persona
 import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
 import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
 import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
-import { ScanResponse } from '../../data/interfaces/xRayBodyScansApi'
+import type { ScanSummaryResponse } from '../../data/interfaces/xRayBodyScansApi'
 import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
 import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
@@ -13,7 +13,6 @@ import LatestCalculationSummary from '../../services/interfaces/offencesService/
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
-import { XrayBodyScanSummary } from '../utils/overviewController/mapXrayBodyScanData'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -38,7 +37,6 @@ export default interface OverviewPageData {
   isYouthPrisoner: boolean
   prisonName: string
   xrayBodyScanSummary: Result<XrayBodyScanSummary> | null
-  xrayBodyScanLatest: Result<ScanResponse> | null
   offencesOverview: {
     mainOffenceDescription: string
     fullStatus: FullStatus
@@ -96,4 +94,10 @@ interface PersonalDetails {
     croNumber: string
     pncNumber: string
   }
+}
+
+/** Extended response from xray body scans api for overview page card and status */
+export interface XrayBodyScanSummary extends ScanSummaryResponse {
+  viewHistoryUrl: string
+  recordScanUrl?: string
 }

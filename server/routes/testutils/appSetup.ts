@@ -22,7 +22,22 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use((req, res, next) => {
     req.user = userSupplier()
     req.flash = flashProvider
-    res.locals = { user: { ...req.user } as HmppsUser }
+    res.locals = {
+      feComponents: {
+        header: 'DPS header',
+        footer: 'DPS footer',
+        cssIncludes: [],
+        jsIncludes: [],
+        sharedData: {
+          caseLoads: [],
+          activeCaseLoad: {},
+          services: [],
+          allocationJobResponsibilities: [],
+          cspDirectives: {},
+        },
+      },
+      user: { ...req.user } as HmppsUser,
+    }
     next()
   })
   app.use(express.json())

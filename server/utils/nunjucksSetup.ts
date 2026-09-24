@@ -69,12 +69,7 @@ import groupDistinguishingMarks, {
 } from '../views/dataUtils/groupDistinguishingMarksForView'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import { bodyPartLabels } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
-import {
-  appInsightsWebAnalyticsEnabled,
-  militaryHistoryEnabled,
-  offencesMoved,
-  displayEmployabilitySkillsFromLwp,
-} from './featureFlags'
+import { appInsightsWebAnalyticsEnabled, militaryHistoryEnabled, offencesMoved } from './featureFlags'
 import appendRefererToUrl from './appendRefererToUrl'
 import { mapSexualOrientationText } from './referenceDataMapping'
 import logger from '../../logger'
@@ -145,7 +140,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('bodyPartLabels', bodyPartLabels)
   njkEnv.addGlobal('generateContactChangeLink', generateContactChangeLink)
   njkEnv.addGlobal('offencesMoved', offencesMoved)
-  njkEnv.addGlobal('displayEmployabilitySkillsFromLwp', displayEmployabilitySkillsFromLwp)
   njkEnv.addGlobal('courtCaseReleaseDatesUrl', config.serviceUrls.courtCaseReleaseDates)
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)

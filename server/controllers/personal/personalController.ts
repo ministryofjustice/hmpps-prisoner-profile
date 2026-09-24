@@ -1,8 +1,7 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import config from '../../config'
-import { PrisonUser } from '../../interfaces/HmppsUser'
-import PersonalPageService from '../../services/personalPageService'
-import CareNeedsService from '../../services/careNeedsService'
+import { Role } from '../../data/enums/role'
+import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
@@ -11,6 +10,8 @@ import {
   editProfileSimulateFetch,
   editReligionEnabled,
 } from '../../utils/featureFlags'
+import CareNeedsService from '../../services/careNeedsService'
+import PersonalPageService from '../../services/personalPageService'
 
 export default class PersonalController {
   constructor(
@@ -24,11 +25,13 @@ export default class PersonalController {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { prisonId, prisonerNumber, bookingId } = prisonerData
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const { activeCaseLoadId } = user as PrisonUser
+      const { activeCaseLoadId, userRoles } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
+      const xrayBodyScansServiceEnabled =
+        config.featureToggles.xRayBodyScansEnabled && userRoles?.includes(Role.DpsApplicationDeveloper)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -39,7 +42,7 @@ export default class PersonalController {
           personEndpointsEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
-        this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
+        xrayBodyScansServiceEnabled ? null : this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
 
       await this.auditService.sendPageView({
@@ -73,6 +76,7 @@ export default class PersonalController {
         hasHomeOfficeId,
         useCustomErrorBanner: true,
         changeContactLinkEnabled,
+        xrayBodyScansServiceEnabled,
       })
     }
   }

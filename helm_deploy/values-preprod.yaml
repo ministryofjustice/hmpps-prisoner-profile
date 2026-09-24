@@ -52,6 +52,7 @@ generic-service:
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-preprod.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-preprod.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-preprod.hmpps.service.justice.gov.uk"
+    TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler-preprod.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
@@ -73,6 +74,7 @@ generic-service:
     LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk
     NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-preprod.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
+    CELL_MOVEMENTS_API_URL: "https://change-someones-cell-api-preprod.hmpps.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-preprod.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates-preprod.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-preprod.hmpps.service.justice.gov.uk"
@@ -105,7 +107,6 @@ generic-service:
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     X_RAY_BODY_SCANS_ENABLED: "false"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
-    DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "false"
 
   allowlist:
     groups:

@@ -54,6 +54,7 @@ generic-service:
     EXTERNAL_MOVEMENTS_UI_URL: "https://external-movements-dev.hmpps.service.justice.gov.uk"
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-dev.hmpps.service.justice.gov.uk"
+    TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
@@ -75,6 +76,7 @@ generic-service:
     LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk
     NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
+    CELL_MOVEMENTS_API_URL: "https://change-someones-cell-api-dev.hmpps.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
@@ -105,13 +107,13 @@ generic-service:
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
 
     EDIT_PROFILE_SIMULATE_FETCH: "false"
+    EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS: "***"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
     MANAGE_ALLOCATIONS_ENABLED: "true"
     EDIT_RELIGION_ENABLED_FROM: "2025-06-01T00:00:00"
     PERSON_ENDPOINTS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
-    DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP: "true"
 
   allowlist:
     groups:

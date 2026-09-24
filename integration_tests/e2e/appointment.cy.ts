@@ -1973,5 +1973,5 @@ function expectCorrectMovementSlip(expected: MovementSlipScenario['movementSlipE
     { title: 'Comments', description: comments ?? '--' },
     { title: 'Created by', description: 'John Smith' },
   ])
-  return cy.end()
+  return cy.wrap(null)
 }

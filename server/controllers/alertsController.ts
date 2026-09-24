@@ -145,6 +145,7 @@ export default class AlertsController {
         }
     const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType, existingAlerts)
     const errors = req.flash('errors')
+    const duplicateAlertId = req.flash('duplicateAlertId')?.[0]
 
     this.auditService
       .sendPageView({
@@ -165,6 +166,7 @@ export default class AlertsController {
       alertCodes,
       refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
       errors,
+      duplicateAlertId,
       miniBannerData,
     })
   }
@@ -181,6 +183,7 @@ export default class AlertsController {
         activeTo,
       }
       const errors = req.errors || []
+      let duplicateAlertId: string
       if (!errors.length) {
         try {
           await this.alertsService.createAlert(req.middleware.clientToken, {
@@ -190,13 +193,22 @@ export default class AlertsController {
         } catch (error) {
           if (errorHasStatus(error, 400)) {
             errors.push({ text: error.message })
+          } else if (errorHasStatus(error, 409)) {
+            const duplicateAlert = await this.alertsService.getActiveAlertByCode(
+              req.middleware.clientToken,
+              prisonerNumber,
+              alertCode,
+            )
+            if (!duplicateAlert?.alertUuid) throw error
+            duplicateAlertId = duplicateAlert.alertUuid
           } else throw error
         }
       }
 
-      if (errors.length) {
+      if (errors.length || duplicateAlertId) {
         req.flash('alert', { ...alertForm, existingAlerts })
-        req.flash('errors', errors)
+        if (errors.length) req.flash('errors', errors)
+        if (duplicateAlertId) req.flash('duplicateAlertId', duplicateAlertId)
         return res.redirect(`/prisoner/${prisonerNumber}/add-alert`)
       }
 
@@ -246,10 +258,13 @@ export default class AlertsController {
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.activeFrom, a.activeFrom))
 
-      return res.render('partials/alerts/alertDetails', {
-        alerts,
-        allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
-      })
+      return res.render(
+        req.query.duplicate === 'true' ? 'partials/alerts/duplicateAlertDetails' : 'partials/alerts/alertDetails',
+        {
+          alerts,
+          allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+        },
+      )
     }
   }
 

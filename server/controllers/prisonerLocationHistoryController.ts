@@ -65,9 +65,10 @@ export default class PrisonerLocationHistoryController {
           ? format(new Date(currentPrisonerDetails.assignmentEndDateTime), 'dd/MM/yyyy - HH:mm')
           : 'Current cell',
         movedBy: movementMadeByName,
+        // Deliberately not gated on whatHappenedDetails: the reason code comes from prison-api's
+        // bed assignment history and is knowable even when no explanation was ever recorded.
         reasonForMove:
-          (Boolean(whatHappenedDetails) &&
-            mapReasonToCellMoveReasonDescription(cellMoveReasonTypes, currentPrisonerDetails.assignmentReason)) ||
+          mapReasonToCellMoveReasonDescription(cellMoveReasonTypes, currentPrisonerDetails.assignmentReason) ||
           'Not entered',
         whatHappened: whatHappenedDetails || 'Not entered',
         attributes: locationAttributes.attributes,

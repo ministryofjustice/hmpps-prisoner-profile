@@ -9,7 +9,7 @@ export class MovementSlip extends Page {
     cy.get('header').should('not.exist')
     cy.get('.dps-banner').should('not.exist')
     cy.get('footer').should('not.exist')
-    return cy.end()
+    return cy.wrap(null)
   }
 
   get labels(): Cypress.Chainable<Label[]> {

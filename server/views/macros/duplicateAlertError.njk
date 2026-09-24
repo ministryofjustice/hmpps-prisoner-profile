@@ -1,0 +1,38 @@
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+{% from "dps/components/modal/macro.njk" import hmppsModal %}
+
+{% macro duplicateAlertError(alertId, prisonerNumber) %}
+  {% if alertId %}
+    {% set content %}
+      <p>You cannot save this alert because an identical alert has already been saved by another user.</p>
+      <p>View the existing alert before deciding if you need to add the information you entered.</p>
+      <p>You can then copy the text you entered and add it to the existing alert.</p>
+      <p class="govuk-!-margin-bottom-0">
+        <a
+          href="/api/prisoner/{{ prisonerNumber }}/get-alert-details?ids={{ alertId }}&duplicate=true"
+          class="govuk-link govuk-link--no-visited-state hmpps-modal__trigger-show govuk-!-margin-right-4"
+          data-hmpps-modal-id="duplicate-alert-details"
+          data-hmpps-modal-url="/api/prisoner/{{ prisonerNumber }}/get-alert-details?ids={{ alertId }}&duplicate=true"
+          >View existing alert</a
+        >
+        <a
+          href="/prisoner/{{ prisonerNumber }}/alerts/{{ alertId }}/add-more-details"
+          class="govuk-link govuk-link--no-visited-state"
+          >Add details to the alert</a
+        >
+      </p>
+    {% endset %}
+    {{
+      mojAlert({
+          variant: "error",
+          title: "This alert already exists",
+          showTitleAsHeading: true,
+          dismissible: false,
+          html: content,
+          attributes: { "data-qa": "duplicate-alert-error" },
+          classes: "govuk-!-margin-bottom-6"
+      })
+    }}
+    {{ hmppsModal({ id: "duplicate-alert-details", title: "Alert details", classes: "alert-details-modal" }) }}
+  {% endif %}
+{% endmacro %}

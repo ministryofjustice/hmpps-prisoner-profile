@@ -21,6 +21,7 @@ import { createRedisClient } from './redisClient'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
+import CellMovementsApiRestClient from './cellMovementsApiClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
 import applicationInfoSupplier from '../applicationInfo'
 import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
@@ -71,6 +72,7 @@ const circuitBreakers = {
   prisonerSearch: circuitBreakerBuilder('prisonerSearchApi', config.apis.prisonerSearchApi),
   nonAssociations: circuitBreakerBuilder('nonAssociationsApi', config.apis.nonAssociationsApi),
   whereabouts: circuitBreakerBuilder('whereaboutsApi', config.apis.whereaboutsApi),
+  cellMovements: circuitBreakerBuilder('cellMovementsApi', config.apis.cellMovementsApi),
   bookAVideoLink: circuitBreakerBuilder('bookAVideoLinkApi', config.apis.bookAVideoLinkApi),
   prisonerProfileDelius: circuitBreakerBuilder('prisonerProfileDeliusApi', config.apis.prisonerProfileDeliusApi),
   educationAndWorkPlan: circuitBreakerBuilder('educationAndWorkPlanApi', config.apis.educationAndWorkPlanApi),
@@ -120,6 +122,8 @@ export const dataAccess = {
   nonAssociationsApiClientBuilder: (token: string) =>
     new NonAssociationsApiRestClient(token, circuitBreakers.nonAssociations),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token, circuitBreakers.whereabouts),
+  cellMovementsApiClientBuilder: (token: string) =>
+    new CellMovementsApiRestClient(token, circuitBreakers.cellMovements),
   bookAVideoLinkApiClientBuilder: (token: string) =>
     new BookAVideoLinkRestApiClient(token, circuitBreakers.bookAVideoLink),
   prisonerProfileDeliusApiClientBuilder: (token: string) =>

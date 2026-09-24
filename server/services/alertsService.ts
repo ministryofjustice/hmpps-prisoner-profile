@@ -171,6 +171,13 @@ export default class AlertsService {
     return capitaliseAlertDisplayNames(alert)
   }
 
+  public async getActiveAlertByCode(clientToken: string, prisonerNumber: string, alertCode: string) {
+    const alertsApiClient = this.alertsApiClientBuilder(clientToken)
+    const alerts = await alertsApiClient.getAlerts(prisonerNumber, { isActive: true, alertCode })
+
+    return alerts.content[0]
+  }
+
   public async getAlertDetails(token: string, alertId: string) {
     const alertsApiClient = this.alertsApiClientBuilder(token)
     const alert = await alertsApiClient.getAlertDetails(alertId)

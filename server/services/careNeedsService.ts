@@ -24,11 +24,6 @@ export interface CareNeedAdjustment {
   agency: string
 }
 
-export interface XrayBodyScan {
-  comment: string
-  scanDate: string
-}
-
 export interface XrayBodyScanSummary {
   total: number
   since: string
@@ -51,22 +46,6 @@ export default class CareNeedsService {
       prisonApiClient.getAllReasonableAdjustments(bookingId),
     ])
     return this.toCareNeeds(healthCodes, personalCareNeeds, reasonableAdjustments)
-  }
-
-  /**
-   * Handle request for x-ray body scans
-   *
-   * @deprecated will be removed
-   * @param token
-   * @param bookingId
-   */
-  public async getXrayBodyScans(token: string, bookingId: number): Promise<XrayBodyScan[]> {
-    const prisonApiClient = this.prisonApiClientBuilder(token)
-
-    const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(bookingId, [
-      HealthDomainReferenceCode.XRayBodyScan,
-    ])
-    return this.toXrayBodyScan(personalCareNeeds)
   }
 
   /**
@@ -136,15 +115,6 @@ export default class CareNeedsService {
         }))
     }
     return []
-  }
-
-  private toXrayBodyScan(personalCareNeeds: PersonalCareNeed[]): XrayBodyScan[] {
-    return personalCareNeeds
-      ?.filter(need => need.problemType === HealthDomainReferenceCode.XRayBodyScan)
-      .map(careNeed => ({
-        comment: careNeed.commentText,
-        scanDate: careNeed.startDate,
-      }))
   }
 
   private toXrayBodyScanSummary(personalCareNeeds: PersonalCareNeed[]): XrayBodyScanSummary {

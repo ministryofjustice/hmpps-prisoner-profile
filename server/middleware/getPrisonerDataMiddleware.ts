@@ -94,6 +94,13 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         alertSummaryData,
       }
 
+      const { firstName: firstNameInmate, middleName: middleNameInmate, lastName: lastNameInmate } = inmateDetail
+      res.locals.prisonerName = {
+        firstLast: formatName(firstNameInmate, '', lastNameInmate),
+        lastCommaFirst: formatName(firstNameInmate, '', lastNameInmate, { style: NameFormatStyle.lastCommaFirst }),
+        full: formatName(firstNameInmate, middleNameInmate, lastNameInmate),
+      }
+
       // Provide additional commonly used data to the template
       res.locals = {
         ...res.locals,

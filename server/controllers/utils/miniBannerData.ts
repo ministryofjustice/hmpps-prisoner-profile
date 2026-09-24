@@ -5,7 +5,8 @@ import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
 
 export default (prisonerData: Prisoner, inmateDetail: InmateDetail, prisonerPermissions: PrisonerPermissions) => {
-  const { firstName, lastName, cellLocation, prisonerNumber } = prisonerData
+  const { firstName, lastName } = inmateDetail
+  const { cellLocation, prisonerNumber } = prisonerData
   const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
   return {

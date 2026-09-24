@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 @property --body-part-inactive-colour {
   syntax: "<color>";
   inherits: true;

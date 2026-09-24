@@ -3,7 +3,6 @@ import Interface from './Interface'
 
 export const careNeedsServiceMock = (): jest.Mocked<Interface<CareNeedsService>> => ({
   getCareNeedsAndAdjustments: jest.fn(),
-  getXrayBodyScans: jest.fn(),
   getXrayBodyScanSummary: jest.fn(),
 })
 

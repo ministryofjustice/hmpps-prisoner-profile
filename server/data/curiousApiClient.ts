@@ -3,7 +3,6 @@ import type { AllAssessmentDTO, AllQualificationsDTO } from 'curiousApiClient'
 import RestClient, { Request } from './restClient'
 import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
-import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
 import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
 import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
 import { CuriousApiToken } from './hmppsAuthClient'
@@ -11,12 +10,6 @@ import { CuriousApiToken } from './hmppsAuthClient'
 export default class CuriousRestApiClient extends RestClient implements CuriousApiClient {
   constructor(token: CuriousApiToken, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
     super('Curious API', config.apis.curiousApiUrl, token.curiousApiToken, circuitBreaker)
-  }
-
-  async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills | null> {
-    return this.getAndIgnore404({
-      path: `/learnerEmployabilitySkills/${offenderNumber}`,
-    })
   }
 
   async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals | null> {

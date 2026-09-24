@@ -4,7 +4,7 @@ import Address from '../data/interfaces/prisonApi/Address'
 import { AgenciesEmail } from '../data/interfaces/prisonApi/Agency'
 import Telephone from '../data/interfaces/prisonApi/Telephone'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { Contact, ContactDetail } from '../data/interfaces/prisonApi/StaffContacts'
+import type { ContactDetail } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
 import { staffAllocationMock } from '../data/localMockData/keyWorker'
@@ -14,34 +14,12 @@ import AllocationManagerClient from '../data/interfaces/allocationManagerApi/all
 import { ContactRelationship } from '../data/enums/ContactRelationship'
 import { Result } from '../utils/result/result'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { mockContactDetail, mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
+import {
+  mockContactDetail,
+  mockContactDetailYouthEstate,
+  mockPrisonerContact,
+} from '../data/localMockData/contactDetail'
 import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
-
-function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
-  return {
-    lastName: 'Smith',
-    firstName: 'John',
-    middleName: 'Paul',
-    contactType: 'O',
-    contactTypeDescription: 'Responsible Officer',
-    relationship: 'PROBATION',
-    relationshipDescription: 'Probation Officer',
-    commentText: 'Some comment',
-    emergencyContact: false,
-    nextOfKin: false,
-    relationshipId: 1,
-    personId: 1,
-    activeFlag: true,
-    expiryDate: '2020-01-01',
-    approvedVisitorFlag: false,
-    canBeContactedFlag: true,
-    awareOfChargesFlag: false,
-    contactRootOffenderId: 1,
-    bookingId: 1,
-    createDateTime: '2020-01-01',
-    ...overrides,
-  }
-}
 
 const mockAddress = (overrides?: Partial<Address>): Address => ({
   noFixedAddress: false,
@@ -160,7 +138,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
 
@@ -203,9 +181,9 @@ describe('professionalContactsService', () => {
         bookingId: 1,
         nextOfKin: [],
         otherContacts: [
-          PrisonerContactBuilder({ personId: 1, relationshipDescription: 'Responsible officer' }),
-          PrisonerContactBuilder({ personId: 2, relationshipDescription: 'Prison Guard' }),
-          PrisonerContactBuilder({ personId: 3, relationshipDescription: 'Prison Guard' }),
+          mockPrisonerContact({ personId: 1, relationshipDescription: 'Responsible officer' }),
+          mockPrisonerContact({ personId: 2, relationshipDescription: 'Prison Guard' }),
+          mockPrisonerContact({ personId: 3, relationshipDescription: 'Prison Guard' }),
         ],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
@@ -234,7 +212,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
       keyWorkerApiClient.getCurrentAllocations = jest.fn(async () => Promise.reject(Error('some error!')))
@@ -277,7 +255,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
       allocationManagerApiClient.getPomByOffenderNo = jest.fn(async () => Promise.reject(Error('some error!')))
@@ -329,7 +307,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
       professionalContactsClient.getCommunityManager = jest.fn(async () => Promise.reject(Error('some error!')))
@@ -375,7 +353,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getAddressesForPerson = jest.fn(async () => [mockAddress({ endDate: '2020-01-01' })])
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
@@ -403,7 +381,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getAddressesForPerson = jest.fn(async () => [
         mockAddress({ endDate: '2050-01-01' }),
@@ -428,10 +406,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [
-          PrisonerContactBuilder({ relationship: 'COM' }),
-          PrisonerContactBuilder({ relationship: 'POM' }),
-        ],
+        otherContacts: [mockPrisonerContact({ relationship: 'COM' }), mockPrisonerContact({ relationship: 'POM' })],
       }
 
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
@@ -459,7 +434,7 @@ describe('professionalContactsService', () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
-        otherContacts: [PrisonerContactBuilder()],
+        otherContacts: [mockPrisonerContact()],
       }
       prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
@@ -481,32 +456,32 @@ describe('professionalContactsService', () => {
         bookingId: 1,
         nextOfKin: [],
         otherContacts: [
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 1,
             relationship: ContactRelationship.CuspOfficer,
             relationshipDescription: 'CuSP Officer',
           }),
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 2,
             relationship: ContactRelationship.CuspOfficerBackup,
             relationshipDescription: 'CuSP Officer (backup)',
           }),
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 3,
             relationship: ContactRelationship.YouthJusticeWorker,
             relationshipDescription: 'Youth Justice Worker',
           }),
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 4,
             relationship: ContactRelationship.ResettlementPractitioner,
             relationshipDescription: 'Resettlement Practitioner',
           }),
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 5,
             relationship: ContactRelationship.YouthJusticeService,
             relationshipDescription: 'Youth Justice Service',
           }),
-          PrisonerContactBuilder({
+          mockPrisonerContact({
             personId: 6,
             relationship: ContactRelationship.YouthJusticeServiceCaseManager,
             relationshipDescription: 'Youth Justice Service Case Manager',
@@ -548,7 +523,7 @@ describe('professionalContactsService', () => {
       bookingId: 1,
       nextOfKin: [],
       otherContacts: [
-        PrisonerContactBuilder({
+        mockPrisonerContact({
           personId: 1,
           firstName: 'Ivan',
           lastName: 'Smirnov',

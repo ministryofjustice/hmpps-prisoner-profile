@@ -4,6 +4,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from '../../macros/duplicateAlertError.njk' import duplicateAlertError %}
 {% extends "../index.njk" %}
 {% set breadcrumbParent = { text: 'Alerts', href: '/prisoner/' + prisonerNumber + '/alerts/active' } %}
 {% set pageTitle = 'Create an alert' %}
@@ -14,6 +15,8 @@
         {{ miniBanner(miniBannerData) }}
     </div>
 </div>
+
+{{ duplicateAlertError(duplicateAlertId, prisonerNumber) }}
 
 {% if errors.length > 0 %}
     {{ govukErrorSummary({

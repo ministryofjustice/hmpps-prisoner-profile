@@ -33,7 +33,7 @@ describe('ImageController', () => {
 
   const miniBannerData = {
     cellLocation: '2-3-001',
-    prisonerName: 'Last, First',
+    prisonerName: 'Saunders, John',
     prisonerNumber: 'A1234BC',
     prisonerThumbnailImageUrl: '/api/prisoner/A1234BC/image?imageId=1413311&fullSizeImage=false',
   }

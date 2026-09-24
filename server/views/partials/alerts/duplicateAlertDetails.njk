@@ -1,0 +1,20 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set alert = alerts[0] %}
+<span class="govuk-caption-m">{{ alert.alertCode.alertTypeDescription }}</span>
+<h1 class="govuk-heading-m">{{ alert.alertCode.description }}</h1>
+<pre class="alert-details__notes govuk-body">{{ alert.description }}</pre>
+<div class="hmpps-secondary-text govuk-body-s">
+  <div>Start date: {{ alert.activeFrom | formatDate }}</div>
+  {% if alert.activeTo %}
+    <div>End date: {{ alert.activeTo | formatDate }}</div>
+  {% endif %}
+  <div>Created by {{ alert.createdByDisplayName }}</div>
+</div>
+{{
+  govukButton({
+      text: "Close",
+      classes: "govuk-button--secondary hmpps-modal__trigger-hide",
+      attributes: { "data-qa": "alert-details-close-button" }
+  })
+}}

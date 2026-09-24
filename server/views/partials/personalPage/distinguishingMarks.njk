@@ -4,109 +4,112 @@
 {% set groupedDistinguishingMarks = distinguishingMarks | groupDistinguishingMarks %}
 
 {% macro distinguishingMarks(type, info) %}
-    {% if info and info | length %}
-        <div data-module="hmpps-open-close-all" data-open-text="Show all {{ type }} details"
-             data-close-text="Hide all {{ type }} details">
-            {% for bodyPart, marks in info %}
-                <details class="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">
-                            {{ bodyPart }}
-                        </span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        {% for mark in marks %}
-                            <div class="personal-distinguishing-marks__row__populated__mark">
-                                <dl>
-                                    {% if not (bodyPart === 'Neck' or bodyPart === 'Back') %}
-                                        <div class="personal-distinguishing-marks__row__populated__row">
-                                            <dt class="personal-distinguishing-marks__row__mark__row__key">Location</dt>
-                                            <dd class='govuk-!-margin-left-0'>{{ mark.location }}</dd>
-                                        </div>
-                                    {% endif %}
-                                    <div class="personal-distinguishing-marks__row__populated__row">
-                                        <dt class="personal-distinguishing-marks__row__mark__row__key">Description</dt>
-                                        <dd class='govuk-!-margin-left-0'>{{ mark.comment or "Not entered" }}</dd>
-                                    </div>
-                                    {% if mark.photographUuids.length %}
-                                        <div class="personal-distinguishing-marks__row__populated__row__image-list distinguishing-mark-summary-image__container">
-                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
-                                                 alt="Image of {{ type }} on {{ mark.location }}"
-                                                 class="distinguishing-mark-summary-image__image" />
-                                        </div>
-                                        {% if mark.photographUuids.length > 1 %}
-                                            <div class="personal-distinguishing-marks__row__populated__row">
-                                                <p class="govuk-!-margin-top-3 govuk-!-margin-bottom-0">1 of {{ mark.photographUuids.length }} photos.
-                                                    <a data-qa="mark-images-link"
-                                                       href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
-                                                       class='govuk-link govuk-link--no-visited-state'
-                                                    >All images<span class="govuk-visually-hidden"> of {{ type }} on {{ mark.location }}</span></a></p>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                </dl>
-                                {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
-                                    <div>
-                                        <a href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}"
-                                           class="govuk-link govuk-link--no-visited-state">Change <span class="govuk-visually-hidden">{{ type }} {{ loop.index }} of {{ loop.length }} on {{ mark.location }}</span></a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
+  {% if info and info | length %}
+    <div data-module="hmpps-open-close-all" data-open-text="Show all {{ type }} details"
+         data-close-text="Hide all {{ type }} details">
+      {% for bodyPart, marks in info %}
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              {{ bodyPart }}
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            {% for mark in marks %}
+              <div class="personal-distinguishing-marks__row__populated__mark">
+                <div class="personal-distinguishing-marks__mark-details">
+                  {% if not (bodyPart === 'Neck' or bodyPart === 'Back') %}
+                    <div class="personal-distinguishing-marks__row__populated__row">
+                      <span class="personal-distinguishing-marks__row__mark__row__key govuk-!-font-weight-bold govuk-!-display-block">Location</span>
+                      <span class='govuk-!-margin-left-0 govuk-!-display-block'>{{ mark.location }}</span>
                     </div>
-                </details>
+                  {% endif %}
+                  <div class="personal-distinguishing-marks__row__populated__row">
+                    <span class="personal-distinguishing-marks__row__mark__row__key govuk-!-font-weight-bold govuk-!-display-block">Description</span>
+                    <span class='govuk-!-margin-left-0 govuk-!-display-block'>{{ mark.comment or "Not entered" }}</span>
+                  </div>
+                  {% if mark.photographUuids.length %}
+                    <div class="personal-distinguishing-marks__row__populated__row__image-list distinguishing-mark-summary-image__container">
+                      <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
+                           alt="Image of {{ type }} on {{ mark.location }}"
+                           class="distinguishing-mark-summary-image__image" />
+                    </div>
+                    {% if mark.photographUuids.length > 1 %}
+                      <div class="personal-distinguishing-marks__row__populated__row">
+                        <p class="govuk-!-margin-top-3 govuk-!-margin-bottom-0">1 of {{ mark.photographUuids.length }} photos.
+                          <a data-qa="mark-images-link"
+                             href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
+                             class='govuk-link govuk-link--no-visited-state'
+                          >All images<span class="govuk-visually-hidden"> of {{ type }} on {{ mark.location }}</span></a></p>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                {% if mark.markType.code != 'OTH' and isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+                  <div>
+                    <a href="/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/{{ mark.markType.description | lower }}/{{ mark.id }}"
+                       class="govuk-link govuk-link--no-visited-state">Change <span class="govuk-visually-hidden">{{ type }} {{ loop.index }} of {{ loop.length }} on {{ mark.location }}</span></a>
+                  </div>
+                {% endif %}
+              </div>
             {% endfor %}
-        </div>
-    {% else %}
-        Not entered
-    {% endif %}
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+  {% else %}
+    Not entered
+  {% endif %}
 {% endmacro %}
 
 <h3 id="marks" class="govuk-heading-m">Distinguishing marks</h3>
 <div class="personal-distinguishing-marks">
-    {{ bodyParts({
-        id: 'all-distinguishing-marks',
-        selected: groupedDistinguishingMarks.selected,
-        disabled: true,
-        scalable: true
-    }) }}
-    <div class="personal-distinguishing-marks__info">
-        <dl>
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-tattoo' }}">
-                <span class="anchor-center" id="tattoos"></span>
-                <dt class="personal-distinguishing-marks__row__key">Tattoos</dt>
-                <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMarks('tattoo', groupedDistinguishingMarks.tattoos) }}</dd>
-                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
-                  <dd class='personal-distinguishing-marks__row__actions'>
-                      <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/tattoo'>Add tattoo</a>
-                  </dd>
-                {% endif %}
-            </div>
+  {{ bodyParts({
+    id: 'all-distinguishing-marks',
+    selected: groupedDistinguishingMarks.selected,
+    disabled: true,
+    scalable: true
+  }) }}
+  <div class="personal-distinguishing-marks__info">
+    <dl>
+      <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-tattoo' }}">
+        <dt class="personal-distinguishing-marks__row__key">
+          <span class="anchor-center" id="tattoos"></span>Tattoos
+        </dt>
+        <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMarks('tattoo', groupedDistinguishingMarks.tattoos) }}</dd>
+        {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+          <dd class='personal-distinguishing-marks__row__actions'>
+            <a class='govuk-link govuk-link--no-visited-state'
+               href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/tattoo'>Add tattoo</a>
+          </dd>
+        {% endif %}
+      </div>
 
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-scar' }}">
-                <span class="anchor-center" id="scars"></span>
-                <dt class="personal-distinguishing-marks__row__key">Scars</dt>
-                <dd data-qa="distinguishing-marks-scars">{{ distinguishingMarks('scar', groupedDistinguishingMarks.scars) }}</dd>
-                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
-                  <dd class='personal-distinguishing-marks__row__actions'>
-                      <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/scar'>Add scar</a>
-                  </dd>
-                {% endif %}
-            </div>
+      <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-scar' }}">
+        <dt class="personal-distinguishing-marks__row__key">
+          <span class="anchor-center" id="scars"></span>Scars
+        </dt>
+        <dd data-qa="distinguishing-marks-scars">{{ distinguishingMarks('scar', groupedDistinguishingMarks.scars) }}</dd>
+        {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+          <dd class='personal-distinguishing-marks__row__actions'>
+            <a class='govuk-link govuk-link--no-visited-state'
+               href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/scar'>Add scar</a>
+          </dd>
+        {% endif %}
+      </div>
 
-            <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-mark' }}">
-                <span class="anchor-center" id="other-marks"></span>
-                <dt class="personal-distinguishing-marks__row__key">Other marks</dt>
-                <dd data-qa="distinguishing-marks-others">{{ distinguishingMarks('other mark', groupedDistinguishingMarks.others) }}</dd>
-                {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
-                  <dd class='personal-distinguishing-marks__row__actions'>
-                      <a class='govuk-link govuk-link--no-visited-state'
-                         href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/mark'>Add mark</a>
-                  </dd>
-                {% endif %}
-            </div>
-        </dl>
-    </div>
+      <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }} {{ "row-updated" if flashMessage.fieldName === 'distinguishing-marks-mark' }}">
+        <dt class="personal-distinguishing-marks__row__key">
+          <span class="anchor-center" id="other-marks"></span>Other marks
+        </dt>
+        <dd data-qa="distinguishing-marks-others">{{ distinguishingMarks('other mark', groupedDistinguishingMarks.others) }}</dd>
+        {% if isGranted(CorePersonRecordPermission.edit_distinguishing_marks, prisonerPermissions) %}
+          <dd class='personal-distinguishing-marks__row__actions'>
+            <a class='govuk-link govuk-link--no-visited-state'
+               href='/prisoner/{{ prisonerNumber }}/personal/distinguishing-marks/mark'>Add mark</a>
+          </dd>
+        {% endif %}
+      </div>
+    </dl>
+  </div>
 </div>

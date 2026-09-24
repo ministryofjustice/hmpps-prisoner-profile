@@ -3,9 +3,13 @@ import config from '../config'
 import { formatDateISO } from '../utils/dateHelpers'
 import type { PageResponse } from './interfaces/PageResponse'
 import type {
+  LegacyScanResponse,
   ListScansRequest,
   ScanResponse,
+  ScanSummaryRequest,
   ScanSummaryResponse,
+  ScanSummaryResponseWithAlerts,
+  ScanSummaryResponseWithoutAlerts,
   XRayBodyScansApiClient,
 } from './interfaces/xRayBodyScansApi'
 import RestClient, { type Request } from './restClient'
@@ -17,9 +21,45 @@ interface RawScanResponse extends Omit<ScanResponse, 'scanDate' | 'mergedAt' | '
   lastModifiedAt: string
 }
 
-interface RawScanSummaryResponse extends Omit<ScanSummaryResponse, 'fromScanDate' | 'toScanDate'> {
+interface RawLegacyScanResponse extends Omit<LegacyScanResponse, 'scanDate'> {
+  scanDate: string | null
+}
+
+function convertRawScanResponse(scan: RawScanResponse): ScanResponse
+function convertRawScanResponse(scan: RawLegacyScanResponse): LegacyScanResponse
+function convertRawScanResponse(scan: RawScanResponse | RawLegacyScanResponse): ScanResponse | LegacyScanResponse
+function convertRawScanResponse(scan: RawScanResponse | RawLegacyScanResponse): ScanResponse | LegacyScanResponse {
+  if (scan.source === 'NOMIS') {
+    return {
+      ...scan,
+      // using midday in order to avoid daylight saving switches
+      scanDate: scan.scanDate ? new Date(`${scan.scanDate}T12:00:00`) : null,
+    }
+  }
+  return {
+    ...scan,
+    // using midday in order to avoid daylight saving switches
+    scanDate: new Date(`${scan.scanDate}T12:00:00`),
+    mergedAt: scan.mergedAt ? new Date(scan.mergedAt) : null,
+    createdAt: new Date(scan.createdAt),
+    lastModifiedAt: new Date(scan.lastModifiedAt),
+  }
+}
+
+interface RawScanSummaryResponse extends Omit<ScanSummaryResponse, 'latestScan' | 'fromScanDate' | 'toScanDate'> {
+  latestScan: RawScanResponse | RawLegacyScanResponse | null
   fromScanDate: string
   toScanDate: string
+}
+
+function convertRawScanSummaryResponse(summary: RawScanSummaryResponse): ScanSummaryResponse {
+  return {
+    ...summary,
+    latestScan: summary.latestScan ? convertRawScanResponse(summary.latestScan) : null,
+    // using midday in order to avoid daylight saving switches
+    fromScanDate: new Date(`${summary.fromScanDate}T12:00:00`),
+    toScanDate: new Date(`${summary.toScanDate}T12:00:00`),
+  }
 }
 
 export default class XRayBodyScansApiRestClient extends RestClient implements XRayBodyScansApiClient {
@@ -27,13 +67,16 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     super('X-ray Body Scans API', config.apis.xRayBodyScans, token, circuitBreaker)
   }
 
-  async listScans(prisonerNumber: string, request?: ListScansRequest): Promise<PageResponse<ScanResponse>> {
+  async listScans(
+    prisonerNumber: string,
+    request?: ListScansRequest,
+  ): Promise<PageResponse<ScanResponse | LegacyScanResponse>> {
     const query: object = {
       ...(request ?? {}),
       fromScanDate: request?.fromScanDate ? formatDateISO(request.fromScanDate) : undefined,
       toScanDate: request?.toScanDate ? formatDateISO(request.toScanDate) : undefined,
     }
-    const response = await this.get<PageResponse<RawScanResponse>>(
+    const response = await this.get<PageResponse<RawScanResponse | RawLegacyScanResponse>>(
       {
         path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan`,
         query,
@@ -42,29 +85,30 @@ export default class XRayBodyScansApiRestClient extends RestClient implements XR
     )
     return {
       ...response,
-      content: response.content.map(scan => ({
-        ...scan,
-        // using midday in order to avoid daylight saving switches:
-        scanDate: new Date(`${scan.scanDate}T12:00:00`),
-        mergedAt: scan.mergedAt ? new Date(scan.mergedAt) : null,
-        createdAt: new Date(scan.createdAt),
-        lastModifiedAt: new Date(scan.lastModifiedAt),
-      })),
+      content: response.content.map(convertRawScanResponse),
     }
   }
 
-  async getScanSummary(prisonerNumber: string): Promise<ScanSummaryResponse> {
+  async getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts: true },
+  ): Promise<ScanSummaryResponseWithAlerts>
+
+  async getScanSummary(
+    prisonerNumber: string,
+    request: ScanSummaryRequest & { includeAlerts?: false },
+  ): Promise<ScanSummaryResponseWithoutAlerts>
+
+  async getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse>
+
+  async getScanSummary(prisonerNumber: string, request?: ScanSummaryRequest): Promise<ScanSummaryResponse> {
     const response = await this.get<RawScanSummaryResponse>(
       {
         path: `/prisoner/${encodeURIComponent(prisonerNumber)}/scan/summary`,
+        query: request,
       },
       this.token,
     )
-    return {
-      ...response,
-      // using midday in order to avoid daylight saving switches:
-      fromScanDate: new Date(`${response.fromScanDate}T12:00:00`),
-      toScanDate: new Date(`${response.toScanDate}T12:00:00`),
-    }
+    return convertRawScanSummaryResponse(response)
   }
 }

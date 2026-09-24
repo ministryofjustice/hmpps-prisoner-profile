@@ -1,12 +1,11 @@
 import logger from '../../logger'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
 import { errorHasStatus } from '../utils/errorHelpers'
 import { formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
-import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import { CellMovementsApiClient } from '../data/interfaces/cellMovementsApi'
 import AttributesForLocation from '../data/interfaces/locationsInsidePrisonApi/AttributesForLocation'
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
@@ -26,8 +25,7 @@ type PrisonerLocationHistoryResponse = {
 export default class PrisonerLocationHistoryService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
-    private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>,
+    private readonly cellMovementsApiClientBuilder: RestClientBuilder<CellMovementsApiClient>,
     private readonly locationsInsidePrisonApiClientBuilder: RestClientBuilder<LocationsInsidePrisonApiClient>,
     private readonly nomisSyncPrisonerMappingApiClientBuilder: RestClientBuilder<NomisSyncPrisonerMappingApiClient>,
   ) {}
@@ -45,29 +43,16 @@ export default class PrisonerLocationHistoryService {
       return staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : username
     }
 
+    // One call to the cell movements API replaces the whereabouts + case-notes two-hop this made
+    // before: commentText is the explanation the case note used to hold. 404 (nothing recorded
+    // through DPS for this bed assignment) is the common case and returns null, as it always has.
     const fetchWhatHappened = async (
       bookingId: number,
-      offenderNo: string,
-      caseloadId: string,
       bedAssignmentHistorySequence: number,
-      caseNotesApi: CaseNotesApiClient,
-      whereaboutsApi: WhereaboutsApiClient,
+      cellMovementsApi: CellMovementsApiClient,
     ) => {
-      const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence, true)
-      if (cellMoveReason) {
-        const caseNote = await caseNotesApi.getCaseNote(
-          offenderNo,
-          caseloadId,
-          cellMoveReason.cellMoveReason?.caseNoteId.toString(),
-          true,
-        )
-
-        if (caseNote) {
-          return caseNote.text
-        }
-      }
-
-      return null
+      const reason = await cellMovementsApi.getCellMovementReason(bookingId, bedAssignmentHistorySequence, true)
+      return reason?.commentText ?? null
     }
 
     const getLocationHistoryWithPrisoner = async (
@@ -83,14 +68,11 @@ export default class PrisonerLocationHistoryService {
     }
 
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
-    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+    const cellMovementsApiClient = this.cellMovementsApiClientBuilder(token)
     const locationsInsidePrisonApiClient = this.locationsInsidePrisonApiClientBuilder(token)
     const nomisSyncPrisonerMappingApiClient = this.nomisSyncPrisonerMappingApiClientBuilder(token)
 
     const { bookingId } = prisonerData
-
-    const offenderNo = prisonerData.prisonerNumber
 
     const { dpsLocationId } = await nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId(
       parseInt(locationId, 10),
@@ -124,14 +106,7 @@ export default class PrisonerLocationHistoryService {
 
     const [movementMadeByName, whatHappenedDetails, locationHistoryWithPrisoner] = await Promise.all([
       fetchStaffName(movementMadeBy, prisonApiClient),
-      fetchWhatHappened(
-        bookingId,
-        offenderNo,
-        prisonerData.prisonId,
-        bedAssignmentHistorySequence,
-        caseNotesApiClient,
-        whereaboutsApiClient,
-      ),
+      fetchWhatHappened(bookingId, bedAssignmentHistorySequence, cellMovementsApiClient),
       getLocationHistoryWithPrisoner(locationHistory, prisonApiClient),
     ])
 

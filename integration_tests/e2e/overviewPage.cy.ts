@@ -4,14 +4,17 @@ import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import type { ErrorResponse } from '../../server/data/interfaces/xRayBodyScansApi'
-import { emptyPageResponse, pageResponse } from '../../server/data/localMockData/pageResponse'
 import {
   mockContactDetailStaffContacts,
   mockContactDetailYouthEstate,
 } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 import { prisonerHasNeedsMock } from '../../server/data/localMockData/supportForAdditionalNeedsMock'
-import { mockScanResponse, mockScanSummaryResponse } from '../../server/data/localMockData/xRayBodyScansMock'
+import {
+  mockLegacyScanResponse,
+  mockScanResponse,
+  mockScanSummaryResponse,
+} from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
@@ -108,7 +111,7 @@ context('Overview Page', () => {
   context('Given prisoner is within the users case load', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
@@ -316,18 +319,11 @@ context('Overview Page', () => {
     })
 
     context('X-ray body scans card', () => {
-      it('should have an action to record a new scan', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.xrayBodyScansCard.cardActions
-          .find('a')
-          .should('contain.text', 'Record a new scan')
-          .and('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/create-scan')
-      })
-
       it('should show scan count for someone with no scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU'),
+          response: mockScanSummaryResponse({ prisonerNumber: 'G6123VU' }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -339,7 +335,15 @@ context('Overview Page', () => {
       it('should show scan count for someone not near the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 10, 1, 9, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 10,
+            positiveCount: 1,
+            negativeCount: 9,
+            inconclusiveCount: 0,
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -351,7 +355,15 @@ context('Overview Page', () => {
       it('should show scan count for someone near the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 101, 1, 99, 1),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 101,
+            positiveCount: 1,
+            negativeCount: 99,
+            inconclusiveCount: 1,
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -363,7 +375,15 @@ context('Overview Page', () => {
       it('should show scan count for someone at the annual limit', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 116, 10, 106, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 116,
+            positiveCount: 10,
+            negativeCount: 106,
+            inconclusiveCount: 0,
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -375,7 +395,15 @@ context('Overview Page', () => {
       it('should not normally show legacy data note', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 0, 1, 0, 1, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 0,
+            dpsCount: 1,
+            positiveCount: 0,
+            negativeCount: 1,
+            inconclusiveCount: 0,
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -385,7 +413,15 @@ context('Overview Page', () => {
       it('should show legacy data note if there were NOMIS scans this year', () => {
         cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: mockScanSummaryResponse('G6123VU', 1, 0, 0, 0, 0),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 1,
+            dpsCount: 0,
+            positiveCount: 0,
+            negativeCount: 0,
+            inconclusiveCount: 0,
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
@@ -396,20 +432,60 @@ context('Overview Page', () => {
       })
 
       it('should say so if no scan was recorded ever', () => {
-        cy.task('stubXRayBodyListScans', { prisonerNumber: 'G6123VU', response: emptyPageResponse() })
+        cy.task('stubXRayBodyScanSummary', {
+          prisonerNumber: 'G6123VU',
+          response: mockScanSummaryResponse({ prisonerNumber: 'G6123VU', latestScan: null }),
+          request: { includeLatestScan: true },
+        })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.xrayBodyScansCard.shouldShowNoScans()
       })
 
-      it('should show basic details of latest scan', () => {
-        cy.task('stubXRayBodyListScans', {
+      it('should show basic details of latest scan if from DPS', () => {
+        cy.task('stubXRayBodyScanSummary', {
           prisonerNumber: 'G6123VU',
-          response: pageResponse([mockScanResponse('G6123VU', new Date(2026, 6, 20, 12))]),
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            dpsCount: 1,
+            positiveCount: 1,
+            latestScan: mockScanResponse('G6123VU', new Date(2026, 6, 20, 12)),
+          }),
+          request: { includeLatestScan: true },
         })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', 'Item detected')
+      })
+
+      it('should show date of latest scan if from NOMIS', () => {
+        cy.task('stubXRayBodyScanSummary', {
+          prisonerNumber: 'G6123VU',
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 1,
+            latestScan: mockLegacyScanResponse('G6123VU', new Date(2026, 6, 20, 12)),
+          }),
+          request: { includeLatestScan: true },
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowLatestScan('20/07/2026', null)
+      })
+
+      it('should not show date of latest scan if from NOMIS but no date was recorded', () => {
+        cy.task('stubXRayBodyScanSummary', {
+          prisonerNumber: 'G6123VU',
+          response: mockScanSummaryResponse({
+            prisonerNumber: 'G6123VU',
+            nomisCount: 1,
+            latestScan: mockLegacyScanResponse('G6123VU', null),
+          }),
+          request: { includeLatestScan: true },
+        })
+        cy.visit('/prisoner/G6123VU')
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.shouldShowNoScans()
       })
 
       it('should link to scan history', () => {
@@ -417,7 +493,16 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.historyLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview',
+        )
+      })
+
+      it('should link to record a new scan', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.xrayBodyScansCard.recordLink.should(
+          'have.attr',
+          'href',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan',
         )
       })
     })
@@ -454,16 +539,23 @@ context('Overview Page', () => {
       })
 
       it('Displays x-ray body scan limit reached', () => {
-        const response = mockScanSummaryResponse('G6123VU', 0, 116, 0, 0, 0)
+        const response = mockScanSummaryResponse({
+          prisonerNumber: 'G6123VU',
+          nomisCount: 0,
+          dpsCount: 116,
+          positiveCount: 0,
+          negativeCount: 0,
+          inconclusiveCount: 0,
+        })
         cy.task('stubXRayBodyScanSummary', { prisonerNumber: 'G6123VU', response })
         cy.visit('/prisoner/G6123VU')
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().find('li').should('have.length', 4)
-        overviewPage.statusList().should('contain.text', `Scans in ${response.fromScanDate.getFullYear()}`)
+        overviewPage.statusList().should('contain.text', `X-ray body scans in ${response.fromScanDate.getFullYear()}`)
         overviewPage
           .statusList()
           .find('a')
-          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scans')
+          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview')
           .and('have.text', 'Scan limit reached')
       })
     })
@@ -962,7 +1054,8 @@ context('Overview Page', () => {
     })
   })
 
-  context('Given user is not a DPS developer', () => {
+  // TODO: remove once XRBS no longer relies on DPS app dev as a feature flag
+  context('Given XRBS feature flag is off', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
@@ -1176,7 +1269,7 @@ context('Overview Page', () => {
   context('Given API call to x-ray body scans api fails', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
@@ -1202,20 +1295,9 @@ context('Overview Page', () => {
         .statusList()
         .find('li')
         .eq(3)
-        .should('contain.text', 'Scan limit information is currently unavailable')
+        .should('contain.text', 'X-ray body scan limit information is currently unavailable')
 
       overviewPage.xrayBodyScansCard.shouldShowSummaryIsUnavailable()
-    })
-
-    it('Displays a page error banner and highlights the failure in the card if latest scan could not be loaded', () => {
-      cy.task('stubXRayBodyListScans', { prisonerNumber: 'G6123VU', response: errorResponse })
-      visitOverviewPage()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
-
-      overviewPage.apiErrorBanner().should('exist')
-      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
-
-      overviewPage.xrayBodyScansCard.shouldShowLatestScanIsUnavailable()
     })
   })
 })

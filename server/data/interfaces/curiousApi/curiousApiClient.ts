@@ -1,11 +1,9 @@
 import type { AllAssessmentDTO, AllQualificationsDTO } from 'curiousApiClient'
-import LearnerEmployabilitySkills from './LearnerEmployabilitySkills'
 import LearnerGoals from './LearnerGoals'
 import LearnerNeurodivergence from './LearnerNeurodivergence'
 
 export default interface CuriousApiClient {
   // Curious 1 endpoints
-  getLearnerEmployabilitySkills(prisonerNumber: string): Promise<LearnerEmployabilitySkills | null>
   getLearnerGoals(prisonerNumber: string): Promise<LearnerGoals | null>
   getLearnerNeurodivergence(prisonerNumber: string): Promise<LearnerNeurodivergence[] | null>
 

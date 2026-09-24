@@ -46,7 +46,7 @@
     {% if not breadCrumbs %}
       {% set breadCrumbs = [
         { text: 'Digital Prison Services', href: "/" | prependBaseUrl },
-        { text: breadcrumbPrisonerName | default(prisonerName.lastCommaFirst | default(prisonerName)), href: '/prisoner/' + prisonerNumber } if prisonerNumber and pageTitle != 'Overview' else null,
+        { text: breadcrumbPrisonerName | default(prisonerName.lastCommaFirst | default(prisonerName)), href: '/prisoner/' + prisonerNumber } if prisonerNumber and pageTitle != 'Overview' and isGranted(PrisonerBasePermission.read, prisonerPermissions) else null,
         breadcrumbParent
       ] | removeNullish %}
     {% endif %}

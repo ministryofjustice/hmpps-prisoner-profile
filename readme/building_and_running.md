@@ -93,6 +93,7 @@ WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov
 INCIDENT_REPORTING_UI_URL=https://incident-reporting-dev.hmpps.service.justice.gov.uk
 PRISON_ROLL_COUNT_UI_URL=https://prison-roll-count-dev.hmpps.service.justice.gov.uk
 WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
+CELL_MOVEMENTS_API_URL=https://change-someones-cell-api-dev.hmpps.service.justice.gov.uk
 LEARNING_AND_WORK_PROGRESS_UI_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
 EDUCATION_AND_WORK_PLAN_API_URL=https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
 CONTENTFUL_HOST=https://graphql.eu.contentful.com
@@ -108,6 +109,7 @@ CSIP_API_URL=https://csip-api-dev.hmpps.service.justice.gov.uk
 SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL=https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk
 PERSON_API_URL=https://hmpps-person-record-dev.hmpps.service.justice.gov.uk
 X_RAY_BODY_SCANS_API_URL=https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk
+TRANSFER_SCHEDULER_UI_URL=https://transfer-scheduler-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>

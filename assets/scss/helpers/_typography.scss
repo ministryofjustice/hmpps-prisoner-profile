@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-secondary-text {
   color: govuk-colour("black", $variant: "tint-25");
 }

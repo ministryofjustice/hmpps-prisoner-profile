@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 #court-cases-sentence-details {
   .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
     visibility: hidden;
@@ -63,7 +65,7 @@
   margin-right: 5px;
   margin-bottom: 5px;
   vertical-align: middle;
-  color: $govuk-brand-colour;
+  color: govuk-functional-colour(brand);
 }
 
 .empty-accordion-header {

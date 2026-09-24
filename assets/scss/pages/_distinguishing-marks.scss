@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .mark-photo-container {
   display: flex;
   flex-direction: row;
@@ -5,7 +7,7 @@
   column-gap: 20px;
   justify-content: space-between;
   padding: 15px;
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   margin-bottom: 30px;
 }
 
@@ -16,11 +18,11 @@
   column-gap: 20px;
   justify-content: space-between;
   padding: 15px;
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   margin-bottom: 30px;
 
   a {
-    color: $govuk-link-colour
+    color: govuk-functional-colour(link);
   }
 
   > .image-preview {
@@ -45,7 +47,7 @@
 }
 
 label.govuk-link {
-  color: $govuk-link-colour;
+  color: govuk-functional-colour(link);
   cursor: pointer;
 }
 
@@ -97,7 +99,7 @@ label.govuk-link {
   &__summary {
     @media screen {
       padding-right: 20px;
-      border-right: 1px solid $govuk-border-colour;
+      border-right: 1px solid govuk-functional-colour(border);
       flex-basis: 33%;
     }
   }
@@ -156,7 +158,7 @@ label.govuk-link {
     }
 
     &:focus-within {
-      border-color: $govuk-focus-colour;
+      border-color: govuk-functional-colour(focus);
     }
   }
 
@@ -202,7 +204,7 @@ label.govuk-link {
   width: 100%;
 
   tr {
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
   }
 
   th {

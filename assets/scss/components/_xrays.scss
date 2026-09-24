@@ -1,3 +1,5 @@
+@use '@ministryofjustice/frontend/moj/base' as *;
+
 .hmpps-xray {
   &__total {
     @include govuk-responsive-margin(1, 'bottom');

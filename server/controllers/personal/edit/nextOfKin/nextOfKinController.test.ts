@@ -495,6 +495,34 @@ describe('NextOfKinController', () => {
           page: Page.EditNextOfKinAddressFindUkAddress,
         })
       })
+
+      it('should repopulate input value from flash if present', async () => {
+        req = {
+          ...req,
+          query: { contact: contactCacheId },
+          flash: (key: string) => {
+            if (key === 'requestBody') {
+              return [JSON.stringify({ 'address-autosuggest-input': '123 Fake Street' })]
+            }
+            if (key === 'errors') {
+              return [{ href: '#address-autosuggest-input', text: 'This is not a valid address' }]
+            }
+            return []
+          },
+        } as unknown as Request
+
+        setupCachedDataMocks()
+
+        await controller.displayFindUkAddress()(req, res, next)
+
+        expect(res.render).toHaveBeenCalledWith(
+          'pages/edit/address/findUkAddress',
+          expect.objectContaining({
+            inputValue: '123 Fake Street',
+            errors: [{ href: '#address-autosuggest-input', text: 'This is not a valid address' }],
+          }),
+        )
+      })
     })
 
     describe('Submitting the page', () => {

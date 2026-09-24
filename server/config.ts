@@ -167,6 +167,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
+    cellMovementsApi: {
+      url: get('CELL_MOVEMENTS_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('CELL_MOVEMENTS_API_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('CELL_MOVEMENTS_API_TIMEOUT_SECONDS', 3000)),
+      },
+      agent: new AgentConfig(Number(get('CELL_MOVEMENTS_API_TIMEOUT_DEADLINE', 3000))),
+    },
     bookAVideoLinkApi: {
       url: get('BOOK_A_VIDEO_LINK_API_URL', 'http://localhost:8082', requiredInProduction),
       healthPath: '/health/ping',
@@ -376,7 +385,8 @@ export default {
     allocatePersonalOfficers: get('ALLOCATE_PERSONAL_OFFICERS_UI_URL', 'http://localhost:3001', requiredInProduction),
     externalMovements: get('EXTERNAL_MOVEMENTS_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
-    xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001'), // TODO: make required once exists
+    xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
+    transferScheduler: get('TRANSFER_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -405,6 +415,12 @@ export default {
 
     editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
 
+    editAddressSpecificPhoneNumbers: {
+      enabledPrisons: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS', []) as string[],
+      enabledPrisonsByDate: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS_BY_DATE', []) as string[],
+      enabledPrisonsFrom: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_FROM', '2099-01-01T00:00:00'),
+    },
+
     personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
 
     healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),
@@ -417,6 +433,9 @@ export default {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('PERSON_DUPLICATE_RECORDS_ENABLED_FROM', '2099-01-01T00:00:00'),
+      // Manual overrides for duplicate prisoner records to be used for demoing and testing:
+      // Provided as a JSON array of arrays string, e.g. [["A1234BC","B5678DE","C9012FG"]]
+      overrides: JSON.parse(get('PERSON_DUPLICATE_RECORDS_OVERRIDES', '[]') as string) as string[][],
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
@@ -434,8 +453,6 @@ export default {
       enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('OFFENCES_MOVED_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
-
-    displayEmployabilitySkillsFromLwp: toBoolean(get('DISPLAY_EMPLOYABILITY_SKILLS_FROM_LWP', 'false')),
   },
   defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {

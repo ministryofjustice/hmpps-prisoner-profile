@@ -1,10 +1,9 @@
 import type { Result } from '../../../utils/result/result'
-import type { OverviewStatus } from '../../interfaces/OverviewPageData'
+import type { OverviewStatus, XrayBodyScanSummary } from '../../interfaces/OverviewPageData'
 import type Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import type InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import type { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import type { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
-import type { XrayBodyScanSummary } from './mapXrayBodyScanData'
 import {
   getProfileInformationValue,
   ProfileInformationType,
@@ -101,7 +100,7 @@ function getXrayBodyScanLimitReachedStatus(
       fulfilled(summary): OverviewStatus | null {
         return summary.atScanLimit
           ? {
-              label: `Scans in ${summary.fromScanDate.getFullYear()}`,
+              label: `X-ray body scans in ${summary.fromScanDate.getFullYear()}`,
               subText: 'Scan limit reached',
               subTextHref: summary.viewHistoryUrl,
               style: 'warning',
@@ -111,7 +110,7 @@ function getXrayBodyScanLimitReachedStatus(
 
       rejected(): OverviewStatus {
         return {
-          label: 'Scan limit information is currently unavailable. Try again later.',
+          label: 'X-ray body scan limit information is currently unavailable. Try again later.',
           style: 'error',
         }
       },
