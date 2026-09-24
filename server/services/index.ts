@@ -145,6 +145,7 @@ export const services = () => {
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     keyworkerApiClientBuilder,
+    prisonService,
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)

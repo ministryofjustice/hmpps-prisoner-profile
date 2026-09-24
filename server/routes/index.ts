@@ -83,6 +83,7 @@ export default function routes(services: Services): Router {
     services.professionalContactsService,
     services.csipService,
     services.contactsService,
+    services.prisonService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(

@@ -1,5 +1,5 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import ProfessionalContactsService from './professionalContactsService'
+import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
 import Address from '../data/interfaces/prisonApi/Address'
 import { AgenciesEmail } from '../data/interfaces/prisonApi/Agency'
 import Telephone from '../data/interfaces/prisonApi/Telephone'
@@ -20,6 +20,8 @@ import {
   mockPrisonerContact,
 } from '../data/localMockData/contactDetail'
 import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
+import type PrisonService from './prisonService'
+import ProfessionalContactsService from './professionalContactsService'
 
 const mockAddress = (overrides?: Partial<Address>): Address => ({
   noFixedAddress: false,
@@ -109,6 +111,7 @@ const expectedPersonalOfficerResponse = [
 
 describe('professionalContactsService', () => {
   let prisonApiClient: PrisonApiClient
+  let prisonService: jest.MockedObject<PrisonService>
   let allocationManagerApiClient: AllocationManagerClient
   let professionalContactsClient: PrisonerProfileDeliusApiClient
   let keyWorkerApiClient: KeyWorkerClient
@@ -118,6 +121,8 @@ describe('professionalContactsService', () => {
     prisonApiClient.getAddressesForPerson = jest.fn(async () => [mockAddress()])
     prisonApiClient.getPersonPhones = jest.fn(async () => mockPhone)
     prisonApiClient.getPersonEmails = jest.fn(async () => mockEmails)
+
+    prisonService = prisonServiceMock()
 
     allocationManagerApiClient = {
       getPomByOffenderNo: jest.fn(async () => mockPom),
@@ -147,6 +152,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -193,6 +199,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
@@ -222,6 +229,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -265,6 +273,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -317,6 +326,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -363,6 +373,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -394,6 +405,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
@@ -416,6 +428,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
@@ -444,6 +457,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
@@ -495,6 +509,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, 'FYI')).map(result => result.getOrThrow())
@@ -539,6 +554,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        prisonService,
       )
     })
 

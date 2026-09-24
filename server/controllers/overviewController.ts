@@ -35,8 +35,8 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
 import { Result } from '../utils/result/result'
 import OffenderService from '../services/offenderService'
+import PrisonService from '../services/prisonService'
 import ProfessionalContactsService from '../services/professionalContactsService'
-import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 import { Role } from '../data/enums/role'
 import getOverviewStatuses from './utils/overviewController/getOverviewStatuses'
 import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfoLinks'
@@ -68,6 +68,7 @@ export default class OverviewController {
     private readonly professionalContactsService: ProfessionalContactsService,
     private readonly csipService: CsipService,
     private readonly contactsService: ContactsService,
+    private readonly prisonService: PrisonService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
@@ -77,7 +78,6 @@ export default class OverviewController {
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
     const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, user)
-    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -108,6 +108,7 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
       xrayBodyScanSummary,
+      isYouthPrisoner,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -173,6 +174,7 @@ export default class OverviewController {
             apiErrorCallback,
           )
         : null,
+      this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken),
     ])
 
     const overviewActions = buildOverviewActions(

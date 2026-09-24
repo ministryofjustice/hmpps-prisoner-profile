@@ -18,6 +18,7 @@ context('Professional contacts list page', () => {
     cy.setupUserAuth()
     cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubGetAllPrisons')
     cy.task('stubGetOffenderContacts')
     cy.task('stubGetCommunityManager')
     cy.task('stubCurrentAllocations', { prisonerNumber: 'G6123VU' })

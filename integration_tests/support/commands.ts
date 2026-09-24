@@ -55,6 +55,7 @@ Cypress.Commands.add(
     daysOverdue,
     reviewOverdueDays,
   }) => {
+    cy.task('stubGetAllPrisons')
     cy.task('stubNonAssociations', prisonerNumber)
     cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, overrides: prisonerDataOverrides })
     cy.task('stubAccountBalances', bookingId)

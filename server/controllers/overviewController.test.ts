@@ -62,8 +62,10 @@ import {
   mockScanSummaryResponse,
 } from '../data/localMockData/xRayBodyScansMock'
 import ContactsService from '../services/contactsService'
+import type PrisonService from '../services/prisonService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
 import OverviewController from './overviewController'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
@@ -130,6 +132,7 @@ describe('overviewController', () => {
   let professionalContactsService: ProfessionalContactsService
   let csipService: CsipService
   let contactsService: ContactsService
+  let prisonService: PrisonService
 
   let xRayBodyScansWasEnabled: boolean = false
 
@@ -171,6 +174,7 @@ describe('overviewController', () => {
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
+    prisonService = prisonServiceMock()
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -188,6 +192,7 @@ describe('overviewController', () => {
       professionalContactsService,
       csipService,
       contactsService,
+      prisonService,
     )
   })
 
