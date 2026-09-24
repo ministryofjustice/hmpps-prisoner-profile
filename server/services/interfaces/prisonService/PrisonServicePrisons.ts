@@ -6,5 +6,5 @@
  */
 export interface Prison {
   prisonId: string
-  prisonName: string
+  prisonName: string | undefined
 }

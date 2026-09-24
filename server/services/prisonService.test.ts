@@ -38,7 +38,7 @@ describe('prisonService', () => {
   const prisonId = 'MDI'
   const systemToken = 'a-system-token'
 
-  describe('getPrisonByPrisonId', () => {
+  describe('get prison by id', () => {
     it('should get prison by ID given prison has been previously cached', async () => {
       // Given
       prisonRegisterStore.getActivePrisons.mockResolvedValue(activePrisons)
@@ -53,13 +53,26 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(prisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(prisonId, systemToken)
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(mockedPrisonMapper).toHaveBeenCalledWith(moorlandPrisonResponse)
       expect(prisonRegisterClient.getAllPrisons).not.toHaveBeenCalled()
       expect(prisonRegisterStore.setActivePrisons).not.toHaveBeenCalled()
+      expect(actualWithCompleteDetails).toEqual(
+        expect.objectContaining({
+          ...expectedPrison,
+          active: true,
+          types: expect.arrayOf(
+            expect.objectContaining({
+              code: expect.any(String),
+              description: expect.any(String),
+            }),
+          ),
+        }),
+      )
     })
 
     it('should get prison by ID given prison has not been previously cached', async () => {
@@ -77,14 +90,27 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(prisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(prisonId, systemToken)
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(mockedPrisonMapper).toHaveBeenCalledWith(moorlandPrisonResponse)
       expect(prisonRegisterClientBuilder).toHaveBeenCalledWith(systemToken)
-      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalled()
+      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
+      expect(actualWithCompleteDetails).toEqual(
+        expect.objectContaining({
+          ...expectedPrison,
+          active: true,
+          types: expect.arrayOf(
+            expect.objectContaining({
+              code: expect.any(String),
+              description: expect.any(String),
+            }),
+          ),
+        }),
+      )
     })
 
     it('should not get prison by ID given prison does not exist in cache or API', async () => {
@@ -101,14 +127,19 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(unknownPrisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(
+        unknownPrisonId,
+        systemToken,
+      )
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(mockedPrisonMapper).not.toHaveBeenCalled()
       expect(prisonRegisterClientBuilder).toHaveBeenCalledWith(systemToken)
-      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalled()
+      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
+      expect(actualWithCompleteDetails).toBeUndefined()
     })
 
     it('should get prison by ID given retrieving from cache throws an error', async () => {
@@ -126,14 +157,27 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(prisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(prisonId, systemToken)
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(mockedPrisonMapper).toHaveBeenCalledWith(moorlandPrisonResponse)
       expect(prisonRegisterClientBuilder).toHaveBeenCalledWith(systemToken)
-      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalled()
+      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
+      expect(actualWithCompleteDetails).toEqual(
+        expect.objectContaining({
+          ...expectedPrison,
+          active: true,
+          types: expect.arrayOf(
+            expect.objectContaining({
+              code: expect.any(String),
+              description: expect.any(String),
+            }),
+          ),
+        }),
+      )
     })
 
     it('should not get prison by ID given retrieving from cache and API both throw errors', async () => {
@@ -148,14 +192,16 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(prisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(prisonId, systemToken)
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(mockedPrisonMapper).not.toHaveBeenCalled()
       expect(prisonRegisterClientBuilder).toHaveBeenCalledWith(systemToken)
-      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalled()
+      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).not.toHaveBeenCalled()
+      expect(actualWithCompleteDetails).toBeUndefined()
     })
 
     it('should get prison by ID given prison has not been previously cached but putting in cache throws an error', async () => {
@@ -172,13 +218,26 @@ describe('prisonService', () => {
 
       // When
       const actual = await prisonService.getPrisonByPrisonId(prisonId, systemToken)
+      const actualWithCompleteDetails = await prisonService.getCompletePrisonDetailsByPrisonId(prisonId, systemToken)
 
       // Then
       expect(actual).toEqual(expectedPrison)
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClientBuilder).toHaveBeenCalledWith(systemToken)
-      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalled()
+      expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
+      expect(actualWithCompleteDetails).toEqual(
+        expect.objectContaining({
+          ...expectedPrison,
+          active: true,
+          types: expect.arrayOf(
+            expect.objectContaining({
+              code: expect.any(String),
+              description: expect.any(String),
+            }),
+          ),
+        }),
+      )
     })
   })
 
@@ -192,7 +251,7 @@ describe('prisonService', () => {
 
       // Then
       expect(actual).toEqual({ ASI: 'Ashfield (HMP)', MDI: 'Moorland (HMP & YOI)' })
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).not.toHaveBeenCalled()
       expect(prisonRegisterStore.setActivePrisons).not.toHaveBeenCalled()
     })
@@ -207,7 +266,7 @@ describe('prisonService', () => {
 
       // Then
       expect(actual).toEqual({ ASI: 'Ashfield (HMP)', MDI: 'Moorland (HMP & YOI)' })
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
     })
@@ -222,7 +281,7 @@ describe('prisonService', () => {
 
       // Then
       expect(actual).toEqual({ ASI: 'Ashfield (HMP)', MDI: 'Moorland (HMP & YOI)' })
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
     })
@@ -237,7 +296,7 @@ describe('prisonService', () => {
 
       // Then
       expect(actual).toEqual({})
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).not.toHaveBeenCalled()
     })
@@ -253,7 +312,7 @@ describe('prisonService', () => {
 
       // Then
       expect(actual).toEqual({ ASI: 'Ashfield (HMP)', MDI: 'Moorland (HMP & YOI)' })
-      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalled()
+      expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
     })
