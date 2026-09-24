@@ -35,11 +35,12 @@ describe('prisonRegisterStore', () => {
     await prisonRegisterStore.setActivePrisons(activePrisons, durationDays)
 
     // Then
-    expect(redisClient.set).toHaveBeenCalledWith(
-      'activePrisons',
-      JSON.stringify(activePrisons),
-      { EX: 172800 }, // 2 days in seconds
-    )
+    expect(redisClient.set).toHaveBeenCalledWith('activePrisons', JSON.stringify(activePrisons), {
+      expiration: {
+        type: 'EX',
+        value: 172800, // 2 days in seconds
+      },
+    })
   })
 
   it('should get active prisons given redis client returns active prisons', async () => {

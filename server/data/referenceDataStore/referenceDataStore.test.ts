@@ -32,7 +32,12 @@ describe('prisonRegisterStore', () => {
     expect(redisClient.set).toHaveBeenCalledWith(
       'reference_data_COUNTRY',
       JSON.stringify(CountryReferenceDataCodesMock),
-      { EX: 3600 }, // 1 hr in seconds
+      {
+        expiration: {
+          type: 'EX',
+          value: 3600, // 1 hr in seconds
+        },
+      },
     )
   })
 

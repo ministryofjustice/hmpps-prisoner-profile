@@ -33,11 +33,12 @@ describe('Ephemeral Data Store', () => {
       await dataStore.cacheData(uuid, dataObject, ttlMinutes)
 
       expect(uuid).toBeDefined()
-      expect(redisClient.set).toHaveBeenCalledWith(
-        `ephemeral:${uuid}`,
-        JSON.stringify(dataObject),
-        { EX: 3600 }, // 1 hour in seconds
-      )
+      expect(redisClient.set).toHaveBeenCalledWith(`ephemeral:${uuid}`, JSON.stringify(dataObject), {
+        expiration: {
+          type: 'EX',
+          value: 3600, // 1 hour in seconds
+        },
+      })
     })
 
     it('handles caching null data', async () => {
@@ -47,11 +48,12 @@ describe('Ephemeral Data Store', () => {
       await dataStore.cacheData(uuid, null, ttlMinutes)
 
       expect(uuid).toBeDefined()
-      expect(redisClient.set).toHaveBeenCalledWith(
-        `ephemeral:${uuid}`,
-        'null',
-        { EX: 3600 }, // 1 hour in seconds
-      )
+      expect(redisClient.set).toHaveBeenCalledWith(`ephemeral:${uuid}`, 'null', {
+        expiration: {
+          type: 'EX',
+          value: 3600, // 1 hour in seconds
+        },
+      })
     })
   })
 

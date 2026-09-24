@@ -1,4 +1,4 @@
-import { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
 import type { RedisClient } from '../redisClient'
 
 import logger from '../../../logger'
@@ -18,7 +18,10 @@ export class EphemeralDataStore {
   async cacheData<T>(key: UUID, value: T, ttlMinutes: number) {
     await this.ensureConnected()
     await this.client.set(`ephemeral:${key}`, JSON.stringify(value), {
-      EX: ttlMinutes * 60,
+      expiration: {
+        type: 'EX',
+        value: ttlMinutes * 60,
+      },
     })
   }
 
@@ -30,7 +33,7 @@ export class EphemeralDataStore {
 
   async removeData(key: UUID): Promise<void> {
     await this.ensureConnected()
-    this.client.del(`ephemeral:${key}`)
+    await this.client.del(`ephemeral:${key}`)
   }
 
   private async ensureConnected() {

@@ -1,8 +1,8 @@
 import logger from '../../logger'
 import PrisonRegisterStore from '../data/prisonRegisterStore/prisonRegisterStore'
 import PrisonRegisterApiClient from '../data/interfaces/prisonRegisterApi/PrisonRegisterApiClient'
-import { PrisonDto } from '../data/interfaces/prisonRegisterApi/prisonRegisterApiTypes'
-import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import type { PrisonDto } from '../data/interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import type { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import toPrison from './mappers/prisonMapper'
 import { RestClientBuilder } from '../data'
 
@@ -64,11 +64,11 @@ export default class PrisonService {
     return (
       // return prison from the cache
       (await this.getCachedPrison(prisonId)) ||
-      (async () => {
+      Promise.try(async () => {
         // or retrieve prisons from the API and cache them before returning the one we are looking for
         const allPrisonResponses = await this.retrieveAndCacheActivePrisons(token)
         return allPrisonResponses.find(prisonResponse => prisonResponse.prisonId === prisonId)
-      })()
+      })
     )
   }
 
@@ -87,7 +87,7 @@ export default class PrisonService {
     return undefined
   }
 
-  private async getCachedPrisons(): Promise<Array<PrisonDto>> {
+  private async getCachedPrisons(): Promise<PrisonDto[]> {
     try {
       const allActivePrisons = await this.prisonRegisterStore.getActivePrisons()
       if (allActivePrisons && allActivePrisons.length > 0) {
@@ -105,9 +105,9 @@ export default class PrisonService {
    * Calls the prison-register API to retrieve all prisons, then caches just the active ones in the cache.
    * Returns an array of active prisons that were cached.
    */
-  private async retrieveAndCacheActivePrisons(token: string): Promise<Array<PrisonDto>> {
+  private async retrieveAndCacheActivePrisons(token: string): Promise<PrisonDto[]> {
     logger.info('Retrieving and caching active prisons')
-    let allPrisonResponses: Array<PrisonDto>
+    let allPrisonResponses: PrisonDto[]
     try {
       allPrisonResponses = (await this.prisonRegisterClientBuilder(token).getAllPrisons()) || []
     } catch (ex) {
