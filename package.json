@@ -136,6 +136,8 @@
     "@opentelemetry/sdk-trace-web": "2.8.0",
     "brace-expansion": "5.0.9",
     "diff": "^9.0.0",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.3",
+    "proxy-addr": "2.0.8",
+    "moment": "2.31.0"
   }
 }
