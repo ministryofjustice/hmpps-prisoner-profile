@@ -1,28 +1,37 @@
+{% from "../bannerSearch/bannerSearch.njk" import bannerSearch %}
+
 {% macro miniBanner(data, options = {displayImage: true, nameLink: true, classes: '', nameClasses: ''}) %}
-    <div class="hmpps-mini-banner govuk-body {{ options.classes }}">
-        {% if options.displayImage %}
-            {% if isGranted(CorePersonRecordPermission.read_photo, data.prisonerPermissions) %}
-                <img class="hmpps-mini-banner__photo" src="{{ data.prisonerThumbnailImageUrl }}" alt="{{ data.prisonerName }}" width="80" height="100"/>
-            {% else %}
-                <img class="hmpps-mini-banner__photo" src="{{ placeholderPrisonerImageUrl }}" alt="Photo of {{ data.prisonerName }} is not available" width="80" height="100"/>
-            {% endif %}
+  <div class="hmpps-mini-banner govuk-body {{ options.classes }}">
+    {% if options.displayImage %}
+      {% if isGranted(CorePersonRecordPermission.read_photo, data.prisonerPermissions) %}
+        <img class="hmpps-mini-banner__photo" src="{{ data.prisonerThumbnailImageUrl }}" alt="{{ data.prisonerName }}"
+             width="80" height="100" />
+      {% else %}
+        <img class="hmpps-mini-banner__photo" src="{{ placeholderPrisonerImageUrl }}"
+             alt="Photo of {{ data.prisonerName }} is not available" width="80" height="100" />
+      {% endif %}
+    {% endif %}
+    <div class="hmpps-mini-banner__name">
+      <div class="govuk-!-font-weight-bold {{ options.nameClasses }}">
+        {% if options.nameLink %}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href="/prisoner/{{ data.prisonerNumber }}">{{ data.prisonerName }}</a>
+        {% else %}
+          {{ data.prisonerName }}
         {% endif %}
-        <div class="hmpps-mini-banner__name">
-            <div class="govuk-!-font-weight-bold {{ options.nameClasses }}">
-                {% if options.nameLink %}
-                    <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ data.prisonerNumber }}">{{ data.prisonerName }}</a>
-                {% else %}
-                    {{ data.prisonerName }}
-                {% endif %}
-            </div>
-            <div id="prisonerNumber">{{ data.prisonerNumber }}</div>
-        </div>
-{# Commented out pending decision on whether this should be included in the miniBanner  #}
-{#        {% if isGranted(PrisonerBaseLocationPermission.read_location_details, prisonerPermissions) %}#}
-{#            <dl class="hmpps-mini-banner__location">#}
-{#                <dt>Location</dt>#}
-{#                <dd>{{ data.cellLocation }}</dd>#}
-{#            </dl>#}
-{#        {% endif %}#}
+      </div>
+      <div id="prisonerNumber">{{ data.prisonerNumber }}</div>
     </div>
+
+
+    {# Commented out pending decision on whether this should be included in the miniBanner  #}
+    {#        {% if isGranted(PrisonerBaseLocationPermission.read_location_details, prisonerPermissions) %} #}
+    {#            <dl class="hmpps-mini-banner__location"> #}
+    {#                <dt>Location</dt> #}
+    {#                <dd>{{ data.cellLocation }}</dd> #}
+    {#            </dl> #}
+    {#        {% endif %} #}
+
+    {{ bannerSearch(data.prisonerNumber, { id: "mini-banner-search", classes: "hmpps-banner-search--mini" }) }}
+  </div>
 {% endmacro %}

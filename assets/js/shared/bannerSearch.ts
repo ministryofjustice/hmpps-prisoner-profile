@@ -1,7 +1,7 @@
-const RESULT_SELECTOR = '.hmpps-profile-banner-search__result'
+const RESULT_SELECTOR = '.hmpps-banner-search__result'
 
 function renderSuggestionText(link: HTMLAnchorElement, suggestion: string, query: string) {
-  const textContainer = link.querySelector<HTMLElement>('.hmpps-profile-banner-search__result-text')
+  const textContainer = link.querySelector<HTMLElement>('.hmpps-banner-search__result-text')
 
   if (!textContainer) {
     return
@@ -36,12 +36,12 @@ function renderSuggestionText(link: HTMLAnchorElement, suggestion: string, query
   }
 }
 
-export function profileBannerSearch() {
-  document.querySelectorAll<HTMLElement>('[data-profile-banner-search]').forEach(search => {
-    const input = search.querySelector<HTMLInputElement>('.hmpps-profile-banner-search__input')
-    const clearButton = search.querySelector<HTMLButtonElement>('.hmpps-profile-banner-search__clear')
-    const submitButton = search.querySelector<HTMLButtonElement>('.hmpps-profile-banner-search__submit')
-    const resultsList = search.querySelector<HTMLUListElement>('.hmpps-profile-banner-search__results')
+export function bannerSearch() {
+  document.querySelectorAll<HTMLElement>('[data-banner-search]').forEach(search => {
+    const input = search.querySelector<HTMLInputElement>('.hmpps-banner-search__input')
+    const clearButton = search.querySelector<HTMLButtonElement>('.hmpps-banner-search__clear')
+    const submitButton = search.querySelector<HTMLButtonElement>('.hmpps-banner-search__submit')
+    const resultsList = search.querySelector<HTMLUListElement>('.hmpps-banner-search__results')
     const resultItems = Array.from(search.querySelectorAll<HTMLElement>(RESULT_SELECTOR))
 
     if (!input || !resultsList || !resultItems.length) {
