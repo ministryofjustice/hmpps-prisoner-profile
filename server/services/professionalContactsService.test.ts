@@ -149,7 +149,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -195,7 +195,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
 
       expect(response.length).toEqual(8)
       expect(response[0].relationshipDescription).toEqual('Key Worker')
@@ -224,7 +224,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -267,7 +267,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -319,7 +319,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -365,7 +365,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -396,7 +396,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
 
       expect(response.find(contact => contact.address?.endDate === '2050-01-01')).toBeTruthy()
       expect(response.find(contact => contact.address?.addressId === 999)).toBeTruthy()
@@ -418,7 +418,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -446,12 +446,12 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'MDI')).map(contact => contact.getOrThrow())
 
       expect(response.find(contact => contact.address?.label === 'Not entered')).toBeTruthy()
     })
 
-    it('should return YOI contacts and not POM, COM, Key Worker if the prisoner is in a youthEstatePrison', async () => {
+    it('should return YCS contacts and not POM, COM, Key Worker if the prisoner is in a youthEstatePrison', async () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
@@ -497,7 +497,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1, true)).map(result => result.getOrThrow())
+      const response = (await service.getContacts('token', 'A1234AA', 1, 'FYI')).map(result => result.getOrThrow())
 
       expect(response.find(contact => contact.relationshipDescription === 'Key Worker')).toBeFalsy()
       expect(response.find(contact => contact.relationshipDescription === 'Prison Offender Manager')).toBeFalsy()

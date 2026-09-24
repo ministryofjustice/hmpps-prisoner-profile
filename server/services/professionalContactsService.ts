@@ -56,9 +56,10 @@ export default class ProfessionalContactsService {
     clientToken: string,
     prisonerNumber: string,
     bookingId: number,
-    isYouthPrisoner: boolean,
+    prisonId: string,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<Result<ProfessionalContact, ProfessionalContactApiError>[]> {
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
     const [contacts, allocationManager, communityManager, allocations] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
       Result.wrap(
