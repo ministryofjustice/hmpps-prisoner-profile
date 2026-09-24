@@ -69,6 +69,15 @@ export default class PrisonService {
     )
   }
 
+  /**
+   * Whether prison register lists this prison as part of Youth Custody Service (YCS)
+   * NB: defaults to false if prison is not found
+   */
+  async isPrisonPartOfYouthCustodyService(prisonId: string, token: string): Promise<boolean> {
+    const prison = await this.getCompletePrisonDetailsByPrisonId(prisonId, token)
+    return Boolean(prison?.types?.some(type => type.code === 'YCS'))
+  }
+
   private async getCachedPrison(prisonId: string): Promise<PrisonDto | undefined> {
     try {
       const allActivePrisons = (await this.getCachedPrisons()) || []

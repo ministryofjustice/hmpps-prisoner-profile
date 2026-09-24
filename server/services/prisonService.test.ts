@@ -1,10 +1,9 @@
-import PrisonService from './prisonService'
-import PrisonRegisterStore from '../data/prisonRegisterStore/prisonRegisterStore'
+import type { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import PrisonRegisterApiRestClient from '../data/prisonRegisterApiClient'
-import toPrison from './mappers/prisonMapper'
-import { PrisonDto } from '../data/interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import PrisonRegisterStore from '../data/prisonRegisterStore/prisonRegisterStore'
 import { prisonsKeyedByPrisonId } from '../data/localMockData/prisonRegisterMockData'
-import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import toPrison from './mappers/prisonMapper'
+import PrisonService from './prisonService'
 
 jest.mock('./mappers/prisonMapper')
 jest.mock('../data/prisonRegisterStore/prisonRegisterStore')
@@ -13,8 +12,8 @@ jest.mock('../data/prisonRegisterApiClient')
 describe('prisonService', () => {
   const mockedPrisonMapper = jest.mocked(toPrison)
 
-  const prisonRegisterStore = jest.mocked(new PrisonRegisterStore(null))
-  const prisonRegisterClient = jest.mocked(new PrisonRegisterApiRestClient(null))
+  const prisonRegisterStore = jest.mocked(new PrisonRegisterStore({} as never))
+  const prisonRegisterClient = jest.mocked(new PrisonRegisterApiRestClient({} as never))
   const prisonRegisterClientBuilder = jest.fn()
 
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterClientBuilder)
@@ -24,13 +23,13 @@ describe('prisonService', () => {
     prisonRegisterClientBuilder.mockReturnValue(prisonRegisterClient)
   })
 
-  const allPrisons: Array<PrisonDto> = [
+  const allPrisons = [
     prisonsKeyedByPrisonId.AKI, // not an active prison
     prisonsKeyedByPrisonId.ASI, // an active prison
     prisonsKeyedByPrisonId.MDI, // an active prison
   ]
 
-  const activePrisons: Array<PrisonDto> = [
+  const activePrisons = [
     prisonsKeyedByPrisonId.ASI, // an active prison
     prisonsKeyedByPrisonId.MDI, // an active prison
   ]
@@ -315,6 +314,57 @@ describe('prisonService', () => {
       expect(prisonRegisterStore.getActivePrisons).toHaveBeenCalledWith()
       expect(prisonRegisterClient.getAllPrisons).toHaveBeenCalledWith()
       expect(prisonRegisterStore.setActivePrisons).toHaveBeenCalledWith(activePrisons, 1)
+    })
+  })
+
+  describe('isPrisonPartOfYouthCustodyService', () => {
+    it.each([
+      {
+        scenario: 'a cached YCS establishment',
+        setup: () => {
+          prisonRegisterStore.getActivePrisons.mockResolvedValue([prisonsKeyedByPrisonId.FYI])
+        },
+        expectedResult: true,
+      },
+      {
+        scenario: 'an uncached YCS establishment',
+        setup: () => {
+          prisonRegisterStore.getActivePrisons.mockResolvedValue([prisonsKeyedByPrisonId.FYI])
+          prisonRegisterClient.getAllPrisons.mockResolvedValue(allPrisons)
+        },
+        expectedResult: true,
+      },
+      {
+        scenario: 'a different type of establishment',
+        setup: () => {
+          prisonRegisterStore.getActivePrisons.mockResolvedValue([
+            {
+              ...prisonsKeyedByPrisonId.MDI,
+              prisonId: 'FYI',
+            },
+          ])
+        },
+        expectedResult: false,
+      },
+      {
+        scenario: 'an unknown establishment',
+        setup: () => {
+          prisonRegisterStore.getActivePrisons.mockResolvedValue([])
+        },
+        expectedResult: false,
+      },
+      {
+        scenario: 'errors',
+        setup: () => {
+          prisonRegisterStore.getActivePrisons.mockRejectedValue('some-cache-error')
+          prisonRegisterClient.getAllPrisons.mockRejectedValue('some-api-error')
+        },
+        expectedResult: false,
+      },
+    ])('should return $expectedResult for $scenario', async ({ setup, expectedResult }) => {
+      setup()
+      const actual = await prisonService.isPrisonPartOfYouthCustodyService('FYI', systemToken)
+      expect(actual).toBe(expectedResult)
     })
   })
 })
