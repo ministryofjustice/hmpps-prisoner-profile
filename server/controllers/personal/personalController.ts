@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express'
 import config from '../../config'
+import { Role } from '../../data/enums/role'
 import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
@@ -8,7 +9,6 @@ import {
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
-  isXrayBodyScansServiceEnabled,
 } from '../../utils/featureFlags'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
@@ -25,12 +25,13 @@ export default class PersonalController {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { prisonId, prisonerNumber, bookingId } = prisonerData
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const { activeCaseLoadId } = user as PrisonUser
+      const { activeCaseLoadId, userRoles } = user as PrisonUser
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
-      const xrayBodyScansServiceEnabled = isXrayBodyScansServiceEnabled(res)
+      const xrayBodyScansServiceEnabled =
+        config.featureToggles.xRayBodyScansEnabled && userRoles?.includes(Role.DpsApplicationDeveloper)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {

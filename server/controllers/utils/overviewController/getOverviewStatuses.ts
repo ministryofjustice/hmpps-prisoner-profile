@@ -1,10 +1,9 @@
 import type { Result } from '../../../utils/result/result'
-import type { OverviewStatus } from '../../interfaces/OverviewPageData'
+import type { OverviewStatus, XrayBodyScanSummary } from '../../interfaces/OverviewPageData'
 import type Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import type InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import type { HasNeed } from '../../../data/interfaces/supportForAdditionalNeedsApi/SupportForAdditionalNeeds'
 import type { PrisonerPrisonSchedule } from '../../../data/interfaces/prisonApi/PrisonerSchedule'
-import type { XrayBodyScanSummary } from './mapXrayBodyScanData'
 import {
   getProfileInformationValue,
   ProfileInformationType,

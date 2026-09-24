@@ -11,10 +11,10 @@ jest.mock('../data/prisonRegisterStore/prisonRegisterStore')
 jest.mock('../data/prisonRegisterApiClient')
 
 describe('prisonService', () => {
-  const mockedPrisonMapper = toPrison as jest.MockedFunction<typeof toPrison>
+  const mockedPrisonMapper = jest.mocked(toPrison)
 
-  const prisonRegisterStore = new PrisonRegisterStore(null) as jest.Mocked<PrisonRegisterStore>
-  const prisonRegisterClient = new PrisonRegisterApiRestClient(null) as jest.Mocked<PrisonRegisterApiRestClient>
+  const prisonRegisterStore = jest.mocked(new PrisonRegisterStore(null))
+  const prisonRegisterClient = jest.mocked(new PrisonRegisterApiRestClient(null))
   const prisonRegisterClientBuilder = jest.fn()
 
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterClientBuilder)

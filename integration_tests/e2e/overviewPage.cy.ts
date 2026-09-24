@@ -111,7 +111,7 @@ context('Overview Page', () => {
   context('Given prisoner is within the users case load', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
@@ -1054,7 +1054,8 @@ context('Overview Page', () => {
     })
   })
 
-  context('Given user is not a DPS developer', () => {
+  // TODO: remove once XRBS no longer relies on DPS app dev as a feature flag
+  context('Given XRBS feature flag is off', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
@@ -1062,7 +1063,6 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    // TODO: remove once XRBS no longer relies on DPS app dev
     it('should not show x-ray body scans summary', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.xrayBodyScansCard.container.should('not.exist')
@@ -1269,7 +1269,7 @@ context('Overview Page', () => {
   context('Given API call to x-ray body scans api fails', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })

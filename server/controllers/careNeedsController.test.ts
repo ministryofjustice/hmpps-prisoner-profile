@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -13,13 +14,14 @@ import { Role } from '../data/enums/role'
 import CareNeedsService from '../services/careNeedsService'
 import CareNeedsController from './careNeedsController'
 
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
+const mockedIsGranted = jest.mocked(isGranted)
+
 describe('Care needs controller', () => {
   const prisonerNumber = 'G6123VU'
 
   let req: Request
   let res: Response
-  // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
-  let resWithDpsDevRole: Response
 
   let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
   let controller: CareNeedsController
@@ -28,6 +30,9 @@ describe('Care needs controller', () => {
 
   beforeEach(() => {
     xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
+    mockedIsGranted.mockImplementation(() => {
+      throw new Error('should not be called')
+    })
 
     req = {
       middleware: {
@@ -75,16 +80,6 @@ describe('Care needs controller', () => {
       render: jest.fn(),
       status: jest.fn(),
     } as unknown as Response
-    resWithDpsDevRole = {
-      ...res,
-      locals: {
-        ...res.locals,
-        user: {
-          ...res.locals.user,
-          userRoles: [Role.PrisonUser, Role.DpsApplicationDeveloper],
-        },
-      },
-    } as unknown as Response
 
     xRayBodyScansApiClient = xRayBodyScansApiClientMock()
     controller = new CareNeedsController(new CareNeedsService(null), () => xRayBodyScansApiClient, auditServiceMock())
@@ -114,7 +109,7 @@ describe('Care needs controller', () => {
       res.locals.prisonNamesById = { BXI: 'Brixton (HMP)', MDI: 'Moorland (HMP & YOI)' }
     })
 
-    it('should call the service and render the page', async () => {
+    it('should call the x-ray body scans api and render the page when the feature flag is off', async () => {
       const pageOfScans = pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)])
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageOfScans)
 
@@ -128,7 +123,9 @@ describe('Care needs controller', () => {
       expect(xRayBodyScansApiClient.listScans).toHaveBeenCalledWith(prisonerNumber, { size: 200 })
     })
 
-    it('should render the page when the x-ray body scans service is enabled but user doesn’t have DPS app dev role', async () => {
+    it('should render the page when the x-ray body scans service is enabled but user doesn’t have permission', async () => {
+      config.featureToggles.xRayBodyScansEnabled = true
+      mockedIsGranted.mockReturnValue(false)
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
 
       await controller.displayXrayBodyScans(req, res)
@@ -143,10 +140,10 @@ describe('Care needs controller', () => {
 
     it('should render the page when the x-ray body scans service is not enabled in active case load', async () => {
       config.featureToggles.xRayBodyScansEnabled = true
-      resWithDpsDevRole.locals.feComponents.sharedData.services = []
+      res.locals.feComponents.sharedData.services = []
       xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
 
-      await controller.displayXrayBodyScans(req, resWithDpsDevRole)
+      await controller.displayXrayBodyScans(req, res)
 
       expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
@@ -170,10 +167,11 @@ describe('Care needs controller', () => {
       expect(res.redirect).not.toHaveBeenCalled()
     })
 
-    it('should redirect to x-ray body scans service when enabled and user has DPS app dev role', async () => {
+    it('should redirect to x-ray body scans service when enabled and user has permission', async () => {
       config.featureToggles.xRayBodyScansEnabled = true
+      mockedIsGranted.mockReturnValue(true)
 
-      await controller.displayXrayBodyScans(req, resWithDpsDevRole)
+      await controller.displayXrayBodyScans(req, res)
 
       expect(res.render).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching('/prisoner/G6123VU/scan-overview$'))
