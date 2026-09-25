@@ -39,7 +39,7 @@
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.4",
     "@microsoft/applicationinsights-web": "3.4.4",
-    "@ministryofjustice/frontend": "11.0.1",
+    "@ministryofjustice/frontend": "11.1.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.1.0",
     "@ministryofjustice/hmpps-connect-dps-components": "6.3.5",
