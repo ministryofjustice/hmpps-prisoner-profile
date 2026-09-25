@@ -343,7 +343,7 @@
   padding: 2px 8px 3px;
   text-decoration: none;
   overflow-wrap: break-word;
-  color: govuk-shade(govuk-colour('green'), 20%);
+  color: govuk-colour("green", $variant: "shade-25");
   background-color: govuk-colour("green", $variant: "tint-80");
 
   > p {
@@ -359,7 +359,7 @@
   margin: 5px 0 15px;
   text-decoration: none;
   overflow-wrap: break-word;
-  color: govuk-shade(govuk-colour('green'), 20%);
+  color: govuk-colour("green", $variant: "shade-25");
   background-color: govuk-colour("green", $variant: "tint-80");
 
   > p {

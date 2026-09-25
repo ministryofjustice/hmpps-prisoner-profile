@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express'
-import { isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -12,10 +11,13 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { xRayBodyScansApiClientMock } from '../../tests/mocks/xRayBodyScansApiClientMock'
 import { Role } from '../data/enums/role'
 import CareNeedsService from '../services/careNeedsService'
+import {
+  XRayBodyScansAvailability,
+  XRayBodyScansAvailabilityService,
+} from '../services/xRayBodyScansAvailabilityService'
 import CareNeedsController from './careNeedsController'
 
-jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
-const mockedIsGranted = jest.mocked(isGranted)
+jest.mock('../services/xRayBodyScansAvailabilityService')
 
 describe('Care needs controller', () => {
   const prisonerNumber = 'G6123VU'
@@ -24,15 +26,13 @@ describe('Care needs controller', () => {
   let res: Response
 
   let xRayBodyScansApiClient: jest.Mocked<XRayBodyScansApiClient>
+  const mockedXrbsAvailabilityService = jest.mocked(new XRayBodyScansAvailabilityService({} as never))
   let controller: CareNeedsController
 
   let xRayBodyScansWasEnabled: boolean = false
 
   beforeEach(() => {
     xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
-    mockedIsGranted.mockImplementation(() => {
-      throw new Error('should not be called')
-    })
 
     req = {
       middleware: {
@@ -82,7 +82,12 @@ describe('Care needs controller', () => {
     } as unknown as Response
 
     xRayBodyScansApiClient = xRayBodyScansApiClientMock()
-    controller = new CareNeedsController(new CareNeedsService(null), () => xRayBodyScansApiClient, auditServiceMock())
+    controller = new CareNeedsController(
+      new CareNeedsService({} as never),
+      () => xRayBodyScansApiClient,
+      mockedXrbsAvailabilityService,
+      auditServiceMock(),
+    )
   })
 
   afterEach(() => {
@@ -106,54 +111,34 @@ describe('Care needs controller', () => {
 
   describe('displayXrayBodyScans', () => {
     beforeEach(() => {
+      config.featureToggles.xRayBodyScansEnabled = true
       res.locals.prisonNamesById = { BXI: 'Brixton (HMP)', MDI: 'Moorland (HMP & YOI)' }
     })
 
-    it('should call the x-ray body scans api and render the page when the feature flag is off', async () => {
-      const pageOfScans = pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)])
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageOfScans)
+    it.each([
+      { scenario: 'unavailable', availability: XRayBodyScansAvailability.UNAVAILABLE },
+      { scenario: 'not available yet', availability: XRayBodyScansAvailability.AVAILABLE_SOON },
+    ])(
+      'should call the api and render the page when the x-ray body scans service is $scenario',
+      async ({ availability }) => {
+        const pageOfScans = pageResponse([mockScanResponse(prisonerNumber), mockLegacyScanResponse(prisonerNumber)])
+        mockedXrbsAvailabilityService.getAvailability.mockResolvedValueOnce(availability)
+        xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageOfScans)
 
-      await controller.displayXrayBodyScans(req, res)
+        await controller.displayXrayBodyScans(req, res)
 
-      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        pageOfScans,
-        showingDpsAndNomisScans: false,
-      })
-      expect(xRayBodyScansApiClient.listScans).toHaveBeenCalledWith(prisonerNumber, { size: 200 })
-    })
-
-    it('should render the page when the x-ray body scans service is enabled but user doesn’t have permission', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
-      mockedIsGranted.mockReturnValue(false)
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
-
-      await controller.displayXrayBodyScans(req, res)
-
-      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        pageOfScans: expect.objectContaining({ content: [] }),
-        showingDpsAndNomisScans: false,
-      })
-      expect(res.redirect).not.toHaveBeenCalled()
-    })
-
-    it('should render the page when the x-ray body scans service is not enabled in active case load', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
-      res.locals.feComponents.sharedData.services = []
-      xRayBodyScansApiClient.listScans.mockResolvedValueOnce(pageResponse([]))
-
-      await controller.displayXrayBodyScans(req, res)
-
-      expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        pageOfScans: expect.objectContaining({ content: [] }),
-        showingDpsAndNomisScans: false,
-      })
-      expect(res.redirect).not.toHaveBeenCalled()
-    })
+        expect(res.render).toHaveBeenCalledWith('pages/xrayBodyScans', {
+          pageTitle: 'X-ray body scans',
+          pageOfScans,
+          showingDpsAndNomisScans: true,
+        })
+        expect(xRayBodyScansApiClient.listScans).toHaveBeenCalledWith(prisonerNumber, { size: 200 })
+        expect(res.redirect).not.toHaveBeenCalled()
+      },
+    )
 
     it('should show an error message if loading x-ray body scans failed', async () => {
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValueOnce(XRayBodyScansAvailability.UNAVAILABLE)
       xRayBodyScansApiClient.listScans.mockRejectedValueOnce({ status: 500, message: 'Internal Server Error' })
 
       await controller.displayXrayBodyScans(req, res)
@@ -168,8 +153,7 @@ describe('Care needs controller', () => {
     })
 
     it('should redirect to x-ray body scans service when enabled and user has permission', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
-      mockedIsGranted.mockReturnValue(true)
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValueOnce(XRayBodyScansAvailability.AVAILABLE)
 
       await controller.displayXrayBodyScans(req, res)
 

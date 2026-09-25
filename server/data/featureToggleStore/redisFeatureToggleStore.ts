@@ -19,7 +19,10 @@ export default class RedisFeatureToggleStore implements FeatureToggleStore {
   public async setToggle(prisonId: string, featureToggle: string, status: boolean, durationHours = 1): Promise<void> {
     await this.ensureConnected()
     await this.client.set(`featureToggle:${prisonId}:${featureToggle}`, JSON.stringify(status), {
-      EX: durationHours * 60 * 60,
+      expiration: {
+        type: 'EX',
+        value: durationHours * 60 * 60,
+      },
     })
   }
 
