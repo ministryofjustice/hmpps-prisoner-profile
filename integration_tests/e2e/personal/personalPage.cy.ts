@@ -653,14 +653,16 @@ context('When signed in', () => {
       })
       cy.task('reset')
       cy.setupUserAuth()
-      cy.setupComponentsData()
+      // removing xrbs service access to force card to show
+      cy.setupComponentsData({ services: [] })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
 
     it('Says that x-ray body scans have moved to the overview page when feature flag is on', () => {
-      // TODO: remove once XRBS no longer relies on DPS app dev as a feature flag
+      // TODO: remove cy.setupUserAuth(…) once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+      cy.setupComponentsData()
       visitPersonalDetailsPage()
       const page = Page.verifyOnPage(PersonalPage)
       page.security.card.should('contain.text', 'X-ray body scan information has moved')

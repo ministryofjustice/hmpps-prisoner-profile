@@ -18,6 +18,10 @@ export enum XRayBodyScansAvailability {
 export class XRayBodyScansAvailabilityService {
   constructor(private readonly prisonService: PrisonService) {}
 
+  showOverviewCard(availability: XRayBodyScansAvailability): boolean {
+    return availability !== XRayBodyScansAvailability.UNAVAILABLE
+  }
+
   async getAvailability(req: Request, res: Response): Promise<XRayBodyScansAvailability> {
     const { clientToken } = req.middleware
     const { prisonerPermissions, user } = res.locals

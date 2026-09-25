@@ -14,9 +14,10 @@ export default function personalRouter(services: Services): Router {
   const { prisonPermissionsService } = services
 
   const personalController = new PersonalController(
-    services.personalPageService,
-    services.careNeedsService,
     services.auditService,
+    services.careNeedsService,
+    services.personalPageService,
+    services.xRayBodyScansAvailabilityService,
   )
 
   router.get(

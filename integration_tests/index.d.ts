@@ -25,6 +25,7 @@ declare global {
         prisonerNumber: string
         bookingId: number
         caseLoads?: CaseLoad[]
+        services?: Service[]
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
         prisonId?: string

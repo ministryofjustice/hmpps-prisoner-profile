@@ -27,7 +27,8 @@ context('X-ray body scans', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.setupComponentsData({ services: [] }) // removing xrbs service access
+    // removing xrbs service access to force this page to show
+    cy.setupComponentsData({ services: [] })
     cy.setupBannerStubs({ prisonerNumber })
     cy.task('stubGetAllPrisons')
   })

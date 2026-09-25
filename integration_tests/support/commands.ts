@@ -47,6 +47,7 @@ Cypress.Commands.add(
         caseloadFunction: '',
       },
     ],
+    services = undefined,
     restrictedPatient = false,
     prisonerDataOverrides = {},
     highComplexityOfNeeds = false,
@@ -92,7 +93,7 @@ Cypress.Commands.add(
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
-    cy.setupComponentsData({ caseLoads })
+    cy.setupComponentsData({ caseLoads, services })
     cy.task('stubGetCurrentCsip', { prisonerNumber, ...(reviewOverdueDays && { reviewOverdueDays }) })
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
