@@ -26,11 +26,11 @@
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
     "clean": "rm -rf dist test_results",
     "rebuild": "npm run clean && npm run setup && npm run build",
-    "setup": "npm ci && hmpps-npm-script-run-allowlist"
+    "setup": "npm ci"
   },
   "engines": {
     "node": "^24",
-    "npm": "^11"
+    "npm": "^12"
   },
   "dependencies": {
     "@apollo/client": "4.3.0",
@@ -82,7 +82,6 @@
     "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/frontend-types": "2.0.2",
-    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
     "@tsconfig/node24": "^24.0.5",
     "@types/bunyan": "^1.8.11",
@@ -139,5 +138,14 @@
     "serialize-javascript": "^7.0.3",
     "proxy-addr": "2.0.8",
     "moment": "2.31.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "dtrace-provider@0.8.8": false,
+    "fsevents@2.3.3": true,
+    "fsevents@2.3.2": true,
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.28.2": true,
+    "cypress@16.1.0": true
   }
 }
