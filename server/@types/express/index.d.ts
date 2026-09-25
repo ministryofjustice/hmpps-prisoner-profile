@@ -1,5 +1,5 @@
 import type { UUID } from 'node:crypto'
-import type { SharedData } from '@ministryofjustice/hmpps-connect-dps-components'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 import type { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import type HmppsError from '../../interfaces/HmppsError'
 import type { HmppsUser } from '../../interfaces/HmppsUser'

@@ -70,8 +70,6 @@ import OverviewController from './overviewController'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
-const prisonerPermissions = {} as PrisonerPermissions
-
 const getResLocals = ({
   userRoles = [Role.CellMove],
   caseLoads = CaseLoadsDummyDataA,
@@ -86,8 +84,8 @@ const getResLocals = ({
       cssIncludes: [],
       jsIncludes: [],
       sharedData: {
-        caseLoads: [],
-        activeCaseLoad: {},
+        caseLoads,
+        activeCaseLoad: caseLoads[0],
         services: [
           {
             id: 'x-ray-body-scans',
@@ -108,7 +106,7 @@ const getResLocals = ({
       caseLoads,
       token: 'USER_TOKEN',
     } as HmppsUser,
-    prisonerPermissions,
+    prisonerPermissions: {} as PrisonerPermissions,
   }
 }
 
