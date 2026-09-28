@@ -4,8 +4,8 @@
 {%- call summaryCard({title: "Security", id: "security"}) -%}
   <div class="govuk-grid-row" data-qa="security">
     <div class="govuk-grid-column-full">
-      {% if xrayBodyScansServiceEnabled %}
-        {% set xrayBodyScansMoved %}
+      {% if xrayBodyScansMoved %}
+        {% set xrayBodyScansMovedMessage %}
           You can now find this person’s X-ray body scan information on the <a href="/prisoner/{{ prisonerNumber }}#xray-body-scan-card">Overview page</a>.
         {% endset %}
         {{ mojAlert({
@@ -13,7 +13,7 @@
           title: "X-ray body scan information has moved",
           showTitleAsHeading: true,
           dismissible: false,
-          html: xrayBodyScansMoved
+          html: xrayBodyScansMovedMessage
         }) }}
       {% else %}
         <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">

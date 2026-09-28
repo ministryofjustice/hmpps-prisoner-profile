@@ -77,7 +77,7 @@ export default class EditPage extends Page {
           cy.get(`input[name=${name}][value=${value.value}]`).click()
           if (value.subValues) {
             value.subValues.forEach(subValue => {
-              cy.get(`input[name=${value.value}-subvalues][value=${subValue}]`).click()
+              cy.get(`input[name="${value.value}-subvalues"][value=${subValue}]`).click()
             })
           }
           if (value.conditionals) {

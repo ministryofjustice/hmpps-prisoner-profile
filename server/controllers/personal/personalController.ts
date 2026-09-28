@@ -1,23 +1,24 @@
 import type { RequestHandler } from 'express'
 import config from '../../config'
-import { Role } from '../../data/enums/role'
 import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
-import { AuditService, Page } from '../../services/auditService'
 import {
   changeContactDetailsLinkEnabled,
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
 } from '../../utils/featureFlags'
-import CareNeedsService from '../../services/careNeedsService'
-import PersonalPageService from '../../services/personalPageService'
+import { type AuditService, Page } from '../../services/auditService'
+import type CareNeedsService from '../../services/careNeedsService'
+import type PersonalPageService from '../../services/personalPageService'
+import type { XRayBodyScansAvailabilityService } from '../../services/xRayBodyScansAvailabilityService'
 
 export default class PersonalController {
   constructor(
-    private readonly personalPageService: PersonalPageService,
-    private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
+    private readonly careNeedsService: CareNeedsService,
+    private readonly personalPageService: PersonalPageService,
+    private readonly xRayBodyScansAvailabilityService: XRayBodyScansAvailabilityService,
   ) {}
 
   displayPersonalPage(): RequestHandler {
@@ -25,13 +26,15 @@ export default class PersonalController {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { prisonId, prisonerNumber, bookingId } = prisonerData
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const { activeCaseLoadId, userRoles } = user as PrisonUser
+      const { activeCaseLoadId } = user as PrisonUser
+
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
-      const xrayBodyScansServiceEnabled =
-        config.featureToggles.xRayBodyScansEnabled && userRoles?.includes(Role.DpsApplicationDeveloper)
+      const xrayBodyScansMoved = await this.xRayBodyScansAvailabilityService
+        .getAvailability(req, res)
+        .then(this.xRayBodyScansAvailabilityService.showOverviewCard)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, {
@@ -42,7 +45,7 @@ export default class PersonalController {
           personEndpointsEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
-        xrayBodyScansServiceEnabled ? null : this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
+        xrayBodyScansMoved ? null : this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
 
       await this.auditService.sendPageView({
@@ -76,7 +79,7 @@ export default class PersonalController {
         hasHomeOfficeId,
         useCustomErrorBanner: true,
         changeContactLinkEnabled,
-        xrayBodyScansServiceEnabled,
+        xrayBodyScansMoved,
       })
     }
   }

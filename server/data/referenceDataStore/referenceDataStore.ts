@@ -1,6 +1,6 @@
-import { RedisClient } from '../redisClient'
 import logger from '../../../logger'
-import { ReferenceDataCodeDto } from '../interfaces/referenceData'
+import { RedisClient } from '../redisClient'
+import type { ReferenceDataCodeDto } from '../interfaces/referenceData'
 
 const REFERENCE_DATA_PREFIX = 'reference_data_'
 
@@ -20,13 +20,18 @@ export default class ReferenceDataStore {
   async setReferenceData(domain: string, codes: ReferenceDataCodeDto[], durationHours = 1): Promise<string> {
     await this.ensureConnected()
     return (
-      await this.client.set(REFERENCE_DATA_PREFIX + domain, JSON.stringify(codes), { EX: durationHours * 60 * 60 })
+      await this.client.set(REFERENCE_DATA_PREFIX + domain, JSON.stringify(codes), {
+        expiration: {
+          type: 'EX',
+          value: durationHours * 60 * 60,
+        },
+      })
     )?.toString()
   }
 
   async getReferenceData(domain: string): Promise<ReferenceDataCodeDto[]> {
     await this.ensureConnected()
     const serializedReferenceDataCodes = (await this.client.get(REFERENCE_DATA_PREFIX + domain))?.toString()
-    return serializedReferenceDataCodes ? (JSON.parse(serializedReferenceDataCodes) as ReferenceDataCodeDto[]) : []
+    return serializedReferenceDataCodes ? JSON.parse(serializedReferenceDataCodes) : []
   }
 }

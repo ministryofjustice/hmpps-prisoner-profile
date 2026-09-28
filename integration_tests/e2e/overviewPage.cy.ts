@@ -1054,12 +1054,26 @@ context('Overview Page', () => {
     })
   })
 
-  // TODO: remove once XRBS no longer relies on DPS app dev as a feature flag
-  context('Given XRBS feature flag is off', () => {
+  context('Given XRBS is not available in youth custody estate', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth()
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        prisonerDataOverrides: { prisonId: 'FYI' },
+        caseLoads: [
+          {
+            caseLoadId: 'FYI',
+            currentlyActive: true,
+            description: 'Feltham A',
+            type: '',
+            caseloadFunction: '',
+          },
+        ],
+        services: [],
+      })
       visitOverviewPage()
     })
 

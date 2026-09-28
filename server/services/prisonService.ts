@@ -1,8 +1,8 @@
 import logger from '../../logger'
 import PrisonRegisterStore from '../data/prisonRegisterStore/prisonRegisterStore'
 import PrisonRegisterApiClient from '../data/interfaces/prisonRegisterApi/PrisonRegisterApiClient'
-import { PrisonDto } from '../data/interfaces/prisonRegisterApi/prisonRegisterApiTypes'
-import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import type { PrisonDto } from '../data/interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import type { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import toPrison from './mappers/prisonMapper'
 import { RestClientBuilder } from '../data'
 
@@ -23,15 +23,12 @@ export default class PrisonService {
   async getAllPrisonNamesById(token: string): Promise<Record<string, string>> {
     try {
       const prisons = (await this.getCachedPrisons()) || (await this.retrieveAndCacheActivePrisons(token))
-      return prisons.reduce(
-        (acc, prison) => {
-          acc[prison.prisonId] = prison.prisonName
-          return acc
-        },
-        {} as Record<string, string>,
-      )
+      return prisons.reduce<Record<string, string>>((acc, prison) => {
+        acc[prison.prisonId] = prison.prisonName
+        return acc
+      }, {})
     } catch (e) {
-      logger.error(`Error looking up prisons`, e)
+      logger.error('Error looking up prisons', e)
       return {}
     }
   }
@@ -41,7 +38,7 @@ export default class PrisonService {
    */
   async getPrisonByPrisonId(prisonId: string, token: string): Promise<Prison> {
     try {
-      const prisonResponse = await this.getPrison(prisonId, token)
+      const prisonResponse = await this.getCompletePrisonDetailsByPrisonId(prisonId, token)
 
       if (prisonResponse) {
         return toPrison(prisonResponse)
@@ -56,23 +53,32 @@ export default class PrisonService {
   }
 
   /**
-   * Returns the [PrisonResponse] identified by the specified `prisonId`
+   * Returns the [PrisonDto] identified by the specified `prisonId`
    * Return the object from the cache if it exists in the cache, else seed the cache by calling the API and return the
-   * specified [PrisonResponse]
+   * specified [PrisonDto]
    */
-  private async getPrison(prisonId: string, token: string): Promise<PrisonDto> {
+  async getCompletePrisonDetailsByPrisonId(prisonId: string, token: string): Promise<PrisonDto | undefined> {
     return (
       // return prison from the cache
       (await this.getCachedPrison(prisonId)) ||
-      (async () => {
+      Promise.try(async () => {
         // or retrieve prisons from the API and cache them before returning the one we are looking for
         const allPrisonResponses = await this.retrieveAndCacheActivePrisons(token)
         return allPrisonResponses.find(prisonResponse => prisonResponse.prisonId === prisonId)
-      })()
+      })
     )
   }
 
-  private async getCachedPrison(prisonId: string): Promise<PrisonDto> {
+  /**
+   * Whether prison register lists this prison as part of Youth Custody Service (YCS)
+   * NB: defaults to false if prison is not found
+   */
+  async isPrisonPartOfYouthCustodyService(prisonId: string, token: string): Promise<boolean> {
+    const prison = await this.getCompletePrisonDetailsByPrisonId(prisonId, token)
+    return Boolean(prison?.types?.some(type => type.code === 'YCS'))
+  }
+
+  private async getCachedPrison(prisonId: string): Promise<PrisonDto | undefined> {
     try {
       const allActivePrisons = (await this.getCachedPrisons()) || []
       const cachedPrison = allActivePrisons.find(prisonResponse => prisonResponse.prisonId === prisonId)
@@ -87,13 +93,13 @@ export default class PrisonService {
     return undefined
   }
 
-  private async getCachedPrisons(): Promise<Array<PrisonDto>> {
+  private async getCachedPrisons(): Promise<PrisonDto[] | undefined> {
     try {
       const allActivePrisons = await this.prisonRegisterStore.getActivePrisons()
       if (allActivePrisons && allActivePrisons.length > 0) {
         return allActivePrisons
       }
-      logger.debug(`Prisons not found in cache`)
+      logger.debug('Prisons not found in cache')
     } catch (ex) {
       // Looking up the prisons from the cached data store failed for some reason. Return undefined.
       logger.error('Error retrieving cached prisons', ex)
@@ -105,9 +111,9 @@ export default class PrisonService {
    * Calls the prison-register API to retrieve all prisons, then caches just the active ones in the cache.
    * Returns an array of active prisons that were cached.
    */
-  private async retrieveAndCacheActivePrisons(token: string): Promise<Array<PrisonDto>> {
+  private async retrieveAndCacheActivePrisons(token: string): Promise<PrisonDto[]> {
     logger.info('Retrieving and caching active prisons')
-    let allPrisonResponses: Array<PrisonDto>
+    let allPrisonResponses: PrisonDto[]
     try {
       allPrisonResponses = (await this.prisonRegisterClientBuilder(token).getAllPrisons()) || []
     } catch (ex) {

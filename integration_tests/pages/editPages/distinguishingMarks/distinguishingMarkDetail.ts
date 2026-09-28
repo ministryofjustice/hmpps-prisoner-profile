@@ -12,7 +12,7 @@ export default class DistinguishingMarkDetail extends Page {
     name: (): PageElement => this.miniBanner().card().find('.hmpps-mini-banner__name'),
   })
 
-  form = (): PageElement => cy.get('form#mark-detail-form[enctype=multipart/form-data]')
+  form = (): PageElement => cy.get('form#mark-detail-form[enctype="multipart/form-data"]')
 
   bodyPartRadios = (): PageElement => cy.get('input[type=radio]')
 
