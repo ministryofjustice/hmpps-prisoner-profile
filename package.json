@@ -26,20 +26,20 @@
     "integration-test-3": "cypress run --spec \"**/e2e/*.cy.ts,**/alerts/**/*.cy.ts,**/personal/*.cy.ts,**/photo/**/*,**/workAndSkillsPage/**/*.cy.ts\"",
     "clean": "rm -rf dist test_results",
     "rebuild": "npm run clean && npm run setup && npm run build",
-    "setup": "npm ci && hmpps-npm-script-run-allowlist"
+    "setup": "npm ci"
   },
   "engines": {
     "node": "^24",
-    "npm": "^11"
+    "npm": "^12"
   },
   "dependencies": {
-    "@apollo/client": "4.3.0",
-    "@aws-sdk/client-sqs": "3.1134.0",
+    "@apollo/client": "4.3.1",
+    "@aws-sdk/client-sqs": "3.1136.0",
     "@contentful/rich-text-html-renderer": "17.2.3",
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.4",
     "@microsoft/applicationinsights-web": "3.4.4",
-    "@ministryofjustice/frontend": "11.0.1",
+    "@ministryofjustice/frontend": "11.1.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.1.0",
     "@ministryofjustice/hmpps-connect-dps-components": "6.3.5",
@@ -82,7 +82,6 @@
     "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/frontend-types": "2.0.2",
-    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
     "@tsconfig/node24": "^24.0.5",
     "@types/bunyan": "^1.8.11",
@@ -113,7 +112,7 @@
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
     "esbuild-sass-plugin": "^3.7.0",
-    "jest": "30.5.1",
+    "jest": "30.5.2",
     "jest-html-reporter": "4.4.2",
     "jest-junit": "^17.0.0",
     "jsonwebtoken": "^9.0.3",
@@ -121,7 +120,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "nock": "14.0.17",
     "patch-package": "8.0.1",
-    "prettier": "3.9.7",
+    "prettier": "3.9.8",
     "prettier-plugin-jinja-template": "^2.2.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
@@ -139,5 +138,14 @@
     "serialize-javascript": "^7.0.3",
     "proxy-addr": "2.0.8",
     "moment": "2.31.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "dtrace-provider@0.8.8": false,
+    "fsevents@2.3.3": true,
+    "fsevents@2.3.2": true,
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.28.2": true,
+    "cypress@16.1.0": true
   }
 }
