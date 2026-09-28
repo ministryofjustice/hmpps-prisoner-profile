@@ -9,6 +9,7 @@ import {
   DietAndAllergyUpdate,
   HealthAndMedicationReferenceDataDomain,
   ReferenceDataIdSelection,
+  ReferenceDataSelection,
 } from '../../../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 import { validationErrorsFromFlash } from '../../../../utils/validationErrorsFromFlash'
@@ -28,7 +29,7 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
 
     const mapDietAndAllergy = (
       dietAndAllergy: DietAndAllergy,
-      field: keyof Omit<DietAndAllergy, 'cateringInstructions'>,
+      field: 'foodAllergies' | 'medicalDietaryRequirements' | 'personalisedDietaryRequirements',
     ): ReferenceDataIdSelection[] => {
       if (dietAndAllergy && dietAndAllergy[field]) {
         return dietAndAllergy[field].value.map(selection => ({
@@ -86,23 +87,46 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
           medical?: ReferenceDataIdSelection[]
           personalised?: ReferenceDataIdSelection[]
           cateringInstructions?: string
+          reviewStatus?: string
         }>(req)
 
         const dietAndAllergy = healthAndMedication?.dietAndAllergy
 
-        const allergiesSelected = () => {
-          if (requestBodyFlash?.allergy) return requestBodyFlash.allergy.filter(item => !!item.value)
-          return mapDietAndAllergy(dietAndAllergy, 'foodAllergies')
+        const pendingMerges = healthAndMedication?.pendingMerges || []
+        const hasPendingMerges = pendingMerges.length > 0
+
+        const deduplicate = (selections: ReferenceDataSelection[]) => {
+          const others = selections.filter(
+            s =>
+              s.value.id.endsWith('_OTHER') ||
+              ['MEDICAL_DIET_EATING_DISORDER', 'MEDICAL_DIET_NUTRIENT_DEFICIENCY'].includes(s.value.id),
+          )
+          const nonOthers = selections.filter(s => !others.includes(s))
+          const uniqueNonOthers = Array.from(new Set(nonOthers.map(s => s.value.id))).map(id =>
+            nonOthers.find(s => s.value.id === id),
+          )
+          return [...uniqueNonOthers, ...others]
         }
 
-        const medicalDietChecked = () => {
-          if (requestBodyFlash?.medical) return requestBodyFlash.medical.filter(item => !!item.value)
-          return mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements')
+        const groupedPendingMerges = {
+          foodAllergies: deduplicate(pendingMerges.flatMap(pm => pm.dietAndAllergy?.foodAllergies.value || [])),
+          medicalDietaryRequirements: deduplicate(
+            pendingMerges.flatMap(pm => pm.dietAndAllergy?.medicalDietaryRequirements.value || []),
+          ),
+          personalisedDietaryRequirements: deduplicate(
+            pendingMerges.flatMap(pm => pm.dietAndAllergy?.personalisedDietaryRequirements.value || []),
+          ),
+          cateringInstructions: pendingMerges
+            .map(pm => pm.dietAndAllergy?.cateringInstructions?.value)
+            .filter(instr => !!instr),
         }
 
-        const personalisedDietChecked = () => {
-          if (requestBodyFlash?.personalised) return requestBodyFlash.personalised.filter(item => !!item.value)
-          return mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements')
+        const getSelected = (
+          flashField: ReferenceDataIdSelection[],
+          apiField: 'foodAllergies' | 'medicalDietaryRequirements' | 'personalisedDietaryRequirements',
+        ) => {
+          if (flashField) return flashField.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, apiField)
         }
 
         const cateringInstructions = requestBodyFlash?.cateringInstructions
@@ -120,10 +144,25 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
         res.render('pages/edit/dietAndFoodAllergies', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           miniBannerData,
-          allergyOptions: checkboxOptions('allergy', allergyCodes, allergiesSelected()),
-          medicalDietOptions: checkboxOptions('medical', medicalDietCodes, medicalDietChecked()),
-          personalisedDietOptions: checkboxOptions('personalised', personalisedDietCodes, personalisedDietChecked()),
+          allergyOptions: checkboxOptions(
+            'allergy',
+            allergyCodes,
+            getSelected(requestBodyFlash?.allergy, 'foodAllergies'),
+          ),
+          medicalDietOptions: checkboxOptions(
+            'medical',
+            medicalDietCodes,
+            getSelected(requestBodyFlash?.medical, 'medicalDietaryRequirements'),
+          ),
+          personalisedDietOptions: checkboxOptions(
+            'personalised',
+            personalisedDietCodes,
+            getSelected(requestBodyFlash?.personalised, 'personalisedDietaryRequirements'),
+          ),
           cateringInstructions,
+          hasPendingMerges,
+          groupedPendingMerges,
+          reviewStatus: requestBodyFlash?.reviewStatus,
           errors: errors ?? [],
         })
       },
@@ -132,19 +171,24 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const { prisonerNumber } = req.params
-        const dietAndAllergy = (await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber))
-          ?.dietAndAllergy
+        const healthAndMedication = await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber)
+        const dietAndAllergy = healthAndMedication?.dietAndAllergy
+        const hasPendingMerges = (healthAndMedication?.pendingMerges || []).length > 0
+        const { reviewStatus } = req.body
+
+        if (hasPendingMerges && !reviewStatus) {
+          req.flash('errors', [{ text: 'Select if the review is complete', href: '#reviewStatus' }])
+          req.flash('requestBody', JSON.stringify(req.body))
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/diet-and-food-allergies`)
+        }
+
+        const filterSelections = (selections: ReferenceDataIdSelection[]) =>
+          selections?.filter((item: ReferenceDataIdSelection) => !!item.value) || []
 
         const update: Partial<DietAndAllergyUpdate> = {
-          foodAllergies: req.body.allergy
-            ? req.body.allergy.filter((item: ReferenceDataIdSelection) => !!item.value)
-            : [],
-          medicalDietaryRequirements: req.body.medical
-            ? req.body.medical.filter((item: ReferenceDataIdSelection) => !!item.value)
-            : [],
-          personalisedDietaryRequirements: req.body.personalised
-            ? req.body.personalised.filter((item: ReferenceDataIdSelection) => !!item.value)
-            : [],
+          foodAllergies: filterSelections(req.body.allergy),
+          medicalDietaryRequirements: filterSelections(req.body.medical),
+          personalisedDietaryRequirements: filterSelections(req.body.personalised),
           cateringInstructions: req.body.cateringInstructions,
         }
 
@@ -161,6 +205,9 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
           prisonerNumber,
           submit: async () => {
             await this.personalPageService.updateDietAndFoodAllergies(clientToken, user, prisonerNumber, update)
+            if (reviewStatus === 'COMPLETE') {
+              await this.personalPageService.completeMerge(clientToken, prisonerNumber)
+            }
           },
           fieldData: dietAndFoodAllergiesFieldData,
           auditDetails: { fieldName, previous: previousValues, updated: update },
