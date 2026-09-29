@@ -114,6 +114,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
+    X_RAY_BODY_SCANS_READS_ENABLED_PRISONS: "***"
 
   allowlist:
     groups:

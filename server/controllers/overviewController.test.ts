@@ -78,9 +78,11 @@ jest.mock('../services/xRayBodyScansAvailabilityService')
 const getResLocals = ({
   userRoles = [Role.CellMove],
   caseLoads = CaseLoadsDummyDataA,
+  activeCaseLoadId = 'MDI',
 }: {
   userRoles?: Role[]
   caseLoads?: CaseLoad[]
+  activeCaseLoadId?: string
 } = {}): Locals => {
   return {
     feComponents: {
@@ -110,6 +112,7 @@ const getResLocals = ({
       staffId: 487023,
       caseLoads,
       token: 'USER_TOKEN',
+      activeCaseLoadId,
     } as HmppsUser,
     prisonerPermissions: {} as PrisonerPermissions,
   }
@@ -1081,6 +1084,40 @@ describe('overviewController', () => {
           }),
         }),
       )
+    })
+  })
+
+  describe('TO BE DELETED: XRBS Silent reads', () => {
+    it('Calls the API when enabled for the active caseload', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalled()
+    })
+
+    it('Calls the API once when enabled for the active caseload and also enabled generally', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
+    })
+
+    it('Calls the API once when enabled for but not silently reading', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['LEI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
+    })
+
+    it('Does not call the API when not enabled and not silently reading', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = []
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(0)
     })
   })
 })
