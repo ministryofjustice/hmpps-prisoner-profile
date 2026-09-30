@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@apollo/client": "4.3.1",
-    "@aws-sdk/client-sqs": "3.1136.0",
+    "@aws-sdk/client-sqs": "3.1138.0",
     "@contentful/rich-text-html-renderer": "17.2.3",
     "@contentful/rich-text-types": "17.2.7",
     "@microsoft/applicationinsights-clickanalytics-js": "3.4.4",
@@ -47,7 +47,7 @@
     "@ministryofjustice/hmpps-monitoring": "2.1.0",
     "@ministryofjustice/hmpps-prison-permissions-lib": "4.4.0",
     "@ministryofjustice/hmpps-rest-client": "2.2.0",
-    "@sentry/node": "10.75.0",
+    "@sentry/node": "10.75.2",
     "@types/multer": "2.2.0",
     "accessible-autocomplete": "^3.0.1",
     "agentkeepalive": "^4.6.0",
@@ -75,7 +75,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "6.2.1",
-    "superagent": "^10.3.0",
+    "superagent": "^10.4.0",
     "url-value-parser": "^2.2.0"
   },
   "devDependencies": {
@@ -133,7 +133,7 @@
     "@opentelemetry/resources": "2.8.0",
     "@opentelemetry/sdk-trace-base": "2.8.0",
     "@opentelemetry/sdk-trace-web": "2.8.0",
-    "brace-expansion": "5.0.9",
+    "brace-expansion": ">=5.0.12",
     "diff": "^9.0.0",
     "serialize-javascript": "^7.0.3",
     "proxy-addr": "2.0.8",
