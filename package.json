@@ -49,7 +49,7 @@
     "@ministryofjustice/hmpps-rest-client": "2.2.0",
     "@sentry/node": "11.0.0",
     "@types/multer": "2.2.0",
-    "accessible-autocomplete": "^3.0.1",
+    "accessible-autocomplete": "^3.0.2",
     "agentkeepalive": "^4.6.0",
     "body-parser": "^2.3.0",
     "bunyan": "^1.8.15",
