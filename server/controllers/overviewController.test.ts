@@ -993,8 +993,8 @@ describe('overviewController', () => {
           mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
         },
         expectedLinks: {
-          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview?entryPoint=profile-overview'),
-          recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan?entryPoint=profile-overview'),
+          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview\\?entryPoint=profile-overview'),
+          recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan\\?entryPoint=profile-overview'),
         },
       },
       {
@@ -1007,7 +1007,7 @@ describe('overviewController', () => {
           })
         },
         expectedLinks: {
-          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview?entryPoint=profile-overview'),
+          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview\\?entryPoint=profile-overview'),
         },
       },
       {
