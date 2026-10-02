@@ -1,11 +1,11 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .notification-banner-yellow {
   border: 1px solid #594d00;
   padding: 8px 8px 6px;
   margin-bottom: 15px;
   background: #fff7bf;
-  @include govuk-font(16);
+  @include govuk.govuk-font(16);
 
   a:link,
   a:visited {

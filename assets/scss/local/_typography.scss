@@ -1,0 +1,33 @@
+@use 'govuk-frontend/dist/govuk';
+
+.hmpps-secondary-text {
+  color: govuk.govuk-colour('black', $variant: 'tint-25');
+}
+
+.hmpps-red-text {
+  color: govuk.govuk-colour('red');
+}
+
+.hmpps-green-text {
+  color: govuk.govuk-colour('green');
+}
+
+.hmpps-dark-grey-font {
+  color: govuk.govuk-colour('black', $variant: 'tint-25');
+}
+
+.hmpps-white-font {
+  color: govuk.govuk-colour('white');
+}
+
+.hmpps-font-weight-normal dt {
+  font-weight: normal;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+pre, p {
+  word-wrap: break-word;
+}

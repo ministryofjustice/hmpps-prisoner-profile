@@ -1,17 +1,17 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
-@use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/dps/components/alert-flag/alert-flag' as *;
+@use 'govuk-frontend/dist/govuk';
+@use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/dps/components/alert-flag/alert-flag';
 
 @use 'sass:color';
 
 @mixin govuk-list {
-  @include govuk-font($size: 19);
+  @include govuk.govuk-font($size: 19);
   margin-top: 0;
   padding-left: 0;
   list-style-type: none;
-  color: govuk-functional-colour(text);
+  color: govuk.govuk-functional-colour(text);
 
   > li {
-    margin-bottom: govuk-spacing(1);
+    margin-bottom: govuk.govuk-spacing(1);
   }
 }
 
@@ -84,7 +84,7 @@
       justify-content: space-between;
       flex-basis: min-content;
       padding-bottom: 30px;
-      border-bottom: 1px solid govuk-colour("black", $variant: "tint-25");
+      border-bottom: 1px solid govuk.govuk-colour('black', $variant: 'tint-25');
       margin-bottom: 30px;
 
       &__content {
@@ -98,21 +98,21 @@
       &__sub-title {
         font-size: 16px;
         font-weight: bold;
-        color: govuk-functional-colour(secondary-text);
+        color: govuk.govuk-functional-colour(secondary-text);
         margin-bottom: 15px;
       }
 
       &__title {
         font-size: 24px;
         font-weight: bold;
-        color: govuk-functional-colour(text);
+        color: govuk.govuk-functional-colour(text);
         margin-bottom: 15px;
       }
 
       &__notes {
         font-size: 19px;
         font-weight: 300;
-        color: govuk-functional-colour(text);
+        color: govuk.govuk-functional-colour(text);
         margin-bottom: 20px;
         word-break: break-word;
       }
@@ -120,7 +120,7 @@
       &__metadata {
         font-size: 19px;
         font-weight: 300;
-        color: govuk-functional-colour(text);
+        color: govuk.govuk-functional-colour(text);
 
         span {
           font-weight: 700;

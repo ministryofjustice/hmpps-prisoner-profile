@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-address-field {
   max-width: 630px;
@@ -13,7 +13,7 @@
 }
 
 .address-cards {
-  @include govuk-media-query($from: tablet) {
+  @include govuk.govuk-media-query($from: tablet) {
     .govuk-summary-list__key {
       width: 30%;
     }

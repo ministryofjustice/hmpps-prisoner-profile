@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-name-change {
   .govuk-label {
@@ -16,7 +16,7 @@
   .govuk-warning-text {
     &__text {
       margin-top: 5px;
-      @include govuk-font($size: 16, $weight: 'bold');
+      @include govuk.govuk-font($size: 16, $weight: 'bold');
     }
   }
 }
