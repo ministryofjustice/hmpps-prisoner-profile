@@ -166,9 +166,9 @@ export default class OverviewController {
               let recordScanUrl: string | undefined
               if (xRayBodyScansAvailability === XRayBodyScansAvailability.AVAILABLE) {
                 const xrbsUrlPrefix = `${config.serviceUrls.xRayBodyScansUi}/prisoner/${summaryResponse.prisonerNumber}`
-                viewHistoryUrl = `${xrbsUrlPrefix}/scan-overview`
+                viewHistoryUrl = `${xrbsUrlPrefix}/scan-overview?entryPoint=profile-overview`
                 if (isGranted(XRayBodyScansPermission.edit_scans, prisonerPermissions)) {
-                  recordScanUrl = `${xrbsUrlPrefix}/record-scan`
+                  recordScanUrl = `${xrbsUrlPrefix}/record-scan?entryPoint=profile-overview`
                 }
               } else {
                 viewHistoryUrl = `/prisoner/${prisonerNumber}/x-ray-body-scans`
