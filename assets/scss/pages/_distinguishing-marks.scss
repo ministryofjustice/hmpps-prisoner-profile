@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .mark-photo-container {
   display: flex;
@@ -7,7 +7,7 @@
   column-gap: 20px;
   justify-content: space-between;
   padding: 15px;
-  border: 1px solid govuk-functional-colour(border);
+  border: 1px solid govuk.govuk-functional-colour(border);
   margin-bottom: 30px;
 }
 
@@ -18,11 +18,11 @@
   column-gap: 20px;
   justify-content: space-between;
   padding: 15px;
-  border: 1px solid govuk-functional-colour(border);
+  border: 1px solid govuk.govuk-functional-colour(border);
   margin-bottom: 30px;
 
   a {
-    color: govuk-functional-colour(link);
+    color: govuk.govuk-functional-colour(link);
   }
 
   > .image-preview {
@@ -47,7 +47,7 @@
 }
 
 label.govuk-link {
-  color: govuk-functional-colour(link);
+  color: govuk.govuk-functional-colour(link);
   cursor: pointer;
 }
 
@@ -55,7 +55,7 @@ label.govuk-link {
   &__container {
     aspect-ratio: 3 / 4;
     width: 150px;
-    background-color: govuk-colour("black", $variant: "tint-95");
+    background-color: govuk.govuk-colour('black', $variant: 'tint-95');
   }
   &__image {
     aspect-ratio: 3 / 4;
@@ -99,7 +99,7 @@ label.govuk-link {
   &__summary {
     @media screen {
       padding-right: 20px;
-      border-right: 1px solid govuk-functional-colour(border);
+      border-right: 1px solid govuk.govuk-functional-colour(border);
       flex-basis: 33%;
     }
   }
@@ -120,14 +120,14 @@ label.govuk-link {
     object-fit: contain;
     aspect-ratio: 3 / 4;
     width: 100%;
-    background-color: govuk-colour("black", $variant: "tint-95");
+    background-color: govuk.govuk-colour('black', $variant: 'tint-95');
   }
 }
 
 .mark-changeable-image {
   position: relative;
   width: 100%;
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
 
   &__overlay {
     position: absolute;
@@ -158,7 +158,7 @@ label.govuk-link {
     }
 
     &:focus-within {
-      border-color: govuk-functional-colour(focus);
+      border-color: govuk.govuk-functional-colour(focus);
     }
   }
 
@@ -180,7 +180,7 @@ label.govuk-link {
   position: relative;
   text-align: center;
   vertical-align: middle;
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
   width: 100%;
   aspect-ratio: 3 / 4;
 
@@ -204,7 +204,7 @@ label.govuk-link {
   width: 100%;
 
   tr {
-    border-bottom: 1px solid govuk-functional-colour(border);
+    border-bottom: 1px solid govuk.govuk-functional-colour(border);
   }
 
   th {
@@ -225,7 +225,7 @@ label.govuk-link {
 
   td:last-child {
     padding-right: 0;
-    @include govuk-media-query($from: tablet) {
+    @include govuk.govuk-media-query($from: tablet) {
       width: 20%;
       text-align: right;
     }
