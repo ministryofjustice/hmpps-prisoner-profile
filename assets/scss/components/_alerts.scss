@@ -3,21 +3,9 @@
 
 @use 'sass:color';
 
-@mixin govuk-list {
-  @include govuk.govuk-font($size: 19);
-  margin-top: 0;
-  padding-left: 0;
-  list-style-type: none;
-  color: govuk.govuk-functional-colour(text);
-
-  > li {
-    margin-bottom: govuk.govuk-spacing(1);
-  }
-}
-
 .alerts-list {
+  @extend %govuk-list;
   min-height: 50px;
-  @include govuk-list;
   margin: 17px 15px 13px 150px;
 
   display: flex;
@@ -39,7 +27,7 @@
 }
 
 .alerts-list-no-flex {
-  @include govuk-list;
+  @extend %govuk-list;
   margin-bottom: 0;
 }
 
