@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .money-tab-summary {
 
@@ -56,7 +56,7 @@
   margin-top: 15px;
   margin-bottom: 50px;
   padding: 15px;
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
 
   h3 {
     margin-top: 0;

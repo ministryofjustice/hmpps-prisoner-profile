@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .personal-distinguishing-marks {
   display: grid;
@@ -13,23 +13,23 @@
   dl {
     margin: 0;
     &:not(:last-of-type) {
-      border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
-      margin-bottom: govuk-spacing(3);
+      border-bottom: 1px solid govuk.govuk-colour('black', $variant: 'tint-95');
+      margin-bottom: govuk.govuk-spacing(3);
     }
   }
 
   dt {
-    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk.govuk-font($size: 19, $weight: 'bold');
   }
 
 
   &__row {
-    margin-bottom: govuk-spacing(3);
-    border-bottom: 1px solid govuk-functional-colour(border);
+    margin-bottom: govuk.govuk-spacing(3);
+    border-bottom: 1px solid govuk.govuk-functional-colour(border);
 
     &__empty {
       display: flex;
-      padding-bottom: govuk-spacing(3);
+      padding-bottom: govuk.govuk-spacing(3);
 
       dt {
         min-width: 105px;
@@ -43,7 +43,7 @@
         margin: 0;
 
         summary.govuk-details__summary {
-          color: govuk-colour('black');
+          color: govuk.govuk-colour('black');
         }
 
         div.govuk-details__text {
@@ -52,11 +52,11 @@
       }
 
       details {
-        margin-bottom: govuk-spacing(2);
+        margin-bottom: govuk.govuk-spacing(2);
 
         &:not(:last-of-type) {
-          padding-bottom: govuk-spacing(2);
-          border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
+          padding-bottom: govuk.govuk-spacing(2);
+          border-bottom: 1px solid govuk.govuk-colour('black', $variant: 'tint-95');
         }
       }
 
@@ -65,14 +65,14 @@
         justify-content: space-between;
 
         &:not(:last-of-type) {
-          padding-bottom: govuk-spacing(3);
-          margin-bottom: govuk-spacing(3);
-          border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
+          padding-bottom: govuk.govuk-spacing(3);
+          margin-bottom: govuk.govuk-spacing(3);
+          border-bottom: 1px solid govuk.govuk-colour('black', $variant: 'tint-95');
         }
 
         dl {
           &:not(:last-child) {
-            margin-bottom: govuk-spacing(3);
+            margin-bottom: govuk.govuk-spacing(3);
           }
         }
 
@@ -85,7 +85,7 @@
 
       &__row {
         &:not(:last-of-type) {
-          padding: 0 0 govuk-spacing(3) 0;
+          padding: 0 0 govuk.govuk-spacing(3) 0;
         }
 
         &__image-list {
@@ -93,7 +93,7 @@
           flex-direction: column;
           img {
             &:not(:last-of-type) {
-              margin-bottom: govuk-spacing(2);
+              margin-bottom: govuk.govuk-spacing(2);
             }
           }
         }

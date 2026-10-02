@@ -1,15 +1,16 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
+@use '../local/helpers';
 
 .hmpps-profile-banner-alert {
   padding: 20px 30px;
   margin: 0 -15px;
 
   &--warning {
-    background-color: rgba(govuk-colour('orange'), 0.25);
+    background-color: rgba(govuk.govuk-colour('orange'), 0.25);
   }
 
   &--info {
-    background-color: rgba(govuk-colour('green'), 0.25);
+    background-color: rgba(govuk.govuk-colour('green'), 0.25);
   }
 
   p {
@@ -38,7 +39,7 @@
       'photo name name'
       'photo info info';
 
-    background-color: govuk-colour('blue');
+    background-color: govuk.govuk-colour('blue');
 
     @media print {
       padding: 15px 10px;
@@ -82,7 +83,7 @@
 
           p {
             margin: 0;
-            color: govuk-functional-colour(link);
+            color: govuk.govuk-functional-colour(link);
             text-decoration: underline;
           }
         }
@@ -111,7 +112,7 @@
           gap: 12px 30px;
 
           & a {
-            color: govuk-colour('white');
+            color: govuk.govuk-colour('white');
           }
         }
       }
@@ -130,17 +131,17 @@
     h2,
     p,
     h3 {
-      color: govuk-colour('white');
+      color: govuk.govuk-colour('white');
     }
 
     h2 {
-      margin-bottom: govuk-spacing(2);
+      margin-bottom: govuk.govuk-spacing(2);
     }
 
     .hmpps-profile-banner-top-nav-container {
       .container {
         @media (min-width: 961px) and (max-width: 1152px) {
-          margin-top: govuk-spacing(4);
+          margin-top: govuk.govuk-spacing(4);
         }
         @media (max-width: 640px) {
           display: inline-grid !important;
@@ -148,11 +149,11 @@
           padding-top: 20px;
         }
         @media (max-width: 640px) {
-          margin-top: govuk-spacing(3);
+          margin-top: govuk.govuk-spacing(3);
         }
       }
 
-      @include govuk-responsive-padding(7, 'top');
+      @include govuk.govuk-responsive-padding(7, 'top');
 
       @media (max-width: 1152px) {
         padding-top: 0;
@@ -163,7 +164,7 @@
       }
 
       @media (max-width: 640px) {
-        padding-left: govuk-spacing(6);
+        padding-left: govuk.govuk-spacing(6);
         top: -286px;
         left: 150px;
         position: relative;
@@ -171,16 +172,16 @@
     }
 
     .govuk-grid-column-three-quarters {
-      padding-left: govuk-spacing(4);
+      padding-left: govuk.govuk-spacing(4);
 
       @media (min-width: 961px) and (max-width: 1152px) {
-        margin-top: govuk-spacing(7);
+        margin-top: govuk.govuk-spacing(7);
       }
 
       @media (min-width: 641px) and (max-width: 960px) {
         p {
           padding-bottom: 0;
-          margin-bottom: govuk-spacing(3);
+          margin-bottom: govuk.govuk-spacing(3);
         }
       }
     }
@@ -218,7 +219,7 @@
   }
 
   .hmpps-profile-banner-tabs {
-    border-bottom: 2px solid govuk-functional-colour(border);
+    border-bottom: 2px solid govuk.govuk-functional-colour(border);
 
     nav {
       padding: 10px 15px 0 15px;
@@ -236,16 +237,16 @@
       padding: 0;
 
       li {
-        margin: 0 govuk-spacing(6) 0 0;
+        margin: 0 govuk.govuk-spacing(6) 0 0;
         height: 32px;
-        color: govuk-colour('blue');
+        color: govuk.govuk-colour('blue');
       }
 
       .hmpps-profile-tab-link-selected {
-        border-bottom: 4px solid govuk-colour('blue');
+        border-bottom: 4px solid govuk.govuk-colour('blue');
 
         span {
-          color: govuk-colour('black');
+          color: govuk.govuk-colour('black');
         }
       }
 
@@ -279,7 +280,7 @@
   display: block;
   color: #6e3619;
 
-  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+  @include helpers.forced-dark-colours {
     color: white;
   }
 }

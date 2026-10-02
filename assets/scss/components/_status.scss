@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-status-list {
   display: flex;
@@ -16,50 +16,50 @@
   height: 70px;
   max-width: 14em;
   padding: 0 15px;
-  background-color: govuk-colour("black", $variant: "tint-95");
-  border-left: 6px solid govuk-colour("black", $variant: "tint-80");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
+  border-left: 6px solid govuk.govuk-colour('black', $variant: 'tint-80');
 
   p {
-    @include govuk-font($size: 19, $weight: 'bold');
-    color: govuk-colour('black');
+    @include govuk.govuk-font($size: 19, $weight: 'bold');
+    color: govuk.govuk-colour('black');
     margin: 0;
   }
 
   p + p {
-    @include govuk-font($size: 16);
-    color: govuk-colour("black", $variant: "tint-25");
+    @include govuk.govuk-font($size: 16);
+    color: govuk.govuk-colour('black', $variant: 'tint-25');
   }
 
   &--error {
     background-color: transparent;
-    border-left-color: govuk-colour('red');
+    border-left-color: govuk.govuk-colour('red');
 
     p {
-      @include govuk-font($size: 16);
+      @include govuk.govuk-font($size: 16);
     }
   }
 
   &--prominent {
-    background-color: govuk-colour("blue", $variant: "tint-95");
-    border-left-color: govuk-colour("blue", $variant: "tint-25");
+    background-color: govuk.govuk-colour('blue', $variant: 'tint-95');
+    border-left-color: govuk.govuk-colour('blue', $variant: 'tint-25');
 
     a, a:visited {
       color: #1c5791; // NB: custom colour for increased contrast
     }
     a:focus {
-      color: govuk-functional-colour(text);
+      color: govuk.govuk-functional-colour(text);
     }
   }
 
   &--warning {
-    background-color: govuk-colour("red", $variant: "tint-95");
-    border-left-color: govuk-colour("red", $variant: "shade-25");
+    background-color: govuk.govuk-colour('red', $variant: 'tint-95');
+    border-left-color: govuk.govuk-colour('red', $variant: 'shade-25');
 
     a, a:visited {
-      color: govuk-colour("red", $variant: "shade-25");
+      color: govuk.govuk-colour('red', $variant: 'shade-25');
     }
     a:focus {
-      color: govuk-functional-colour(text);
+      color: govuk.govuk-functional-colour(text);
     }
   }
 }

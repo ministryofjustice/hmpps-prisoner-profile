@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .autocomplete__wrapper {
   position: relative;
@@ -7,7 +7,7 @@
 .autocomplete__hint,
 .autocomplete__input {
   -webkit-appearance: none;
-  border: $govuk-border-width-form-element solid govuk-functional-colour(input-border);
+  border: govuk.$govuk-border-width-form-element solid govuk.govuk-functional-colour(input-border);
   border-radius: 0; /* Safari 10 on iOS adds implicit border rounding. */
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -21,13 +21,12 @@
   position: relative;
 
   .govuk-form-group--error & {
-    border-color: govuk-functional-colour(error);
+    border-color: govuk.govuk-functional-colour(error);
 
     &:focus {
-      border-color: govuk-functional-colour(input-border);
+      border-color: govuk.govuk-functional-colour(input-border);
     }
   }
-
 }
 
 .autocomplete__hint {

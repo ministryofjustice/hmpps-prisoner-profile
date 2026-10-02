@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-action-header {
   display: flex;
@@ -16,13 +16,13 @@
   align-items: center;
   height: 40px;
   padding: 10px;
-  border: 1px solid govuk-colour("black", $variant: "tint-25");
-  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
+  border: 1px solid govuk.govuk-colour('black', $variant: 'tint-25');
+  box-shadow: 0 5px govuk.govuk-colour('black', $variant: 'tint-80');
 
   img {
     margin-right: 10px;
 
-    @include govuk-media-query($until: tablet) {
+    @include govuk.govuk-media-query($until: tablet) {
       display: none;
     }
   }
@@ -30,7 +30,7 @@
   a {
     font-weight: 700;
 
-    @include govuk-media-query($until: tablet) {
+    @include govuk.govuk-media-query($until: tablet) {
       font-size: 16px;
     }
   }
