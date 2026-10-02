@@ -20,12 +20,12 @@ import Telephone from '../data/interfaces/prisonApi/Telephone'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import { Result } from '../utils/result/result'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
 import { formatDate } from '../utils/dateHelpers'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import StaffAllocation from '../data/interfaces/keyWorkerApi/StaffAllocation'
+import PrisonService from './prisonService'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -50,15 +50,17 @@ export default class ProfessionalContactsService {
     private readonly allocationApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
+    private readonly prisonService: PrisonService,
   ) {}
 
   async getContacts(
     clientToken: string,
     prisonerNumber: string,
     bookingId: number,
-    isYouthPrisoner: boolean,
+    prisonId: string,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<Result<ProfessionalContact, ProfessionalContactApiError>[]> {
+    const isYouthPrisoner = await this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken)
     const [contacts, allocationManager, communityManager, allocations] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
       Result.wrap(
@@ -186,12 +188,12 @@ export default class ProfessionalContactsService {
     return sortByDateTime(right.startDate, left.startDate) // Most recently added first
   }
 
-  getProfessionalContactsOverview(
+  async getProfessionalContactsOverview(
     clientToken: string,
     { prisonId, bookingId, prisonerNumber }: Prisoner,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<YouthStaffContacts | StaffContacts> {
-    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
+    const isYouthPrisoner = await this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken)
     return isYouthPrisoner
       ? this.getYouthStaffContactsOverview(clientToken, bookingId)
       : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, apiErrorCallback)

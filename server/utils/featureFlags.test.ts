@@ -1,6 +1,11 @@
 import { addMinutes, formatISO, subMinutes } from 'date-fns'
 import config from '../config'
-import { editProfileEnabled, editProfileSimulateFetch, offencesMoved } from './featureFlags'
+import {
+  editAddressSpecificPhoneNumbersEnabled,
+  editProfileEnabled,
+  editProfileSimulateFetch,
+  offencesMoved,
+} from './featureFlags'
 
 describe('featureToggles', () => {
   describe('editProfileEnabled', () => {
@@ -66,6 +71,38 @@ describe('featureToggles', () => {
       config.featureToggles.editProfile.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
 
       expect(editProfileEnabled('MDI')).toBeTruthy()
+    })
+  })
+
+  describe('editAddressSpecificPhoneNumbersEnabled', () => {
+    afterEach(() => {
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons = []
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsByDate = []
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsFrom = '2099-01-01T00:00:00'
+    })
+
+    it('is not enabled by default', () => {
+      expect(editAddressSpecificPhoneNumbersEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is enabled when active case load is listed as permanently enabled', () => {
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons = ['MDI']
+
+      expect(editAddressSpecificPhoneNumbersEnabled('MDI')).toBeTruthy()
+    })
+
+    it('is not enabled when active case load is listed by date but the date has not passed', () => {
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsByDate = ['MDI']
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsFrom = formatISO(addMinutes(Date.now(), 1))
+
+      expect(editAddressSpecificPhoneNumbersEnabled('MDI')).toBeFalsy()
+    })
+
+    it('is enabled when active case load is listed by date and the date has passed', () => {
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsByDate = ['MDI']
+      config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisonsFrom = formatISO(subMinutes(Date.now(), 1))
+
+      expect(editAddressSpecificPhoneNumbersEnabled('MDI')).toBeTruthy()
     })
   })
 

@@ -1,6 +1,5 @@
-import { Request, Response } from 'express'
-import ProfessionalContactsService from '../services/professionalContactsService'
-import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import type { Request, Response } from 'express'
+import type ProfessionalContactsService from '../services/professionalContactsService'
 
 export default class ProfessionalContactsController {
   constructor(readonly professionalContactsService: ProfessionalContactsService) {}
@@ -14,7 +13,7 @@ export default class ProfessionalContactsController {
         clientToken,
         prisonerNumber,
         bookingId,
-        youthEstatePrisons.includes(prisonId),
+        prisonId,
         res.locals.apiErrorCallback,
       )
     ).map(contact => contact.toPromiseSettledResult())

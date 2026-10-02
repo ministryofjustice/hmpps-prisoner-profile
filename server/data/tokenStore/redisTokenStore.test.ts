@@ -42,7 +42,12 @@ describe('tokenStore', () => {
     it('Can set token', async () => {
       await tokenStore.setToken('user-1', 'token-1', 10)
 
-      expect(redisClient.set).toHaveBeenCalledWith('systemToken:user-1', 'token-1', { EX: 10 })
+      expect(redisClient.set).toHaveBeenCalledWith('systemToken:user-1', 'token-1', {
+        expiration: {
+          type: 'EX',
+          value: 10,
+        },
+      })
     })
 
     it('Connects when no connection calling set token', async () => {

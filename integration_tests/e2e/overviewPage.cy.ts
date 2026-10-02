@@ -111,7 +111,7 @@ context('Overview Page', () => {
   context('Given prisoner is within the users case load', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
@@ -493,7 +493,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.historyLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview?entryPoint=profile-overview',
         )
       })
 
@@ -502,7 +502,7 @@ context('Overview Page', () => {
         overviewPage.xrayBodyScansCard.recordLink.should(
           'have.attr',
           'href',
-          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan',
+          'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/record-scan?entryPoint=profile-overview',
         )
       })
     })
@@ -555,7 +555,11 @@ context('Overview Page', () => {
         overviewPage
           .statusList()
           .find('a')
-          .should('have.attr', 'href', 'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview')
+          .should(
+            'have.attr',
+            'href',
+            'http://localhost:9091/xRayBodyScansUi/prisoner/G6123VU/scan-overview?entryPoint=profile-overview',
+          )
           .and('have.text', 'Scan limit reached')
       })
     })
@@ -1059,15 +1063,29 @@ context('Overview Page', () => {
     })
   })
 
-  context('Given user is not a DPS developer', () => {
+  context('Given XRBS is not available in youth custody estate', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth()
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        prisonerDataOverrides: { prisonId: 'FYI' },
+        caseLoads: [
+          {
+            caseLoadId: 'FYI',
+            currentlyActive: true,
+            description: 'Feltham A',
+            type: '',
+            caseloadFunction: '',
+          },
+        ],
+        services: [],
+      })
       visitOverviewPage()
     })
 
-    // TODO: remove once XRBS no longer relies on DPS app dev
     it('should not show x-ray body scans summary', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.xrayBodyScansCard.container.should('not.exist')
@@ -1274,7 +1292,7 @@ context('Overview Page', () => {
   context('Given API call to x-ray body scans api fails', () => {
     beforeEach(() => {
       cy.task('reset')
-      // TODO: use `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev
+      // TODO: replace with `cy.setupUserAuth()` once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })

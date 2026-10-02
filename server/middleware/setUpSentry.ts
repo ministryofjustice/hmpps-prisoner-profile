@@ -18,7 +18,17 @@ export function setUpSentry() {
       dsn: config.sentry.dsn,
       environment: config.sentry.environment,
       release: config.gitRef,
-      sendDefaultPii: false,
+
+      dataCollection: {
+        cookies: false,
+        userInfo: false,
+        urlQueryParams: { deny: ['user', 'username', 'prisoner', 'prisonerNumber'] },
+        httpHeaders: false,
+        httpBodies: [],
+        databaseQueryData: false,
+        genAI: { inputs: false, outputs: false },
+        graphQL: { document: false, variables: false },
+      },
 
       ignoreErrors: [
         // ignore timeouts; already logged in Application Insights
@@ -56,6 +66,7 @@ export function setUpSentry() {
         if (event.request?.url) {
           event.request.url = anonymise(event.request.url)!
         }
+        delete event.user?.ip_address
         delete event.user?.email
         delete event.user?.username
         delete event.request?.data
@@ -124,7 +135,7 @@ function monkeyPatchSuperagent(): void {
         message: `${method} ${url} ${status}`,
         data: {
           url,
-          'http.method': method,
+          method,
           status_code: status,
         },
       })
@@ -146,7 +157,7 @@ function monkeyPatchSuperagent(): void {
         message: `${method} ${url} ${status}`,
         data: {
           url,
-          'http.method': method,
+          method,
           status_code: status,
           error: errorMessage,
         },

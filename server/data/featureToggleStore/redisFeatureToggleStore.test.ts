@@ -28,11 +28,12 @@ describe('redisFeatureToggleStore', () => {
 
     await redisFeatureToggleStore.setToggle(prisonId, featureToggle, true, durationHours)
 
-    expect(redisClient.set).toHaveBeenCalledWith(
-      'featureToggle:MDI:alertsApiEnabled',
-      JSON.stringify(true),
-      { EX: 3600 }, // 1 hour in seconds
-    )
+    expect(redisClient.set).toHaveBeenCalledWith('featureToggle:MDI:alertsApiEnabled', JSON.stringify(true), {
+      expiration: {
+        type: 'EX',
+        value: 3600, // 1 hour in seconds
+      },
+    })
   })
 
   it('should get feature toggle status', async () => {

@@ -3,15 +3,18 @@ import config from '../config'
 import logger from '../../logger'
 import { type AuditService, Page } from '../services/auditService'
 import type CareNeedsService from '../services/careNeedsService'
+import {
+  XRayBodyScansAvailability,
+  type XRayBodyScansAvailabilityService,
+} from '../services/xRayBodyScansAvailabilityService'
 import type { RestClientBuilder } from '../data'
-import { Role } from '../data/enums/role'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
-import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default class CareNeedsController {
   constructor(
     readonly careNeedsService: CareNeedsService,
     private readonly xRayBodyScansApiClientBuilder: RestClientBuilder<XRayBodyScansApiClient>,
+    private readonly xRayBodyScansAvailabilityService: XRayBodyScansAvailabilityService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -41,15 +44,11 @@ export default class CareNeedsController {
 
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
-    const { user } = res.locals
-    const { userRoles } = user as PrisonUser
 
-    // TODO: make this obey service’s active agencies
-    const showUnsafeXRayBodyScanData =
-      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
+    const xRayBodyScansAvailability = await this.xRayBodyScansAvailabilityService.getAvailability(req, res)
 
-    if (showUnsafeXRayBodyScanData) {
-      // TODO: move redirect to router level once enabled everywhere
+    if (xRayBodyScansAvailability === XRayBodyScansAvailability.AVAILABLE) {
+      // TODO: replace displayXrayBodyScans with redirect at router level once enabled everywhere
       res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerData.prisonerNumber}/scan-overview`)
       return
     }

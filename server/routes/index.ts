@@ -83,6 +83,8 @@ export default function routes(services: Services): Router {
     services.professionalContactsService,
     services.csipService,
     services.contactsService,
+    services.prisonService,
+    services.xRayBodyScansAvailabilityService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
@@ -93,6 +95,7 @@ export default function routes(services: Services): Router {
   const careNeedsController = new CareNeedsController(
     services.careNeedsService,
     services.dataAccess.xRayBodyScansApiClientBuilder,
+    services.xRayBodyScansAvailabilityService,
     services.auditService,
   )
   const duplicateProfilesController = new DuplicateProfilesController(

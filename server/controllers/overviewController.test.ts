@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import type { Locals, Request, Response } from 'express'
 import {
   PersonalRelationshipsPermission,
   PersonPrisonCategoryPermission,
@@ -7,9 +7,10 @@ import {
   PrisonerMoneyPermission,
   PrisonerPermissions,
   PrisonerVisitsAndVisitorsPermission,
+  XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
-import OverviewController from './overviewController'
+import type { HmppsUser } from '../interfaces/HmppsUser'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import {
   inmateDetailMock,
@@ -61,29 +62,59 @@ import {
   mockScanSummaryResponse,
 } from '../data/localMockData/xRayBodyScansMock'
 import ContactsService from '../services/contactsService'
+import type PrisonService from '../services/prisonService'
+import {
+  XRayBodyScansAvailability,
+  XRayBodyScansAvailabilityService,
+} from '../services/xRayBodyScansAvailabilityService'
 import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
+import OverviewController from './overviewController'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
-
-const prisonerPermissions = {} as PrisonerPermissions
+jest.mock('../services/xRayBodyScansAvailabilityService')
 
 const getResLocals = ({
-  userRoles = ['CELL_MOVE'],
+  userRoles = [Role.CellMove],
   caseLoads = CaseLoadsDummyDataA,
+  activeCaseLoadId = 'MDI',
 }: {
-  userRoles?: string[]
+  userRoles?: Role[]
   caseLoads?: CaseLoad[]
-} = {}) => {
+  activeCaseLoadId?: string
+} = {}): Locals => {
   return {
+    feComponents: {
+      header: 'DPS header',
+      footer: 'DPS footer',
+      cssIncludes: [],
+      jsIncludes: [],
+      sharedData: {
+        caseLoads,
+        activeCaseLoad: caseLoads[0],
+        services: [
+          {
+            id: 'x-ray-body-scans',
+            heading: 'X-ray body scans',
+            description: 'X-ray body scans API',
+            href: 'http://localhost:3001/xRayBodyScansApi',
+            navEnabled: false,
+          },
+        ],
+        allocationJobResponsibilities: [],
+        cspDirectives: {},
+      },
+    },
     user: {
       authSource: 'nomis',
       userRoles,
       staffId: 487023,
       caseLoads,
       token: 'USER_TOKEN',
-    },
-    prisonerPermissions,
+      activeCaseLoadId,
+    } as HmppsUser,
+    prisonerPermissions: {} as PrisonerPermissions,
   }
 }
 
@@ -107,12 +138,17 @@ describe('overviewController', () => {
   let professionalContactsService: ProfessionalContactsService
   let csipService: CsipService
   let contactsService: ContactsService
-
-  let xRayBodyScansWasEnabled: boolean = false
+  let prisonService: PrisonService
+  const mockedXrbsAvailabilityService = jest.mocked(new XRayBodyScansAvailabilityService({} as never))
+  mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+  const xrbsAvailabilityServiceModule = jest.requireActual<
+    typeof import('../services/xRayBodyScansAvailabilityService')
+  >('../services/xRayBodyScansAvailabilityService')
+  mockedXrbsAvailabilityService.showOverviewCard.mockImplementation(
+    new xrbsAvailabilityServiceModule.XRayBodyScansAvailabilityService({} as never).showOverviewCard,
+  )
 
   beforeEach(() => {
-    xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
-
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
@@ -148,6 +184,7 @@ describe('overviewController', () => {
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
+    prisonService = prisonServiceMock()
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -165,11 +202,9 @@ describe('overviewController', () => {
       professionalContactsService,
       csipService,
       contactsService,
+      prisonService,
+      mockedXrbsAvailabilityService,
     )
-  })
-
-  afterEach(() => {
-    config.featureToggles.xRayBodyScansEnabled = xRayBodyScansWasEnabled
   })
 
   describe('moneySummary', () => {
@@ -656,42 +691,99 @@ describe('overviewController', () => {
     })
 
     describe('x-ray body scan limit', () => {
-      // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
-      let resWithDpsDevRole: Response
-      beforeEach(() => {
-        config.featureToggles.xRayBodyScansEnabled = true
-
-        resWithDpsDevRole = {
-          ...res,
-          locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
-        } as unknown as Response
-      })
-
-      it.each([
-        { scenario: 'under the limit', dpsCount: 50 },
-        { scenario: 'nearing the limit', dpsCount: 100 },
-      ])('should not display when scans are $scenario', async ({ dpsCount }) => {
-        const summary = mockScanSummaryResponse({
-          prisonerNumber: offenderNo,
-          nomisCount: 0,
-          dpsCount,
-          positiveCount: 0,
-          negativeCount: dpsCount,
-          inconclusiveCount: 0,
+      describe.each([
+        {
+          scenario: 'is available',
+          availability: XRayBodyScansAvailability.AVAILABLE,
+          expectedLink: 'http://localhost:3001/prisoner/A1234BC/scan-overview?entryPoint=profile-overview',
+        },
+        {
+          scenario: 'will be available soon',
+          availability: XRayBodyScansAvailability.AVAILABLE_SOON,
+          expectedLink: '/prisoner/A1234BC/x-ray-body-scans',
+        },
+      ])('when the x-ray body scans service $scenario', ({ availability, expectedLink }) => {
+        beforeEach(() => {
+          mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(availability)
         })
-        xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
 
-        await controller.displayOverview(req, resWithDpsDevRole)
+        it.each([
+          { scenario: 'under the limit', dpsCount: 50 },
+          { scenario: 'nearing the limit', dpsCount: 100 },
+        ])('should not display when scans are $scenario', async ({ dpsCount }) => {
+          const summary = mockScanSummaryResponse({
+            prisonerNumber: offenderNo,
+            nomisCount: 0,
+            dpsCount,
+            positiveCount: 0,
+            negativeCount: dpsCount,
+            inconclusiveCount: 0,
+          })
+          xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
 
-        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
-          'pages/overviewPage',
-          expect.objectContaining({
-            statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
-          }),
-        )
+          await controller.displayOverview(req, res)
+
+          expect(res.render).toHaveBeenCalledWith(
+            'pages/overviewPage',
+            expect.objectContaining({
+              statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
+            }),
+          )
+        })
+
+        it('should display when scans are at the limit', async () => {
+          const summary = mockScanSummaryResponse({
+            prisonerNumber: offenderNo,
+            nomisCount: 10,
+            dpsCount: 110,
+            positiveCount: 2,
+            negativeCount: 108,
+            inconclusiveCount: 10,
+          })
+          xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
+
+          await controller.displayOverview(req, res)
+
+          expect(res.render).toHaveBeenCalledWith(
+            'pages/overviewPage',
+            expect.objectContaining({
+              statuses: [
+                { label: 'In Moorland (HMP & YOI)' },
+                { label: 'Recognised listener' },
+                {
+                  label: expect.stringContaining('X-ray body scans in'),
+                  subText: 'Scan limit reached',
+                  subTextHref: expectedLink,
+                  style: 'warning',
+                },
+              ],
+            }),
+          )
+        })
+
+        it('should indicate an error when API fails', async () => {
+          xRayBodyScansApiClient.getScanSummary.mockRejectedValueOnce('Server Error')
+
+          await controller.displayOverview(req, res)
+
+          expect(res.render).toHaveBeenCalledWith(
+            'pages/overviewPage',
+            expect.objectContaining({
+              statuses: [
+                { label: 'In Moorland (HMP & YOI)' },
+                { label: 'Recognised listener' },
+                {
+                  label: 'X-ray body scan limit information is currently unavailable. Try again later.',
+                  style: 'error',
+                },
+              ],
+            }),
+          )
+        })
       })
 
-      it('should display when scans are at the limit', async () => {
+      it('should not display when service is unavailable', async () => {
+        mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
         const summary = mockScanSummaryResponse({
           prisonerNumber: offenderNo,
           nomisCount: 10,
@@ -702,41 +794,12 @@ describe('overviewController', () => {
         })
         xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(summary)
 
-        await controller.displayOverview(req, resWithDpsDevRole)
+        await controller.displayOverview(req, res)
 
-        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+        expect(res.render).toHaveBeenCalledWith(
           'pages/overviewPage',
           expect.objectContaining({
-            statuses: [
-              { label: 'In Moorland (HMP & YOI)' },
-              { label: 'Recognised listener' },
-              {
-                label: expect.stringContaining('X-ray body scans in'),
-                subText: 'Scan limit reached',
-                subTextHref: 'http://localhost:3001/prisoner/A1234BC/scan-overview',
-                style: 'warning',
-              },
-            ],
-          }),
-        )
-      })
-
-      it('should indicate an error when API fails', async () => {
-        xRayBodyScansApiClient.getScanSummary.mockRejectedValueOnce('Server Error')
-
-        await controller.displayOverview(req, resWithDpsDevRole)
-
-        expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
-          'pages/overviewPage',
-          expect.objectContaining({
-            statuses: [
-              { label: 'In Moorland (HMP & YOI)' },
-              { label: 'Recognised listener' },
-              {
-                label: 'X-ray body scan limit information is currently unavailable. Try again later.',
-                style: 'error',
-              },
-            ],
+            statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised listener' }],
           }),
         )
       })
@@ -900,13 +963,20 @@ describe('overviewController', () => {
     })
   })
 
-  describe('x-ray body scans card', () => {
+  describe('X-ray body scans card', () => {
     beforeEach(() => {
-      config.featureToggles.xRayBodyScansEnabled = true
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+      mockPermissions({
+        [XRayBodyScansPermission.read_scans]: true,
+        [XRayBodyScansPermission.edit_scans]: true,
+      })
     })
 
-    it('should not call api without DPS app dev role', async () => {
+    it('should not get scan summary from api when service is unavailable', async () => {
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+
       await controller.displayOverview(req, res)
+
       expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -916,21 +986,59 @@ describe('overviewController', () => {
       )
     })
 
-    // TODO: remove `resWithDpsDevRole` once XRBS no longer relies on DPS app dev
-    let resWithDpsDevRole: Response
-    beforeEach(() => {
-      resWithDpsDevRole = {
-        ...res,
-        locals: getResLocals({ userRoles: [Role.DpsApplicationDeveloper] }),
-      } as unknown as Response
-    })
+    it.each([
+      {
+        scenario: 'can access x-ray body scans service',
+        setup: () => {
+          mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+        },
+        expectedLinks: {
+          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview\\?entryPoint=profile-overview'),
+          recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan\\?entryPoint=profile-overview'),
+        },
+      },
+      {
+        scenario: 'can access x-ray body scans service but does not have edit x-ray body scans permission',
+        setup: () => {
+          mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+          mockPermissions({
+            [XRayBodyScansPermission.read_scans]: true,
+            [XRayBodyScansPermission.edit_scans]: false,
+          })
+        },
+        expectedLinks: {
+          viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview\\?entryPoint=profile-overview'),
+        },
+      },
+      {
+        scenario: 'cannot yet access x-ray body scans service',
+        setup: () => {
+          mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE_SOON)
+        },
+        expectedLinks: {
+          viewHistoryUrl: `/prisoner/${offenderNo}/x-ray-body-scans`,
+        },
+      },
+    ])('should get scan summary from api when user $scenario', async ({ setup, expectedLinks }) => {
+      setup()
+      const scanSummary = mockScanSummaryResponse({ prisonerNumber: offenderNo })
+      xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(scanSummary)
 
-    it('should not load when disabled', async () => {
-      config.featureToggles.xRayBodyScansEnabled = false
+      await controller.displayOverview(req, res)
 
-      await controller.displayOverview(req, resWithDpsDevRole)
-
-      expect(xRayBodyScansApiClient.getScanSummary).not.toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          xrayBodyScanSummary: expect.objectContaining({
+            status: 'fulfilled',
+            value: {
+              ...scanSummary,
+              ...expectedLinks,
+            },
+          }),
+        }),
+      )
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledWith(offenderNo, { includeLatestScan: true })
     })
 
     it.each([
@@ -949,18 +1057,14 @@ describe('overviewController', () => {
       })
       xRayBodyScansApiClient.getScanSummary.mockResolvedValueOnce(scanSummary)
 
-      await controller.displayOverview(req, resWithDpsDevRole)
+      await controller.displayOverview(req, res)
 
-      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+      expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
           xrayBodyScanSummary: expect.objectContaining({
             status: 'fulfilled',
-            value: {
-              ...scanSummary,
-              recordScanUrl: expect.stringMatching('/prisoner/A1234BC/record-scan$'),
-              viewHistoryUrl: expect.stringMatching('/prisoner/A1234BC/scan-overview$'),
-            },
+            value: expect.objectContaining(scanSummary),
           }),
         }),
       )
@@ -969,9 +1073,9 @@ describe('overviewController', () => {
 
     it('should indicate an error when API fails', async () => {
       xRayBodyScansApiClient.getScanSummary.mockRejectedValueOnce('Server Error')
-      await controller.displayOverview(req, resWithDpsDevRole)
+      await controller.displayOverview(req, res)
 
-      expect(resWithDpsDevRole.render).toHaveBeenCalledWith(
+      expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
           xrayBodyScanSummary: expect.objectContaining({
@@ -980,6 +1084,40 @@ describe('overviewController', () => {
           }),
         }),
       )
+    })
+  })
+
+  describe('TO BE DELETED: XRBS Silent reads', () => {
+    it('Calls the API when enabled for the active caseload', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalled()
+    })
+
+    it('Calls the API once when enabled for the active caseload and also enabled generally', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
+    })
+
+    it('Calls the API once when enabled for but not silently reading', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['LEI']
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
+    })
+
+    it('Does not call the API when not enabled and not silently reading', async () => {
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = []
+      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
+      await controller.displayOverview(req, res)
+
+      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(0)
     })
   })
 })

@@ -20,7 +20,12 @@ export default class RedisTokenStore implements TokenStore {
 
   public async setToken(key: string, token: string, durationSeconds: number): Promise<void> {
     await this.ensureConnected()
-    await this.client.set(`${this.prefix}${key}`, token, { EX: durationSeconds })
+    await this.client.set(`${this.prefix}${key}`, token, {
+      expiration: {
+        type: 'EX',
+        value: durationSeconds,
+      },
+    })
   }
 
   public async getToken(key: string): Promise<string> {

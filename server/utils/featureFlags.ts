@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import config from '../config'
-import { FeatureFlagMethod } from '../middleware/featureFlagGuard'
+import type { FeatureFlagMethod } from '../middleware/featureFlagGuard'
 
 interface ScheduledFeatureFlag {
   enabledPrisons: string[]
@@ -25,6 +25,10 @@ export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: st
   config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
 
 export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
+
+export const editAddressSpecificPhoneNumbersEnabled: FeatureFlagMethod = scheduledFeatureFlag(
+  config.featureToggles.editAddressSpecificPhoneNumbers,
+)
 
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 

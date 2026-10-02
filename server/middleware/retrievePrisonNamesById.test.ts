@@ -5,7 +5,7 @@ import PrisonService from '../services/prisonService'
 jest.mock('../services/prisonService')
 
 describe('retrievePrisonNamesById', () => {
-  const prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
+  const prisonService = jest.mocked(new PrisonService(null, null))
   const requestHandler = retrievePrisonNamesById(prisonService)
 
   const token = 'a-system-token'

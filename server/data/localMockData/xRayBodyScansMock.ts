@@ -27,8 +27,6 @@ export function mockScanResponse(
     justificationDescription: 'Reasonable suspicion',
     outcome: 'POSITIVE',
     outcomeDescription: 'Item detected',
-    typeOfFind: 'INORGANIC',
-    typeOfFindDescription: 'Inorganic',
     caseNoteId: null,
     mergedAt: null,
     mergedFromPrisonerNumber: null,

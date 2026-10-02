@@ -9,13 +9,13 @@ import {
   PrisonerIncentivesPermission,
   PrisonerMoneyPermission,
   PrisonerVisitsAndVisitorsPermission,
+  XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { Role } from '../data/enums/role'
 import { formatName, isInUsersCaseLoad } from '../utils/utils'
 import type { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import type { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
@@ -35,18 +35,21 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
 import { Result } from '../utils/result/result'
 import OffenderService from '../services/offenderService'
+import PrisonService from '../services/prisonService'
 import ProfessionalContactsService from '../services/professionalContactsService'
-import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import {
+  XRayBodyScansAvailability,
+  XRayBodyScansAvailabilityService,
+} from '../services/xRayBodyScansAvailabilityService'
 import getOverviewStatuses from './utils/overviewController/getOverviewStatuses'
 import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfoLinks'
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
-import { mapXrayBodyScanSummary } from './utils/overviewController/mapXrayBodyScanData'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
-import ContactsService from '../services/contactsService'
 import { offencesMoved } from '../utils/featureFlags'
+import ContactsService from '../services/contactsService'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -68,16 +71,17 @@ export default class OverviewController {
     private readonly professionalContactsService: ProfessionalContactsService,
     private readonly csipService: CsipService,
     private readonly contactsService: ContactsService,
+    private readonly prisonService: PrisonService,
+    private readonly xRayBodyScansAvailabilityService: XRayBodyScansAvailabilityService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
     const { apiErrorCallback, user, prisonerPermissions } = res.locals
-    const { activeCaseLoadId, userRoles } = user as PrisonUser
+    const { activeCaseLoadId } = user as PrisonUser
     const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
 
     const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, user)
-    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -85,10 +89,13 @@ export default class OverviewController {
     const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
     const showCourtCaseSummary = isGranted(PersonSentenceCalculationPermission.edit, prisonerPermissions)
     const showConfirmedReleaseDateNonCalculate = !showCourtCaseSummary && offencesMoved(activeCaseLoadId)
+    const xRayBodyScansAvailability = await this.xRayBodyScansAvailabilityService.getAvailability(req, res)
+    const showXRayBodyScansCard = this.xRayBodyScansAvailabilityService.showOverviewCard(xRayBodyScansAvailability)
 
-    // TODO: make this obey service’s active agencies
-    const showUnsafeXRayBodyScanData =
-      config.featureToggles.xRayBodyScansEnabled && userRoles.includes(Role.DpsApplicationDeveloper)
+    // TODO: Delete this once performance testing is over
+    const xrayBodyScansReadsEnabled =
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes('***') ||
+      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes(activeCaseLoadId)
 
     const [
       pathfinderNominal,
@@ -110,6 +117,9 @@ export default class OverviewController {
       currentCsipDetail,
       externalContactsSummary,
       xrayBodyScanSummary,
+      isYouthPrisoner,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _xrbsPerformanceTestToBeRemoved,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -149,11 +159,36 @@ export default class OverviewController {
       isGranted(PersonalRelationshipsPermission.read_contacts, prisonerPermissions)
         ? Result.wrap(this.contactsService.getExternalContactsCount(clientToken, prisonerNumber), apiErrorCallback)
         : null,
-      showUnsafeXRayBodyScanData
+      showXRayBodyScansCard
+        ? Result.wrap(
+            xRayBodyScansApiClient.getScanSummary(prisonerNumber, { includeLatestScan: true }).then(summaryResponse => {
+              let viewHistoryUrl: string
+              let recordScanUrl: string | undefined
+              if (xRayBodyScansAvailability === XRayBodyScansAvailability.AVAILABLE) {
+                const xrbsUrlPrefix = `${config.serviceUrls.xRayBodyScansUi}/prisoner/${summaryResponse.prisonerNumber}`
+                viewHistoryUrl = `${xrbsUrlPrefix}/scan-overview?entryPoint=profile-overview`
+                if (isGranted(XRayBodyScansPermission.edit_scans, prisonerPermissions)) {
+                  recordScanUrl = `${xrbsUrlPrefix}/record-scan?entryPoint=profile-overview`
+                }
+              } else {
+                viewHistoryUrl = `/prisoner/${prisonerNumber}/x-ray-body-scans`
+              }
+              return {
+                ...summaryResponse,
+                viewHistoryUrl,
+                recordScanUrl,
+              }
+            }),
+            apiErrorCallback,
+          )
+        : null,
+      this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken),
+      // TODO: Delete this once performance testing is done
+      xrayBodyScansReadsEnabled && !showXRayBodyScansCard
         ? Result.wrap(
             xRayBodyScansApiClient
               .getScanSummary(prisonerNumber, { includeLatestScan: true })
-              .then(mapXrayBodyScanSummary),
+              .then(_summaryResponse => true),
             apiErrorCallback,
           )
         : null,

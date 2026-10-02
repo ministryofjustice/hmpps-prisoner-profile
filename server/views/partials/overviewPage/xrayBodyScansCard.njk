@@ -46,10 +46,11 @@
       <p>
         <a href="{{ xrayBodyScanSummary.viewHistoryUrl }}">Check body scan details</a>
 
-        {# TODO: add permission check that XRBS service is enabled in … relevant caseload #}
-        <a href="{{ xrayBodyScanSummary.recordScanUrl }}" class="govuk-!-margin-left-3">
-          Record a new scan
-        </a>
+        {% if xrayBodyScanSummary.recordScanUrl %}
+          <a href="{{ xrayBodyScanSummary.recordScanUrl }}" class="govuk-!-margin-left-3">
+            Record a new scan
+          </a>
+        {% endif %}
       </p>
 
     {% else %}

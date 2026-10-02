@@ -1,4 +1,4 @@
-import { PrisonDto } from '../interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import type { PrisonDto } from '../interfaces/prisonRegisterApi/prisonRegisterApiTypes'
 
 const prisonsKeyedByPrisonId: Record<string, PrisonDto> = {
   AKI: {
@@ -5117,6 +5117,6 @@ const prisonsKeyedByPrisonId: Record<string, PrisonDto> = {
   },
 }
 
-const allPrisons: Array<PrisonDto> = Object.entries(prisonsKeyedByPrisonId).map(entry => entry[1])
+const allPrisons = Object.values(prisonsKeyedByPrisonId)
 
 export { prisonsKeyedByPrisonId, allPrisons }
