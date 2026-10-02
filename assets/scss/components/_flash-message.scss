@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 @keyframes flashMessageFadeOut {
   0% {
@@ -29,12 +29,12 @@
     text-align: center;
     padding: 10px 30px;
     margin: 0;
-    background-color: govuk-functional-colour(success);
-    color: govuk-functional-colour(inverse-text);
-    @include govuk-font($size: 19, $weight: "bold");
+    background-color: govuk.govuk-functional-colour(success);
+    color: govuk.govuk-functional-colour(inverse-text);
+    @include govuk.govuk-font($size: 19, $weight: 'bold');
 
     &::before {
-      content: url("/assets/images/tick-icon.svg");
+      content: url('/assets/images/tick-icon.svg');
       height: 25px;
       margin-right: 12px;
     }

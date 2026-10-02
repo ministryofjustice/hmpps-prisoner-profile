@@ -1,8 +1,8 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .past-care-needs-list {
   .govuk-summary-list__row:first-of-type {
-    border-top: 1px solid govuk-functional-colour(border);
+    border-top: 1px solid govuk.govuk-functional-colour(border);
   }
 
   .govuk-summary-list__key {

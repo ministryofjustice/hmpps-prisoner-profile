@@ -1,4 +1,5 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
+@use '../../../../assets/scss/local/helpers';
 
 .mini-card {
   position: relative;
@@ -6,12 +7,12 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-items: flex-start;
-  border: 1px solid govuk-colour("black", $variant: "tint-25");
-  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
+  border: 1px solid govuk.govuk-colour('black', $variant: 'tint-25');
+  box-shadow: 0 5px govuk.govuk-colour('black', $variant: 'tint-80');
   min-height: 100%; // can be overridden for each usage of .mini-card
 
   &__heading {
-    background-color: govuk-colour("black", $variant: "tint-95");
+    background-color: govuk.govuk-colour('black', $variant: 'tint-95');
     padding-left: 15px;
     padding-right: 15px;
     margin-bottom: 10px;
@@ -30,12 +31,12 @@
   }
 
   &__label {
-    @include govuk-responsive-margin(1, 'bottom');
-    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk.govuk-responsive-margin(1, 'bottom');
+    @include govuk.govuk-font($size: 19, $weight: 'bold');
   }
 
   &__item {
-    @include govuk-font($size: 19);
+    @include govuk.govuk-font($size: 19);
     margin: 0 0 5px 0;
     display: flex;
     align-items: center;
@@ -48,19 +49,19 @@
     flex-shrink: 0;
     color: inherit;
 
-    @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    @include helpers.forced-dark-colours {
       color: white;
     }
   }
 
   &__link {
-    @include govuk-font($size: 19);
+    @include govuk.govuk-font($size: 19);
     padding-left: 15px;
     padding-right: 15px;
     margin-top: auto;
     padding-top: 15px;
     margin-bottom: 12px;
-    border-top: 1px solid govuk-colour("black", $variant: "tint-95");
+    border-top: 1px solid govuk.govuk-colour('black', $variant: 'tint-95');
   }
 }
 
@@ -72,21 +73,21 @@
   flex-wrap: nowrap;
   justify-items: flex-start;
   padding: 10px 15px;
-  border: 1px solid govuk-colour("black", $variant: "tint-25");
-  box-shadow: 0 5px govuk-colour("black", $variant: "tint-80");
+  border: 1px solid govuk.govuk-colour('black', $variant: 'tint-25');
+  box-shadow: 0 5px govuk.govuk-colour('black', $variant: 'tint-80');
   min-height: 100%; // can be overridden for each usage of .mini-card
 
   h2 {
-    @include govuk-font($size: 19, $weight: bold);
+    @include govuk.govuk-font($size: 19, $weight: bold);
     margin: 0 0 5px 0;
   }
 
   &__item {
-    @include govuk-font($size: 19);
+    @include govuk.govuk-font($size: 19);
     margin: 0 0 5px 0;
   }
 
   &__link {
-    @include govuk-font($size: 19);
+    @include govuk.govuk-font($size: 19);
   }
 }
