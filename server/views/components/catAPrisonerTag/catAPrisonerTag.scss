@@ -1,13 +1,13 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .dps-cat-a-tag {
-  @include govuk-font($size: 16);
+  @include govuk.govuk-font($size: 16);
 
   display: inline-block;
   height: 26px;
   padding: 6px 20px 0 20px;
-  color: govuk-functional-colour("inverse-text");
-  background-color: govuk-colour("magenta", $variant: "shade-25");
+  color: govuk.govuk-functional-colour('inverse-text');
+  background-color: govuk.govuk-colour('magenta', $variant: 'shade-25');
   text-decoration: none;
   font-weight: 700;
   overflow-wrap: break-word;

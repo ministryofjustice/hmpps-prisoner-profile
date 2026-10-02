@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .govuk-main-wrapper {
   padding-top: 0;
@@ -71,11 +71,11 @@ a.govuk-tabs__tab {
   padding: 22px;
   margin: 0;
   min-height: 26px;
-  border-left: 8px solid govuk-colour('green');
-  background-color: govuk-colour("black", $variant: "tint-95");
+  border-left: 8px solid govuk.govuk-colour('green');
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
 
   &__error {
-    border-left: 8px solid govuk-colour('red');
+    border-left: 8px solid govuk.govuk-colour('red');
   }
 
   &__small {
@@ -89,7 +89,7 @@ a.govuk-tabs__tab {
 
     a:link,
     a:visited {
-      color: govuk-functional-colour(text);
+      color: govuk.govuk-functional-colour(text);
     }
   }
 }
@@ -111,18 +111,18 @@ a.govuk-tabs__tab {
 }
 
 .hmpps-warning__blue {
-  border: 5px solid govuk-colour('blue');
+  border: 5px solid govuk.govuk-colour('blue');
   padding: 20px;
 
   .govuk-warning-text__icon {
-    border-color: govuk-colour('blue');
-    background-color: govuk-colour('blue');
+    border-color: govuk.govuk-colour('blue');
+    background-color: govuk.govuk-colour('blue');
   }
 }
 
-[data-qa="identity-number-value"],
-[data-qa="cro-number"],
-[data-qa="pnc-number"],
-[data-qa="most-recent-existing-value"] {
+[data-qa='identity-number-value'],
+[data-qa='cro-number'],
+[data-qa='pnc-number'],
+[data-qa='most-recent-existing-value'] {
   white-space: pre-wrap;
 }

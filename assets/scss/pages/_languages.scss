@@ -1,7 +1,7 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .other-languages-sidebar {
   margin-top: 50px;
-  border-left: 2px solid govuk-functional-colour(border);
+  border-left: 2px solid govuk.govuk-functional-colour(border);
   padding: 0 0 0 20px;
 }

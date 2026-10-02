@@ -1,12 +1,13 @@
-@use 'govuk-frontend/dist/govuk/settings/global-styles' with ($govuk-global-styles: true);
-
-@use '@ministryofjustice/frontend/moj/all' as * with (
-  $moj-page-width: 1170px,
+@use 'govuk-frontend/dist/govuk' with (
+  $govuk-global-styles: true,
+  $govuk-page-width: 1170px,
 );
+@use '@ministryofjustice/frontend/moj/all';
+@use '@ministryofjustice/hmpps-connect-dps-components/dist/assets/all' as dps-components;
+@use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all' as dps-shared-items;
 
-@use 'govuk-frontend/dist/govuk/index' as *;
-@use '@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
-@use '@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/scss/all';
+@use './overrides';
+@use './local';
 
 @use 'server/views/components/catAPrisonerTag/catAPrisonerTag';
 @use 'server/views/components/fileUploadWithPreview/fileUploadWithPreview';
@@ -71,9 +72,3 @@
 @use './pages/prisoner-schedule';
 @use './pages/location-details';
 @use './pages/profile-photo';
-
-@use './overrides/local';
-@use './overrides/print';
-
-@use './helpers/index';
-@use './helpers/typography';

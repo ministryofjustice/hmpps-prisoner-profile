@@ -1,22 +1,23 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
+@use '../local/helpers';
 
 @property --body-part-inactive-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
   initial-value: #f2f2f1;
 }
 @property --body-part-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
   initial-value: #fff;
 }
 @property --body-part-detail-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
   initial-value: #919397;
 }
 @property --body-part-outline-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
   initial-value: #919397;
 }
@@ -40,7 +41,7 @@
     --body-part-detail-colour: #5e530e;
   }
 
-  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+  @include helpers.forced-dark-colours {
     --body-part-inactive-colour: #444;
     --body-part-colour: #000;
     --body-part-detail-colour: #fff;
@@ -63,7 +64,7 @@
 
 .dps-body-parts {
   outline: none;
-  @include govuk-responsive-margin(6, "bottom");
+  @include govuk.govuk-responsive-margin(6, 'bottom');
 }
 
 .dps-body-parts__sides {
@@ -91,8 +92,8 @@
 .dps-body-parts__side-title {
   display: block;
   text-align: center;
-  @include govuk-font($size: 16);
-  @include govuk-responsive-margin(2, "bottom");
+  @include govuk.govuk-font($size: 16);
+  @include govuk.govuk-responsive-margin(2, 'bottom');
 }
 
 .dps-body-parts a {
@@ -159,36 +160,36 @@
 }
 
 @property --body-part-tooltip-shadow-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
-  initial-value: govuk-colour("black", $variant: "tint-25");
+  initial-value: govuk.govuk-colour('black', $variant: 'tint-25');
 }
 @property --body-part-tooltip-background-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
-  initial-value: govuk-colour('white');
+  initial-value: govuk.govuk-colour('white');
 }
 @property --body-part-tooltip-foreground-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
-  initial-value: govuk-colour('black');
+  initial-value: govuk.govuk-colour('black');
 }
 @property --body-part-tooltip-border-colour {
-  syntax: "<color>";
+  syntax: '<color>';
   inherits: true;
-  initial-value: govuk-colour('blue');
+  initial-value: govuk.govuk-colour('blue');
 }
 
 .dps-body-parts__tooltip {
   $border-size: 1px;
   $pointer-size: 5px;
 
-  --body-part-tooltip-shadow-colour: #{govuk-colour("black", $variant: "tint-25")};
-  --body-part-tooltip-background-colour: #{govuk-colour('white')};
-  --body-part-tooltip-foreground-colour: #{govuk-functional-colour(text)};
-  --body-part-tooltip-border-colour: #{govuk-colour('blue')};
+  --body-part-tooltip-shadow-colour: #{govuk.govuk-colour('black', $variant: 'tint-25')};
+  --body-part-tooltip-background-colour: #{govuk.govuk-colour('white')};
+  --body-part-tooltip-foreground-colour: #{govuk.govuk-functional-colour(text)};
+  --body-part-tooltip-border-colour: #{govuk.govuk-colour('blue')};
 
-  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+  @include helpers.forced-dark-colours {
     --body-part-tooltip-background-colour: #000;
     --body-part-tooltip-foreground-colour: #fff;
     --body-part-tooltip-border-colour: #99e;
@@ -209,9 +210,9 @@
   text-align: center;
   z-index: 1000;
 
-  @include govuk-font($size: 16);
+  @include govuk.govuk-font($size: 16);
 
-  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+  @include helpers.forced-dark-colours {
     box-shadow: none;
   }
 
@@ -230,7 +231,7 @@
     border-right: #{$pointer-size + $border-size} solid transparent;
     filter: drop-shadow(0 4px 2px var(--body-part-tooltip-shadow-colour));
 
-    @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    @include helpers.forced-dark-colours {
       filter: none;
     }
   }
@@ -243,6 +244,6 @@
 }
 
 .dps-body-parts__message {
-  @include govuk-font($size: 19);
-  @include govuk-responsive-margin(6, "top");
+  @include govuk.govuk-font($size: 19);
+  @include govuk.govuk-responsive-margin(6, 'top');
 }

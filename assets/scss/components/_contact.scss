@@ -1,37 +1,37 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-contact {
-  @include govuk-responsive-margin(2, 'top');
+  @include govuk.govuk-responsive-margin(2, 'top');
 
   &:first-child {
-    @include govuk-responsive-margin(0, 'top');
+    @include govuk.govuk-responsive-margin(0, 'top');
   }
 
   .hmpps-contact__emergency-contact {
-    color: govuk-colour('red');
-    @include govuk-font($size: 16, $weight: 'bold');
-    @include govuk-responsive-margin(0, 'bottom');
+    color: govuk.govuk-colour('red');
+    @include govuk.govuk-font($size: 16, $weight: 'bold');
+    @include govuk.govuk-responsive-margin(0, 'bottom');
   }
 
   .hmpps-contact__next-of-kin {
-    color: govuk-colour("black", $variant: "tint-25");
-    @include govuk-font($size: 16, $weight: 'bold');
-    @include govuk-responsive-margin(1, 'bottom');
+    color: govuk.govuk-colour('black', $variant: 'tint-25');
+    @include govuk.govuk-font($size: 16, $weight: 'bold');
+    @include govuk.govuk-responsive-margin(1, 'bottom');
   }
 
   .hmpps-contact__name {
-    @include govuk-font($size: 24, $weight: 'bold');
-    @include govuk-responsive-margin(1, 'bottom');
+    @include govuk.govuk-font($size: 24, $weight: 'bold');
+    @include govuk.govuk-responsive-margin(1, 'bottom');
   }
 
   .hmpps-contact__relationship {
-    @include govuk-font($size: 19);
-    @include govuk-responsive-margin(0, 'bottom');
+    @include govuk.govuk-font($size: 19);
+    @include govuk.govuk-responsive-margin(0, 'bottom');
   }
 
   .hmpps-contact__contact-number {
-    @include govuk-font($size: 19);
-    @include govuk-responsive-margin(0, 'bottom');
+    @include govuk.govuk-font($size: 19);
+    @include govuk.govuk-responsive-margin(0, 'bottom');
   }
 
   &:last-of-type {
