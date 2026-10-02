@@ -13,9 +13,7 @@
     border-top: 1px solid;
 
     &__values {
-      @include govuk.govuk-font($size: 19);
-      margin-top: 0;
-      color: govuk.govuk-functional-colour(text);
+      @extend .govuk-body;
       margin-bottom: govuk.govuk-spacing(3);
       flex: 1 0 33.333%;
       box-sizing: border-box;
