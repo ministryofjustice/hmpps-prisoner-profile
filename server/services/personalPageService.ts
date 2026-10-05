@@ -327,8 +327,9 @@ export default class PersonalPageService {
       )
       ;[addresses, globalNumbersAndEmails, distinguishingMarks, militaryRecords, physicalAttributes] =
         await Promise.all([
-          profileSummary.mapAsync(summary =>
-            getOptions.editProfileEnabled ? this.addressService.transformAddresses(token, summary.addresses) : null,
+          Result.wrap(
+            getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
+            getOptions.apiErrorCallback,
           ),
           profileSummary.mapAsync(summary =>
             getOptions.editProfileEnabled

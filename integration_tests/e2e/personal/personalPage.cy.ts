@@ -1,6 +1,7 @@
 import { startOfYear } from 'date-fns'
 import { Role } from '../../../server/data/enums/role'
-import { mockAddresses } from '../../../server/data/localMockData/addresses'
+import { addressesPrimaryAndMailMock, mockAddresses } from '../../../server/data/localMockData/addresses'
+import { componentsCaseLoadMock } from '../../../server/data/localMockData/componentApi/componentsMock'
 import Page from '../../pages/page'
 import PersonalPage from '../../pages/personalPage'
 import { permissionsTests } from '../permissionsTests'
@@ -489,30 +490,42 @@ context('When signed in', () => {
     })
 
     context('Addresses', () => {
+      beforeEach(() => {
+        cy.task('stubAddresses', {
+          prisonerNumber,
+          resp: addressesPrimaryAndMailMock.map(address => ({
+            ...address,
+            phones: address.phones.map(phone => ({ ...phone, ext: '567' })),
+          })),
+        })
+        cy.reload()
+      })
+
       it('Displays prisoner addresses', () => {
         const page = Page.verifyOnPage(PersonalPage)
         page.addresses().addressHeading().should('include.text', 'Primary and postal address')
 
-        page.addresses().address().should('include.text', 'No fixed address')
-        page.addresses().address().should('include.text', 'Flat 1')
-        page.addresses().address().should('include.text', 'The Flats')
-        page.addresses().address().should('include.text', '1 The Road')
-        page.addresses().address().should('include.text', 'The Area')
-        page.addresses().address().should('include.text', 'Sheffield')
-        page.addresses().address().should('include.text', 'South Yorkshire')
-        page.addresses().address().should('include.text', 'A1 2BC')
+        page.addresses().address().should('include.text', '1 Station Road')
+        page.addresses().address().should('include.text', 'Some Town')
+        page.addresses().address().should('include.text', 'Countyshire')
+        page.addresses().address().should('include.text', 'CS1 1CS')
         page.addresses().address().should('include.text', 'England')
 
-        page.addresses().addressTypes().should('include.text', 'Home')
-        page.addresses().addressDates().should('include.text', 'From June 2024 to June 2099')
+        page.addresses().addressTypes().should('include.text', 'Reception')
+        page.addresses().addressDates().should('include.text', 'From January 2024')
 
         page.addresses().addressPhoneNumbers().should('include.text', 'Home')
-        page.addresses().addressPhoneNumbers().should('include.text', '012345678')
-        page.addresses().addressPhoneNumbers().should('include.text', 'Ext: 567')
+        page.addresses().addressPhoneNumbers().should('include.text', '0912 3456789')
+        page.addresses().addressPhoneNumbers().should('include.text', '0912 3456788')
+        page
+          .addresses()
+          .addressPhoneNumbers()
+          .invoke('text')
+          .should('match', /Ext(?:ension)?: 567/)
 
-        page.addresses().addressComments().should('include.text', 'Some comment')
+        page.addresses().addressComments().should('include.text', 'Example comment')
 
-        page.addresses().addressAddedDate().should('include.text', 'Added on 16 June 2024')
+        page.addresses().addressAddedDate().should('include.text', 'Added on 1 January 2024')
 
         page.addresses().addressesLink().should('include.text', 'View all addresses (1)')
         page
@@ -653,9 +666,10 @@ context('When signed in', () => {
       })
       cy.task('reset')
       cy.setupUserAuth()
-      // removing xrbs service access to force card to show
-      cy.setupComponentsData({ services: [] })
-      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      // The legacy counts remain in estates excluded from the XRBS rollout.
+      cy.setupComponentsData({ services: [], caseLoads: [{ ...componentsCaseLoadMock, caseLoadId: 'FYI' }] })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { prisonId: 'FYI' } })
+      cy.task('stubGetAllPrisons')
       cy.task('stubPersonalCareNeeds')
     })
 
@@ -663,6 +677,7 @@ context('When signed in', () => {
       // TODO: remove cy.setupUserAuth(…) once XRBS no longer relies on DPS app dev as a feature flag
       cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupComponentsData()
+      cy.task('stubPrisonerData', { prisonerNumber })
       visitPersonalDetailsPage()
       const page = Page.verifyOnPage(PersonalPage)
       page.security.card.should('contain.text', 'X-ray body scan information has moved')
@@ -851,15 +866,6 @@ context('When signed in', () => {
         .should('contain.text', 'This information is currently unavailable. Try again later.')
     })
 
-    it('Displays a page error banner and error message for addresses', () => {
-      const page = Page.verifyOnPage(PersonalPage)
-      page.apiErrorBanner().should('exist')
-      page
-        .addresses()
-        .apiErrorMessage()
-        .should('contain.text', 'This information is currently unavailable. Try again later.')
-    })
-
     it('Displays a page error banner and error message for global numbers and emails', () => {
       const page = Page.verifyOnPage(PersonalPage)
       page.apiErrorBanner().should('exist')
@@ -873,6 +879,26 @@ context('When signed in', () => {
       const page = Page.verifyOnPage(PersonalPage)
       page.apiErrorBanner().should('exist')
       cy.get('[data-qa=military-records-api-error]').should('exist')
+    })
+  })
+
+  context('Given API call to get addresses from Prison API fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData()
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+      cy.task('stubAddresses', { prisonerNumber, status: 500, resp: { error: 'Something went wrong' } })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays a page error banner and error message for addresses', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+      page.apiErrorBanner().should('exist')
+      page
+        .addresses()
+        .apiErrorMessage()
+        .should('contain.text', 'This information is currently unavailable. Try again later.')
     })
   })
 

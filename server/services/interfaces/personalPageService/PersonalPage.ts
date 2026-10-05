@@ -190,11 +190,16 @@ export interface GlobalNumbersAndEmails {
   emails: GlobalEmail[]
 }
 
-export interface AddressForDisplay extends AddressResponseDto {
-  addressPhoneNumbersForDisplay?: PhoneNumber[]
+export interface AddressForDisplay extends Omit<AddressResponseDto, 'personId'> {
+  addressPhoneNumbersForDisplay?: AddressPhoneNumberForDisplay[]
+}
+
+export interface AddressPhoneNumberForDisplay extends PhoneNumber {
+  createDatetime?: string
+  updatedOn?: string
 }
 
 export interface SummarisedAddresses {
-  primaryOrPostal: AddressResponseDto[]
+  primaryOrPostal: AddressForDisplay[]
   totalActive: number
 }

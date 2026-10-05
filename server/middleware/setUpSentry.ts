@@ -23,7 +23,7 @@ export function setUpSentry() {
         cookies: false,
         userInfo: false,
         urlQueryParams: { deny: ['user', 'username', 'prisoner', 'prisonerNumber'] },
-        httpHeaders: false,
+        httpHeaders: { request: false, response: false },
         httpBodies: [],
         databaseQueryData: false,
         genAI: { inputs: false, outputs: false },

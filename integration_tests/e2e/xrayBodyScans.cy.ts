@@ -12,6 +12,7 @@ const possessivePrisonerName = 'John Saunders’'
 context('X-ray body scans - Permissions', () => {
   const visitPage = prisonerDataOverrides => {
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
+    cy.setupComponentsData({ services: [] })
     cy.task('stubXRayBodyListScans', { prisonerNumber })
     cy.signIn({ failOnStatusCode: false, redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
   }
