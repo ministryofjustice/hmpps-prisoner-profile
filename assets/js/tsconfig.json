@@ -6,6 +6,7 @@
     "lib": ["dom", "dom.iterable", "es2022"],
     "strict": false,
     "esModuleInterop": true,
+    "useUnknownInCatchVariables": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "types": ["@ministryofjustice/frontend-types"]

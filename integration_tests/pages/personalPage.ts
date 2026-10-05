@@ -98,13 +98,13 @@ export default class PersonalPage extends Page {
     const summaryListValues = () => primaryAndPostalAddress().find('.govuk-summary-list__value')
     return {
       apiErrorMessage: () => cy.get('[data-qa=addresses-api-error]'),
-      addressHeading: () => primaryAndPostalAddress().get('span'),
-      address: () => primaryAndPostalAddress().get('p'),
+      addressHeading: () => primaryAndPostalAddress().children('h2, span.govuk-caption-m'),
+      address: () => primaryAndPostalAddress().children('p'),
       addressTypes: () => summaryListValues().eq(0),
       addressDates: () => summaryListValues().eq(1),
-      addressPhoneNumbers: () => summaryListValues().eq(2),
-      addressComments: () => summaryListValues().eq(3),
-      addressAddedDate: () => primaryAndPostalAddress().get('.hmpps-address__added-date'),
+      addressPhoneNumbers: () => primaryAndPostalAddress().find('.hmpps-address__phones__list'),
+      addressComments: () => summaryListValues().last(),
+      addressAddedDate: () => primaryAndPostalAddress().find('.hmpps-address__added-date'),
       addressesLink: () => cy.getDataQa('all-addresses-link'),
     }
   }

@@ -3,4 +3,6 @@ export default interface Telephone {
   number: string
   type: string
   ext?: string
+  createDatetime?: string
+  modifyDatetime?: string
 }

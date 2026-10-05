@@ -43,29 +43,88 @@ export default class AddressService {
       CorePersonRecordReferenceDataDomain.phoneTypes,
       token,
     )
-    return (
-      addresses
-        ?.map(address => {
-          const buildingNumber = this.getBuildingNumberForDisplay(address.buildingNumber, address.buildingName)?.trim()
-          const buildingName = this.getBuildingNameForDisplay(address.buildingNumber, address.buildingName)?.trim()
-          const buildingParts = !address.subBuildingName && buildingName?.split(',')
-          return {
-            ...address,
-            buildingNumber,
-            subBuildingName: address.subBuildingName || (buildingParts?.length > 1 ? buildingParts[0]?.trim() : null),
-            buildingName: buildingParts?.length > 1 ? buildingParts.slice(1)?.join(',')?.trim() : buildingName,
-            addressTypes: address.addressTypes.filter(type => type.active),
-            addressPhoneNumbersForDisplay: transformPhones(address.addressPhoneNumbers, phoneTypes),
-          } as AddressForDisplay
-        })
-        ?.filter(address => !address.toDate || new Date(address.toDate) > new Date())
-        .sort(a => (a.primaryAddress ? -1 : 1)) || []
+    return this.filterAndSortActiveAddresses(
+      addresses?.map(address => {
+        const buildingNumber = this.getBuildingNumberForDisplay(address.buildingNumber, address.buildingName)?.trim()
+        const buildingName = this.getBuildingNameForDisplay(address.buildingNumber, address.buildingName)?.trim()
+        const buildingParts = !address.subBuildingName && buildingName?.split(',')
+        const phoneNumbers = address.addressPhoneNumbers ?? []
+        return {
+          ...address,
+          buildingNumber,
+          subBuildingName: address.subBuildingName || (buildingParts?.length > 1 ? buildingParts[0]?.trim() : null),
+          buildingName: buildingParts?.length > 1 ? buildingParts.slice(1)?.join(',')?.trim() : buildingName,
+          addressTypes: address.addressTypes.filter(type => type.active),
+          addressPhoneNumbersForDisplay: transformPhones(phoneNumbers, phoneTypes),
+        } as AddressForDisplay
+      }) ?? [],
     )
   }
 
   async getAddressesForDisplay(token: string, prisonerNumber: string): Promise<AddressForDisplay[]> {
-    const addresses = await this.getAddresses(token, prisonerNumber)
-    return this.transformAddresses(token, addresses)
+    const addresses = await this.getAddressesFromPrisonAPI(token, prisonerNumber)
+    const phoneTypes = await this.referenceDataService.getActiveReferenceDataCodes(
+      CorePersonRecordReferenceDataDomain.phoneTypes,
+      token,
+    )
+
+    return this.filterAndSortActiveAddresses(
+      addresses?.map(address => {
+        const buildingNumber = this.getBuildingNumberForDisplay(undefined, address.premise)?.trim()
+        const buildingName = this.getBuildingNameForDisplay(undefined, address.premise)?.trim()
+        const buildingParts = !address.flat && buildingName?.split(',')
+        const addressPhoneNumbersForDisplay = (address.phones ?? []).map(phone => {
+          const { createDatetime, modifyDatetime } = phone
+          return {
+            id: phone.phoneId,
+            type: phone.type,
+            typeDescription: phoneTypes?.find(type => type.code === phone.type)?.description,
+            number: phone.number,
+            extension: phone.ext,
+            createDatetime: createDatetime ?? '',
+            updatedOn:
+              modifyDatetime && (!createDatetime || new Date(modifyDatetime) > new Date(createDatetime))
+                ? modifyDatetime
+                : createDatetime,
+          }
+        })
+
+        return {
+          addressId: address.addressId,
+          noFixedAbode: address.noFixedAddress,
+          buildingNumber,
+          subBuildingName: address.flat || (buildingParts?.length > 1 ? buildingParts[0]?.trim() : null),
+          buildingName: buildingParts?.length > 1 ? buildingParts.slice(1)?.join(',')?.trim() : buildingName,
+          thoroughfareName: address.street,
+          dependantLocality: address.locality,
+          postTown: address.town ? { description: address.town } : undefined,
+          county: address.county ? { description: address.county } : undefined,
+          country: address.country ? { description: address.country } : undefined,
+          postCode: address.postalCode,
+          fromDate: address.startDate ?? '',
+          toDate: address.endDate,
+          addressTypes: (address.addressUsages ?? [])
+            .filter(usage => usage.activeFlag)
+            .map(usage => ({
+              addressUsageType: {
+                code: usage.addressUsage,
+                description: usage.addressUsageDescription,
+              },
+              active: usage.activeFlag,
+            })),
+          postalAddress: address.mail,
+          primaryAddress: address.primary,
+          comment: address.comment,
+          addressPhoneNumbersForDisplay,
+        } as AddressForDisplay
+      }) ?? [],
+    )
+  }
+
+  private filterAndSortActiveAddresses(addresses: AddressForDisplay[]): AddressForDisplay[] {
+    return addresses
+      .filter(address => !address.toDate || new Date(address.toDate) > new Date())
+      .sort(address => (address.primaryAddress ? -1 : 1))
   }
 
   private getBuildingNumberForDisplay(buildingNumber: string, buildingName: string) {

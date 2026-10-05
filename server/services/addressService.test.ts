@@ -89,20 +89,85 @@ describe('addressService', () => {
   })
 
   describe('getAddressesForDisplay', () => {
+    it('gets addresses from the prison API', async () => {
+      prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
+
+      await addressService.getAddressesForDisplay('token', 'A1234AA')
+
+      expect(prisonApiClient.getAddresses).toHaveBeenCalledWith('A1234AA')
+      expect(personIntegrationApiClient.getAddresses).not.toHaveBeenCalled()
+    })
+
     it('Handles the API returning 404 for addresses', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async (): Promise<AddressResponseDto[]> => null)
+      prisonApiClient.getAddresses = jest.fn(async () => null as typeof mockAddresses | null)
 
       const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
       expect(addresses).toEqual([])
     })
 
     it('Filters out expired addresses', async () => {
-      personIntegrationApiClient.getAddresses = jest.fn(async () => [
-        { ...mockAddressResponseDto, toDate: formatDateISO(subDays(new Date(), 1)) },
+      prisonApiClient.getAddresses = jest.fn(async () => [
+        { ...mockAddresses[0], endDate: formatDateISO(subDays(new Date(), 1)) },
       ])
 
       const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
       expect(addresses).toEqual([])
+    })
+
+    it('maps Prison API addresses and phone numbers for display', async () => {
+      const address = { ...mockAddresses[0], phones: [mockAddresses[0].phones[0]] }
+      prisonApiClient.getAddresses = jest.fn(async () => [address])
+      referenceDataService.getActiveReferenceDataCodes = jest
+        .fn()
+        .mockResolvedValue([{ code: 'VISIT', description: 'Visit' } as ReferenceDataCodeDto])
+
+      const [displayAddress] = await addressService.getAddressesForDisplay('token', 'A1234AA')
+
+      expect(displayAddress).toEqual(
+        expect.objectContaining({
+          addressId: address.addressId,
+          subBuildingName: '7',
+          buildingName: 'premises address',
+          thoroughfareName: 'street field',
+          dependantLocality: 'locality field',
+          postTown: { description: 'Leeds' },
+          county: { description: 'West Yorkshire' },
+          country: { description: 'England' },
+          postCode: 'LS1 AAA',
+          comment: address.comment,
+          addressTypes: expect.arrayContaining([
+            expect.objectContaining({
+              addressUsageType: { code: 'DPH', description: 'Discharge - Permanent Housing' },
+            }),
+          ]),
+          addressPhoneNumbersForDisplay: [
+            expect.objectContaining({
+              id: 1324254,
+              typeDescription: 'Visit',
+              number: '4444555566',
+            }),
+          ],
+        }),
+      )
+    })
+
+    it.each([
+      ['2023-07-19T10:00:00', '2023-07-20T11:00:00', '2023-07-20T11:00:00'],
+      ['2023-07-19T10:00:00', undefined, '2023-07-19T10:00:00'],
+      ['2023-07-20T11:00:00', '2023-07-19T10:00:00', '2023-07-20T11:00:00'],
+      ['2023-07-19T10:00:00', '2023-07-19T10:00:00', '2023-07-19T10:00:00'],
+      [undefined, undefined, undefined],
+    ])('uses the latest Prison API audit date (%s, %s)', async (createDatetime, modifyDatetime, updatedOn) => {
+      prisonApiClient.getAddresses = jest.fn(async () => [
+        {
+          ...mockAddresses[0],
+          phones: [{ ...mockAddresses[0].phones[0], createDatetime, modifyDatetime }],
+        },
+      ])
+
+      const [result] = await addressService.getAddressesForDisplay('token', 'A1234AA')
+
+      expect(result.addressPhoneNumbersForDisplay[0]).toEqual(expect.objectContaining({ updatedOn }))
     })
 
     it.each([
@@ -163,18 +228,45 @@ describe('addressService', () => {
         addressOverride: Partial<AddressResponseDto>,
         addressForDisplay: Partial<AddressForDisplay>,
       ) => {
-        personIntegrationApiClient.getAddresses = jest.fn(async () => [
-          { ...mockAddressResponseDto, ...addressOverride } as AddressResponseDto,
-        ])
-
         referenceDataService.getActiveReferenceDataCodes = jest
           .fn()
           .mockResolvedValue([{ code: 'HOME', description: 'Home' }])
 
-        const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
+        const addresses = await addressService.transformAddresses('token', [
+          { ...mockAddressResponseDto, ...addressOverride } as AddressResponseDto,
+        ])
         expect(addresses).toEqual([expect.objectContaining(addressForDisplay)])
       },
     )
+
+    it.each([{ addressPhoneNumbers: [] }, { addressPhoneNumbers: undefined }, { addressPhoneNumbers: null }])(
+      'handles missing address phone numbers ($addressPhoneNumbers)',
+      async ({ addressPhoneNumbers }) => {
+        const [result] = await addressService.transformAddresses(clientToken, [
+          {
+            ...mockAddressResponseDto,
+            addressPhoneNumbers,
+          },
+        ])
+
+        expect(result.addressPhoneNumbersForDisplay).toEqual([])
+      },
+    )
+
+    it('preserves the API phone order for the legacy display without mutating the response', async () => {
+      const address: AddressResponseDto = {
+        ...mockAddressResponseDto,
+        addressPhoneNumbers: [
+          { ...mockAddressResponseDto.addressPhoneNumbers[0], contactId: 1 },
+          { ...mockAddressResponseDto.addressPhoneNumbers[0], contactId: 2 },
+        ],
+      }
+      const originalAddress = structuredClone(address)
+      const [result] = await addressService.transformAddresses(clientToken, [address])
+
+      expect(result.addressPhoneNumbersForDisplay.map(phone => phone.id)).toEqual([1, 2])
+      expect(address).toEqual(originalAddress)
+    })
   })
 
   describe('getCityCode', () => {
