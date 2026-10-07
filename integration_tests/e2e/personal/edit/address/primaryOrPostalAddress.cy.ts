@@ -9,6 +9,7 @@ import NotFoundPage from '../../../../pages/notFoundPage'
 import PrimaryOrPostalAddressPage from '../../../../pages/editPages/address/primaryOrPostalAddressPage'
 import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mockAddressResponseDto } from '../../../../../server/data/localMockData/personIntegrationApi/addresses'
+import { mockAddresses } from '../../../../../server/data/localMockData/addresses'
 
 context('Primary or Postal Address Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -129,6 +130,30 @@ context('Primary or Postal Address Page', () => {
       page.flashMessage().should('include.text', 'Address updated')
 
       // ...and put the entry back again for other tests
+      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+    })
+
+    it('can save an address and add a phone number', () => {
+      const { addressId } = mockAddresses[0]
+      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+      cy.task('stubCreateAddress', { prisonerNumber, response: { addressId } })
+      cy.task('stubAddAddressPhoneNumbers', { prisonerNumber, addressId })
+
+      page.checkBox('primary').click()
+      cy.getDataQa('add-address-phone-number-button').click()
+
+      cy.location('pathname').should(
+        'eq',
+        `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`,
+      )
+      cy.get('.hmpps-flash-message').should('contain.text', 'Address updated')
+      cy.get('.govuk-inset-text').should('contain.text', 'Leeds')
+      cy.get('input[name="phoneNumberType"][value="MOB"]').check()
+      cy.get('input[name="phoneNumber"]').type('01234567890')
+      cy.get('[data-qa="save-address-phone-numbers"]').click()
+
+      cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
+      cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
       cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
     })
   })

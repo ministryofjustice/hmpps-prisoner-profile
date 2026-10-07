@@ -293,10 +293,10 @@ export default {
       body: response,
     }),
 
-  stubCreateAddress: ({ prisonerNumber }: { prisonerNumber: string }) =>
+  stubCreateAddress: ({ prisonerNumber, response = {} }: { prisonerNumber: string; response?: object }) =>
     stubPostWithResponse({
       path: `${baseUrl}/v2/person/${prisonerNumber}/addresses`,
-      responseBody: {},
+      responseBody: response,
     }),
 
   stubPersonIntegrationGetContacts: ({ prisonerNumber }: { prisonerNumber: string }) =>
