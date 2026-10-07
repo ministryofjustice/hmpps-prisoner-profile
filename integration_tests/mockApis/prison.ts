@@ -256,14 +256,22 @@ export default {
     })
   },
 
-  stubAddresses: ({ prisonerNumber, resp = mockAddresses }: { prisonerNumber: string; resp: unknown }) => {
+  stubAddresses: ({
+    prisonerNumber,
+    resp = mockAddresses,
+    status = 200,
+  }: {
+    prisonerNumber: string
+    resp?: unknown
+    status?: number
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
         urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses`,
       },
       response: {
-        status: 200,
+        status,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },

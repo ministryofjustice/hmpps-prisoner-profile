@@ -748,6 +748,19 @@ describe('PersonalPageService', () => {
   })
 
   describe('Addresses', () => {
+    it('loads addresses from Prison API when person endpoints are enabled', async () => {
+      addressService.getAddressesForDisplay = jest.fn().mockResolvedValue([mockAddressResponseDto])
+      personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () => PrisonerProfileSummaryMock)
+
+      await constructService().get('token', PrisonerMockDataA, {
+        editProfileEnabled: true,
+        personEndpointsEnabled: true,
+      })
+
+      expect(addressService.getAddressesForDisplay).toHaveBeenCalledWith('token', PrisonerMockDataA.prisonerNumber)
+      expect(addressService.transformAddresses).not.toHaveBeenCalled()
+    })
+
     it('Provides primary or postal addresses and a total count', async () => {
       addressService.getAddressesForDisplay = jest
         .fn()

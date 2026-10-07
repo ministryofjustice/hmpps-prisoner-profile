@@ -4,6 +4,7 @@ import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import {
   changeContactDetailsLinkEnabled,
+  editAddressSpecificPhoneNumbersEnabled,
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
@@ -73,6 +74,7 @@ export default class PersonalController {
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled,
         displayNewAddressesCard: editEnabled,
+        editAddressSpecificPhoneNumbersEnabled: editAddressSpecificPhoneNumbersEnabled(activeCaseLoadId),
         editReligionEnabled: editEnabled || editReligionEnabled(),
         personalRelationshipsApiReadEnabled,
         hasPersonalId,

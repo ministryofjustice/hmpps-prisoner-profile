@@ -3,6 +3,16 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
+
+{% macro addressHeading(text) %}
+  {% if editAddressSpecificPhoneNumbersEnabled %}
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">{{ text }}</h2>
+  {% else %}
+    <span class="govuk-caption-m govuk-!-margin-bottom-2">{{ text }}</span>
+  {% endif %}
+{% endmacro %}
+
 {% macro addressSummary(address, primaryOrPostal) %}
   <div class="hmpps-address" id="hmpps-address-{{ primaryOrPostal }}">
     {{ caller() }}
@@ -30,10 +40,12 @@
       From {{ address.fromDate | formatAddressDate }}{% if address.toDate %} to {{ address.toDate | formatAddressDate }}{% endif %}
     {% endset %}
 
+    {% set addressPhoneNumbers = address.addressPhoneNumbersForDisplay or [] %}
+
     {% set addressPhoneNumbersHtml %}
-      {% if address.addressPhoneNumbersForDisplay.length > 0 %}
+      {% if addressPhoneNumbers.length > 0 %}
         <div class="hmpps-address__phones__list">
-          {% for number in address.addressPhoneNumbersForDisplay %}
+          {% for number in addressPhoneNumbers %}
             <div class="hmpps-address__phone">
               <div class="hmpps-address__phone__details">
                 <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
@@ -55,17 +67,17 @@
         {{ govukSummaryList({
           rows: [
             {
-              key: { text: "Type" },
+              key: { text: "Address type" if editAddressSpecificPhoneNumbersEnabled else "Type" },
               value: { html: addressUsageTypesHtml }
             },
             {
-              key: { text: "Dates" },
+              key: { text: "Address dates" if editAddressSpecificPhoneNumbersEnabled else "Dates" },
               value: { text: addressDatesText }
             },
             {
               key: { text: "Address phone numbers" },
               value: { html: addressPhoneNumbersHtml }
-            },
+            } if not editAddressSpecificPhoneNumbersEnabled,
             {
               key: { text: "Comments" },
               value: { text: address.comment or "Not entered" }
@@ -82,6 +94,47 @@
     }) }}
 
     <p class="hmpps-address__added-date govuk-body-s">Added on {{ address.fromDate | formatDate }}</p>
+
+    {% if editAddressSpecificPhoneNumbersEnabled %}
+      <div class="govuk-!-margin-bottom-0" data-qa="address-phone-numbers">
+        <div class="hmpps-address__phones__header">
+          <h2 class="govuk-heading-m">Phone numbers</h2>
+          {% if canEditAddressPhoneNumbers %}
+            <p class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses/{{ address.addressId }}/add-address-phone-number">Add a new phone number</a>
+            </p>
+          {% endif %}
+        </div>
+        {% if addressPhoneNumbers.length > 0 %}
+          <div class="hmpps-address__phones__list">
+            {% for number in addressPhoneNumbers | sort(true, false, 'createDatetime') %}
+              <div class="hmpps-address__phone">
+                <div class="hmpps-address__phone__details">
+                  <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
+                  <p class="govuk-body govuk-!-margin-0">{{ number.number }}</p>
+                  {% if number.extension %}
+                    <p class="govuk-body govuk-!-margin-0">Extension: {{ number.extension }}</p>
+                  {% endif %}
+                  {% if number.updatedOn %}
+                    <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-3">Updated on {{ number.updatedOn | formatDate }}</p>
+                  {% endif %}
+                </div>
+                {% if canEditAddressPhoneNumbers %}
+                  <div class="govuk-body">
+                    <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses/{{ address.addressId }}/change-address-phone-number/{{ number.id }}">
+                      Change <span class="govuk-visually-hidden">{{ number.typeDescription }} number {{ number.number }}{% if number.extension %} extension {{ number.extension }}{% endif %}</span>
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="govuk-body">Not entered</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
     <hr class="hmpps-address__break govuk-section-break govuk-section-break--visible" aria-hidden="true">
   </div>
 {% endmacro %}
@@ -99,15 +152,15 @@
           {% for address in addresses.value.primaryOrPostal %}
             {% if address.primaryAddress and address.postalAddress %}
               {% call addressSummary(address, 'primary-and-postal') %}
-                <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary and postal address</span>
+                {{ addressHeading('Primary and postal address') }}
               {% endcall %}
             {% elseif address.primaryAddress %}
               {% call addressSummary(address, 'primary') %}
-                <span class="govuk-caption-m govuk-!-margin-bottom-2">Primary address</span>
+                {{ addressHeading('Primary address') }}
               {% endcall %}
             {% elseif address.postalAddress %}
               {% call addressSummary(address, 'postal') %}
-                <span class="govuk-caption-m govuk-!-margin-bottom-2">Postal address</span>
+                {{ addressHeading('Postal address') }}
               {% endcall %}
             {% endif %}
           {% endfor %}

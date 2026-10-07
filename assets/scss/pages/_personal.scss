@@ -488,6 +488,10 @@
         padding-bottom: 0;
       }
     }
+
+    & > div:not(:last-child) .hmpps-address__updated-date {
+      margin-bottom: govuk-spacing(1);
+    }
   }
 
   &__phone {
@@ -495,7 +499,22 @@
     justify-content: space-between;
   }
 
-  &__added-date {
+  &__phones__header {
+    > h2,
+    > p {
+      margin-bottom: govuk-spacing(2);
+    }
+
+    @include govuk-media-query($from: tablet) {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 15px;
+    }
+  }
+
+  &__added-date,
+  &__updated-date {
     color: govuk-functional-colour(secondary-text);
   }
 
