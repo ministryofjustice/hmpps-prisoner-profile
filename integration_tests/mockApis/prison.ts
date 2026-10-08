@@ -280,6 +280,21 @@ export default {
     })
   },
 
+  stubAddAddressPhoneNumbers: ({ prisonerNumber, addressId }: { prisonerNumber: string; addressId: number }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [],
+      },
+    }),
+
   stubOffenderContacts: (prisonerNumber: string) => {
     return stubFor({
       request: {

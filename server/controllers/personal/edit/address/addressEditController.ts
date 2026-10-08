@@ -14,6 +14,7 @@ import { displayManualEditAddressHandler, submitManualEditAddressHandler } from 
 import { displayConfirmAddressHandler } from '../../../handlers/confirmAddress'
 import { displayFindUkAddressHandler, submitFindUkAddressHandler } from '../../../handlers/findUkAddress'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
+import { editAddressSpecificPhoneNumbersEnabled } from '../../../../utils/featureFlags'
 
 export default class AddressEditController {
   constructor(
@@ -128,6 +129,7 @@ export default class AddressEditController {
         backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
         breadcrumbPrisonerName: prisonerName,
         miniBannerData,
+        addPhoneNumberEnabled: editAddressSpecificPhoneNumbersEnabled((res.locals.user as PrisonUser).activeCaseLoadId),
       })
     }
   }
@@ -158,7 +160,12 @@ export default class AddressEditController {
       })
 
       try {
-        await this.addressService.createAddress(clientToken, prisonerNumber, address, res.locals.user as PrisonUser)
+        const createdAddress = await this.addressService.createAddress(
+          clientToken,
+          prisonerNumber,
+          address,
+          res.locals.user as PrisonUser,
+        )
         await this.ephemeralDataService.removeData(addressCacheId as UUID)
 
         req.flash('flashMessage', {
@@ -175,6 +182,15 @@ export default class AddressEditController {
             details: { address },
           })
           .catch(error => logger.error(error))
+
+        if (
+          req.body.submitAction === 'saveAndContinueToAddPhoneNumber' &&
+          editAddressSpecificPhoneNumbersEnabled((res.locals.user as PrisonUser).activeCaseLoadId)
+        ) {
+          return res.redirect(
+            `/prisoner/${prisonerNumber}/addresses/${createdAddress.addressId}/add-address-phone-number`,
+          )
+        }
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
       } catch {

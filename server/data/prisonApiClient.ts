@@ -42,7 +42,7 @@ import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces
 import Details from './interfaces/prisonApi/Details'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
-import Telephone from './interfaces/prisonApi/Telephone'
+import Telephone, { AddressPhoneNumberCreateRequest } from './interfaces/prisonApi/Telephone'
 import Belief from './interfaces/prisonApi/Belief'
 import Reception from './interfaces/prisonApi/Reception'
 import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
@@ -194,6 +194,20 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
   // NB: This can return 404 for released prisoners
   async getAddresses(prisonerNumber: string): Promise<Address[] | null> {
     return this.getAndIgnore404({ path: `/api/offenders/${prisonerNumber}/addresses` })
+  }
+
+  async addAddressPhoneNumbers(
+    prisonerNumber: string,
+    addressId: number,
+    phoneNumbers: AddressPhoneNumberCreateRequest[],
+  ): Promise<Telephone[]> {
+    return this.post(
+      {
+        path: `/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers`,
+        data: phoneNumbers,
+      },
+      this.token,
+    )
   }
 
   async getAddressesForPerson(personId: number): Promise<Address[]> {

@@ -104,11 +104,20 @@
     }) }}
     <div class="govuk-button-group">
       {{ govukButton({
-        text: "Save",
+        text: "Save and return to profile" if addPhoneNumberEnabled else "Save",
         type: "submit",
         preventDoubleClick: true,
         attributes: { "data-qa": "submit-button" }
       }) }}
+      {% if addPhoneNumberEnabled %}
+        {{ govukButton({
+          text: "Save and continue to add a phone number",
+          type: "submit",
+          classes: "govuk-button--secondary",
+          preventDoubleClick: true,
+          attributes: { name: "submitAction", value: "saveAndContinueToAddPhoneNumber", "data-qa": "add-address-phone-number-button" }
+        }) }}
+      {% endif %}
       <a
         href="/prisoner/{{ prisonerNumber }}/personal#addresses"
         class="govuk-link govuk-link--no-visited-state"
