@@ -4,6 +4,21 @@ const phoneNumberInvalidCharacterChecker = /[^\d() ]/
 const phoneExtensionInvalidCharacterChecker = /[^\d]/
 
 export const phoneNumberValidator = (body: Record<string, string>): HmppsError[] => {
+  const indexes = Object.keys(body)
+    .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
+    .filter((index): index is string => index !== undefined)
+    .map(Number)
+
+  if (indexes.length) {
+    return Array.from({ length: Math.max(...indexes) + 1 }, (_, index) =>
+      phoneNumberValidator({
+        phoneNumberType: body[`phoneNumberType${index}`] ?? '',
+        phoneNumber: body[`phoneNumber${index}`] ?? '',
+        phoneExtension: body[`phoneExtension${index}`] ?? '',
+      }).map(error => (error.href ? { ...error, href: `${error.href}-${index}` } : error)),
+    ).flat()
+  }
+
   const { phoneNumberType, phoneNumber, phoneExtension } = body
   const errors: HmppsError[] = []
 

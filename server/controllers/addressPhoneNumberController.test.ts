@@ -8,7 +8,7 @@ import AddressService from '../services/addressService'
 import AddressPhoneNumberController from './addressPhoneNumberController'
 
 describe('AddressPhoneNumberController', () => {
-  it('submits a phone number and returns to the personal page', async () => {
+  it('submits all phone numbers and returns to the personal page', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.addAddressPhoneNumbers = jest
       .fn()
@@ -24,9 +24,12 @@ describe('AddressPhoneNumberController', () => {
       params: { addressId: '5622837' },
       query: {},
       body: {
-        phoneNumberType: 'MOB',
-        phoneNumber: '01234567890',
-        phoneExtension: '123',
+        phoneNumberType0: 'MOB',
+        phoneNumber0: '01234567890',
+        phoneExtension0: '123',
+        phoneNumberType1: 'HOME',
+        phoneNumber1: '01234567891',
+        phoneExtension1: '',
       },
       flash: jest.fn(),
     } as unknown as Request
@@ -41,7 +44,10 @@ describe('AddressPhoneNumberController', () => {
       'CLIENT_TOKEN',
       PrisonerMockDataA.prisonerNumber,
       5622837,
-      [{ phoneNumber: '01234567890', phoneNumberType: 'MOB', extension: '123' }],
+      [
+        { phoneNumber: '01234567890', phoneNumberType: 'MOB', extension: '123' },
+        { phoneNumber: '01234567891', phoneNumberType: 'HOME', extension: undefined },
+      ],
     )
     expect(req.flash).toHaveBeenCalledWith('flashMessage', {
       text: 'Address phone number updated',
