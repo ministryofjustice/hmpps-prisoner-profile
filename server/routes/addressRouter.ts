@@ -45,7 +45,10 @@ export default function addressRouter(services: Services): Router {
     `${basePath}/addresses/:addressId/add-address-phone-number`,
     auditPageAccessAttempt({ services, page: Page.AddAddressPhoneNumber }),
     ...addressPhoneNumberMiddleware,
-    validationMiddleware([phoneNumberValidator], { redirectBackOnError: true }),
+    (req, res, next) => {
+      if (req.query.removePhoneNumber !== undefined) return next()
+      return validationMiddleware([phoneNumberValidator], { redirectBackOnError: true })(req, res, next)
+    },
     addressPhoneNumberController.submit(),
   )
 

@@ -19,44 +19,63 @@
   {{ govukInsetText({ html: addressHtml }) }}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    {%
-      call govukFieldset({
-        legend: {
-          text: "Phone number type",
+    {% for phoneNumber in phoneNumbers %}
+      {% if phoneNumbers.length > 1 %}
+        <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ phoneNumbers.length }}</h2>
+      {% endif %}
+      {%
+        call govukFieldset({
+          legend: {
+            text: "Phone number type",
             classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold",
-          isPageHeading: false
-        }
-      })
-    %}
-      {{
-        govukRadios({
-          name: "phoneNumberType",
-          id: "phone-number-type",
-          items: phoneNumber.phoneTypeOptions,
-          errorMessage: { text: (errors | findError("phone-number-type")).text } if errors | findError("phone-number-type")
+            isPageHeading: false
+          }
         })
-      }}
-      {{
-        govukInput({
-          label: { text: "Phone number", classes: "govuk-!-font-weight-bold" },
-          id: "phone-number",
-          name: "phoneNumber",
-          classes: "govuk-input--width-20",
-          value: phoneNumber.phoneNumber,
-          errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
-        })
-      }}
-      {{
-        govukInput({
-          label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
-          id: "phone-extension",
-          name: "phoneExtension",
-          classes: "govuk-input--width-5",
-          value: phoneNumber.phoneExtension,
-          errorMessage: { text: (errors | findError("phone-extension")).text } if errors | findError("phone-extension")
-        })
-      }}
-    {% endcall %}
+      %}
+        {{
+          govukRadios({
+            name: "phoneNumberType" + phoneNumber.index,
+            id: "phone-number-type-" + phoneNumber.index,
+            items: phoneNumber.phoneTypeOptions,
+            errorMessage: { text: (errors | findError("phone-number-type-" + phoneNumber.index)).text } if errors | findError("phone-number-type-" + phoneNumber.index)
+          })
+        }}
+        {{
+          govukInput({
+            label: { text: "Phone number", classes: "govuk-!-font-weight-bold" },
+            id: "phone-number-" + phoneNumber.index,
+            name: "phoneNumber" + phoneNumber.index,
+            classes: "govuk-input--width-20",
+            value: phoneNumber.phoneNumber,
+            errorMessage: { text: (errors | findError("phone-number-" + phoneNumber.index)).text } if errors | findError("phone-number-" + phoneNumber.index)
+          })
+        }}
+        {{
+          govukInput({
+            label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
+            id: "phone-extension-" + phoneNumber.index,
+            name: "phoneExtension" + phoneNumber.index,
+            classes: "govuk-input--width-5",
+            value: phoneNumber.phoneExtension,
+            errorMessage: { text: (errors | findError("phone-extension-" + phoneNumber.index)).text } if errors | findError("phone-extension-" + phoneNumber.index)
+          })
+        }}
+      {% endcall %}
+      {% if phoneNumbers.length > 1 %}
+        {{
+          govukButton({
+            text: "Remove phone number " + loop.index,
+            type: "submit",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+            attributes: {
+              formaction: "?removePhoneNumber=" + phoneNumber.index,
+              "data-qa": "remove-address-phone-number-" + phoneNumber.index
+            }
+          })
+        }}
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
+      {% endif %}
+    {% endfor %}
     <div class="govuk-button-group">
       {{
         govukButton({
@@ -64,6 +83,16 @@
           type: "submit",
           preventDoubleClick: true,
           attributes: { "data-qa": "save-address-phone-numbers" }
+        })
+      }}
+      {{
+        govukButton({
+          text: "Add another phone number",
+          id: "submit-and-add-another",
+          type: "submit",
+          classes: "govuk-button--secondary hmpps-button__add-another",
+          preventDoubleClick: true,
+          attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
         })
       }}
       <a

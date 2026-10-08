@@ -17,6 +17,21 @@ const phoneNumberTypes = [
   { text: 'Fax', value: 'FAX' },
 ]
 
+const addressPhoneNumberFormValues = (body: Record<string, unknown>) => {
+  const value = (key: string): string => (typeof body[key] === 'string' ? body[key] : '')
+  const indexes = Object.keys(body)
+    .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
+    .filter((index): index is string => index !== undefined)
+    .map(Number)
+  const lastIndex = Math.max(0, ...indexes)
+
+  return Array.from({ length: lastIndex + 1 }, (_, index) => ({
+    phoneNumberType: value(`phoneNumberType${index}`),
+    phoneNumber: value(`phoneNumber${index}`),
+    phoneExtension: value(`phoneExtension${index}`),
+  }))
+}
+
 export default class AddressPhoneNumberController {
   constructor(
     private readonly addressService: AddressService,
@@ -33,12 +48,8 @@ export default class AddressPhoneNumberController {
 
       if (!address) throw new NotFoundError('Could not find address')
 
-      const formValues = requestBodyFromFlash<Record<string, string>>(req)
-      const phoneNumber = {
-        phoneNumberType: formValues?.phoneNumberType ?? '',
-        phoneNumber: formValues?.phoneNumber ?? '',
-        phoneExtension: formValues?.phoneExtension ?? '',
-      }
+      const formValues = requestBodyFromFlash<Record<string, unknown>>(req)
+      const phoneNumbers = addressPhoneNumberFormValues(formValues ?? {})
       const errors = req.flash('errors')
 
       await this.auditService.sendPageView({
@@ -64,13 +75,14 @@ export default class AddressPhoneNumberController {
             country: address.country,
           }),
         ],
-        phoneNumber: {
+        phoneNumbers: phoneNumbers.map((phoneNumber, index) => ({
           ...phoneNumber,
+          index,
           phoneTypeOptions: phoneNumberTypes.map(option => ({
             ...option,
             checked: phoneNumber.phoneNumberType === option.value,
           })),
-        },
+        })),
         errors,
         prisonerNumber,
         miniBannerData,
@@ -82,13 +94,38 @@ export default class AddressPhoneNumberController {
     return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const addressId = Number(req.params.addressId)
-      const phoneNumberRequests = [
-        {
-          phoneNumber: req.body.phoneNumber,
-          phoneNumberType: req.body.phoneNumberType,
-          extension: req.body.phoneExtension || undefined,
-        },
-      ]
+      const phoneNumbers = addressPhoneNumberFormValues(req.body)
+
+      if (req.query.removePhoneNumber !== undefined) {
+        const removedIndex = Number(req.query.removePhoneNumber)
+        const requestBody = Object.fromEntries(
+          phoneNumbers
+            .filter((_, index) => index !== removedIndex)
+            .flatMap((phoneNumber, index) => [
+              [`phoneNumberType${index}`, phoneNumber.phoneNumberType] as const,
+              [`phoneNumber${index}`, phoneNumber.phoneNumber] as const,
+              [`phoneExtension${index}`, phoneNumber.phoneExtension] as const,
+            ]),
+        )
+        req.flash('requestBody', JSON.stringify(requestBody))
+        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+      }
+
+      if (req.query.addAnother === 'true') {
+        const requestBody = { ...req.body }
+        const nextIndex = phoneNumbers.length
+        requestBody[`phoneNumberType${nextIndex}`] = ''
+        requestBody[`phoneNumber${nextIndex}`] = ''
+        requestBody[`phoneExtension${nextIndex}`] = ''
+        req.flash('requestBody', JSON.stringify(requestBody))
+        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+      }
+
+      const phoneNumberRequests = phoneNumbers.map(({ phoneNumber, phoneNumberType, phoneExtension }) => ({
+        phoneNumber,
+        phoneNumberType,
+        extension: phoneExtension || undefined,
+      }))
 
       try {
         const createdPhoneNumbers = await this.addressService.addAddressPhoneNumbers(
