@@ -674,8 +674,6 @@ context('When signed in', () => {
     })
 
     it('Says that x-ray body scans have moved to the overview page when feature flag is on', () => {
-      // TODO: remove cy.setupUserAuth(…) once XRBS no longer relies on DPS app dev as a feature flag
-      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DpsApplicationDeveloper] })
       cy.setupComponentsData()
       cy.task('stubPrisonerData', { prisonerNumber })
       visitPersonalDetailsPage()
