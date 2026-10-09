@@ -55,6 +55,8 @@ jobs:
           - integration-test-1
           - integration-test-2
           - integration-test-3
+          - integration-test-4
+          - integration-test-5
     name: node integration tests
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/node_integration_tests.yml@v2 # WORKFLOW_VERSION
     needs: [node_build]
