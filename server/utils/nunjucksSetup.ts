@@ -75,6 +75,7 @@ import logger from '../../logger'
 import { ApplicationInfo } from '../applicationInfo'
 import filterArrayOnPropertyFilter from './filterArrayOnPropertyFilter'
 import generateContactChangeLink from '../views/dataUtils/generateContactChangeLink'
+import propertySummaryToMiniSummary from '../views/dataUtils/propertySummaryToMiniSummary'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
@@ -213,6 +214,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatAddressDate', formatAddressDate)
   njkEnv.addFilter('toMoneyMiniSummary', moneySummaryToMiniSummary)
   njkEnv.addFilter('toAdjudicationsMiniSummary', adjudicationsSummaryToMiniSummary)
+  njkEnv.addFilter('toPropertyMiniSummary', propertySummaryToMiniSummary)
   njkEnv.addFilter('toNonAssociationMiniSummary', nonAssociationSummaryToMiniSummary)
   njkEnv.addFilter('toVisitsMiniSummary', visitsSummaryToMiniSummary)
   njkEnv.addFilter('toCsraMiniSummary', csraSummaryToMiniSummary)

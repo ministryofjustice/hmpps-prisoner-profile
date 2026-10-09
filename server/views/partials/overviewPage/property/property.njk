@@ -1,0 +1,5 @@
+{% if propertySummary and isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions) %}
+  <div class="govuk-grid-column-one-third">
+    {{ miniCard(propertySummary | toPropertyMiniSummary(prisonerNumber), 'mini-card--property', propertySummary.status != 'fulfilled') }}
+  </div>
+{% endif %}

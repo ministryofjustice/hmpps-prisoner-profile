@@ -6,9 +6,11 @@ import {
   PrisonerIncentivesPermission,
   PrisonerMoneyPermission,
   PrisonerPermissions,
+  PrisonerPropertyPermission,
   PrisonerVisitsAndVisitorsPermission,
   XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import config from '../config'
 import type { HmppsUser } from '../interfaces/HmppsUser'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -71,6 +73,8 @@ import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
 import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
 import OverviewController from './overviewController'
+import PrisonerPropertyService from '../services/prisonerPropertyService'
+import { prisonerPropertyServiceMock } from '../../tests/mocks/prisonerPropertyServiceMock'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/xRayBodyScansAvailabilityService')
@@ -139,6 +143,7 @@ describe('overviewController', () => {
   let csipService: CsipService
   let contactsService: ContactsService
   let prisonService: PrisonService
+  let prisonerPropertyService: PrisonerPropertyService
   const mockedXrbsAvailabilityService = jest.mocked(new XRayBodyScansAvailabilityService({} as never))
   mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
   const xrbsAvailabilityServiceModule = jest.requireActual<
@@ -185,6 +190,7 @@ describe('overviewController', () => {
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
     prisonService = prisonServiceMock()
+    prisonerPropertyService = prisonerPropertyServiceMock() as PrisonerPropertyService
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -204,6 +210,7 @@ describe('overviewController', () => {
       contactsService,
       prisonService,
       mockedXrbsAvailabilityService,
+      prisonerPropertyService,
     )
   })
 
@@ -238,6 +245,75 @@ describe('overviewController', () => {
           moneySummary: null,
         }),
       )
+    })
+  })
+
+  describe('propertySummary', () => {
+    const originalPropertySummaryTileEnabled = config.featureToggles.propertySummaryTileEnabled
+
+    beforeEach(() => {
+      res.locals.feComponents.sharedData.services = [
+        ...res.locals.feComponents.sharedData.services,
+        { id: 'prisoner-property' } as Service,
+      ]
+    })
+
+    afterEach(() => {
+      config.featureToggles.propertySummaryTileEnabled = originalPropertySummaryTileEnabled
+      jest.clearAllMocks()
+    })
+
+    it('should call prisonerPropertyService.getPropertySummary when the feature is enabled and permission is granted and the service is enabled', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue({
+        currentEstablishmentName: 'Moorland (HMP & YOI)',
+        heldInCurrentEstablishment: 2,
+        dueForTransferIn: 0,
+        dueForTransferOut: 0,
+        overdueForDisposal: 0,
+        overdueForReturn: 0,
+      })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).toHaveBeenCalledWith('CLIENT_TOKEN', offenderNo)
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          propertySummary: expect.objectContaining({ status: 'fulfilled' }),
+        }),
+      )
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when permission is not granted', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: false })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when the prisoner property service is not enabled in mfe', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      res.locals.feComponents.sharedData.services = res.locals.feComponents.sharedData.services.filter(
+        service => service.id !== 'prisoner-property',
+      )
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when the feature flag is disabled', async () => {
+      config.featureToggles.propertySummaryTileEnabled = false
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
     })
   })
 

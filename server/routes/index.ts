@@ -85,6 +85,7 @@ export default function routes(services: Services): Router {
     services.contactsService,
     services.prisonService,
     services.xRayBodyScansAvailabilityService,
+    services.prisonerPropertyService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
