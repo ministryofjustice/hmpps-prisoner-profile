@@ -38,7 +38,7 @@ import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './PrisonerSc
 import Details from './Details'
 import HistoryForLocationItem from './HistoryForLocationItem'
 import CellMoveReasonType from './CellMoveReasonTypes'
-import Telephone from './Telephone'
+import Telephone, { AddressPhoneNumberCreateRequest } from './Telephone'
 import Belief from './Belief'
 import Reception from './Reception'
 import { OffenderContacts } from './OffenderContact'
@@ -201,6 +201,12 @@ export interface PrisonApiClient {
   getPersonEmails(personId: number): Promise<AgenciesEmail[]>
 
   getPersonPhones(personId: number): Promise<Telephone[]>
+
+  addAddressPhoneNumbers(
+    prisonerNumber: string,
+    addressId: number,
+    phoneNumbers: AddressPhoneNumberCreateRequest[],
+  ): Promise<Telephone[]>
 
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null>
 

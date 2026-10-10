@@ -346,6 +346,7 @@ describe('Address Edit Controller', () => {
             prisonerThumbnailImageUrl: `/api/prisoner/${prisonerNumber}/image?imageId=1413311&fullSizeImage=false`,
           },
           backLinkUrl: `/prisoner/${prisonerNumber}/personal/confirm-address?address=${addressCacheId}`,
+          addPhoneNumberEnabled: false,
         })
 
         expect(auditService.sendPageView).toHaveBeenCalledWith({

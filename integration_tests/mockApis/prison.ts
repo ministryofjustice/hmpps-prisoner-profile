@@ -17,6 +17,7 @@ import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
+import type { AddressPhoneNumberCreateRequest } from '../../server/data/interfaces/prisonApi/Telephone'
 import {
   pastCareNeedsMock,
   personalCareNeedsMock,
@@ -279,6 +280,30 @@ export default {
       },
     })
   },
+
+  stubAddAddressPhoneNumbers: ({
+    prisonerNumber,
+    addressId,
+    requestBody,
+  }: {
+    prisonerNumber: string
+    addressId: number
+    requestBody: AddressPhoneNumberCreateRequest[]
+  }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers`,
+        bodyPatterns: [{ equalToJson: requestBody }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [],
+      },
+    }),
 
   stubOffenderContacts: (prisonerNumber: string) => {
     return stubFor({

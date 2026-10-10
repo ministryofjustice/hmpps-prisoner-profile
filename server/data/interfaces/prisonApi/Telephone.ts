@@ -6,3 +6,9 @@ export default interface Telephone {
   createDatetime?: string
   modifyDatetime?: string
 }
+
+export interface AddressPhoneNumberCreateRequest {
+  phoneNumber: string
+  phoneNumberType: string
+  extension?: string
+}

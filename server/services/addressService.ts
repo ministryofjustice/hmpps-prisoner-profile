@@ -2,6 +2,7 @@ import { OsAddress, OsPlacesAddressService } from '@ministryofjustice/hmpps-conn
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Address from '../data/interfaces/prisonApi/Address'
+import Telephone, { AddressPhoneNumberCreateRequest } from '../data/interfaces/prisonApi/Telephone'
 import ReferenceDataService from './referenceData/referenceDataService'
 import AddressMapper, { AddressLocation } from './mappers/addressMapper'
 import {
@@ -176,6 +177,15 @@ export default class AddressService {
 
   public async getAddressesFromPrisonAPI(token: string, prisonerNumber: string): Promise<Address[] | null> {
     return this.prisonApiClientBuilder(token).getAddresses(prisonerNumber)
+  }
+
+  public async addAddressPhoneNumbers(
+    token: string,
+    prisonerNumber: string,
+    addressId: number,
+    phoneNumbers: AddressPhoneNumberCreateRequest[],
+  ): Promise<Telephone[]> {
+    return this.prisonApiClientBuilder(token).addAddressPhoneNumbers(prisonerNumber, addressId, phoneNumbers)
   }
 
   public async getAddressesMatchingQuery(searchQuery: string): Promise<OsAddress[]> {

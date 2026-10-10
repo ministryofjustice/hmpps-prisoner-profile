@@ -9,6 +9,7 @@ import NotFoundPage from '../../../../pages/notFoundPage'
 import PrimaryOrPostalAddressPage from '../../../../pages/editPages/address/primaryOrPostalAddressPage'
 import { PersonalRelationshipsReferenceDataDomain } from '../../../../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mockAddressResponseDto } from '../../../../../server/data/localMockData/personIntegrationApi/addresses'
+import { mockAddresses } from '../../../../../server/data/localMockData/addresses'
 
 context('Primary or Postal Address Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -129,6 +130,61 @@ context('Primary or Postal Address Page', () => {
       page.flashMessage().should('include.text', 'Address updated')
 
       // ...and put the entry back again for other tests
+      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+    })
+
+    it('can save an address and add and remove phone numbers', () => {
+      const { addressId } = mockAddresses[0]
+      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
+      cy.task('stubCreateAddress', { prisonerNumber, response: { addressId } })
+      cy.task('stubAddAddressPhoneNumbers', {
+        prisonerNumber,
+        addressId,
+        requestBody: [
+          { phoneNumber: '01234567890', phoneNumberType: 'MOB' },
+          { phoneNumber: '07853544216', phoneNumberType: 'MOB' },
+        ],
+      })
+
+      page.checkBox('primary').click()
+      cy.getDataQa('add-address-phone-number-button').click()
+
+      cy.location('pathname').should(
+        'eq',
+        `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`,
+      )
+      cy.get('.hmpps-flash-message').should('contain.text', 'Address updated')
+      cy.get('.govuk-inset-text').should('contain.text', 'Leeds')
+      cy.get('.govuk-heading-m').should('not.exist')
+      cy.get('[data-qa^="remove-address-phone-number-"]').should('not.exist')
+      cy.get('hr.govuk-section-break--visible').should('not.exist')
+      cy.get('input[name="phoneNumberType0"][value="MOB"]').check()
+      cy.get('input[name="phoneNumber0"]').type('01234567890')
+      cy.get('[data-qa="add-another-phone-number"]').click()
+      cy.get('.govuk-heading-m').should('have.length', 2)
+      cy.get('.govuk-heading-m').eq(0).should('contain.text', 'Phone number 1 of 2')
+      cy.get('.govuk-heading-m').eq(1).should('contain.text', 'Phone number 2 of 2')
+      cy.get('[data-qa^="remove-address-phone-number-"]').should('have.length', 2)
+      cy.get('[data-qa="remove-address-phone-number-0"]').should('have.class', 'govuk-button--secondary')
+      cy.get('input[name="phoneNumberType1"][value="HOME"]').check()
+      cy.get('input[name="phoneNumber1"]').type('0113222333')
+      cy.get('[data-qa="add-another-phone-number"]').click()
+      cy.get('input[name="phoneNumberType2"][value="MOB"]').check()
+      cy.get('input[name="phoneNumber2"]').type('not a number')
+      cy.get('[data-qa="remove-address-phone-number-1"]').click()
+
+      cy.get('.govuk-heading-m').should('have.length', 2)
+      cy.get('.govuk-heading-m').eq(0).should('contain.text', 'Phone number 1 of 2')
+      cy.get('.govuk-heading-m').eq(1).should('contain.text', 'Phone number 2 of 2')
+      cy.get('input[name="phoneNumber0"]').should('have.value', '01234567890')
+      cy.get('input[name="phoneNumber1"]').should('have.value', 'not a number')
+      cy.get('input[name="phoneNumber2"]').should('not.exist')
+      cy.get('input[name="phoneNumber1"]').clear()
+      cy.get('input[name="phoneNumber1"]').type('07853544216')
+      cy.get('[data-qa="save-address-phone-numbers"]').click()
+
+      cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
+      cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
       cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
     })
   })

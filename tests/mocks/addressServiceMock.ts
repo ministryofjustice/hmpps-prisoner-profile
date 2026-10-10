@@ -3,6 +3,7 @@ import AddressService from '../../server/services/addressService'
 
 export const addressServiceMock = (): Interface<AddressService> => ({
   createAddress: jest.fn(),
+  addAddressPhoneNumbers: jest.fn(),
   getAddresses: jest.fn(),
   getAddressesForDisplay: jest.fn(),
   getAddressesFromPrisonAPI: jest.fn(),
