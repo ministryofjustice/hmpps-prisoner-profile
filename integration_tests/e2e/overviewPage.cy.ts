@@ -16,6 +16,7 @@ import {
   mockScanSummaryResponse,
 } from '../../server/data/localMockData/xRayBodyScansMock'
 import IndexPage from '../pages'
+import { componentsServicesMock } from '../../server/data/localMockData/componentApi/componentsMock'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -214,11 +215,12 @@ context('Overview Page', () => {
     context('Mini Summary C', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.adjudicationsIncentivesGroup().should('exist')
+        overviewPage.miniSummaryGroupC().should('exist')
       })
 
-      it('Displays the adjudications summary', () => {
+      it('Mini summary Group C should contain adjudications card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('c', 'adjudications').should('exist')
         overviewPage.adjudicationsSummary().contains('h2', 'Adjudications')
         overviewPage.adjudicationsSummary().contains('p', 'Proven in last 3 months')
         overviewPage.adjudicationsSummary().contains('p', '4')
@@ -232,8 +234,9 @@ context('Overview Page', () => {
           )
       })
 
-      it('Displays the incentives summary', () => {
+      it('Mini summary Group C should contain incentives card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('c', 'incentives').should('exist')
         overviewPage.incentivesCard().contains('h2', 'Incentives')
         overviewPage.incentivesCard().contains('p', 'Since last review')
         overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 2')
@@ -243,24 +246,57 @@ context('Overview Page', () => {
           .incentivesCard()
           .contains('a[href="http://localhost:3001/incentive-reviews/prisoner/G6123VU"]', 'Incentive level details')
       })
-    })
 
-    context('Mini Summary D', () => {
-      it('Mini summary list is displayed', () => {
+      it('Mini summary Group C should contain category card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryCsraCsipGroup().should('exist')
-      })
-
-      it('Mini summary Group D should contain Category card with correct data', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('c', 'category').should('exist')
         overviewPage.categoryCard().contains('Category')
         overviewPage.categoryCard().contains('.mini-card__item', 'B')
         overviewPage.categoryCard().contains('.mini-card__item', 'Next review: 19/02/2023')
         overviewPage.categoryCard().contains('a', 'Category')
       })
 
+      context('when the property card is not displayed', () => {
+        beforeEach(() => {
+          cy.task('reset')
+          cy.clearCookies()
+          cy.clearLocalStorage()
+          cy.setupUserAuth()
+          cy.setupOverviewPageStubs({
+            prisonerNumber: 'G6123VU',
+            bookingId: 1102484,
+            prisonerDataOverrides: { category: 'B' },
+            services: componentsServicesMock.filter(service => service.id !== 'prisoner-property'),
+          })
+          visitOverviewPage()
+        })
+
+        it('moves the category summary back into group D', () => {
+          const overviewPage = Page.verifyOnPage(OverviewPage)
+          overviewPage.miniSummaryCard('d', 'property').should('not.exist')
+          overviewPage.miniSummaryCard('c', 'category').should('not.exist')
+
+          overviewPage.miniSummaryCard('d', 'category').should('exist')
+          overviewPage.miniSummaryCard('d', 'csra').should('exist')
+          overviewPage.miniSummaryCard('d', 'csip').should('exist')
+        })
+      })
+    })
+
+    context('Mini Summary D', () => {
+      it('Mini summary list is displayed', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryGroupD().should('exist')
+      })
+
+      it('Mini summary Group D should not contain the Category card when the property card is displayed', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('d', 'category').should('not.exist')
+      })
+
       it('Mini summary Group D should contain CSRA card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('d', 'csra').should('exist')
         overviewPage.csraCard().contains('CSRA')
         overviewPage.csraCard().contains('.mini-card__item', 'Standard')
         overviewPage.csraCard().contains('.mini-card__item', 'Last review: 19/02/2021')
@@ -269,11 +305,21 @@ context('Overview Page', () => {
 
       it('Mini summary Group D should contain CSIP card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('d', 'csip').should('exist')
         overviewPage.csipCard().contains('CSIP')
         overviewPage.csipCard().contains('.mini-card__item', 'Status: CSIP open')
         overviewPage.csipCard().contains('.mini-card__item', 'Next review date: 01/01/2099')
         overviewPage.csipCard().contains('.mini-card__item', 'History: 1 CSIP (1 referral)')
         overviewPage.csipCard().contains('a', 'CSIP details')
+      })
+
+      it('Mini summary Group D should contain Property card with correct data', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.miniSummaryCard('d', 'property').should('exist')
+        overviewPage.propertyCard().contains('h2', 'Property')
+        overviewPage.propertyCard().contains('p', 'Containers in Isle of Wight (HMP)')
+        overviewPage.propertyCard().contains('.mini-card__item', 'Due for transfer in: 3')
+        overviewPage.propertyCard().contains('.mini-card__item', 'Due for transfer out: 0')
       })
     })
 

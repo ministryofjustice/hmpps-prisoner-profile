@@ -10,6 +10,7 @@ import {
   ReligionReferenceDataCodesMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
+import { propertySummaryMock } from '../../server/data/localMockData/prisonerPropertySummaryMock'
 import {
   PersonalRelationshipsContactsDtoMock,
   PersonalRelationshipsDomesticStatusMock,
@@ -98,6 +99,7 @@ Cypress.Commands.add(
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
     cy.task('stubXRayBodyScanSummary', { prisonerNumber })
+    cy.task('stubPrisonerPropertySummary', { prisonerNumber, response: propertySummaryMock })
   },
 )
 

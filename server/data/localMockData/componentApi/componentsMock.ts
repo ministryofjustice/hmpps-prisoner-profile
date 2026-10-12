@@ -58,4 +58,11 @@ export const componentsServicesMock: Service[] = [
     href: 'http://localhost:3001/xRayBodyScansApi',
     navEnabled: false,
   },
+  {
+    id: 'prisoner-property',
+    heading: 'Prisoner property',
+    description: 'Prisoner property API',
+    href: 'http://localhost:3001/prisonerProperty',
+    navEnabled: true,
+  },
 ]

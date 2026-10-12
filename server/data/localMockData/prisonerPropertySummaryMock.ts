@@ -26,7 +26,7 @@ export const propertySummaryDueOutMock: PrisonerPropertySummary = {
   hasEverHadProperty: true,
 }
 
-/** Design state 3: no property anywhere, so the card links to the history instead. */
+/** Design state 3: no property anywhere. */
 export const propertySummaryEmptyMock: PrisonerPropertySummary = {
   currentEstablishmentId: 'IWI',
   currentEstablishmentName: 'Isle of Wight (HMP)',
