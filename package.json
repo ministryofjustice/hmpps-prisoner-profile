@@ -35,7 +35,7 @@
     "npm": "^12"
   },
   "dependencies": {
-    "@apollo/client": "4.3.1",
+    "@apollo/client": "4.3.2",
     "@aws-sdk/client-sqs": "3.1145.0",
     "@contentful/rich-text-html-renderer": "17.2.3",
     "@contentful/rich-text-types": "17.2.7",
