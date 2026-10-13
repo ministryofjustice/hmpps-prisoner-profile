@@ -1,11 +1,11 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-actions-block {
-  border: 1px solid govuk-colour("black", $variant: "tint-25");
+  border: 1px solid govuk.govuk-colour('black', $variant: 'tint-25');
 
   h2 {
     padding: 15px;
-    border-bottom: 2px solid govuk-colour('black');
+    border-bottom: 2px solid govuk.govuk-colour('black');
     margin: 0;
   }
 }
@@ -28,7 +28,7 @@
       align-self: flex-start;
       margin-right: 15px;
 
-      @include govuk-media-query($until: tablet) {
+      @include govuk.govuk-media-query($until: tablet) {
         display: none;
       }
     }
@@ -36,13 +36,13 @@
     a {
       font-weight: 700;
 
-      @include govuk-media-query($until: tablet) {
+      @include govuk.govuk-media-query($until: tablet) {
         font-size: 16px;
       }
     }
   }
 
   li:not(:last-of-type) {
-    border-bottom: 2px solid govuk-functional-colour(border);
+    border-bottom: 2px solid govuk.govuk-functional-colour(border);
   }
 }

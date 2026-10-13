@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 @page {
   margin: 0;
@@ -10,7 +10,7 @@
   }
 }
 
-@include govuk-media-query($media-type: print) {
+@include govuk.govuk-media-query($media-type: print) {
   @page {
     margin-top: 1.4cm;
     margin-bottom: 1.4cm;
@@ -18,7 +18,7 @@
 
   // govuk-frontend overrides
   .govuk-template {
-    background-color: govuk-colour('white');
+    background-color: govuk.govuk-colour('white');
   }
 
   .govuk-heading-l {
@@ -61,11 +61,11 @@
 
     &:link,
     &:visited {
-      color: govuk-functional-colour(text);
+      color: govuk.govuk-functional-colour(text);
     }
 
     // Remove url from links in printed view within a table
-    &[href^="/"], &[href^="http://"], &[href^="https://"] {
+    &[href^='/'], &[href^='http://'], &[href^='https://'] {
       &::after {
         content: '';
       }

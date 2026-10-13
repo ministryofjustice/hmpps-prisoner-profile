@@ -1,25 +1,25 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .xray-body-scan-card__columns {
-  margin: 0 #{-$govuk-gutter-half};
+  margin: 0 #{-(govuk.$govuk-gutter-half)};
 
-  @media #{govuk-from-breakpoint(tablet)} {
+  @media #{govuk.govuk-from-breakpoint(tablet)} {
     display: flex;
   }
 }
 
 .xray-body-scan-card__column {
   box-sizing: border-box;
-  padding: 0 $govuk-gutter-half;
+  padding: 0 govuk.$govuk-gutter-half;
 
-  @media #{govuk-from-breakpoint(tablet)} {
+  @media #{govuk.govuk-from-breakpoint(tablet)} {
     flex-grow: 1;
     width: 50%;
   }
 }
 
 .xray-body-scan-card__summary {
-  @media #{govuk-from-breakpoint(tablet)} {
+  @media #{govuk.govuk-from-breakpoint(tablet)} {
     display: flex;
     flex-direction: column;
 
