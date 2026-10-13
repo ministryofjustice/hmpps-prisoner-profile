@@ -42,7 +42,7 @@ import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces
 import Details from './interfaces/prisonApi/Details'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
-import Telephone, { AddressPhoneNumberCreateRequest } from './interfaces/prisonApi/Telephone'
+import Telephone, { AddressPhoneNumberRequest } from './interfaces/prisonApi/Telephone'
 import Belief from './interfaces/prisonApi/Belief'
 import Reception from './interfaces/prisonApi/Reception'
 import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
@@ -199,12 +199,27 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
   async addAddressPhoneNumbers(
     prisonerNumber: string,
     addressId: number,
-    phoneNumbers: AddressPhoneNumberCreateRequest[],
+    phoneNumbers: AddressPhoneNumberRequest[],
   ): Promise<Telephone[]> {
     return this.post(
       {
         path: `/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers`,
         data: phoneNumbers,
+      },
+      this.token,
+    )
+  }
+
+  async updateAddressPhoneNumber(
+    prisonerNumber: string,
+    addressId: number,
+    phoneId: number,
+    phoneNumber: AddressPhoneNumberRequest,
+  ): Promise<Telephone> {
+    return this.put(
+      {
+        path: `/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers/${phoneId}`,
+        data: phoneNumber,
       },
       this.token,
     )

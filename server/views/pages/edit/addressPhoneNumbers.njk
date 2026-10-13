@@ -85,16 +85,18 @@
           attributes: { "data-qa": "save-address-phone-numbers" }
         })
       }}
-      {{
-        govukButton({
-          text: "Add another phone number",
-          id: "submit-and-add-another",
-          type: "submit",
-          classes: "govuk-button--secondary hmpps-button__add-another",
-          preventDoubleClick: true,
-          attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
-        })
-      }}
+      {% if not isChanging %}
+        {{
+          govukButton({
+            text: "Add another phone number",
+            id: "submit-and-add-another",
+            type: "submit",
+            classes: "govuk-button--secondary hmpps-button__add-another",
+            preventDoubleClick: true,
+            attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
+          })
+        }}
+      {% endif %}
       <a
         href="/prisoner/{{ prisonerNumber }}/personal"
         class="govuk-link govuk-link--no-visited-state"
