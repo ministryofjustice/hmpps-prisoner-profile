@@ -189,6 +189,34 @@ context('Primary or Postal Address Page', () => {
     })
   })
 
+  context('Changing an address phone number', () => {
+    it('prefills and saves a phone number', () => {
+      const { addressId } = mockAddresses[0]
+      const phoneId = 1324254
+      const requestBody = { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' }
+
+      cy.task('stubUpdateAddressPhoneNumber', { prisonerNumber, addressId, phoneId, requestBody })
+      cy.signIn({
+        redirectPath: `/prisoner/${prisonerNumber}/addresses/${addressId}/change-address-phone-number/${phoneId}`,
+        failOnStatusCode: false,
+      })
+
+      cy.get('input[name="phoneNumberType0"][value="VISIT"]').should('be.checked')
+      cy.get('input[name="phoneNumber0"]').should('have.value', '4444555566')
+      cy.get('input[name="phoneExtension0"]').should('have.value', '')
+      cy.getDataQa('add-another-phone-number').should('not.exist')
+      cy.get('input[name="phoneNumberType0"][value="HOME"]').check()
+      cy.get('input[name="phoneNumber0"]').clear()
+      cy.get('input[name="phoneNumber0"]').type(requestBody.phoneNumber)
+      cy.get('input[name="phoneExtension0"]').type(requestBody.extension)
+      cy.getDataQa('save-address-phone-numbers').click()
+
+      cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
+      cy.location('hash').should('eq', '#addresses')
+      cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
+    })
+  })
+
   context('When prisoner already has a primary and postal address', () => {
     beforeEach(() => {
       cy.task('stubGetAddresses', {

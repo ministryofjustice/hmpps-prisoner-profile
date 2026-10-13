@@ -7,7 +7,7 @@ export default interface Telephone {
   modifyDatetime?: string
 }
 
-export interface AddressPhoneNumberCreateRequest {
+export interface AddressPhoneNumberRequest {
   phoneNumber: string
   phoneNumberType: string
   extension?: string

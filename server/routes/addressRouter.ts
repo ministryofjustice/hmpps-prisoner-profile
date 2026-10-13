@@ -53,6 +53,21 @@ export default function addressRouter(services: Services): Router {
   )
 
   router.get(
+    `${basePath}/addresses/:addressId/change-address-phone-number/:phoneId`,
+    auditPageAccessAttempt({ services, page: Page.EditAddressPhoneNumber }),
+    ...addressPhoneNumberMiddleware,
+    addressPhoneNumberController.display(),
+  )
+
+  router.post(
+    `${basePath}/addresses/:addressId/change-address-phone-number/:phoneId`,
+    auditPageAccessAttempt({ services, page: Page.EditAddressPhoneNumber }),
+    ...addressPhoneNumberMiddleware,
+    validationMiddleware([phoneNumberValidator], { redirectBackOnError: true }),
+    addressPhoneNumberController.submit(),
+  )
+
+  router.get(
     `${basePath}/addresses`,
     auditPageAccessAttempt({ services, page: Page.Addresses }),
     getPrisonerData(services, { minimal: true }),
