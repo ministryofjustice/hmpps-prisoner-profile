@@ -41,5 +41,14 @@ export default function buildOverviewInfoLinks(
     })
   }
 
+  // Visibility is gated by the sidebar's caseload check (isInUsersCaseLoad), so no
+  // additional permission is required: any user who can see the prisoner can view the
+  // incident summary.
+  links.push({
+    text: 'Incident summary',
+    url: `${config.serviceUrls.incidentReporting}/prisoner/${prisonerData.prisonerNumber}/incident-summary`,
+    dataQA: 'incident-summary-info-link',
+  })
+
   return links
 }
