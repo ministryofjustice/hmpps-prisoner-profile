@@ -1,3 +1,14 @@
 .diet-and-food-allergies-text-input {
   width: 465px;
 }
+
+.diet-and-food-allergies-additional-info {
+  background-color: #f3f2f1;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .govuk-section-break {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
