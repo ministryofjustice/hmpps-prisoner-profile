@@ -10,7 +10,7 @@ import AddressService from '../services/addressService'
 import AddressPhoneNumberController from './addressPhoneNumberController'
 
 describe('AddressPhoneNumberController', () => {
-  it('submits all phone numbers and returns to the personal page', async () => {
+  it('submits all phone numbers and returns to the page it came from', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.addAddressPhoneNumbers = jest
       .fn()
@@ -24,7 +24,7 @@ describe('AddressPhoneNumberController', () => {
         inmateDetail: inmateDetailMock,
       },
       params: { addressId: '5622837' },
-      query: {},
+      query: { returnTo: 'addresses' },
       body: {
         phoneNumberType0: 'MOB',
         phoneNumber0: '01234567890',
@@ -32,6 +32,7 @@ describe('AddressPhoneNumberController', () => {
         phoneNumberType1: 'HOME',
         phoneNumber1: '01234567891',
         phoneExtension1: '',
+        returnTo: 'addresses',
       },
       flash: jest.fn(),
     } as unknown as Request
@@ -56,7 +57,7 @@ describe('AddressPhoneNumberController', () => {
       fieldName: 'addressPhoneNumbers',
       phoneIds: [123],
     })
-    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
+    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses`)
   })
 
   it('prefills the selected phone number on the change page', async () => {
@@ -72,6 +73,7 @@ describe('AddressPhoneNumberController', () => {
         inmateDetail: inmateDetailMock,
       },
       params: { addressId: '5622837', phoneId: '1324254' },
+      query: { returnTo: 'addresses' },
       flash: jest.fn().mockReturnValue([]),
     } as unknown as Request
     const res = {
@@ -102,6 +104,7 @@ describe('AddressPhoneNumberController', () => {
           }),
         ],
         isChanging: true,
+        returnToAddresses: true,
       }),
     )
     expect(auditService.sendPageView).toHaveBeenCalledWith(
@@ -109,7 +112,7 @@ describe('AddressPhoneNumberController', () => {
     )
   })
 
-  it('updates a phone number and returns to the personal page', async () => {
+  it('updates a phone number and returns to the page it came from', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.updateAddressPhoneNumber = jest
       .fn()
@@ -124,8 +127,8 @@ describe('AddressPhoneNumberController', () => {
         inmateDetail: inmateDetailMock,
       },
       params: { addressId: '5622837', phoneId: '1324254' },
-      query: {},
-      body: { phoneNumberType0: 'HOME', phoneNumber0: '02012345678', phoneExtension0: '321' },
+      query: { returnTo: 'addresses' },
+      body: { phoneNumberType0: 'HOME', phoneNumber0: '02012345678', phoneExtension0: '321', returnTo: 'addresses' },
       originalUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/change-address-phone-number/1324254`,
       flash: jest.fn(),
     } as unknown as Request
@@ -159,6 +162,6 @@ describe('AddressPhoneNumberController', () => {
         phoneNumber: { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' },
       },
     })
-    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
+    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses`)
   })
 })

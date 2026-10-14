@@ -5,6 +5,8 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
+
 
 {% block body %}
 <div class="govuk-grid-row">
@@ -13,7 +15,7 @@
     </div>
 </div>
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row hmpps-three-quarters-responsive">
     <div class="govuk-grid-column-three-quarters hmpps-full-width-print address-cards">
 
     {% if primaryAddress %}
@@ -21,24 +23,20 @@
         <div class="govuk-grid-row" data-qa="primary-address">
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
-                    classes: 'govuk-!-margin-bottom-0',
-                    rows: primaryAddress | addressToSummaryItems
+                    rows: primaryAddress | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
                 }) }}
-                <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ primaryAddress.startDate | formatAddressDate }}</span></div>
             </div>
         </div>
     {%- endcall -%}
     {% endif %}
 
     {% if mailAddress %}
-    {%- call summaryCard({title: "Mail address", id: "mail-address"}) -%}
+    {%- call summaryCard({title: "Postal address", id: "mail-address"}) -%}
         <div class="govuk-grid-row" data-qa="mail-address">
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
-                    classes: 'govuk-!-margin-bottom-0',
-                    rows: mailAddress | addressToSummaryItems
+                    rows: mailAddress | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
                 }) }}
-                <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ mailAddress.startDate | formatAddressDate }}</span></div>
             </div>
         </div>
     {%- endcall -%}
@@ -47,14 +45,13 @@
     {% if otherAddresses.length > 0 %}
     {%- call summaryCard({title: "Other active addresses", id: "other-addresses"}) -%}
         {% for address in otherAddresses %}
-        {% set dividerClass = "address-section-divider" if not loop.last %}
         <div class="govuk-grid-row" data-qa="other-address">
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
-                    classes: 'govuk-!-margin-bottom-0',
-                    rows: address | addressToSummaryItems
+                    classes: '' if loop.last else 'govuk-!-margin-bottom-0',
+                    rows: address | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
                 }) }}
-                <div class="govuk-body address-metadata {{ dividerClass }}">From <span data-qa="address-from">{{ address.startDate | formatAddressDate }}</span></div>
+                {% if not loop.last %}<hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true">{% endif %}
             </div>
         </div>
         {% endfor %}

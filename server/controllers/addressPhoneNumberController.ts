@@ -55,6 +55,7 @@ export default class AddressPhoneNumberController {
       if (isChanging && !phone) throw new NotFoundError('Could not find phone number')
 
       const formValues = requestBodyFromFlash<Record<string, unknown>>(req)
+      const returnToAddresses = req.query?.returnTo === 'addresses' || formValues?.returnTo === 'addresses'
       const initialFormValues = phone
         ? {
             phoneNumberType0: phone.type,
@@ -97,6 +98,7 @@ export default class AddressPhoneNumberController {
           })),
         })),
         isChanging,
+        returnToAddresses,
         errors,
         prisonerNumber,
         miniBannerData,
@@ -110,20 +112,25 @@ export default class AddressPhoneNumberController {
       const addressId = Number(req.params.addressId)
       const isChanging = req.params.phoneId !== undefined
       const phoneNumbers = addressPhoneNumberFormValues(req.body)
+      const returnToAddresses = req.query?.returnTo === 'addresses' || req.body?.returnTo === 'addresses'
+      const addAddressPhoneNumberUrl = `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number${returnToAddresses ? '?returnTo=addresses' : ''}`
 
       if (!isChanging && req.query.removePhoneNumber !== undefined) {
         const removedIndex = Number(req.query.removePhoneNumber)
-        const requestBody = Object.fromEntries(
-          phoneNumbers
-            .filter((_, index) => index !== removedIndex)
-            .flatMap((phoneNumber, index) => [
-              [`phoneNumberType${index}`, phoneNumber.phoneNumberType] as const,
-              [`phoneNumber${index}`, phoneNumber.phoneNumber] as const,
-              [`phoneExtension${index}`, phoneNumber.phoneExtension] as const,
-            ]),
-        )
+        const requestBody = {
+          ...Object.fromEntries(
+            phoneNumbers
+              .filter((_, index) => index !== removedIndex)
+              .flatMap((phoneNumber, index) => [
+                [`phoneNumberType${index}`, phoneNumber.phoneNumberType] as const,
+                [`phoneNumber${index}`, phoneNumber.phoneNumber] as const,
+                [`phoneExtension${index}`, phoneNumber.phoneExtension] as const,
+              ]),
+          ),
+          ...(returnToAddresses ? { returnTo: 'addresses' } : {}),
+        }
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
       if (!isChanging && req.query.addAnother === 'true') {
@@ -133,7 +140,7 @@ export default class AddressPhoneNumberController {
         requestBody[`phoneNumber${nextIndex}`] = ''
         requestBody[`phoneExtension${nextIndex}`] = ''
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
       const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
@@ -181,7 +188,11 @@ export default class AddressPhoneNumberController {
           })
           .catch(error => logger.error(error))
 
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
+        return res.redirect(
+          returnToAddresses
+            ? `/prisoner/${prisonerNumber}/addresses`
+            : `/prisoner/${prisonerNumber}/personal#addresses`,
+        )
       } catch {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))

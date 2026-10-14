@@ -204,19 +204,19 @@ describe('Personal page addresses', () => {
     expect($('[data-qa="all-addresses-link"]')).toHaveLength(0)
   })
 
-  it('retains the legacy display when the feature flag is disabled', () => {
+  it('keeps the new display without editing links when the feature flag is disabled', () => {
     const $ = render({
       editAddressSpecificPhoneNumbersEnabled: false,
       addresses: Result.fulfilled({ primaryOrPostal: [{ ...address, comment: null }], totalActive: 1 }),
     })
 
-    expect($('.hmpps-address > .govuk-caption-m').text()).toBe('Primary and postal address')
-    expect($('details').text()).toContain('Address phone numbers')
-    expect($('details').text()).toContain(mockHomePhone.number)
-    expect($('details').text()).toContain('Ext: 567')
+    expect($('.hmpps-address > h2').text()).toBe('Primary and postal address')
+    expect($('details').text()).not.toContain('Address phone numbers')
+    expect($('[data-qa="address-phone-numbers"]').text()).toContain(mockHomePhone.number)
+    expect($('[data-qa="address-phone-numbers"]').text()).toContain('Extension: 567')
     expect($('details').text()).toContain('Comments')
     expect($('details').text()).toContain('Not entered')
-    expect($('[data-qa="address-phone-numbers"]')).toHaveLength(0)
+    expect($('[data-qa="address-phone-numbers"]')).toHaveLength(1)
     expect($('.hmpps-address a')).toHaveLength(0)
   })
 

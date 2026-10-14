@@ -67,9 +67,7 @@ import config from '../config'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
-import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
-import Address from '../data/interfaces/prisonApi/Address'
-import GovSummaryItem from '../interfaces/GovSummaryItem'
+import type { AddressForDisplay, OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
 import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
@@ -958,68 +956,112 @@ describe('utils', () => {
   })
 
   describe('address to summary items', () => {
-    it.each([
-      [
-        'Full normal address',
+    const address = {
+      addressId: 5622837,
+      noFixedAbode: false,
+      subBuildingName: 'Flat 2',
+      buildingName: 'Building',
+      buildingNumber: '1',
+      thoroughfareName: 'Street',
+      dependantLocality: 'Locality',
+      postTown: { description: 'Town' },
+      county: { description: 'County' },
+      postCode: 'AB1 1AB',
+      country: { description: 'England' },
+      fromDate: '2024-01-01',
+      addressTypes: [{ addressUsageType: { code: 'HOME', description: 'Home' }, active: true }],
+      comment: 'Comment',
+      addressPhoneNumbersForDisplay: [
         {
-          primary: true,
-          mail: true,
-          noFixedAddress: false,
-          startDate: '2024-01-01',
-          street: 'Street',
-          town: 'Town',
-          postalCode: 'AB1 1AB',
-          phones: [{ type: 'HOME', number: '1234567890' }],
-          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: true }],
-          comment: 'Comment',
-        } as Address,
-        [
-          {
-            key: { text: 'Address' },
-            value: { html: 'Street<br/>Town<br/>AB1 1AB' },
-            classes: 'govuk-summary-list__row--no-border',
-          },
-          {
-            key: { text: 'Type of address' },
-            value: { html: 'Reception' },
-          },
-          {
-            key: { text: 'Phone' },
-            value: { html: '1234567890' },
-          },
-          {
-            key: { text: 'Comment' },
-            value: { text: 'Comment' },
-          },
-        ],
-      ],
-      [
-        'No fixed address with no phone or comment',
+          id: 123,
+          type: 'HOME',
+          typeDescription: 'Home',
+          number: '01234567890',
+          extension: '123',
+          createDatetime: '2024-01-01T10:00:00',
+          updatedOn: '2024-01-02T11:00:00',
+        },
         {
-          primary: true,
-          mail: true,
-          noFixedAddress: true,
-          startDate: '2024-01-01',
-          street: 'Street',
-          town: 'Town',
-          postalCode: 'AB1 1AB',
-          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: false }],
-        } as Address,
-        [
-          {
-            key: { text: 'Address' },
-            value: { html: 'No fixed address' },
-            classes: 'govuk-summary-list__row--no-border',
-          },
-          {
-            key: { text: 'Type of address' },
-            value: { html: 'Not entered' },
-          },
-        ],
+          id: 124,
+          type: 'VISIT',
+          typeDescription: 'Agency visit line',
+          number: '02012345678',
+          createDatetime: '2024-02-01T10:00:00',
+          updatedOn: '2024-02-01T10:00:00',
+        },
       ],
-      ['No address', null, []],
-    ])('%s: addressToSummaryItems(%s, %s, %s)', (_: string, address: Address, expected: GovSummaryItem[]) => {
-      expect(addressToSummaryItems(address)).toEqual(expected)
+    } as AddressForDisplay
+
+    it.each([false, true])('formats address phones only when the flag is disabled (%s)', enabled => {
+      const rows = addressToSummaryItems(address, 'G6123VU', false, enabled)
+
+      expect(rows.map(row => row.value.html).join('')).toContain(enabled ? '02012345678' : '02012 345678')
+    })
+
+    it('builds the address rows and latest-first phone actions', () => {
+      const rows = addressToSummaryItems(address, 'G6123VU', true, true)
+
+      expect(rows.map(row => row.key.text)).toEqual([
+        'Address',
+        'Address type',
+        'Address dates',
+        'Comments',
+        'Phone numbers',
+        '',
+        '',
+      ])
+      expect(rows[0].value.html).toContain('Added on 1 January 2024')
+      expect(rows[0].value.html).toContain('hmpps-address__added-date')
+      expect(rows[1].value.html).toBe('Home')
+      expect(rows[2].value.text).toBe('From January 2024')
+      expect(rows[3].value.text).toBe('Comment')
+      expect(rows[4].actions.items[0]).toEqual({
+        href: '/prisoner/G6123VU/addresses/5622837/add-address-phone-number?returnTo=addresses',
+        text: 'Add a phone number',
+        visuallyHiddenText: 'for this address',
+      })
+      expect(rows[4].value.text).toBe('')
+      expect(rows[5].value.html).toContain('Agency visit line')
+      expect(rows[5].value.html).toContain('02012345678')
+      expect(rows[5].value.html).toContain('Updated on 1 February 2024')
+      expect(rows[5].value.html).toContain('hmpps-address__updated-date')
+      expect(rows[5].value.html).toContain('govuk-!-margin-top-0')
+      expect(rows[5].value.html).toContain('govuk-!-font-weight-bold')
+      expect(rows[5].actions.items[0]).toEqual({
+        href: '/prisoner/G6123VU/addresses/5622837/change-address-phone-number/124?returnTo=addresses',
+        text: 'Change',
+        visuallyHiddenText: 'Agency visit line number 02012345678',
+      })
+      expect(rows[6].value.html).toContain('Home')
+      expect(rows[6].value.html).toContain('01234567890')
+      expect(rows[6].value.html).toContain('Extension: 123')
+      expect(rows[6].value.html).toContain('Updated on 2 January 2024')
+      expect(rows[6].actions.items[0].href).toBe(
+        '/prisoner/G6123VU/addresses/5622837/change-address-phone-number/123?returnTo=addresses',
+      )
+    })
+
+    it('always shows empty phone and comment states', () => {
+      const rows = addressToSummaryItems(
+        { ...address, comment: undefined, addressPhoneNumbersForDisplay: [] },
+        'G6123VU',
+        false,
+      )
+
+      expect(rows.map(row => row.key.text)).toEqual([
+        'Address',
+        'Address type',
+        'Address dates',
+        'Comments',
+        'Phone numbers',
+      ])
+      expect(rows[3].value.text).toBe('Not entered')
+      expect(rows[4].value.text).toBe('Not entered')
+      expect(rows[4].actions).toBeUndefined()
+    })
+
+    it('returns no rows when the address is missing', () => {
+      expect(addressToSummaryItems(null, 'G6123VU', false)).toEqual([])
     })
   })
 

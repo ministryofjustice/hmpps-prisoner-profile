@@ -11,8 +11,7 @@ import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import type { RadioOption, SelectOption } from '../interfaces/GovOptions'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
-import Address from '../data/interfaces/prisonApi/Address'
-import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
+import type { AddressForDisplay, OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
@@ -20,6 +19,7 @@ import { pluralise } from './pluralise'
 import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
+import { formatAddressDate, formatDate } from './dateHelpers'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -645,44 +645,129 @@ export const formatPomName = (pomName: string): string => {
   return formatName(pomName.split(', ')[1], null, pomName.split(', ')[0])
 }
 
-export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
+type AddressSummaryItem = GovSummaryItem & {
+  actions?: { items: { href: string; text: string; visuallyHiddenText?: string }[] }
+}
+
+export const addressToSummaryItems = (
+  address: AddressForDisplay | null | undefined,
+  prisonerNumber: string,
+  canEditAddressPhoneNumbers: boolean,
+  addressPhoneNumbersEnabled = false,
+): AddressSummaryItem[] => {
   if (!address) return []
+
+  const addressLines = address.noFixedAbode
+    ? ['No fixed address']
+    : addressToLines({
+        flat: address.subBuildingName,
+        premise: address.buildingName,
+        street: [address.buildingNumber, address.thoroughfareName].filter(Boolean).join(' '),
+        locality: address.dependantLocality,
+        town: address.postTown?.description,
+        county: address.county?.description,
+        postalCode: address.postCode,
+        country: address.country?.description,
+      })
+
+  if (!address.noFixedAbode && address.dependantLocality) addressLines.splice(1, 0, address.dependantLocality)
+
+  const addressUrl = `/prisoner/${prisonerNumber}/addresses/${address.addressId}`
+  const addPhoneNumberAction =
+    canEditAddressPhoneNumbers && address.addressId !== undefined
+      ? {
+          href: `${addressUrl}/add-address-phone-number?returnTo=addresses`,
+          text: 'Add a phone number',
+          visuallyHiddenText: 'for this address',
+        }
+      : undefined
 
   const addressSummary = {
     key: { text: 'Address' },
-    value: { html: address.noFixedAddress ? 'No fixed address' : addressToLines(address).join('<br/>') },
+    value: {
+      html: [
+        addressLines.join('<br/>'),
+        address.fromDate &&
+          `<p class="hmpps-address__added-date govuk-body-s govuk-!-margin-bottom-0" data-qa="address-added-on">Added on ${formatDate(address.fromDate)}</p>`,
+      ]
+        .filter(Boolean)
+        .join(''),
+    },
     classes: 'govuk-summary-list__row--no-border',
   }
 
-  const addressUsage = {
-    key: { text: 'Type of address' },
+  const addressType = {
+    key: { text: 'Address type' },
     value: {
-      html: address.addressUsages.filter(usage => usage.activeFlag).length
-        ? address.addressUsages
-            .filter(usage => usage.activeFlag)
-            .map(usage => usage.addressUsageDescription)
+      html: address.addressTypes?.length
+        ? address.addressTypes
+            .filter(type => type.active)
+            .map(type => type.addressUsageType.description)
             .join('<br/>')
         : 'Not entered',
     },
   }
 
-  const phones = address.phones?.length
-    ? {
-        key: { text: 'Phone' },
-        value: {
-          html: address.phones.map(phone => phone.number).join('<br/>'),
-        },
-      }
-    : undefined
+  const addressDates = {
+    key: { text: 'Address dates' },
+    value: {
+      text: address.fromDate
+        ? `From ${formatAddressDate(address.fromDate)}${address.toDate ? ` to ${formatAddressDate(address.toDate)}` : ''}`
+        : 'Not entered',
+    },
+  }
 
-  const comment = address.comment
-    ? {
-        key: { text: 'Comment' },
-        value: { text: address.comment },
-      }
-    : undefined
+  const comment = {
+    key: { text: 'Comments' },
+    value: { text: address.comment || 'Not entered' },
+  }
 
-  return [addressSummary, addressUsage, phones, comment].filter(Boolean)
+  const phoneNumbers = [...(address.addressPhoneNumbersForDisplay ?? [])].sort((first, second) =>
+    (second.createDatetime ?? '').localeCompare(first.createDatetime ?? ''),
+  )
+  const phoneNumberRows = phoneNumbers.map((phone, index) => ({
+    key: { text: !addressPhoneNumbersEnabled && index === 0 ? 'Phone numbers' : '' },
+    value: {
+      html: [
+        `<p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">${phone.typeDescription || phone.type}</p>`,
+        `<p class="govuk-body govuk-!-margin-0">${addressPhoneNumbersEnabled ? phone.number : formatPhoneNumber(phone.number)}</p>`,
+        phone.extension && `<p class="govuk-body govuk-!-margin-0">Extension: ${phone.extension}</p>`,
+        phone.updatedOn &&
+          `<p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-0" data-qa="phone-updated-on">Updated on ${formatDate(phone.updatedOn)}</p>`,
+      ]
+        .filter(Boolean)
+        .join(''),
+    },
+    actions:
+      canEditAddressPhoneNumbers && address.addressId !== undefined && phone.id !== undefined
+        ? {
+            items: [
+              {
+                href: `${addressUrl}/change-address-phone-number/${phone.id}?returnTo=addresses`,
+                text: 'Change',
+                visuallyHiddenText: `${phone.typeDescription} number ${phone.number}`,
+              },
+            ],
+          }
+        : undefined,
+  }))
+
+  return [
+    addressSummary,
+    addressType,
+    addressDates,
+    comment,
+    ...(addressPhoneNumbersEnabled || !phoneNumbers.length
+      ? [
+          {
+            key: { text: 'Phone numbers' },
+            value: { text: phoneNumbers.length ? '' : 'Not entered' },
+            actions: addPhoneNumberAction ? { items: [addPhoneNumberAction] } : undefined,
+          },
+        ]
+      : []),
+    ...phoneNumberRows,
+  ]
 }
 
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'
