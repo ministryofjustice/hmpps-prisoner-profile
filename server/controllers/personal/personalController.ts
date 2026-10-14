@@ -38,7 +38,7 @@ export default class PersonalController {
         .then(this.xRayBodyScansAvailabilityService.showOverviewCard)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(clientToken, prisonerData, {
+        this.personalPageService.get(clientToken, prisonerData, prisonerPermissions, {
           editProfileEnabled: editEnabled,
           simulateFetchEnabled,
           personalRelationshipsApiReadEnabled,
