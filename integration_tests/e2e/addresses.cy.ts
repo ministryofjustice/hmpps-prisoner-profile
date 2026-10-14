@@ -127,7 +127,8 @@ context('Addresses page', () => {
       .find('.govuk-summary-list__actions')
       .should('contain.text', 'Change')
     cy.get('.address-cards .govuk-summary-list__row').first().should('have.css', 'border-bottom-style', 'none')
-    ;[375, 641, 768, 960, 961, 1152, 1440].forEach(width => {
+    const viewportWidths = [375, 641, 768, 960, 961, 1152, 1440]
+    viewportWidths.forEach(width => {
       cy.viewport(width, 900)
       cy.get(addPhoneNumberLink)
         .should('be.visible')
