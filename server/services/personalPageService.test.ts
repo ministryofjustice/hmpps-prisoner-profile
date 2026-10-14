@@ -607,7 +607,7 @@ describe('PersonalPageService', () => {
     describe('When new property card is not enabled in the overview page', () => {
       beforeEach(() => {
         config.featureToggles.propertySummaryTileEnabled = false
-        mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+        mockPermissions({ [PrisonerPropertyPermission.read_property_details]: true })
       })
 
       it('Fallback to the old property card and map the data from the API', async () => {
@@ -627,7 +627,7 @@ describe('PersonalPageService', () => {
     describe('When new property card IS visible', () => {
       beforeEach(() => {
         config.featureToggles.propertySummaryTileEnabled = true
-        mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+        mockPermissions({ [PrisonerPropertyPermission.read_property_details]: true })
       })
 
       it('returns no property items', async () => {
@@ -635,7 +635,7 @@ describe('PersonalPageService', () => {
           prisonerPropertyServiceEnabled: true,
         })
 
-        expect(property).toEqual([])
+        expect(property).toBeNull()
       })
     })
   })

@@ -4,7 +4,7 @@
 {% from "macros/hmppsError.njk" import hmppsError %}
 
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
-{% set showProperty = property and isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions) %}
+{% set showProperty = property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions) %}
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 
 {% block body %}

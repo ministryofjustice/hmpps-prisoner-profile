@@ -289,9 +289,8 @@ export default class PersonalPageService {
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getSecondaryLanguages(bookingId),
-      !propertySummaryTileEnabled() &&
-      !getOptions.prisonerPropertyServiceEnabled &&
-      isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions)
+      !(propertySummaryTileEnabled() && getOptions.prisonerPropertyServiceEnabled) &&
+      isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
         ? prisonApiClient.getProperty(bookingId)
         : null,
       !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
@@ -687,7 +686,7 @@ export default class PersonalPageService {
 
   private property(property: PropertyContainer[]): PropertyItem[] {
     if (!Array.isArray(property)) {
-      return []
+      return null
     }
     return property.map(({ location, containerType, sealMark }) => ({
       containerType,
