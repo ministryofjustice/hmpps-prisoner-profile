@@ -33,6 +33,10 @@ describe('X-ray body scans availability service', () => {
       expect(availabilityService.showOverviewCard(XRayBodyScansAvailability.AVAILABLE_SOON)).toBe(true)
     })
 
+    it('should show if the service access is not authorised', () => {
+      expect(availabilityService.showOverviewCard(XRayBodyScansAvailability.UNAUTHORISED)).toBe(true)
+    })
+
     it('should not show if the service is unavailable', () => {
       expect(availabilityService.showOverviewCard(XRayBodyScansAvailability.UNAVAILABLE)).toBe(false)
     })
@@ -71,13 +75,13 @@ describe('X-ray body scans availability service', () => {
       expect(prisonService.getCompletePrisonDetailsByPrisonId).not.toHaveBeenCalled()
     })
 
-    it('should indicate that the service is not available when user does not have permission', async () => {
+    it('should indicate that access to the service is unauthorised due to permissions if it will be available soon to the user’s active case load', async () => {
       config.featureToggles.xRayBodyScansEnabled = true
       mockPermissions({ [XRayBodyScansPermission.read_scans]: false })
 
-      await expect(availabilityService.getAvailability(req, res)).resolves.toBe(XRayBodyScansAvailability.UNAVAILABLE)
+      await expect(availabilityService.getAvailability(req, res)).resolves.toBe(XRayBodyScansAvailability.UNAUTHORISED)
 
-      expect(prisonService.getCompletePrisonDetailsByPrisonId).not.toHaveBeenCalled()
+      expect(prisonService.getCompletePrisonDetailsByPrisonId).toHaveBeenCalledWith('MDI', 'token3')
     })
 
     it('should indicate that the service will be available soon when the user’s active case load is not yet enabled', async () => {
@@ -106,6 +110,22 @@ describe('X-ray body scans availability service', () => {
         expect(prisonService.getCompletePrisonDetailsByPrisonId).toHaveBeenCalledWith(activeCaseLoadId, 'token3')
       },
     )
+
+    it('should indicate that access to the service is unauthorised due to permissions despite being available to the user’s active case load', async () => {
+      config.featureToggles.xRayBodyScansEnabled = true
+      mockPermissions({ [XRayBodyScansPermission.read_scans]: false })
+      res.locals.feComponents.sharedData.services.push({
+        id: 'x-ray-body-scans',
+        heading: 'X-ray body scans',
+        description: 'X-ray body scans API',
+        href: 'http://localhost:3001/xRayBodyScansApi',
+        navEnabled: false,
+      })
+
+      await expect(availabilityService.getAvailability(req, res)).resolves.toBe(XRayBodyScansAvailability.UNAUTHORISED)
+
+      expect(prisonService.getCompletePrisonDetailsByPrisonId).not.toHaveBeenCalled()
+    })
 
     it.each([
       { scenario: 'enabled in their active case load', activeCaseLoadId: 'MDI' },
