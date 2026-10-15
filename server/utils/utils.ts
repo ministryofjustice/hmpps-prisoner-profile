@@ -10,9 +10,7 @@ import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import type { RadioOption, SelectOption } from '../interfaces/GovOptions'
-import GovSummaryItem from '../interfaces/GovSummaryItem'
-import Address from '../data/interfaces/prisonApi/Address'
-import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
+import type { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
@@ -643,46 +641,6 @@ export const formatPomName = (pomName: string): string => {
   }
 
   return formatName(pomName.split(', ')[1], null, pomName.split(', ')[0])
-}
-
-export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
-  if (!address) return []
-
-  const addressSummary = {
-    key: { text: 'Address' },
-    value: { html: address.noFixedAddress ? 'No fixed address' : addressToLines(address).join('<br/>') },
-    classes: 'govuk-summary-list__row--no-border',
-  }
-
-  const addressUsage = {
-    key: { text: 'Type of address' },
-    value: {
-      html: address.addressUsages.filter(usage => usage.activeFlag).length
-        ? address.addressUsages
-            .filter(usage => usage.activeFlag)
-            .map(usage => usage.addressUsageDescription)
-            .join('<br/>')
-        : 'Not entered',
-    },
-  }
-
-  const phones = address.phones?.length
-    ? {
-        key: { text: 'Phone' },
-        value: {
-          html: address.phones.map(phone => phone.number).join('<br/>'),
-        },
-      }
-    : undefined
-
-  const comment = address.comment
-    ? {
-        key: { text: 'Comment' },
-        value: { text: address.comment },
-      }
-    : undefined
-
-  return [addressSummary, addressUsage, phones, comment].filter(Boolean)
 }
 
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'

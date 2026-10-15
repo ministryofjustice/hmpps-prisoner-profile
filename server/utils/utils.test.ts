@@ -1,7 +1,6 @@
 import {
   addDefaultSelectedValue,
   addressToLines,
-  addressToSummaryItems,
   apostrophe,
   arrayIncludes,
   arrayToQueryString,
@@ -67,9 +66,7 @@ import config from '../config'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
-import { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
-import Address from '../data/interfaces/prisonApi/Address'
-import GovSummaryItem from '../interfaces/GovSummaryItem'
+import type { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
 import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
@@ -954,72 +951,6 @@ describe('utils', () => {
         [group1Key]: [group1Item1, group1Item2],
         [group2Key]: [group2Item1],
       })
-    })
-  })
-
-  describe('address to summary items', () => {
-    it.each([
-      [
-        'Full normal address',
-        {
-          primary: true,
-          mail: true,
-          noFixedAddress: false,
-          startDate: '2024-01-01',
-          street: 'Street',
-          town: 'Town',
-          postalCode: 'AB1 1AB',
-          phones: [{ type: 'HOME', number: '1234567890' }],
-          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: true }],
-          comment: 'Comment',
-        } as Address,
-        [
-          {
-            key: { text: 'Address' },
-            value: { html: 'Street<br/>Town<br/>AB1 1AB' },
-            classes: 'govuk-summary-list__row--no-border',
-          },
-          {
-            key: { text: 'Type of address' },
-            value: { html: 'Reception' },
-          },
-          {
-            key: { text: 'Phone' },
-            value: { html: '1234567890' },
-          },
-          {
-            key: { text: 'Comment' },
-            value: { text: 'Comment' },
-          },
-        ],
-      ],
-      [
-        'No fixed address with no phone or comment',
-        {
-          primary: true,
-          mail: true,
-          noFixedAddress: true,
-          startDate: '2024-01-01',
-          street: 'Street',
-          town: 'Town',
-          postalCode: 'AB1 1AB',
-          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: false }],
-        } as Address,
-        [
-          {
-            key: { text: 'Address' },
-            value: { html: 'No fixed address' },
-            classes: 'govuk-summary-list__row--no-border',
-          },
-          {
-            key: { text: 'Type of address' },
-            value: { html: 'Not entered' },
-          },
-        ],
-      ],
-      ['No address', null, []],
-    ])('%s: addressToSummaryItems(%s, %s, %s)', (_: string, address: Address, expected: GovSummaryItem[]) => {
-      expect(addressToSummaryItems(address)).toEqual(expected)
     })
   })
 

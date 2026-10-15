@@ -4,7 +4,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import AddressController from './addressController'
 import AddressService from '../services/addressService'
-import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
+import type { AddressForDisplay } from '../services/interfaces/personalPageService/PersonalPage'
 import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 import { prisonUserMock } from '../data/localMockData/user'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
@@ -42,23 +42,44 @@ describe('Address controller', () => {
     })
 
     it('should render the addresses page', async () => {
-      const getAddressesFromPrisonAPI = jest
-        .spyOn(controller.addressService, 'getAddressesFromPrisonAPI')
-        .mockResolvedValue([...addressesPrimaryAndMailMock, ...addressesNoStartDateMock])
+      const primaryAndPostalAddress = {
+        addressId: 5622837,
+        primaryAddress: true,
+        postalAddress: true,
+        fromDate: '2024-01-01',
+      } as AddressForDisplay
+      const otherAddress = {
+        primaryAddress: false,
+        postalAddress: false,
+        fromDate: '2023-11-20',
+      } as AddressForDisplay
+      const latestOtherAddress = {
+        primaryAddress: false,
+        postalAddress: false,
+        fromDate: '2024-03-15',
+      } as AddressForDisplay
+      const getAddressesForDisplay = jest
+        .spyOn(controller.addressService, 'getAddressesForDisplay')
+        .mockResolvedValue([primaryAndPostalAddress, otherAddress, latestOtherAddress])
 
       await controller.displayAddresses(req, res)
 
-      expect(getAddressesFromPrisonAPI).toHaveBeenCalledWith(
+      expect(getAddressesForDisplay).toHaveBeenCalledWith(
         req.middleware.clientToken,
         req.middleware.prisonerData.prisonerNumber,
       )
-      expect(res.render).toHaveBeenCalledWith('pages/addresses/addresses', {
-        pageTitle: 'Addresses',
-        primaryAddressLabel: 'Primary and mail address',
-        primaryAddress: addressesPrimaryAndMailMock[0],
-        mailAddress: undefined,
-        otherAddresses: addressesNoStartDateMock.reverse(),
-      })
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/addresses/addresses',
+        expect.objectContaining({
+          pageTitle: 'Addresses',
+          primaryAddressLabel: 'Primary and postal address',
+          primaryAddress: primaryAndPostalAddress,
+          mailAddress: undefined,
+          otherAddresses: [latestOtherAddress, otherAddress],
+          editEnabled: expect.any(Boolean),
+          editAddressSpecificPhoneNumbersEnabled: expect.any(Boolean),
+        }),
+      )
     })
   })
 

@@ -110,6 +110,7 @@ export default class AddressPhoneNumberController {
       const addressId = Number(req.params.addressId)
       const isChanging = req.params.phoneId !== undefined
       const phoneNumbers = addressPhoneNumberFormValues(req.body)
+      const addAddressPhoneNumberUrl = `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`
 
       if (!isChanging && req.query.removePhoneNumber !== undefined) {
         const removedIndex = Number(req.query.removePhoneNumber)
@@ -123,7 +124,7 @@ export default class AddressPhoneNumberController {
             ]),
         )
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
       if (!isChanging && req.query.addAnother === 'true') {
@@ -133,7 +134,7 @@ export default class AddressPhoneNumberController {
         requestBody[`phoneNumber${nextIndex}`] = ''
         requestBody[`phoneExtension${nextIndex}`] = ''
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
       const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(

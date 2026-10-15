@@ -76,16 +76,8 @@
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
       {% endif %}
     {% endfor %}
-    <div class="govuk-button-group">
-      {{
-        govukButton({
-          text: "Save and return to profile",
-          type: "submit",
-          preventDoubleClick: true,
-          attributes: { "data-qa": "save-address-phone-numbers" }
-        })
-      }}
-      {% if not isChanging %}
+    {% if not isChanging %}
+      <div class="govuk-button-group">
         {{
           govukButton({
             text: "Add another phone number",
@@ -96,7 +88,17 @@
             attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
           })
         }}
-      {% endif %}
+      </div>
+    {% endif %}
+    <div class="govuk-button-group">
+      {{
+        govukButton({
+          text: "Save and return to profile",
+          type: "submit",
+          preventDoubleClick: true,
+          attributes: { "data-qa": "save-address-phone-numbers" }
+        })
+      }}
       <a
         href="/prisoner/{{ prisonerNumber }}/personal"
         class="govuk-link govuk-link--no-visited-state"
