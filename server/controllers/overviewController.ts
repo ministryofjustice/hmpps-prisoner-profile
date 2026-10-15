@@ -142,7 +142,7 @@ export default class OverviewController {
         ? Result.wrap(this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId), apiErrorCallback)
         : null,
       propertySummaryTileEnabled() &&
-      isServiceEnabled('prisoner-property', res.locals.feComponents?.sharedData) &&
+      (await this.prisonerPropertyService.isPrisonActive(clientToken, prisonId)) &&
       isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions)
         ? Result.wrap(this.prisonerPropertyService.getPropertySummary(clientToken, prisonerNumber), apiErrorCallback)
         : null,

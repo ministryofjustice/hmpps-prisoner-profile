@@ -18,4 +18,15 @@ export default class PrisonerPropertyApiRestClient extends RestClient implements
       this.token,
     )
   }
+
+  /**
+   * The agency ids the property service is switched on for, from the API's `/info` endpoint. That
+   * endpoint is public and ignores the token, but RestClient requires one, so we pass ours through.
+   * Returns [] when the key is absent (e.g. an older API deploy) so callers degrade to "no prison
+   * active" rather than erroring.
+   */
+  async getActiveAgencyIds(): Promise<string[]> {
+    const info = await this.get<{ activeAgencies?: string[] }>({ path: '/info' }, this.token)
+    return info?.activeAgencies ?? []
+  }
 }

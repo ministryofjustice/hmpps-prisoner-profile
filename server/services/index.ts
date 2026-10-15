@@ -213,6 +213,7 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     metricsService,
   )
+  const prisonerPropertyService = new PrisonerPropertyService(prisonerPropertyApiClientBuilder)
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
@@ -227,9 +228,9 @@ export const services = () => {
     domesticStatusService,
     globalPhoneNumberAndEmailAddressesService,
     addressService,
+    prisonerPropertyService,
   )
   const xRayBodyScansAvailabilityService = new XRayBodyScansAvailabilityService(prisonService)
-  const prisonerPropertyService = new PrisonerPropertyService(prisonerPropertyApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),

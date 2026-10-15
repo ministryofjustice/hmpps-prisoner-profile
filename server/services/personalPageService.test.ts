@@ -1,6 +1,8 @@
 import { PrisonerPermissions, PrisonerPropertyPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import PrisonerPropertyService from './prisonerPropertyService'
+import { prisonerPropertyServiceMock } from '../../tests/mocks/prisonerPropertyServiceMock'
 import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -98,6 +100,7 @@ describe('PersonalPageService', () => {
   let domesticStatusService: DomesticStatusService
   let globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService
   let addressService: AddressService
+  let prisonerPropertyService: PrisonerPropertyService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -181,6 +184,8 @@ describe('PersonalPageService', () => {
     globalPhoneNumberAndEmailAddressesService.transformContacts = jest.fn(async () => globalPhonesAndEmailsMock)
 
     addressService = addressServiceMock() as AddressService
+    prisonerPropertyService = prisonerPropertyServiceMock() as PrisonerPropertyService
+    prisonerPropertyService.isPrisonActive = jest.fn(async () => true)
   })
 
   const constructService = () =>
@@ -198,6 +203,7 @@ describe('PersonalPageService', () => {
       domesticStatusService,
       globalPhoneNumberAndEmailAddressesService,
       addressService,
+      prisonerPropertyService,
     )
 
   describe('Getting information from the Prison API', () => {

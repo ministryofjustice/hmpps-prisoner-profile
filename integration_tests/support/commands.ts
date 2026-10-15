@@ -99,6 +99,7 @@ Cypress.Commands.add(
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
     cy.task('stubPersonalRelationshipsCount', { prisonerNumber })
     cy.task('stubXRayBodyScanSummary', { prisonerNumber })
+    cy.task('stubPropertyActiveAgencies', { activeAgencies: ['***'] })
     cy.task('stubPrisonerPropertySummary', { prisonerNumber, response: propertySummaryMock })
   },
 )

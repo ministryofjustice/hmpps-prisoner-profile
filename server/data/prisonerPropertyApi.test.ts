@@ -32,4 +32,18 @@ describe('prisonerPropertyApiClient', () => {
       expect(response).toEqual(propertySummaryMock)
     })
   })
+
+  describe('getActiveAgencyIds', () => {
+    it('should return the activeAgencies from the info endpoint', async () => {
+      fakePrisonerPropertyApi.get('/info').reply(200, { activeAgencies: ['IWI', 'MDI'] })
+
+      expect(await prisonerPropertyApiClient.getActiveAgencyIds()).toEqual(['IWI', 'MDI'])
+    })
+
+    it('should return an empty list when the api does not report activeAgencies', async () => {
+      fakePrisonerPropertyApi.get('/info').reply(200, { git: { branch: 'main' } })
+
+      expect(await prisonerPropertyApiClient.getActiveAgencyIds()).toEqual([])
+    })
+  })
 })

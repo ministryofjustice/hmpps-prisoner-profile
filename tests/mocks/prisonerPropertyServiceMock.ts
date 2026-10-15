@@ -3,6 +3,7 @@ import PrisonerPropertyService from '../../server/services/prisonerPropertyServi
 
 export const prisonerPropertyServiceMock = (): Interface<PrisonerPropertyService> => ({
   getPropertySummary: jest.fn(),
+  isPrisonActive: jest.fn(async () => true),
 })
 
 export default { prisonerPropertyServiceMock }

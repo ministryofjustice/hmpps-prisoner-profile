@@ -80,6 +80,7 @@ import { religionFieldData } from '../controllers/personal/fieldData'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import AddressService from './addressService'
+import PrisonerPropertyService from './prisonerPropertyService'
 
 interface PersonalPageGetOptions {
   editProfileEnabled: boolean
@@ -105,6 +106,7 @@ export default class PersonalPageService {
     private readonly domesticStatusService: DomesticStatusService,
     private readonly globalPhoneNumberAndEmailAddressesService: GlobalPhoneNumberAndEmailAddressesService,
     private readonly addressService: AddressService,
+    private readonly prisonerPropertyService: PrisonerPropertyService,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
@@ -289,7 +291,7 @@ export default class PersonalPageService {
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getSecondaryLanguages(bookingId),
-      !(propertySummaryTileEnabled() && getOptions.prisonerPropertyServiceEnabled) &&
+      !(propertySummaryTileEnabled() && (await this.prisonerPropertyService.isPrisonActive(token, prisonId))) &&
       isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
         ? prisonApiClient.getProperty(bookingId)
         : null,
