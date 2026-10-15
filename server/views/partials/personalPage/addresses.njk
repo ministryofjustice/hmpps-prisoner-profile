@@ -81,7 +81,7 @@
             {% for number in addressPhoneNumbers | sort(true, false, 'createDatetime') %}
               <div class="hmpps-address__phone {{ 'row-updated' if flashMessage and flashMessage.fieldName == 'addressPhoneNumbers' and flashMessage.phoneIds and number.id in flashMessage.phoneIds }}">
                 <div class="hmpps-address__phone__details">
-                  <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
+                  <p class="govuk-body govuk-!-margin-0">{{ number.typeDescription }}</p>
                   <p class="govuk-body govuk-!-margin-0">{{ number.number if editAddressSpecificPhoneNumbersEnabled else number.number | formatPhoneNumber }}</p>
                   {% if number.extension %}
                     <p class="govuk-body govuk-!-margin-0">Extension: {{ number.extension }}</p>

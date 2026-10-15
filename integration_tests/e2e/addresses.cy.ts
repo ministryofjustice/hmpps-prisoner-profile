@@ -107,7 +107,7 @@ context('Addresses page', () => {
     addressesPage.noAddressesMessage().should('be.visible')
   })
 
-  it('adds a phone number from this page and returns here', () => {
+  it('adds a phone number from this page and returns to the personal page', () => {
     cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     const [address] = mockAddresses
     const { addressId } = address
@@ -142,16 +142,16 @@ context('Addresses page', () => {
     addPhoneNumberLink().click()
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
     const phoneNumbersPage = Page.verifyOnPageWithTitle(AddressPhoneNumbersPage, 'Add a phone number for this address')
-    phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/addresses`)
+    phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/personal`)
     phoneNumbersPage.phoneNumberType('HOME').check()
     phoneNumbersPage.phoneNumber().type(requestBody[0].phoneNumber)
     phoneNumbersPage.saveButton().click()
 
-    cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses`)
+    cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
     addressesPage.flashMessage().should('contain.text', 'Address phone number updated')
   })
 
-  it('changes a phone number from this page and returns here', () => {
+  it('changes a phone number from this page and returns to the personal page', () => {
     cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     const [address] = mockAddresses
     const { addressId, phones = [] } = address
@@ -174,7 +174,7 @@ context('Addresses page', () => {
     phoneNumbersPage.phoneExtension().type(requestBody.extension)
     phoneNumbersPage.saveButton().click()
 
-    cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses`)
+    cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
     addressesPage.flashMessage().should('contain.text', 'Address phone number updated')
   })
 })

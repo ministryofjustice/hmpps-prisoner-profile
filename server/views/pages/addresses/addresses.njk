@@ -60,7 +60,7 @@
           value: { text: '' if phoneNumbers.length else 'Not entered' },
           actions: {
             items: [{
-              href: addressUrl + '/add-address-phone-number?returnTo=addresses',
+              href: addressUrl + '/add-address-phone-number',
               text: 'Add a phone number',
               visuallyHiddenText: 'for this address'
             }]
@@ -70,7 +70,7 @@
     {% endif %}
     {% for phone in phoneNumbers %}
       {% set phoneHtml %}
-        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ phone.typeDescription or phone.type }}</p>
+        <p class="govuk-body govuk-!-margin-0">{{ phone.typeDescription or phone.type }}</p>
         <p class="govuk-body govuk-!-margin-0">
           {{ phone.number if editAddressSpecificPhoneNumbersEnabled else phone.number | formatPhoneNumber }}
         </p>
@@ -87,7 +87,7 @@
           value: { html: phoneHtml },
           actions: {
             items: [{
-              href: addressUrl + '/change-address-phone-number/' + phone.id + '?returnTo=addresses',
+              href: addressUrl + '/change-address-phone-number/' + phone.id,
               text: 'Change',
               visuallyHiddenText: phone.typeDescription + ' number ' + phone.number
             }]

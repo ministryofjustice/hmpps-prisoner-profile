@@ -45,7 +45,7 @@ export default class AddressesPage extends Page {
   firstAddressRow = (): PageElement => cy.get('.address-cards .govuk-summary-list__row').first()
 
   phoneNumberLinks = (prisonerNumber: string, addressId: number) => {
-    const addSelector = `a[href="/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number?returnTo=addresses"]`
+    const addSelector = `a[href="/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number"]`
     const changePath = `/prisoner/${prisonerNumber}/addresses/${addressId}/change-address-phone-number/`
     return {
       add: (): PageElement => cy.get(addSelector),
@@ -57,7 +57,7 @@ export default class AddressesPage extends Page {
           .find(addSelector),
       changeActions: (): PageElement =>
         cy.get(`a[href*="${changePath}"]`).closest('.govuk-summary-list__row').find('.govuk-summary-list__actions'),
-      change: (phoneId: number): PageElement => cy.get(`a[href="${changePath}${phoneId}?returnTo=addresses"]`),
+      change: (phoneId: number): PageElement => cy.get(`a[href="${changePath}${phoneId}"]`),
     }
   }
 

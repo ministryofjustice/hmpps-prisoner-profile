@@ -101,6 +101,7 @@ describe('Personal page addresses', () => {
 
     expect(phones.find('h2').text()).toBe('Phone numbers')
     expect(phones.text()).toContain('Home')
+    expect(phones.find('.hmpps-address__phone__details p').first().hasClass('govuk-!-font-weight-bold')).toBe(false)
     expect(phones.text()).toContain(mockHomePhone.number)
     expect(phones.text()).toContain('Extension: 567')
     expect(phones.text()).toContain('Updated on 20 July 2023')

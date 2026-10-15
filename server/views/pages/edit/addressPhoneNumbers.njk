@@ -19,7 +19,6 @@
   {{ govukInsetText({ html: addressHtml }) }}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    {% if returnToAddresses %}<input type="hidden" name="returnTo" value="addresses" />{% endif %}
     {% for phoneNumber in phoneNumbers %}
       {% if phoneNumbers.length > 1 %}
         <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ phoneNumbers.length }}</h2>
@@ -101,7 +100,7 @@
         })
       }}
       <a
-        href="/prisoner/{{ prisonerNumber }}/{{ 'addresses' if returnToAddresses else 'personal' }}"
+        href="/prisoner/{{ prisonerNumber }}/personal"
         class="govuk-link govuk-link--no-visited-state"
         data-qa="cancel-link"
         >Cancel</a
