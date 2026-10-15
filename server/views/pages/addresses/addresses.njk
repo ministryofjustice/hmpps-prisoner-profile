@@ -7,6 +7,97 @@
 
 {% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
 
+{% macro addressDetails(address, classes='') %}
+  {% if address %}
+    {%
+      set addressLines = ['No fixed address'] if address.noFixedAbode else {
+        flat: address.subBuildingName,
+        premise: address.buildingName,
+        street: [address.buildingNumber, address.thoroughfareName] | select | join(' '),
+        town: address.postTown.description,
+        county: address.county.description,
+        postalCode: address.postCode,
+        country: address.country.description
+      } | addressToLines
+    %}
+    {% if not address.noFixedAbode and address.dependantLocality %}
+      {% set _ = addressLines.splice(1, 0, address.dependantLocality) %}
+    {% endif %}
+
+
+    {% set addressHtml %}
+      {% for line in addressLines %}{{ line }}{% if not loop.last %}<br />{% endif %}{% endfor %}
+      {% if address.fromDate %}
+        <p class="hmpps-address__added-date govuk-body-s govuk-!-margin-bottom-0" data-qa="address-added-on">
+          {{- 'Added on ' }}{{ address.fromDate | formatDate -}}
+        </p>
+      {% endif %}
+    {% endset %}
+    {% set addressTypesHtml %}
+      {% if address.addressTypes.length %}
+        {% for type in address.addressTypes | selectattr('active') %}
+          {{ type.addressUsageType.description }}{% if not loop.last %}<br />{% endif %}
+        {% endfor %}
+      {% else %}
+        Not entered
+      {% endif %}
+    {% endset %}
+    {% set addressDatesText = 'From ' + (address.fromDate | formatAddressDate) + (' to ' + (address.toDate | formatAddressDate) if address.toDate else '') if address.fromDate else 'Not entered' %}
+    {%
+      set rows = [
+        { key: { text: 'Address' }, value: { html: addressHtml }, classes: 'govuk-summary-list__row--no-border' },
+        { key: { text: 'Address type' }, value: { html: addressTypesHtml } },
+        { key: { text: 'Address dates' }, value: { text: addressDatesText } },
+        { key: { text: 'Comments' }, value: { text: address.comment or 'Not entered' } }
+      ]
+    %}
+    {% set addressUrl = '/prisoner/' + prisonerNumber + '/addresses/' + address.addressId %}
+    {% set phoneNumbers = (address.addressPhoneNumbersForDisplay or []) | sort(true, true, 'createDatetime') %}
+    {% if editAddressSpecificPhoneNumbersEnabled or not phoneNumbers.length %}
+      {%
+        set _ = rows.push({
+          key: { text: 'Phone numbers' },
+          value: { text: '' if phoneNumbers.length else 'Not entered' },
+          actions: {
+            items: [{
+              href: addressUrl + '/add-address-phone-number?returnTo=addresses',
+              text: 'Add a phone number',
+              visuallyHiddenText: 'for this address'
+            }]
+          } if canEditAddressPhoneNumbers and address.addressId !== undefined
+        })
+      %}
+    {% endif %}
+    {% for phone in phoneNumbers %}
+      {% set phoneHtml %}
+        <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ phone.typeDescription or phone.type }}</p>
+        <p class="govuk-body govuk-!-margin-0">
+          {{ phone.number if editAddressSpecificPhoneNumbersEnabled else phone.number | formatPhoneNumber }}
+        </p>
+        {% if phone.extension %}<p class="govuk-body govuk-!-margin-0">Extension: {{ phone.extension }}</p>{% endif %}
+        {% if phone.updatedOn %}
+          <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-0" data-qa="phone-updated-on">
+            {{- 'Updated on ' }}{{ phone.updatedOn | formatDate -}}
+          </p>
+        {% endif %}
+      {% endset %}
+      {%
+        set _ = rows.push({
+          key: { text: 'Phone numbers' if not editAddressSpecificPhoneNumbersEnabled and loop.first else '' },
+          value: { html: phoneHtml },
+          actions: {
+            items: [{
+              href: addressUrl + '/change-address-phone-number/' + phone.id + '?returnTo=addresses',
+              text: 'Change',
+              visuallyHiddenText: phone.typeDescription + ' number ' + phone.number
+            }]
+          } if canEditAddressPhoneNumbers and address.addressId !== undefined and phone.id !== undefined
+        })
+      %}
+    {% endfor %}
+    {{ govukSummaryList({ classes: classes, rows: rows }) }}
+  {% endif %}
+{% endmacro %}
 
 {% block body %}
 <div class="govuk-grid-row">
@@ -22,9 +113,7 @@
     {%- call summaryCard({title: primaryAddressLabel, id: "primary-address"}) -%}
         <div class="govuk-grid-row" data-qa="primary-address">
             <div class="govuk-grid-column-full">
-                {{ govukSummaryList({
-                    rows: primaryAddress | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
-                }) }}
+                {{ addressDetails(primaryAddress) }}
             </div>
         </div>
     {%- endcall -%}
@@ -34,9 +123,7 @@
     {%- call summaryCard({title: "Postal address", id: "mail-address"}) -%}
         <div class="govuk-grid-row" data-qa="mail-address">
             <div class="govuk-grid-column-full">
-                {{ govukSummaryList({
-                    rows: mailAddress | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
-                }) }}
+                {{ addressDetails(mailAddress) }}
             </div>
         </div>
     {%- endcall -%}
@@ -47,10 +134,7 @@
         {% for address in otherAddresses %}
         <div class="govuk-grid-row" data-qa="other-address">
             <div class="govuk-grid-column-full">
-                {{ govukSummaryList({
-                    classes: '' if loop.last else 'govuk-!-margin-bottom-0',
-                    rows: address | addressToSummaryItems(prisonerNumber, canEditAddressPhoneNumbers, editAddressSpecificPhoneNumbersEnabled)
-                }) }}
+                {{ addressDetails(address, '' if loop.last else 'govuk-!-margin-bottom-0') }}
                 {% if not loop.last %}<hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true">{% endif %}
             </div>
         </div>

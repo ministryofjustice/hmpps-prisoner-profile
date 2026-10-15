@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import AddressesPage from '../pages/addressesPage'
+import AddressPhoneNumbersPage from '../pages/editPages/address/addressPhoneNumbersPage'
 import { Role } from '../../server/data/enums/role'
 import {
   addressesMailMock,
@@ -49,8 +50,8 @@ context('Addresses page', () => {
     primaryAddress.card().should('contain.text', 'Agency Visit Line')
     primaryAddress.card().should('contain.text', '0113 333444')
     primaryAddress.comments().should('contain.text', 'comment')
-    primaryAddress.card().find('a[href*="/add-address-phone-number"]').should('not.exist')
-    primaryAddress.card().find('a[href*="/change-address-phone-number"]').should('not.exist')
+    primaryAddress.addPhoneNumberLink().should('not.exist')
+    primaryAddress.changePhoneNumberLinks().should('not.exist')
 
     const otherAddresses = addressesPage.otherAddresses()
     otherAddresses.header().should('have.text', 'Other active addresses')
@@ -60,7 +61,7 @@ context('Addresses page', () => {
     otherAddress.address().should('contain.text', 'Doncaster')
     otherAddress.address().should('contain.text', 'South Yorkshire')
     otherAddress.typeOfAddress().should('contain.text', 'Not entered')
-    otherAddress.card().find('dl div:nth-child(4) dd').should('contain.text', 'Not entered')
+    otherAddress.comments().should('contain.text', 'Not entered')
   })
 
   it('should contain a primary address which is also a mail address', () => {
@@ -79,7 +80,7 @@ context('Addresses page', () => {
     primaryAddress.card().should('contain.text', '0912 3456788')
     primaryAddress.comments().should('contain.text', 'Example comment')
     primaryAddress.fromDate().should('contain.text', 'From January 2024')
-    primaryAddress.card().find('[data-qa="address-added-on"]').should('have.text', 'Added on 1 January 2024')
+    primaryAddress.addedOn().should('have.text', 'Added on 1 January 2024')
   })
 
   it('should contain a postal address', () => {
@@ -111,49 +112,43 @@ context('Addresses page', () => {
     const [address] = mockAddresses
     const { addressId } = address
     const requestBody = [{ phoneNumber: '01234567890', phoneNumberType: 'HOME' }]
-    const addPhoneNumberLink = `a[href="/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number?returnTo=addresses"]`
     cy.task('stubAddresses', { prisonerNumber, resp: [address] })
     cy.task('stubAddAddressPhoneNumbers', { prisonerNumber, addressId, requestBody })
 
     addressesPage = visitAddressesPage()
-    cy.get('.govuk-grid-row.hmpps-three-quarters-responsive').should('exist')
-    cy.contains('.govuk-summary-list__key', 'Phone numbers')
-      .closest('.govuk-summary-list__row')
-      .find('.govuk-summary-list__actions')
-      .find(addPhoneNumberLink)
-      .should('exist')
-    cy.get(`a[href*="/prisoner/${prisonerNumber}/addresses/${addressId}/change-address-phone-number/"]`)
-      .closest('.govuk-summary-list__row')
-      .find('.govuk-summary-list__actions')
-      .should('contain.text', 'Change')
-    cy.get('.address-cards .govuk-summary-list__row').first().should('have.css', 'border-bottom-style', 'none')
+    const addPhoneNumberLink = addressesPage.phoneNumberLinks(prisonerNumber, addressId).add
+    addressesPage.layout().should('exist')
+    addressesPage.phoneNumberLinks(prisonerNumber, addressId).addAction().should('exist')
+    addressesPage.phoneNumberLinks(prisonerNumber, addressId).changeActions().should('contain.text', 'Change')
+    addressesPage.firstAddressRow().should('have.css', 'border-bottom-style', 'none')
     const viewportWidths = [375, 641, 768, 960, 961, 1152, 1440]
     viewportWidths.forEach(width => {
       cy.viewport(width, 900)
-      cy.get(addPhoneNumberLink)
+      addPhoneNumberLink()
         .should('be.visible')
         .should($link => {
           const link = $link[0].getBoundingClientRect()
-          const card = $link.closest('.hmpps-summary-card')[0].getBoundingClientRect()
+          const card = addressesPage.addressCardBounds($link)
           expect(link.left).to.be.at.least(card.left)
           expect(link.right).to.be.at.most(card.right)
           if (width >= 641) {
-            const actions = $link.closest('.govuk-summary-list__actions')[0].getBoundingClientRect()
+            const actions = addressesPage.phoneNumberActionsBounds($link)
             expect(link.left).to.be.at.least(actions.left)
             expect(link.right).to.be.at.most(actions.right)
             expect(link.height).to.be.lessThan(30)
           }
         })
     })
-    cy.get(addPhoneNumberLink).click()
+    addPhoneNumberLink().click()
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
-    cy.getDataQa('cancel-link').should('have.attr', 'href', `/prisoner/${prisonerNumber}/addresses`)
-    cy.get('input[name="phoneNumberType0"][value="HOME"]').check()
-    cy.get('input[name="phoneNumber0"]').type(requestBody[0].phoneNumber)
-    cy.getDataQa('save-address-phone-numbers').click()
+    const phoneNumbersPage = Page.verifyOnPageWithTitle(AddressPhoneNumbersPage, 'Add a phone number for this address')
+    phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/addresses`)
+    phoneNumbersPage.phoneNumberType('HOME').check()
+    phoneNumbersPage.phoneNumber().type(requestBody[0].phoneNumber)
+    phoneNumbersPage.saveButton().click()
 
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses`)
-    cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
+    addressesPage.flashMessage().should('contain.text', 'Address phone number updated')
   })
 
   it('changes a phone number from this page and returns here', () => {
@@ -166,18 +161,20 @@ context('Addresses page', () => {
     cy.task('stubUpdateAddressPhoneNumber', { prisonerNumber, addressId, phoneId: phone.phoneId, requestBody })
 
     addressesPage = visitAddressesPage()
-    cy.get(
-      `a[href="/prisoner/${prisonerNumber}/addresses/${addressId}/change-address-phone-number/${phone.phoneId}?returnTo=addresses"]`,
-    ).click()
-    cy.get('input[name="phoneNumberType0"][value="VISIT"]').should('be.checked')
-    cy.get('input[name="phoneNumber0"]').should('have.value', phone.number)
-    cy.get('input[name="phoneNumberType0"][value="HOME"]').check()
-    cy.get('input[name="phoneNumber0"]').clear()
-    cy.get('input[name="phoneNumber0"]').type(requestBody.phoneNumber)
-    cy.get('input[name="phoneExtension0"]').type(requestBody.extension)
-    cy.getDataQa('save-address-phone-numbers').click()
+    addressesPage.phoneNumberLinks(prisonerNumber, addressId).change(phone.phoneId).click()
+    const phoneNumbersPage = Page.verifyOnPageWithTitle(
+      AddressPhoneNumbersPage,
+      'Change the phone number for this address',
+    )
+    phoneNumbersPage.phoneNumberType('VISIT').should('be.checked')
+    phoneNumbersPage.phoneNumber().should('have.value', phone.number)
+    phoneNumbersPage.phoneNumberType('HOME').check()
+    phoneNumbersPage.phoneNumber().clear()
+    phoneNumbersPage.phoneNumber().type(requestBody.phoneNumber)
+    phoneNumbersPage.phoneExtension().type(requestBody.extension)
+    phoneNumbersPage.saveButton().click()
 
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses`)
-    cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
+    addressesPage.flashMessage().should('contain.text', 'Address phone number updated')
   })
 })

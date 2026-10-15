@@ -7,7 +7,6 @@ import fs from 'fs'
 import {
   addDefaultSelectedValue,
   addressToLines,
-  addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
   arrayIncludes,
@@ -212,7 +211,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
   njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
   njkEnv.addFilter('formatAddressDate', formatAddressDate)
-  njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
   njkEnv.addFilter('toMoneyMiniSummary', moneySummaryToMiniSummary)
   njkEnv.addFilter('toAdjudicationsMiniSummary', adjudicationsSummaryToMiniSummary)
   njkEnv.addFilter('toNonAssociationMiniSummary', nonAssociationSummaryToMiniSummary)
