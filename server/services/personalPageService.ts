@@ -1,3 +1,8 @@
+import {
+  isGranted,
+  PrisonerPermissions,
+  PrisonerPropertyPermission,
+} from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   AddressForDisplay,
@@ -55,7 +60,7 @@ import {
   ReferenceDataCode,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { militaryHistoryEnabled } from '../utils/featureFlags'
+import { militaryHistoryEnabled, propertySummaryTileEnabled } from '../utils/featureFlags'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
@@ -81,6 +86,7 @@ interface PersonalPageGetOptions {
   simulateFetchEnabled: boolean
   personalRelationshipsApiReadEnabled: boolean
   personEndpointsEnabled: boolean
+  prisonerPropertyServiceEnabled: boolean
   apiErrorCallback: (error: Error) => void
 }
 
@@ -251,6 +257,7 @@ export default class PersonalPageService {
   public async get(
     token: string,
     prisonerData: Prisoner,
+    prisonerPermissions: PrisonerPermissions,
     options: Partial<PersonalPageGetOptions> = {},
   ): Promise<PersonalPage> {
     const defaultOptions: PersonalPageGetOptions = {
@@ -258,6 +265,7 @@ export default class PersonalPageService {
       simulateFetchEnabled: false,
       personalRelationshipsApiReadEnabled: true,
       personEndpointsEnabled: false,
+      prisonerPropertyServiceEnabled: false,
       apiErrorCallback: () => null,
     }
     const getOptions: PersonalPageGetOptions = { ...defaultOptions, ...options }
@@ -281,7 +289,10 @@ export default class PersonalPageService {
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getSecondaryLanguages(bookingId),
-      prisonApiClient.getProperty(bookingId),
+      !(propertySummaryTileEnabled() && getOptions.prisonerPropertyServiceEnabled) &&
+      isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
+        ? prisonApiClient.getProperty(bookingId)
+        : null,
       !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
@@ -675,7 +686,7 @@ export default class PersonalPageService {
 
   private property(property: PropertyContainer[]): PropertyItem[] {
     if (!Array.isArray(property)) {
-      return []
+      return null
     }
     return property.map(({ location, containerType, sealMark }) => ({
       containerType,

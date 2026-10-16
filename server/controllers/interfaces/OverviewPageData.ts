@@ -13,6 +13,7 @@ import LatestCalculationSummary from '../../services/interfaces/offencesService/
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
+import { PrisonerPropertySummary } from '../../data/interfaces/prisonerPropertyApi/prisonerPropertyApiClient'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -25,6 +26,7 @@ export default interface OverviewPageData {
   bookingId: number
   moneySummary: AccountBalances | null
   adjudicationSummary: Result<AdjudicationsOverviewSummary>
+  propertySummary: Result<PrisonerPropertySummary> | null
   visitsSummary: VisitsOverviewSummary | null
   schedule: OverviewSchedule
   csraSummary: CsraSummary

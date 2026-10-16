@@ -4,6 +4,7 @@
 {% from "macros/hmppsError.njk" import hmppsError %}
 
 {% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
+{% set showProperty = property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions) %}
 {% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
 
 {% block body %}
@@ -23,7 +24,7 @@
     { text: "Phone and email", href: "#phones-and-emails", template: "partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
     { text: "Next of kin", href: "#next-of-kin", template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
     { text: "Security", href: "#security", template: "partials/personalPage/security.njk" },
-    { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: inUserCaseload }
+    { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: showProperty }
   ] %}
 
   {% set sidebar %}
