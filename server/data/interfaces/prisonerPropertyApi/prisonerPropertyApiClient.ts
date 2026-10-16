@@ -26,5 +26,4 @@ export interface PrisonerPropertySummary {
 
 export interface PrisonerPropertyApiClient {
   getPrisonerPropertySummary(prisonerNumber: string): Promise<PrisonerPropertySummary>
-  getActiveAgencyIds(): Promise<string[]>
 }

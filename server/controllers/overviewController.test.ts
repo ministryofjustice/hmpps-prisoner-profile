@@ -256,7 +256,6 @@ describe('overviewController', () => {
         ...res.locals.feComponents.sharedData.services,
         { id: 'prisoner-property' } as Service,
       ]
-      prisonerPropertyService.isPrisonActive = jest.fn().mockResolvedValue(true)
     })
 
     afterEach(() => {
@@ -278,10 +277,6 @@ describe('overviewController', () => {
 
       await controller.displayOverview(req, res)
 
-      expect(prisonerPropertyService.isPrisonActive).toHaveBeenCalledWith(
-        'CLIENT_TOKEN',
-        req.middleware.prisonerData.prisonId,
-      )
       expect(prisonerPropertyService.getPropertySummary).toHaveBeenCalledWith('CLIENT_TOKEN', offenderNo)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -291,23 +286,21 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call prisonerPropertyService.getPropertySummary when the prison property service is inactive', async () => {
-      config.featureToggles.propertySummaryTileEnabled = true
-      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
-      prisonerPropertyService.isPrisonActive = jest.fn().mockResolvedValue(false)
-
-      await controller.displayOverview(req, res)
-
-      expect(prisonerPropertyService.isPrisonActive).toHaveBeenCalledWith(
-        'CLIENT_TOKEN',
-        req.middleware.prisonerData.prisonId,
-      )
-      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
-    })
-
     it('should not call prisonerPropertyService.getPropertySummary when permission is not granted', async () => {
       config.featureToggles.propertySummaryTileEnabled = true
       mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: false })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when the prisoner property service is not enabled in mfe', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      res.locals.feComponents.sharedData.services = res.locals.feComponents.sharedData.services.filter(
+        service => service.id !== 'prisoner-property',
+      )
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
 
       await controller.displayOverview(req, res)
 
