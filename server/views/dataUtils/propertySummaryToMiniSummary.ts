@@ -26,17 +26,17 @@ const mapper: MiniCardMapper<Result<PrisonerPropertySummary>, [string, PrisonerP
     return {
       heading: 'Property',
       id: 'property',
-      topLabel: `Containers in ${summary.currentEstablishmentName}`,
-      topContent: summary.heldInCurrentEstablishment,
+      topLabel: `Containers in ${summary.prisonName}`,
+      topContent: summary.heldAtThisPrison,
       topClass: 'big',
       items: [
         { text: `Due for transfer in: ${summary.dueForTransferIn}` },
         { text: `Due for transfer out: ${summary.dueForTransferOut}` },
-        ...(summary.overdueForDisposal > 0
-          ? [warningItem(`${pluralise(summary.overdueForDisposal, 'disposal')} overdue`)]
+        ...(summary.dueToBeDisposed > 0
+          ? [warningItem(`${pluralise(summary.dueToBeDisposed, 'disposal')} overdue`)]
           : []),
-        ...(summary.overdueForReturn > 0
-          ? [warningItem(`${pluralise(summary.overdueForReturn, 'return')} overdue`)]
+        ...(summary.dueToBeReturned > 0
+          ? [warningItem(`${pluralise(summary.dueToBeReturned, 'return')} overdue`)]
           : []),
       ],
       linkLabel: 'Property',

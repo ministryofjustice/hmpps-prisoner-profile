@@ -75,6 +75,7 @@ import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
 import OverviewController from './overviewController'
 import PrisonerPropertyService from '../services/prisonerPropertyService'
 import { prisonerPropertyServiceMock } from '../../tests/mocks/prisonerPropertyServiceMock'
+import { propertySummaryMock } from '../data/localMockData/prisonerPropertySummaryMock'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/xRayBodyScansAvailabilityService')
@@ -266,18 +267,11 @@ describe('overviewController', () => {
     it('should call prisonerPropertyService.getPropertySummary when the feature is enabled and permission is granted and the service is enabled', async () => {
       config.featureToggles.propertySummaryTileEnabled = true
       mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
-      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue({
-        currentEstablishmentName: 'Moorland (HMP & YOI)',
-        heldInCurrentEstablishment: 2,
-        dueForTransferIn: 0,
-        dueForTransferOut: 0,
-        overdueForDisposal: 0,
-        overdueForReturn: 0,
-      })
+      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue(propertySummaryMock)
 
       await controller.displayOverview(req, res)
 
-      expect(prisonerPropertyService.getPropertySummary).toHaveBeenCalledWith('CLIENT_TOKEN', offenderNo)
+      expect(prisonerPropertyService.getPropertySummary).toHaveBeenCalledWith('CLIENT_TOKEN', 'MDI', offenderNo)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -314,6 +308,37 @@ describe('overviewController', () => {
       await controller.displayOverview(req, res)
 
       expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      {
+        description: 'when the prisoner is held at users prison',
+        summary: { ...propertySummaryMock, prisonerHeldHere: true, heldAtThisPrison: 0 },
+        expected: expect.objectContaining({ status: 'fulfilled' }),
+      },
+      {
+        description: 'when the prisoner is not held at users prison but property is held there',
+        summary: { ...propertySummaryMock, prisonerHeldHere: false, heldAtThisPrison: 2 },
+        expected: expect.objectContaining({ status: 'fulfilled' }),
+      },
+      {
+        description: 'unless the prisoner is not held at users prison and no property is held there',
+        summary: { ...propertySummaryMock, prisonerHeldHere: false, heldAtThisPrison: 0 },
+        expected: null,
+      },
+    ])('should show the property card $description', async ({ summary, expected }) => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue(summary)
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          propertySummary: expected,
+        }),
+      )
     })
   })
 

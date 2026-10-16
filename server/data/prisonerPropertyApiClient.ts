@@ -1,5 +1,6 @@
 import type CircuitBreaker from 'opossum'
 import config from '../config'
+import { mapToQueryString } from '../utils/utils'
 import type {
   PrisonerPropertyApiClient,
   PrisonerPropertySummary,
@@ -12,9 +13,12 @@ export default class PrisonerPropertyApiRestClient extends RestClient implements
   }
 
   /** Requires the system client to hold ROLE_PRISONER_PROPERTY__RO. */
-  async getPrisonerPropertySummary(prisonerNumber: string): Promise<PrisonerPropertySummary> {
+  async getPrisonerPropertySummary(prisonId: string, prisonerNumber: string): Promise<PrisonerPropertySummary> {
     return this.get<PrisonerPropertySummary>(
-      { path: `/property-containers/prisoner/${encodeURIComponent(prisonerNumber)}/summary` },
+      {
+        path: `/property-containers/prisoner/${encodeURIComponent(prisonerNumber)}/summary`,
+        query: mapToQueryString({ prisonId }),
+      },
       this.token,
     )
   }

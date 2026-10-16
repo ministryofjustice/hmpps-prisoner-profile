@@ -109,7 +109,7 @@ export default class OverviewController {
       confirmedReleaseDate,
       moneySummary,
       adjudicationSummary,
-      propertySummary,
+      propertySummaryResult,
       visitsSummary,
       schedule,
       incentiveSummary,
@@ -144,7 +144,10 @@ export default class OverviewController {
       propertySummaryTileEnabled() &&
       isServiceEnabled('prisoner-property', res.locals.feComponents?.sharedData) &&
       isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions)
-        ? Result.wrap(this.prisonerPropertyService.getPropertySummary(clientToken, prisonerNumber), apiErrorCallback)
+        ? Result.wrap(
+            this.prisonerPropertyService.getPropertySummary(clientToken, activeCaseLoadId, prisonerNumber),
+            apiErrorCallback,
+          )
         : null,
       isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions)
         ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber)
@@ -215,12 +218,16 @@ export default class OverviewController {
 
     this.auditOverviewPageView(req, res, prisonerData)
 
+    const showPropertyCard =
+      propertySummaryResult &&
+      (propertySummaryResult.getOrNull()?.prisonerHeldHere || propertySummaryResult.getOrNull()?.heldAtThisPrison > 0)
+
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
       ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
       moneySummary,
       adjudicationSummary,
-      propertySummary,
+      propertySummary: showPropertyCard ? propertySummaryResult : null,
       visitsSummary,
       currentCsipDetail,
       categorySummary: getCategorySummary(

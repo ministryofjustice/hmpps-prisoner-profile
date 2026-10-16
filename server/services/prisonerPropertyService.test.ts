@@ -16,7 +16,7 @@ describe('prisonerPropertyService', () => {
 
   describe('getPropertySummary', () => {
     it('returns the summary from the api', async () => {
-      expect(await service.getPropertySummary(token, 'G6123VU')).toEqual(propertySummaryMock)
+      expect(await service.getPropertySummary(token, 'MDI', 'G6123VU')).toEqual(propertySummaryMock)
     })
   })
 })
