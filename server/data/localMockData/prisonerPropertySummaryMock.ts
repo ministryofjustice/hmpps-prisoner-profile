@@ -8,11 +8,12 @@ export const propertySummaryAtPrisonMock = (prisonId: string, prisonName: string
   currentEstablishmentId: prisonId,
   currentEstablishmentName: prisonName,
   heldAtThisPrison: 5,
-  dueForTransferOut: 2,
+  dueToTransferOut: 2,
   dueToBeReturned: 1,
   dueToBeDisposed: 2,
   heldAtOtherPrisons: 0,
-  dueForTransferIn: 1,
+  dueToTransferIn: 1,
+  hasEverHadProperty: true,
 })
 
 export const propertySummaryMock = propertySummaryAtPrisonMock('MDI', 'Moorland (HMP & YOI)')

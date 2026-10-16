@@ -32,7 +32,7 @@ export interface PrisonerPropertySummary {
    * Containers held at the viewing prison that are due to transfer out, because their
    * owner has moved on or is in transit
    */
-  dueForTransferOut: number
+  dueToTransferOut: number
 
   /**
    * Containers held at the viewing prison that are due to be returned, because their
@@ -54,7 +54,13 @@ export interface PrisonerPropertySummary {
    * follow the prisoner here, plus any already sent here and not yet logged on arrival. Only counted
    * when the prisoner is held at the viewing prison, otherwise 0.
    */
-  dueForTransferIn: number
+  dueToTransferIn: number
+
+  /**
+   * Whether the prisoner has any recorded property at all, at any prison (including containers since returned,
+   * disposed or transferred). Lets the card tell "never had property" apart from "no longer has any".
+   */
+  hasEverHadProperty: boolean
 }
 
 export interface PrisonerPropertyApiClient {

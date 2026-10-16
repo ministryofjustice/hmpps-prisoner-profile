@@ -322,6 +322,9 @@ context('Overview Page', () => {
         overviewPage.propertyCard().contains('.mini-card__item', 'Due for transfer out: 2')
         overviewPage.propertyCard().contains('.mini-card__item', '2 disposals overdue')
         overviewPage.propertyCard().contains('.mini-card__item', '1 return overdue')
+        overviewPage
+          .propertyCard()
+          .contains('a[href="http://localhost:3001/prisoner-property/prisoner/G6123VU"]', 'Property')
       })
     })
 

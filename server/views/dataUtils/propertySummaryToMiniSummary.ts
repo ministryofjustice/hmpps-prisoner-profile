@@ -30,8 +30,8 @@ const mapper: MiniCardMapper<Result<PrisonerPropertySummary>, [string, PrisonerP
       topContent: summary.heldAtThisPrison,
       topClass: 'big',
       items: [
-        { text: `Due for transfer in: ${summary.dueForTransferIn}` },
-        { text: `Due for transfer out: ${summary.dueForTransferOut}` },
+        { text: `Due for transfer in: ${summary.dueToTransferIn}` },
+        { text: `Due for transfer out: ${summary.dueToTransferOut}` },
         ...(summary.dueToBeDisposed > 0
           ? [warningItem(`${pluralise(summary.dueToBeDisposed, 'disposal')} overdue`)]
           : []),
