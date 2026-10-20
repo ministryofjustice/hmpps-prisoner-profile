@@ -19,7 +19,7 @@
     {
       text: "Identity numbers",
       href: "#identity-numbers",
-      template: "partials/personalPage/identityNumbers.njk"
+      template: "partials/personalPage/identityNumbers.njk",
       condition: isGranted(CorePersonRecordPermission.read_identifiers, prisonerPermissions)
     },
     {
@@ -46,7 +46,7 @@
       condition: isGranted(CorePersonRecordPermission.read_address, prisonerPermissions)
     },
     {
-      id: "global-numbers-and-email-addresses"
+      id: "global-numbers-and-email-addresses",
       text: "Phone and email",
       href: "#phones-and-emails",
       template: "partials/personalPage/globalNumbersAndEmailAddresses.njk",
