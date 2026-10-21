@@ -67,7 +67,7 @@
       text: "Property",
       href: "#property",
       template: "partials/personalPage/property.njk",
-      condition: isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
+      condition: property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
     }
   ] %}
 

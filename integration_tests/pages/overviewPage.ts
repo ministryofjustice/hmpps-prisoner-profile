@@ -69,19 +69,24 @@ export default class OverviewPage extends Page {
 
   secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(5) dd')
 
-  adjudicationsIncentivesGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').first()
+  miniSummaryGroupC = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').first()
 
-  adjudicationsSummary = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').find('#adjudications')
+  miniSummaryGroupD = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').first()
 
-  incentivesCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-c]').find('#incentives')
+  miniSummaryCard = (group: string, id: string): PageElement =>
+    cy.get(`[data-qa=overview-mini-summary-group-${group}]`).find(`#${id}`)
 
-  categoryCsraCsipGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').first()
+  adjudicationsSummary = (): PageElement => this.miniSummaryCard('c', 'adjudications')
 
-  categoryCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#category')
+  incentivesCard = (): PageElement => this.miniSummaryCard('c', 'incentives')
 
-  csraCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#csra')
+  categoryCard = (): PageElement => this.miniSummaryCard('c', 'category')
 
-  csipCard = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-d]').find('#csip')
+  csraCard = (): PageElement => this.miniSummaryCard('d', 'csra')
+
+  csipCard = (): PageElement => this.miniSummaryCard('d', 'csip')
+
+  propertyCard = (): PageElement => this.miniSummaryCard('d', 'property')
 
   personalDetails = () => {
     const card = (): PageElement => cy.getDataQa('personal-details')
