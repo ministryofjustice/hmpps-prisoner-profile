@@ -447,9 +447,6 @@ export default {
     },
 
     xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
-    xRayBodyScansSilentReads: {
-      enabledPrisons: get('X_RAY_BODY_SCANS_READS_ENABLED_PRISONS', []) as string[],
-    },
 
     offencesMoved: {
       enabledPrisons: get('OFFENCES_MOVED_ENABLED_PRISONS', []) as string[],
