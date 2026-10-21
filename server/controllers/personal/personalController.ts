@@ -8,11 +8,13 @@ import {
   editProfileEnabled,
   editProfileSimulateFetch,
   editReligionEnabled,
+  propertySummaryTileEnabled,
 } from '../../utils/featureFlags'
 import { type AuditService, Page } from '../../services/auditService'
 import type CareNeedsService from '../../services/careNeedsService'
 import type PersonalPageService from '../../services/personalPageService'
 import type { XRayBodyScansAvailabilityService } from '../../services/xRayBodyScansAvailabilityService'
+import { isServiceEnabled } from '../../utils/isServiceEnabled'
 
 export default class PersonalController {
   constructor(
@@ -32,6 +34,8 @@ export default class PersonalController {
       const editEnabled = editProfileEnabled(activeCaseLoadId)
       const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
       const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
+      const prisonerPropertyServiceEnabled =
+        propertySummaryTileEnabled() && isServiceEnabled('prisoner-property', res.locals.feComponents?.sharedData)
       const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
       const xrayBodyScansMoved = await this.xRayBodyScansAvailabilityService
         .getAvailability(req, res)
@@ -44,6 +48,7 @@ export default class PersonalController {
           personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           personEndpointsEnabled,
+          prisonerPropertyServiceEnabled,
         }),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         xrayBodyScansMoved ? null : this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),

@@ -60,7 +60,7 @@ import {
   ReferenceDataCode,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { militaryHistoryEnabled, propertySummaryTileEnabled } from '../utils/featureFlags'
+import { militaryHistoryEnabled } from '../utils/featureFlags'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
@@ -289,7 +289,7 @@ export default class PersonalPageService {
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getSecondaryLanguages(bookingId),
-      !(propertySummaryTileEnabled() && getOptions.prisonerPropertyServiceEnabled) &&
+      !getOptions.prisonerPropertyServiceEnabled &&
       isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
         ? prisonApiClient.getProperty(bookingId)
         : null,
