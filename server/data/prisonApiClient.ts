@@ -13,7 +13,6 @@ import ScheduledEvent from './interfaces/prisonApi/ScheduledEvent'
 import InmateDetail from './interfaces/prisonApi/InmateDetail'
 import PersonalCareNeeds from './interfaces/prisonApi/PersonalCareNeeds'
 import OffenderActivitiesHistory from './interfaces/prisonApi/OffenderActivitiesHistory'
-import OffenderAttendanceHistory from './interfaces/prisonApi/OffenderAttendanceHistory'
 import SecondaryLanguage from './interfaces/prisonApi/SecondaryLanguage'
 import PropertyContainer from './interfaces/prisonApi/PropertyContainer'
 import CourtCase from './interfaces/prisonApi/CourtCase'
@@ -56,19 +55,6 @@ import RestClient, { Request } from './restClient'
 export default class PrisonApiRestClient extends RestClient implements PrisonApiClient {
   constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
     super('Prison API', config.apis.prisonApi, token, circuitBreaker)
-  }
-
-  async getOffenderAttendanceHistory(
-    prisonerNumber: string,
-    fromDate: string,
-    toDate: string,
-  ): Promise<OffenderAttendanceHistory> {
-    return this.get(
-      {
-        path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=1000`,
-      },
-      this.token,
-    )
   }
 
   async getUserCaseLoads(): Promise<CaseLoad[]> {

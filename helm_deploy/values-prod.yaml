@@ -90,6 +90,7 @@ generic-service:
     PERSON_API_URL: "https://hmpps-person-record.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_API_URL: "https://prisoner-property-api.hmpps.service.justice.gov.uk"
+    ACTIVITIES_API_URL: 'https://activities-api.prison.service.justice.gov.uk'
 
     # Feature flags
     AUDIT_ENABLED: 'true'

@@ -9,7 +9,6 @@ import ScheduledEvent from './ScheduledEvent'
 import InmateDetail from './InmateDetail'
 import PersonalCareNeeds from './PersonalCareNeeds'
 import OffenderActivitiesHistory from './OffenderActivitiesHistory'
-import OffenderAttendanceHistory from './OffenderAttendanceHistory'
 import SecondaryLanguage from './SecondaryLanguage'
 import PropertyContainer from './PropertyContainer'
 import CourtCase from './CourtCase'
@@ -84,12 +83,6 @@ export interface PrisonApiClient {
   getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds>
 
   getOffenderActivitiesHistory(prisonerNumber: string, earliestEndDate: string): Promise<OffenderActivitiesHistory>
-
-  getOffenderAttendanceHistory(
-    prisonerNumber: string,
-    fromDate: string,
-    toDate: string,
-  ): Promise<OffenderAttendanceHistory>
 
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
 

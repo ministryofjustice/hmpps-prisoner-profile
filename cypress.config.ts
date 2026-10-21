@@ -20,6 +20,7 @@ import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfileDeliusApi'
 import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
+import activitiesApi from './integration_tests/mockApis/activitiesApi'
 import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import prisonRegisterApi from './integration_tests/mockApis/prisonRegisterApi'
 import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateReleaseDatesApi'
@@ -76,6 +77,7 @@ export default defineConfig({
         ...nonAssociationsApi,
         ...prisonerProfileDeliusApi,
         ...whereAboutsApi,
+        ...activitiesApi,
         ...cellMovementsApi,
         ...prisonRegisterApi,
         ...calcluateReleaseDatesApi,
