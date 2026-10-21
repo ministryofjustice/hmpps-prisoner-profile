@@ -92,11 +92,6 @@ export default class OverviewController {
     const xRayBodyScansAvailability = await this.xRayBodyScansAvailabilityService.getAvailability(req, res)
     const showXRayBodyScansCard = this.xRayBodyScansAvailabilityService.showOverviewCard(xRayBodyScansAvailability)
 
-    // TODO: Delete this once performance testing is over
-    const xrayBodyScansReadsEnabled =
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes('***') ||
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes(activeCaseLoadId)
-
     const [
       pathfinderNominal,
       socNominal,
@@ -118,8 +113,6 @@ export default class OverviewController {
       externalContactsSummary,
       xrayBodyScanSummary,
       isYouthPrisoner,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      _xrbsPerformanceTestToBeRemoved,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -183,15 +176,6 @@ export default class OverviewController {
           )
         : null,
       this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken),
-      // TODO: Delete this once performance testing is done
-      xrayBodyScansReadsEnabled && !showXRayBodyScansCard
-        ? Result.wrap(
-            xRayBodyScansApiClient
-              .getScanSummary(prisonerNumber, { includeLatestScan: true })
-              .then(_summaryResponse => true),
-            apiErrorCallback,
-          )
-        : null,
     ])
 
     const overviewActions = buildOverviewActions(
