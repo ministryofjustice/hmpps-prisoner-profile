@@ -15,7 +15,6 @@ const mapper: MiniCardMapper<OverviewPageData['categorySummary'], [boolean, numb
     items: [
       {
         text: codeDescription || 'Not entered',
-        classes: 'hmpps-mini-card__big',
       },
       ...(nextReviewDate
         ? [

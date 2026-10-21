@@ -13,10 +13,7 @@ describe('categorySummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       id: 'category',
       heading: 'Category',
-      items: [
-        { text: 'CODE', classes: 'hmpps-mini-card__big' },
-        { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' },
-      ],
+      items: [{ text: 'CODE' }, { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'Category',
       linkHref: 'http://localhost:3001/12345',
     })
@@ -33,10 +30,7 @@ describe('categorySummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       id: 'category',
       heading: 'Category',
-      items: [
-        { text: 'CODE', classes: 'hmpps-mini-card__big' },
-        { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' },
-      ],
+      items: [{ text: 'CODE' }, { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'Manage category',
       linkHref: 'http://localhost:3001/12345',
     })
@@ -53,10 +47,7 @@ describe('categorySummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       id: 'category',
       heading: 'Category',
-      items: [
-        { text: 'CODE', classes: 'hmpps-mini-card__big' },
-        { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' },
-      ],
+      items: [{ text: 'CODE' }, { text: 'Next review: 01/01/2021', classes: 'hmpps-secondary-text' }],
     })
   })
 
@@ -66,7 +57,7 @@ describe('categorySummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       id: 'category',
       heading: 'Category',
-      items: [{ text: 'Not entered', classes: 'hmpps-mini-card__big' }],
+      items: [{ text: 'Not entered' }],
       linkHref: 'http://localhost:3001/12345',
       linkLabel: 'Category',
     })
