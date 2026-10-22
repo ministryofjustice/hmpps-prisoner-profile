@@ -66,9 +66,37 @@ describe('categorySummaryToMiniSummary', () => {
     expect(miniSummary).toEqual({
       id: 'category',
       heading: 'Category',
-      items: [{ text: 'Not entered', classes: 'hmpps-mini-card__big' }],
+      items: [{ text: 'Not entered', classes: '' }],
       linkHref: 'http://localhost:3001/12345',
       linkLabel: 'Category',
+    })
+  })
+
+  it('should not apply the class "big"  when there is no category code', () => {
+    const categorySummary: OverviewPageData['categorySummary'] = {
+      codeDescription: undefined,
+      nextReviewDate: '2021-01-01',
+      userCanManage: true,
+    }
+    const bookingId = 12345
+    const miniSummary = categorySummaryToMiniSummary(categorySummary, true, bookingId)
+    expect(miniSummary.items[0]).toEqual({
+      text: 'Not entered',
+      classes: '',
+    })
+  })
+
+  it('should not apply the class "big" when category code is "Not entered"', () => {
+    const categorySummary: OverviewPageData['categorySummary'] = {
+      codeDescription: 'Not entered',
+      nextReviewDate: '2021-01-01',
+      userCanManage: true,
+    }
+    const bookingId = 12345
+    const miniSummary = categorySummaryToMiniSummary(categorySummary, true, bookingId)
+    expect(miniSummary.items[0]).toEqual({
+      text: 'Not entered',
+      classes: '',
     })
   })
 })
