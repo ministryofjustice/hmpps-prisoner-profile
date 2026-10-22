@@ -1,5 +1,7 @@
 @use 'sass:map';
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
+
+@use './typography';
 
 .remove-column-gutters {
   padding-left: 0;
@@ -28,7 +30,7 @@
 
   &:focus {
     img {
-      outline: 4px solid govuk-functional-colour(focus);
+      outline: 4px solid govuk.govuk-functional-colour(focus);
       outline-offset: -1px;
     }
   }
@@ -54,12 +56,12 @@
 }
 
 .hmpps-grey-details-card {
-  border-left: 5px solid govuk-colour("black", $variant: "tint-80");
+  border-left: 5px solid govuk.govuk-colour('black', $variant: 'tint-80');
   margin: 0;
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
 }
 
-@include govuk-media-query($from: tablet) {
+@include govuk.govuk-media-query($from: tablet) {
   .hmpps-conditional-summary-row {
     display: table-row-group;
   }
@@ -70,7 +72,7 @@
 }
 
 .prisoner-profile-breadcrumbs {
-  @include govuk-clearfix;
+  @include govuk.govuk-clearfix;
   margin-top: 15px;
   margin-bottom: 15px;
 
@@ -91,7 +93,7 @@
       transform: rotate(225deg);
       border: solid;
       border-width: 1px 1px 0 0;
-      border-color: govuk-colour('black');
+      border-color: govuk.govuk-colour('black');
     }
 
     a:link,
@@ -99,18 +101,18 @@
       display: inline-block;
       position: relative;
       padding-left: 12px;
-      color: govuk-colour('black');
+      color: govuk.govuk-colour('black');
     }
   }
 
   &__search {
     float: left;
-    @include govuk-font($size: 16);
+    @include govuk.govuk-font($size: 16);
 
     &:has(+ .prisoner-profile-breadcrumbs__breadcrumbs ol > li > a) {
-      border-right: 1px solid govuk-functional-colour(secondary-text);
-      padding-right: govuk-spacing(3);
-      margin-right: govuk-spacing(3);
+      border-right: 1px solid govuk.govuk-functional-colour(secondary-text);
+      padding-right: govuk.govuk-spacing(3);
+      margin-right: govuk.govuk-spacing(3);
     }
   }
 
@@ -125,21 +127,21 @@
 }
 
 .horizontal-information {
-  @media print, (min-width: map.get($govuk-breakpoints, 'tablet')) {
+  @media print, (min-width: map.get(govuk.$govuk-breakpoints, 'tablet')) {
     padding-bottom: 0;
     display: flex;
   }
 
   &--with-border {
-    padding: govuk-spacing(3) 0;
-    border-top: 1px solid govuk-functional-colour(border);
-    border-bottom: 1px solid govuk-functional-colour(border);
+    padding: govuk.govuk-spacing(3) 0;
+    border-top: 1px solid govuk.govuk-functional-colour(border);
+    border-bottom: 1px solid govuk.govuk-functional-colour(border);
   }
 
   &__item {
-    @media print, (min-width: map.get($govuk-breakpoints, 'tablet')) {
+    @media print, (min-width: map.get(govuk.$govuk-breakpoints, 'tablet')) {
       flex: 1 1 0;
-      padding-right: govuk-spacing(3);
+      padding-right: govuk.govuk-spacing(3);
 
       &--tenth {
         flex-basis: 10%;
@@ -169,11 +171,11 @@
 @include hmpps-width-x;
 
 .hmpps-border-top {
-  border-top: 1px solid govuk-functional-colour(border);
+  border-top: 1px solid govuk.govuk-functional-colour(border);
 }
 
 .hmpps-border-bottom {
-  border-bottom: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk.govuk-functional-colour(border);
 }
 
 div.hmpps-merged-key-summary-list-row {
@@ -185,11 +187,11 @@ div.hmpps-merged-key-summary-list-row {
   }
 
   > .govuk-summary-list__value {
-    border-bottom: 1px solid govuk-functional-colour(border);
+    border-bottom: 1px solid govuk.govuk-functional-colour(border);
   }
 
   > .govuk-summary-list__actions {
-    border-bottom: 1px solid govuk-functional-colour(border);
+    border-bottom: 1px solid govuk.govuk-functional-colour(border);
   }
 }
 

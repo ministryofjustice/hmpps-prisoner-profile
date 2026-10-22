@@ -1,6 +1,6 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 #current-religion-display {
-  background-color: govuk-colour("black", $variant: "tint-95");
+  background-color: govuk.govuk-colour('black', $variant: 'tint-95');
   width: fit-content;
 }
