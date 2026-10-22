@@ -9,12 +9,15 @@ const mapper: MiniCardMapper<OverviewPageData['categorySummary'], [boolean, numb
   bookingId,
 ) => {
   const { codeDescription, nextReviewDate, userCanManage } = categorySummary || {}
+  const categoryText = codeDescription || 'Not entered'
+  const isNotEntered = categoryText === 'Not entered'
   return {
     id: 'category',
     heading: 'Category',
     items: [
       {
-        text: codeDescription || 'Not entered',
+        text: categoryText,
+        classes: isNotEntered ? '' : 'hmpps-mini-card__big',
       },
       ...(nextReviewDate
         ? [
