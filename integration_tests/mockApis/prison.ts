@@ -17,7 +17,7 @@ import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
-import type { AddressPhoneNumberCreateRequest } from '../../server/data/interfaces/prisonApi/Telephone'
+import type { AddressPhoneNumberRequest } from '../../server/data/interfaces/prisonApi/Telephone'
 import {
   pastCareNeedsMock,
   personalCareNeedsMock,
@@ -288,7 +288,7 @@ export default {
   }: {
     prisonerNumber: string
     addressId: number
-    requestBody: AddressPhoneNumberCreateRequest[]
+    requestBody: AddressPhoneNumberRequest[]
   }) =>
     stubFor({
       request: {
@@ -302,6 +302,37 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: [],
+      },
+    }),
+
+  stubUpdateAddressPhoneNumber: ({
+    prisonerNumber,
+    addressId,
+    phoneId,
+    requestBody,
+  }: {
+    prisonerNumber: string
+    addressId: number
+    phoneId: number
+    requestBody: AddressPhoneNumberRequest
+  }) =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers/${phoneId}`,
+        bodyPatterns: [{ equalToJson: requestBody }],
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          phoneId,
+          number: requestBody.phoneNumber,
+          type: requestBody.phoneNumberType,
+          ext: requestBody.extension,
+        },
       },
     }),
 

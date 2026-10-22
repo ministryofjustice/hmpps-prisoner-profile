@@ -47,3 +47,5 @@ export const personDuplicateRecordsEnabled: FeatureFlagMethod = scheduledFeature
 )
 
 export const offencesMoved: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.offencesMoved)
+
+export const propertySummaryTileEnabled: FeatureFlagMethod = () => config.featureToggles.propertySummaryTileEnabled

@@ -76,6 +76,20 @@
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
       {% endif %}
     {% endfor %}
+    {% if not isChanging %}
+      <div class="govuk-button-group">
+        {{
+          govukButton({
+            text: "Add another phone number",
+            id: "submit-and-add-another",
+            type: "submit",
+            classes: "govuk-button--secondary hmpps-button__add-another",
+            preventDoubleClick: true,
+            attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
+          })
+        }}
+      </div>
+    {% endif %}
     <div class="govuk-button-group">
       {{
         govukButton({
@@ -83,16 +97,6 @@
           type: "submit",
           preventDoubleClick: true,
           attributes: { "data-qa": "save-address-phone-numbers" }
-        })
-      }}
-      {{
-        govukButton({
-          text: "Add another phone number",
-          id: "submit-and-add-another",
-          type: "submit",
-          classes: "govuk-button--secondary hmpps-button__add-another",
-          preventDoubleClick: true,
-          attributes: { name: "submitAction", value: "addAnother", "data-qa": "add-another-phone-number" }
         })
       }}
       <a

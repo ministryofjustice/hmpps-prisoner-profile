@@ -3,9 +3,6 @@
 {% from "macros/conditionallyShow.njk" import conditionallyShow %}
 {% from "macros/hmppsError.njk" import hmppsError %}
 
-{% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length %}
-{% set inUserCaseload = isInUsersCaseLoad(prisonId, user) %}
-
 {% block body %}
   {% if pageHasApiErrors and useCustomErrorBanner %}
     <div class="govuk-grid-row">
@@ -14,16 +11,64 @@
   {% endif %}
 
   {% set sections = [
-    { text: "Personal details", href: "#personal-details", template: "partials/personalPage/personalDetails.njk" },
-    { text: "Identity numbers", href: "#identity-numbers", template: "partials/personalPage/identityNumbers.njk" },
-    { text: "Care needs", href: "#care-needs", template: "partials/personalPage/careNeeds.njk" },
-    { text: "Neurodiversity", href: "#neurodiversity", template: "partials/personalPage/neurodiversity.njk", condition: showNeurodiversity },
-    { text: "Appearance", href: "#appearance", template: "partials/personalPage/appearance.njk", condition: inUserCaseload },
-    { text: "Addresses", href: "#addresses", template: "partials/personalPage/addresses.njk" if displayNewAddressesCard else "partials/personalPage/oldAddresses.njk" },
-    { text: "Phone and email", href: "#phones-and-emails", template: "partials/personalPage/globalNumbersAndEmailAddresses.njk", condition: inUserCaseload and editEnabled, id: "global-numbers-and-email-addresses" },
-    { text: "Next of kin", href: "#next-of-kin", template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk", condition: inUserCaseload },
-    { text: "Security", href: "#security", template: "partials/personalPage/security.njk" },
-    { text: "Property", href: "#property", template: "partials/personalPage/property.njk", condition: inUserCaseload }
+    {
+      text: "Personal details",
+      href: "#personal-details",
+      template: "partials/personalPage/personalDetails.njk"
+    },
+    {
+      text: "Identity numbers",
+      href: "#identity-numbers",
+      template: "partials/personalPage/identityNumbers.njk",
+      condition: isGranted(CorePersonRecordPermission.read_identifiers, prisonerPermissions)
+    },
+    {
+      text: "Care needs",
+      href: "#care-needs",
+      template: "partials/personalPage/careNeeds.njk"
+    },
+    {
+      text: "Neurodiversity",
+      href: "#neurodiversity",
+      template: "partials/personalPage/neurodiversity.njk",
+      condition: neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length
+    },
+    {
+      text: "Appearance",
+      href: "#appearance",
+      template: "partials/personalPage/appearance.njk",
+      condition: isGranted(CorePersonRecordPermission.read_physical_characteristics, prisonerPermissions) or isGranted(CorePersonRecordPermission.read_distinguishing_marks, prisonerPermissions)
+    },
+    {
+      text: "Addresses",
+      href: "#addresses",
+      template: "partials/personalPage/addresses.njk" if displayNewAddressesCard else "partials/personalPage/oldAddresses.njk",
+      condition: isGranted(CorePersonRecordPermission.read_address, prisonerPermissions)
+    },
+    {
+      id: "global-numbers-and-email-addresses",
+      text: "Phone and email",
+      href: "#phones-and-emails",
+      template: "partials/personalPage/globalNumbersAndEmailAddresses.njk",
+      condition: isGranted(CorePersonRecordPermission.read_phone_numbers, prisonerPermissions) or isGranted(CorePersonRecordPermission.read_email_addresses, prisonerPermissions)
+    },
+    {
+      text: "Next of kin",
+      href: "#next-of-kin",
+      template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk",
+      condition: isGranted(PersonalRelationshipsPermission.read_emergency_contacts, prisonerPermissions)
+    },
+    {
+      text: "Security",
+      href: "#security",
+      template: "partials/personalPage/security.njk"
+    },
+    {
+      text: "Property",
+      href: "#property",
+      template: "partials/personalPage/property.njk",
+      condition: property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
+    }
   ] %}
 
   {% set sidebar %}

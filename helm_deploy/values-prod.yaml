@@ -51,6 +51,7 @@ generic-service:
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans.hmpps.service.justice.gov.uk"
     TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_UI_URL: "https://prisoner-property.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: 'https://activities.prison.service.justice.gov.uk/activities'
@@ -88,6 +89,7 @@ generic-service:
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_API_URL: "https://prisoner-property-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: 'true'
@@ -103,10 +105,10 @@ generic-service:
     MANAGE_ALLOCATIONS_ENABLED: 'true'
     EDIT_RELIGION_ENABLED_FROM: '2025-06-10T00:00:00'
     PERSON_ENDPOINTS_ENABLED: 'false'
-    X_RAY_BODY_SCANS_ENABLED: "false"
+    X_RAY_BODY_SCANS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE: 'HLI'
     OFFENCES_MOVED_ENABLED_FROM: '2026-08-20T10:00:00'
-    X_RAY_BODY_SCANS_READS_ENABLED_PRISONS: "***"
+    PROPERTY_SUMMARY_TILE_ENABLED: "false"
 
   allowlist:
     groups:

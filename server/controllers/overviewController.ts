@@ -8,6 +8,7 @@ import {
   PrisonerAdjudicationsPermission,
   PrisonerIncentivesPermission,
   PrisonerMoneyPermission,
+  PrisonerPropertyPermission,
   PrisonerVisitsAndVisitorsPermission,
   XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
@@ -48,8 +49,9 @@ import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
-import { offencesMoved } from '../utils/featureFlags'
+import { offencesMoved, propertySummaryTileEnabled } from '../utils/featureFlags'
 import ContactsService from '../services/contactsService'
+import PrisonerPropertyService from '../services/prisonerPropertyService'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -73,6 +75,7 @@ export default class OverviewController {
     private readonly contactsService: ContactsService,
     private readonly prisonService: PrisonService,
     private readonly xRayBodyScansAvailabilityService: XRayBodyScansAvailabilityService,
+    private readonly prisonerPropertyService: PrisonerPropertyService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
@@ -92,11 +95,6 @@ export default class OverviewController {
     const xRayBodyScansAvailability = await this.xRayBodyScansAvailabilityService.getAvailability(req, res)
     const showXRayBodyScansCard = this.xRayBodyScansAvailabilityService.showOverviewCard(xRayBodyScansAvailability)
 
-    // TODO: Delete this once performance testing is over
-    const xrayBodyScansReadsEnabled =
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes('***') ||
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons.includes(activeCaseLoadId)
-
     const [
       pathfinderNominal,
       socNominal,
@@ -106,6 +104,7 @@ export default class OverviewController {
       confirmedReleaseDate,
       moneySummary,
       adjudicationSummary,
+      propertySummaryResult,
       visitsSummary,
       schedule,
       incentiveSummary,
@@ -118,8 +117,6 @@ export default class OverviewController {
       externalContactsSummary,
       xrayBodyScanSummary,
       isYouthPrisoner,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      _xrbsPerformanceTestToBeRemoved,
     ] = await Promise.all([
       Result.wrap(pathfinderApiClient.getNominal(prisonerNumber), apiErrorCallback),
       Result.wrap(manageSocCasesApiClient.getNominal(prisonerNumber), apiErrorCallback),
@@ -136,6 +133,14 @@ export default class OverviewController {
         : null,
       isGranted(PrisonerAdjudicationsPermission.read, prisonerPermissions)
         ? Result.wrap(this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId), apiErrorCallback)
+        : null,
+      propertySummaryTileEnabled() &&
+      isServiceEnabled('prisoner-property', res.locals.feComponents?.sharedData) &&
+      isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions)
+        ? Result.wrap(
+            this.prisonerPropertyService.getPropertySummary(clientToken, activeCaseLoadId, prisonerNumber),
+            apiErrorCallback,
+          )
         : null,
       isGranted(PrisonerVisitsAndVisitorsPermission.read, prisonerPermissions)
         ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber)
@@ -183,15 +188,6 @@ export default class OverviewController {
           )
         : null,
       this.prisonService.isPrisonPartOfYouthCustodyService(prisonId, clientToken),
-      // TODO: Delete this once performance testing is done
-      xrayBodyScansReadsEnabled && !showXRayBodyScansCard
-        ? Result.wrap(
-            xRayBodyScansApiClient
-              .getScanSummary(prisonerNumber, { includeLatestScan: true })
-              .then(_summaryResponse => true),
-            apiErrorCallback,
-          )
-        : null,
     ])
 
     const overviewActions = buildOverviewActions(
@@ -206,11 +202,16 @@ export default class OverviewController {
 
     this.auditOverviewPageView(req, res, prisonerData)
 
+    const showPropertyCard =
+      propertySummaryResult &&
+      (propertySummaryResult.getOrNull()?.prisonerHeldHere || propertySummaryResult.getOrNull()?.heldAtThisPrison > 0)
+
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
       ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
       moneySummary,
       adjudicationSummary,
+      propertySummary: showPropertyCard ? propertySummaryResult : null,
       visitsSummary,
       currentCsipDetail,
       categorySummary: getCategorySummary(

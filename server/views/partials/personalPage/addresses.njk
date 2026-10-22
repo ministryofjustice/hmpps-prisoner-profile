@@ -6,11 +6,7 @@
 {% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
 
 {% macro addressHeading(text) %}
-  {% if editAddressSpecificPhoneNumbersEnabled %}
     <h2 class="govuk-heading-m govuk-!-margin-bottom-2">{{ text }}</h2>
-  {% else %}
-    <span class="govuk-caption-m govuk-!-margin-bottom-2">{{ text }}</span>
-  {% endif %}
 {% endmacro %}
 
 {% macro addressSummary(address, primaryOrPostal) %}
@@ -42,42 +38,18 @@
 
     {% set addressPhoneNumbers = address.addressPhoneNumbersForDisplay or [] %}
 
-    {% set addressPhoneNumbersHtml %}
-      {% if addressPhoneNumbers.length > 0 %}
-        <div class="hmpps-address__phones__list">
-          {% for number in addressPhoneNumbers %}
-            <div class="hmpps-address__phone">
-              <div class="hmpps-address__phone__details">
-                <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
-                <p class="govuk-body govuk-!-margin-0">{{ number.number | formatPhoneNumber }}</p>
-                {% if number.extension %}
-                  <p class="govuk-body govuk-!-margin-0">Ext: {{ number.extension }}</p>
-                {% endif %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="govuk-body">Not entered</p>
-      {% endif %}
-    {% endset %}
-
     {% set additionalDetailsHtml %}
       <div class="hmpps-address__additional-details">
         {{ govukSummaryList({
           rows: [
             {
-              key: { text: "Address type" if editAddressSpecificPhoneNumbersEnabled else "Type" },
+              key: { text: "Address type" },
               value: { html: addressUsageTypesHtml }
             },
             {
-              key: { text: "Address dates" if editAddressSpecificPhoneNumbersEnabled else "Dates" },
+              key: { text: "Address dates" },
               value: { text: addressDatesText }
             },
-            {
-              key: { text: "Address phone numbers" },
-              value: { html: addressPhoneNumbersHtml }
-            } if not editAddressSpecificPhoneNumbersEnabled,
             {
               key: { text: "Comments" },
               value: { text: address.comment or "Not entered" }
@@ -95,7 +67,6 @@
 
     <p class="hmpps-address__added-date govuk-body-s">Added on {{ address.fromDate | formatDate }}</p>
 
-    {% if editAddressSpecificPhoneNumbersEnabled %}
       <div class="govuk-!-margin-bottom-0" data-qa="address-phone-numbers">
         <div class="hmpps-address__phones__header">
           <h2 class="govuk-heading-m">Phone numbers</h2>
@@ -110,8 +81,8 @@
             {% for number in addressPhoneNumbers | sort(true, false, 'createDatetime') %}
               <div class="hmpps-address__phone {{ 'row-updated' if flashMessage and flashMessage.fieldName == 'addressPhoneNumbers' and flashMessage.phoneIds and number.id in flashMessage.phoneIds }}">
                 <div class="hmpps-address__phone__details">
-                  <p class="govuk-body govuk-!-margin-0 govuk-!-font-weight-bold">{{ number.typeDescription }}</p>
-                  <p class="govuk-body govuk-!-margin-0">{{ number.number }}</p>
+                  <p class="govuk-body govuk-!-margin-0">{{ number.typeDescription }}</p>
+                  <p class="govuk-body govuk-!-margin-0">{{ number.number if editAddressSpecificPhoneNumbersEnabled else number.number | formatPhoneNumber }}</p>
                   {% if number.extension %}
                     <p class="govuk-body govuk-!-margin-0">Extension: {{ number.extension }}</p>
                   {% endif %}
@@ -133,7 +104,6 @@
           <p class="govuk-body">Not entered</p>
         {% endif %}
       </div>
-    {% endif %}
 
     <hr class="hmpps-address__break govuk-section-break govuk-section-break--visible" aria-hidden="true">
   </div>

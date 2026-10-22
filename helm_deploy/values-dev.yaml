@@ -55,6 +55,7 @@ generic-service:
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-dev.hmpps.service.justice.gov.uk"
     TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler-dev.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_UI_URL: "https://prisoner-property-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
@@ -73,8 +74,8 @@ generic-service:
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-dev.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
-    LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk
-    NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk
+    LOCATIONS_INSIDE_PRISON_API_URL: "https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk"
+    NOMIS_SYNC_PRISONER_MAPPING_API_URL: "https://nomis-sync-prisoner-mapping-dev.hmpps.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     CELL_MOVEMENTS_API_URL: "https://change-someones-cell-api-dev.hmpps.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
@@ -90,6 +91,7 @@ generic-service:
     SUPPORT_FOR_ADDITIONAL_NEEDS_API_URL: "https://support-for-additional-needs-api-dev.hmpps.service.justice.gov.uk"
     PERSON_API_URL: "https://hmpps-person-record-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk"
+    PRISONER_PROPERTY_API_URL: "https://prisoner-property-api-dev.hmpps.service.justice.gov.uk"
 
     # Circuit Breaker
     CIRCUIT_BREAKER_DEFAULT_THRESHOLD: 80
@@ -114,7 +116,7 @@ generic-service:
     PERSON_ENDPOINTS_ENABLED: "true"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     X_RAY_BODY_SCANS_ENABLED: "true"
-    X_RAY_BODY_SCANS_READS_ENABLED_PRISONS: "***"
+    PROPERTY_SUMMARY_TILE_ENABLED: "true"
 
   allowlist:
     groups:

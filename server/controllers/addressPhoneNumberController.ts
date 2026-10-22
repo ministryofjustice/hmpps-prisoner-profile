@@ -48,8 +48,21 @@ export default class AddressPhoneNumberController {
 
       if (!address) throw new NotFoundError('Could not find address')
 
+      const phoneId = req.params.phoneId === undefined ? undefined : Number(req.params.phoneId)
+      const isChanging = phoneId !== undefined
+      const phone = isChanging ? address.phones?.find(candidate => candidate.phoneId === phoneId) : undefined
+
+      if (isChanging && !phone) throw new NotFoundError('Could not find phone number')
+
       const formValues = requestBodyFromFlash<Record<string, unknown>>(req)
-      const phoneNumbers = addressPhoneNumberFormValues(formValues ?? {})
+      const initialFormValues = phone
+        ? {
+            phoneNumberType0: phone.type,
+            phoneNumber0: phone.number,
+            phoneExtension0: phone.ext ?? '',
+          }
+        : {}
+      const phoneNumbers = addressPhoneNumberFormValues(formValues ?? initialFormValues)
       const errors = req.flash('errors')
 
       await this.auditService.sendPageView({
@@ -57,12 +70,12 @@ export default class AddressPhoneNumberController {
         prisonerNumber,
         prisonId,
         correlationId: req.id,
-        page: Page.AddAddressPhoneNumber,
+        page: isChanging ? Page.EditAddressPhoneNumber : Page.AddAddressPhoneNumber,
       })
 
       return res.render('pages/edit/addressPhoneNumbers', {
-        pageTitle: 'Add a phone number for this address - Prisoner personal details',
-        formTitle: 'Add a phone number for this address',
+        pageTitle: `${isChanging ? 'Change a phone number for this address' : 'Add a phone number for this address'} - Prisoner personal details`,
+        formTitle: isChanging ? 'Change the phone number for this address' : 'Add a phone number for this address',
         addressLines: [
           ...(address.noFixedAddress ? ['No fixed address'] : []),
           ...addressToLines({
@@ -83,6 +96,7 @@ export default class AddressPhoneNumberController {
             checked: phoneNumber.phoneNumberType === option.value,
           })),
         })),
+        isChanging,
         errors,
         prisonerNumber,
         miniBannerData,
@@ -94,9 +108,11 @@ export default class AddressPhoneNumberController {
     return async (req, res) => {
       const { clientToken, prisonerNumber } = getCommonRequestData(req, res)
       const addressId = Number(req.params.addressId)
+      const isChanging = req.params.phoneId !== undefined
       const phoneNumbers = addressPhoneNumberFormValues(req.body)
+      const addAddressPhoneNumberUrl = `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`
 
-      if (req.query.removePhoneNumber !== undefined) {
+      if (!isChanging && req.query.removePhoneNumber !== undefined) {
         const removedIndex = Number(req.query.removePhoneNumber)
         const requestBody = Object.fromEntries(
           phoneNumbers
@@ -108,36 +124,50 @@ export default class AddressPhoneNumberController {
             ]),
         )
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
-      if (req.query.addAnother === 'true') {
+      if (!isChanging && req.query.addAnother === 'true') {
         const requestBody = { ...req.body }
         const nextIndex = phoneNumbers.length
         requestBody[`phoneNumberType${nextIndex}`] = ''
         requestBody[`phoneNumber${nextIndex}`] = ''
         requestBody[`phoneExtension${nextIndex}`] = ''
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
+        return res.redirect(addAddressPhoneNumberUrl)
       }
 
-      const phoneNumberRequests = phoneNumbers.map(({ phoneNumber, phoneNumberType, phoneExtension }) => ({
-        phoneNumber,
-        phoneNumberType,
-        extension: phoneExtension || undefined,
-      }))
+      const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
+        ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
+          phoneNumber,
+          phoneNumberType,
+          extension: phoneExtension || undefined,
+        }),
+      )
 
       try {
-        const createdPhoneNumbers = await this.addressService.addAddressPhoneNumbers(
-          clientToken,
-          prisonerNumber,
-          addressId,
-          phoneNumberRequests,
-        )
+        const savedPhoneNumbers = isChanging
+          ? [
+              await this.addressService.updateAddressPhoneNumber(
+                clientToken,
+                prisonerNumber,
+                addressId,
+                Number(req.params.phoneId),
+                phoneNumberRequests[0],
+              ),
+            ]
+          : await this.addressService.addAddressPhoneNumbers(
+              clientToken,
+              prisonerNumber,
+              addressId,
+              phoneNumberRequests,
+            )
         req.flash('flashMessage', {
           text: 'Address phone number updated',
           fieldName: 'addressPhoneNumbers',
-          phoneIds: createdPhoneNumbers.map(phoneNumber => phoneNumber.phoneId).filter(Boolean),
+          phoneIds: isChanging
+            ? [Number(req.params.phoneId)]
+            : savedPhoneNumbers.map(phoneNumber => phoneNumber.phoneId).filter(Boolean),
         })
 
         this.auditService
@@ -145,8 +175,10 @@ export default class AddressPhoneNumberController {
             user: res.locals.user,
             prisonerNumber,
             correlationId: req.id,
-            action: PostAction.AddAddressPhoneNumber,
-            details: { addressId, phoneNumbers: phoneNumberRequests },
+            action: isChanging ? PostAction.EditAddressPhoneNumber : PostAction.AddAddressPhoneNumber,
+            details: isChanging
+              ? { addressId, phoneId: Number(req.params.phoneId), phoneNumber: phoneNumberRequests[0] }
+              : { addressId, phoneNumbers: phoneNumberRequests },
           })
           .catch(error => logger.error(error))
 

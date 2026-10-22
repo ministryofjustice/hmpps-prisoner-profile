@@ -52,6 +52,7 @@ import EphemeralDataService from './ephemeralDataService'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import IdentityNumbersService from './identityNumbersService'
 import { XRayBodyScansAvailabilityService } from './xRayBodyScansAvailabilityService'
+import PrisonerPropertyService from './prisonerPropertyService'
 
 export const services = () => {
   const {
@@ -65,6 +66,7 @@ export const services = () => {
     incentivesApiClientBuilder,
     curiousApiClientBuilder,
     adjudicationsApiClientBuilder,
+    prisonerPropertyApiClientBuilder,
     nonAssociationsApiClientBuilder,
     whereaboutsApiClientBuilder,
     cellMovementsApiClientBuilder,
@@ -227,6 +229,7 @@ export const services = () => {
     addressService,
   )
   const xRayBodyScansAvailabilityService = new XRayBodyScansAvailabilityService(prisonService)
+  const prisonerPropertyService = new PrisonerPropertyService(prisonerPropertyApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -290,6 +293,7 @@ export const services = () => {
     identityNumbersService,
     metricsService,
     xRayBodyScansAvailabilityService,
+    prisonerPropertyService,
   }
 }
 

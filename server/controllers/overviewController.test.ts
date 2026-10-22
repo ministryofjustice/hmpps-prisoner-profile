@@ -6,9 +6,11 @@ import {
   PrisonerIncentivesPermission,
   PrisonerMoneyPermission,
   PrisonerPermissions,
+  PrisonerPropertyPermission,
   PrisonerVisitsAndVisitorsPermission,
   XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
 import config from '../config'
 import type { HmppsUser } from '../interfaces/HmppsUser'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -71,6 +73,9 @@ import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
 import { prisonServiceMock } from '../../tests/mocks/prisonServiceMock'
 import OverviewController from './overviewController'
+import PrisonerPropertyService from '../services/prisonerPropertyService'
+import { prisonerPropertyServiceMock } from '../../tests/mocks/prisonerPropertyServiceMock'
+import { propertySummaryMock } from '../data/localMockData/prisonerPropertySummaryMock'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 jest.mock('../services/xRayBodyScansAvailabilityService')
@@ -139,6 +144,7 @@ describe('overviewController', () => {
   let csipService: CsipService
   let contactsService: ContactsService
   let prisonService: PrisonService
+  let prisonerPropertyService: PrisonerPropertyService
   const mockedXrbsAvailabilityService = jest.mocked(new XRayBodyScansAvailabilityService({} as never))
   mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
   const xrbsAvailabilityServiceModule = jest.requireActual<
@@ -185,6 +191,7 @@ describe('overviewController', () => {
     csipService = csipServiceMock() as CsipService
     contactsService = contactsServiceMock() as ContactsService
     prisonService = prisonServiceMock()
+    prisonerPropertyService = prisonerPropertyServiceMock() as PrisonerPropertyService
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -204,6 +211,7 @@ describe('overviewController', () => {
       contactsService,
       prisonService,
       mockedXrbsAvailabilityService,
+      prisonerPropertyService,
     )
   })
 
@@ -236,6 +244,99 @@ describe('overviewController', () => {
         'pages/overviewPage',
         expect.objectContaining({
           moneySummary: null,
+        }),
+      )
+    })
+  })
+
+  describe('propertySummary', () => {
+    const originalPropertySummaryTileEnabled = config.featureToggles.propertySummaryTileEnabled
+
+    beforeEach(() => {
+      res.locals.feComponents.sharedData.services = [
+        ...res.locals.feComponents.sharedData.services,
+        { id: 'prisoner-property' } as Service,
+      ]
+    })
+
+    afterEach(() => {
+      config.featureToggles.propertySummaryTileEnabled = originalPropertySummaryTileEnabled
+      jest.clearAllMocks()
+    })
+
+    it('should call prisonerPropertyService.getPropertySummary when the feature is enabled and permission is granted and the service is enabled', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue(propertySummaryMock)
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).toHaveBeenCalledWith('CLIENT_TOKEN', 'MDI', offenderNo)
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          propertySummary: expect.objectContaining({ status: 'fulfilled' }),
+        }),
+      )
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when permission is not granted', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: false })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when the prisoner property service is not enabled in mfe', async () => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      res.locals.feComponents.sharedData.services = res.locals.feComponents.sharedData.services.filter(
+        service => service.id !== 'prisoner-property',
+      )
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it('should not call prisonerPropertyService.getPropertySummary when the feature flag is disabled', async () => {
+      config.featureToggles.propertySummaryTileEnabled = false
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+
+      await controller.displayOverview(req, res)
+
+      expect(prisonerPropertyService.getPropertySummary).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      {
+        description: 'when the prisoner is held at users prison',
+        summary: { ...propertySummaryMock, prisonerHeldHere: true, heldAtThisPrison: 0 },
+        expected: expect.objectContaining({ status: 'fulfilled' }),
+      },
+      {
+        description: 'when the prisoner is not held at users prison but property is held there',
+        summary: { ...propertySummaryMock, prisonerHeldHere: false, heldAtThisPrison: 2 },
+        expected: expect.objectContaining({ status: 'fulfilled' }),
+      },
+      {
+        description: 'unless the prisoner is not held at users prison and no property is held there',
+        summary: { ...propertySummaryMock, prisonerHeldHere: false, heldAtThisPrison: 0 },
+        expected: null,
+      },
+    ])('should show the property card $description', async ({ summary, expected }) => {
+      config.featureToggles.propertySummaryTileEnabled = true
+      mockPermissions({ [PrisonerPropertyPermission.read_property_overview]: true })
+      prisonerPropertyService.getPropertySummary = jest.fn().mockResolvedValue(summary)
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          propertySummary: expected,
         }),
       )
     })
@@ -1084,40 +1185,6 @@ describe('overviewController', () => {
           }),
         }),
       )
-    })
-  })
-
-  describe('TO BE DELETED: XRBS Silent reads', () => {
-    it('Calls the API when enabled for the active caseload', async () => {
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
-      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
-      await controller.displayOverview(req, res)
-
-      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalled()
-    })
-
-    it('Calls the API once when enabled for the active caseload and also enabled generally', async () => {
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['MDI']
-      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
-      await controller.displayOverview(req, res)
-
-      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
-    })
-
-    it('Calls the API once when enabled for but not silently reading', async () => {
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = ['LEI']
-      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.AVAILABLE)
-      await controller.displayOverview(req, res)
-
-      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(1)
-    })
-
-    it('Does not call the API when not enabled and not silently reading', async () => {
-      config.featureToggles.xRayBodyScansSilentReads.enabledPrisons = []
-      mockedXrbsAvailabilityService.getAvailability.mockResolvedValue(XRayBodyScansAvailability.UNAVAILABLE)
-      await controller.displayOverview(req, res)
-
-      expect(xRayBodyScansApiClient.getScanSummary).toHaveBeenCalledTimes(0)
     })
   })
 })

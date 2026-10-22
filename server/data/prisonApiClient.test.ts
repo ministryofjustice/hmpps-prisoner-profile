@@ -215,6 +215,30 @@ describe('prisonApiClient', () => {
     })
   })
 
+  describe('updateAddressPhoneNumber', () => {
+    it('Should update an address phone number via the API', async () => {
+      const prisonerNumber = 'A1234BC'
+      const addressId = 5622837
+      const phoneId = 1324254
+      const phoneNumber = { phoneNumber: '07123456789', phoneNumberType: 'MOB', extension: '123' }
+      const updatedPhoneNumber = {
+        phoneId,
+        number: phoneNumber.phoneNumber,
+        type: phoneNumber.phoneNumberType,
+        ext: '123',
+      }
+
+      fakePrisonApi
+        .put(`/api/offenders/${prisonerNumber}/addresses/${addressId}/phone-numbers/${phoneId}`, phoneNumber)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, updatedPhoneNumber)
+
+      const output = await prisonApiClient.updateAddressPhoneNumber(prisonerNumber, addressId, phoneId, phoneNumber)
+
+      expect(output).toEqual(updatedPhoneNumber)
+    })
+  })
+
   describe('getAddressesForPerson', () => {
     it('Should return data from the API', async () => {
       const personId = 123456
