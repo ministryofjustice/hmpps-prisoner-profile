@@ -67,6 +67,7 @@ export const services = () => {
     curiousApiClientBuilder,
     adjudicationsApiClientBuilder,
     prisonerPropertyApiClientBuilder,
+    activitiesApiClientBuilder,
     nonAssociationsApiClientBuilder,
     whereaboutsApiClientBuilder,
     cellMovementsApiClientBuilder,
@@ -127,6 +128,7 @@ export const services = () => {
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
     prisonApiClientBuilder,
+    activitiesApiClientBuilder,
     personalLearningPlansService,
     curiousApiToken,
   )

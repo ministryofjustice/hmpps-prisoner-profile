@@ -11,7 +11,6 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import WorkAndSkillsPageService, { WorkAndSkillsData } from './workAndSkillsPageService'
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
-import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
@@ -33,10 +32,17 @@ describe('WorkAndSkillsService', () => {
   prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
   prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
   prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
-  prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
   prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
   prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
   prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
+
+  const activitiesApiClient = {
+    getAttendanceSummary: jest.fn(async (_prisonerNumber: string, _startDate: string, _endDate: string) => ({
+      acceptableAbsence: 0,
+      unacceptableAbsence: 0,
+      total: 0,
+    })),
+  }
 
   const curiousApiClientMock = (prisonerNumber: string = 'A1234BC') => {
     const learnerGoals = aValidLearnerGoals({
@@ -67,6 +73,7 @@ describe('WorkAndSkillsService', () => {
     return new WorkAndSkillsPageService(
       () => curiousApiClient,
       () => prisonApiClient,
+      () => activitiesApiClient,
       personalLearningPlanService,
       () => Promise.resolve({ curiousApiToken: 'token' }),
     )
@@ -143,6 +150,23 @@ describe('WorkAndSkillsService', () => {
       const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
       responseAssertions(res)
+    })
+
+    describe('Unacceptable absences', () => {
+      it('should use the attendance summary for the last six months and the last month', async () => {
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+        activitiesApiClient.getAttendanceSummary
+          .mockResolvedValueOnce({ acceptableAbsence: 0, unacceptableAbsence: 4, total: 10 })
+          .mockResolvedValueOnce({ acceptableAbsence: 0, unacceptableAbsence: 1, total: 3 })
+
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        expect(res.unacceptableAbsences).toEqual({
+          unacceptableAbsenceLastSixMonths: 4,
+          unacceptableAbsenceLastMonth: 1,
+        })
+        expect(activitiesApiClient.getAttendanceSummary).toHaveBeenCalledTimes(2)
+      })
     })
 
     describe('Curious goals', () => {
