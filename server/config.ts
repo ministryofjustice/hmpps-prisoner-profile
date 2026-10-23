@@ -455,8 +455,6 @@ export default {
       enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    xRayBodyScansEnabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
-
     offencesMoved: {
       enabledPrisons: get('OFFENCES_MOVED_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('OFFENCES_MOVED_ENABLED_PRISONS_BY_DATE', []) as string[],

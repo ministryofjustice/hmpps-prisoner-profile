@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 import { isGranted, XRayBodyScansPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import config from '../config'
 import type { PrisonUser } from '../interfaces/HmppsUser'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import type PrisonService from './prisonService'
@@ -34,11 +33,6 @@ export class XRayBodyScansAvailabilityService {
     const { clientToken } = req.middleware
     const { prisonerPermissions, user } = res.locals
     const { activeCaseLoadId } = user as PrisonUser
-
-    if (!config.featureToggles.xRayBodyScansEnabled) {
-      // rollout has not commenced
-      return XRayBodyScansAvailability.UNAVAILABLE
-    }
 
     // permissions may disallow access (likely due to prisoner’s location)
     // NB: read scans is a stricter check than the base check (read and edit scans checks currently match)

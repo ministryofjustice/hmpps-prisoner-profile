@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express'
-import config from '../config'
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
@@ -29,11 +28,7 @@ describe('Care needs controller', () => {
   const mockedXrbsAvailabilityService = jest.mocked(new XRayBodyScansAvailabilityService({} as never))
   let controller: CareNeedsController
 
-  let xRayBodyScansWasEnabled: boolean = false
-
   beforeEach(() => {
-    xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
-
     req = {
       middleware: {
         clientToken: 'CLIENT_TOKEN',
@@ -91,8 +86,6 @@ describe('Care needs controller', () => {
   })
 
   afterEach(() => {
-    config.featureToggles.xRayBodyScansEnabled = xRayBodyScansWasEnabled
-
     const spy = jest.spyOn(Date, 'now')
     spy.mockRestore()
   })
@@ -111,7 +104,6 @@ describe('Care needs controller', () => {
 
   describe('displayXrayBodyScans', () => {
     beforeEach(() => {
-      config.featureToggles.xRayBodyScansEnabled = true
       res.locals.prisonNamesById = { BXI: 'Brixton (HMP)', MDI: 'Moorland (HMP & YOI)' }
     })
 
