@@ -349,7 +349,6 @@ export default {
     },
     xRayBodyScans: {
       url: get('X_RAY_BODY_SCANS_API_URL', 'http://localhost:8082', requiredInProduction),
-      enabled: toBoolean(get('X_RAY_BODY_SCANS_ENABLED', 'false')),
       healthPath: '/health/ping',
       timeout: {
         response: Number(get('X_RAY_BODY_SCANS_TIMEOUT_RESPONSE', 3000)),
