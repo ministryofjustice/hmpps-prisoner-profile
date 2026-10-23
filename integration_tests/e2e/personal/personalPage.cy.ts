@@ -1,7 +1,10 @@
 import { startOfYear } from 'date-fns'
 import { Role } from '../../../server/data/enums/role'
 import { addressesPrimaryAndMailMock, mockAddresses } from '../../../server/data/localMockData/addresses'
-import { componentsCaseLoadMock } from '../../../server/data/localMockData/componentApi/componentsMock'
+import {
+  componentsCaseLoadMock,
+  componentsServicesMock,
+} from '../../../server/data/localMockData/componentApi/componentsMock'
 import Page from '../../pages/page'
 import PersonalPage from '../../pages/personalPage'
 import { permissionsTests } from '../permissionsTests'
@@ -276,19 +279,44 @@ context('When signed in', () => {
     })
 
     context('Property card', () => {
-      it('Displays the prisoners property', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        page.sidebarLinks().should('contain.text', 'Property')
+      context(
+        'When the property service is available to the user and the card should appear on the overview instead',
+        () => {
+          it('Does not display the old property card', () => {
+            const page = Page.verifyOnPage(PersonalPage)
+            cy.getDataQa('hidden-property').should('exist')
+            page.sidebarLinks().should('not.contain.text', 'Property')
+          })
+        },
+      )
 
-        page.property().item(0).containerType().should('include.text', 'Valuables')
-        page.property().item(0).sealMark().should('include.text', 'MDA646165646')
-        page.property().item(0).location().should('include.text', 'Property Box 14')
-        page.property().item(1).containerType().should('include.text', 'Confiscated')
-        page.property().item(1).sealMark().should('include.text', '')
-        page.property().item(1).location().should('include.text', 'Property Box 15')
-        page.property().item(2).containerType().should('include.text', 'Branston Storage')
-        page.property().item(2).sealMark().should('include.text', 'BOB')
-        page.property().item(2).location().should('include.text', 'Property Box 3')
+      context('When the property service is not available to users', () => {
+        beforeEach(() => {
+          cy.task('reset')
+          cy.clearCookies()
+          cy.clearLocalStorage()
+          cy.setupUserAuth()
+          cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
+          cy.setupComponentsData({
+            services: componentsServicesMock.filter(service => service.id !== 'prisoner-property'),
+          })
+          visitPersonalDetailsPage()
+        })
+
+        it('Displays the old property card', () => {
+          const page = Page.verifyOnPage(PersonalPage)
+          page.sidebarLinks().should('contain.text', 'Property')
+
+          page.property().item(0).containerType().should('include.text', 'Valuables')
+          page.property().item(0).sealMark().should('include.text', 'MDA646165646')
+          page.property().item(0).location().should('include.text', 'Property Box 14')
+          page.property().item(1).containerType().should('include.text', 'Confiscated')
+          page.property().item(1).sealMark().should('include.text', '')
+          page.property().item(1).location().should('include.text', 'Property Box 15')
+          page.property().item(2).containerType().should('include.text', 'Branston Storage')
+          page.property().item(2).sealMark().should('include.text', 'BOB')
+          page.property().item(2).location().should('include.text', 'Property Box 3')
+        })
       })
     })
 
