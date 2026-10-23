@@ -57,7 +57,6 @@ export default class CareNeedsController {
       const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
       const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
       const showingDpsAndNomisScans =
-        config.featureToggles.xRayBodyScansEnabled &&
         pageOfScans.content.some(scan => scan.source === 'DPS') &&
         pageOfScans.content.some(scan => scan.source === 'NOMIS')
 
