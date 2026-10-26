@@ -70,7 +70,7 @@
     "http-errors": "^2.0.1",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "1.13.15",
-    "multer": "^2.4.0",
+    "multer": "^2.5.0",
     "nocache": "^4.0.0",
     "nunjucks": "^3.2.4",
     "opossum": "10.0.0",
