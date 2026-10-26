@@ -137,9 +137,10 @@
     "@opentelemetry/sdk-trace-web": "2.8.0",
     "brace-expansion": ">=5.0.12",
     "diff": "^9.0.0",
-    "serialize-javascript": "^7.0.3",
+    "moment": "2.31.0",
     "proxy-addr": "2.0.8",
-    "moment": "2.31.0"
+    "qs": "^6.16.1",
+    "serialize-javascript": "^7.0.3"
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,
