@@ -139,15 +139,13 @@
     "diff": "^9.0.0",
     "moment": "2.31.0",
     "proxy-addr": "2.0.8",
-    "qs": "^6.16.1",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.1.4"
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,
     "cypress@16.2.0": true,
     "dtrace-provider@0.8.8": false,
     "esbuild@0.28.2": true,
-    "fsevents@2.3.2": true,
     "fsevents@2.3.3": true,
     "unrs-resolver@1.12.2": true
   }
