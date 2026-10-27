@@ -1,25 +1,14 @@
-import CircuitBreaker from 'opossum'
-import RestClient, { Request } from './restClient'
+import type CircuitBreaker from 'opossum'
 import config from '../config'
-
-interface PersonRecordIdentifiers {
-  prisonNumbers?: string[]
-}
-
-export interface PersonRecord {
-  identifiers?: PersonRecordIdentifiers
-}
-
-interface PersonApiClient {
-  getRecord(prisonerNumber: string): Promise<PersonRecord>
-}
+import RestClient, { type Request } from './restClient'
+import type { PersonApiClient, PersonRecord } from './interfaces/personApi'
 
 export default class PersonApiRestClient extends RestClient implements PersonApiClient {
   constructor(token: string, circuitBreaker?: CircuitBreaker<[Request<unknown, unknown>, string], unknown>) {
     super('Person API', config.apis.personApi, token, circuitBreaker)
   }
 
-  async getRecord(prisonerNumber: string): Promise<PersonRecord> {
-    return this.get<PersonRecord>({ path: `/person/prison/${prisonerNumber}` }, this.token)
+  getRecord(prisonerNumber: string): Promise<PersonRecord> {
+    return this.get<PersonRecord>({ path: `/person/prison/${encodeURIComponent(prisonerNumber)}` }, this.token)
   }
 }

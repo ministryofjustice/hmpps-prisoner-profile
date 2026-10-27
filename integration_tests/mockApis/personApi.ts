@@ -1,7 +1,7 @@
 import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
-import { PersonRecord } from '../../server/data/personApiClient'
+import type { PersonRecord } from '../../server/data/interfaces/personApi'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
@@ -19,7 +19,7 @@ export default {
         identifiers: {
           prisonNumbers,
         },
-      } as PersonRecord,
+      } satisfies PersonRecord,
     }),
 
   stubPersonApiGetRecordNotFound: ({ prisonerNumber }: { prisonerNumber: string }) =>
