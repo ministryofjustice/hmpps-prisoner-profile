@@ -2,9 +2,20 @@ import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
 import type { PersonRecord } from '../../server/data/interfaces/personApi'
+import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
+
+  stubPersonApiGetReligionCodes: () =>
+    stubFor({
+      request: { method: 'GET', urlPath: '/personRecord/person/prison/religion-codes' },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: personApiReligionCodesMock,
+      },
+    }),
 
   stubPersonApiGetRecord: ({
     prisonerNumber,
