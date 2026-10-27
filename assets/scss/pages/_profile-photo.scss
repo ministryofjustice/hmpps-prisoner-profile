@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 #profile-photo-print-link {
   font-size: 16px;
@@ -44,6 +44,6 @@
 }
 
 .photo-upload-error__back-link {
-  color: govuk-functional-colour(link) !important;
+  color: govuk.govuk-functional-colour(link) !important;
   font-weight: 400 !important;
 }

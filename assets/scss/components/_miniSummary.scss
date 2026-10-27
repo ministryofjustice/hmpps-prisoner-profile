@@ -1,19 +1,19 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-card-heading-background {
   h2 {
     margin: 0;
   }
-  @include govuk-responsive-padding(2, 'top');
-  @include govuk-responsive-padding(2, 'bottom');
-  @include govuk-responsive-padding(3, 'left');
-  @include govuk-responsive-padding(3, 'right');
+  @include govuk.govuk-responsive-padding(2, 'top');
+  @include govuk.govuk-responsive-padding(2, 'bottom');
+  @include govuk.govuk-responsive-padding(3, 'left');
+  @include govuk.govuk-responsive-padding(3, 'right');
 }
 
 .card-body {
   .card-label {
-    @include govuk-responsive-margin(1, 'bottom');
-    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk.govuk-responsive-margin(1, 'bottom');
+    @include govuk.govuk-font($size: 19, $weight: 'bold');
   }
 
   .hmpps-mini-card__big {
@@ -32,12 +32,12 @@
 
   .hmpps-mini-card__sub-text {
     margin-bottom: 10px;
-    color: govuk-colour("black", $variant: "tint-25");
+    color: govuk.govuk-colour('black', $variant: 'tint-25');
   }
 
   .hmpps-mini-card__error {
     font-weight: 700;
-    color: govuk-functional-colour(error);
+    color: govuk.govuk-functional-colour(error);
     margin-bottom: 10px;
     margin-top: -5px;
   }
@@ -46,7 +46,7 @@
     margin-top: auto;
     padding-top: 15px;
     margin-bottom: 15px;
-    border-top: 1px solid govuk-colour("black", $variant: "tint-95");
+    border-top: 1px solid govuk.govuk-colour('black', $variant: 'tint-95');
   }
 }
 

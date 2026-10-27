@@ -1,30 +1,30 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 body {
   position: relative;
 }
 
 .hmpps-back-to-top {
-  margin-top: govuk-spacing(4);
-  margin-bottom: govuk-spacing(6);
+  margin-top: govuk.govuk-spacing(4);
+  margin-bottom: govuk.govuk-spacing(6);
 }
 
-@include govuk-media-query($from: tablet) {
+@include govuk.govuk-media-query($from: tablet) {
   .hmpps-back-to-top {
     position: absolute;
     margin-top: auto;
-    margin-bottom: govuk-spacing(8);
+    margin-bottom: govuk.govuk-spacing(8);
   }
 
   .js-enabled .hmpps-back-to-top--fixed {
     position: fixed;
-    top: calc(100% - #{govuk-spacing(8)});
+    top: calc(100% - #{govuk.govuk-spacing(8)});
     bottom: auto;
     left: auto;
   }
 
   .js-enabled .hmpps-back-to-top--hidden .hmpps-back-to-top__link {
-    @include govuk-visually-hidden-focusable;
+    @include govuk.govuk-visually-hidden-focusable;
   }
 }
 
@@ -32,7 +32,7 @@ body {
   display: inline-block;
   width: .8em;
   height: 1em;
-  margin-top: -(govuk-spacing(1));
-  margin-right: govuk-spacing(2);
+  margin-top: -(govuk.govuk-spacing(1));
+  margin-right: govuk.govuk-spacing(2);
   vertical-align: middle;
 }

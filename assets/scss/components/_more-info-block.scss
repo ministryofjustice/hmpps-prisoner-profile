@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-more-info-block {
   h2 {
@@ -9,7 +9,7 @@
   ul {
     padding: 0 15px;
     margin: 0 0 30px 0;
-    color: govuk-colour('blue');
+    color: govuk.govuk-colour('blue');
 
     li {
       font-weight: 300;

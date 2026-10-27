@@ -1,16 +1,16 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .hmpps-photo-list {
   .hmpps-photo-list__item {
-    border-bottom: solid 1px govuk-functional-colour(border);
+    border-bottom: solid 1px govuk.govuk-functional-colour(border);
     display: flex;
-    @include govuk-responsive-margin(4, 'bottom');
-    @include govuk-responsive-padding(2);
+    @include govuk.govuk-responsive-margin(4, 'bottom');
+    @include govuk.govuk-responsive-padding(2);
   }
 
   .hmpps-photo-list__main {
-    background-color: govuk-colour("black", $variant: "tint-95");
-    border: solid 1px govuk-functional-colour(border);
+    background-color: govuk.govuk-colour('black', $variant: 'tint-95');
+    border: solid 1px govuk.govuk-functional-colour(border);
   }
 
   .hmpps-photo-list__photo {
