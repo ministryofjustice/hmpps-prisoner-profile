@@ -7,9 +7,13 @@ import { personApiReligionCodesMock } from '../../server/data/localMockData/pers
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
 
-  stubPersonApiGetReligionCodes: () =>
+  stubPersonApiGetReligionCodes: ({ activeOnly = false }: { activeOnly?: boolean } = {}) =>
     stubFor({
-      request: { method: 'GET', urlPath: '/personRecord/person/prison/religion-codes' },
+      request: {
+        method: 'GET',
+        urlPath: '/personRecord/person/prison/religion-codes',
+        queryParameters: { active: { equalTo: activeOnly.toString() } },
+      },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },

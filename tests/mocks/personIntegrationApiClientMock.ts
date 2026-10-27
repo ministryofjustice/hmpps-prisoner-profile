@@ -2,16 +2,16 @@ import { PersonIntegrationApiClient } from '../../server/data/interfaces/personI
 import { MilitaryRecordsMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 
-export const personIntegrationApiClientMock = (): PersonIntegrationApiClient => ({
+export const personIntegrationApiClientMock = (): jest.Mocked<PersonIntegrationApiClient> => ({
   updateBirthPlace: jest.fn(),
   updateCountryOfBirth: jest.fn(),
   updateNationality: jest.fn(),
   updateReligion: jest.fn(),
   getReferenceDataCodes: jest.fn(),
-  getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
+  getMilitaryRecords: jest.fn(async _ => MilitaryRecordsMock),
   updateMilitaryRecord: jest.fn(),
   createMilitaryRecord: jest.fn(),
-  getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
+  getPhysicalAttributes: jest.fn(async _ => corePersonPhysicalAttributesDtoMock),
   updatePhysicalAttributes: jest.fn(),
   getDistinguishingMark: jest.fn(),
   getDistinguishingMarks: jest.fn(),

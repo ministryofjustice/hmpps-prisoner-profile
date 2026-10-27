@@ -437,6 +437,10 @@ export default {
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
 
+    usePersonApi: {
+      religion: toBoolean(get('USE_PERSON_API_FOR_RELIGION', 'false')),
+    },
+
     personDuplicateRecords: {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS_BY_DATE', []) as string[],

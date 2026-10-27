@@ -14,7 +14,6 @@ import {
   CountryReferenceDataCodesMock,
   createPrisonerProfileSummary,
   MilitaryRecordsMock,
-  ReligionReferenceDataCodesMock,
 } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
@@ -92,10 +91,7 @@ context('When signed in', () => {
         domain: 'COUNTRY',
         referenceData: CountryReferenceDataCodesMock,
       })
-      cy.task('stubPersonIntegrationGetReferenceData', {
-        domain: 'RELF',
-        referenceData: ReligionReferenceDataCodesMock,
-      })
+      cy.task('stubPersonApiGetReligionCodes')
       cy.task('stubGetPseudonyms', { prisonerNumber, response: [] })
       visitPersonalDetailsPage()
     })

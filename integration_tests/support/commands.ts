@@ -7,7 +7,6 @@ import {
   MilitaryRecordsMock,
   phoneUsageReferenceDataMock,
   PseudonymResponseMock,
-  ReligionReferenceDataCodesMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 import { propertySummaryMock } from '../../server/data/localMockData/prisonerPropertySummaryMock'
@@ -194,10 +193,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     domain: 'COUNTRY',
     referenceData: CountryReferenceDataCodesMock,
   })
-  cy.task('stubPersonIntegrationGetReferenceData', {
-    domain: 'RELF',
-    referenceData: ReligionReferenceDataCodesMock,
-  })
+  cy.task('stubPersonApiGetReligionCodes')
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)

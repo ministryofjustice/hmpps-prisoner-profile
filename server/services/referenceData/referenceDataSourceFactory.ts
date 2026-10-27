@@ -1,6 +1,9 @@
+import config from '../../config'
 import { ReferenceDataDomain } from '../../data/interfaces/referenceData'
 import { ReferenceDataSource } from './referenceDataSource'
 import { RestClientBuilder } from '../../data'
+import { PersonApiClient } from '../../data/interfaces/personApi'
+import { PersonApiReferenceDataSource } from './personApiReferenceDataSource'
 import {
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
@@ -26,11 +29,13 @@ export class ReferenceDataSourceFactory {
   private readonly referenceDataSources = new Map<ReferenceDataDomain, ReferenceDataSource>()
 
   constructor(
+    personApiClientBuilder: RestClientBuilder<PersonApiClient>,
     personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     personCommunicationNeedsApiClientBuilder: RestClientBuilder<PersonCommunicationNeedsApiClient>,
     personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
   ) {
+    const personSource = new PersonApiReferenceDataSource(personApiClientBuilder)
     const personIntegrationSource = new PersonIntegrationApiReferenceDataSource(personIntegrationApiClientBuilder)
     const healthAndMedicationSource = new HealthAndMedicationApiReferenceDataSource(healthAndMedicationApiClientBuilder)
     const personCommunicationNeedsSource = new PersonCommunicationNeedsApiReferenceDataSource(
@@ -55,6 +60,10 @@ export class ReferenceDataSourceFactory {
     Object.values(PersonalRelationshipsReferenceDataDomain).forEach(domain => {
       this.referenceDataSources.set(domain, personalRelationshipsSource)
     })
+
+    if (config.featureToggles.usePersonApi.religion) {
+      this.referenceDataSources.set(CorePersonRecordReferenceDataDomain.religion, personSource)
+    }
   }
 
   getReferenceDataSourceFor(domain: ReferenceDataDomain): ReferenceDataSource {
