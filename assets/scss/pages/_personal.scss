@@ -463,6 +463,24 @@
 }
 
 .hmpps-address {
+  > h2 {
+    margin-bottom: 5px;
+  }
+
+  .govuk-details {
+    margin-top: govuk.govuk-spacing(4);
+    margin-bottom: 0;
+
+    &[open] > .govuk-details__summary {
+      margin-bottom: 0;
+    }
+
+    .govuk-details__text {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
   &__additional-details {
     width: 95%;
 
@@ -477,21 +495,28 @@
 
   &__phones__list {
     & > div {
-      padding: 5px 0;
+      padding: 0;
 
-      &:first-child {
-        padding-top: 0;
+      &:not(:last-child) {
+        margin-bottom: govuk.govuk-spacing(4);
       }
 
       &:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
+        margin-bottom: 0;
       }
+    }
+
+    .hmpps-address__updated-date {
+      margin-top: govuk.govuk-spacing(2);
     }
 
     & > div:not(:last-child) .hmpps-address__updated-date {
       margin-bottom: govuk.govuk-spacing(1);
     }
+  }
+
+  &__added-date {
+    margin-top: govuk.govuk-spacing(4);
   }
 
   &__phone {
@@ -500,7 +525,10 @@
   }
 
   &__phones__header {
-    > h2,
+    > h2 {
+      margin-bottom: govuk.govuk-spacing(1);
+    }
+
     > p {
       margin-bottom: govuk.govuk-spacing(2);
     }

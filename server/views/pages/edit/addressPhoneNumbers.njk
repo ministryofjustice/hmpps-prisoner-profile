@@ -16,65 +16,71 @@
 
 {% block form %}
   <h1 class="govuk-heading-l">{{ formTitle }}</h1>
-  {{ govukInsetText({ html: addressHtml }) }}
+  {% if addressLines %}{{ govukInsetText({ html: addressHtml }) }}{% endif %}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    {% if highlightAddressId %}<input type="hidden" name="highlightAddressId" value="{{ highlightAddressId }}" />{% endif %}
+    {% if addressCacheId %}<input type="hidden" name="addressCacheId" value="{{ addressCacheId }}" />{% endif %}
     {% for phoneNumber in phoneNumbers %}
-      {% if phoneNumbers.length > 1 %}
-        <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ phoneNumbers.length }}</h2>
-      {% endif %}
-      {%
-        call govukFieldset({
-          legend: {
-            text: "Phone number type",
-            classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold",
-            isPageHeading: false
-          }
-        })
-      %}
-        {{
-          govukRadios({
-            name: "phoneNumberType" + phoneNumber.index,
-            id: "phone-number-type-" + phoneNumber.index,
-            items: phoneNumber.phoneTypeOptions,
-            errorMessage: { text: (errors | findError("phone-number-type-" + phoneNumber.index)).text } if errors | findError("phone-number-type-" + phoneNumber.index)
-          })
-        }}
-        {{
-          govukInput({
-            label: { text: "Phone number", classes: "govuk-!-font-weight-bold" },
-            id: "phone-number-" + phoneNumber.index,
-            name: "phoneNumber" + phoneNumber.index,
-            classes: "govuk-input--width-20",
-            value: phoneNumber.phoneNumber,
-            errorMessage: { text: (errors | findError("phone-number-" + phoneNumber.index)).text } if errors | findError("phone-number-" + phoneNumber.index)
-          })
-        }}
-        {{
-          govukInput({
-            label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
-            id: "phone-extension-" + phoneNumber.index,
-            name: "phoneExtension" + phoneNumber.index,
-            classes: "govuk-input--width-5",
-            value: phoneNumber.phoneExtension,
-            errorMessage: { text: (errors | findError("phone-extension-" + phoneNumber.index)).text } if errors | findError("phone-extension-" + phoneNumber.index)
-          })
-        }}
-      {% endcall %}
-      {% if phoneNumbers.length > 1 %}
-        {{
-          govukButton({
-            text: "Remove phone number " + loop.index,
-            type: "submit",
-            classes: "govuk-button--secondary govuk-!-margin-bottom-0",
-            attributes: {
-              formaction: "?removePhoneNumber=" + phoneNumber.index,
-              "data-qa": "remove-address-phone-number-" + phoneNumber.index
+      <div id="phone-number-section-{{ phoneNumber.index }}">
+        {% if phoneNumbers.length > 1 %}
+          <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ phoneNumbers.length }}</h2>
+        {% endif %}
+        {%
+          call govukFieldset({
+            legend: {
+              text: "Phone number type",
+              classes: "govuk-fieldset__legend--s govuk-!-font-weight-bold",
+              isPageHeading: false
             }
           })
-        }}
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
-      {% endif %}
+        %}
+          {{
+            govukRadios({
+              name: "phoneNumberType" + phoneNumber.index,
+              id: "phone-number-type-" + phoneNumber.index,
+              items: phoneNumber.phoneTypeOptions,
+              errorMessage: { text: (errors | findError("phone-number-type-" + phoneNumber.index)).text } if errors | findError("phone-number-type-" + phoneNumber.index)
+            })
+          }}
+          {{
+            govukInput({
+              label: { text: "Phone number", classes: "govuk-!-font-weight-bold" },
+              id: "phone-number-" + phoneNumber.index,
+              name: "phoneNumber" + phoneNumber.index,
+              classes: "govuk-input--width-20",
+              value: phoneNumber.phoneNumber,
+              errorMessage: { text: (errors | findError("phone-number-" + phoneNumber.index)).text } if errors | findError("phone-number-" + phoneNumber.index)
+            })
+          }}
+          {{
+            govukInput({
+              label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
+              id: "phone-extension-" + phoneNumber.index,
+              name: "phoneExtension" + phoneNumber.index,
+              classes: "govuk-input--width-5",
+              value: phoneNumber.phoneExtension,
+              errorMessage: { text: (errors | findError("phone-extension-" + phoneNumber.index)).text } if errors | findError("phone-extension-" + phoneNumber.index)
+            })
+          }}
+        {% endcall %}
+        {% if phoneNumbers.length > 1 %}
+          {{
+            govukButton({
+              text: "Remove phone number " + loop.index,
+              type: "submit",
+              classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+              attributes: {
+                name: "removePhoneNumber",
+                value: phoneNumber.index,
+                formaction: "?removePhoneNumber=" + phoneNumber.index,
+                "data-qa": "remove-address-phone-number-" + phoneNumber.index
+              }
+            })
+          }}
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
+        {% endif %}
+      </div>
     {% endfor %}
     {% if not isChanging %}
       <div class="govuk-button-group">
@@ -96,13 +102,13 @@
           text: "Save and return to profile",
           type: "submit",
           preventDoubleClick: true,
-          attributes: { "data-qa": "save-address-phone-numbers" }
+          attributes: { "data-qa": saveButtonQa or "save-address-phone-numbers" }
         })
       }}
       <a
-        href="/prisoner/{{ prisonerNumber }}/personal"
+        href="{{ cancelUrl }}"
         class="govuk-link govuk-link--no-visited-state"
-        data-qa="cancel-link"
+        data-qa="{{ cancelButtonQa or 'cancel-link' }}"
         >Cancel</a
       >
     </div>

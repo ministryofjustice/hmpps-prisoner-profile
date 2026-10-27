@@ -51,11 +51,14 @@ describe('AddressPhoneNumberController', () => {
         { phoneNumber: '01234567891', phoneNumberType: 'HOME', extension: undefined },
       ],
     )
-    expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-      text: 'Address phone number updated',
-      fieldName: 'addressPhoneNumbers',
-      phoneIds: [123],
-    })
+    expect(req.flash).toHaveBeenCalledWith(
+      'flashMessage',
+      expect.objectContaining({
+        text: 'Address phone number updated',
+        fieldName: 'addressPhoneNumbers',
+        phoneIds: [123],
+      }),
+    )
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
   })
 
@@ -109,6 +112,42 @@ describe('AddressPhoneNumberController', () => {
     )
   })
 
+  it('returns to address completion when cancelling the new address phone step', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.getAddressesFromPrisonAPI = jest.fn().mockResolvedValue(mockAddresses)
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: { addressCacheId: 'address-cache-id' },
+      flash: jest.fn().mockReturnValue([]),
+    } as unknown as Request
+    const res = {
+      locals: {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: 999,
+        prisonerPermissions: {},
+      },
+      render: jest.fn(),
+    } as unknown as Response
+
+    await controller.display()(req, res, jest.fn())
+
+    expect(res.render).toHaveBeenCalledWith(
+      'pages/edit/addressPhoneNumbers',
+      expect.objectContaining({
+        addressCacheId: 'address-cache-id',
+        cancelUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/cancel-add-address-phone-number?addressCacheId=address-cache-id`,
+      }),
+    )
+  })
+
   it('updates a phone number and returns to the personal page', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.updateAddressPhoneNumber = jest
@@ -125,7 +164,7 @@ describe('AddressPhoneNumberController', () => {
       },
       params: { addressId: '5622837', phoneId: '1324254' },
       query: {},
-      body: { phoneNumberType0: 'HOME', phoneNumber0: '02012345678', phoneExtension0: '321' },
+      body: { phoneNumberType0: 'HOME', phoneNumber0: '02012345678', phoneExtension0: '123' },
       originalUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/change-address-phone-number/1324254`,
       flash: jest.fn(),
     } as unknown as Request
@@ -141,13 +180,16 @@ describe('AddressPhoneNumberController', () => {
       PrisonerMockDataA.prisonerNumber,
       5622837,
       1324254,
-      { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' },
+      { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '123' },
     )
-    expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-      text: 'Address phone number updated',
-      fieldName: 'addressPhoneNumbers',
-      phoneIds: [1324254],
-    })
+    expect(req.flash).toHaveBeenCalledWith(
+      'flashMessage',
+      expect.objectContaining({
+        text: 'Address phone number updated',
+        fieldName: 'addressPhoneNumbers',
+        phoneIds: [1324254],
+      }),
+    )
     expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
       user: prisonUserMock,
       prisonerNumber: PrisonerMockDataA.prisonerNumber,
@@ -156,7 +198,7 @@ describe('AddressPhoneNumberController', () => {
       details: {
         addressId: 5622837,
         phoneId: 1324254,
-        phoneNumber: { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' },
+        phoneNumber: { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '123' },
       },
     })
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)

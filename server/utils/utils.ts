@@ -24,6 +24,21 @@ const properCase = (word: string): string =>
 
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
+export const addressPhoneNumberFormValues = (body: Record<string, unknown>) => {
+  const value = (key: string): string => (typeof body[key] === 'string' ? body[key] : '')
+  const indexes = Object.keys(body)
+    .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
+    .filter((index): index is string => index !== undefined)
+    .map(Number)
+  const lastIndex = Math.max(0, ...indexes)
+
+  return Array.from({ length: lastIndex + 1 }, (_, index) => ({
+    phoneNumberType: value(`phoneNumberType${index}`),
+    phoneNumber: value(`phoneNumber${index}`),
+    phoneExtension: value(`phoneExtension${index}`),
+  }))
+}
+
 export const isEmpty = (array: Array<unknown>): boolean => !array || (Array.isArray(array) && !array.length)
 
 export const withheldPhotoCategoryCodes = ['A', 'H', 'P']
