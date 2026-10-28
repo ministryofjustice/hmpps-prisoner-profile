@@ -119,36 +119,22 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       expect(next).toHaveBeenCalled()
     })
 
-    it('should set empty array when personRecord is null', async () => {
-      personApiClient.getRecord.mockResolvedValue(null)
+    it.each([
+      { scenario: 'personRecord is null', record: null },
+      // NB: just in case; according to CPR docs, none of the below are possible
+      { scenario: 'personRecord.identifiers is missing', record: { identifiers: undefined } },
+      {
+        scenario: 'personRecord.identifiers.prisonNumbers is missing',
+        record: { identifiers: { prisonNumbers: undefined } },
+      },
+    ])('should set empty array when $scenario', async ({ record }) => {
+      personApiClient.getRecord.mockResolvedValue(record)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
       expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
-      expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('should set empty array when personRecord.identifiers is missing', async () => {
-      personApiClient.getRecord.mockResolvedValue({})
-
-      await getDuplicatePrisonerData(services)(req, res, next)
-
-      expect(req.middleware.duplicatePrisonerData).toEqual([])
-      expect(res.locals.duplicateRecordsFound).toBeFalsy()
-      expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('should set empty array when personRecord.identifiers.prisonNumbers is missing', async () => {
-      personApiClient.getRecord.mockResolvedValue({ identifiers: {} })
-
-      await getDuplicatePrisonerData(services)(req, res, next)
-
-      expect(req.middleware.duplicatePrisonerData).toEqual([])
-      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })

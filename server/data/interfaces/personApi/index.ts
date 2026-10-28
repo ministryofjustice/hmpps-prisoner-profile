@@ -5,11 +5,13 @@ export interface PersonApiReferenceDataCode {
 }
 
 interface PersonRecordIdentifiers {
-  prisonNumbers?: string[]
+  prisonNumbers: string[]
+  // NB: non-exhaustive
 }
 
 export interface PersonRecord {
-  identifiers?: PersonRecordIdentifiers
+  identifiers: PersonRecordIdentifiers
+  // NB: non-exhaustive
 }
 
 export interface PersonApiClient {
