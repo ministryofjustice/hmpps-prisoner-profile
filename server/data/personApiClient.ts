@@ -9,7 +9,7 @@ export default class PersonApiRestClient extends RestClient implements PersonApi
   }
 
   getReligionCodes(activeOnly = false): Promise<PersonApiReferenceDataCode[]> {
-    return this.get({ path: '/person/prison/religion-codes', query: { active: activeOnly } }, this.token)
+    return this.get({ path: '/person/reference-data/religion-codes', query: { active: activeOnly } }, this.token)
   }
 
   getRecord(prisonerNumber: string): Promise<PersonRecord> {

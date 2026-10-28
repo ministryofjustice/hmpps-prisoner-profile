@@ -11,7 +11,7 @@ export default {
     stubFor({
       request: {
         method: 'GET',
-        urlPath: '/personRecord/person/prison/religion-codes',
+        urlPath: '/personRecord/person/reference-data/religion-codes',
         queryParameters: { active: { equalTo: activeOnly.toString() } },
       },
       response: {
