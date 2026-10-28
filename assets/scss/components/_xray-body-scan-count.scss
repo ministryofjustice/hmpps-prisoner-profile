@@ -1,36 +1,36 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 .xray-body-scan-count {
-  border-left: $govuk-border-width solid govuk-functional-colour(border);
-  padding-left: $govuk-border-width-wide;
-  @include govuk-responsive-margin(2, 'bottom');
+  border-left: govuk.$govuk-border-width solid govuk.govuk-functional-colour(border);
+  padding-left: govuk.$govuk-border-width-wide;
+  @include govuk.govuk-responsive-margin(2, 'bottom');
 
   .xray-body-scan-count__number, .xray-body-scan-count__limit-warning {
     display: block;
   }
 
-  @include govuk-font($size: 16);
+  @include govuk.govuk-font($size: 16);
   .xray-body-scan-count__number {
-    @include govuk-font($size: 36);
+    @include govuk.govuk-font($size: 36);
   }
 }
 
 .xray-body-scan-count--nearing-limit {
   &.xray-body-scan-count {
-    border-color: govuk-colour('orange');
+    border-color: govuk.govuk-colour('orange');
   }
 
   .xray-body-scan-count__number, .xray-body-scan-count__limit-warning {
-    color: govuk-colour('orange', $variant: 'shade-25');
+    color: govuk.govuk-colour('orange', $variant: 'shade-25');
   }
 }
 
 .xray-body-scan-count--at-limit {
   &.xray-body-scan-count {
-    border-color: govuk-colour('red');
+    border-color: govuk.govuk-colour('red');
   }
 
   .xray-body-scan-count__number, .xray-body-scan-count__limit-warning {
-    color: govuk-colour('red', $variant: 'shade-25');
+    color: govuk.govuk-colour('red', $variant: 'shade-25');
   }
 }

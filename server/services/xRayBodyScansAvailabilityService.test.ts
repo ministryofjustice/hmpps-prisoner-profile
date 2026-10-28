@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 import { XRayBodyScansPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import config from '../config'
 import type PrisonService from './prisonService'
 import type { PrisonUser } from '../interfaces/HmppsUser'
 import mockPermissions from '../../tests/mocks/mockPermissions'
@@ -9,17 +8,11 @@ import { XRayBodyScansAvailability, XRayBodyScansAvailabilityService } from './x
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
-let xRayBodyScansWasEnabled: boolean
-beforeAll(() => {
-  xRayBodyScansWasEnabled = config.featureToggles.xRayBodyScansEnabled
-})
-
 describe('X-ray body scans availability service', () => {
   let prisonService: jest.MockedObject<PrisonService>
   let availabilityService: XRayBodyScansAvailabilityService
 
   beforeEach(() => {
-    config.featureToggles.xRayBodyScansEnabled = xRayBodyScansWasEnabled
     prisonService = prisonServiceMock()
     availabilityService = new XRayBodyScansAvailabilityService(prisonService)
   })
@@ -69,14 +62,7 @@ describe('X-ray body scans availability service', () => {
       } as unknown as Response
     })
 
-    it('should indicate that the service is not available by default', async () => {
-      await expect(availabilityService.getAvailability(req, res)).resolves.toBe(XRayBodyScansAvailability.UNAVAILABLE)
-
-      expect(prisonService.getCompletePrisonDetailsByPrisonId).not.toHaveBeenCalled()
-    })
-
     it('should indicate that access to the service is unauthorised due to permissions if it will be available soon to the user’s active case load', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
       mockPermissions({ [XRayBodyScansPermission.read_scans]: false })
 
       await expect(availabilityService.getAvailability(req, res)).resolves.toBe(XRayBodyScansAvailability.UNAUTHORISED)
@@ -85,7 +71,6 @@ describe('X-ray body scans availability service', () => {
     })
 
     it('should indicate that the service will be available soon when the user’s active case load is not yet enabled', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
       mockPermissions({ [XRayBodyScansPermission.read_scans]: true })
 
       await expect(availabilityService.getAvailability(req, res)).resolves.toBe(
@@ -101,7 +86,6 @@ describe('X-ray body scans availability service', () => {
     ])(
       'should indicate that the service is not available when the user’s active case load is part of the $scenario',
       async ({ activeCaseLoadId }) => {
-        config.featureToggles.xRayBodyScansEnabled = true
         mockPermissions({ [XRayBodyScansPermission.read_scans]: true })
         ;(res.locals.user as PrisonUser).activeCaseLoadId = activeCaseLoadId
 
@@ -112,7 +96,6 @@ describe('X-ray body scans availability service', () => {
     )
 
     it('should indicate that access to the service is unauthorised due to permissions despite being available to the user’s active case load', async () => {
-      config.featureToggles.xRayBodyScansEnabled = true
       mockPermissions({ [XRayBodyScansPermission.read_scans]: false })
       res.locals.feComponents.sharedData.services.push({
         id: 'x-ray-body-scans',
@@ -137,7 +120,6 @@ describe('X-ray body scans availability service', () => {
     ])(
       'should indicate that the service is available to permitted users when $scenario',
       async ({ activeCaseLoadId }) => {
-        config.featureToggles.xRayBodyScansEnabled = true
         mockPermissions({ [XRayBodyScansPermission.read_scans]: true })
         ;(res.locals.user as PrisonUser).activeCaseLoadId = activeCaseLoadId
         res.locals.feComponents.sharedData.services.push({

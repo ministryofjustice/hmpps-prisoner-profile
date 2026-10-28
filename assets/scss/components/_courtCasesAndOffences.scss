@@ -1,4 +1,4 @@
-@use '@ministryofjustice/frontend/moj/base' as *;
+@use 'govuk-frontend/dist/govuk';
 
 #court-cases-sentence-details {
   .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
@@ -6,25 +6,25 @@
   }
 }
 
-#court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
+#court-cases-sentence-details button[aria-expanded='false'] .govuk-accordion__show-all-text:before {
     content: 'Show all offences and sentence details';
     visibility: hidden;
     visibility: visible;
 }
 
-#court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
+#court-cases-sentence-details button[aria-expanded='true'] .govuk-accordion__show-all-text:before {
   content: 'Hide all offences and sentence details';
   visibility: hidden;
   visibility: visible;
 }
 
-#court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
+#court-cases-sentence-details button[aria-expanded='false'] .govuk-accordion__section-toggle-text:before {
   content: 'Show offences and sentence details';
   visibility: hidden;
   visibility: visible;
 }
 
-#court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
+#court-cases-sentence-details button[aria-expanded='true'] .govuk-accordion__section-toggle-text:before {
   content: 'Hide offences and sentence details';
   visibility: hidden;
   visibility: visible;
@@ -36,26 +36,26 @@
   }
 }
 
-#court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
+#court-cases-upcoming-appearances button[aria-expanded='false'] .govuk-accordion__show-all-text:before {
   content: 'Show all offences and upcoming court appearances';
   visibility: hidden;
   visibility: visible;
 }
 
-#court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
+#court-cases-upcoming-appearances button[aria-expanded='true'] .govuk-accordion__show-all-text:before {
   content: 'Hide all offences and upcoming court appearances';
   visibility: hidden;
   visibility: visible;
 }
 
 
-#court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
+#court-cases-upcoming-appearances button[aria-expanded='false'] .govuk-accordion__section-toggle-text:before {
   content: 'Show offences and upcoming court appearances';
   visibility: hidden;
   visibility: visible;
 }
 
-#court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
+#court-cases-upcoming-appearances button[aria-expanded='true'] .govuk-accordion__section-toggle-text:before {
   content: 'Hide offences and upcoming court appearances';
   visibility: hidden;
   visibility: visible;
@@ -65,7 +65,7 @@
   margin-right: 5px;
   margin-bottom: 5px;
   vertical-align: middle;
-  color: govuk-functional-colour(brand);
+  color: govuk.govuk-functional-colour(brand);
 }
 
 .empty-accordion-header {
@@ -77,17 +77,17 @@
 
   // Visually separate the section from the one underneath when user changes colours in their
   // browser. See https://github.com/alphagov/govuk-frontend/issues/2321#issuecomment-924201488
-  border-bottom: govuk-spacing(2) solid transparent;
+  border-bottom: govuk.govuk-spacing(2) solid transparent;
 
-  color: govuk-functional-colour(text);
+  color: govuk.govuk-functional-colour(text);
   background: none;
 
   text-align: left;
   -webkit-appearance: none;
 
-  @include govuk-font($size: 24, $weight: bold);
+  @include govuk.govuk-font($size: 24, $weight: bold);
 
-  @include govuk-media-query($from: tablet) {
-    padding-bottom: govuk-spacing(2);
+  @include govuk.govuk-media-query($from: tablet) {
+    padding-bottom: govuk.govuk-spacing(2);
   }
 }

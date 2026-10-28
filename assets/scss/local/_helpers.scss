@@ -1,0 +1,5 @@
+@mixin forced-dark-colours() {
+  @media (forced-colors: active) and (prefers-color-scheme: dark) {
+    @content;
+  }
+}
