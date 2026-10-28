@@ -39,7 +39,7 @@ describe('propertySummaryToMiniSummary', () => {
         }),
       ],
       linkLabel: 'Property',
-      linkHref: `${config.serviceUrls.prisonerProperty}/prisoner/${prisonerNumber}`,
+      linkHref: `${config.serviceUrls.prisonerProperty}/prisoner/${prisonerNumber}?returnToService=prisonerProfile`,
     })
   })
 
