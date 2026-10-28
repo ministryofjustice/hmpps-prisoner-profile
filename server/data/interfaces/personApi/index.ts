@@ -4,17 +4,35 @@ export interface PersonApiReferenceDataCode {
   active: boolean
 }
 
-interface PersonRecordIdentifiers {
-  prisonNumbers: string[]
+export interface PersonRecord {
   // NB: non-exhaustive
+  identifiers: {
+    prisonNumbers: string[]
+  }
+  religion: {
+    code: string | null
+    description: string | null
+  }
 }
 
-export interface PersonRecord {
-  identifiers: PersonRecordIdentifiers
-  // NB: non-exhaustive
+export interface DpsPersonRecord extends PersonRecord {
+  religionHistory: {
+    // NB: non-exhaustive
+    current: boolean
+    religionCode: string
+    religionDescription: string | null
+    changeReasonKnown: boolean
+    comments: string | null
+    startDate: string
+    endDate: string | null
+    createUserId: string
+  }[]
 }
 
 export interface PersonApiClient {
   getReligionCodes(activeOnly?: boolean): Promise<PersonApiReferenceDataCode[]>
-  getRecord(prisonerNumber: string): Promise<PersonRecord>
+
+  getRecord(prisonerNumber: string, withReligionHistory?: false): Promise<PersonRecord>
+  getRecord(prisonerNumber: string, withReligionHistory: true): Promise<DpsPersonRecord>
+  getRecord(prisonerNumber: string, withReligionHistory?: boolean): Promise<PersonRecord | DpsPersonRecord>
 }

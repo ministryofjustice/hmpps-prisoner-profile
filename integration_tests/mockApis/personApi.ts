@@ -1,7 +1,10 @@
 import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
-import type { PersonRecord } from '../../server/data/interfaces/personApi'
+import {
+  mockPersonRecord,
+  mockPersonRecordWithReligionHistory,
+} from '../../server/data/localMockData/personApi/personRecordMock'
 import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
 
 export default {
@@ -21,21 +24,29 @@ export default {
       },
     }),
 
-  stubPersonApiGetRecord: ({
+  stubPersonApiGetRecord({
     prisonerNumber,
     prisonNumbers = [],
+    withReligionHistory = false,
   }: {
     prisonerNumber: string
     prisonNumbers?: string[]
-  }) =>
-    stubGetWithBody({
-      path: `/personRecord/person/prison/${prisonerNumber}`,
+    withReligionHistory?: boolean
+  }) {
+    const record = withReligionHistory ? mockPersonRecordWithReligionHistory : mockPersonRecord
+    return stubGetWithBody({
+      path: withReligionHistory
+        ? `/personRecord/person/prison/dps/${prisonerNumber}`
+        : `/personRecord/person/prison/${prisonerNumber}`,
       body: {
+        ...record,
         identifiers: {
+          ...record.identifiers,
           prisonNumbers,
         },
-      } satisfies PersonRecord,
-    }),
+      },
+    })
+  },
 
   stubPersonApiGetRecordNotFound: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubFor({

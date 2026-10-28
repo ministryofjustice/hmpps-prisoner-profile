@@ -43,6 +43,7 @@ import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApi
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
+import type { PersonApiClient } from './interfaces/personApi'
 import PersonApiRestClient from './personApiClient'
 import XRayBodyScansApiRestClient from './xRayBodyScansApiClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
@@ -155,7 +156,8 @@ export const dataAccess = {
     new PrisonerProfileApiRestClient(token, circuitBreakers.prisonerProfile),
   personalRelationshipsApiClientBuilder: (token: string) =>
     new PersonalRelationshipsApiRestClient(token, circuitBreakers.personalRelationships),
-  personApiClientBuilder: (token: string) => new PersonApiRestClient(token, circuitBreakers.personApi),
+  personApiClientBuilder: (token: string) =>
+    new PersonApiRestClient(token, circuitBreakers.personApi) as PersonApiClient,
   xRayBodyScansApiClientBuilder: (token: string) =>
     new XRayBodyScansApiRestClient(token, circuitBreakers.xRayBodyScans),
   prisonerPropertyApiClientBuilder: (token: string) =>

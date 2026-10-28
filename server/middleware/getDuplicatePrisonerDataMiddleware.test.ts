@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import getDuplicatePrisonerData, { GHOST_PRISON_ID } from './getDuplicatePrisonerDataMiddleware'
 import { Services } from '../services'
 import { DataAccess } from '../data'
-import type { PersonApiClient } from '../data/interfaces/personApi'
+import type { PersonApiClient, PersonRecord } from '../data/interfaces/personApi'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonerSearchClient } from '../data/interfaces/prisonerSearchApi/prisonerSearchClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -128,7 +128,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         record: { identifiers: { prisonNumbers: undefined } },
       },
     ])('should set empty array when $scenario', async ({ record }) => {
-      personApiClient.getRecord.mockResolvedValue(record)
+      personApiClient.getRecord.mockResolvedValue(record as PersonRecord)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
