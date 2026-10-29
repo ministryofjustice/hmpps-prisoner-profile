@@ -381,15 +381,27 @@
 }
 
 .contact-status-bar {
+  align-items: flex-start;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+
+  @include govuk.govuk-media-query($from: tablet) {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+  }
 
   .contact-type-pills {
+    column-gap: 10px;
     display: flex;
-    flex-direction: row;
-    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @include govuk.govuk-media-query($until: tablet) {
+    align-items: baseline;
+    flex-direction: column;
   }
 
   .contact-change-link {
@@ -398,17 +410,17 @@
 }
 
 .contact-type-pill {
+  align-items: center;
+  border: 2px solid govuk.govuk-colour('black', $variant: 'tint-50');
+  border-radius: 100px;
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  margin: 10px 0 15px;
-  padding: 11px 13px 11px 35px;
   gap: 5px;
   height: 38px;
-  border: 2px solid govuk.govuk-functional-colour(border);
-  border-radius: 100px;
+  justify-content: flex-end;
+  margin: 10px 0 15px;
+  padding: 11px 13px 11px 35px;
 }
 
 .contact-type-pill--next-of-kin {
