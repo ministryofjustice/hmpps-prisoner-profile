@@ -5,12 +5,8 @@
 
 {% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
 
-{% macro addressHeading(text) %}
-    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">{{ text }}</h2>
-{% endmacro %}
-
 {% macro addressSummary(address, primaryOrPostal) %}
-  <div class="hmpps-address" id="hmpps-address-{{ primaryOrPostal }}">
+  <div class="hmpps-address {{ 'row-updated' if flashMessage and flashMessage.addressIds and address.addressId in flashMessage.addressIds }}" id="hmpps-address-{{ primaryOrPostal }}">
     {{ caller() }}
     {% if address.noFixedAbode %}<p class="govuk-body govuk-!-margin-bottom-1">No fixed address</p>{% endif %}
     {% if address.subBuildingName %}<p class="govuk-body-l govuk-!-margin-bottom-0">{{ address.subBuildingName }}</p>{% endif %}
@@ -61,8 +57,7 @@
 
     {{ govukDetails({
       summaryText: "Additional address details",
-      html: additionalDetailsHtml,
-      classes: 'govuk-!-margin-top-5'
+      html: additionalDetailsHtml
     }) }}
 
     <p class="hmpps-address__added-date govuk-body-s">Added on {{ address.fromDate | formatDate }}</p>
@@ -72,7 +67,7 @@
           <h2 class="govuk-heading-m">Phone numbers</h2>
           {% if canEditAddressPhoneNumbers %}
             <p class="govuk-body">
-              <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses/{{ address.addressId }}/add-address-phone-number">Add a new phone number</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses/{{ address.addressId }}/add-address-phone-number">Add a phone number</a>
             </p>
           {% endif %}
         </div>
@@ -87,7 +82,7 @@
                     <p class="govuk-body govuk-!-margin-0">Extension: {{ number.extension }}</p>
                   {% endif %}
                   {% if number.updatedOn %}
-                    <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-3">Updated on {{ number.updatedOn | formatDate }}</p>
+                    <p class="hmpps-address__updated-date govuk-body-s">Updated on {{ number.updatedOn | formatDate }}</p>
                   {% endif %}
                 </div>
                 {% if canEditAddressPhoneNumbers %}
@@ -122,15 +117,15 @@
           {% for address in addresses.value.primaryOrPostal %}
             {% if address.primaryAddress and address.postalAddress %}
               {% call addressSummary(address, 'primary-and-postal') %}
-                {{ addressHeading('Primary and postal address') }}
+                <h2 class="govuk-heading-m">Primary and postal address</h2>
               {% endcall %}
             {% elseif address.primaryAddress %}
               {% call addressSummary(address, 'primary') %}
-                {{ addressHeading('Primary address') }}
+                <h2 class="govuk-heading-m">Primary address</h2>
               {% endcall %}
             {% elseif address.postalAddress %}
               {% call addressSummary(address, 'postal') %}
-                {{ addressHeading('Postal address') }}
+                <h2 class="govuk-heading-m">Postal address</h2>
               {% endcall %}
             {% endif %}
           {% endfor %}
