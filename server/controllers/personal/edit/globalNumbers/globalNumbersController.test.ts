@@ -162,6 +162,32 @@ describe('GlobalNumbersController', () => {
           )
         })
 
+        it('trims, removes brackets and formats an 11-digit number before saving', async () => {
+          validRequest.body = { phoneNumberType: 'MOB', phoneNumber: ' (01234)567890 ', phoneExtension: '' }
+
+          await action(validRequest, res, next)
+
+          expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            { phoneNumberType: 'MOB', phoneNumber: '01234 567890', phoneExtension: '' },
+          )
+        })
+
+        it('keeps numbers longer than 11 digits in the entered format after trimming brackets and spaces', async () => {
+          validRequest.body = { phoneNumberType: 'MOB', phoneNumber: ' (+123456789012) ', phoneExtension: '' }
+
+          await action(validRequest, res, next)
+
+          expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            { phoneNumberType: 'MOB', phoneNumber: '+123456789012', phoneExtension: '' },
+          )
+        })
+
         it('Redirects to the personal page #phones-and-emais on success', async () => {
           await action(validRequest, res, next)
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
@@ -231,7 +257,7 @@ describe('GlobalNumbersController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
         })
 
-        it('Allows duplicate phone number if the extention differs', async () => {
+        it('Allows duplicate phone number if the extension differs', async () => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
             phones: [
               {
@@ -247,6 +273,12 @@ describe('GlobalNumbersController', () => {
 
           await action(validRequest, res, next)
 
+          expect(personalPageService.createGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            { phoneNumberType: 'FAX', phoneNumber: '1234', phoneExtension: '4322' },
+          )
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
             fieldName: 'phoneNumber',
@@ -464,7 +496,7 @@ describe('GlobalNumbersController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/change-phone-number/123`)
         })
 
-        it('Allows duplicate phone number if the extention differs', async () => {
+        it('Allows duplicate phone number if the extension differs', async () => {
           personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
             phones: [
               {
@@ -487,10 +519,14 @@ describe('GlobalNumbersController', () => {
 
           await action(validRequest, res, next)
 
-          expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-            text: 'Phone number updated',
-            fieldName: 'phoneNumber',
-          })
+          expect(personalPageService.updateGlobalPhoneNumber).toHaveBeenCalledWith(
+            'token',
+            prisonUserMock,
+            prisonerNumber,
+            '123',
+            { phoneNumberType: 'FAX', phoneNumber: '1234', phoneExtension: '5555' },
+          )
+          expect(validRequest.flash).not.toHaveBeenCalledWith('errors', expect.anything())
         })
 
         it('Handles API errors', async () => {

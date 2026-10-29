@@ -2,14 +2,13 @@ import * as cheerio from 'cheerio'
 import nunjucks from 'nunjucks'
 import { CorePersonRecordPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { formatAddressDate, formatDate } from '../../../utils/dateHelpers'
-import { addressToLines, apostrophe, formatPhoneNumber, prependBaseUrl } from '../../../utils/utils'
+import { addressToLines, apostrophe, prependBaseUrl } from '../../../utils/utils'
 import { AddressForDisplay } from '../../../services/interfaces/personalPageService/PersonalPage'
 
 const env = nunjucks.configure(['server/views', 'node_modules/govuk-frontend/dist'], { autoescape: true })
 env.addFilter('addressToLines', addressToLines)
 env.addFilter('formatAddressDate', formatAddressDate)
 env.addFilter('formatDate', formatDate)
-env.addFilter('formatPhoneNumber', formatPhoneNumber)
 env.addFilter('apostrophe', apostrophe)
 env.addFilter('prependBaseUrl', prependBaseUrl)
 env.addFilter('removeNullish', (values: unknown[]) => values.filter(value => value != null))
@@ -44,7 +43,7 @@ const address = {
       id: 124,
       type: 'VISIT',
       typeDescription: 'Agency visit line',
-      number: '02012345678',
+      number: '02012  345678',
       createDatetime: '2024-02-01T10:00:00',
       updatedOn: '2024-02-01T10:00:00',
     },
@@ -70,7 +69,7 @@ const render = (overrides = {}) => {
 }
 
 describe('Addresses page', () => {
-  it.each([false, true])('formats address phones only when the flag is disabled (%s)', enabled => {
+  it.each([false, true])('shows stored address phone values unchanged when the flag is %s', enabled => {
     const $ = render({ editEnabled: false, editAddressSpecificPhoneNumbersEnabled: enabled })
     const rows = $('.govuk-summary-list__row')
 
@@ -80,7 +79,7 @@ describe('Addresses page', () => {
         .eq(enabled ? 5 : 4)
         .find('.govuk-summary-list__value')
         .text(),
-    ).toContain(enabled ? '02012345678' : '02012 345678')
+    ).toContain('02012  345678')
     expect($('a')).toHaveLength(0)
   })
 
@@ -104,13 +103,15 @@ describe('Addresses page', () => {
     expect(rows.eq(4).find('a').text()).toContain('Add a phone number')
     expect(rows.eq(5).find('.govuk-summary-list__value p').first().text()).toBe('Agency visit line')
     expect(rows.eq(5).find('[class~="govuk-!-font-weight-bold"]')).toHaveLength(0)
-    expect(rows.eq(5).text()).toContain('02012345678')
+    expect(rows.eq(5).text()).toContain('02012  345678')
+    expect(rows.eq(5).find('[data-qa="phone-number-value"]')).toHaveLength(1)
     expect(rows.eq(5).find('[data-qa="phone-updated-on"]').text()).toBe('Updated on 1 February 2024')
     expect(rows.eq(5).find('a').attr('href')).toBe(`${addressUrl}/change-address-phone-number/124`)
-    expect(rows.eq(5).find('.govuk-visually-hidden').text().trim()).toBe('Agency visit line number 02012345678')
+    expect(rows.eq(5).find('.govuk-visually-hidden').text().trim()).toBe('Agency visit line number 02012  345678')
     expect(rows.eq(6).text()).toContain('Home')
     expect(rows.eq(6).text()).toContain('01234567890')
     expect(rows.eq(6).text()).toContain('Extension: 123')
+    expect(rows.eq(6).find('[data-qa="phone-extension-value"]')).toHaveLength(1)
     expect(rows.eq(6).find('[data-qa="phone-updated-on"]').text()).toBe('Updated on 2 January 2024')
     expect(rows.eq(6).find('a').attr('href')).toBe(`${addressUrl}/change-address-phone-number/123`)
     expect(rows.first().hasClass('govuk-summary-list__row--no-actions')).toBe(true)

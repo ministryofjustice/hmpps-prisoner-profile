@@ -141,8 +141,8 @@ context('Primary or Postal Address Page', () => {
         prisonerNumber,
         addressId,
         requestBody: [
-          { phoneNumber: '01234567890', phoneNumberType: 'MOB' },
-          { phoneNumber: '07853544216', phoneNumberType: 'MOB' },
+          { phoneNumber: '01234 567890', phoneNumberType: 'MOB' },
+          { phoneNumber: '07853 544216', phoneNumberType: 'MOB' },
         ],
       })
 
@@ -193,7 +193,8 @@ context('Primary or Postal Address Page', () => {
     it('prefills and saves a phone number', () => {
       const { addressId } = mockAddresses[0]
       const phoneId = 1324254
-      const requestBody = { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' }
+      const requestBody = { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '321' }
+      const phoneNumberInput = '02012345678'
 
       cy.task('stubUpdateAddressPhoneNumber', { prisonerNumber, addressId, phoneId, requestBody })
       cy.signIn({
@@ -207,7 +208,7 @@ context('Primary or Postal Address Page', () => {
       cy.getDataQa('add-another-phone-number').should('not.exist')
       cy.get('input[name="phoneNumberType0"][value="HOME"]').check()
       cy.get('input[name="phoneNumber0"]').clear()
-      cy.get('input[name="phoneNumber0"]').type(requestBody.phoneNumber)
+      cy.get('input[name="phoneNumber0"]').type(phoneNumberInput)
       cy.get('input[name="phoneExtension0"]').type(requestBody.extension)
       cy.getDataQa('save-address-phone-numbers').click()
 

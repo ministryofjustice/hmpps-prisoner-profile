@@ -71,10 +71,10 @@
     {% for phone in phoneNumbers %}
       {% set phoneHtml %}
         <p class="govuk-body govuk-!-margin-0">{{ phone.typeDescription or phone.type }}</p>
-        <p class="govuk-body govuk-!-margin-0">
-          {{ phone.number if editAddressSpecificPhoneNumbersEnabled else phone.number | formatPhoneNumber }}
+        <p class="govuk-body govuk-!-margin-0" data-qa="phone-number-value">
+          {{ phone.number }}
         </p>
-        {% if phone.extension %}<p class="govuk-body govuk-!-margin-0">Extension: {{ phone.extension }}</p>{% endif %}
+        {% if phone.extension %}<p class="govuk-body govuk-!-margin-0" data-qa="phone-extension-value">Extension: {{ phone.extension }}</p>{% endif %}
         {% if phone.updatedOn %}
           <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-0" data-qa="phone-updated-on">
             {{- 'Updated on ' }}{{ phone.updatedOn | formatDate -}}

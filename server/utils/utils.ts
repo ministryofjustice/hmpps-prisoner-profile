@@ -378,6 +378,11 @@ export const findError = (errors: HmppsError[], formFieldId: string) => {
   return null
 }
 
+export const findFieldErrors = (errors: HmppsError[], formFieldId: string) => {
+  const messages = errors.filter(error => error.href === `#${formFieldId}`).map(error => error.text)
+  return messages.length ? messages : null
+}
+
 export const isActiveCaseLoad = (prisonId: string, user: HmppsUser) =>
   user.authSource === 'nomis' && user.activeCaseLoadId === prisonId
 

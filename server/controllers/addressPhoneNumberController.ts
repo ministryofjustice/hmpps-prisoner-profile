@@ -6,6 +6,11 @@ import getCommonRequestData from '../utils/getCommonRequestData'
 import NotFoundError from '../utils/notFoundError'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import logger from '../../logger'
+import {
+  normalisePhoneExtension,
+  phoneNumberForStorage,
+  validatePhoneNumberDuplicate,
+} from '../validators/personal/phoneNumberValidator'
 
 const phoneNumberTypes = [
   { text: 'Mobile', value: 'MOB' },
@@ -139,13 +144,37 @@ export default class AddressPhoneNumberController {
 
       const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
         ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
-          phoneNumber,
+          phoneNumber: phoneNumberForStorage(phoneNumber),
           phoneNumberType,
-          extension: phoneExtension || undefined,
+          extension: normalisePhoneExtension(phoneExtension) || undefined,
         }),
       )
 
       try {
+        const address = (await this.addressService.getAddressesFromPrisonAPI(clientToken, prisonerNumber))?.find(
+          candidate => candidate.addressId === addressId,
+        )
+        const existingNumbers = (address?.phones ?? [])
+          .filter(phone => !isChanging || phone.phoneId !== Number(req.params.phoneId))
+          .map(phone => ({ number: phone.number, extension: phone.ext }))
+        const duplicateErrors = phoneNumberRequests.flatMap((phone, index) => {
+          const errors = validatePhoneNumberDuplicate(
+            phone.phoneNumber,
+            phone.extension,
+            existingNumbers,
+            'address',
+            index,
+          )
+          if (!errors.length) existingNumbers.push({ number: phone.phoneNumber, extension: phone.extension })
+          return errors
+        })
+
+        if (duplicateErrors.length) {
+          req.flash('errors', duplicateErrors)
+          req.flash('requestBody', JSON.stringify(req.body))
+          return res.redirect(isChanging ? req.originalUrl : addAddressPhoneNumberUrl)
+        }
+
         const savedPhoneNumbers = isChanging
           ? [
               await this.addressService.updateAddressPhoneNumber(

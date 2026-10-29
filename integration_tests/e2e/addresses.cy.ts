@@ -111,7 +111,8 @@ context('Addresses page', () => {
     cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     const [address] = mockAddresses
     const { addressId } = address
-    const requestBody = [{ phoneNumber: '01234567890', phoneNumberType: 'HOME' }]
+    const requestBody = [{ phoneNumber: '01234 567890', phoneNumberType: 'HOME' }]
+    const phoneNumberInput = '01234567890'
     cy.task('stubAddresses', { prisonerNumber, resp: [address] })
     cy.task('stubAddAddressPhoneNumbers', { prisonerNumber, addressId, requestBody })
 
@@ -144,7 +145,7 @@ context('Addresses page', () => {
     const phoneNumbersPage = Page.verifyOnPageWithTitle(AddressPhoneNumbersPage, 'Add a phone number for this address')
     phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/personal`)
     phoneNumbersPage.phoneNumberType('HOME').check()
-    phoneNumbersPage.phoneNumber().type(requestBody[0].phoneNumber)
+    phoneNumbersPage.phoneNumber().type(phoneNumberInput)
     phoneNumbersPage.saveButton().click()
 
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
@@ -156,7 +157,8 @@ context('Addresses page', () => {
     const [address] = mockAddresses
     const { addressId, phones = [] } = address
     const [phone] = phones
-    const requestBody = { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' }
+    const requestBody = { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '321' }
+    const phoneNumberInput = '02012345678'
     cy.task('stubAddresses', { prisonerNumber, resp: [address] })
     cy.task('stubUpdateAddressPhoneNumber', { prisonerNumber, addressId, phoneId: phone.phoneId, requestBody })
 
@@ -170,7 +172,7 @@ context('Addresses page', () => {
     phoneNumbersPage.phoneNumber().should('have.value', phone.number)
     phoneNumbersPage.phoneNumberType('HOME').check()
     phoneNumbersPage.phoneNumber().clear()
-    phoneNumbersPage.phoneNumber().type(requestBody.phoneNumber)
+    phoneNumbersPage.phoneNumber().type(phoneNumberInput)
     phoneNumbersPage.phoneExtension().type(requestBody.extension)
     phoneNumbersPage.saveButton().click()
 
