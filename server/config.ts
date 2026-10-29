@@ -167,6 +167,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
+    activitiesApi: {
+      url: get('ACTIVITIES_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('ACTIVITIES_API_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('ACTIVITIES_API_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('ACTIVITIES_API_TIMEOUT_DEADLINE', 3000))),
+    },
     cellMovementsApi: {
       url: get('CELL_MOVEMENTS_API_URL', 'http://localhost:8082', requiredInProduction),
       healthPath: '/health/ping',
