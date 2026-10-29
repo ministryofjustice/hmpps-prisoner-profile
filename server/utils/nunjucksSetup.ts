@@ -12,6 +12,7 @@ import {
   arrayIncludes,
   contactAddressToHtml,
   findError,
+  findFieldErrors,
   formatMoney,
   formatName,
   formatNino,
@@ -156,6 +157,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)
   njkEnv.addFilter('find', <T>(l: T[], iteratee: keyof T, eq: T[keyof T]) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)
+  njkEnv.addFilter('findFieldErrors', findFieldErrors)
   njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
   njkEnv.addFilter('containsSelected', (items: { selected: boolean }[]) => items && items.some(item => item.selected))
   njkEnv.addFilter('removeNullish', (arr: unknown[]) => arr.filter(o => o !== undefined && o !== null))

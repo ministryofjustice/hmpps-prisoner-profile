@@ -82,9 +82,9 @@
               <div class="hmpps-address__phone {{ 'row-updated' if flashMessage and flashMessage.fieldName == 'addressPhoneNumbers' and flashMessage.phoneIds and number.id in flashMessage.phoneIds }}">
                 <div class="hmpps-address__phone__details">
                   <p class="govuk-body govuk-!-margin-0">{{ number.typeDescription }}</p>
-                  <p class="govuk-body govuk-!-margin-0">{{ number.number if editAddressSpecificPhoneNumbersEnabled else number.number | formatPhoneNumber }}</p>
+                  <p class="govuk-body govuk-!-margin-0" data-qa="phone-number-value">{{ number.number }}</p>
                   {% if number.extension %}
-                    <p class="govuk-body govuk-!-margin-0">Extension: {{ number.extension }}</p>
+                    <p class="govuk-body govuk-!-margin-0" data-qa="phone-extension-value">Extension: {{ number.extension }}</p>
                   {% endif %}
                   {% if number.updatedOn %}
                     <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-3">Updated on {{ number.updatedOn | formatDate }}</p>

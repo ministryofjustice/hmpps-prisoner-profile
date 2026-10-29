@@ -32,6 +32,7 @@
           }
         })
       %}
+        {% set phoneNumberErrors = errors | findFieldErrors("phone-number-" + phoneNumber.index) %}
         {{
           govukRadios({
             name: "phoneNumberType" + phoneNumber.index,
@@ -47,9 +48,10 @@
             name: "phoneNumber" + phoneNumber.index,
             classes: "govuk-input--width-20",
             value: phoneNumber.phoneNumber,
-            errorMessage: { text: (errors | findError("phone-number-" + phoneNumber.index)).text } if errors | findError("phone-number-" + phoneNumber.index)
+            errorMessage: { html: phoneNumberErrors | join("<br>") } if phoneNumberErrors
           })
         }}
+        {% set phoneExtensionErrors = errors | findFieldErrors("phone-extension-" + phoneNumber.index) %}
         {{
           govukInput({
             label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
@@ -57,7 +59,7 @@
             name: "phoneExtension" + phoneNumber.index,
             classes: "govuk-input--width-5",
             value: phoneNumber.phoneExtension,
-            errorMessage: { text: (errors | findError("phone-extension-" + phoneNumber.index)).text } if errors | findError("phone-extension-" + phoneNumber.index)
+            errorMessage: { html: phoneExtensionErrors | join("<br>") } if phoneExtensionErrors
           })
         }}
       {% endcall %}
