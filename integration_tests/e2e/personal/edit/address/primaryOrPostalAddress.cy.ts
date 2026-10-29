@@ -24,7 +24,7 @@ context('Primary or Postal Address Page', () => {
     dependantLocality: 'My Locality',
     postTownCode: 'CITY1',
     countyCode: 'COUNTY1',
-    countryCode: 'COUNTRY1',
+    countryCode: 'ENG',
     postCode: 'A1 2BC',
     fromDate: '2025-06-10',
     addressTypes: [],
@@ -72,7 +72,7 @@ context('Primary or Postal Address Page', () => {
     })
     cy.task('stubPersonIntegrationGetReferenceData', {
       domain: 'COUNTRY',
-      referenceData: [{ code: 'COUNTRY1', description: 'My Country', isActive: true }],
+      referenceData: [{ code: 'ENG', description: 'England', isActive: true }],
     })
   })
 
@@ -107,7 +107,7 @@ context('Primary or Postal Address Page', () => {
       page.addressLine(4).should('contain.text', 'My Post Town')
       page.addressLine(5).should('contain.text', 'My County')
       page.addressLine(6).should('contain.text', 'A1 2BC')
-      page.addressLine(7).should('contain.text', 'My Country')
+      page.addressLine(7).should('contain.text', 'England')
     })
 
     it('links are correct', () => {
