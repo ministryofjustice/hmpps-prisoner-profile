@@ -26,7 +26,7 @@ export default {
 
   stubPersonApiGetRecord({
     prisonerNumber,
-    prisonNumbers = [],
+    prisonNumbers,
     withReligionHistory = false,
   }: {
     prisonerNumber: string
@@ -42,7 +42,7 @@ export default {
         ...record,
         identifiers: {
           ...record.identifiers,
-          prisonNumbers,
+          prisonNumbers: prisonNumbers ?? [prisonerNumber],
         },
       },
     })

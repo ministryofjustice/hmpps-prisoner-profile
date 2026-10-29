@@ -218,6 +218,7 @@ export const services = () => {
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personalRelationshipsApiClientBuilder,

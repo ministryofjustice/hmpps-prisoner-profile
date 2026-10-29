@@ -59,6 +59,7 @@ context('When signed in', () => {
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber })
       cy.task('stubSecondaryLanguages', 1102484)
       cy.task('stubProperty', 1102484)
       cy.task('stubAddresses', { prisonerNumber: 'G6123VU' })
@@ -185,11 +186,10 @@ context('When signed in', () => {
         page
           .personalDetails()
           .religionOrBelief()
-          .should('contain', 'Celestial Church of God')
-          .and(
-            'contain.html',
-            '<a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/G6123VU/religion-belief-history">Religion, faith or belief history</a>',
-          )
+          .should('contain', 'They prefer not to say')
+          .find('a')
+          .should('contain.text', 'Religion, faith or belief history')
+          .and('have.attr', 'href', '/prisoner/G6123VU/religion-belief-history')
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual or straight')
         page
@@ -833,6 +833,7 @@ context('When signed in', () => {
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
+      cy.task('stubPersonApiGetRecord', { prisonerNumber })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
       visitPersonalDetailsPage()
     })

@@ -3,6 +3,7 @@ import {
   PrisonerPermissions,
   PrisonerPropertyPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import config from '../config'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   AddressForDisplay,
@@ -42,6 +43,7 @@ import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { noCallbackOnErrorBecause, Result } from '../utils/result/result'
+import { PersonApiClient } from '../data/interfaces/personApi'
 import {
   CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
@@ -94,6 +96,7 @@ export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
+    private readonly personApiClientBuilder: RestClientBuilder<PersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
@@ -107,10 +110,9 @@ export default class PersonalPageService {
     private readonly addressService: AddressService,
   ) {}
 
-  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
+  getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication | null> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    const response = apiClient.getHealthAndMedication(prisonerNumber)
-    return response
+    return apiClient.getHealthAndMedication(prisonerNumber)
   }
 
   async getGlobalPhonesAndEmails(token: string, prisonerNumber: string): Promise<GlobalNumbersAndEmails> {
@@ -393,8 +395,8 @@ export default class PersonalPageService {
       countryOfBirth = refData.map(data => data.description)
     }
 
-    return {
-      personalDetails: await this.personalDetails(
+    const [personalDetails, nextOfKin] = await Promise.all([
+      this.personalDetails(
         token,
         id => this.prisonService.getPrisonByPrisonId(id, token),
         personIntegrationApiClient,
@@ -406,12 +408,16 @@ export default class PersonalPageService {
         personalRelationshipsNumberOfChildren,
         personalRelationshipsDomesticStatus,
       ),
+      this.nextOfKin(offenderContacts, prisonApiClient),
+    ])
+    return {
+      personalDetails,
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses: addressResponseResult,
       oldAddresses,
       oldAddressSummary: this.addressSummary(oldAddresses),
-      nextOfKin: await this.nextOfKin(offenderContacts, prisonApiClient),
+      nextOfKin,
       nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
         contacts,
         hasNextOfKin: contacts.some(contact => contact.isNextOfKin),
@@ -429,7 +435,6 @@ export default class PersonalPageService {
         ),
       },
       learnerNeurodivergence,
-      hasCurrentBelief: inmateDetail.religion !== null,
       distinguishingMarks,
       militaryRecords: militaryRecords.map(records => records?.filter(record => record.militarySeq === 1)), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
@@ -480,7 +485,10 @@ export default class PersonalPageService {
     const { profileInformation, physicalAttributes } = inmateDetail
     const { ethnicity, raceCode: ethnicityCode } = physicalAttributes
 
-    const aliases = await this.aliases(personIntegrationApiClient, prisonerData)
+    const [aliases, religionOrBelief] = await Promise.all([
+      this.aliases(personIntegrationApiClient, prisonerData),
+      this.getReligionOrBelief(token, inmateDetail),
+    ])
 
     let ethnicGroup = 'Not entered'
     if (ethnicity) {
@@ -546,7 +554,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      religionOrBelief: await this.formatReligion(token, inmateDetail.religion),
+      religionOrBelief: religionOrBelief || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
@@ -566,16 +574,29 @@ export default class PersonalPageService {
     }
   }
 
-  private async formatReligion(token: string, religion?: string): Promise<string> {
-    if (!religion) {
-      return 'Not entered'
+  private async getReligionOrBelief(clientToken: string, inmateDetail: InmateDetail): Promise<string | null> {
+    if (!config.featureToggles.usePersonApi.religion) {
+      const { religion } = inmateDetail
+      if (!religion) {
+        return null
+      }
+
+      const refData = await this.getReferenceDataCodes(clientToken, CorePersonRecordReferenceDataDomain.religion)
+      const code = refData.find(r => r.description?.toLowerCase() === religion.toLowerCase() || r.code === religion)
+      const override = religionFieldData.referenceDataOverrides.find(o => o.id === code?.code)
+
+      return override ? (override.description ?? religion) : religion
     }
 
-    const refData = await this.getReferenceDataCodes(token, CorePersonRecordReferenceDataDomain.religion)
-    const code = refData.find(r => r.description?.toLowerCase() === religion.toLowerCase() || r.code === religion)
-    const override = religionFieldData.referenceDataOverrides.find(o => o.id === code?.code)
+    const personApiClient = this.personApiClientBuilder(clientToken)
+    // TODO: extract out into a shared variable when more domains are retrieved from this endpoint
+    const record = await personApiClient.getRecord(inmateDetail.offenderNo)
+    if (!record.religion?.code) {
+      return null
+    }
 
-    return override ? (override.description ?? religion) : religion
+    const override = religionFieldData.referenceDataOverrides.find(o => o.id === record.religion.code)
+    return override?.description ?? record.religion.description ?? null
   }
 
   private aliases = async (personIntegrationApiClient: PersonIntegrationApiClient, prisonerData: Prisoner) => {
