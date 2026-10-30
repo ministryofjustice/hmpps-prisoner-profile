@@ -1,4 +1,3 @@
-import { Request } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
 import PersonalEditController from '../personalEditController'
 import { AuditService } from '../../../../services/auditService'
@@ -9,44 +8,18 @@ import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
 import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import {
-  getProfileInformationValue,
-  ProfileInformationType,
-} from '../../../../data/interfaces/prisonApi/ProfileInformation'
 import type { RadioOption } from '../../../../interfaces/GovOptions'
-import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 
 export default class ReligionController extends PersonalEditController {
   constructor(
     private readonly personalPageService: PersonalPageService,
-    protected readonly auditService: AuditService,
+    auditService: AuditService,
   ) {
     super(auditService)
   }
 
   religion(): EditControllerRequestHandlers {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
-
-    const currentReligionValue = (req: Request, referenceData: ReferenceDataCodeDto[]) => {
-      const { inmateDetail } = req.middleware
-      const profileInformationValue = getProfileInformationValue(
-        ProfileInformationType.Religion,
-        inmateDetail.profileInformation,
-      )
-      const currentValue =
-        profileInformationValue &&
-        (referenceData.find(
-          religion =>
-            religion.description.toLowerCase() === profileInformationValue.toLowerCase() ||
-            religion.code === profileInformationValue,
-        ) ?? { code: '?', description: profileInformationValue })
-
-      const override = religionFieldData.referenceDataOverrides.find(o => o.id === currentValue?.code)
-      return {
-        ...currentValue,
-        description: override?.description ?? currentValue?.description,
-      }
-    }
 
     // When there are multiple variants of a religion, we want to display the 'Other' option last:
     const demoteOtherVariant = (prefix: string, a: RadioOption, b: RadioOption): number => {
@@ -85,6 +58,7 @@ export default class ReligionController extends PersonalEditController {
 
     return {
       edit: async (req, res) => {
+        const { inmateDetail } = req.middleware
         const { clientToken, prisonerNumber, naturalPrisonerName, prisonId, miniBannerData } = getCommonRequestData(
           req,
           res,
@@ -111,7 +85,7 @@ export default class ReligionController extends PersonalEditController {
           .map(code => religionReferenceData.find(it => it.code === code))
           .filter(Boolean)
 
-        const currentReligion = currentReligionValue(req, religionReferenceData)
+        const currentReligion = await this.personalPageService.getReligionOrBelief(clientToken, inmateDetail)
         const fieldValue = requestBodyFlash?.religion
         const currentReasonKnown = requestBodyFlash?.reasonKnown
         const currentReasonForChange = requestBodyFlash?.reasonForChange

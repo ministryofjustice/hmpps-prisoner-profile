@@ -2,6 +2,7 @@ import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
 import { inmateDetailMock } from '../../../../server/data/localMockData/inmateDetailMock'
+import { mockPersonRecord } from '../../../../server/data/localMockData/personApi/personRecordMock'
 import Page from '../../../pages/page'
 import EditReligion from '../../../pages/editPages/religion'
 
@@ -108,6 +109,10 @@ context('Edit religion, faith or belief', () => {
             profileInformation: [],
           },
         })
+        cy.task('stubPersonApiGetRecord', {
+          prisonerNumber,
+          personRecord: { ...mockPersonRecord, religion: { code: null, description: null } },
+        })
         cy.task('stubPersonalCareNeeds')
         cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
       },
@@ -135,6 +140,10 @@ context('Edit religion, faith or belief', () => {
           ...inmateDetailMock,
           profileInformation: [],
         },
+      })
+      cy.task('stubPersonApiGetRecord', {
+        prisonerNumber,
+        personRecord: { ...mockPersonRecord, religion: { code: null, description: null } },
       })
       cy.task('stubPersonalCareNeeds')
 

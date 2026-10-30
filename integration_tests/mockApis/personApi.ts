@@ -6,6 +6,7 @@ import {
   mockPersonRecordWithReligionHistory,
 } from '../../server/data/localMockData/personApi/personRecordMock'
 import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
+import { PersonRecord } from '../../server/data/interfaces/personApi'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
@@ -27,13 +28,15 @@ export default {
   stubPersonApiGetRecord({
     prisonerNumber,
     prisonNumbers,
+    personRecord,
     withReligionHistory = false,
   }: {
     prisonerNumber: string
     prisonNumbers?: string[]
+    personRecord: PersonRecord
     withReligionHistory?: boolean
   }) {
-    const record = withReligionHistory ? mockPersonRecordWithReligionHistory : mockPersonRecord
+    const record = personRecord ?? (withReligionHistory ? mockPersonRecordWithReligionHistory : mockPersonRecord)
     return stubGetWithBody({
       path: withReligionHistory
         ? `/personRecord/person/prison/dps/${prisonerNumber}`

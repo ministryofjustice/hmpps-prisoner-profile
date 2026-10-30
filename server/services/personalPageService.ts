@@ -3,6 +3,7 @@ import {
   PrisonerPermissions,
   PrisonerPropertyPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import logger from '../../logger'
 import config from '../config'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
@@ -325,7 +326,7 @@ export default class PersonalPageService {
         this.addressService.getAddressesForDisplay(token, prisonerNumber),
         this.getDistinguishingMarks(token, prisonerNumber),
         this.getGlobalPhonesAndEmails(token, prisonerNumber),
-      ])
+      ]).catch(logger.warn)
     }
 
     let addresses: Result<AddressForDisplay[], Error>
@@ -554,7 +555,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      religionOrBelief: religionOrBelief || 'Not entered',
+      religionOrBelief: religionOrBelief?.description || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
@@ -574,9 +575,12 @@ export default class PersonalPageService {
     }
   }
 
-  private async getReligionOrBelief(clientToken: string, inmateDetail: InmateDetail): Promise<string | null> {
+  async getReligionOrBelief(
+    clientToken: string,
+    inmateDetail: InmateDetail,
+  ): Promise<{ code: string; description: string } | null> {
     if (!config.featureToggles.usePersonApi.religion) {
-      const { religion } = inmateDetail
+      const religion = getProfileInformationValue(ProfileInformationType.Religion, inmateDetail.profileInformation)
       if (!religion) {
         return null
       }
@@ -585,7 +589,11 @@ export default class PersonalPageService {
       const code = refData.find(r => r.description?.toLowerCase() === religion.toLowerCase() || r.code === religion)
       const override = religionFieldData.referenceDataOverrides.find(o => o.id === code?.code)
 
-      return override ? (override.description ?? religion) : religion
+      return {
+        code: '?',
+        ...code,
+        description: override?.description ?? religion,
+      }
     }
 
     const personApiClient = this.personApiClientBuilder(clientToken)
@@ -596,7 +604,10 @@ export default class PersonalPageService {
     }
 
     const override = religionFieldData.referenceDataOverrides.find(o => o.id === record.religion.code)
-    return override?.description ?? record.religion.description ?? null
+    return {
+      code: record.religion.code,
+      description: override?.description ?? record.religion.description,
+    }
   }
 
   private aliases = async (personIntegrationApiClient: PersonIntegrationApiClient, prisonerData: Prisoner) => {
