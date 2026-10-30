@@ -29,7 +29,7 @@ export class BackToTop extends Component<HTMLDivElement> {
     this.$header = document.querySelector('.connect-dps-common-header')
 
     // Check if there is anything to observe
-    if (this.$h1 && this.$footer && this.$sidebar && this.$header) {
+    if (this.$h1 && this.$footer && this.$sidebar) {
       this.startObserving()
     }
   }
@@ -77,6 +77,8 @@ export class BackToTop extends Component<HTMLDivElement> {
     observer.observe(this.$h1)
     observer.observe(this.$footer)
     observer.observe(this.$sidebar)
-    observer.observe(this.$header)
+    if (this.$header) {
+      observer.observe(this.$header)
+    }
   }
 }

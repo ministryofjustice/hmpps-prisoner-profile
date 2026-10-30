@@ -16,14 +16,14 @@ body {
     margin-bottom: govuk.govuk-spacing(8);
   }
 
-  .js-enabled .hmpps-back-to-top--fixed {
+  .govuk-frontend-supported .hmpps-back-to-top--fixed {
     position: fixed;
     top: calc(100% - #{govuk.govuk-spacing(8)});
     bottom: auto;
     left: auto;
   }
 
-  .js-enabled .hmpps-back-to-top--hidden .hmpps-back-to-top__link {
+  .govuk-frontend-supported .hmpps-back-to-top--hidden .hmpps-back-to-top__link {
     @include govuk.govuk-visually-hidden-focusable;
   }
 }
