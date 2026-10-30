@@ -22,7 +22,6 @@ context('Edit religion, faith or belief', () => {
         cy.setupComponentsData()
         cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
         cy.task('stubPersonalCareNeeds')
-        cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,
@@ -37,6 +36,16 @@ context('Edit religion, faith or belief', () => {
         },
         { radioInputs: { religion: 'ZORO', reasonKnown: 'YES' }, textAreaInputs: { reasonForChange: 'Some text' } },
       ],
+      validInputSetup: [
+        { userId: 'USER1', religionCode: 'ZORO', comment: '' },
+        { userId: 'USER1', religionCode: 'ZORO', comment: 'Some text' },
+        { userId: 'USER1', religionCode: 'ZORO', comment: 'Some text' },
+      ].map(request => () => {
+        cy.task('stubPersonApiUpdateReligion', {
+          prisonerNumber,
+          request,
+        })
+      }),
       invalidInputs: [
         {
           testDescription: 'Nothing selected',
@@ -114,7 +123,10 @@ context('Edit religion, faith or belief', () => {
           personRecord: { ...mockPersonRecord, religion: { code: null, description: null } },
         })
         cy.task('stubPersonalCareNeeds')
-        cy.task('stubPersonIntegrationReligionUpdate', { prisonerNumber })
+        cy.task('stubPersonApiUpdateReligion', {
+          prisonerNumber,
+          request: { userId: 'USER1', religionCode: 'ZORO' },
+        })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,

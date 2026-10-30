@@ -1148,13 +1148,33 @@ describe('PersonalPageService', () => {
   })
 
   describe('Update religion', () => {
-    it('Updates the religion using Person Integration API', async () => {
-      await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
-      expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
-      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
-        prisonerNumber: 'A1234AA',
-        fieldsUpdated: ['religion'],
-        user: prisonUserMock,
+    withoutPersonApi(() => {
+      it('Updates the religion using Person Integration API', async () => {
+        await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+        expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
+        expect(personApiClient.updateReligion).not.toHaveBeenCalled()
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['religion'],
+          user: prisonUserMock,
+        })
+      })
+    })
+
+    withPersonApi(() => {
+      it('Updates the religion using Person API', async () => {
+        await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+        expect(personApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', {
+          userId: 'JSMITH_GEN',
+          religionCode: 'ZORO',
+          comment: 'Some comment',
+        })
+        expect(personIntegrationApiClient.updateReligion).not.toHaveBeenCalled()
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['religion'],
+          user: prisonUserMock,
+        })
       })
     })
   })
@@ -1443,7 +1463,8 @@ describe('PersonalPageService', () => {
   })
 })
 
-function withoutPersonApi(tests: () => void) {
+/** When all “use person API / CPR” feature flags are disabled */
+function withoutPersonApi(testCases: () => void) {
   describe('Before using Person API for any core person record details', () => {
     beforeEach(() => {
       config.featureToggles.usePersonApi = Object.fromEntries(
@@ -1451,10 +1472,11 @@ function withoutPersonApi(tests: () => void) {
       ) as typeof config.featureToggles.usePersonApi
     })
 
-    tests()
+    testCases()
   })
 }
 
+/** When all “use person API / CPR” feature flags are enabled */
 function withPersonApi(tests: () => void) {
   describe('When using Person API for all core person record details', () => {
     beforeEach(() => {

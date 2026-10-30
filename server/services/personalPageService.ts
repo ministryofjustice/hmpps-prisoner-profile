@@ -915,16 +915,23 @@ export default class PersonalPageService {
     religionCode: string,
     reasonForChange?: string,
   ) {
-    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+    if (!config.featureToggles.usePersonApi.religion) {
+      const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+      await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+    } else {
+      const personApiClient = this.personApiClientBuilder(clientToken)
+      await personApiClient.updateReligion(prisonerNumber, {
+        userId: user.username,
+        religionCode,
+        comment: reasonForChange,
+      })
+    }
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['religion'],
       prisonerNumber,
       user,
     })
-
-    return response
   }
 
   async updateSexualOrientation(
