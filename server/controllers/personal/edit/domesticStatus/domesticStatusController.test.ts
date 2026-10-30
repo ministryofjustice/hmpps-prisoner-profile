@@ -12,7 +12,7 @@ import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 import DomesticStatusController from './domesticStatusController'
 
 describe('DomesticStatusController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: DomesticStatusController
   let res: Response
@@ -63,9 +63,9 @@ describe('DomesticStatusController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
-    personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+    personalPageService.getDomesticStatus.mockResolvedValue(PersonalRelationshipsDomesticStatusMock)
 
     controller = new DomesticStatusController(personalPageService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
@@ -99,7 +99,7 @@ describe('DomesticStatusController', () => {
       ]
 
       beforeEach(() => {
-        personalPageService.getDomesticStatusReferenceData = jest.fn(async () => referenceData)
+        personalPageService.getDomesticStatusReferenceData.mockResolvedValue(referenceData)
       })
 
       it('Renders the default edit page with the correct data', async () => {
@@ -225,9 +225,7 @@ describe('DomesticStatusController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateDomesticStatus = async () => {
-          throw new Error()
-        }
+        personalPageService.updateDomesticStatus.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

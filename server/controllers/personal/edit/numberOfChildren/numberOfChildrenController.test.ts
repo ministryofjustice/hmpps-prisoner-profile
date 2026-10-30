@@ -11,7 +11,7 @@ import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/Pr
 import NumberOfChildrenController from './numberOfChildrenController'
 
 describe('NumberOfChildrenController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: NumberOfChildrenController
   let res: Response
@@ -62,9 +62,9 @@ describe('NumberOfChildrenController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
-    personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
+    personalPageService.getNumberOfChildren.mockResolvedValue(PersonalRelationshipsNumberOfChildrenMock)
 
     controller = new NumberOfChildrenController(personalPageService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
@@ -162,8 +162,6 @@ describe('NumberOfChildrenController', () => {
           body: { hasChildren: 'YES', numberOfChildren: '5' },
           flash: jest.fn(),
         } as unknown as Request
-
-        personalPageService.updateNumberOfChildren = jest.fn()
       })
 
       it('Updates the number of children', async () => {
@@ -208,9 +206,7 @@ describe('NumberOfChildrenController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateNumberOfChildren = async () => {
-          throw new Error()
-        }
+        personalPageService.updateNumberOfChildren.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

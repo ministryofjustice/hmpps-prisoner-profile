@@ -9,7 +9,7 @@ import { prisonUserMock } from '../../../../data/localMockData/user'
 import CountryOfBirthController from './countryOfBirthController'
 
 describe('CountryOfBirthController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: CountryOfBirthController
   let res: Response
@@ -24,7 +24,7 @@ describe('CountryOfBirthController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new CountryOfBirthController(personalPageService, auditService)
@@ -176,9 +176,7 @@ describe('CountryOfBirthController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateCountryOfBirth = async () => {
-          throw new Error()
-        }
+        personalPageService.updateCountryOfBirth.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

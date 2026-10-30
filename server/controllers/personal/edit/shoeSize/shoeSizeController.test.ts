@@ -11,7 +11,7 @@ import { prisonUserMock } from '../../../../data/localMockData/user'
 import { shoeSizeFieldData } from '../../fieldData'
 
 describe('ShoeSizeController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: ShoeSizeController
   let res: Response
@@ -26,8 +26,8 @@ describe('ShoeSizeController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
+    personalPageService = personalPageServiceMock()
+    personalPageService.getPhysicalAttributes.mockResolvedValue(corePersonPhysicalAttributesMock)
     auditService = auditServiceMock()
 
     controller = new ShoeSizeController(personalPageService, auditService)
@@ -169,9 +169,7 @@ describe('ShoeSizeController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updatePhysicalAttributes = async () => {
-          throw new Error()
-        }
+        personalPageService.updatePhysicalAttributes.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

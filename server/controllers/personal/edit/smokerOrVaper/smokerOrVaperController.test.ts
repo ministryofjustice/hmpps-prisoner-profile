@@ -12,7 +12,7 @@ import InmateDetail from '../../../../data/interfaces/prisonApi/InmateDetail'
 import SmokerOrVaperController from './smokerOrVaperController'
 
 describe('SmokerOrVaperController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: SmokerOrVaperController
   let res: Response
@@ -32,7 +32,7 @@ describe('SmokerOrVaperController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new SmokerOrVaperController(personalPageService, auditService)
@@ -173,9 +173,7 @@ describe('SmokerOrVaperController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateSmokerOrVaper = async () => {
-          throw new Error()
-        }
+        personalPageService.updateSmokerOrVaper.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

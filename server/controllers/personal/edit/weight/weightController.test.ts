@@ -8,11 +8,10 @@ import { corePersonPhysicalAttributesMock } from '../../../../data/localMockData
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { weightFieldData } from '../../fieldData'
-import { CorePersonPhysicalAttributes } from '../../../../services/interfaces/corePerson/corePersonPhysicalAttributes'
 import WeightController from './weightController'
 
 describe('WeightController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: WeightController
   let res: Response
@@ -27,8 +26,8 @@ describe('WeightController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
+    personalPageService = personalPageServiceMock()
+    personalPageService.getPhysicalAttributes.mockResolvedValue(corePersonPhysicalAttributesMock)
     auditService = auditServiceMock()
 
     controller = new WeightController(personalPageService, auditService)
@@ -152,9 +151,7 @@ describe('WeightController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.updatePhysicalAttributes = async () => {
-            throw new Error()
-          }
+          personalPageService.updatePhysicalAttributes.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 
@@ -251,11 +248,11 @@ describe('WeightController', () => {
         })
 
         it('Keeps the inputs empty when no weight exists', async () => {
-          personalPageService.getPhysicalAttributes = jest.fn(async (): Promise<CorePersonPhysicalAttributes> => ({
+          personalPageService.getPhysicalAttributes.mockResolvedValue({
             ...corePersonPhysicalAttributesMock,
             height: undefined,
             weight: undefined,
-          }))
+          })
           const req = {
             params: { prisonerNumber },
             flash: (): string[] => [],
@@ -328,9 +325,7 @@ describe('WeightController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.updatePhysicalAttributes = async () => {
-            throw new Error()
-          }
+          personalPageService.updatePhysicalAttributes.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 
