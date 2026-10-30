@@ -10,6 +10,7 @@ export const personApiClientMock = (): jest.Mocked<PersonApiClient> => ({
   getRecord: jest.fn((_, withReligionHistory) =>
     Promise.resolve(withReligionHistory ? mockPersonRecordWithReligionHistory : (mockPersonRecord as DpsPersonRecord)),
   ),
+  updateReligion: jest.fn((_prisonerNumber, _request) => Promise.resolve()),
 })
 
 export default { personApiClientMock }

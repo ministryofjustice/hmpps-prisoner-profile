@@ -29,10 +29,18 @@ export interface DpsPersonRecord extends PersonRecord {
   }[]
 }
 
+export interface UpdateReligionRequest {
+  userId: string
+  religionCode: string
+  comment?: string | null
+}
+
 export interface PersonApiClient {
   getReligionCodes(activeOnly?: boolean): Promise<PersonApiReferenceDataCode[]>
 
   getRecord(prisonerNumber: string, withReligionHistory?: false): Promise<PersonRecord>
   getRecord(prisonerNumber: string, withReligionHistory: true): Promise<DpsPersonRecord>
   getRecord(prisonerNumber: string, withReligionHistory?: boolean): Promise<PersonRecord | DpsPersonRecord>
+
+  updateReligion(prisonerNumber: string, request: UpdateReligionRequest): Promise<void>
 }

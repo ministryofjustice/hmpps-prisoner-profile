@@ -1,12 +1,12 @@
 import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
+import type { PersonRecord, UpdateReligionRequest } from '../../server/data/interfaces/personApi'
 import {
   mockPersonRecord,
   mockPersonRecordWithReligionHistory,
 } from '../../server/data/localMockData/personApi/personRecordMock'
 import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
-import { PersonRecord } from '../../server/data/interfaces/personApi'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
@@ -70,6 +70,27 @@ export default {
       },
       response: {
         status: 500,
+      },
+    }),
+
+  stubPersonApiUpdateReligion: ({
+    prisonerNumber,
+    request,
+  }: {
+    prisonerNumber: string
+    request: UpdateReligionRequest
+  }) =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/personRecord/person/prison/${prisonerNumber}/religion`,
+        bodyPatterns: [{ equalToJson: request }],
+      },
+      response: {
+        status: 204,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
       },
     }),
 }
