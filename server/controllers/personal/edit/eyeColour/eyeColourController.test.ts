@@ -13,7 +13,7 @@ import { eyeColourCodesMock } from '../../../../data/localMockData/personIntegra
 import { objectToRadioOptions } from '../../../../utils/utils'
 
 describe('EyeColourController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: EyeColourController
   let res: Response
@@ -28,8 +28,8 @@ describe('EyeColourController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
+    personalPageService = personalPageServiceMock()
+    personalPageService.getPhysicalAttributes.mockResolvedValue(corePersonPhysicalAttributesMock)
     auditService = auditServiceMock()
 
     controller = new EyeColourController(personalPageService, auditService)
@@ -182,9 +182,7 @@ describe('EyeColourController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updatePhysicalAttributes = async () => {
-          throw new Error()
-        }
+        personalPageService.updatePhysicalAttributes.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 
@@ -361,9 +359,7 @@ describe('EyeColourController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updatePhysicalAttributes = async () => {
-          throw new Error()
-        }
+        personalPageService.updatePhysicalAttributes.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

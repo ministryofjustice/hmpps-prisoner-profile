@@ -11,7 +11,7 @@ import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/Pr
 import NationalityController from './nationalityController'
 
 describe('NationalityController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: NationalityController
   let res: Response
@@ -36,7 +36,7 @@ describe('NationalityController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new NationalityController(personalPageService, auditService)
@@ -269,9 +269,7 @@ describe('NationalityController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateNationality = async () => {
-          throw new Error()
-        }
+        personalPageService.updateNationality.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

@@ -84,7 +84,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
         cy.task('stubImages')
         cy.task('stubPrisonerSearchFindByNumbers', {
@@ -119,7 +119,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
         cy.task('stubImages')
         cy.task('stubPrisonerSearchFindByNumbers', {
@@ -155,7 +155,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC'],
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -178,7 +178,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -202,7 +202,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -226,7 +226,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC'],
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -249,7 +249,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -273,7 +273,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC', 'B5678CD', 'C9999EF'],
+          prisonNumbers: [prisonerNumber, 'A1234BC', 'B5678CD', 'C9999EF'],
         })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([
@@ -296,10 +296,7 @@ context('Duplicate Prisoner Records', () => {
 
     context('When no duplicate records exist', () => {
       beforeEach(() => {
-        cy.task('stubPersonApiGetRecord', {
-          prisonerNumber,
-          prisonNumbers: ['G6123VU'],
-        })
+        cy.task('stubPersonApiGetRecord', { prisonerNumber })
         cy.task('stubPrisonerSearchFindByNumbers', {
           prisoners: buildDuplicatePrisoners([{ prisonerNumber: 'G6123VU', prisonId: 'MDI' }]),
         })
@@ -348,7 +345,7 @@ context('Duplicate Prisoner Records', () => {
       beforeEach(() => {
         cy.task('stubPersonApiGetRecord', {
           prisonerNumber,
-          prisonNumbers: ['G6123VU', 'A1234BC'],
+          prisonNumbers: [prisonerNumber, 'A1234BC'],
         })
         cy.task('stubPrisonerSearchFindByNumbersError')
       })

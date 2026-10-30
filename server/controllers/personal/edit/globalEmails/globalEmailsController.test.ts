@@ -8,7 +8,7 @@ import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/global
 import GlobalEmailsController from './globalEmailsController'
 
 describe('GlobalEmailsController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: GlobalEmailsController
   let res: Response
@@ -43,7 +43,7 @@ describe('GlobalEmailsController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new GlobalEmailsController(personalPageService, auditService)
@@ -56,7 +56,7 @@ describe('GlobalEmailsController', () => {
         const action: RequestHandler = async (req, response) => controller.globalEmails().add.edit(req, response, next)
 
         beforeEach(() => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Renders the default edit page with the correct data', async () => {
@@ -151,7 +151,7 @@ describe('GlobalEmailsController', () => {
             flash: jest.fn(),
           } as unknown as Request
 
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
@@ -184,8 +184,8 @@ describe('GlobalEmailsController', () => {
         })
 
         it('Handles duplicate emails', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
-            emails: [{ email: 'foo@example.com' }],
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
+            emails: [{ id: 143, email: 'foo@example.com' }],
             phones: [],
           })
 
@@ -210,9 +210,7 @@ describe('GlobalEmailsController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.createGlobalEmail = async () => {
-            throw new Error()
-          }
+          personalPageService.createGlobalEmail.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 
@@ -241,7 +239,7 @@ describe('GlobalEmailsController', () => {
         const action: RequestHandler = async (req, response) => controller.globalEmails().edit.edit(req, response, next)
 
         beforeEach(() => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Renders the default edit page with the correct data', async () => {
@@ -335,7 +333,7 @@ describe('GlobalEmailsController', () => {
             flash: jest.fn(),
           } as unknown as Request
 
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
@@ -364,9 +362,7 @@ describe('GlobalEmailsController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.updateGlobalEmail = async () => {
-            throw new Error()
-          }
+          personalPageService.updateGlobalEmail.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 
@@ -375,10 +371,10 @@ describe('GlobalEmailsController', () => {
         })
 
         it('Handles duplicate emails', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             emails: [
-              { id: '234', email: 'foo@example.com' },
-              { id: '555', email: 'something@example.com' },
+              { id: 234, email: 'foo@example.com' },
+              { id: 555, email: 'something@example.com' },
             ],
             phones: [],
           })

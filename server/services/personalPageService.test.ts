@@ -22,6 +22,7 @@ import { prisonUserMock } from '../data/localMockData/user'
 import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { PersonApiClient } from '../data/interfaces/personApi'
 import {
   PersonIntegrationApiClient,
   PseudonymResponseDto,
@@ -44,6 +45,8 @@ import {
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
 import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
+import { personApiClientMock } from '../../tests/mocks/personApiClientMock'
+import { mockPersonRecord } from '../data/localMockData/personApi/personRecordMock'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
@@ -85,13 +88,19 @@ jest.mock('./referenceData/referenceDataService')
 
 const permissions = {} as PrisonerPermissions
 
+let usePersonApiFeatureDefaults: typeof config.featureToggles.usePersonApi
+beforeAll(() => {
+  usePersonApiFeatureDefaults = { ...config.featureToggles.usePersonApi }
+})
+
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
-  let personIntegrationApiClient: PersonIntegrationApiClient
+  let personApiClient: jest.Mocked<PersonApiClient>
+  let personIntegrationApiClient: jest.Mocked<PersonIntegrationApiClient>
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
   let personalRelationshipsApiClient: PersonalRelationshipsApiClient
-  let referenceDataService: ReferenceDataService
+  let referenceDataService: jest.Mocked<ReferenceDataService>
   let prisonService: PrisonService
   let metricsService: MetricsService
   let nextOfKinService: NextOfKinService
@@ -100,6 +109,8 @@ describe('PersonalPageService', () => {
   let addressService: AddressService
 
   beforeEach(() => {
+    config.featureToggles.usePersonApi = { ...usePersonApiFeatureDefaults }
+
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
     prisonApiClient.getSecondaryLanguages = jest.fn(async () => secondaryLanguagesMock)
@@ -111,8 +122,9 @@ describe('PersonalPageService', () => {
 
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
+    personApiClient = personApiClientMock()
     personIntegrationApiClient = personIntegrationApiClientMock()
-    personIntegrationApiClient.getPseudonyms = jest.fn(async () => [] as PseudonymResponseDto[])
+    personIntegrationApiClient.getPseudonyms.mockResolvedValue([])
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
@@ -140,14 +152,14 @@ describe('PersonalPageService', () => {
       updateSmokerStatus: jest.fn(async () => {}),
     }
 
-    referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
-    referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
-    referenceDataService.getActiveReferenceDataCodes = jest.fn(async () => ReligionReferenceDataCodesMock)
+    referenceDataService = jest.mocked(new ReferenceDataService(null, null))
+    referenceDataService.getReferenceData.mockResolvedValue(EnglandCountryReferenceDataCodeMock)
+    referenceDataService.getActiveReferenceDataCodes.mockResolvedValue(ReligionReferenceDataCodesMock)
 
-    prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
+    prisonService = new PrisonService(null, null)
     prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
 
-    metricsService = new MetricsService() as jest.Mocked<MetricsService>
+    metricsService = jest.mocked(new MetricsService())
 
     personalRelationshipsApiClient = {
       getContacts: jest.fn(async () => PersonalRelationshipsContactsDtoMock),
@@ -161,22 +173,13 @@ describe('PersonalPageService', () => {
       addContactAddress: jest.fn(),
     }
 
-    nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService) as jest.Mocked<NextOfKinService>
+    nextOfKinService = new NextOfKinService(null, referenceDataService, metricsService)
     nextOfKinService.getNextOfKinEmergencyContacts = jest.fn(async () => PersonalRelationshipsContactsDtoMock.content)
 
-    domesticStatusService = new DomesticStatusService(
-      null,
-      referenceDataService,
-      metricsService,
-    ) as jest.Mocked<DomesticStatusService>
+    domesticStatusService = new DomesticStatusService(null, referenceDataService, metricsService)
     domesticStatusService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
 
-    globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(
-      null,
-      null,
-      null,
-    ) as jest.Mocked<GlobalPhoneNumberAndEmailAddressesService>
-
+    globalPhoneNumberAndEmailAddressesService = new GlobalPhoneNumberAndEmailAddressesService(null, null, null)
     globalPhoneNumberAndEmailAddressesService.getForPrisonerNumber = jest.fn(async () => globalPhonesAndEmailsMock)
     globalPhoneNumberAndEmailAddressesService.transformContacts = jest.fn(async () => globalPhonesAndEmailsMock)
 
@@ -187,6 +190,7 @@ describe('PersonalPageService', () => {
     new PersonalPageService(
       () => prisonApiClient,
       () => curiousApiClient,
+      () => personApiClient,
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
       () => personalRelationshipsApiClient,
@@ -238,8 +242,8 @@ describe('PersonalPageService', () => {
           pseudonyms: PseudonymResponseDto[],
           personEndpointsEnabled: boolean,
         ) => {
-          personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
-          personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () =>
+          personIntegrationApiClient.getPseudonyms.mockResolvedValue(pseudonyms)
+          personIntegrationApiClient.getPrisonerProfileSummary.mockResolvedValue(
             createPrisonerProfileSummary({ pseudonyms }),
           )
           const service = constructService()
@@ -545,24 +549,48 @@ describe('PersonalPageService', () => {
     })
 
     describe('One-to-one mapped data', () => {
-      it('Maps the data from the API', async () => {
-        const { personalDetails } = await constructService().get('token', PrisonerMockDataA, permissions)
-        expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
-        expect(personalDetails.ethnicGroup).toEqual(
-          `${inmateDetailMock.physicalAttributes.ethnicity} (${inmateDetailMock.physicalAttributes.raceCode})`,
-        )
-        expect(personalDetails.fullName).toEqual(
-          formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
-        )
-        expect(personalDetails.marriageOrCivilPartnership).toEqual(
-          PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
-        )
-        expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
-        expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
-        expect(personalDetails.countryOfBirth.getOrNull()).toEqual(EnglandCountryReferenceDataCodeMock.description)
-        expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
-        expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
-        expect(personalDetails.socialCareNeeded).toEqual('No')
+      withoutPersonApi(() => {
+        it('Maps the data from the API', async () => {
+          const { personalDetails } = await constructService().get('token', PrisonerMockDataA, permissions)
+          expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
+          expect(personalDetails.ethnicGroup).toEqual(
+            `${inmateDetailMock.physicalAttributes.ethnicity} (${inmateDetailMock.physicalAttributes.raceCode})`,
+          )
+          expect(personalDetails.fullName).toEqual(
+            formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
+          )
+          expect(personalDetails.marriageOrCivilPartnership).toEqual(
+            PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
+          )
+          expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
+          expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
+          expect(personalDetails.countryOfBirth.getOrNull()).toEqual(EnglandCountryReferenceDataCodeMock.description)
+          expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
+          expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
+          expect(personalDetails.socialCareNeeded).toEqual('No')
+        })
+      })
+
+      withPersonApi(() => {
+        it('Maps the data from the API', async () => {
+          const { personalDetails } = await constructService().get('token', PrisonerMockDataA, permissions)
+          expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
+          expect(personalDetails.ethnicGroup).toEqual(
+            `${inmateDetailMock.physicalAttributes.ethnicity} (${inmateDetailMock.physicalAttributes.raceCode})`,
+          )
+          expect(personalDetails.fullName).toEqual(
+            formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
+          )
+          expect(personalDetails.marriageOrCivilPartnership).toEqual(
+            PersonalRelationshipsDomesticStatusMock.domesticStatusDescription,
+          )
+          expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
+          expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
+          expect(personalDetails.countryOfBirth.getOrNull()).toEqual(EnglandCountryReferenceDataCodeMock.description)
+          expect(personalDetails.religionOrBelief).toEqual(mockPersonRecord.religion.description)
+          expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
+          expect(personalDetails.socialCareNeeded).toEqual('No')
+        })
       })
     })
   })
@@ -791,7 +819,7 @@ describe('PersonalPageService', () => {
   describe('Addresses', () => {
     it('loads addresses from Prison API when person endpoints are enabled', async () => {
       addressService.getAddressesForDisplay = jest.fn().mockResolvedValue([mockAddressResponseDto])
-      personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () => PrisonerProfileSummaryMock)
+      personIntegrationApiClient.getPrisonerProfileSummary.mockResolvedValue(PrisonerProfileSummaryMock)
 
       await constructService().get('token', PrisonerMockDataA, permissions, {
         editProfileEnabled: true,
@@ -1120,13 +1148,33 @@ describe('PersonalPageService', () => {
   })
 
   describe('Update religion', () => {
-    it('Updates the religion using Person Integration API', async () => {
-      await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
-      expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
-      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
-        prisonerNumber: 'A1234AA',
-        fieldsUpdated: ['religion'],
-        user: prisonUserMock,
+    withoutPersonApi(() => {
+      it('Updates the religion using Person Integration API', async () => {
+        await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+        expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
+        expect(personApiClient.updateReligion).not.toHaveBeenCalled()
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['religion'],
+          user: prisonUserMock,
+        })
+      })
+    })
+
+    withPersonApi(() => {
+      it('Updates the religion using Person API', async () => {
+        await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+        expect(personApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', {
+          userId: 'JSMITH_GEN',
+          religionCode: 'ZORO',
+          comment: 'Some comment',
+        })
+        expect(personIntegrationApiClient.updateReligion).not.toHaveBeenCalled()
+        expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['religion'],
+          user: prisonUserMock,
+        })
       })
     })
   })
@@ -1162,7 +1210,7 @@ describe('PersonalPageService', () => {
   describe('getMilitaryRecords', () => {
     it('should get military records from the API', async () => {
       const service = constructService()
-      personIntegrationApiClient.getMilitaryRecords = jest.fn(async () => MilitaryRecordsMock)
+      personIntegrationApiClient.getMilitaryRecords.mockResolvedValue(MilitaryRecordsMock)
 
       const result = await service.getMilitaryRecords('token', 'A1234AA')
       expect(result).toEqual(MilitaryRecordsMock)
@@ -1256,7 +1304,7 @@ describe('PersonalPageService', () => {
         describe.each([false, true])('personEndpointsEnabled=%s', personEndpointsEnabled => {
           it('Gets the phones and emails from the service', async () => {
             const service = constructService()
-            personIntegrationApiClient.getPrisonerProfileSummary = jest.fn(async () => PrisonerProfileSummaryMock)
+            personIntegrationApiClient.getPrisonerProfileSummary.mockResolvedValue(PrisonerProfileSummaryMock)
             const result = await service.get('token', PrisonerMockDataA, permissions, {
               editProfileEnabled: true,
               personEndpointsEnabled,
@@ -1414,3 +1462,29 @@ describe('PersonalPageService', () => {
     })
   })
 })
+
+/** When all “use person API / CPR” feature flags are disabled */
+function withoutPersonApi(testCases: () => void) {
+  describe('Before using Person API for any core person record details', () => {
+    beforeEach(() => {
+      config.featureToggles.usePersonApi = Object.fromEntries(
+        Object.keys(config.featureToggles.usePersonApi).map(domain => [domain, false]),
+      ) as typeof config.featureToggles.usePersonApi
+    })
+
+    testCases()
+  })
+}
+
+/** When all “use person API / CPR” feature flags are enabled */
+function withPersonApi(tests: () => void) {
+  describe('When using Person API for all core person record details', () => {
+    beforeEach(() => {
+      config.featureToggles.usePersonApi = Object.fromEntries(
+        Object.keys(config.featureToggles.usePersonApi).map(domain => [domain, true]),
+      ) as typeof config.featureToggles.usePersonApi
+    })
+
+    tests()
+  })
+}

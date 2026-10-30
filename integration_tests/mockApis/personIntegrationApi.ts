@@ -48,12 +48,6 @@ export default {
       responseBody: null,
     }),
 
-  stubPersonIntegrationReligionUpdate: () =>
-    stubPutWithResponse<void>({
-      path: `${baseUrl}/v2/person/.*/religion`,
-      responseBody: null,
-    }),
-
   stubPersonIntegrationNationalityUpdate: () =>
     stubPutWithResponse<void>({
       path: `${baseUrl}/v2/person/.*/nationality`,

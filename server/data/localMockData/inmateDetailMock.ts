@@ -188,7 +188,7 @@ export const inmateDetailMock: InmateDetail = {
     {
       type: 'RELF',
       question: 'Religion',
-      resultValue: 'Druid',
+      resultValue: 'Celestial Church of God',
     },
     {
       type: 'NAT',

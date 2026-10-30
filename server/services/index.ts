@@ -75,6 +75,7 @@ export const services = () => {
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
@@ -116,6 +117,7 @@ export const services = () => {
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const referenceDataSourceFactory = new ReferenceDataSourceFactory(
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personCommunicationNeedsApiClientBuilder,
@@ -216,6 +218,7 @@ export const services = () => {
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personalRelationshipsApiClientBuilder,

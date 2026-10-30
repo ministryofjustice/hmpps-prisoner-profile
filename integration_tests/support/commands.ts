@@ -7,7 +7,6 @@ import {
   MilitaryRecordsMock,
   phoneUsageReferenceDataMock,
   PseudonymResponseMock,
-  ReligionReferenceDataCodesMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 import { propertySummaryMock } from '../../server/data/localMockData/prisonerPropertySummaryMock'
@@ -175,6 +174,7 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
   cy.task('stubInmateDetail', { bookingId })
+  cy.task('stubPersonApiGetRecord', { prisonerNumber })
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
   cy.task('stubOffenderContacts', prisonerNumber)
@@ -194,10 +194,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     domain: 'COUNTRY',
     referenceData: CountryReferenceDataCodesMock,
   })
-  cy.task('stubPersonIntegrationGetReferenceData', {
-    domain: 'RELF',
-    referenceData: ReligionReferenceDataCodesMock,
-  })
+  cy.task('stubPersonApiGetReligionCodes')
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)

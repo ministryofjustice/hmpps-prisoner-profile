@@ -4,37 +4,39 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
 {% set currentReligionHtml %}
-{% if currentReligion %}
-  <span>
-    <b>Current religion, faith or belief:</b>
-    {% if currentReligion.description %}
-      {{ currentReligion.description }}
-    {% endif %}
-  </span>
-{% endif %}
+  {% if currentReligion %}
+    <span>
+      <b>Current religion, faith or belief:</b>
+      {{ currentReligion.description or 'Not entered' }}
+    </span>
+  {% endif %}
 {% endset %}
-{% set reasonForChangeKnownHtml -%}
-{{ govukTextarea({
-  name: "reasonForChange",
-  id: "reason-for-change-known",
-  value: currentReasonForChange,
-  errorMessage: errors | findError('reasonForChange'),
-  label: {
-    text: "Enter why this person’s religion, faith or belief has changed"
-  }
-}) }}
-{% endset -%}
-{% set reasonForChangeUnknownHtml -%}
-{{ govukTextarea({
-  name: "reasonForChangeUnknown",
-  id: "reason-for-change-unknown",
-  value: currentReasonForChangeUnknown,
-  label: {
-    text: "Give details (optional)"
-  }
-}) }}
-{% endset -%}
+
+{% set reasonForChangeKnownHtml %}
+  {{ govukTextarea({
+    name: "reasonForChange",
+    id: "reason-for-change-known",
+    value: currentReasonForChange,
+    errorMessage: errors | findError('reasonForChange'),
+    label: {
+      text: "Enter why this person’s religion, faith or belief has changed"
+    }
+  }) }}
+{% endset %}
+
+{% set reasonForChangeUnknownHtml %}
+  {{ govukTextarea({
+    name: "reasonForChangeUnknown",
+    id: "reason-for-change-unknown",
+    value: currentReasonForChangeUnknown,
+    label: {
+      text: "Give details (optional)"
+    }
+  }) }}
+{% endset %}
+
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Religion, faith or belief</h1>
   {% if currentReligion and currentReligion.code %}
