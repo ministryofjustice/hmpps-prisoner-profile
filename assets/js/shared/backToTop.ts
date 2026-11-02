@@ -35,30 +35,18 @@ export class BackToTop extends Component<HTMLDivElement> {
   }
 
   private startObserving(): void {
-    let h1IsIntersecting = false
-    let footerIsIntersecting = false
-    let sidebarIsIntersecting = false
-    let headerIsIntersecting = false
-    const observer = new window.IntersectionObserver(entries => {
-      // Find the elements we care about from the entries
-      const h1Entry = entries.find(entry => entry.target === this.$h1)
-      const footerEntry = entries.find(entry => entry.target === this.$footer)
-      const sidebarEntry = entries.find(entry => entry.target === this.$sidebar)
-      const headerEntry = entries.find(entry => entry.target === this.$header)
+    const isIntersecting = (element: Element | null): boolean => {
+      if (!element) return false
 
-      // If there is an entry this means the element has changed so lets check if it's intersecting.
-      if (h1Entry) {
-        h1IsIntersecting = h1Entry.isIntersecting
-      }
-      if (footerEntry) {
-        footerIsIntersecting = footerEntry.isIntersecting
-      }
-      if (sidebarEntry) {
-        sidebarIsIntersecting = sidebarEntry.isIntersecting
-      }
-      if (headerEntry) {
-        headerIsIntersecting = headerEntry.isIntersecting
-      }
+      const bounds = element.getBoundingClientRect()
+      return bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth
+    }
+
+    const updatePosition = (): void => {
+      const h1IsIntersecting = isIntersecting(this.$h1)
+      const footerIsIntersecting = isIntersecting(this.$footer)
+      const sidebarIsIntersecting = isIntersecting(this.$sidebar)
+      const headerIsIntersecting = isIntersecting(this.$header)
 
       if (sidebarIsIntersecting || h1IsIntersecting || headerIsIntersecting) {
         // If the sidebar, h1, or header is visible then hide the back to top link as it's not required
@@ -73,12 +61,15 @@ export class BackToTop extends Component<HTMLDivElement> {
         this.$root.classList.remove('hmpps-back-to-top--hidden')
         this.$root.classList.add('hmpps-back-to-top--fixed')
       }
-    })
+    }
+
+    const observer = new window.IntersectionObserver(updatePosition)
     observer.observe(this.$h1)
     observer.observe(this.$footer)
     observer.observe(this.$sidebar)
     if (this.$header) {
       observer.observe(this.$header)
     }
+    updatePosition()
   }
 }
