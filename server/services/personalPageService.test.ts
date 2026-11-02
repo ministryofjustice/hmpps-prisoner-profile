@@ -1,6 +1,7 @@
 import { PrisonerPermissions, PrisonerPropertyPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import config from '../config'
 import mockPermissions from '../../tests/mocks/mockPermissions'
+import { withPersonApi, withoutPersonApi } from '../../tests/utils/withPersonApiFeature'
 import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -1462,29 +1463,3 @@ describe('PersonalPageService', () => {
     })
   })
 })
-
-/** When all “use person API / CPR” feature flags are disabled */
-function withoutPersonApi(testCases: () => void) {
-  describe('Before using Person API for any core person record details', () => {
-    beforeEach(() => {
-      config.featureToggles.usePersonApi = Object.fromEntries(
-        Object.keys(config.featureToggles.usePersonApi).map(domain => [domain, false]),
-      ) as typeof config.featureToggles.usePersonApi
-    })
-
-    testCases()
-  })
-}
-
-/** When all “use person API / CPR” feature flags are enabled */
-function withPersonApi(tests: () => void) {
-  describe('When using Person API for all core person record details', () => {
-    beforeEach(() => {
-      config.featureToggles.usePersonApi = Object.fromEntries(
-        Object.keys(config.featureToggles.usePersonApi).map(domain => [domain, true]),
-      ) as typeof config.featureToggles.usePersonApi
-    })
-
-    tests()
-  })
-}

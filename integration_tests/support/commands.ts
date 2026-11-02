@@ -187,7 +187,6 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubReasonableAdjustments', bookingId)
   cy.task('stubGetIdentifiers', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
-  cy.task('stubBeliefHistory')
   cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber })
   cy.task('stubGetDistinguishingMarkImage')
   cy.task('stubPersonIntegrationGetReferenceData', {

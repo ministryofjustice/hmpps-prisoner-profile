@@ -1,6 +1,6 @@
 import { PrisonApiClient } from '../../server/data/interfaces/prisonApi/prisonApiClient'
 
-export const prisonApiClientMock = (): PrisonApiClient => ({
+export const prisonApiClientMock = (): jest.Mocked<PrisonApiClient> => ({
   getAccountBalances: jest.fn(),
   getActivities: jest.fn(),
   getActivitiesAtLocation: jest.fn(),

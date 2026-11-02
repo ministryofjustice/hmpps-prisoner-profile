@@ -46,7 +46,7 @@ describe('Prisoner belief history', () => {
       render: jest.fn(),
       status: jest.fn(),
     } as unknown as Response
-    controller = new BeliefHistoryController(new BeliefService(null), auditServiceMock())
+    controller = new BeliefHistoryController(new BeliefService(null, null, null), auditServiceMock())
   })
 
   afterEach(() => {

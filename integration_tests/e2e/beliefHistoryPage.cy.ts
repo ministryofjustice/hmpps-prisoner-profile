@@ -1,9 +1,10 @@
 import Page from '../pages/page'
 import BeliefHistoryPage from '../pages/beliefHistoryPage'
-import { beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
+import { mockPersonRecordWithReligionHistory } from '../../server/data/localMockData/personApi/personRecordMock'
 
+const prisonerNumber = 'G6123VU'
 const visitBeliefHistoryPage = (): BeliefHistoryPage => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/religion-belief-history' })
+  cy.signIn({ redirectPath: `/prisoner/${prisonerNumber}/religion-belief-history` })
   return Page.verifyOnPageWithTitle(BeliefHistoryPage, 'John Saunders’ religion, faith or belief history')
 }
 
@@ -14,41 +15,47 @@ context('Belief history page', () => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupComponentsData()
-    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubPrisonerData', { prisonerNumber })
+    cy.task('stubManageUsersGetPrisonUser', { user: { username: 'jlpic', firstName: 'Jean-Luc', lastName: 'Picard' } })
   })
 
   it('should contain a list of beliefs', () => {
-    cy.task('stubBeliefHistory', { bookingId: 1102484 })
+    cy.task('stubPersonApiGetRecord', { prisonerNumber, withReligionHistory: true })
 
     beliefHistoryPage = visitBeliefHistoryPage()
     beliefHistoryPage.beliefHistoryList().children().should('have.length', 2)
 
     const activeBelief = beliefHistoryPage.activeBeliefCard()
-    activeBelief.description().contains('Scientologist')
+    activeBelief.description().contains('They prefer not to say')
     activeBelief.activeTag().should('be.visible')
-    activeBelief.comments().contains('Comments')
-    activeBelief.startDate().contains('1 January 2024')
+    activeBelief.comments().contains('They do not want others to know')
+    activeBelief.startDate().contains('28 October 2026')
     activeBelief.endDate().should('not.exist')
-    activeBelief.addedBy().contains('James Kirk')
+    activeBelief.addedBy().contains('Jean-Luc Picard')
     activeBelief.updatedBy().should('not.exist')
 
     const previousBelief = beliefHistoryPage.previousBeliefCard()
-    previousBelief.description().contains('Roman Catholic')
+    previousBelief.description().contains('Celestial Church of God')
     previousBelief.activeTag().should('not.exist')
-    previousBelief.comments().contains('Comments')
-    previousBelief.startDate().contains('1 January 2024')
-    previousBelief.endDate().contains('2 February 2024')
-    previousBelief.addedBy().contains('James Kirk')
-    previousBelief.updatedBy().contains('Jean-Luc Picard on 3 February 2024')
+    previousBelief.comments().should('not.exist')
+    previousBelief.startDate().contains('1 January 2022')
+    previousBelief.endDate().contains('28 October 2026')
+    previousBelief.addedBy().contains('Jkirk')
+    previousBelief.updatedBy().contains('Jean-Luc Picard on 28 October 2026')
   })
 
   it('should not display belief history comment if it is not present', () => {
-    cy.task('stubBeliefHistory', {
-      beliefHistory: [
-        { ...beliefHistoryMock[0], comments: null },
-        { ...beliefHistoryMock[0], comments: undefined },
-        { ...beliefHistoryMock[0], comments: '' },
-      ],
+    cy.task('stubPersonApiGetRecord', {
+      prisonerNumber,
+      personRecord: {
+        ...mockPersonRecordWithReligionHistory,
+        religionHistory: [
+          { ...mockPersonRecordWithReligionHistory.religionHistory[0], comments: null },
+          { ...mockPersonRecordWithReligionHistory.religionHistory[0], current: false, comments: undefined },
+          { ...mockPersonRecordWithReligionHistory.religionHistory[0], current: false, comments: '' },
+        ],
+      },
+      withReligionHistory: true,
     })
 
     visitBeliefHistoryPage()
@@ -59,8 +66,15 @@ context('Belief history page', () => {
   })
 
   it('should display belief history comment even if change reason is false', () => {
-    cy.task('stubBeliefHistory', {
-      beliefHistory: [{ ...beliefHistoryMock[0], changeReason: false, comments: 'Comments' }],
+    cy.task('stubPersonApiGetRecord', {
+      prisonerNumber,
+      personRecord: {
+        ...mockPersonRecordWithReligionHistory,
+        religionHistory: [
+          { ...mockPersonRecordWithReligionHistory.religionHistory[0], changeReason: false, comments: 'Comments' },
+        ],
+      },
+      withReligionHistory: true,
     })
 
     beliefHistoryPage = visitBeliefHistoryPage()
