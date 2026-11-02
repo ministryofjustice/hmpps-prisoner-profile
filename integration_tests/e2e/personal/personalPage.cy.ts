@@ -612,8 +612,7 @@ context('When signed in', () => {
         scrollToFloatingPosition()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
         cy.scrollTo('bottom')
-        page.backToTopLink().parent().should('not.have.class', 'hmpps-back-to-top--fixed')
-        page.backToTopLink().parent().should('not.have.class', 'hmpps-back-to-top--hidden')
+        page.backToTopLink().parent().should('not.have.css', 'position', 'fixed')
         page.backToTopLink().should('be.visible')
       })
 
