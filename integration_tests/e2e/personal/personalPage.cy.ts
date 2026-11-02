@@ -619,7 +619,7 @@ context('When signed in', () => {
       it('Returns to the top and hides the link when clicked', () => {
         const page = Page.verifyOnPage(PersonalPage)
         scrollToFloatingPosition()
-        page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
+        page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().click()
         cy.location('hash').should('equal', '#top')
         cy.get('#top').should($top => {
