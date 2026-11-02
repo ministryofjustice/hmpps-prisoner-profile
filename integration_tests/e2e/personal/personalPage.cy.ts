@@ -143,7 +143,13 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.setupComponentsData()
+      cy.setupComponentsData({
+        footer: {
+          html: '<footer class="connect-dps-common-footer govuk-footer">Footer</footer>',
+          css: [],
+          javascript: [],
+        },
+      })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       visitPersonalDetailsPage()
@@ -580,10 +586,38 @@ context('When signed in', () => {
         page.backToTopLinkHidden().should('exist')
       })
 
-      it('Displays the back to top link after scrolling down', () => {
+      it('Floats the back to top link in the viewport after scrolling down', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.get('.connect-dps-common-footer').scrollTo('bottom', { ensureScrollable: false })
+        cy.get('#appearance').scrollIntoView()
+        page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
+        page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().should('be.visible')
+        page.backToTopLink().should($link => {
+          const bounds = $link[0].getBoundingClientRect()
+          expect(bounds.top).to.be.greaterThan(0)
+          expect(bounds.bottom).to.be.lessThan($link[0].ownerDocument.defaultView.innerHeight)
+        })
+      })
+
+      it('Stops floating the back to top link when the footer is visible', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        cy.get('#appearance').scrollIntoView()
+        page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
+        cy.get('.govuk-footer').scrollIntoView()
+        page.backToTopLink().parent().should('not.have.css', 'position', 'fixed')
+        page.backToTopLink().should('be.visible')
+      })
+
+      it('Returns to the top and hides the link when clicked', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        cy.get('#appearance').scrollIntoView()
+        page.backToTopLink().parent().should('have.css', 'position', 'fixed')
+        page.backToTopLink().click()
+        cy.location('hash').should('equal', '#top')
+        cy.get('#top').should($top => {
+          expect($top[0].getBoundingClientRect().top).to.be.closeTo(0, 1)
+        })
+        page.backToTopLinkHidden().should('exist')
       })
     })
   })

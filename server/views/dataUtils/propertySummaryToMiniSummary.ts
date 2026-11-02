@@ -41,7 +41,7 @@ const mapper: MiniCardMapper<Result<PrisonerPropertySummary>, [string, PrisonerP
       ],
       linkLabel: 'Property',
       linkHref: isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
-        ? `${config.serviceUrls.prisonerProperty}/prisoner/${prisonerNumber}`
+        ? `${config.serviceUrls.prisonerProperty}/prisoner/${prisonerNumber}?returnToService=prisonerProfile`
         : undefined,
     }
   }
