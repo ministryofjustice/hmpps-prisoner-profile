@@ -588,7 +588,7 @@ context('When signed in', () => {
 
       it('Floats the back to top link in the viewport after scrolling down', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.get('#next-of-kin').scrollIntoView()
+        cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
         page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().should('be.visible')
@@ -601,7 +601,7 @@ context('When signed in', () => {
 
       it('Stops floating the back to top link when the footer is visible', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.get('#next-of-kin').scrollIntoView()
+        cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
         cy.get('.govuk-footer').scrollIntoView()
         page.backToTopLink().parent().should('not.have.css', 'position', 'fixed')
@@ -610,7 +610,7 @@ context('When signed in', () => {
 
       it('Returns to the top and hides the link when clicked', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.get('#next-of-kin').scrollIntoView()
+        cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().click()
         cy.location('hash').should('equal', '#top')
