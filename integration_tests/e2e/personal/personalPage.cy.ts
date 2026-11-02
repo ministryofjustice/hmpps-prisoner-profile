@@ -586,8 +586,7 @@ context('When signed in', () => {
         page.backToTopLinkHidden().should('exist')
       })
 
-      // TODO: temporarily skipping as it does not always pass in CI
-      it.skip('Floats the back to top link in the viewport after scrolling down', () => {
+      it('Floats the back to top link in the viewport after scrolling down', () => {
         const page = Page.verifyOnPage(PersonalPage)
         cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
@@ -600,8 +599,7 @@ context('When signed in', () => {
         })
       })
 
-      // TODO: temporarily skipping as it does not always pass in CI
-      it.skip('Stops floating the back to top link when the footer is visible', () => {
+      it('Stops floating the back to top link when the footer is visible', () => {
         const page = Page.verifyOnPage(PersonalPage)
         cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
@@ -610,8 +608,7 @@ context('When signed in', () => {
         page.backToTopLink().should('be.visible')
       })
 
-      // TODO:temporarily skipping as it does not always pass in CI
-      it.skip('Returns to the top and hides the link when clicked', () => {
+      it('Returns to the top and hides the link when clicked', () => {
         const page = Page.verifyOnPage(PersonalPage)
         cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.css', 'position', 'fixed')
