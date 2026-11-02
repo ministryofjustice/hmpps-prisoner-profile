@@ -23,25 +23,25 @@ context('Belief history page', () => {
     cy.task('stubPersonApiGetRecord', { prisonerNumber, withReligionHistory: true })
 
     beliefHistoryPage = visitBeliefHistoryPage()
-    beliefHistoryPage.beliefHistoryList().children().should('have.length', 2)
+    beliefHistoryPage.beliefHistoryList.should('have.length', 2)
 
-    const activeBelief = beliefHistoryPage.activeBeliefCard()
-    activeBelief.description().contains('They prefer not to say')
-    activeBelief.activeTag().should('be.visible')
-    activeBelief.comments().contains('They do not want others to know')
-    activeBelief.startDate().contains('28 October 2026')
-    activeBelief.endDate().should('not.exist')
-    activeBelief.addedBy().contains('Jean-Luc Picard')
-    activeBelief.updatedBy().should('not.exist')
+    const activeBelief = beliefHistoryPage.getBeliefCard(0)
+    activeBelief.description.contains('They prefer not to say')
+    activeBelief.activeTag.contains('ACTIVE')
+    activeBelief.comments.contains('They do not want others to know')
+    activeBelief.startDate.contains('28 October 2026')
+    activeBelief.endDate.should('not.exist')
+    activeBelief.created.contains('Jean-Luc Picard')
+    activeBelief.modified.should('not.exist')
 
-    const previousBelief = beliefHistoryPage.previousBeliefCard()
-    previousBelief.description().contains('Celestial Church of God')
-    previousBelief.activeTag().should('not.exist')
-    previousBelief.comments().should('not.exist')
-    previousBelief.startDate().contains('1 January 2022')
-    previousBelief.endDate().contains('28 October 2026')
-    previousBelief.addedBy().contains('Jkirk')
-    previousBelief.updatedBy().contains('Jean-Luc Picard on 28 October 2026')
+    const previousBelief = beliefHistoryPage.getBeliefCard(1)
+    previousBelief.description.contains('Celestial Church of God')
+    previousBelief.activeTag.should('not.exist')
+    previousBelief.comments.should('not.exist')
+    previousBelief.startDate.contains('1 January 2022')
+    previousBelief.endDate.contains('28 October 2026')
+    previousBelief.created.contains('Jkirk')
+    previousBelief.modified.contains('Jean-Luc Picard on 28 October 2026')
   })
 
   it('should not display belief history comment if it is not present', () => {
@@ -58,11 +58,10 @@ context('Belief history page', () => {
       withReligionHistory: true,
     })
 
-    visitBeliefHistoryPage()
-
-    cy.get('.belief-card').eq(0).find('.belief-card__comments').should('not.exist')
-    cy.get('.belief-card').eq(1).find('.belief-card__comments').should('not.exist')
-    cy.get('.belief-card').eq(2).find('.belief-card__comments').should('not.exist')
+    beliefHistoryPage = visitBeliefHistoryPage()
+    beliefHistoryPage.getBeliefCard(0).comments.should('not.exist')
+    beliefHistoryPage.getBeliefCard(1).comments.should('not.exist')
+    beliefHistoryPage.getBeliefCard(2).comments.should('not.exist')
   })
 
   it('should display belief history comment even if change reason is false', () => {
@@ -78,6 +77,6 @@ context('Belief history page', () => {
     })
 
     beliefHistoryPage = visitBeliefHistoryPage()
-    beliefHistoryPage.activeBeliefCard().comments().contains('Comments')
+    beliefHistoryPage.getBeliefCard(0).comments.contains('Comments')
   })
 })
