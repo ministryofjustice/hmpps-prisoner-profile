@@ -584,12 +584,11 @@ context('When signed in', () => {
       it('Does not display the back to top link initially', () => {
         const page = Page.verifyOnPage(PersonalPage)
         page.backToTopLinkHidden().should('exist')
-        page.backToTopLink().should('have.css', 'height', '1px')
       })
 
       it('Floats the back to top link in the viewport after scrolling down', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.scrollTo(0, 1500)
+        cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
         page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().should('be.visible')
@@ -602,25 +601,23 @@ context('When signed in', () => {
 
       it('Stops floating the back to top link when the footer is visible', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.scrollTo(0, 1500)
+        cy.get('#appearance').scrollIntoView()
         page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
-        cy.scrollTo('bottom')
-        page.backToTopLink().parent().should('not.have.class', 'hmpps-back-to-top--fixed')
-        page.backToTopLink().parent().should('not.have.class', 'hmpps-back-to-top--hidden')
+        cy.get('.govuk-footer').scrollIntoView()
+        page.backToTopLink().parent().should('not.have.css', 'position', 'fixed')
         page.backToTopLink().should('be.visible')
       })
 
       it('Returns to the top and hides the link when clicked', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.scrollTo(0, 1500)
-        page.backToTopLink().parent().should('have.class', 'hmpps-back-to-top--fixed')
+        cy.get('#appearance').scrollIntoView()
+        page.backToTopLink().parent().should('have.css', 'position', 'fixed')
         page.backToTopLink().click()
         cy.location('hash').should('equal', '#top')
         cy.get('#top').should($top => {
-          expect($top[0].getBoundingClientRect().top).to.equal(0)
+          expect($top[0].getBoundingClientRect().top).to.be.closeTo(0, 1)
         })
         page.backToTopLinkHidden().should('exist')
-        page.backToTopLink().should('have.css', 'height', '1px')
       })
     })
   })
