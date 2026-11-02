@@ -302,4 +302,4 @@ export const services = () => {
 
 export type Services = ReturnType<typeof services>
 
-export { PrisonerSearchService, CommonApiRoutes }
+export { CommonApiRoutes }

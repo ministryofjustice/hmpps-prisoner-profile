@@ -329,6 +329,7 @@ Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
   cy.task('stubPersonApiPing', httpStatus)
   cy.task('stubXRayBodyScanPing', httpStatus)
   cy.task('stubCellMovementsApiPing', httpStatus)
+  cy.task('stubManageUsersApiPing', httpStatus)
 })
 
 Cypress.Commands.add(

@@ -11,6 +11,11 @@ import { PersonalRelationshipsReferenceDataDomain } from '../../data/interfaces/
 import type { PersonalRelationshipsApiClient } from '../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataSourceFactory } from './referenceDataSourceFactory'
 
+let usePersonApiFeatureDefaults: typeof config.featureToggles.usePersonApi
+beforeAll(() => {
+  usePersonApiFeatureDefaults = { ...config.featureToggles.usePersonApi }
+})
+
 describe('referenceDataSourceFactory', () => {
   const personApiClient = personApiClientMock()
   const healthAndMedicationApiClient = {
@@ -25,6 +30,7 @@ describe('referenceDataSourceFactory', () => {
   } as unknown as jest.Mocked<PersonalRelationshipsApiClient>
 
   beforeEach(() => {
+    config.featureToggles.usePersonApi = { ...usePersonApiFeatureDefaults }
     jest.resetAllMocks()
     personApiClient.getReligionCodes.mockResolvedValue([])
     healthAndMedicationApiClient.getReferenceDataCodes.mockResolvedValue([])
