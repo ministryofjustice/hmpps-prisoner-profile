@@ -39,6 +39,7 @@
 
 {% block form %}
   <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Religion, faith or belief</h1>
+
   {% if currentReligion and currentReligion.code %}
     {{ govukInsetText({
       id: "current-religion-display",
@@ -46,6 +47,7 @@
       classes: "govuk-!-margin-top-2"
     }) }}
   {% endif %}
+
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
     <input type="hidden" name="currentReligionCode" value="{{ currentReligion.code }}"/>
@@ -68,6 +70,7 @@
         items: options
       }) }}
     </div>
+
     {% if currentReligion and currentReligion.code %}
       {{ govukRadios({
         name: "reasonKnown",
@@ -105,6 +108,7 @@
         attributes: { "data-qa": "religion-update-warning" }
       }) }}
     {% endif %}
+
     <div class="govuk-button-group">
       {{ govukButton({
         text: "Save",

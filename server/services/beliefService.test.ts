@@ -1,6 +1,7 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { beliefHistoryMock } from '../data/localMockData/beliefHistoryMock'
+import { beliefServiceMock } from './mocks/beliefServiceMocks'
 import BeliefService from './beliefService'
 
 describe('beliefService', () => {
@@ -18,7 +19,7 @@ describe('beliefService', () => {
 
       const response = await service.getBeliefHistory('token', 'A1234AA')
 
-      expect(response).toEqual(beliefHistoryMock)
+      expect(response).toEqual(beliefServiceMock)
     })
   })
 })

@@ -26,6 +26,9 @@ export interface DpsPersonRecord extends PersonRecord {
     startDate: string
     endDate: string | null
     createUserId: string
+    createDateTime: string
+    modifyUserId: string | null
+    modifyDateTime: string | null
   }[]
 }
 
