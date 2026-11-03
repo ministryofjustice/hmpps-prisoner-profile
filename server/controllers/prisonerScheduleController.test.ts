@@ -10,7 +10,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'A1234BC'
-  let prisonApi: PrisonApiClient
+  let prisonApi: jest.Mocked<PrisonApiClient>
 
   let req: Request
   let res: Response
@@ -31,8 +31,8 @@ describe('Prisoner schedule', () => {
     res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() } as unknown as Response
 
     prisonApi = prisonApiClientMock()
-    prisonApi.getScheduledEventsForThisWeek = jest.fn().mockResolvedValue(getEventsThisWeekMock)
-    prisonApi.getScheduledEventsForNextWeek = jest.fn().mockResolvedValue(getEventsNextWeekMock)
+    prisonApi.getScheduledEventsForThisWeek.mockResolvedValue(getEventsThisWeekMock)
+    prisonApi.getScheduledEventsForNextWeek.mockResolvedValue(getEventsNextWeekMock)
     controller = new PrisonerScheduleController(() => prisonApi, auditServiceMock())
   })
 

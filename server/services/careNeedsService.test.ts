@@ -10,35 +10,35 @@ import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMo
 import CareNeedsService from './careNeedsService'
 
 describe('careNeedsService', () => {
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let careNeedsService: CareNeedsService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getAllPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getAllReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
+    prisonApiClient.getPersonalCareNeeds.mockResolvedValue(personalCareNeedsMock)
+    prisonApiClient.getAllPersonalCareNeeds.mockResolvedValue(personalCareNeedsMock)
+    prisonApiClient.getAllReasonableAdjustments.mockResolvedValue(mockReasonableAdjustments)
+    prisonApiClient.getReferenceCodesByDomain.mockImplementation(async (domain: ReferenceCodeDomain) =>
       mockReferenceDomains(domain),
     )
     careNeedsService = new CareNeedsService(() => prisonApiClient)
   })
 
   const setPersonalCareNeedsMock = (careNeeds: PersonalCareNeed[]) => {
-    prisonApiClient.getAllPersonalCareNeeds = jest.fn(async () => ({
+    prisonApiClient.getAllPersonalCareNeeds.mockResolvedValue({
       offenderNo: 'AB1234',
       personalCareNeeds: careNeeds,
-    }))
+    })
   }
 
   const setPersonalCareNeedsForXrayBodyScansMock = (careNeeds: PersonalCareNeed[]) => {
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+    prisonApiClient.getPersonalCareNeeds.mockResolvedValue({
       offenderNo: 'AB1234',
       personalCareNeeds: careNeeds,
-    }))
+    })
   }
   const setCodeReferencesMock = (referenceCodes: ReferenceCode[]) => {
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
+    prisonApiClient.getReferenceCodesByDomain.mockResolvedValue(referenceCodes)
   }
 
   describe('getCareNeedsAndAdjustments', () => {
@@ -209,7 +209,7 @@ describe('careNeedsService', () => {
         },
       ])
 
-      prisonApiClient.getAllReasonableAdjustments = jest.fn(async () => ({
+      prisonApiClient.getAllReasonableAdjustments.mockResolvedValue({
         reasonableAdjustments: [
           {
             personalCareNeedId: 1,
@@ -221,7 +221,7 @@ describe('careNeedsService', () => {
             treatmentDescription: 'Behavioural responses/Body language',
           },
         ],
-      }))
+      })
 
       const careNeeds = await careNeedsService.getCareNeedsAndAdjustments('token', PrisonerMockDataA.bookingId)
 

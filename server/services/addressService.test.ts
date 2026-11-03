@@ -28,7 +28,7 @@ describe('addressService', () => {
   let metricsService: MetricsService
   let referenceDataService: ReferenceDataService
   let osPlacesAddressService: OsPlacesAddressService
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let personIntegrationApiClient: PersonIntegrationApiClient
   let addressService: AddressService
 
@@ -74,7 +74,7 @@ describe('addressService', () => {
 
   describe('getAddressesFromPrisonAPI', () => {
     it('Handles address data from prison API correctly', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
+      prisonApiClient.getAddresses.mockResolvedValue(mockAddresses)
       const addresses = await addressService.getAddressesFromPrisonAPI('token', 'A1234AA')
       expect(addresses).toEqual(mockAddresses)
     })
@@ -90,7 +90,7 @@ describe('addressService', () => {
 
   describe('getAddressesForDisplay', () => {
     it('gets addresses from the prison API', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
+      prisonApiClient.getAddresses.mockResolvedValue(mockAddresses)
 
       await addressService.getAddressesForDisplay('token', 'A1234AA')
 
@@ -99,14 +99,14 @@ describe('addressService', () => {
     })
 
     it('Handles the API returning 404 for addresses', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => null as typeof mockAddresses | null)
+      prisonApiClient.getAddresses.mockResolvedValue(null)
 
       const addresses = await addressService.getAddressesForDisplay('token', 'A1234AA')
       expect(addresses).toEqual([])
     })
 
     it('Filters out expired addresses', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => [
+      prisonApiClient.getAddresses.mockResolvedValue([
         { ...mockAddresses[0], endDate: formatDateISO(subDays(new Date(), 1)) },
       ])
 
@@ -116,7 +116,7 @@ describe('addressService', () => {
 
     it('maps Prison API addresses and phone numbers for display', async () => {
       const address = { ...mockAddresses[0], phones: [mockAddresses[0].phones[0]] }
-      prisonApiClient.getAddresses = jest.fn(async () => [address])
+      prisonApiClient.getAddresses.mockResolvedValue([address])
       referenceDataService.getActiveReferenceDataCodes = jest
         .fn()
         .mockResolvedValue([{ code: 'VISIT', description: 'Visit' } as ReferenceDataCodeDto])
@@ -158,7 +158,7 @@ describe('addressService', () => {
       ['2023-07-19T10:00:00', '2023-07-19T10:00:00', '2023-07-19T10:00:00'],
       [undefined, undefined, undefined],
     ])('uses the latest Prison API audit date (%s, %s)', async (createDatetime, modifyDatetime, updatedOn) => {
-      prisonApiClient.getAddresses = jest.fn(async () => [
+      prisonApiClient.getAddresses.mockResolvedValue([
         {
           ...mockAddresses[0],
           phones: [{ ...mockAddresses[0].phones[0], createDatetime, modifyDatetime }],

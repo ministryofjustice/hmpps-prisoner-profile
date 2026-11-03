@@ -28,7 +28,7 @@ let req: Request
 let res: Response
 let next: NextFunction
 let services: Services
-let prisonApiClient: PrisonApiClient
+let prisonApiClient: jest.Mocked<PrisonApiClient>
 let prisonerSearchApiClient: PrisonerSearchClient
 let alertsApiClient: AlertsApiClient
 let featureToggleStoreMock: FeatureToggleStore
@@ -60,8 +60,8 @@ describe('GetPrisonerDataMiddleware', () => {
       findByNumbers: jest.fn(),
     }
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
-    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    prisonApiClient.getAssessments.mockResolvedValue(assessmentsMock)
+    prisonApiClient.getInmateDetail.mockResolvedValue(inmateDetailMock)
     alertsApiClient = {
       createAlert: jest.fn(async (): Promise<Alert> => null),
       getAlertDetails: jest.fn(async (): Promise<Alert> => null),
@@ -189,7 +189,7 @@ describe('GetPrisonerDataMiddleware', () => {
   })
 
   it('should add a cachebusting query param for undefined imageIds', async () => {
-    prisonApiClient.getInmateDetail = jest.fn(async () => ({ ...inmateDetailMock, facialImageId: undefined as number }))
+    prisonApiClient.getInmateDetail.mockResolvedValue({ ...inmateDetailMock, facialImageId: undefined as number })
 
     await getPrisonerData(services)(req, res, next)
 
@@ -199,8 +199,7 @@ describe('GetPrisonerDataMiddleware', () => {
   it('should set the newArrival24 flag if latest arrival date is today', async () => {
     const arrivalDate = new Date()
     const arrivalDateString = formatDateISO(arrivalDate)
-    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
-    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
+    prisonApiClient.getLatestArrivalDate.mockResolvedValue(arrivalDateString)
 
     await getPrisonerData(services)(req, res, next)
 
@@ -214,7 +213,7 @@ describe('GetPrisonerDataMiddleware', () => {
     ['day before yesterday', subDays(startOfToday(), 2)],
   ])('should set newArrival72 to true when arrival date is %s', async (_label, arrivalDate) => {
     const arrivalDateString = formatDateISO(arrivalDate)
-    prisonApiClient.getLatestArrivalDate = jest.fn(async () => arrivalDateString)
+    prisonApiClient.getLatestArrivalDate.mockResolvedValue(arrivalDateString)
 
     await getPrisonerData(services)(req, res, next)
 
