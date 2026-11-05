@@ -10,7 +10,7 @@ import { cityOrTownOfBirthFieldData } from '../../fieldData'
 import CityOrTownOfBirthController from './cityOrTownOfBirthController'
 
 describe('CityOrTownOfBirthController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: CityOrTownOfBirthController
   let res: Response
@@ -25,7 +25,7 @@ describe('CityOrTownOfBirthController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new CityOrTownOfBirthController(personalPageService, auditService)
@@ -153,9 +153,7 @@ describe('CityOrTownOfBirthController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateCityOrTownOfBirth = async () => {
-          throw new Error()
-        }
+        personalPageService.updateCityOrTownOfBirth.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

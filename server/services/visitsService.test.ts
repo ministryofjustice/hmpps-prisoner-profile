@@ -12,19 +12,19 @@ import { VisitsService } from './visitsService'
 describe('visitsService', () => {
   let prisoner: Prisoner
   let service: VisitsService
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
 
   beforeEach(() => {
     prisoner = PrisonerMockDataA
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getVisitsForBookingWithVisitors = jest.fn(async () => pagedVisitsMock)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (referenceCode: ReferenceCodeDomain) => {
+    prisonApiClient.getVisitsForBookingWithVisitors.mockResolvedValue(pagedVisitsMock)
+    prisonApiClient.getReferenceCodesByDomain.mockImplementation(async (referenceCode: ReferenceCodeDomain) => {
       if (referenceCode === ReferenceCodeDomain.VisitCancellationReasons) {
-        return [{ code: 'Cancellation', description: 'desc', activeFlag: 'Y' as 'Y' | 'N' }]
+        return [{ code: 'Cancellation', description: 'desc', activeFlag: 'Y' }]
       }
 
       if (referenceCode === ReferenceCodeDomain.VisitCompletionReasons) {
-        return [{ code: 'Completion', description: 'desc', activeFlag: 'Y' as 'Y' | 'N' }]
+        return [{ code: 'Completion', description: 'desc', activeFlag: 'Y' }]
       }
 
       return []
@@ -58,7 +58,7 @@ describe('visitsService', () => {
 
     it('Handles no visits', async () => {
       const mockVisits = mockPagedVisits([])
-      prisonApiClient.getVisitsForBookingWithVisitors = jest.fn(async () => mockVisits)
+      prisonApiClient.getVisitsForBookingWithVisitors.mockResolvedValue(mockVisits)
       const result = await service.getVisits('', prisoner, {} as VisitsListQueryParams)
       expect(result.visitsWithPaginationInfo).toEqual(mockVisits)
     })

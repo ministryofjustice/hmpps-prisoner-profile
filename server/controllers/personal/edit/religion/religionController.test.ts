@@ -1,15 +1,15 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { AuditService, PostAction } from '../../../../services/auditService'
 import PersonalPageService from '../../../../services/personalPageService'
 import ReligionController from './religionController'
 import { prisonUserMock } from '../../../../data/localMockData/user'
-import InmateDetail from '../../../../data/interfaces/prisonApi/InmateDetail'
+import type InmateDetail from '../../../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
 
 describe('ReligionController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: ReligionController
   let res: Response
@@ -30,6 +30,7 @@ describe('ReligionController', () => {
       firstName: 'First',
       lastName: 'Last',
       birthPlace: 'SHEFFIELD',
+      religion: 'Buddhist',
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
         { question: 'Nationality', resultValue: 'BRIT', type: ProfileInformationType.Nationality },
@@ -60,7 +61,11 @@ describe('ReligionController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
+    personalPageService.getReligionOrBelief.mockResolvedValue({
+      code: 'BUDD',
+      description: 'Buddhist',
+    })
     auditService = auditServiceMock()
 
     controller = new ReligionController(personalPageService, auditService)
@@ -140,11 +145,8 @@ describe('ReligionController', () => {
           currentReasonForChangeUnknown: undefined,
           currentReasonKnown: undefined,
           currentReligion: {
-            id: 'RELF_BUDD',
             code: 'BUDD',
             description: 'Buddhist',
-            isActive: true,
-            listSequence: 99,
           },
           errors: [],
           options: expectedOptions,
@@ -270,7 +272,7 @@ describe('ReligionController', () => {
           updatedReligion: 'ZORO',
           reason: 'Some reason',
         },
-      ])('Prisoner with existing religion - valid request: %s', async ({ body, updatedReligion, reason }) => {
+      ])('Prisoner with existing religion - valid request: $body', async ({ body, updatedReligion, reason }) => {
         const request = { ...validRequest, body } as Request
         await action(request, res, next)
         expect(personalPageService.updateReligion).toHaveBeenCalledWith(
@@ -297,7 +299,7 @@ describe('ReligionController', () => {
           updatedReligion: 'ZORO',
           reason: 'Some reason',
         },
-      ])('Prisoner without existing religion - valid request: %s', async ({ body, updatedReligion, reason }) => {
+      ])('Prisoner without existing religion - valid request: $body', async ({ body, updatedReligion, reason }) => {
         const request = {
           middleware: {
             clientToken: 'token',
@@ -371,9 +373,7 @@ describe('ReligionController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateReligion = async () => {
-          throw new Error()
-        }
+        personalPageService.updateReligion.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

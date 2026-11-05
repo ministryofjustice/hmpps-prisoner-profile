@@ -8,7 +8,7 @@ import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/global
 import GlobalNumbersController from './globalNumbersController'
 
 describe('GlobalNumbersController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: GlobalNumbersController
   let res: Response
@@ -43,7 +43,7 @@ describe('GlobalNumbersController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new GlobalNumbersController(personalPageService, auditService)
@@ -145,7 +145,7 @@ describe('GlobalNumbersController', () => {
             flash: jest.fn(),
           } as unknown as Request
 
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Updates the phone number', async () => {
@@ -208,9 +208,11 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Handles duplicate phone numbers with extensions', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             phones: [
               {
+                id: 1,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '4321',
@@ -233,9 +235,11 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Handles duplicate phone numbers without extensions', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             phones: [
               {
+                id: 1,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: null,
@@ -258,9 +262,11 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Allows duplicate phone number if the extension differs', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             phones: [
               {
+                id: 1,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '4321',
@@ -286,9 +292,7 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.createGlobalPhoneNumber = async () => {
-            throw new Error()
-          }
+          personalPageService.createGlobalPhoneNumber.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 
@@ -337,7 +341,7 @@ describe('GlobalNumbersController', () => {
         } as unknown as Request
 
         beforeEach(() => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Renders the default edit page with the correct data', async () => {
@@ -424,7 +428,7 @@ describe('GlobalNumbersController', () => {
             flash: jest.fn(),
           } as unknown as Request
 
-          personalPageService.getGlobalPhonesAndEmails = jest.fn(async () => globalPhonesAndEmailsMock)
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue(globalPhonesAndEmailsMock)
         })
 
         it('Updates the email', async () => {
@@ -457,16 +461,18 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Handles duplicate phone numbers', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             phones: [
               {
-                id: '123',
+                id: 123,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '1111',
               },
               {
-                id: '1234',
+                id: 1234,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '4321',
@@ -497,16 +503,18 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Allows duplicate phone number if the extension differs', async () => {
-          personalPageService.getGlobalPhonesAndEmails = jest.fn().mockResolvedValue({
+          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
             phones: [
               {
-                id: '123',
+                id: 123,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '1111',
               },
               {
-                id: '1234',
+                id: 1234,
+                typeDescription: 'Mobile',
                 number: '(12)34',
                 type: 'MOB',
                 extension: '4321',
@@ -530,9 +538,7 @@ describe('GlobalNumbersController', () => {
         })
 
         it('Handles API errors', async () => {
-          personalPageService.updateGlobalPhoneNumber = async () => {
-            throw new Error()
-          }
+          personalPageService.updateGlobalPhoneNumber.mockRejectedValue(new Error())
 
           await action(validRequest, res, next)
 

@@ -6,6 +6,7 @@ import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
+import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { CellMovementReasonMock } from '../data/localMockData/cellMovementReasonMock'
@@ -52,31 +53,32 @@ describe('Specific Prisoner Location History', () => {
     const prisonApiClient = prisonApiClientMock()
     const locationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()
     const nomisSyncPrisonerMappingApiClient = nomisSyncPrisonerMappingApiClientMock()
-    const cellMovementsApiClient: CellMovementsApiClient = {
+    const cellMovementsApiClient: jest.Mocked<CellMovementsApiClient> = {
       getCellMovementReason: jest.fn(),
     }
 
-    prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
-    prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
+    prisonApiClient.getDetails.mockResolvedValue(GetDetailsMock)
+    prisonApiClient.getStaffDetails.mockResolvedValue(StaffDetailsMock)
     historyForLocationMock = mockHistoryForLocation()
-    prisonApiClient.getHistoryForLocation = jest.fn().mockImplementation(async () => historyForLocationMock)
-    prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(agencyDetailsMock)
-    prisonApiClient.getUserCaseLoads = jest.fn().mockResolvedValue(CaseLoadsDummyDataA)
-    prisonApiClient.getCellMoveReasonTypes = jest.fn().mockResolvedValue(getCellMoveReasonTypesMock)
-    prisonApiClient.getInmateDetail = jest.fn().mockResolvedValue(inmateDetailMock)
+    prisonApiClient.getHistoryForLocation.mockImplementation(async () => historyForLocationMock)
+    prisonApiClient.getAgencyDetails.mockResolvedValue({ ...AgenciesMock, ...agencyDetailsMock })
+    prisonApiClient.getUserCaseLoads.mockResolvedValue(CaseLoadsDummyDataA)
+    prisonApiClient.getCellMoveReasonTypes.mockResolvedValue(getCellMoveReasonTypesMock)
+    prisonApiClient.getInmateDetail.mockResolvedValue(inmateDetailMock)
     cellMovementReasonMock = CellMovementReasonMock
-    cellMovementsApiClient.getCellMovementReason = jest.fn().mockImplementation(async () => cellMovementReasonMock)
+    cellMovementsApiClient.getCellMovementReason.mockImplementation(async () => cellMovementReasonMock)
 
     nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest
       .fn()
       .mockResolvedValue({ dpsLocationId: 'abcdefg' })
 
-    locationsInsidePrisonApiClient.getLocation = jest.fn().mockResolvedValue({
+    locationsInsidePrisonApiClient.getLocation.mockResolvedValue({
+      id: 'location-1',
       localName: 'Cell 1',
       key: 'LEI-1-1',
     })
 
-    locationsInsidePrisonApiClient.getLocationAttributes = jest.fn().mockResolvedValue([
+    locationsInsidePrisonApiClient.getLocationAttributes.mockResolvedValue([
       { code: 'LISTENER_CRISIS', description: 'Listener / crisis cell' },
       { code: 'SO', description: 'Single occupancy' },
     ])

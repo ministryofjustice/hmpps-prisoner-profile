@@ -21,7 +21,6 @@ export default interface PersonalPage {
   physicalCharacteristics: Result<PhysicalCharacteristics>
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
-  hasCurrentBelief: boolean
   distinguishingMarks: Result<PersonIntegrationDistinguishingMark[]> | null
   militaryRecords: Result<MilitaryRecord[]> | null
   globalNumbersAndEmails: Result<GlobalNumbersAndEmails>

@@ -1,4 +1,7 @@
-import Belief from '../interfaces/prisonApi/Belief'
+import type Belief from '../interfaces/prisonApi/Belief'
+
+// mocks for data as returned by prison-api
+// see also /server/services/mocks/beliefServiceMocks.ts
 
 export const beliefHistoryMock: Belief[] = [
   {

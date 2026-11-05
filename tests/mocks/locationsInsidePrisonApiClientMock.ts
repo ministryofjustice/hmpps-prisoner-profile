@@ -1,6 +1,6 @@
 import { LocationsInsidePrisonApiClient } from '../../server/data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
 
-export const locationsInsidePrisonApiClientMock = (): LocationsInsidePrisonApiClient => ({
+export const locationsInsidePrisonApiClientMock = (): jest.Mocked<LocationsInsidePrisonApiClient> => ({
   getLocation: jest.fn(),
   getLocationByKey: jest.fn(),
   getLocationsForAppointments: jest.fn(),

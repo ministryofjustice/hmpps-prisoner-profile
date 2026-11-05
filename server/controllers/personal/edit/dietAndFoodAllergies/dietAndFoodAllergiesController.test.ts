@@ -8,10 +8,7 @@ import { personalPageServiceMock } from '../../../../../tests/mocks/personalPage
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { healthAndMedicationMock } from '../../../../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
-import {
-  HealthAndMedication,
-  ReferenceDataIdSelection,
-} from '../../../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { ReferenceDataIdSelection } from '../../../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import {
   foodAllergyCodesMock,
   medicalDietCodesMock,
@@ -19,7 +16,7 @@ import {
 } from '../../../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 
 describe('DietAndFoodAllergiesController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: DietAndFoodAllergiesController
   let res: Response
@@ -34,8 +31,8 @@ describe('DietAndFoodAllergiesController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getHealthAndMedication = jest.fn(async () => ({ ...healthAndMedicationMock }))
+    personalPageService = personalPageServiceMock()
+    personalPageService.getHealthAndMedication.mockResolvedValue({ ...healthAndMedicationMock })
     auditService = auditServiceMock()
 
     controller = new DietAndFoodAllergiesController(personalPageService, auditService)
@@ -117,7 +114,7 @@ describe('DietAndFoodAllergiesController', () => {
       })
 
       it('Renders the edit page with the correct data from the health and medications api when no existing data is present', async () => {
-        personalPageService.getHealthAndMedication = jest.fn(async () => null as HealthAndMedication)
+        personalPageService.getHealthAndMedication.mockResolvedValue(null)
 
         const req = {
           params: { prisonerNumber },
@@ -310,9 +307,7 @@ describe('DietAndFoodAllergiesController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateDietAndFoodAllergies = async () => {
-          throw new Error()
-        }
+        personalPageService.updateDietAndFoodAllergies.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

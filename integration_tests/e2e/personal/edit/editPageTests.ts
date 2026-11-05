@@ -23,11 +23,13 @@ export function editPageTests<TPage extends EditPage>(options: {
   editPageTitle?: string
   successfulFlashMessage?: string
   validInputs: EditPageInput[]
+  validInputSetup?: (() => void)[]
   invalidInputs?: {
     testDescription: string
     input: EditPageInput
     errorMessages: string[]
   }[]
+  invalidInputSetup?: (() => void)[]
   redirectUrl?: string
   redirectAnchor?: string
   personalPageHref?: string
@@ -40,11 +42,13 @@ export function editPageTests<TPage extends EditPage>(options: {
     prisonerName,
     testSetup,
     validInputs,
+    validInputSetup = [],
     editPage,
     editPageWithTitle,
     editPageTitle,
     successfulFlashMessage,
     invalidInputs,
+    invalidInputSetup = [],
     redirectUrl = '/prisoner/G6123VU/personal',
     redirectAnchor,
     submitButtonId,
@@ -128,6 +132,10 @@ export function editPageTests<TPage extends EditPage>(options: {
           it(`Can submit a valid input (${index + 1} of ${validInputs.length})`, () => {
             page = getPage()
             fillWithInputs(validInput)
+
+            if (validInputSetup[index]) {
+              validInputSetup[index]()
+            }
             page.submit(submitButtonId)
 
             cy.location('pathname').should('eq', redirectUrl)
@@ -142,7 +150,7 @@ export function editPageTests<TPage extends EditPage>(options: {
 
       if (invalidInputs?.length > 0) {
         context('It handles invalid responses', () => {
-          invalidInputs.forEach(({ testDescription, input, errorMessages }) => {
+          invalidInputs.forEach(({ testDescription, input, errorMessages }, index) => {
             it(`Handles invalid input: ${testDescription}`, () => {
               cy.signIn({ redirectPath: editUrl })
               page = getPage()
@@ -151,7 +159,12 @@ export function editPageTests<TPage extends EditPage>(options: {
                 cy.intercept('POST', url, req => {
                   req.headers.Referrer = url
                 })
+
+                if (invalidInputSetup[index]) {
+                  invalidInputSetup[index]()
+                }
                 page.submit(submitButtonId)
+
                 errorMessages.forEach(message => {
                   page.errorMessage().should('include.text', message)
                 })

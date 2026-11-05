@@ -78,7 +78,6 @@ import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getC
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import CsraAssessment, { CsraAssessmentSummary } from '../../server/data/interfaces/prisonApi/CsraAssessment'
-import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
 import receptionsWithCapacityMock from '../../server/data/localMockData/receptionsWithCapacityMock'
 import { OffenderCellHistoryMock } from '../../server/data/localMockData/offenderCellHistoryMock'
 import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
@@ -97,7 +96,6 @@ import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/priso
 import PrisonerSchedule, { TimeSlot } from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
 import { loadFileAsBase64, stubGetWithBody } from './utils'
 import { formatDateISO } from '../../server/utils/dateHelpers'
-import Belief from '../../server/data/interfaces/prisonApi/Belief'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -966,7 +964,7 @@ export default {
     })
   },
 
-  stubStaffDetails: staffId => {
+  stubStaffDetails: (staffId: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1390,24 +1388,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: response,
-      },
-    })
-  },
-
-  stubBeliefHistory: ({ bookingId, beliefHistory }: { bookingId?: number; beliefHistory?: Belief[] } = {}) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/offenders/.*/belief-history(\\?bookingId=.*)?`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody:
-          beliefHistory ||
-          (bookingId ? beliefHistoryMock.map(belief => ({ ...belief, bookingId })) : beliefHistoryAllBookingsMock),
       },
     })
   },

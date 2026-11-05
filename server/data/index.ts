@@ -1,9 +1,7 @@
-/* eslint-disable import/order */
-/*
- * Do appinsights first as it does some magic instrumentation work, i.e. it affects other 'require's
- * In particular, applicationinsights automatically collects bunyan logs
- */
 import { OsPlacesApiClient } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import { ApiConfig } from '@ministryofjustice/hmpps-rest-client'
+import logger from '../../logger'
+import config from '../config'
 import AllocationManagerApiClient from './allocationManagerApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import CuriousRestApiClient from './curiousApiClient'
@@ -16,7 +14,6 @@ import PrisonApiRestClient from './prisonApiClient'
 import LocationsInsidePrisonApiRestClient from './locationsInsidePrisonApiClient'
 import NomisSyncPrisonMappingRestClient from './nomisSyncPrisonerMappingClient'
 import PrisonerSearchClient from './prisonerSearchClient'
-
 import { createRedisClient } from './redisClient'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
@@ -28,7 +25,6 @@ import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
 import PrisonRegisterStore from './prisonRegisterStore/prisonRegisterStore'
 import CalculateReleaseDatesApiClient from './calculateReleaseDatesApiClient'
 import PrisonRegisterApiRestClient from './prisonRegisterApiClient'
-import config from '../config'
 import RedisTokenStore from './tokenStore/redisTokenStore'
 import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 import AlertsApiRestClient from './alertsApiClient'
@@ -43,13 +39,13 @@ import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApi
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 import SupportForAdditionalNeedsApiRestClient from './supportForAdditionalNeedsApiRestClient'
+import type { PersonApiClient } from './interfaces/personApi'
 import PersonApiRestClient from './personApiClient'
 import XRayBodyScansApiRestClient from './xRayBodyScansApiClient'
 import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
-import logger from '../../logger'
 import { circuitBreakerBuilder } from './restClient'
-import { ApiConfig } from '@ministryofjustice/hmpps-rest-client'
 import PrisonerPropertyApiRestClient from './prisonerPropertyApiClient'
+import ManageUsersApiRestClient from './manageUsersApiClient'
 
 type RestClientBuilder<T> = (token: string) => T
 type CuriousRestClientBuilder<T> = (token: CuriousApiToken) => T
@@ -96,6 +92,7 @@ const circuitBreakers = {
   personApi: circuitBreakerBuilder('personApi', config.apis.personApi),
   xRayBodyScans: circuitBreakerBuilder('xRayBodyScans', config.apis.xRayBodyScans),
   prisonerProperty: circuitBreakerBuilder('prisonerPropertyApi', config.apis.prisonerPropertyApi),
+  manageUsersApi: circuitBreakerBuilder('manageUsersApi', config.apis.manageUsersApi),
 }
 
 export const dataAccess = {
@@ -155,11 +152,13 @@ export const dataAccess = {
     new PrisonerProfileApiRestClient(token, circuitBreakers.prisonerProfile),
   personalRelationshipsApiClientBuilder: (token: string) =>
     new PersonalRelationshipsApiRestClient(token, circuitBreakers.personalRelationships),
-  personApiClientBuilder: (token: string) => new PersonApiRestClient(token, circuitBreakers.personApi),
+  personApiClientBuilder: (token: string) =>
+    new PersonApiRestClient(token, circuitBreakers.personApi) as PersonApiClient,
   xRayBodyScansApiClientBuilder: (token: string) =>
     new XRayBodyScansApiRestClient(token, circuitBreakers.xRayBodyScans),
   prisonerPropertyApiClientBuilder: (token: string) =>
     new PrisonerPropertyApiRestClient(token, circuitBreakers.prisonerProperty),
+  manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token, circuitBreakers.manageUsersApi),
   tokenStore,
 }
 

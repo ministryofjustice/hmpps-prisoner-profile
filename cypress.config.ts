@@ -37,6 +37,7 @@ import supportForAdditionalNeedsApi from './integration_tests/mockApis/supportFo
 import personApi from './integration_tests/mockApis/personApi'
 import xRayBodyScansApi from './integration_tests/mockApis/xRayBodyScansApi'
 import prisonerPropertyApi from './integration_tests/mockApis/prisonerPropertyApi'
+import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -93,6 +94,7 @@ export default defineConfig({
         ...personApi,
         ...xRayBodyScansApi,
         ...prisonerPropertyApi,
+        ...manageUsersApi,
       })
     },
     baseUrl: 'http://localhost:3007',

@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import getDuplicatePrisonerData, { GHOST_PRISON_ID } from './getDuplicatePrisonerDataMiddleware'
 import { Services } from '../services'
 import { DataAccess } from '../data'
+import type { PersonApiClient, PersonRecord } from '../data/interfaces/personApi'
 import MetricsService from '../services/metrics/metricsService'
-import PersonApiRestClient from '../data/personApiClient'
 import { PrisonerSearchClient } from '../data/interfaces/prisonerSearchApi/prisonerSearchClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { Role } from '../data/enums/role'
 import { metricsServiceMock } from '../../tests/mocks/metricsServiceMock'
+import { personApiClientMock } from '../../tests/mocks/personApiClientMock'
 import * as featureFlags from '../utils/featureFlags'
 
 jest.mock('../utils/featureFlags')
@@ -27,8 +28,8 @@ let req: Request
 let res: Response
 let next: NextFunction
 let services: Services
-let personApiClient: PersonApiRestClient
-let prisonerSearchClient: PrisonerSearchClient
+let personApiClient: jest.Mocked<PersonApiClient>
+let prisonerSearchClient: jest.Mocked<PrisonerSearchClient>
 let metricsService: MetricsService
 
 const mockUser = {
@@ -37,12 +38,6 @@ const mockUser = {
   username: 'testuser',
   userRoles: [Role.PrisonUser],
   activeCaseLoadId: 'MDI',
-}
-
-const mockPersonRecord = {
-  identifiers: {
-    prisonNumbers: ['A1234BC', 'B5678DE', 'C9012FG'],
-  },
 }
 
 const mockPrisoners: Prisoner[] = [
@@ -71,20 +66,18 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
     next = jest.fn()
 
-    personApiClient = {
-      getRecord: jest.fn(async () => mockPersonRecord),
-    } as unknown as PersonApiRestClient
+    personApiClient = personApiClientMock()
 
     prisonerSearchClient = {
-      findByNumbers: jest.fn(async () => mockPrisoners),
-    } as unknown as PrisonerSearchClient
+      findByNumbers: jest.fn(() => Promise.resolve(mockPrisoners)),
+    } as unknown as jest.Mocked<PrisonerSearchClient>
 
     metricsService = metricsServiceMock()
 
     services = {
       dataAccess: {
-        personApiClientBuilder: jest.fn(() => personApiClient),
-        prisonerSearchApiClientBuilder: jest.fn(() => prisonerSearchClient),
+        personApiClientBuilder: () => personApiClient,
+        prisonerSearchApiClientBuilder: () => prisonerSearchClient,
       } as unknown as DataAccess,
       metricsService,
     } as unknown as Services
@@ -126,36 +119,22 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       expect(next).toHaveBeenCalled()
     })
 
-    it('should set empty array when personRecord is null', async () => {
-      personApiClient.getRecord = jest.fn(async (): Promise<null> => null)
+    it.each([
+      { scenario: 'personRecord is null', record: null },
+      // NB: just in case; according to CPR docs, none of the below are possible
+      { scenario: 'personRecord.identifiers is missing', record: { identifiers: undefined } },
+      {
+        scenario: 'personRecord.identifiers.prisonNumbers is missing',
+        record: { identifiers: { prisonNumbers: undefined } },
+      },
+    ])('should set empty array when $scenario', async ({ record }) => {
+      personApiClient.getRecord.mockResolvedValue(record as PersonRecord)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
       expect(req.middleware.duplicatePrisonerData).toEqual([])
       expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(personApiClient.getRecord).toHaveBeenCalledWith('A1234BC')
-      expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('should set empty array when personRecord.identifiers is missing', async () => {
-      personApiClient.getRecord = jest.fn(async () => ({}))
-
-      await getDuplicatePrisonerData(services)(req, res, next)
-
-      expect(req.middleware.duplicatePrisonerData).toEqual([])
-      expect(res.locals.duplicateRecordsFound).toBeFalsy()
-      expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('should set empty array when personRecord.identifiers.prisonNumbers is missing', async () => {
-      personApiClient.getRecord = jest.fn(async () => ({ identifiers: {} }))
-
-      await getDuplicatePrisonerData(services)(req, res, next)
-
-      expect(req.middleware.duplicatePrisonerData).toEqual([])
-      expect(res.locals.duplicateRecordsFound).toBeFalsy()
       expect(prisonerSearchClient.findByNumbers).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
@@ -194,7 +173,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
     })
 
     it('should not track found metrics when no duplicates remain', async () => {
-      prisonerSearchClient.findByNumbers = jest.fn(async () => [mockPrisoners[0]])
+      prisonerSearchClient.findByNumbers.mockResolvedValue([mockPrisoners[0]])
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -204,7 +183,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
     })
 
     it('should handle empty prisoner search results', async () => {
-      prisonerSearchClient.findByNumbers = jest.fn(async (): Promise<Prisoner[]> => [])
+      prisonerSearchClient.findByNumbers.mockResolvedValue([])
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -222,7 +201,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGhostEstablishmentDuplicate)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithGhostEstablishmentDuplicate)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -237,7 +216,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('B5678DE', GHOST_PRISON_ID),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithGhostEstablishmentDuplicate)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithGhostEstablishmentDuplicate)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -257,7 +236,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('D3456HI', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithMultipleGhostEstablishmentDuplicates)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithMultipleGhostEstablishmentDuplicates)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -290,7 +269,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'BXI'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithMultipleActive)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithMultipleActive)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -306,7 +285,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'BXI'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithMultipleActive)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithMultipleActive)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -328,7 +307,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('B5678DE', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithInactiveDuplicates)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithInactiveDuplicates)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -345,7 +324,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('B5678DE', 'LEI'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersInactiveOriginalOneActiveDuplicate)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersInactiveOriginalOneActiveDuplicate)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -363,7 +342,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'BXI'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersInactiveOriginalMultipleActiveDuplicates)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersInactiveOriginalMultipleActiveDuplicates)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -384,7 +363,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
       // Original active (MDI) + 1 active duplicate (LEI) = 2 total active → filter
       const prisonersOneEach: Prisoner[] = [createTestPrisoner('A1234BC', 'MDI'), createTestPrisoner('B5678DE', 'LEI')]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersOneEach)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersOneEach)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -406,7 +385,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'TRN'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithTRN)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithTRN)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -431,7 +410,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('C9012FG', 'OUT'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisonersWithOUT)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisonersWithOUT)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -458,7 +437,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
         createTestPrisoner('D3456HI', 'TRN'),
       ]
 
-      prisonerSearchClient.findByNumbers = jest.fn(async () => prisoners)
+      prisonerSearchClient.findByNumbers.mockResolvedValue(prisoners)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -478,7 +457,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
   describe('Error handling', () => {
     it('should handle Person API failure gracefully', async () => {
       const error = new Error('API request failed')
-      personApiClient.getRecord = jest.fn().mockRejectedValue(error)
+      personApiClient.getRecord.mockRejectedValue(error)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -491,7 +470,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
 
     it('should handle Prisoner Search API failure gracefully', async () => {
       const error = new Error('API request failed')
-      prisonerSearchClient.findByNumbers = jest.fn().mockRejectedValue(error)
+      prisonerSearchClient.findByNumbers.mockRejectedValue(error)
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
@@ -503,7 +482,7 @@ describe('GetDuplicatePrisonerDataMiddleware', () => {
     })
 
     it('should not call Prisoner Search API when Person API fails', async () => {
-      personApiClient.getRecord = jest.fn().mockRejectedValue(new Error('API request failed'))
+      personApiClient.getRecord.mockRejectedValue(new Error('API request failed'))
 
       await getDuplicatePrisonerData(services)(req, res, next)
 
