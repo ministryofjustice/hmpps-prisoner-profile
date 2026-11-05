@@ -2,7 +2,6 @@ import { Validator } from '../../middleware/validationMiddleware'
 import { validateMandatoryName, validateName } from './nameValidator'
 import HmppsError from '../../interfaces/HmppsError'
 import { validateDate } from './dateValidator'
-import { validateExtensionNumber, validateMandatoryPhoneNumber } from './phoneNumberValidator'
 import { PhoneNumberTypeMappings } from '../../data/constants/phoneNumberMappings'
 import {
   NextOfKinPhoneNumberSubmission,
@@ -97,18 +96,41 @@ export const validatePhoneNumbers = (phoneNumber: NextOfKinPhoneNumberSubmission
     return []
   }
 
-  const { type } = phoneNumber
-  const { formValue } = PhoneNumberTypeMappings[type]
+  const { formValue } = PhoneNumberTypeMappings[phoneNumber.type]
   const numberToValidate = phoneNumber?.numbers?.[formValue]
 
-  const numberErrors =
-    validateMandatoryPhoneNumber(`#phoneNumber-${formValue}-number`, 'Phone number', numberToValidate.number) ?? []
-  const extensionErrors =
-    (numberToValidate?.extension &&
-      validateExtensionNumber(`#phoneNumber-${formValue}-extension`, 'Extension', numberToValidate.extension)) ??
-    []
+  return [
+    ...validatePhoneNumber(`#phoneNumber-${formValue}-number`, 'Phone number', numberToValidate.number),
+    ...(numberToValidate?.extension
+      ? validateExtensionNumber(`#phoneNumber-${formValue}-extension`, 'Extension', numberToValidate.extension)
+      : []),
+  ]
+}
 
-  return [...numberErrors, ...extensionErrors]
+const validatePhoneNumber = (href: string, label: string, phoneNumber: string): HmppsError[] => {
+  if (!phoneNumber?.trim()) {
+    return [{ href, text: `Enter a ${label.toLowerCase()}` }]
+  }
+
+  if (/[^\d() ]/.test(phoneNumber)) {
+    return [{ text: `${label}s must only contain numbers or brackets`, href }]
+  }
+  if (phoneNumber.length > 40) {
+    return [{ text: `${label} must be 40 characters or less`, href }]
+  }
+
+  return []
+}
+
+const validateExtensionNumber = (href: string, label: string, extensionNumber: string): HmppsError[] => {
+  if (/\D/.test(extensionNumber)) {
+    return [{ text: `${label} must only contain numbers`, href }]
+  }
+  if (extensionNumber.length > 7) {
+    return [{ text: `${label} must be 7 characters or less`, href }]
+  }
+
+  return []
 }
 
 export const validateAutocomplete = (href: string, type: string, invalidValue: string) => {

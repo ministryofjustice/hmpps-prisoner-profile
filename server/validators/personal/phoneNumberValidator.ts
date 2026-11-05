@@ -1,70 +1,106 @@
 import HmppsError from '../../interfaces/HmppsError'
 
-const phoneNumberInvalidCharacterChecker = /[^\d() ]/
-const phoneExtensionInvalidCharacterChecker = /[^\d]/
-
 export const phoneNumberValidator = (body: Record<string, string>): HmppsError[] => {
   const indexes = Object.keys(body)
     .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
     .filter((index): index is string => index !== undefined)
     .map(Number)
 
-  if (indexes.length) {
-    return Array.from({ length: Math.max(...indexes) + 1 }, (_, index) =>
-      phoneNumberValidator({
-        phoneNumberType: body[`phoneNumberType${index}`] ?? '',
-        phoneNumber: body[`phoneNumber${index}`] ?? '',
-        phoneExtension: body[`phoneExtension${index}`] ?? '',
-      }).map(error => (error.href ? { ...error, href: `${error.href}-${index}` } : error)),
-    ).flat()
+  if (!indexes.length) {
+    return validatePhoneNumberFields(body.phoneNumberType, body.phoneNumber, body.phoneExtension)
   }
 
-  const { phoneNumberType, phoneNumber, phoneExtension } = body
+  return Array.from({ length: Math.max(...indexes) + 1 }, (_, index) =>
+    validatePhoneNumberFields(
+      body[`phoneNumberType${index}`],
+      body[`phoneNumber${index}`],
+      body[`phoneExtension${index}`],
+      index,
+    ),
+  ).flat()
+}
+
+const validatePhoneNumberFields = (
+  phoneNumberType: string,
+  phoneNumber: string,
+  phoneExtension: string,
+  index?: number,
+): HmppsError[] => {
+  const hrefSuffix = index === undefined ? '' : `-${index}`
+  const phoneNumberHref = `#phone-number${hrefSuffix}`
+  const phoneExtensionHref = `#phone-extension${hrefSuffix}`
+  const normalisedPhoneNumber = normalisePhoneNumber(phoneNumber)
+  const normalisedExtension = normalisePhoneExtension(phoneExtension)
   const errors: HmppsError[] = []
 
-  if (!phoneNumberType) {
-    return [{ text: 'Select a phone number type', href: '#phone-number-type' }]
+  if (!phoneNumberType) errors.push({ text: 'Select a phone number type', href: `#phone-number-type${hrefSuffix}` })
+
+  if (!normalisedPhoneNumber || normalisedPhoneNumber === '+') {
+    errors.push({ href: phoneNumberHref, text: 'Enter a phone number' })
+  } else {
+    if (normalisedPhoneNumber.length > 40) {
+      errors.push({ text: 'Phone number must be 40 characters or less', href: phoneNumberHref })
+    }
+    if (!/^\+?\d[\d ]*$/.test(normalisedPhoneNumber)) {
+      errors.push({
+        text: 'Phone numbers must only contain numbers or brackets, or a plus sign (+) at the start of the number',
+        href: phoneNumberHref,
+      })
+    }
   }
 
-  errors.push(...validateMandatoryPhoneNumber('#phone-number', 'Phone number', phoneNumber))
-
-  if (phoneExtension) {
-    if (phoneExtension.match(phoneExtensionInvalidCharacterChecker)) {
-      errors.push({ text: 'Extension must only contain numbers', href: '#phone-extension' })
-    } else if (phoneExtension.length > 7) {
-      errors.push({ text: 'Extension must be 7 characters or less', href: '#phone-extension' })
-    }
+  if (/[^\d ]/.test(normalisedExtension)) {
+    errors.push({ text: 'Extension must only contain numbers', href: phoneExtensionHref })
+  }
+  if (normalisedExtension.length > 7) {
+    errors.push({ text: 'Extension must be 7 characters or less', href: phoneExtensionHref })
   }
 
   return errors
 }
 
-export const validateMandatoryPhoneNumber = (href: string, label: string, phoneNumber: string): HmppsError[] => {
-  if (!phoneNumber?.trim()) {
-    return [{ href, text: `Enter a ${label.toLowerCase()}` }]
+export const validatePhoneNumberDuplicate = (
+  phoneNumber: string,
+  extension: string | null | undefined,
+  existingPhoneNumbers: ExistingPhoneNumber[],
+  context: 'global' | 'address',
+  index = 0,
+): HmppsError[] => {
+  const duplicateKey = phoneNumberDuplicateKey(phoneNumber, extension)
+  if (
+    !existingPhoneNumbers.some(
+      existingPhoneNumber =>
+        phoneNumberDuplicateKey(existingPhoneNumber.number, existingPhoneNumber.extension) === duplicateKey,
+    )
+  ) {
+    return []
   }
 
-  return validatePhoneNumber(href, label, phoneNumber)
+  return [
+    {
+      href: context === 'global' ? '#phone-number' : `#phone-number-${index}`,
+      text: `This phone number already exists for this ${context === 'global' ? 'person' : 'address'}. Add a new number or edit the saved one`,
+    },
+  ]
 }
 
-export const validatePhoneNumber = (href: string, label: string, phoneNumber: string): HmppsError[] => {
-  if (phoneNumber.match(phoneNumberInvalidCharacterChecker)) {
-    return [{ text: `${label}s must only contain numbers or brackets`, href }]
-  }
-  if (phoneNumber.length > 40) {
-    return [{ text: `${label} must be 40 characters or less`, href }]
-  }
+export const normalisePhoneNumber = (phoneNumber: string = ''): string => phoneNumber.trim().replace(/[()]/g, '')
 
-  return []
-}
+export const normalisePhoneExtension = (extension: string | null = ''): string => (extension ?? '').trim()
 
-export const validateExtensionNumber = (href: string, label: string, extensionNumber: string): HmppsError[] => {
-  if (extensionNumber.match(phoneExtensionInvalidCharacterChecker)) {
-    return [{ text: `${label} must only contain numbers`, href }]
-  }
-  if (extensionNumber.length > 7) {
-    return [{ text: `${label} must be 7 characters or less`, href }]
-  }
+type ExistingPhoneNumber = { number: string; extension?: string | null }
 
-  return []
+const phoneNumberDuplicateKey = (phoneNumber: string, extension?: string | null): string =>
+  JSON.stringify([
+    normalisePhoneNumber(phoneNumber).replace(/\s/g, ''),
+    normalisePhoneExtension(extension).replace(/\s/g, ''),
+  ])
+
+export const phoneNumberForStorage = (phoneNumber: string): string => {
+  const normalisedPhoneNumber = normalisePhoneNumber(phoneNumber)
+  const elevenDigitNumber = normalisedPhoneNumber.match(/^(\+?)(\d{11})$/)
+
+  return elevenDigitNumber
+    ? `${elevenDigitNumber[1]}${elevenDigitNumber[2].slice(0, 5)} ${elevenDigitNumber[2].slice(5)}`
+    : normalisedPhoneNumber
 }

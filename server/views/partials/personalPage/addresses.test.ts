@@ -2,7 +2,6 @@ import * as cheerio from 'cheerio'
 import nunjucks from 'nunjucks'
 import { CorePersonRecordPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { formatAddressDate, formatDate } from '../../../utils/dateHelpers'
-import { formatPhoneNumber } from '../../../utils/utils'
 import { mockAddresses } from '../../../data/localMockData/addresses'
 import { AddressForDisplay } from '../../../services/interfaces/personalPageService/PersonalPage'
 import { Result } from '../../../utils/result/result'
@@ -10,7 +9,6 @@ import { Result } from '../../../utils/result/result'
 const env = nunjucks.configure(['server/views', 'node_modules/govuk-frontend/dist'], { autoescape: true })
 env.addFilter('formatAddressDate', formatAddressDate)
 env.addFilter('formatDate', formatDate)
-env.addFilter('formatPhoneNumber', formatPhoneNumber)
 
 const mockAddress = mockAddresses[0]
 const mockHomePhone = mockAddress.phones!.find(phone => phone.type === 'HOME')!
