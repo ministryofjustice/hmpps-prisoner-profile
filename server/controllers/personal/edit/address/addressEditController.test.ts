@@ -13,6 +13,7 @@ import { addressServiceMock } from '../../../../../tests/mocks/addressServiceMoc
 import { AddressRequestDto } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AddressLocation } from '../../../../services/mappers/addressMapper'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
+import config from '../../../../config'
 
 const clientToken = 'CLIENT_TOKEN'
 const { prisonerNumber } = PrisonerMockDataA
@@ -38,8 +39,10 @@ describe('Address Edit Controller', () => {
   let ephemeralDataService: EphemeralDataService
   let auditService: AuditService
   let controller: AddressEditController
+  let enabledAddressPhonePrisons: string[]
 
   beforeEach(() => {
+    enabledAddressPhonePrisons = [...config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons]
     req = {
       id: '123',
       query: {},
@@ -67,6 +70,7 @@ describe('Address Edit Controller', () => {
     next = jest.fn()
 
     addressService = addressServiceMock() as AddressService
+    addressService.createAddress = jest.fn().mockResolvedValue({ addressId: 123 })
     ephemeralDataService = ephemeralDataServiceMock() as EphemeralDataService
     auditService = auditServiceMock()
 
@@ -75,6 +79,7 @@ describe('Address Edit Controller', () => {
   })
 
   afterEach(() => {
+    config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons = enabledAddressPhonePrisons
     jest.resetAllMocks()
   })
 
@@ -446,10 +451,13 @@ describe('Address Edit Controller', () => {
           prisonUserMock,
         )
 
-        expect(req.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Address updated',
-          fieldName: 'addresses',
-        })
+        expect(req.flash).toHaveBeenCalledWith(
+          'flashMessage',
+          expect.objectContaining({
+            text: 'Address updated',
+            fieldName: 'addresses',
+          }),
+        )
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
