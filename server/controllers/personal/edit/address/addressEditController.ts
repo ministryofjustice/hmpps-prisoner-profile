@@ -85,9 +85,21 @@ export default class AddressEditController {
       const { clientToken, prisonerName, naturalPrisonerName, prisonerNumber, prisonId, miniBannerData } =
         getCommonRequestData(req, res)
       const { address: addressCacheId } = req.query
-      const addressCache = await this.ephemeralDataService.getData<{ address: AddressRequestDto; route: string }>(
-        addressCacheId as UUID,
-      )
+      const addressCache = await this.ephemeralDataService.getData<{
+        address?: AddressRequestDto
+        route?: string
+        completedAddressId?: number
+      }>(addressCacheId as UUID)
+
+      if (addressCache?.value?.completedAddressId !== undefined) {
+        await this.ephemeralDataService.removeData(addressCacheId as UUID)
+        req.flash('flashMessage', {
+          text: 'Address updated',
+          fieldName: 'addresses',
+          addressIds: [addressCache.value.completedAddressId],
+        })
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
+      }
 
       if (!addressCache?.value?.address) {
         throw new NotFoundError('Could not find cached address')
@@ -166,13 +178,6 @@ export default class AddressEditController {
           address,
           res.locals.user as PrisonUser,
         )
-        await this.ephemeralDataService.removeData(addressCacheId as UUID)
-
-        req.flash('flashMessage', {
-          text: 'Address updated',
-          fieldName: 'addresses',
-        })
-
         this.auditService
           .sendPostSuccess({
             user: res.locals.user,
@@ -187,10 +192,21 @@ export default class AddressEditController {
           req.body.submitAction === 'saveAndContinueToAddPhoneNumber' &&
           editAddressSpecificPhoneNumbersEnabled((res.locals.user as PrisonUser).activeCaseLoadId)
         ) {
+          await this.ephemeralDataService.cacheData(
+            { completedAddressId: createdAddress.addressId },
+            addressCacheId as UUID,
+          )
           return res.redirect(
-            `/prisoner/${prisonerNumber}/addresses/${createdAddress.addressId}/add-address-phone-number`,
+            `/prisoner/${prisonerNumber}/addresses/${createdAddress.addressId}/add-address-phone-number?highlightAddressId=${createdAddress.addressId}&addressCacheId=${addressCacheId}`,
           )
         }
+
+        await this.ephemeralDataService.removeData(addressCacheId as UUID)
+        req.flash('flashMessage', {
+          text: 'Address updated',
+          fieldName: 'addresses',
+          addressIds: [createdAddress.addressId],
+        })
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
       } catch {

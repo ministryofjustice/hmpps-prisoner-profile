@@ -110,7 +110,7 @@ const expectedPersonalOfficerResponse = [
 ]
 
 describe('professionalContactsService', () => {
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let prisonService: jest.MockedObject<PrisonService>
   let allocationManagerApiClient: AllocationManagerClient
   let professionalContactsClient: PrisonerProfileDeliusApiClient
@@ -118,9 +118,9 @@ describe('professionalContactsService', () => {
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getAddressesForPerson = jest.fn(async () => [mockAddress()])
-    prisonApiClient.getPersonPhones = jest.fn(async () => mockPhone)
-    prisonApiClient.getPersonEmails = jest.fn(async () => mockEmails)
+    prisonApiClient.getAddressesForPerson.mockResolvedValue([mockAddress()])
+    prisonApiClient.getPersonPhones.mockResolvedValue(mockPhone)
+    prisonApiClient.getPersonEmails.mockResolvedValue(mockEmails)
 
     prisonService = prisonServiceMock()
 
@@ -145,7 +145,7 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -192,7 +192,7 @@ describe('professionalContactsService', () => {
           mockPrisonerContact({ personId: 3, relationshipDescription: 'Prison Guard' }),
         ],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -221,7 +221,7 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
       keyWorkerApiClient.getCurrentAllocations = jest.fn(async () => Promise.reject(Error('some error!')))
 
       const service = new ProfessionalContactsService(
@@ -265,7 +265,7 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
       allocationManagerApiClient.getPomByOffenderNo = jest.fn(async () => Promise.reject(Error('some error!')))
 
       const service = new ProfessionalContactsService(
@@ -318,7 +318,7 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
       professionalContactsClient.getCommunityManager = jest.fn(async () => Promise.reject(Error('some error!')))
 
       const service = new ProfessionalContactsService(
@@ -365,8 +365,8 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getAddressesForPerson = jest.fn(async () => [mockAddress({ endDate: '2020-01-01' })])
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getAddressesForPerson.mockResolvedValue([mockAddress({ endDate: '2020-01-01' })])
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -394,11 +394,11 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getAddressesForPerson = jest.fn(async () => [
+      prisonApiClient.getAddressesForPerson.mockResolvedValue([
         mockAddress({ endDate: '2050-01-01' }),
         mockAddress({ addressId: 999 }),
       ])
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -421,7 +421,7 @@ describe('professionalContactsService', () => {
         otherContacts: [mockPrisonerContact({ relationship: 'COM' }), mockPrisonerContact({ relationship: 'POM' })],
       }
 
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -449,8 +449,8 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [mockPrisonerContact()],
       }
-      prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getAddressesForPerson.mockResolvedValue([])
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -502,7 +502,7 @@ describe('professionalContactsService', () => {
           }),
         ],
       }
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
         () => prisonApiClient,
@@ -559,7 +559,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should get the staff contact details for an adult prisoner', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockResettlementWorkerContacts)
 
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -576,7 +576,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should get the staff contact details for a youth prisoner', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetailYouthEstate)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockContactDetailYouthEstate)
       const result = await professionalContactsService.getProfessionalContactsOverview('token', {
         ...PrisonerMockDataA,
         prisonId: 'WYI',
@@ -594,7 +594,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should get the staff contact details for a prisoner with complex needs', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockContactDetail)
       keyWorkerApiClient.getCurrentAllocations = jest.fn(
         async () =>
           ({
@@ -620,7 +620,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should use new key worker endpoint to get key worker details for prisons onboard the new version of key worker service', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockResettlementWorkerContacts)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockResettlementWorkerContacts)
 
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -637,7 +637,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting keyworkers name', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockContactDetail)
       keyWorkerApiClient.getCurrentAllocations = jest.fn().mockRejectedValue('Some error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -653,7 +653,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting pom names', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockContactDetail)
       allocationManagerApiClient.getPomByOffenderNo = jest.fn().mockRejectedValue('API error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
@@ -669,7 +669,7 @@ describe('professionalContactsService', () => {
     })
 
     it('should handle error getting com name', async () => {
-      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
+      prisonApiClient.getBookingContacts.mockResolvedValue(mockContactDetail)
       professionalContactsClient.getCommunityManager = jest.fn().mockRejectedValue('API error')
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 

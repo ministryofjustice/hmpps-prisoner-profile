@@ -16,9 +16,11 @@
 
 {% block form %}
   <h1 class="govuk-heading-l">{{ formTitle }}</h1>
-  {{ govukInsetText({ html: addressHtml }) }}
+  {% if addressLines %}{{ govukInsetText({ html: addressHtml }) }}{% endif %}
   <form method="post" novalidate="novalidate" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    {% if highlightAddressId %}<input type="hidden" name="highlightAddressId" value="{{ highlightAddressId }}" />{% endif %}
+    {% if addressCacheId %}<input type="hidden" name="addressCacheId" value="{{ addressCacheId }}" />{% endif %}
     {% for phoneNumber in phoneNumbers %}
       {% if phoneNumbers.length > 1 %}
         <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ phoneNumbers.length }}</h2>
@@ -32,6 +34,7 @@
           }
         })
       %}
+        {% set phoneNumberErrors = errors | findFieldErrors("phone-number-" + phoneNumber.index) %}
         {{
           govukRadios({
             name: "phoneNumberType" + phoneNumber.index,
@@ -47,9 +50,10 @@
             name: "phoneNumber" + phoneNumber.index,
             classes: "govuk-input--width-20",
             value: phoneNumber.phoneNumber,
-            errorMessage: { text: (errors | findError("phone-number-" + phoneNumber.index)).text } if errors | findError("phone-number-" + phoneNumber.index)
+            errorMessage: { html: phoneNumberErrors | join("<br>") } if phoneNumberErrors
           })
         }}
+        {% set phoneExtensionErrors = errors | findFieldErrors("phone-extension-" + phoneNumber.index) %}
         {{
           govukInput({
             label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
@@ -57,7 +61,7 @@
             name: "phoneExtension" + phoneNumber.index,
             classes: "govuk-input--width-5",
             value: phoneNumber.phoneExtension,
-            errorMessage: { text: (errors | findError("phone-extension-" + phoneNumber.index)).text } if errors | findError("phone-extension-" + phoneNumber.index)
+            errorMessage: { html: phoneExtensionErrors | join("<br>") } if phoneExtensionErrors
           })
         }}
       {% endcall %}
@@ -68,6 +72,8 @@
             type: "submit",
             classes: "govuk-button--secondary govuk-!-margin-bottom-0",
             attributes: {
+              name: "removePhoneNumber",
+              value: phoneNumber.index,
               formaction: "?removePhoneNumber=" + phoneNumber.index,
               "data-qa": "remove-address-phone-number-" + phoneNumber.index
             }
@@ -96,13 +102,13 @@
           text: "Save and return to profile",
           type: "submit",
           preventDoubleClick: true,
-          attributes: { "data-qa": "save-address-phone-numbers" }
+          attributes: { "data-qa": saveButtonQa or "save-address-phone-numbers" }
         })
       }}
       <a
-        href="/prisoner/{{ prisonerNumber }}/personal"
+        href="{{ cancelUrl }}"
         class="govuk-link govuk-link--no-visited-state"
-        data-qa="cancel-link"
+        data-qa="{{ cancelButtonQa or 'cancel-link' }}"
         >Cancel</a
       >
     </div>

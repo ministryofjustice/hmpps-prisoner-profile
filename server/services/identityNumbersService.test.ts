@@ -17,7 +17,7 @@ jest.mock('./metrics/metricsService')
 
 describe('IdentityNumbersService', () => {
   let identityNumbersService: IdentityNumbersService
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let personIntegrationApiClient: PersonIntegrationApiClient
   let metricsService: MetricsService
   let clientToken: string
@@ -28,8 +28,8 @@ describe('IdentityNumbersService', () => {
     prisonApiClient = prisonApiClientMock()
     personIntegrationApiClient = personIntegrationApiClientMock()
 
-    prisonApiClient.getIdentifiers = jest.fn(async () => GetIdentifiersMock)
-    prisonApiClient.getIdentifier = jest.fn(async () => GetIdentifierMock)
+    prisonApiClient.getIdentifiers.mockResolvedValue(GetIdentifiersMock)
+    prisonApiClient.getIdentifier.mockResolvedValue(GetIdentifierMock)
 
     metricsService = {
       trackPersonIntegrationUpdate: jest.fn(),

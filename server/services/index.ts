@@ -75,6 +75,7 @@ export const services = () => {
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
@@ -87,6 +88,7 @@ export const services = () => {
     osPlacesApiClient,
     curiousApiToken,
     tokenStore,
+    manageUsersApiClientBuilder,
   } = dataAccess
 
   const auditService = AuditService({
@@ -116,6 +118,7 @@ export const services = () => {
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const referenceDataSourceFactory = new ReferenceDataSourceFactory(
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personCommunicationNeedsApiClientBuilder,
@@ -150,7 +153,7 @@ export const services = () => {
     keyworkerApiClientBuilder,
     prisonService,
   )
-  const beliefService = new BeliefService(prisonApiClientBuilder)
+  const beliefService = new BeliefService(prisonApiClientBuilder, personApiClientBuilder, manageUsersApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
   const osPlacesAddressService = new OsPlacesAddressService(logger, osPlacesApiClient)
@@ -216,6 +219,7 @@ export const services = () => {
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
+    personApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personalRelationshipsApiClientBuilder,
@@ -299,4 +303,4 @@ export const services = () => {
 
 export type Services = ReturnType<typeof services>
 
-export { PrisonerSearchService, CommonApiRoutes }
+export { CommonApiRoutes }

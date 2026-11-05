@@ -28,15 +28,15 @@ describe('WorkAndSkillsService', () => {
   const curiousGoalsMapperMock = toCuriousGoals as jest.MockedFunction<typeof toCuriousGoals>
 
   const prisonApiClient = prisonApiClientMock()
-  prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
-  prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
-  prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
-  prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
-  prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
-  prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
-  prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-  prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
-  prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
+  prisonApiClient.getAccountBalances.mockResolvedValue(accountBalancesMock)
+  prisonApiClient.getAssessments.mockResolvedValue(assessmentsMock)
+  prisonApiClient.getEventsScheduledForToday.mockResolvedValue(dummyScheduledEvents)
+  prisonApiClient.getInmateDetail.mockResolvedValue(inmateDetailMock)
+  prisonApiClient.getOffenderActivitiesHistory.mockResolvedValue(OffenderActivitiesMock)
+  prisonApiClient.getOffenderAttendanceHistory.mockImplementation(async () => OffenderAttendanceHistoryMock())
+  prisonApiClient.getPersonalCareNeeds.mockResolvedValue(personalCareNeedsMock)
+  prisonApiClient.getVisitBalances.mockResolvedValue(visitBalancesMock)
+  prisonApiClient.getVisitSummary.mockResolvedValue(visitSummaryMock)
 
   const curiousApiClientMock = (prisonerNumber: string = 'A1234BC') => {
     const learnerGoals = aValidLearnerGoals({

@@ -4,10 +4,13 @@ export default interface ProfileInformation {
   resultValue: string
 }
 
-export const getProfileInformationValue = (type: ProfileInformationType, array: ProfileInformation[]): string => {
+export const getProfileInformationValue = (
+  type: ProfileInformationType,
+  array: ProfileInformation[],
+): string | null => {
   const value = Array.isArray(array) && array.length ? array.find(item => item.type === type) : null
 
-  return value && value.resultValue
+  return (value && value.resultValue) ?? null
 }
 
 export enum ProfileInformationType {

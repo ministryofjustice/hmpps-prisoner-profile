@@ -1,27 +1,34 @@
-import Page, { PageElement } from './page'
+import Page from './page'
 
 export default class BeliefHistoryPage extends Page {
-  beliefHistoryList = (): PageElement => cy.get('.belief-history-list')
+  get beliefHistoryList() {
+    return cy.get('.belief-history-list').children()
+  }
 
-  activeBeliefCard = () => ({
-    card: (): PageElement => cy.get('.belief-card').eq(0),
-    description: (): PageElement => this.activeBeliefCard().card().find('h2'),
-    activeTag: (): PageElement => this.activeBeliefCard().card().find('.govuk-tag'),
-    comments: (): PageElement => this.activeBeliefCard().card().find('.belief-card__comments'),
-    startDate: (): PageElement => this.activeBeliefCard().card().find('[data-qa=belief-start-date]'),
-    endDate: (): PageElement => this.activeBeliefCard().card().find('[data-qa=belief-end-date]'),
-    addedBy: (): PageElement => this.activeBeliefCard().card().find('[data-qa=belief-added-by]'),
-    updatedBy: (): PageElement => this.activeBeliefCard().card().find('[data-qa=belief-updated-by]'),
-  })
-
-  previousBeliefCard = () => ({
-    card: (): PageElement => cy.get('.belief-card').eq(1),
-    description: (): PageElement => this.previousBeliefCard().card().find('h2'),
-    activeTag: (): PageElement => this.previousBeliefCard().card().find('.govuk-tag'),
-    comments: (): PageElement => this.previousBeliefCard().card().find('.belief-card__comments'),
-    startDate: (): PageElement => this.previousBeliefCard().card().find('[data-qa=belief-start-date]'),
-    endDate: (): PageElement => this.previousBeliefCard().card().find('[data-qa=belief-end-date]'),
-    addedBy: (): PageElement => this.previousBeliefCard().card().find('[data-qa=belief-added-by]'),
-    updatedBy: (): PageElement => this.previousBeliefCard().card().find('[data-qa=belief-updated-by]'),
-  })
+  getBeliefCard(index: number) {
+    const getCard = () => cy.get('.belief-card').eq(index)
+    return {
+      get description() {
+        return getCard().find('h2')
+      },
+      get activeTag() {
+        return getCard().find('.govuk-tag')
+      },
+      get comments() {
+        return getCard().find('.belief-card__comments')
+      },
+      get startDate() {
+        return getCard().find('[data-qa=belief-start-date]')
+      },
+      get endDate() {
+        return getCard().find('[data-qa=belief-end-date]')
+      },
+      get created() {
+        return getCard().find('[data-qa=belief-added-by]')
+      },
+      get modified() {
+        return getCard().find('[data-qa=belief-updated-by]')
+      },
+    }
+  }
 }

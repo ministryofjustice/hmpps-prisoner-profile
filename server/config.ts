@@ -364,6 +364,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_PROPERTY_API_TIMEOUT_DEADLINE', 3000))),
     },
+    manageUsersApi: {
+      url: get('MANAGE_USERS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -436,6 +444,10 @@ export default {
     editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
+
+    usePersonApi: {
+      religion: toBoolean(get('USE_PERSON_API_FOR_RELIGION', 'false')),
+    },
 
     personDuplicateRecords: {
       enabledPrisons: get('PERSON_DUPLICATE_RECORDS_ENABLED_PRISONS', []) as string[],

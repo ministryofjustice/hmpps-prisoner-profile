@@ -13,6 +13,7 @@ import {
   convertToTitleCase,
   extractLocation,
   findError,
+  findFieldErrors,
   formatCategoryALabel,
   formatCategoryCodeDescription,
   formatCommunityManager,
@@ -428,6 +429,22 @@ describe('utils', () => {
       const errors: HmppsError[] = null
       const error = findError(errors, 'myError')
       expect(error).toBeNull()
+    })
+  })
+
+  describe('findFieldErrors', () => {
+    it('returns all messages for a form field', () => {
+      const errors: HmppsError[] = [
+        { text: 'First error', href: '#phone-number' },
+        { text: 'Other field error', href: '#phone-extension' },
+        { text: 'Second error', href: '#phone-number' },
+      ]
+
+      expect(findFieldErrors(errors, 'phone-number')).toEqual(['First error', 'Second error'])
+    })
+
+    it('returns null when a form field has no errors', () => {
+      expect(findFieldErrors([], 'phone-number')).toBeNull()
     })
   })
 

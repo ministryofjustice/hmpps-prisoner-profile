@@ -4,14 +4,13 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { mockCellHistoryItem1, mockOffenderCellHistory } from '../data/localMockData/offenderCellHistoryMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
-import OffenderCellHistory, { OffenderCellHistoryItem } from '../data/interfaces/prisonApi/OffenderCellHistoryInterface'
+import { OffenderCellHistoryItem } from '../data/interfaces/prisonApi/OffenderCellHistoryInterface'
 import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapacityMock'
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
 import LocationDetails from './interfaces/locationDetailsService/LocationDetails'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import Reception from '../data/interfaces/prisonApi/Reception'
 import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
 import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
 import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
@@ -19,7 +18,7 @@ import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsI
 
 describe('prisonerLocationDetailsService', () => {
   let service: LocationDetailsService
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let nomisSyncPrisonerMappingApiClient: NomisSyncPrisonerMappingApiClient
   let locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient
 
@@ -34,8 +33,8 @@ describe('prisonerLocationDetailsService', () => {
       () => locationsInsidePrisonApiClient,
     )
 
-    prisonApiClient.getStaffDetails = jest.fn(async (username: string) => generateStaffDetails(username))
-    prisonApiClient.getAgencyDetails = jest.fn(async (agencyId: string) => generateAgencyDetails(agencyId))
+    prisonApiClient.getStaffDetails.mockImplementation(async (username: string) => generateStaffDetails(username))
+    prisonApiClient.getAgencyDetails.mockImplementation(async (agencyId: string) => generateAgencyDetails(agencyId))
   })
 
   afterEach(() => {
@@ -115,31 +114,31 @@ describe('prisonerLocationDetailsService', () => {
 
   describe('getInmatesAtLocation', () => {
     it('returns data about inmates sharing a location', async () => {
-      prisonApiClient.getInmatesAtLocation = jest.fn(async () => [mockInmateAtLocation])
+      prisonApiClient.getInmatesAtLocation.mockResolvedValue([mockInmateAtLocation])
       await expect(service.getInmatesAtLocation('', 123)).resolves.toEqual([mockInmateAtLocation])
     })
   })
 
   describe('isReceptionFull', () => {
     it('returns true when no receptions with capacity', async () => {
-      prisonApiClient.getReceptionsWithCapacity = jest.fn(async (): Promise<Reception[]> => [])
+      prisonApiClient.getReceptionsWithCapacity.mockResolvedValue([])
       await expect(service.isReceptionFull('', 'LEI')).resolves.toEqual(true)
     })
 
     it('returns false when there are receptions with capacity', async () => {
-      prisonApiClient.getReceptionsWithCapacity = jest.fn(async () => ReceptionsWithCapacityMock)
+      prisonApiClient.getReceptionsWithCapacity.mockResolvedValue(ReceptionsWithCapacityMock)
       await expect(service.isReceptionFull('', 'LEI')).resolves.toEqual(false)
     })
   })
 
   describe('getLocationDetailsByLatestFirst', () => {
     it('handles empty list of cell history', async () => {
-      prisonApiClient.getOffenderCellHistory = jest.fn(async (): Promise<OffenderCellHistory> => ({ content: [] }))
+      prisonApiClient.getOffenderCellHistory.mockResolvedValue({ content: [] })
       await expect(service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)).resolves.toEqual([])
     })
 
     it('returns location details in order of latest first', async () => {
-      prisonApiClient.getOffenderCellHistory = jest.fn(async () =>
+      prisonApiClient.getOffenderCellHistory.mockResolvedValue(
         mockOffenderCellHistory([
           generateCellHistory({ order: 1, agency: 1, livingUnitId: 1, movementMadeByUsername: 'USER_1' }),
           generateCellHistory({ order: 2, agency: 2, livingUnitId: 1, movementMadeByUsername: 'USER_2' }),
@@ -164,7 +163,7 @@ describe('prisonerLocationDetailsService', () => {
       ])(
         'Given %s (%s) return formatted as "%s"',
         async (_: string, description: string, formattedLocationDescription: string) => {
-          prisonApiClient.getOffenderCellHistory = jest.fn(async () => mockOffenderCellHistory([{ description }]))
+          prisonApiClient.getOffenderCellHistory.mockResolvedValue(mockOffenderCellHistory([{ description }]))
           const locationDetails = await service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)
           expect(locationDetails[0].location).toEqual(formattedLocationDescription)
         },
@@ -181,7 +180,7 @@ describe('prisonerLocationDetailsService', () => {
       ])(
         'Given %s (%s) return isTemporaryLocation "%s"',
         async (_: string, description: string, isTemporaryLocation: boolean) => {
-          prisonApiClient.getOffenderCellHistory = jest.fn(async () => mockOffenderCellHistory([{ description }]))
+          prisonApiClient.getOffenderCellHistory.mockResolvedValue(mockOffenderCellHistory([{ description }]))
           const locationDetails = await service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)
           expect(locationDetails[0].isTemporaryLocation).toEqual(isTemporaryLocation)
         },

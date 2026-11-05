@@ -1,26 +1,55 @@
 import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
-import { PersonRecord } from '../../server/data/personApiClient'
+import type { PersonRecord, UpdateReligionRequest } from '../../server/data/interfaces/personApi'
+import {
+  mockPersonRecord,
+  mockPersonRecordWithReligionHistory,
+} from '../../server/data/localMockData/personApi/personRecordMock'
+import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
 
-  stubPersonApiGetRecord: ({
+  stubPersonApiGetReligionCodes: ({ activeOnly = false }: { activeOnly?: boolean } = {}) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: '/personRecord/person/reference-data/religion-codes',
+        queryParameters: { active: { equalTo: activeOnly.toString() } },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: personApiReligionCodesMock,
+      },
+    }),
+
+  stubPersonApiGetRecord({
     prisonerNumber,
-    prisonNumbers = [],
+    prisonNumbers,
+    personRecord,
+    withReligionHistory = false,
   }: {
     prisonerNumber: string
     prisonNumbers?: string[]
-  }) =>
-    stubGetWithBody({
-      path: `/personRecord/person/prison/${prisonerNumber}`,
+    personRecord: PersonRecord
+    withReligionHistory?: boolean
+  }) {
+    const record = personRecord ?? (withReligionHistory ? mockPersonRecordWithReligionHistory : mockPersonRecord)
+    return stubGetWithBody({
+      path: withReligionHistory
+        ? `/personRecord/person/prison/dps/${prisonerNumber}`
+        : `/personRecord/person/prison/${prisonerNumber}`,
       body: {
+        ...record,
         identifiers: {
-          prisonNumbers,
+          ...record.identifiers,
+          prisonNumbers: prisonNumbers ?? [prisonerNumber],
         },
-      } as PersonRecord,
-    }),
+      },
+    })
+  },
 
   stubPersonApiGetRecordNotFound: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubFor({
@@ -41,6 +70,27 @@ export default {
       },
       response: {
         status: 500,
+      },
+    }),
+
+  stubPersonApiUpdateReligion: ({
+    prisonerNumber,
+    request,
+  }: {
+    prisonerNumber: string
+    request: UpdateReligionRequest
+  }) =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/personRecord/person/prison/${prisonerNumber}/religion`,
+        bodyPatterns: [{ equalToJson: request }],
+      },
+      response: {
+        status: 204,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
       },
     }),
 }

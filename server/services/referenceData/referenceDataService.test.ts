@@ -16,16 +16,9 @@ describe('referenceDataService', () => {
   const domain = CorePersonRecordReferenceDataDomain.country
   const code = 'ENG'
   const systemToken = 'a-system-token'
-  const referenceDataStore = new ReferenceDataStore(null) as jest.Mocked<ReferenceDataStore>
-  const referenceDataSourceFactory = new ReferenceDataSourceFactory(
-    null,
-    null,
-    null,
-    null,
-  ) as jest.Mocked<ReferenceDataSourceFactory>
-  const referenceDataSource = new PersonIntegrationApiReferenceDataSource(
-    null,
-  ) as jest.Mocked<PersonIntegrationApiReferenceDataSource>
+  const referenceDataStore = jest.mocked(new ReferenceDataStore(null))
+  const referenceDataSourceFactory = jest.mocked(new ReferenceDataSourceFactory(null, null, null, null, null))
+  const referenceDataSource = jest.mocked(new PersonIntegrationApiReferenceDataSource(null))
 
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
 
