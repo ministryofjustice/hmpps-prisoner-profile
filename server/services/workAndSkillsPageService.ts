@@ -1,6 +1,6 @@
 import { format, startOfToday, sub } from 'date-fns'
-import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { ActivitiesApiClient } from '../data/interfaces/activitiesApi/activitiesApiClient'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 
 import OffenderActivitiesHistory from '../data/interfaces/prisonApi/OffenderActivitiesHistory'
@@ -41,6 +41,7 @@ export default class WorkAndSkillsPageService {
   constructor(
     private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly activitiesApiClientBuilder: RestClientBuilder<ActivitiesApiClient>,
     private readonly personalLearningPlanService: PersonalLearningPlanService,
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
@@ -53,6 +54,7 @@ export default class WorkAndSkillsPageService {
     const curiousApiToken = await this.curiousApiTokenBuilder()
     const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
     const prisonApiClient = this.prisonApiClientBuilder(token)
+    const activitiesApiClient = this.activitiesApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
     const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
 
@@ -66,7 +68,7 @@ export default class WorkAndSkillsPageService {
       this.getLwpEmployabilitySkills(prisonerNumber, token, apiErrorCallback),
       this.getCuriousGoals(prisonerNumber, curiousApiClient, apiErrorCallback),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
-      this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
+      this.getUnacceptableAbsences(prisonerNumber, activitiesApiClient),
       this.getPersonalLearningPlanActionPlan(prisonerNumber, token),
     ])
 
@@ -80,34 +82,23 @@ export default class WorkAndSkillsPageService {
     }
   }
 
-  private async getOffenderAttendanceHistoryStats(
+  private async getUnacceptableAbsences(
     prisonerNumber: string,
-    prisonApiClient: PrisonApiClient,
+    activitiesApiClient: ActivitiesApiClient,
   ): Promise<UnacceptableAttendanceData> {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     const oneMonthAgo = format(sub(startOfToday(), { months: 1 }), 'yyyy-MM-dd')
-    const offenderAttendanceHistory = await prisonApiClient.getOffenderAttendanceHistory(
-      prisonerNumber,
-      sixMonthsAgo,
-      todaysDate,
-    )
 
-    let unacceptableAbsenceLastSixMonths = 0
-    let unacceptableAbsenceLastMonth = 0
+    const [lastSixMonths, lastMonth] = await Promise.all([
+      activitiesApiClient.getAttendanceSummary(prisonerNumber, sixMonthsAgo, todaysDate),
+      activitiesApiClient.getAttendanceSummary(prisonerNumber, oneMonthAgo, todaysDate),
+    ])
 
-    if (offenderAttendanceHistory !== undefined && offenderAttendanceHistory.content.length) {
-      offenderAttendanceHistory.content.forEach(absence => {
-        if (absence.outcome !== undefined && absence.outcome === AbsenceOutcomeCodes.UNACAB) {
-          unacceptableAbsenceLastSixMonths += 1
-          if (absence.eventDate > oneMonthAgo) {
-            unacceptableAbsenceLastMonth += 1
-          }
-        }
-      })
+    return {
+      unacceptableAbsenceLastSixMonths: lastSixMonths?.unacceptableAbsence ?? 0,
+      unacceptableAbsenceLastMonth: lastMonth?.unacceptableAbsence ?? 0,
     }
-
-    return { unacceptableAbsenceLastSixMonths, unacceptableAbsenceLastMonth }
   }
 
   private async getOffenderActivitiesHistory(
