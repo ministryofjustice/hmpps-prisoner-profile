@@ -22,14 +22,14 @@ context('Change phone number', () => {
     editUrl: `prisoner/${prisonerNumber}/personal/add-phone-number`,
     validInputs: [
       { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '1234321', phoneExtension: '123' } },
-      { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123) 123 123', phoneExtension: '123' } },
-      { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123) 123 123' } },
+      { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123)123123', phoneExtension: '123' } },
+      { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: '(123)123123' } },
     ],
     invalidInputs: [
       {
         testDescription: 'No phone number type',
         input: {},
-        errorMessages: ['Select a phone number type'],
+        errorMessages: ['Select a phone number type', 'Enter a phone number'],
       },
       {
         testDescription: 'Empty phone number',
@@ -44,12 +44,27 @@ context('Change phone number', () => {
       {
         testDescription: 'Invalid phone number',
         input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: `123 abc 123` } },
-        errorMessages: ['Phone numbers must only contain numbers or brackets'],
+        errorMessages: [
+          'Phone numbers must only contain numbers or brackets, or a plus sign (+) at the start of the number',
+        ],
+      },
+      {
+        testDescription: 'Phone number exceeds the limit and contains invalid characters',
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneNumber: `${'1'.repeat(40)}a` } },
+        errorMessages: [
+          'Phone number must be 40 characters or less',
+          'Phone numbers must only contain numbers or brackets, or a plus sign (+) at the start of the number',
+        ],
       },
       {
         testDescription: 'Phone extension too long',
         input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneExtension: `${'1'.repeat(7)}1` } },
         errorMessages: ['Extension must be 7 characters or less'],
+      },
+      {
+        testDescription: 'Phone extension exceeds the limit and contains invalid characters',
+        input: { radioInputs: { phoneNumberType: 'HOME' }, textInputs: { phoneExtension: `${'a'.repeat(7)}a` } },
+        errorMessages: ['Extension must only contain numbers', 'Extension must be 7 characters or less'],
       },
       {
         testDescription: 'Duplicate phone number',

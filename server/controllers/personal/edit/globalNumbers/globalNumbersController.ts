@@ -10,6 +10,11 @@ import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces
 import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
 import type { RadioOption } from '../../../../interfaces/GovOptions'
 import { EditControllerRequestHandlers } from '../../../interfaces/EditControllerRequestHandlers'
+import {
+  normalisePhoneExtension,
+  phoneNumberForStorage,
+  validatePhoneNumberDuplicate,
+} from '../../../../validators/personal/phoneNumberValidator'
 
 export default class GlobalNumbersController extends PersonalEditController {
   constructor(
@@ -95,21 +100,20 @@ export default class GlobalNumbersController extends PersonalEditController {
         submit: async (req, res) => {
           const { clientToken, prisonerNumber, naturalPrisonerName } = getCommonRequestData(req, res)
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const storedPhoneNumber = phoneNumberForStorage(phoneNumber)
+          const storedPhoneExtension = normalisePhoneExtension(phoneExtension)
           const fieldData = addPhoneNumberFieldData(naturalPrisonerName)
 
           const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
-          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
-          const isDuplicate = phones.some(
-            phone => phone.number.replace(/\D/g, '') === sanitisedNumber && (phone.extension ?? '') === phoneExtension,
+          const duplicateErrors = validatePhoneNumberDuplicate(
+            storedPhoneNumber,
+            storedPhoneExtension,
+            phones,
+            'global',
           )
 
-          if (isDuplicate) {
-            req.flash('errors', [
-              {
-                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
-                href: '#phone-number',
-              },
-            ])
+          if (duplicateErrors.length) {
+            req.flash('errors', duplicateErrors)
             req.flash('requestBody', JSON.stringify(req.body))
             return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
           }
@@ -124,9 +128,9 @@ export default class GlobalNumbersController extends PersonalEditController {
                 res.locals.user as PrisonUser,
                 prisonerNumber,
                 {
-                  phoneNumber,
+                  phoneNumber: storedPhoneNumber,
                   phoneNumberType,
-                  phoneExtension,
+                  phoneExtension: storedPhoneExtension,
                 },
               )
             },
@@ -134,7 +138,7 @@ export default class GlobalNumbersController extends PersonalEditController {
             auditDetails: {
               fieldName: fieldData.fieldName,
               previous: {},
-              updated: { phoneNumber, phoneNumberType, phoneExtension },
+              updated: { phoneNumber: storedPhoneNumber, phoneNumberType, phoneExtension: storedPhoneExtension },
             },
             options: { onSubmit: onAdditionSubmit },
           })
@@ -191,25 +195,21 @@ export default class GlobalNumbersController extends PersonalEditController {
           const { phoneNumberId } = req.params
           const { clientToken, prisonerNumber, naturalPrisonerName } = getCommonRequestData(req, res)
           const { phoneNumber, phoneNumberType, phoneExtension } = req.body
+          const storedPhoneNumber = phoneNumberForStorage(phoneNumber)
+          const storedPhoneExtension = normalisePhoneExtension(phoneExtension)
           const fieldData = changePhoneNumberFieldData(phoneNumberId, naturalPrisonerName)
           const { phones } = await this.personalPageService.getGlobalPhonesAndEmails(clientToken, prisonerNumber)
           const previousValue = phones.find(phone => phone.id.toString() === phoneNumberId)
 
-          const sanitisedNumber = phoneNumber.replace(/\D/g, '')
-          const isDuplicate = phones
-            .filter(phone => phone.id.toString() !== phoneNumberId)
-            .some(
-              phone =>
-                phone.number.replace(/\D/g, '') === sanitisedNumber && (phone.extension ?? '') === phoneExtension,
-            )
+          const duplicateErrors = validatePhoneNumberDuplicate(
+            storedPhoneNumber,
+            storedPhoneExtension,
+            phones.filter(phone => phone.id.toString() !== phoneNumberId),
+            'global',
+          )
 
-          if (isDuplicate) {
-            req.flash('errors', [
-              {
-                text: 'This phone number already exists for this person. Add a new number or edit the saved one',
-                href: '#phone-number',
-              },
-            ])
+          if (duplicateErrors.length) {
+            req.flash('errors', duplicateErrors)
             req.flash('requestBody', JSON.stringify(req.body))
             return res.redirect(`/prisoner/${prisonerNumber}/personal/${fieldData.url}`)
           }
@@ -225,9 +225,9 @@ export default class GlobalNumbersController extends PersonalEditController {
                 prisonerNumber,
                 phoneNumberId,
                 {
-                  phoneNumber,
+                  phoneNumber: storedPhoneNumber,
                   phoneNumberType,
-                  phoneExtension,
+                  phoneExtension: storedPhoneExtension,
                 },
               )
             },
@@ -239,7 +239,7 @@ export default class GlobalNumbersController extends PersonalEditController {
                 phoneNumberType: previousValue.type,
                 phoneExtension: previousValue.extension,
               },
-              updated: { phoneNumber, phoneNumberType, phoneExtension },
+              updated: { phoneNumber: storedPhoneNumber, phoneNumberType, phoneExtension: storedPhoneExtension },
             },
           })
         },

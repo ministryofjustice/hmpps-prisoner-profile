@@ -1,11 +1,16 @@
 import { RequestHandler } from 'express'
 import AddressService from '../services/addressService'
 import { AuditService, Page, PostAction } from '../services/auditService'
-import { addressToLines } from '../utils/utils'
+import { addressPhoneNumberFormValues, addressToLines } from '../utils/utils'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import NotFoundError from '../utils/notFoundError'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import logger from '../../logger'
+import {
+  normalisePhoneExtension,
+  phoneNumberForStorage,
+  validatePhoneNumberDuplicate,
+} from '../validators/personal/phoneNumberValidator'
 
 const phoneNumberTypes = [
   { text: 'Mobile', value: 'MOB' },
@@ -16,21 +21,6 @@ const phoneNumberTypes = [
   { text: 'Agency visit line', value: 'VISIT' },
   { text: 'Fax', value: 'FAX' },
 ]
-
-const addressPhoneNumberFormValues = (body: Record<string, unknown>) => {
-  const value = (key: string): string => (typeof body[key] === 'string' ? body[key] : '')
-  const indexes = Object.keys(body)
-    .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
-    .filter((index): index is string => index !== undefined)
-    .map(Number)
-  const lastIndex = Math.max(0, ...indexes)
-
-  return Array.from({ length: lastIndex + 1 }, (_, index) => ({
-    phoneNumberType: value(`phoneNumberType${index}`),
-    phoneNumber: value(`phoneNumber${index}`),
-    phoneExtension: value(`phoneExtension${index}`),
-  }))
-}
 
 export default class AddressPhoneNumberController {
   constructor(
@@ -64,6 +54,7 @@ export default class AddressPhoneNumberController {
         : {}
       const phoneNumbers = addressPhoneNumberFormValues(formValues ?? initialFormValues)
       const errors = req.flash('errors')
+      const addressCacheId = formValues?.addressCacheId ?? req.query?.addressCacheId
 
       await this.auditService.sendPageView({
         user: res.locals.user,
@@ -99,8 +90,28 @@ export default class AddressPhoneNumberController {
         isChanging,
         errors,
         prisonerNumber,
+        highlightAddressId: formValues?.highlightAddressId ?? req.query?.highlightAddressId,
+        addressCacheId,
+        cancelUrl: addressCacheId
+          ? `/prisoner/${prisonerNumber}/addresses/${addressId}/cancel-add-address-phone-number?addressCacheId=${addressCacheId}`
+          : `/prisoner/${prisonerNumber}/personal#addresses`,
         miniBannerData,
       })
+    }
+  }
+
+  public cancel(): RequestHandler {
+    return (req, res) => {
+      const { prisonerNumber } = getCommonRequestData(req, res)
+      const addressId = Number(req.params.addressId)
+
+      req.flash('flashMessage', {
+        text: 'Address updated',
+        fieldName: 'addresses',
+        addressIds: [addressId],
+      })
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
     }
   }
 
@@ -123,9 +134,19 @@ export default class AddressPhoneNumberController {
               [`phoneExtension${index}`, phoneNumber.phoneExtension] as const,
             ]),
         )
+        if (req.body.highlightAddressId) requestBody.highlightAddressId = req.body.highlightAddressId
+        if (req.body.addressCacheId) requestBody.addressCacheId = req.body.addressCacheId
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(addAddressPhoneNumberUrl)
+        return res.redirect(`${addAddressPhoneNumberUrl}#phone-number-section-${Math.max(removedIndex - 1, 0)}`)
       }
+
+      const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
+        ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
+          phoneNumber: phoneNumberForStorage(phoneNumber),
+          phoneNumberType,
+          extension: normalisePhoneExtension(phoneExtension) || undefined,
+        }),
+      )
 
       if (!isChanging && req.query.addAnother === 'true') {
         const requestBody = { ...req.body }
@@ -134,18 +155,34 @@ export default class AddressPhoneNumberController {
         requestBody[`phoneNumber${nextIndex}`] = ''
         requestBody[`phoneExtension${nextIndex}`] = ''
         req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(addAddressPhoneNumberUrl)
+        return res.redirect(`${addAddressPhoneNumberUrl}#phone-number-section-${nextIndex}`)
       }
 
-      const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
-        ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
-          phoneNumber,
-          phoneNumberType,
-          extension: phoneExtension || undefined,
-        }),
-      )
-
       try {
+        const address = (await this.addressService.getAddressesFromPrisonAPI(clientToken, prisonerNumber))?.find(
+          candidate => candidate.addressId === addressId,
+        )
+        const existingNumbers = (address?.phones ?? [])
+          .filter(phone => !isChanging || phone.phoneId !== Number(req.params.phoneId))
+          .map(phone => ({ number: phone.number, extension: phone.ext }))
+        const duplicateErrors = phoneNumberRequests.flatMap((phone, index) => {
+          const errors = validatePhoneNumberDuplicate(
+            phone.phoneNumber,
+            phone.extension,
+            existingNumbers,
+            'address',
+            index,
+          )
+          if (!errors.length) existingNumbers.push({ number: phone.phoneNumber, extension: phone.extension })
+          return errors
+        })
+
+        if (duplicateErrors.length) {
+          req.flash('errors', duplicateErrors)
+          req.flash('requestBody', JSON.stringify(req.body))
+          return res.redirect(isChanging ? req.originalUrl : addAddressPhoneNumberUrl)
+        }
+
         const savedPhoneNumbers = isChanging
           ? [
               await this.addressService.updateAddressPhoneNumber(
@@ -165,6 +202,10 @@ export default class AddressPhoneNumberController {
         req.flash('flashMessage', {
           text: 'Address phone number updated',
           fieldName: 'addressPhoneNumbers',
+          addressIds:
+            req.body?.highlightAddressId || req.query?.highlightAddressId
+              ? [Number(req.body?.highlightAddressId || req.query?.highlightAddressId)]
+              : [],
           phoneIds: isChanging
             ? [Number(req.params.phoneId)]
             : savedPhoneNumbers.map(phoneNumber => phoneNumber.phoneId).filter(Boolean),

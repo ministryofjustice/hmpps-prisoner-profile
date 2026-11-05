@@ -26,7 +26,8 @@
         errorMessage: { text: (errors | findError("phone-number-type")).text } if errors | findError("phone-number-type")
       }) }}
     </div>
-    <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number") }}">
+    {% set phoneNumberErrors = errors | findFieldErrors("phone-number") %}
+    <div class="govuk-form-group {{ " govuk-form-group--error" if phoneNumberErrors }}">
       {{ govukInput({
         label: {
           text: "Phone number",
@@ -36,10 +37,11 @@
         name: "phoneNumber",
         classes: "govuk-input--width-20",
         value: phoneNumber,
-        errorMessage: { text: (errors | findError("phone-number")).text } if errors | findError("phone-number")
+        errorMessage: { html: phoneNumberErrors | join("<br>") } if phoneNumberErrors
       }) }}
     </div>
-    <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-extension") }}">
+    {% set phoneExtensionErrors = errors | findFieldErrors("phone-extension") %}
+    <div class="govuk-form-group {{ " govuk-form-group--error" if phoneExtensionErrors }}">
       {{ govukInput({
         label: {
           text: "Extension (optional)",
@@ -49,7 +51,7 @@
         name: "phoneExtension",
         classes: "govuk-input--width-5",
         value: phoneExtension,
-        errorMessage: { text: (errors | findError("phone-extension")).text } if errors | findError("phone-extension")
+        errorMessage: { html: phoneExtensionErrors | join("<br>") } if phoneExtensionErrors
       }) }}
     </div>
     {% endcall %}

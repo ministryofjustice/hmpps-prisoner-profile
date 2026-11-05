@@ -31,8 +31,6 @@ context('Primary or Postal Address Page', () => {
   }
 
   before(() => {
-    cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
-
     cy.refreshReferenceData(PersonalRelationshipsReferenceDataDomain.City)
     cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.county)
     cy.refreshReferenceData(CorePersonRecordReferenceDataDomain.country)
@@ -51,6 +49,7 @@ context('Primary or Postal Address Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
+    cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
     cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
@@ -128,21 +127,17 @@ context('Primary or Postal Address Page', () => {
       cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
       cy.location('hash').should('eq', `#addresses`)
       page.flashMessage().should('include.text', 'Address updated')
-
-      // ...and put the entry back again for other tests
-      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
     })
 
     it('can save an address and add and remove phone numbers', () => {
       const { addressId } = mockAddresses[0]
-      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
       cy.task('stubCreateAddress', { prisonerNumber, response: { addressId } })
       cy.task('stubAddAddressPhoneNumbers', {
         prisonerNumber,
         addressId,
         requestBody: [
-          { phoneNumber: '01234567890', phoneNumberType: 'MOB' },
-          { phoneNumber: '07853544216', phoneNumberType: 'MOB' },
+          { phoneNumber: '01234 567890', phoneNumberType: 'MOB' },
+          { phoneNumber: '07853 544216', phoneNumberType: 'MOB' },
         ],
       })
 
@@ -153,7 +148,6 @@ context('Primary or Postal Address Page', () => {
         'eq',
         `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`,
       )
-      cy.get('.hmpps-flash-message').should('contain.text', 'Address updated')
       cy.get('.govuk-inset-text').should('contain.text', 'Leeds')
       cy.get('.govuk-heading-m').should('not.exist')
       cy.get('[data-qa^="remove-address-phone-number-"]').should('not.exist')
@@ -185,7 +179,6 @@ context('Primary or Postal Address Page', () => {
 
       cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/personal`)
       cy.get('.hmpps-flash-message').should('contain.text', 'Address phone number updated')
-      cy.seedRedisEntry({ key: addressKey, value: { address, route: 'find-uk-address' } })
     })
   })
 
@@ -193,7 +186,8 @@ context('Primary or Postal Address Page', () => {
     it('prefills and saves a phone number', () => {
       const { addressId } = mockAddresses[0]
       const phoneId = 1324254
-      const requestBody = { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '321' }
+      const requestBody = { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '321' }
+      const phoneNumberInput = '02012345678'
 
       cy.task('stubUpdateAddressPhoneNumber', { prisonerNumber, addressId, phoneId, requestBody })
       cy.signIn({
@@ -207,7 +201,7 @@ context('Primary or Postal Address Page', () => {
       cy.getDataQa('add-another-phone-number').should('not.exist')
       cy.get('input[name="phoneNumberType0"][value="HOME"]').check()
       cy.get('input[name="phoneNumber0"]').clear()
-      cy.get('input[name="phoneNumber0"]').type(requestBody.phoneNumber)
+      cy.get('input[name="phoneNumber0"]').type(phoneNumberInput)
       cy.get('input[name="phoneExtension0"]').type(requestBody.extension)
       cy.getDataQa('save-address-phone-numbers').click()
 
