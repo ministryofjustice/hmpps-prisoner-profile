@@ -333,7 +333,7 @@ describe('AddressPhoneNumberController', () => {
     const addressService = addressServiceMock() as AddressService
     addressService.updateAddressPhoneNumber = jest
       .fn()
-      .mockResolvedValue({ phoneId: 1324254, number: '02012345678', type: 'HOME', ext: '321' })
+      .mockResolvedValue({ phoneId: 1324254, number: '02012345678', type: 'HOME', ext: '123' })
     const auditService = auditServiceMock()
     const controller = new AddressPhoneNumberController(addressService, auditService)
     const req = {
@@ -361,7 +361,7 @@ describe('AddressPhoneNumberController', () => {
       PrisonerMockDataA.prisonerNumber,
       5622837,
       1324254,
-      { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '321' },
+      { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '123' },
     )
     expect(req.flash).toHaveBeenCalledWith(
       'flashMessage',
@@ -379,7 +379,7 @@ describe('AddressPhoneNumberController', () => {
       details: {
         addressId: 5622837,
         phoneId: 1324254,
-        phoneNumber: { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '321' },
+        phoneNumber: { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '123' },
       },
     })
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
