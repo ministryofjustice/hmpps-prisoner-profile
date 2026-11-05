@@ -14,9 +14,9 @@
         <div class="hmpps-global-numbers-and-emails__phone">
           <div class="hmpps-global-numbers-and-emails__phone__details">
             <p class="govuk-!-margin-0 govuk-!-font-weight-bold">{{ phone.typeDescription }}</p>
-            <p class="govuk-!-margin-0">{{ phone.number | formatPhoneNumber }}</p>
+            <p class="govuk-!-margin-0" data-qa="phone-number-value">{{ phone.number }}</p>
             {% if phone.extension %}
-              <p class="govuk-!-margin-0"><span aria-label="Extension">Ext</span>: {{ phone.extension }}</p>
+              <p class="govuk-!-margin-0" data-qa="phone-extension-value"><span aria-label="Extension">Ext</span>: {{ phone.extension }}</p>
             {% endif %}
           </div>
           {% if isGranted(CorePersonRecordPermission.edit_phone_numbers, prisonerPermissions) %}

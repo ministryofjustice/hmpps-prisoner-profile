@@ -47,8 +47,8 @@ describe('AddressPhoneNumberController', () => {
       PrisonerMockDataA.prisonerNumber,
       5622837,
       [
-        { phoneNumber: '01234567890', phoneNumberType: 'MOB', extension: '123' },
-        { phoneNumber: '01234567891', phoneNumberType: 'HOME', extension: undefined },
+        { phoneNumber: '01234 567890', phoneNumberType: 'MOB', extension: '123' },
+        { phoneNumber: '01234 567891', phoneNumberType: 'HOME', extension: undefined },
       ],
     )
     expect(req.flash).toHaveBeenCalledWith(
@@ -60,6 +60,187 @@ describe('AddressPhoneNumberController', () => {
       }),
     )
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
+  })
+
+  it('normalises an 11-digit number before saving', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.getAddressesFromPrisonAPI = jest.fn().mockResolvedValue([])
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: {},
+      body: { phoneNumberType0: 'MOB', phoneNumber0: ' (01234)567890 ', phoneExtension0: '' },
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      locals: { user: prisonUserMock, prisonerNumber: PrisonerMockDataA.prisonerNumber },
+      redirect: jest.fn(),
+    } as unknown as Response
+
+    await controller.submit()(req, res, jest.fn())
+
+    expect(addressService.addAddressPhoneNumbers).toHaveBeenCalledWith(
+      'CLIENT_TOKEN',
+      PrisonerMockDataA.prisonerNumber,
+      5622837,
+      [{ phoneNumber: '01234 567890', phoneNumberType: 'MOB', extension: undefined }],
+    )
+  })
+
+  it('rejects a duplicate address phone number after normalising it', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.getAddressesFromPrisonAPI = jest
+      .fn()
+      .mockResolvedValue([{ addressId: 5622837, phones: [{ phoneId: 456, number: '01234 567890' }] }])
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: {},
+      body: { phoneNumberType0: 'MOB', phoneNumber0: '(01234)567890', phoneExtension0: '' },
+      originalUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/add-address-phone-number`,
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      locals: { user: prisonUserMock, prisonerNumber: PrisonerMockDataA.prisonerNumber },
+      redirect: jest.fn(),
+    } as unknown as Response
+
+    await controller.submit()(req, res, jest.fn())
+
+    expect(addressService.addAddressPhoneNumbers).not.toHaveBeenCalled()
+    expect(req.flash).toHaveBeenCalledWith('errors', [
+      {
+        href: '#phone-number-0',
+        text: 'This phone number already exists for this address. Add a new number or edit the saved one',
+      },
+    ])
+    expect(res.redirect).toHaveBeenCalledWith(
+      `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/add-address-phone-number`,
+    )
+  })
+
+  it('handles an error fetching the address for duplicate checking', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.getAddressesFromPrisonAPI = jest.fn().mockRejectedValue(new Error('Prison API unavailable'))
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const originalUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}/addresses/5622837/add-address-phone-number`
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: {},
+      body: { phoneNumberType0: 'MOB', phoneNumber0: '01234567890', phoneExtension0: '' },
+      originalUrl,
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      locals: { user: prisonUserMock, prisonerNumber: PrisonerMockDataA.prisonerNumber },
+      redirect: jest.fn(),
+    } as unknown as Response
+
+    await controller.submit()(req, res, jest.fn())
+
+    expect(addressService.addAddressPhoneNumbers).not.toHaveBeenCalled()
+    expect(req.flash).toHaveBeenCalledWith('errors', [{ text: 'There was an error please try again' }])
+    expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
+    expect(res.redirect).toHaveBeenCalledWith(originalUrl)
+  })
+
+  it('allows the same address phone number when its extension differs', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.addAddressPhoneNumbers = jest
+      .fn()
+      .mockResolvedValue([{ phoneId: 457, number: '01234 567890', type: 'MOB' }])
+    addressService.getAddressesFromPrisonAPI = jest
+      .fn()
+      .mockResolvedValue([{ addressId: 5622837, phones: [{ phoneId: 456, number: '01234 567890', ext: '123' }] }])
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: {},
+      body: { phoneNumberType0: 'MOB', phoneNumber0: '(01234)567890', phoneExtension0: '456' },
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      locals: { user: prisonUserMock, prisonerNumber: PrisonerMockDataA.prisonerNumber },
+      redirect: jest.fn(),
+    } as unknown as Response
+
+    await controller.submit()(req, res, jest.fn())
+
+    expect(addressService.addAddressPhoneNumbers).toHaveBeenCalledWith(
+      'CLIENT_TOKEN',
+      PrisonerMockDataA.prisonerNumber,
+      5622837,
+      [{ phoneNumber: '01234 567890', phoneNumberType: 'MOB', extension: '456' }],
+    )
+    expect(req.flash).not.toHaveBeenCalledWith('errors', expect.anything())
+  })
+
+  it('allows the same number with different extensions in one address submission', async () => {
+    const addressService = addressServiceMock() as AddressService
+    addressService.addAddressPhoneNumbers = jest
+      .fn()
+      .mockResolvedValue([{ phoneId: 457, number: '01234 567890', type: 'MOB' }])
+    addressService.getAddressesFromPrisonAPI = jest.fn().mockResolvedValue([])
+    const controller = new AddressPhoneNumberController(addressService, auditServiceMock())
+    const req = {
+      id: 'request-id',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+      },
+      params: { addressId: '5622837' },
+      query: {},
+      body: {
+        phoneNumberType0: 'MOB',
+        phoneNumber0: '(01234)567890',
+        phoneExtension0: '123',
+        phoneNumberType1: 'BUS',
+        phoneNumber1: '01234 567890',
+        phoneExtension1: '456',
+      },
+      flash: jest.fn(),
+    } as unknown as Request
+    const res = {
+      locals: { user: prisonUserMock, prisonerNumber: PrisonerMockDataA.prisonerNumber },
+      redirect: jest.fn(),
+    } as unknown as Response
+
+    await controller.submit()(req, res, jest.fn())
+
+    expect(addressService.addAddressPhoneNumbers).toHaveBeenCalledWith(
+      'CLIENT_TOKEN',
+      PrisonerMockDataA.prisonerNumber,
+      5622837,
+      [
+        { phoneNumber: '01234 567890', phoneNumberType: 'MOB', extension: '123' },
+        { phoneNumber: '01234 567890', phoneNumberType: 'BUS', extension: '456' },
+      ],
+    )
   })
 
   it('prefills the selected phone number on the change page', async () => {
@@ -152,7 +333,7 @@ describe('AddressPhoneNumberController', () => {
     const addressService = addressServiceMock() as AddressService
     addressService.updateAddressPhoneNumber = jest
       .fn()
-      .mockResolvedValue({ phoneId: 1324254, number: '02012345678', type: 'HOME', ext: '321' })
+      .mockResolvedValue({ phoneId: 1324254, number: '02012345678', type: 'HOME', ext: '123' })
     const auditService = auditServiceMock()
     const controller = new AddressPhoneNumberController(addressService, auditService)
     const req = {
@@ -180,7 +361,7 @@ describe('AddressPhoneNumberController', () => {
       PrisonerMockDataA.prisonerNumber,
       5622837,
       1324254,
-      { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '123' },
+      { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '123' },
     )
     expect(req.flash).toHaveBeenCalledWith(
       'flashMessage',
@@ -198,7 +379,7 @@ describe('AddressPhoneNumberController', () => {
       details: {
         addressId: 5622837,
         phoneId: 1324254,
-        phoneNumber: { phoneNumber: '02012345678', phoneNumberType: 'HOME', extension: '123' },
+        phoneNumber: { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '123' },
       },
     })
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
