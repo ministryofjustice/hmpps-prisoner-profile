@@ -107,7 +107,7 @@ describe('Personal page addresses', () => {
     expect(phones.text()).toContain('Updated on 20 July 2023')
     expect(phones.text()).not.toContain('Updated by')
     expect($('details').text()).not.toContain(mockHomePhone.number)
-    expect(phones.find('a').eq(0).text().trim()).toBe('Add a new phone number')
+    expect(phones.find('a').eq(0).text().trim()).toBe('Add a phone number')
     expect(phones.find('a').eq(0).attr('href')).toBe(
       `/prisoner/A1234BC/addresses/${mockAddress.addressId}/add-address-phone-number`,
     )

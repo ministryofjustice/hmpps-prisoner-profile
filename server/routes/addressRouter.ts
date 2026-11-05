@@ -53,6 +53,12 @@ export default function addressRouter(services: Services): Router {
   )
 
   router.get(
+    `${basePath}/addresses/:addressId/cancel-add-address-phone-number`,
+    ...addressPhoneNumberMiddleware,
+    addressPhoneNumberController.cancel(),
+  )
+
+  router.get(
     `${basePath}/addresses/:addressId/change-address-phone-number/:phoneId`,
     auditPageAccessAttempt({ services, page: Page.EditAddressPhoneNumber }),
     ...addressPhoneNumberMiddleware,

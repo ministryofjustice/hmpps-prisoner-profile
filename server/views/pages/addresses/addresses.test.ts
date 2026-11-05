@@ -155,7 +155,25 @@ describe('Addresses page', () => {
     expect($('.govuk-summary-list__value').first().text()).not.toContain('Building')
   })
 
-  it('returns no rows when the address is missing', () => {
-    expect(render({ primaryAddress: null })('.govuk-summary-list__row')).toHaveLength(0)
+  it('shows the added date when the address has no displayable address lines', () => {
+    const $ = render({
+      primaryAddress: {
+        ...address,
+        subBuildingName: undefined,
+        buildingName: undefined,
+        buildingNumber: undefined,
+        thoroughfareName: undefined,
+        dependantLocality: undefined,
+        postTown: undefined,
+        county: undefined,
+        postCode: undefined,
+        country: { description: 'England' },
+      },
+    })
+
+    expect($('.govuk-summary-list__row').first().find('.govuk-summary-list__value').text().trim()).toBe(
+      'Added on 1 January 2024',
+    )
+    expect($('[data-qa="address-added-on"]').text()).toBe('Added on 1 January 2024')
   })
 })

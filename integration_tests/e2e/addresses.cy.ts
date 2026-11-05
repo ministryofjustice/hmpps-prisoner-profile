@@ -142,7 +142,7 @@ context('Addresses page', () => {
     addPhoneNumberLink().click()
     cy.location('pathname').should('eq', `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`)
     const phoneNumbersPage = Page.verifyOnPageWithTitle(AddressPhoneNumbersPage, 'Add a phone number for this address')
-    phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/personal`)
+    phoneNumbersPage.cancelLink().should('have.attr', 'href', `/prisoner/${prisonerNumber}/personal#addresses`)
     phoneNumbersPage.phoneNumberType('HOME').check()
     phoneNumbersPage.phoneNumber().type(requestBody[0].phoneNumber)
     phoneNumbersPage.saveButton().click()

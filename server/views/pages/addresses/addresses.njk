@@ -28,7 +28,7 @@
     {% set addressHtml %}
       {% for line in addressLines %}{{ line }}{% if not loop.last %}<br />{% endif %}{% endfor %}
       {% if address.fromDate %}
-        <p class="hmpps-address__added-date govuk-body-s govuk-!-margin-bottom-0" data-qa="address-added-on">
+        <p class="hmpps-address__added-date govuk-body-s" data-qa="address-added-on">
           {{- 'Added on ' }}{{ address.fromDate | formatDate -}}
         </p>
       {% endif %}
@@ -76,7 +76,7 @@
         </p>
         {% if phone.extension %}<p class="govuk-body govuk-!-margin-0">Extension: {{ phone.extension }}</p>{% endif %}
         {% if phone.updatedOn %}
-          <p class="hmpps-address__updated-date govuk-body-s govuk-!-margin-top-0" data-qa="phone-updated-on">
+          <p class="hmpps-address__updated-date govuk-body-s" data-qa="phone-updated-on">
             {{- 'Updated on ' }}{{ phone.updatedOn | formatDate -}}
           </p>
         {% endif %}
