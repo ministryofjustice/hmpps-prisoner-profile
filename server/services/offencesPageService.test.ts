@@ -30,8 +30,6 @@ import { ChargeResultCode } from '../data/enums/chargeCodes'
 import OffenderSentenceTerms from '../data/interfaces/prisonApi/OffenderSentenceTerms'
 import SentencedCourtCase from './interfaces/offencesPageService/SentencedCourtCase'
 import DeepPartial from '../interfaces/DeepPartial'
-import CourtCase from '../data/interfaces/prisonApi/CourtCase'
-import PrisonerSentenceDetails from '../data/interfaces/prisonApi/PrisonerSentenceDetails'
 
 const simpleSentenceSummary: DeepPartial<SentenceSummary> = {
   prisonerNumber: 'G6123VU',
@@ -100,7 +98,7 @@ const simpleSentenceSummary: DeepPartial<SentenceSummary> = {
 }
 
 describe('OffencesPageService', () => {
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
 
   const offencesPageServiceConstruct = jest.fn(() => {
     return new OffencesPageService(() => prisonApiClient)
@@ -136,13 +134,13 @@ describe('OffencesPageService', () => {
       ]
 
       prisonApiClient = prisonApiClientMock()
-      prisonApiClient.getCourtCases = jest.fn(async (): Promise<CourtCase[]> => [])
+      prisonApiClient.getCourtCases.mockResolvedValue([])
       // @ts-expect-error - returning partial data for test clarity
-      prisonApiClient.getOffenceHistory = jest.fn(async () => offenceHistory)
+      prisonApiClient.getOffenceHistory.mockResolvedValue(offenceHistory)
       // @ts-expect-error - returning partial data for test clarity
-      prisonApiClient.getSentenceSummary = jest.fn(async () => simpleSentenceSummary)
-      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
+      prisonApiClient.getSentenceSummary.mockResolvedValue(simpleSentenceSummary)
+      prisonApiClient.getSentenceTerms.mockResolvedValue(sentenceTermsMock)
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue(prisonerSentenceDetailsMock)
     })
 
     describe('Offences list', () => {
@@ -395,11 +393,11 @@ describe('OffencesPageService', () => {
   describe('Offences Page', () => {
     beforeEach(() => {
       prisonApiClient = prisonApiClientMock()
-      prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
-      prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
-      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
-      prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
+      prisonApiClient.getCourtCases.mockResolvedValue(CourtCasesMock)
+      prisonApiClient.getOffenceHistory.mockResolvedValue(OffenceHistoryMock)
+      prisonApiClient.getSentenceTerms.mockResolvedValue(sentenceTermsMock)
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue(prisonerSentenceDetailsMock)
+      prisonApiClient.getSentenceSummary.mockResolvedValue(SentenceSummaryWithSentenceMock)
     })
 
     it('Get all data for the offences page for the sentences', async () => {
@@ -488,7 +486,7 @@ describe('OffencesPageService', () => {
 
     it('Get unique charges from court date results', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getUniqueChargesFromCourtDateResults(CourtDateResultsUnsentencedMockB)
+      const res = offencesPageService.getUniqueChargesFromCourtDateResults(CourtDateResultsUnsentencedMockB)
       expect(res).toEqual(UniqueCourtDateResultsUnsentencedMockA)
     })
   })
@@ -541,17 +539,17 @@ describe('OffencesPageService', () => {
 
     beforeEach(() => {
       prisonApiClient = prisonApiClientMock()
-      prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
-      prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
-      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
-      prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
+      prisonApiClient.getCourtCases.mockResolvedValue(CourtCasesMock)
+      prisonApiClient.getOffenceHistory.mockResolvedValue(OffenceHistoryMock)
+      prisonApiClient.getSentenceTerms.mockResolvedValue(sentenceTermsMock)
+      prisonApiClient.getSentenceSummary.mockResolvedValue(SentenceSummaryWithSentenceMock)
     })
 
     it('should return all dates if returned', async () => {
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
         ...prisonerSentenceDetailsMock,
         sentenceDetail,
-      }))
+      })
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getReleaseDates('token', '12345')
       expect(res).toEqual({
@@ -582,10 +580,10 @@ describe('OffencesPageService', () => {
     })
 
     it('should use override dates where available', async () => {
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
         ...prisonerSentenceDetailsMock,
         sentenceDetail,
-      }))
+      })
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getReleaseDates('token', '12345')
       expect(res).toMatchObject({
@@ -603,7 +601,7 @@ describe('OffencesPageService', () => {
     })
 
     it('should return calculated dates where overrides dont exist', async () => {
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async (): Promise<PrisonerSentenceDetails> => ({
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
         ...prisonerSentenceDetailsMock,
         sentenceDetail: {
           ...sentenceDetail,
@@ -618,7 +616,7 @@ describe('OffencesPageService', () => {
           postRecallReleaseOverrideDate: undefined,
           topupSupervisionExpiryOverrideDate: undefined,
         },
-      }))
+      })
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getReleaseDates('token', '12345')
       expect(res).toMatchObject({
@@ -636,10 +634,10 @@ describe('OffencesPageService', () => {
     })
 
     it('should trim empty values', async () => {
-      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+      prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
         ...prisonerSentenceDetailsMock,
         sentenceDetail: { automaticReleaseOverrideDate: 'date' },
-      }))
+      })
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getReleaseDates('token', '12345')
       expect(res).toEqual({
@@ -648,14 +646,14 @@ describe('OffencesPageService', () => {
     })
     describe('sed, led, sled', () => {
       it('should use sed if present', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             sentenceExpiryDate: '2016-02-01',
             licenceExpiryDate: '2016-02-02',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.sentenceExpiryDate).toEqual(sentenceDetail.sentenceExpiryDate)
@@ -664,14 +662,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use led if sed not present', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async (): Promise<PrisonerSentenceDetails> => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             sentenceExpiryDate: undefined,
             licenceExpiryDate: '2016-02-02',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.sentenceExpiryDate).toBeUndefined()
@@ -680,14 +678,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use sled if both present and the same', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             sentenceExpiryDate: '2016-02-02',
             licenceExpiryDate: '2016-02-02',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.sentenceExpiryDate).toBeUndefined()
@@ -696,14 +694,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use none if none present', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async (): Promise<PrisonerSentenceDetails> => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             sentenceExpiryDate: undefined,
             licenceExpiryDate: undefined,
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.sentenceExpiryDate).toBeUndefined()
@@ -714,14 +712,14 @@ describe('OffencesPageService', () => {
 
     describe('non-Dto dates', () => {
       it('should use ARD if type is ARD', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'ARD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toEqual('2017-02-01')
@@ -731,14 +729,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use CRD if type is CRD', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
@@ -748,14 +746,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use NPD if type is NPD', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'NPD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
@@ -765,14 +763,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use PRRD if type is PRRD', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'PRRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
@@ -782,14 +780,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use none if no type', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async (): Promise<PrisonerSentenceDetails> => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: '2016-02-01',
             nonDtoReleaseDateType: undefined,
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
@@ -799,14 +797,14 @@ describe('OffencesPageService', () => {
       })
 
       it('should use none if no date', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async (): Promise<PrisonerSentenceDetails> => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
             nonDtoReleaseDate: undefined,
             nonDtoReleaseDateType: 'ARD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
@@ -816,7 +814,7 @@ describe('OffencesPageService', () => {
       })
 
       it('should use none if no date if crd type and conditionalReleaseDate is the same', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
@@ -824,14 +822,14 @@ describe('OffencesPageService', () => {
             nonDtoReleaseDate: '2012-01-01',
             nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.conditionalReleaseNonDto).toBeUndefined()
       })
 
       it('should use none if no date if ard type and automaticReleaseDate is the same', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
@@ -839,14 +837,14 @@ describe('OffencesPageService', () => {
             nonDtoReleaseDate: '2012-01-01',
             nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
       })
 
       it('should use none if NPD type and nonParoleDate is the same', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
@@ -854,14 +852,14 @@ describe('OffencesPageService', () => {
             nonDtoReleaseDate: '2012-01-01',
             nonDtoReleaseDateType: 'NPD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.nonParoleDateNonDto).toBeUndefined()
       })
 
       it('should use none if PRRD type and postRecallReleaseDate is the same', async () => {
-        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        prisonApiClient.getPrisonerSentenceDetails.mockResolvedValue({
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
@@ -869,7 +867,7 @@ describe('OffencesPageService', () => {
             nonDtoReleaseDate: '2012-01-01',
             nonDtoReleaseDateType: 'PRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
-        }))
+        })
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.postRecallDateNonDto).toBeUndefined()

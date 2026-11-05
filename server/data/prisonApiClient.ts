@@ -58,7 +58,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     super('Prison API', config.apis.prisonApi, token, circuitBreaker)
   }
 
-  async getOffenderAttendanceHistory(
+  getOffenderAttendanceHistory(
     prisonerNumber: string,
     fromDate: string,
     toDate: string,
@@ -71,11 +71,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getUserCaseLoads(): Promise<CaseLoad[]> {
+  getUserCaseLoads(): Promise<CaseLoad[]> {
     return this.get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }, this.token)
   }
 
-  async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
+  getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
     return this.stream(
       {
         path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
@@ -84,7 +84,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAccountBalances(bookingId: number): Promise<AccountBalances> {
+  getAccountBalances(bookingId: number): Promise<AccountBalances> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/balances`,
@@ -93,21 +93,21 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getVisitSummary(bookingId: number): Promise<VisitSummary> {
+  getVisitSummary(bookingId: number): Promise<VisitSummary> {
     return this.get({ path: `/api/bookings/${bookingId}/visits/summary` }, this.token)
   }
 
-  async getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null> {
+  getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null> {
     return this.getAndIgnore404({
       path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
     })
   }
 
-  async getAssessments(bookingId: number): Promise<Assessment[]> {
+  getAssessments(bookingId: number): Promise<Assessment[]> {
     return this.get({ path: `/api/bookings/${bookingId}/assessments` }, this.token)
   }
 
-  async getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
+  getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/events/today`,
@@ -116,12 +116,12 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getBookingContacts(bookingId: number): Promise<ContactDetail> {
+  getBookingContacts(bookingId: number): Promise<ContactDetail> {
     return this.get({ path: `/api/bookings/${bookingId}/contacts` }, this.token)
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {
-    const detail = (await this.get({ path: `/api/bookings/${bookingId}` }, this.token)) as InmateDetail
+    const detail = await this.get<InmateDetail>({ path: `/api/bookings/${bookingId}` }, this.token)
     return detail?.physicalAttributes?.ethnicity === 'Prefer not to say'
       ? {
           ...detail,
@@ -133,7 +133,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
       : detail
   }
 
-  async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
+  getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
     let query
     if (types?.length) {
       query = `type=${types.join()}`
@@ -141,14 +141,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     return this.get({ path: `/api/bookings/${bookingId}/personal-care-needs`, query }, this.token)
   }
 
-  async getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds> {
+  getAllPersonalCareNeeds(bookingId: number): Promise<PersonalCareNeeds> {
     return this.get({ path: `/api/bookings/${bookingId}/personal-care-needs/all` }, this.token)
   }
 
-  async getOffenderActivitiesHistory(
-    prisonerNumber: string,
-    earliestEndDate: string,
-  ): Promise<OffenderActivitiesHistory> {
+  getOffenderActivitiesHistory(prisonerNumber: string, earliestEndDate: string): Promise<OffenderActivitiesHistory> {
     return this.get(
       {
         path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
@@ -157,19 +154,19 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
+  getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
     return this.get({ path: `/api/bookings/${bookingId}/secondary-languages` }, this.token)
   }
 
-  async getProperty(bookingId: number): Promise<PropertyContainer[]> {
+  getProperty(bookingId: number): Promise<PropertyContainer[]> {
     return this.get({ path: `/api/bookings/${bookingId}/property` }, this.token)
   }
 
-  async getCourtCases(bookingId: number): Promise<CourtCase[]> {
+  getCourtCases(bookingId: number): Promise<CourtCase[]> {
     return this.get({ path: `/api/bookings/${bookingId}/court-cases` }, this.token)
   }
 
-  async getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]> {
+  getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]> {
     return this.get(
       {
         path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory`,
@@ -178,7 +175,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]> {
+  getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]> {
     return this.get(
       {
         path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
@@ -187,16 +184,16 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
+  getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
     return this.get({ path: `/api/offenders/${prisonerNumber}/sentences` }, this.token)
   }
 
   // NB: This can return 404 for released prisoners
-  async getAddresses(prisonerNumber: string): Promise<Address[] | null> {
+  getAddresses(prisonerNumber: string): Promise<Address[] | null> {
     return this.getAndIgnore404({ path: `/api/offenders/${prisonerNumber}/addresses` })
   }
 
-  async addAddressPhoneNumbers(
+  addAddressPhoneNumbers(
     prisonerNumber: string,
     addressId: number,
     phoneNumbers: AddressPhoneNumberRequest[],
@@ -210,7 +207,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async updateAddressPhoneNumber(
+  updateAddressPhoneNumber(
     prisonerNumber: string,
     addressId: number,
     phoneId: number,
@@ -225,15 +222,15 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAddressesForPerson(personId: number): Promise<Address[]> {
+  getAddressesForPerson(personId: number): Promise<Address[]> {
     return this.get({ path: `/api/persons/${personId}/addresses` }, this.token)
   }
 
-  async getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
+  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
     return this.get({ path: `/api/offenders/${prisonerNumber}/contacts` }, this.token)
   }
 
-  async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
+  getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
     return this.stream(
       {
         path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
@@ -242,7 +239,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]> {
+  getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]> {
     return this.get(
       {
         path: `/api/reference-domains/domains/${domain}`,
@@ -252,7 +249,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
+  getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
@@ -261,7 +258,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments> {
+  getAllReasonableAdjustments(bookingId: number): Promise<ReasonableAdjustments> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/reasonable-adjustments/all`,
@@ -270,15 +267,15 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getMainOffence(bookingId: number): Promise<MainOffence[]> {
+  getMainOffence(bookingId: number): Promise<MainOffence[]> {
     return this.get({ path: `/api/bookings/${bookingId}/mainOffence` }, this.token)
   }
 
-  async getFullStatus(prisonerNumber: string): Promise<FullStatus> {
+  getFullStatus(prisonerNumber: string): Promise<FullStatus> {
     return this.get({ path: `/api/prisoners/${prisonerNumber}/full-status` }, this.token)
   }
 
-  async getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
+  getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
     return this.get(
       {
         path: `/api/court-date-results/${prisonerNumber}`,
@@ -287,7 +284,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getIdentifier(offenderId: number, seqId: number): Promise<OffenderIdentifier> {
+  getIdentifier(offenderId: number, seqId: number): Promise<OffenderIdentifier> {
     return this.get(
       {
         path: `/api/aliases/${offenderId}/offender-identifiers/${seqId}`,
@@ -296,7 +293,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getIdentifiers(prisonerNumber: string, includeAliases: boolean = false): Promise<OffenderIdentifier[]> {
+  getIdentifiers(prisonerNumber: string, includeAliases: boolean = false): Promise<OffenderIdentifier[]> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=${includeAliases}`,
@@ -305,7 +302,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary> {
+  getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
@@ -314,16 +311,13 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {
+  getAgencyDetails(agencyId: string): Promise<AgencyDetails | null> {
     return this.getAndIgnore404({
       path: `/api/agencies/${agencyId}?activeOnly=false`,
     })
   }
 
-  async getOffenderCellHistory(
-    bookingId: number,
-    params: { page?: number; size?: number },
-  ): Promise<OffenderCellHistory> {
+  getOffenderCellHistory(bookingId: number, params: { page?: number; size?: number }): Promise<OffenderCellHistory> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
@@ -332,11 +326,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getStaffDetails(username: string): Promise<StaffDetails | null> {
+  getStaffDetails(username: string): Promise<StaffDetails | null> {
     return this.getAndIgnore404({ path: `/api/users/${username}` })
   }
 
-  async getInmatesAtLocation(locationId: number): Promise<OffenderBooking[]> {
+  getInmatesAtLocation(locationId: number): Promise<OffenderBooking[]> {
     return this.get(
       {
         path: `/api/locations/${locationId}/inmates`,
@@ -345,7 +339,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
+  getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
     return this.get(
       {
         path: `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
@@ -354,7 +348,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]> {
+  getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]> {
     return this.get<CsraAssessment[]>(
       {
         path: `/api/offender-assessments/csra/${prisonerNumber}`,
@@ -363,7 +357,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]> {
+  getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/transaction-history`,
@@ -373,7 +367,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer> {
+  getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/damage-obligations`,
@@ -383,15 +377,15 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]> {
+  getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]> {
     return this.get({ path: `/api/bookings/${bookingId}/events/thisWeek` }, this.token)
   }
 
-  async getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]> {
+  getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]> {
     return this.get({ path: `/api/bookings/${bookingId}/events/nextWeek` }, this.token)
   }
 
-  async getMovements(
+  getMovements(
     prisonerNumbers: string[],
     movementTypes: MovementType[],
     latestOnly: boolean = true,
@@ -406,11 +400,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAppointmentTypes(): Promise<ReferenceCode[]> {
+  getAppointmentTypes(): Promise<ReferenceCode[]> {
     return this.get({ path: '/api/reference-domains/scheduleReasons?eventType=APP' }, this.token)
   }
 
-  async getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]> {
+  getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]> {
     return this.post(
       {
         path: '/api/offender-sentences',
@@ -420,7 +414,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
+  getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
     return this.post(
       {
         path: `/api/schedules/${agencyId}/courtEvents?date=${date}`,
@@ -430,7 +424,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getVisits(
+  getVisits(
     offenderNumbers: string[],
     agencyId: string,
     date: string,
@@ -446,7 +440,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getAppointments(
+  getAppointments(
     offenderNumbers: string[],
     agencyId: string,
     date: string,
@@ -462,7 +456,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getActivities(
+  getActivities(
     offenderNumbers: string[],
     agencyId: string,
     date: string,
@@ -478,7 +472,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
+  getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
     return this.post(
       {
         path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
@@ -488,7 +482,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getActivitiesAtLocation(
+  getActivitiesAtLocation(
     locationId: number,
     date: string,
     timeSlot?: TimeSlot,
@@ -503,7 +497,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getActivityList(
+  getActivityList(
     agencyId: string,
     locationId: number,
     usage: string,
@@ -519,7 +513,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details> {
+  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details> {
     return this.get(
       {
         path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
@@ -528,7 +522,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
+  getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
     return this.get(
       {
         path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
@@ -537,11 +531,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getCellMoveReasonTypes(): Promise<CellMoveReasonType[]> {
+  getCellMoveReasonTypes(): Promise<CellMoveReasonType[]> {
     return this.get({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' }, this.token)
   }
 
-  async getPersonEmails(personId: number): Promise<AgenciesEmail[]> {
+  getPersonEmails(personId: number): Promise<AgenciesEmail[]> {
     return this.get(
       {
         path: `/api/persons/${personId}/emails`,
@@ -550,7 +544,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getPersonPhones(personId: number): Promise<Telephone[]> {
+  getPersonPhones(personId: number): Promise<Telephone[]> {
     return this.get(
       {
         path: `/api/persons/${personId}/phones`,
@@ -559,13 +553,13 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null> {
+  getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[] | null> {
     return this.getAndIgnore404({
       path: `/api/schedules/${prisonerNumber}/scheduled-transfers`,
     })
   }
 
-  async getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
+  getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
     return this.get(
       {
         path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
@@ -574,7 +568,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getBeliefHistory(prisonerNumber: string): Promise<Belief[]> {
+  getBeliefHistory(prisonerNumber: string): Promise<Belief[]> {
     return this.get(
       {
         path: `/api/offenders/${prisonerNumber}/belief-history`,
@@ -583,7 +577,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getVisitsForBookingWithVisitors(
+  getVisitsForBookingWithVisitors(
     bookingId: number,
     params: VisitsListQueryParams,
   ): Promise<PagedList<VisitWithVisitors>> {
@@ -596,7 +590,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]> {
+  getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]> {
     return this.get(
       {
         path: `/api/bookings/${bookingId}/visits/prisons`,
@@ -605,15 +599,15 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
+  getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
     return this.get({ path: `/api/court/${bookingId}/next-court-event` }, this.token)
   }
 
-  async getActiveCourtCasesCount(bookingId: number): Promise<number> {
+  getActiveCourtCasesCount(bookingId: number): Promise<number> {
     return this.get({ path: `/api/court/${bookingId}/count-active-cases` }, this.token)
   }
 
-  async getLatestArrivalDate(prisonerNumber: string): Promise<string> {
+  getLatestArrivalDate(prisonerNumber: string): Promise<string> {
     return this.get(
       {
         path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
@@ -622,7 +616,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]> {
+  getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]> {
     return this.get(
       {
         path: `/api/images/offenders/${prisonerNumber}`,
@@ -631,7 +625,7 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     )
   }
 
-  async getImageDetail(imageId: number): Promise<ImageDetails> {
+  getImageDetail(imageId: number): Promise<ImageDetails> {
     return this.get(
       {
         path: `/api/images/${imageId}`,

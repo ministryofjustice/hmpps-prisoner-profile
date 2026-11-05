@@ -10,7 +10,7 @@ import InmateDetail from '../../../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
 
 describe('SexualOrientationController', () => {
-  let personalPageService: PersonalPageService
+  let personalPageService: jest.Mocked<PersonalPageService>
   let auditService: AuditService
   let controller: SexualOrientationController
   let res: Response
@@ -61,7 +61,7 @@ describe('SexualOrientationController', () => {
   }
 
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
+    personalPageService = personalPageServiceMock()
     auditService = auditServiceMock()
 
     controller = new SexualOrientationController(personalPageService, auditService)
@@ -194,9 +194,7 @@ describe('SexualOrientationController', () => {
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updateSexualOrientation = async () => {
-          throw new Error()
-        }
+        personalPageService.updateSexualOrientation.mockRejectedValue(new Error())
 
         await action(validRequest, res, next)
 

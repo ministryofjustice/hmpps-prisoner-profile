@@ -4,7 +4,7 @@ import PrisonerScheduleService from './prisonerScheduleService'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 
 describe('prisonerScheduleService', () => {
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let service: PrisonerScheduleService
 
   beforeEach(() => {
@@ -25,14 +25,14 @@ describe('prisonerScheduleService', () => {
     it('Uses the event source description for PA sub types', async () => {
       const events = [{ ...dummyScheduledEvents[0], eventSubType: 'PA', eventSourceDesc: 'The event description' }]
 
-      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
+      prisonApiClient.getEventsScheduledForToday.mockResolvedValue(events)
       const schedule = await service.getScheduleOverview('token', 1)
       const { morning } = schedule
       expect(morning[0].name).toEqual('The event description')
     })
 
     it('Creates the overview page schedule from the events', async () => {
-      prisonApiClient.getEventsScheduledForToday = jest.fn().mockResolvedValue(dummyScheduledEvents)
+      prisonApiClient.getEventsScheduledForToday.mockResolvedValue(dummyScheduledEvents)
 
       const { morning, afternoon, evening } = await service.getScheduleOverview('token', 1)
 

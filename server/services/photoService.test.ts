@@ -7,13 +7,13 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import PhotoService from './photoService'
 
 describe('PhotoService', () => {
-  let prisonApiClient: PrisonApiClient
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let service: PhotoService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getImageDetail = jest.fn(async () => imageDetailMock)
-    prisonApiClient.getImagesForPrisoner = jest.fn(async () => imageDetailListMock)
+    prisonApiClient.getImageDetail.mockResolvedValue(imageDetailMock)
+    prisonApiClient.getImagesForPrisoner.mockResolvedValue(imageDetailListMock)
   })
 
   describe('getImageDetail', () => {

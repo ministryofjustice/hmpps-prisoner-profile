@@ -1,17 +1,12 @@
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { PersonalRelationshipsDomesticStatusMock } from '../../data/localMockData/personalRelationshipsApiMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
-import type PersonalPageService from '../../services/personalPageService'
 
 describe('PersonalController', () => {
-  let personalPageService: PersonalPageService
-
   beforeEach(() => {
-    personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
-    personalPageService.updateSmokerOrVaper = jest.fn()
-    personalPageService.getNumberOfChildren = jest.fn()
-    personalPageService.getDomesticStatus = jest.fn(async () => PersonalRelationshipsDomesticStatusMock)
+    const personalPageService = personalPageServiceMock()
+    personalPageService.getPhysicalAttributes.mockResolvedValue(corePersonPhysicalAttributesMock)
+    personalPageService.getDomesticStatus.mockResolvedValue(PersonalRelationshipsDomesticStatusMock)
   })
 
   describe('displayPersonalPage', () => {

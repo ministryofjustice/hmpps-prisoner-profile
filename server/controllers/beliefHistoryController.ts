@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+import logger from '../../logger'
 import { apostrophe } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
-import BeliefService from '../services/beliefService'
-import logger from '../../logger'
+import type { BeliefHistoryItem } from '../services/interfaces/beliefService/BeliefHistoryItem'
+import type BeliefService from '../services/beliefService'
 import { religionFieldData } from './personal/fieldData'
 
 export default class BeliefHistoryController {
@@ -15,13 +16,15 @@ export default class BeliefHistoryController {
     const { prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
-    const beliefs = (await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)).map(belief => {
-      const override = religionFieldData.referenceDataOverrides.find(o => o.id === belief.beliefCode)
-      return {
-        ...belief,
-        beliefDescription: override?.description ?? belief.beliefDescription,
-      }
-    })
+    const beliefs = (await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)).map<BeliefHistoryItem>(
+      belief => {
+        const override = religionFieldData.referenceDataOverrides.find(o => o.id === belief.religionCode)
+        return {
+          ...belief,
+          religionDescription: override?.description ?? belief.religionDescription,
+        }
+      },
+    )
 
     this.auditService
       .sendPageView({
