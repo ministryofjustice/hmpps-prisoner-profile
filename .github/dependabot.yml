@@ -26,10 +26,13 @@ updates:
     ignore:
       - dependency-name: "@types/node"
         versions:
-          - ">=25"
+          - ">=27"
       - dependency-name: "applicationinsights"
         versions:
           - ">=3"
+      - dependency-name: "nock"
+        versions:
+          - ">=15"
       - dependency-name: "typescript"
         # TODO: remove once dependent libs are updated for v7
         versions:
