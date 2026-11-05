@@ -27,4 +27,9 @@
   .govuk-summary-list__row {
     border-bottom: 0;
   }
+
+  .hmpps-address__added-date,
+  .hmpps-address__updated-date {
+    margin-top: govuk.govuk-spacing(2);
+  }
 }
