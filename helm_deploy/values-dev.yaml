@@ -1,6 +1,3 @@
----
-# Per environment values which override defaults in hmpps-prisoner-profile/values.yaml
-
 generic-service:
   replicaCount: 2
 
@@ -133,7 +130,6 @@ generic-service:
     shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-connect-dps-non-prod # sent to #connect-dps-non-prod-alerts
   businessHoursOnly: true
 
   elastiCacheAlertsClusterIds:

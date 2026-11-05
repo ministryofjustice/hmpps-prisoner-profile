@@ -1,6 +1,3 @@
----
-# Per environment values which override defaults in hmpps-prisoner-profile/values.yaml
-
 generic-service:
   replicaCount: 8
 
@@ -121,8 +118,6 @@ generic-service:
       - sscl
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-connect-dps-prod # sent to #connect-dps-prod-alerts
-
   elastiCacheAlertsClusterIds:
     cp-15ac40963e3a4fbf-001: 'HMPPS Prisoner Profile ElastiCache Cluster Node 1'
     cp-15ac40963e3a4fbf-002: 'HMPPS Prisoner Profile ElastiCache Cluster Node 2'
