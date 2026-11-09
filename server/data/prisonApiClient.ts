@@ -1,7 +1,6 @@
 import { Readable } from 'stream'
 import CircuitBreaker from 'opossum'
 import config from '../config'
-import CaseLoad from './interfaces/prisonApi/CaseLoad'
 import { PrisonApiClient, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'
 import AccountBalances from './interfaces/prisonApi/AccountBalances'
 import VisitSummary from './interfaces/prisonApi/VisitSummary'
@@ -35,11 +34,8 @@ import OffenderCellHistory from './interfaces/prisonApi/OffenderCellHistoryInter
 import CsraAssessment, { CsraAssessmentSummary } from './interfaces/prisonApi/CsraAssessment'
 import Transaction from './interfaces/prisonApi/Transaction'
 import { DamageObligationContainer } from './interfaces/prisonApi/DamageObligation'
-import Movement from './interfaces/prisonApi/Movement'
-import { MovementType } from './enums/movementType'
 import OffenderSentenceDetail from './interfaces/prisonApi/OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces/prisonApi/PrisonerSchedule'
-import Details from './interfaces/prisonApi/Details'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
 import Telephone, { AddressPhoneNumberRequest } from './interfaces/prisonApi/Telephone'
@@ -69,10 +65,6 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
       },
       this.token,
     )
-  }
-
-  getUserCaseLoads(): Promise<CaseLoad[]> {
-    return this.get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }, this.token)
   }
 
   getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
@@ -385,21 +377,6 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     return this.get({ path: `/api/bookings/${bookingId}/events/nextWeek` }, this.token)
   }
 
-  getMovements(
-    prisonerNumbers: string[],
-    movementTypes: MovementType[],
-    latestOnly: boolean = true,
-  ): Promise<Movement[]> {
-    return this.post(
-      {
-        path: `/api/movements/offenders`,
-        query: mapToQueryString({ movementTypes, latestOnly }),
-        data: prisonerNumbers,
-      },
-      this.token,
-    )
-  }
-
   getAppointmentTypes(): Promise<ReferenceCode[]> {
     return this.get({ path: '/api/reference-domains/scheduleReasons?eventType=APP' }, this.token)
   }
@@ -508,15 +485,6 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
       {
         path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
         query: mapToQueryString({ date, timeSlot }),
-      },
-      this.token,
-    )
-  }
-
-  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details> {
-    return this.get(
-      {
-        path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
       },
       this.token,
     )

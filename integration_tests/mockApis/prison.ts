@@ -1,4 +1,3 @@
-import { addDays, format, startOfToday } from 'date-fns'
 import type { SuperAgentRequest } from 'superagent'
 import { stubFor, stubPing } from './wiremock'
 import {
@@ -63,7 +62,6 @@ import {
 } from '../../server/data/localMockData/transactionsMock'
 import { damageObligationContainerMock } from '../../server/data/localMockData/damageObligationsMock'
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
-import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
 import {
@@ -72,7 +70,6 @@ import {
 } from '../../server/data/localMockData/prisonerSchedulesMock'
 import { offenderSentenceDetailsMock } from '../../server/data/localMockData/offenderSentenceDetailsMock'
 import { appointmentTypesMock } from '../../server/data/localMockData/appointmentTypesMock'
-import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
 import { mockHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
@@ -1139,22 +1136,6 @@ export default {
     })
   },
 
-  stubMovements: (prisonerNumber: string) => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPattern: `/prison/api/movements/offenders.*`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: movementsMock(prisonerNumber, format(addDays(startOfToday(), 10), 'yyyy-MM-dd')),
-      },
-    })
-  },
-
   stubAttendanceHistory: (prisonerNumber: string) => {
     return stubFor({
       request: {
@@ -1183,22 +1164,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: resp ?? [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
-      },
-    })
-  },
-
-  stubGetDetails: (prisonerNumber: string) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}\\?fullInfo=false&csraSummary=false`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: GetDetailsMock,
       },
     })
   },

@@ -1,6 +1,5 @@
 import nock, { RequestBodyMatcher } from 'nock'
 import config from '../config'
-import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import dummyScheduledEvents from './localMockData/eventsForToday'
 import PrisonApiClient from './prisonApiClient'
 import {
@@ -29,12 +28,9 @@ import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
-import { MovementType } from './enums/movementType'
-import movementsMock from './localMockData/movementsData'
 import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
-import { GetDetailsMock } from './localMockData/getDetailsMock'
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
@@ -67,15 +63,6 @@ describe('prisonApiClient', () => {
   const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: RequestBodyMatcher, returnData: TReturnData) => {
     fakePrisonApi.post(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
-
-  describe('getCaseLoads', () => {
-    it('should return data from api', async () => {
-      mockSuccessfulPrisonApiCall('/api/users/me/caseLoads?allCaseloads=true', CaseLoadsDummyDataA)
-
-      const output = await prisonApiClient.getUserCaseLoads()
-      expect(output).toEqual(CaseLoadsDummyDataA)
-    })
-  })
 
   describe('getAccountBalances', () => {
     it('Should return data from the API', async () => {
@@ -357,21 +344,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getMovement', () => {
-    it('Should return data from the API', async () => {
-      const prisonerNumber = 'AB1234C'
-      const movements = movementsMock(prisonerNumber)
-      const apiRequest = fakePrisonApi
-        .post(`/api/movements/offenders?movementTypes=TRN&movementTypes=CRT&latestOnly=true`, [prisonerNumber])
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, movements)
-
-      const response = await prisonApiClient.getMovements([prisonerNumber], [MovementType.Transfer, MovementType.Court])
-      expect(apiRequest.isDone()).toBe(true)
-      expect(response).toEqual(movements)
-    })
-  })
-
   describe('getAppointmentTypes', () => {
     it('Should return data from the API', async () => {
       mockSuccessfulPrisonApiCall(`/api/reference-domains/scheduleReasons?eventType=APP`, appointmentTypesMock)
@@ -495,20 +467,6 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getActivityList(agencyId, locationId, usage, date, timeSlot)
       expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getDetails', () => {
-    it('Should return data from the API', async () => {
-      const prisonerNumber = 'AB1234C'
-      const fullInfo = true
-
-      mockSuccessfulPrisonApiCall(
-        `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
-        GetDetailsMock,
-      )
-      const output = await prisonApiClient.getDetails(prisonerNumber, true)
-      expect(output).toEqual(GetDetailsMock)
     })
   })
 
