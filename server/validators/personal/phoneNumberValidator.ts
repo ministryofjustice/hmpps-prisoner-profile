@@ -1,13 +1,19 @@
 import HmppsError from '../../interfaces/HmppsError'
 
-export const phoneNumberValidator = (body: Record<string, string>): HmppsError[] => {
+export const phoneNumberValidator = (body: Record<string, string>, allowNonNumericExtension = false): HmppsError[] => {
   const indexes = Object.keys(body)
     .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
     .filter((index): index is string => index !== undefined)
     .map(Number)
 
   if (!indexes.length) {
-    return validatePhoneNumberFields(body.phoneNumberType, body.phoneNumber, body.phoneExtension)
+    return validatePhoneNumberFields(
+      body.phoneNumberType,
+      body.phoneNumber,
+      body.phoneExtension,
+      undefined,
+      allowNonNumericExtension,
+    )
   }
 
   return Array.from({ length: Math.max(...indexes) + 1 }, (_, index) =>
@@ -16,24 +22,28 @@ export const phoneNumberValidator = (body: Record<string, string>): HmppsError[]
       body[`phoneNumber${index}`],
       body[`phoneExtension${index}`],
       index,
+      allowNonNumericExtension,
     ),
   ).flat()
 }
+
+const hrefSuffix = (index?: number): string => (index === undefined ? '' : `-${index}`)
 
 const validatePhoneNumberFields = (
   phoneNumberType: string,
   phoneNumber: string,
   phoneExtension: string,
   index?: number,
+  allowNonNumericExtension = false,
 ): HmppsError[] => {
-  const hrefSuffix = index === undefined ? '' : `-${index}`
-  const phoneNumberHref = `#phone-number${hrefSuffix}`
-  const phoneExtensionHref = `#phone-extension${hrefSuffix}`
+  const phoneNumberHref = `#phone-number${hrefSuffix(index)}`
+  const phoneExtensionHref = `#phone-extension${hrefSuffix(index)}`
   const normalisedPhoneNumber = normalisePhoneNumber(phoneNumber)
   const normalisedExtension = normalisePhoneExtension(phoneExtension)
   const errors: HmppsError[] = []
 
-  if (!phoneNumberType) errors.push({ text: 'Select a phone number type', href: `#phone-number-type${hrefSuffix}` })
+  if (!phoneNumberType)
+    errors.push({ text: 'Select a phone number type', href: `#phone-number-type${hrefSuffix(index)}` })
 
   if (!normalisedPhoneNumber || normalisedPhoneNumber === '+') {
     errors.push({ href: phoneNumberHref, text: 'Enter a phone number' })
@@ -49,7 +59,7 @@ const validatePhoneNumberFields = (
     }
   }
 
-  if (/[^\d ]/.test(normalisedExtension)) {
+  if (!allowNonNumericExtension && /[^\d ]/.test(normalisedExtension)) {
     errors.push({ text: 'Extension must only contain numbers', href: phoneExtensionHref })
   }
   if (normalisedExtension.length > 7) {
@@ -64,7 +74,7 @@ export const validatePhoneNumberDuplicate = (
   extension: string | null | undefined,
   existingPhoneNumbers: ExistingPhoneNumber[],
   context: 'global' | 'address',
-  index = 0,
+  index?: number,
 ): HmppsError[] => {
   const duplicateKey = phoneNumberDuplicateKey(phoneNumber, extension)
   if (
@@ -78,7 +88,7 @@ export const validatePhoneNumberDuplicate = (
 
   return [
     {
-      href: context === 'global' ? '#phone-number' : `#phone-number-${index}`,
+      href: `#phone-number${hrefSuffix(index)}`,
       text: `This phone number already exists for this ${context === 'global' ? 'person' : 'address'}. Add a new number or edit the saved one`,
     },
   ]
@@ -95,6 +105,18 @@ const phoneNumberDuplicateKey = (phoneNumber: string, extension?: string | null)
     normalisePhoneNumber(phoneNumber).replace(/\s/g, ''),
     normalisePhoneExtension(extension).replace(/\s/g, ''),
   ])
+
+export const deduplicatePhoneNumberPairs = <T extends { phoneNumber: string; extension?: string | null }>(
+  phoneNumbers: T[],
+): T[] => {
+  const seen = new Set<string>()
+  return phoneNumbers.filter(phone => {
+    const key = phoneNumberDuplicateKey(phone.phoneNumber, phone.extension)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
 
 export const phoneNumberForStorage = (phoneNumber: string): string => {
   const normalisedPhoneNumber = normalisePhoneNumber(phoneNumber)

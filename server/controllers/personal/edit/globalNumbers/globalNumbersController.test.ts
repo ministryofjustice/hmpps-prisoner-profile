@@ -44,6 +44,12 @@ describe('GlobalNumbersController', () => {
 
   beforeEach(() => {
     personalPageService = personalPageServiceMock()
+    personalPageService.createGlobalPhoneNumber.mockResolvedValue({
+      id: 123,
+      type: 'MOB',
+      typeDescription: 'Mobile',
+      number: '1234',
+    })
     auditService = auditServiceMock()
 
     controller = new GlobalNumbersController(personalPageService, auditService)
@@ -66,9 +72,15 @@ describe('GlobalNumbersController', () => {
           expect(res.render).toHaveBeenCalledWith('pages/edit/phone', {
             pageTitle: 'Add this person\u2019s phone number - Prisoner personal details',
             formTitle: `Add First Last\u2019s phone number`,
-            phoneTypeOptions: expect.not.arrayContaining([expect.objectContaining({ checked: true })]),
-            phoneExtension: undefined,
-            phoneNumber: undefined,
+            phoneNumbers: [
+              {
+                phoneNumberType: '',
+                phoneNumber: '',
+                phoneExtension: '',
+                index: 0,
+                phoneTypeOptions: expect.not.arrayContaining([expect.objectContaining({ checked: true })]),
+              },
+            ],
             addAnotherEnabled: true,
             errors: [],
             miniBannerData: {
@@ -97,7 +109,7 @@ describe('GlobalNumbersController', () => {
             ...defaultReq,
             flash: (key: string) => {
               return key === 'requestBody'
-                ? [JSON.stringify({ phoneNumberType: 'MOB', phoneNumber: '12345', phoneExtension: '123' })]
+                ? [JSON.stringify({ phoneNumberType0: 'MOB', phoneNumber0: '12345', phoneExtension0: '123' })]
                 : []
             },
           } as unknown as Request
@@ -105,9 +117,14 @@ describe('GlobalNumbersController', () => {
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({
-              phoneTypeOptions: expect.arrayContaining([{ checked: true, text: 'Mobile', value: 'MOB' }]),
-              phoneNumber: '12345',
-              phoneExtension: '123',
+              phoneNumbers: [
+                expect.objectContaining({
+                  phoneNumberType: 'MOB',
+                  phoneNumber: '12345',
+                  phoneExtension: '123',
+                  phoneTypeOptions: expect.arrayContaining([{ checked: true, text: 'Mobile', value: 'MOB' }]),
+                }),
+              ],
             }),
           )
         })
@@ -193,68 +210,65 @@ describe('GlobalNumbersController', () => {
           expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#phones-and-emails`)
         })
 
-        it('Redirects to the add phone number page on success with add another specified', async () => {
-          await action({ ...validRequest, query: { addAnother: 'true' } } as unknown as Request, res, next)
-          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
+        it('reindexes rows and returns to the last row after removal', async () => {
+          validRequest.body = {
+            phoneNumberType0: 'MOB',
+            phoneNumber0: '1111',
+            phoneExtension0: '',
+            phoneNumberType1: 'HOME',
+            phoneNumber1: '2222',
+            phoneExtension1: '',
+            phoneNumberType2: 'BUS',
+            phoneNumber2: '3333',
+            phoneExtension2: '',
+            removePhoneNumber: '1',
+          }
+          const request = { ...validRequest, query: { removePhoneNumber: '1' } } as unknown as Request
+
+          await action(request, res, next)
+
+          expect(request.flash).toHaveBeenCalledWith(
+            'requestBody',
+            JSON.stringify({
+              phoneNumberType0: 'MOB',
+              phoneNumber0: '1111',
+              phoneExtension0: '',
+              phoneNumberType1: 'BUS',
+              phoneNumber1: '3333',
+              phoneExtension1: '',
+            }),
+          )
+          expect(res.redirect).toHaveBeenCalledWith(
+            `/prisoner/${prisonerNumber}/personal/add-phone-number#phone-number-section-1`,
+          )
         })
 
-        it('Adds the success message to the flash', async () => {
+        it('Adds the saved phone number to the success flash', async () => {
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
             fieldName: 'phoneNumber',
+            phoneIds: [123],
           })
         })
 
-        it('Handles duplicate phone numbers with extensions', async () => {
+        it.each([
+          ['with extensions', '4321', '4321'],
+          ['without extensions', null, ''],
+        ])('Handles duplicate phone numbers %s', async (_, savedExtension, submittedExtension) => {
           personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
-            phones: [
-              {
-                id: 1,
-                typeDescription: 'Mobile',
-                number: '(12)34',
-                type: 'MOB',
-                extension: '4321',
-              },
-            ],
+            phones: [{ id: 1, typeDescription: 'Mobile', number: '(12)34', type: 'MOB', extension: savedExtension }],
             emails: [],
           })
 
-          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '4321' }
+          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: submittedExtension }
 
           await action(validRequest, res, next)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [
             {
-              href: '#phone-number',
-              text: 'This phone number already exists for this person. Add a new number or edit the saved one',
-            },
-          ])
-          expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/add-phone-number`)
-        })
-
-        it('Handles duplicate phone numbers without extensions', async () => {
-          personalPageService.getGlobalPhonesAndEmails.mockResolvedValue({
-            phones: [
-              {
-                id: 1,
-                typeDescription: 'Mobile',
-                number: '(12)34',
-                type: 'MOB',
-                extension: null,
-              },
-            ],
-            emails: [],
-          })
-
-          validRequest.body = { phoneNumberType: 'FAX', phoneNumber: '1(23)4', phoneExtension: '' }
-
-          await action(validRequest, res, next)
-
-          expect(validRequest.flash).toHaveBeenCalledWith('errors', [
-            {
-              href: '#phone-number',
+              href: '#phone-number-0',
               text: 'This phone number already exists for this person. Add a new number or edit the saved one',
             },
           ])
@@ -288,6 +302,7 @@ describe('GlobalNumbersController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Phone number updated',
             fieldName: 'phoneNumber',
+            phoneIds: [123],
           })
         })
 
