@@ -3,10 +3,8 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
-import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { inmateDetailMock, inmateDetailMockOverride } from '../data/localMockData/inmateDetailMock'
@@ -32,13 +30,11 @@ describe('prisonerLocationHistoryService', () => {
       getCellMovementReason: jest.fn(),
     }
 
-    prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
     prisonApiClient.getHistoryForLocation = jest
       .fn()
       .mockResolvedValue(mockHistoryForLocation([{ bookingId: PrisonerMockDataA.bookingId }]))
     prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(agencyDetailsMock)
-    prisonApiClient.getUserCaseLoads = jest.fn().mockResolvedValue(CaseLoadsDummyDataA)
     prisonApiClient.getCellMoveReasonTypes = jest.fn().mockResolvedValue(getCellMoveReasonTypesMock)
     prisonApiClient.getInmateDetail = jest.fn().mockResolvedValue(inmateDetailMock)
     cellMovementsApiClient.getCellMovementReason = jest.fn().mockResolvedValue(CellMovementReasonMock)

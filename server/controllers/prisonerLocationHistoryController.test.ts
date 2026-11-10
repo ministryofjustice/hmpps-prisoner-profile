@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import PrisonerLocationHistoryController from './prisonerLocationHistoryController'
-import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
@@ -57,12 +56,10 @@ describe('Specific Prisoner Location History', () => {
       getCellMovementReason: jest.fn(),
     }
 
-    prisonApiClient.getDetails.mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails.mockResolvedValue(StaffDetailsMock)
     historyForLocationMock = mockHistoryForLocation()
     prisonApiClient.getHistoryForLocation.mockImplementation(async () => historyForLocationMock)
     prisonApiClient.getAgencyDetails.mockResolvedValue({ ...AgenciesMock, ...agencyDetailsMock })
-    prisonApiClient.getUserCaseLoads.mockResolvedValue(CaseLoadsDummyDataA)
     prisonApiClient.getCellMoveReasonTypes.mockResolvedValue(getCellMoveReasonTypesMock)
     prisonApiClient.getInmateDetail.mockResolvedValue(inmateDetailMock)
     cellMovementReasonMock = CellMovementReasonMock

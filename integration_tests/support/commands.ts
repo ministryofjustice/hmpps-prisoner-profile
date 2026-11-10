@@ -88,7 +88,6 @@ Cypress.Commands.add(
     cy.task('stubGetSocNominal404')
     cy.task('stubSupportForAdditionalNeeds', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
-    cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubGetLatestCalculation', { prisonerNumber })
@@ -271,7 +270,6 @@ Cypress.Commands.add(
   'setupSpecificLocationHistoryPageStubs',
   ({ prisonerNumber, bookingId, nomisLocationId, dpsLocationId, staffId, prisonId, caseLoads, sharingHistory }) => {
     cy.task('stubPrisonerData', { prisonerNumber })
-    cy.task('stubGetDetails', prisonerNumber)
     cy.task('stubGetAttributesForLocation', dpsLocationId)
     cy.task('stubGetMappingUsingNomisLocationId', { nomisLocationId })
     cy.task('stubGetLocation', { dpsLocationId })

@@ -1,5 +1,4 @@
 import { Readable } from 'stream'
-import CaseLoad from './CaseLoad'
 import AccountBalances from './AccountBalances'
 import VisitSummary from './VisitSummary'
 import VisitBalances from './VisitBalances'
@@ -31,11 +30,8 @@ import OffenderBooking from './OffenderBooking'
 import CsraAssessment, { CsraAssessmentSummary } from './CsraAssessment'
 import Transaction from './Transaction'
 import { DamageObligationContainer } from './DamageObligation'
-import Movement from './Movement'
-import { MovementType } from '../../enums/movementType'
 import OffenderSentenceDetail from './OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './PrisonerSchedule'
-import Details from './Details'
 import HistoryForLocationItem from './HistoryForLocationItem'
 import CellMoveReasonType from './CellMoveReasonTypes'
 import Telephone, { AddressPhoneNumberRequest } from './Telephone'
@@ -64,8 +60,6 @@ export interface TransactionHistoryParams extends QueryParams {
 }
 
 export interface PrisonApiClient {
-  getUserCaseLoads(): Promise<CaseLoad[]>
-
   getAccountBalances(bookingId: number): Promise<AccountBalances>
 
   getVisitSummary(bookingId: number): Promise<VisitSummary>
@@ -151,8 +145,6 @@ export interface PrisonApiClient {
 
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
 
-  getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>
-
   getAppointmentTypes(): Promise<ReferenceCode[]>
 
   getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]>
@@ -191,8 +183,6 @@ export interface PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
-
-  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details>
 
   getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
 
