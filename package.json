@@ -115,7 +115,7 @@
     "esbuild-plugin-manifest": "^1.0.5",
     "esbuild-sass-plugin": "^3.7.0",
     "jest": "30.5.2",
-    "jest-html-reporter": "4.4.2",
+    "jest-html-reporter": "4.4.3",
     "jest-junit": "^17.0.0",
     "jsonwebtoken": "^9.0.3",
     "lint-staged": "17.6.0",
