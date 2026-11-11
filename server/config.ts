@@ -402,6 +402,7 @@ export default {
     courtAppearanceScheduler: get('COURT_APPEARANCE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     xRayBodyScansUi: get('X_RAY_BODY_SCANS_UI_URL', 'http://localhost:3001', requiredInProduction),
     transferScheduler: get('TRANSFER_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
+    releaseScheduler: get('RELEASE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     prisonerProperty: get('PRISONER_PROPERTY_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {

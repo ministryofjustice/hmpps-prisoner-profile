@@ -52,6 +52,7 @@ generic-service:
     COURT_APPEARANCE_SCHEDULER_UI_URL: "https://court-appearance-scheduler-dev.hmpps.service.justice.gov.uk"
     X_RAY_BODY_SCANS_UI_URL: "https://x-ray-body-scans-dev.hmpps.service.justice.gov.uk"
     TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler-dev.hmpps.service.justice.gov.uk"
+    RELEASE_SCHEDULER_UI_URL: "https://release-scheduler-dev.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_UI_URL: "https://prisoner-property-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
