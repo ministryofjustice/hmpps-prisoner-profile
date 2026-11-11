@@ -1,5 +1,9 @@
 @use 'govuk-frontend/dist/govuk';
 
+body {
+  position: relative;
+}
+
 .govuk-main-wrapper {
   padding-top: 0;
 

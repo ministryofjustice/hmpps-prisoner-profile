@@ -10,6 +10,10 @@
   {% set sidebarHtml %}
     <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
       {{ sidebar | safe }}
+
+      {% if sidebarSide == 'right' %}
+        {% include "./backToTop.njk" %}
+      {% endif %}
     </div>
   {% endset %}
   {% set contentHtml %}
@@ -27,4 +31,6 @@
   {% endif %}
 </div>
 
-{% include "./backToTop.njk" %}
+{% if sidebarSide != 'right' %}
+  {% include "./backToTop.njk" %}
+{% endif %}
