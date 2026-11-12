@@ -1,6 +1,5 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "partials/phoneNumberRow/macros/phoneNumberRow.njk" import phoneNumberRow %}
 {% extends "./editPage.njk" %}
 {% block form %}
   <form method="post" novalidate="novalidate" autocomplete="off">
@@ -12,48 +11,35 @@
       }
     }) %}
     <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
-    <div class="govuk-form-group {{ " govuk-form-group--error" if errors | findError(" phone-number-type") }}">
-      {{ govukRadios({
-        name: "phoneNumberType",
-        id: "phone-number-type",
-        fieldset: {
-          legend: {
-            text: "Phone number type",
-            classes: "govuk-!-font-weight-bold"
+    {% set formPhoneNumbers = phoneNumbers if phoneNumbers else [{
+      phoneNumberType: '',
+      phoneNumber: phoneNumber,
+      phoneExtension: phoneExtension,
+      index: 0,
+      phoneTypeOptions: phoneTypeOptions
+    }] %}
+    {% for phone in formPhoneNumbers %}
+      <div id="phone-number-section-{{ phone.index }}">
+        {% if addAnotherEnabled and formPhoneNumbers.length > 1 %}
+          <h2 class="govuk-heading-m">Phone number {{ loop.index }} of {{ formPhoneNumbers.length }}</h2>
+        {% endif %}
+        {{ phoneNumberRow(phone, errors, addAnotherEnabled, true) }}
+      </div>
+      {% if addAnotherEnabled and formPhoneNumbers.length > 1 %}
+        {{ govukButton({
+          text: "Remove phone number " + loop.index,
+          type: "submit",
+          classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+          attributes: {
+            name: "removePhoneNumber",
+            value: phone.index,
+            formaction: "?removePhoneNumber=" + phone.index,
+            "data-qa": "remove-global-phone-number-" + phone.index
           }
-        },
-        items: phoneTypeOptions,
-        errorMessage: { text: (errors | findError("phone-number-type")).text } if errors | findError("phone-number-type")
-      }) }}
-    </div>
-    {% set phoneNumberErrors = errors | findFieldErrors("phone-number") %}
-    <div class="govuk-form-group {{ " govuk-form-group--error" if phoneNumberErrors }}">
-      {{ govukInput({
-        label: {
-          text: "Phone number",
-          classes: "govuk-!-font-weight-bold"
-        },
-        id: "phone-number",
-        name: "phoneNumber",
-        classes: "govuk-input--width-20",
-        value: phoneNumber,
-        errorMessage: { html: phoneNumberErrors | join("<br>") } if phoneNumberErrors
-      }) }}
-    </div>
-    {% set phoneExtensionErrors = errors | findFieldErrors("phone-extension") %}
-    <div class="govuk-form-group {{ " govuk-form-group--error" if phoneExtensionErrors }}">
-      {{ govukInput({
-        label: {
-          text: "Extension (optional)",
-          classes: "govuk-!-font-weight-bold"
-        },
-        id: "phone-extension",
-        name: "phoneExtension",
-        classes: "govuk-input--width-5",
-        value: phoneExtension,
-        errorMessage: { html: phoneExtensionErrors | join("<br>") } if phoneExtensionErrors
-      }) }}
-    </div>
+        }) }}
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true" />
+      {% endif %}
+    {% endfor %}
     {% endcall %}
     {% if addAnotherEnabled %}
       <div class="govuk-button-group">

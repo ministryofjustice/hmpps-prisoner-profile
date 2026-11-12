@@ -105,6 +105,7 @@ describe('Addresses page', () => {
     expect(rows.eq(5).find('[class~="govuk-!-font-weight-bold"]')).toHaveLength(0)
     expect(rows.eq(5).text()).toContain('02012  345678')
     expect(rows.eq(5).find('[data-qa="phone-number-value"]')).toHaveLength(1)
+    expect(rows.eq(5).find('[data-qa="phone-number-value"]').text()).toBe('02012  345678')
     expect(rows.eq(5).find('[data-qa="phone-updated-on"]').text()).toBe('Updated on 1 February 2024')
     expect(rows.eq(5).find('a').attr('href')).toBe(`${addressUrl}/change-address-phone-number/124`)
     expect(rows.eq(5).find('.govuk-visually-hidden').text().trim()).toBe('Agency visit line number 02012  345678')

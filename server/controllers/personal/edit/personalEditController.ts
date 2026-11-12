@@ -208,12 +208,13 @@ export default abstract class PersonalEditController {
     fieldData: FieldData
     auditDetails: object
     options?: {
-      onSubmit: (
+      onSubmit?: (
         submitReq: Request,
         submitRes: Response,
         submitFieldData: FieldData,
         setterOutcome: SetterOutcome | void,
       ) => Promise<void>
+      flashMessage?: () => Record<string, unknown>
     }
   }): Promise<void> {
     const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor, successFlashFieldName } = fieldData
@@ -225,6 +226,7 @@ export default abstract class PersonalEditController {
         req.flash('flashMessage', {
           text: `${successFlashFieldName ?? pageTitle} updated`,
           fieldName,
+          ...options?.flashMessage?.(),
         })
 
         this.auditService

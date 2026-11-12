@@ -60,6 +60,13 @@ describe('Phone number validator', () => {
     ])
   })
 
+  it('allows free-text address extensions up to seven characters', () => {
+    expect(phoneNumberValidator({ ...validRequest, phoneExtension: "Mum's" }, true)).toEqual([])
+    expect(phoneNumberValidator({ ...validRequest, phoneExtension: '12345678' }, true)).toEqual([
+      { text: 'Extension must be 7 characters or less', href: '#phone-extension' },
+    ])
+  })
+
   it('validates indexed phone number fields', () => {
     expect(
       phoneNumberValidator({
@@ -82,7 +89,7 @@ describe('Phone number validator', () => {
     [
       'global',
       0,
-      '#phone-number',
+      '#phone-number-0',
       'This phone number already exists for this person. Add a new number or edit the saved one',
     ],
     [

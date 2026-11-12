@@ -136,8 +136,8 @@ context('Primary or Postal Address Page', () => {
         prisonerNumber,
         addressId,
         requestBody: [
-          { phoneNumber: '01234 567890', phoneNumberType: 'MOB' },
-          { phoneNumber: '07853 544216', phoneNumberType: 'MOB' },
+          { phoneNumber: '01234 567890', phoneNumberType: 'MOB', extension: '' },
+          { phoneNumber: '07853 544216', phoneNumberType: 'MOB', extension: '' },
         ],
       })
 

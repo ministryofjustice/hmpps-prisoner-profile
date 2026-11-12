@@ -111,7 +111,7 @@ context('Addresses page', () => {
     cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PrisonerProfileSensitiveEdit] })
     const [address] = mockAddresses
     const { addressId } = address
-    const requestBody = [{ phoneNumber: '01234 567890', phoneNumberType: 'HOME' }]
+    const requestBody = [{ phoneNumber: '01234 567890', phoneNumberType: 'HOME', extension: '' }]
     const phoneNumberInput = '01234567890'
     cy.task('stubAddresses', { prisonerNumber, resp: [address] })
     cy.task('stubAddAddressPhoneNumbers', { prisonerNumber, addressId, requestBody })
