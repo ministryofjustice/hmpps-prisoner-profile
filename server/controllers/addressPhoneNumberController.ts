@@ -7,8 +7,15 @@ import NotFoundError from '../utils/notFoundError'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import logger from '../../logger'
 import {
+  redirectAfterPhoneNumberRemoval,
+  redirectToNewPhoneNumberRow,
+  redirectWithPhoneNumberErrors,
+} from '../utils/phoneNumberRows'
+import {
+  deduplicatePhoneNumberPairs,
   normalisePhoneExtension,
   phoneNumberForStorage,
+  phoneNumberValidator,
   validatePhoneNumberDuplicate,
 } from '../validators/personal/phoneNumberValidator'
 
@@ -124,38 +131,13 @@ export default class AddressPhoneNumberController {
       const addAddressPhoneNumberUrl = `/prisoner/${prisonerNumber}/addresses/${addressId}/add-address-phone-number`
 
       if (!isChanging && req.query.removePhoneNumber !== undefined) {
-        const removedIndex = Number(req.query.removePhoneNumber)
-        const requestBody = Object.fromEntries(
-          phoneNumbers
-            .filter((_, index) => index !== removedIndex)
-            .flatMap((phoneNumber, index) => [
-              [`phoneNumberType${index}`, phoneNumber.phoneNumberType] as const,
-              [`phoneNumber${index}`, phoneNumber.phoneNumber] as const,
-              [`phoneExtension${index}`, phoneNumber.phoneExtension] as const,
-            ]),
+        return redirectAfterPhoneNumberRemoval(
+          req,
+          res,
+          phoneNumbers,
+          Number(req.query.removePhoneNumber),
+          addAddressPhoneNumberUrl,
         )
-        if (req.body.highlightAddressId) requestBody.highlightAddressId = req.body.highlightAddressId
-        if (req.body.addressCacheId) requestBody.addressCacheId = req.body.addressCacheId
-        req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`${addAddressPhoneNumberUrl}#phone-number-section-${Math.max(removedIndex - 1, 0)}`)
-      }
-
-      const phoneNumberRequests = (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
-        ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
-          phoneNumber: phoneNumberForStorage(phoneNumber),
-          phoneNumberType,
-          extension: normalisePhoneExtension(phoneExtension) || undefined,
-        }),
-      )
-
-      if (!isChanging && req.query.addAnother === 'true') {
-        const requestBody = { ...req.body }
-        const nextIndex = phoneNumbers.length
-        requestBody[`phoneNumberType${nextIndex}`] = ''
-        requestBody[`phoneNumber${nextIndex}`] = ''
-        requestBody[`phoneExtension${nextIndex}`] = ''
-        req.flash('requestBody', JSON.stringify(requestBody))
-        return res.redirect(`${addAddressPhoneNumberUrl}#phone-number-section-${nextIndex}`)
       }
 
       try {
@@ -165,23 +147,35 @@ export default class AddressPhoneNumberController {
         const existingNumbers = (address?.phones ?? [])
           .filter(phone => !isChanging || phone.phoneId !== Number(req.params.phoneId))
           .map(phone => ({ number: phone.number, extension: phone.ext }))
-        const duplicateErrors = phoneNumberRequests.flatMap((phone, index) => {
-          const errors = validatePhoneNumberDuplicate(
-            phone.phoneNumber,
-            phone.extension,
-            existingNumbers,
-            'address',
-            index,
-          )
-          if (!errors.length) existingNumbers.push({ number: phone.phoneNumber, extension: phone.extension })
-          return errors
-        })
+        const errors = [
+          ...phoneNumberValidator(req.body, true),
+          ...phoneNumbers.flatMap((phone, index) =>
+            validatePhoneNumberDuplicate(phone.phoneNumber, phone.phoneExtension, existingNumbers, 'address', index),
+          ),
+        ]
 
-        if (duplicateErrors.length) {
-          req.flash('errors', duplicateErrors)
-          req.flash('requestBody', JSON.stringify(req.body))
-          return res.redirect(isChanging ? req.originalUrl : addAddressPhoneNumberUrl)
+        if (errors.length) {
+          return redirectWithPhoneNumberErrors(
+            req,
+            res,
+            errors,
+            isChanging ? req.originalUrl : addAddressPhoneNumberUrl,
+          )
         }
+
+        if (!isChanging && req.query.addAnother === 'true') {
+          return redirectToNewPhoneNumberRow(req, res, phoneNumbers.length, addAddressPhoneNumberUrl)
+        }
+
+        const phoneNumberRequests = deduplicatePhoneNumberPairs(
+          (isChanging ? phoneNumbers.slice(0, 1) : phoneNumbers).map(
+            ({ phoneNumber, phoneNumberType, phoneExtension }) => ({
+              phoneNumber: phoneNumberForStorage(phoneNumber),
+              phoneNumberType,
+              extension: normalisePhoneExtension(phoneExtension),
+            }),
+          ),
+        )
 
         const savedPhoneNumbers = isChanging
           ? [

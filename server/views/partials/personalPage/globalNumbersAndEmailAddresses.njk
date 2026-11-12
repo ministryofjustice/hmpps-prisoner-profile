@@ -11,7 +11,7 @@
   <div class="hmpps-global-numbers-and-emails__phones__list">
     {% if globalNumbersAndEmails.status === 'fulfilled' %}
       {% for phone in globalNumbersAndEmails.value.phones %}
-        <div class="hmpps-global-numbers-and-emails__phone">
+        <div class="hmpps-global-numbers-and-emails__phone {{ 'row-updated' if flashMessage.fieldName === 'phoneNumber' and flashMessage.phoneIds and phone.id in flashMessage.phoneIds }}">
           <div class="hmpps-global-numbers-and-emails__phone__details">
             <p class="govuk-!-margin-0 govuk-!-font-weight-bold">{{ phone.typeDescription }}</p>
             <p class="govuk-!-margin-0" data-qa="phone-number-value">{{ phone.number }}</p>
@@ -66,7 +66,7 @@
   <div class="govuk-grid-row" data-qa="addresses">
     <div class="govuk-grid-column-full hmpps-global-numbers-and-emails">
       <dl class="govuk-summary-list govuk-summary-list--no-border">
-        {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.value.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true, classes: "row-updated" if flashMessage.fieldName === "phoneNumber" else "" }) }}
+        {{ summaryListRow("Phone numbers", phonesHtml if globalNumbersAndEmails.value.phones.length > 0 else notEnteredTag, "phone-numbers", { html: true, classes: "row-updated" if flashMessage.fieldName === "phoneNumber" and not flashMessage.phoneIds else "" }) }}
         {{ summaryListRow("Email addresses", emailsHtml if globalNumbersAndEmails.value.emails.length > 0 else notEnteredTag, "email-addresses", { html: true, classes: "row-updated" if flashMessage.fieldName === "emailAddress" else "" }) }}
       </dl>
     </div>

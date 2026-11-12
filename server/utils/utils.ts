@@ -30,6 +30,17 @@ export const addressPhoneNumberFormValues = (body: Record<string, unknown>) => {
     .map(key => key.match(/^phoneNumber(?:Type|Extension)?(\d+)$/)?.[1])
     .filter((index): index is string => index !== undefined)
     .map(Number)
+
+  if (!indexes.length) {
+    return [
+      {
+        phoneNumberType: value('phoneNumberType'),
+        phoneNumber: value('phoneNumber'),
+        phoneExtension: value('phoneExtension'),
+      },
+    ]
+  }
+
   const lastIndex = Math.max(0, ...indexes)
 
   return Array.from({ length: lastIndex + 1 }, (_, index) => ({
