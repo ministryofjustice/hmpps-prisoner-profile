@@ -108,7 +108,7 @@ generic-service:
     CHANGE_CONTACT_DETAILS_LINK_ENABLED: "false"
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     PROPERTY_SUMMARY_TILE_ENABLED: "true"
-    USE_PERSON_API_FOR_RELIGION: "false"
+    USE_PERSON_API_FOR_RELIGION: "true"
 
   allowlist:
     groups:

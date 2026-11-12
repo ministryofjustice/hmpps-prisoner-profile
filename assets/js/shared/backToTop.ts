@@ -15,6 +15,11 @@ export class BackToTop extends Component<HTMLDivElement> {
   constructor(root: HTMLDivElement) {
     super(root)
 
+    // immovable back-to-top links need no observation
+    if (root.classList.contains('hmpps-back-to-top--static')) {
+      return
+    }
+
     // Check if we can use Intersection Observers
     if (!('IntersectionObserver' in window)) {
       // If there's no support fallback to regular behaviour

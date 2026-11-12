@@ -7,12 +7,12 @@ export const propertySummaryAtPrisonMock = (prisonId: string, prisonName: string
   prisonerHeldHere: true,
   currentEstablishmentId: prisonId,
   currentEstablishmentName: prisonName,
-  heldAtThisPrison: 5,
-  dueToTransferOut: 2,
-  dueToBeReturned: 1,
-  dueToBeDisposed: 2,
-  heldAtOtherPrisons: 0,
+  heldAtThisPrison: 10,
   dueToTransferIn: 1,
+  dueToTransferOut: 2,
+  dueToBeDisposed: 3,
+  dueToBeReturned: 4,
+  heldAtOtherPrisons: 0,
   hasEverHadProperty: true,
 })
 
