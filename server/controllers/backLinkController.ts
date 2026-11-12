@@ -65,6 +65,11 @@ export const registeredBackLinkServices: RegisteredService[] = [
     hostname: sanitizeUrl(config.serviceUrls.transferScheduler),
     defaultBackLinkText: 'Back to Schedule a transfer for a prisoner',
   },
+  {
+    name: 'release-scheduler',
+    hostname: sanitizeUrl(config.serviceUrls.releaseScheduler),
+    defaultBackLinkText: 'Back to Schedule a release for a prisoner',
+  },
 ]
 
 export const saveBackLink =
