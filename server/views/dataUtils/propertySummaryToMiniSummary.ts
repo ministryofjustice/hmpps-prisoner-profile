@@ -4,7 +4,6 @@ import {
   PrisonerPropertyPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { MiniCardMapper } from '../components/miniCard/miniCardData'
-import { pluralise } from '../../utils/pluralise'
 import { Result } from '../../utils/result/result'
 import { PrisonerPropertySummary } from '../../data/interfaces/prisonerPropertyApi/prisonerPropertyApiClient'
 import config from '../../config'
@@ -17,12 +16,6 @@ const mapper: MiniCardMapper<Result<PrisonerPropertySummary>, [string, PrisonerP
   if (propertySummaryResult.status === 'fulfilled') {
     const summary = propertySummaryResult.getOrNull()
 
-    const warningItem = (text: string) => ({
-      text,
-      showWarningIcon: true,
-      classes: 'hmpps-red-text govuk-!-font-weight-bold',
-    })
-
     return {
       heading: 'Property',
       id: 'property',
@@ -32,12 +25,8 @@ const mapper: MiniCardMapper<Result<PrisonerPropertySummary>, [string, PrisonerP
       items: [
         { text: `Due for transfer in: ${summary.dueToTransferIn}` },
         { text: `Due for transfer out: ${summary.dueToTransferOut}` },
-        ...(summary.dueToBeDisposed > 0
-          ? [warningItem(`${pluralise(summary.dueToBeDisposed, 'disposal')} overdue`)]
-          : []),
-        ...(summary.dueToBeReturned > 0
-          ? [warningItem(`${pluralise(summary.dueToBeReturned, 'return')} overdue`)]
-          : []),
+        { text: `Due for disposal: ${summary.dueToBeDisposed}` },
+        { text: `Due for return: ${summary.dueToBeReturned}` },
       ],
       linkLabel: 'Property',
       linkHref: isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
