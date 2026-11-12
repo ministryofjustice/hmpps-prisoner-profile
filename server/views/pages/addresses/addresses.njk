@@ -71,9 +71,7 @@
     {% for phone in phoneNumbers %}
       {% set phoneHtml %}
         <p class="govuk-body govuk-!-margin-0">{{ phone.typeDescription or phone.type }}</p>
-        <p class="govuk-body govuk-!-margin-0" data-qa="phone-number-value">
-          {{ phone.number }}
-        </p>
+        <p class="govuk-body govuk-!-margin-0"><span data-qa="phone-number-value">{{ phone.number }}</span></p>
         {% if phone.extension %}<p class="govuk-body govuk-!-margin-0" data-qa="phone-extension-value">Extension: {{ phone.extension }}</p>{% endif %}
         {% if phone.updatedOn %}
           <p class="hmpps-address__updated-date govuk-body-s" data-qa="phone-updated-on">

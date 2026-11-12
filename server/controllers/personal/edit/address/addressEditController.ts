@@ -188,6 +188,12 @@ export default class AddressEditController {
           })
           .catch(error => logger.error(error))
 
+        req.flash('flashMessage', {
+          text: 'Address updated',
+          fieldName: 'addresses',
+          addressIds: [createdAddress.addressId],
+        })
+
         if (
           req.body.submitAction === 'saveAndContinueToAddPhoneNumber' &&
           editAddressSpecificPhoneNumbersEnabled((res.locals.user as PrisonUser).activeCaseLoadId)
@@ -202,11 +208,6 @@ export default class AddressEditController {
         }
 
         await this.ephemeralDataService.removeData(addressCacheId as UUID)
-        req.flash('flashMessage', {
-          text: 'Address updated',
-          fieldName: 'addresses',
-          addressIds: [createdAddress.addressId],
-        })
 
         return res.redirect(`/prisoner/${prisonerNumber}/personal#addresses`)
       } catch {

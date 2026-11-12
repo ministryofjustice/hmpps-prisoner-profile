@@ -39,7 +39,6 @@ import { numberOfChildrenValidator } from '../../../validators/personal/numberOf
 import addressEditRouter from './addressEditRouter'
 import { emailValidator } from '../../../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
-import { phoneNumberValidator } from '../../../validators/personal/phoneNumberValidator'
 import { populateEditPageData } from '../../../middleware/populateEditPageData'
 import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
 import { personalPageBasePath } from '../personalRouter'
@@ -480,10 +479,6 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostAddPhoneNumber,
       method: globalNumbersController.globalNumbers().add.submit,
-      validation: {
-        validators: [phoneNumberValidator],
-        redirectBackOnError: true,
-      },
     },
     requiredPermission: CorePersonRecordPermission.edit_phone_numbers,
   })
@@ -497,11 +492,6 @@ export default function editRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditPhoneNumber,
       method: globalNumbersController.globalNumbers().edit.submit,
-      validation: {
-        validators: [phoneNumberValidator],
-        redirectBackOnError: true,
-        redirectTo: ({ phoneNumberId }) => `personal/change-phone-number/${phoneNumberId}`,
-      },
     },
     requiredPermission: CorePersonRecordPermission.edit_phone_numbers,
   })

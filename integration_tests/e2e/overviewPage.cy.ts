@@ -320,8 +320,8 @@ context('Overview Page', () => {
         overviewPage.propertyCard().contains('p', 'Containers in Moorland (HMP & YOI)')
         overviewPage.propertyCard().contains('.mini-card__item', 'Due for transfer in: 1')
         overviewPage.propertyCard().contains('.mini-card__item', 'Due for transfer out: 2')
-        overviewPage.propertyCard().contains('.mini-card__item', '2 disposals overdue')
-        overviewPage.propertyCard().contains('.mini-card__item', '1 return overdue')
+        overviewPage.propertyCard().contains('.mini-card__item', 'Due for disposal: 3')
+        overviewPage.propertyCard().contains('.mini-card__item', 'Due for return: 4')
         overviewPage
           .propertyCard()
           .contains(

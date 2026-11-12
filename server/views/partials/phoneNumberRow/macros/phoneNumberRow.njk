@@ -1,0 +1,41 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% macro phoneNumberRow(phone, errors, indexed, withTypeLegend) %}
+  {% set idSuffix = ("-" + phone.index) if indexed else "" %}
+  {% set nameSuffix = phone.index if indexed else "" %}
+  {% set typeFieldset = { legend: { text: "Phone number type", classes: "govuk-!-font-weight-bold" } } if withTypeLegend else false %}
+  {% set phoneTypeError = errors | findError("phone-number-type" + idSuffix) %}
+  {% set phoneNumberErrors = errors | findFieldErrors("phone-number" + idSuffix) %}
+  {% set phoneExtensionErrors = errors | findFieldErrors("phone-extension" + idSuffix) %}
+
+  <div class="govuk-form-group {{ " govuk-form-group--error" if phoneTypeError }}">
+    {{ govukRadios({
+      name: "phoneNumberType" + nameSuffix,
+      id: "phone-number-type" + idSuffix,
+      fieldset: typeFieldset,
+      items: phone.phoneTypeOptions,
+      errorMessage: { text: phoneTypeError.text } if phoneTypeError
+    }) }}
+  </div>
+  <div class="govuk-form-group {{ " govuk-form-group--error" if phoneNumberErrors }}">
+    {{ govukInput({
+      label: { text: "Phone number", classes: "govuk-!-font-weight-bold" },
+      id: "phone-number" + idSuffix,
+      name: "phoneNumber" + nameSuffix,
+      classes: "govuk-input--width-20",
+      value: phone.phoneNumber,
+      errorMessage: { html: phoneNumberErrors | join("<br>") } if phoneNumberErrors
+    }) }}
+  </div>
+  <div class="govuk-form-group {{ " govuk-form-group--error" if phoneExtensionErrors }}">
+    {{ govukInput({
+      label: { text: "Extension (optional)", classes: "govuk-!-font-weight-bold" },
+      id: "phone-extension" + idSuffix,
+      name: "phoneExtension" + nameSuffix,
+      classes: "govuk-input--width-5",
+      value: phone.phoneExtension,
+      errorMessage: { html: phoneExtensionErrors | join("<br>") } if phoneExtensionErrors
+    }) }}
+  </div>
+{% endmacro %}

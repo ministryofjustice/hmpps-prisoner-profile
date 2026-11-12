@@ -13,8 +13,6 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import { editAddressSpecificPhoneNumbersEnabled, editProfileEnabled } from '../utils/featureFlags'
-import validationMiddleware from '../middleware/validationMiddleware'
-import { phoneNumberValidator } from '../validators/personal/phoneNumberValidator'
 
 export default function addressRouter(services: Services): Router {
   const router = Router()
@@ -45,10 +43,6 @@ export default function addressRouter(services: Services): Router {
     `${basePath}/addresses/:addressId/add-address-phone-number`,
     auditPageAccessAttempt({ services, page: Page.AddAddressPhoneNumber }),
     ...addressPhoneNumberMiddleware,
-    (req, res, next) => {
-      if (req.query.removePhoneNumber !== undefined) return next()
-      return validationMiddleware([phoneNumberValidator], { redirectBackOnError: true })(req, res, next)
-    },
     addressPhoneNumberController.submit(),
   )
 
@@ -69,7 +63,6 @@ export default function addressRouter(services: Services): Router {
     `${basePath}/addresses/:addressId/change-address-phone-number/:phoneId`,
     auditPageAccessAttempt({ services, page: Page.EditAddressPhoneNumber }),
     ...addressPhoneNumberMiddleware,
-    validationMiddleware([phoneNumberValidator], { redirectBackOnError: true }),
     addressPhoneNumberController.submit(),
   )
 
