@@ -35,7 +35,7 @@ import CsraAssessment, { CsraAssessmentSummary } from './interfaces/prisonApi/Cs
 import Transaction from './interfaces/prisonApi/Transaction'
 import { DamageObligationContainer } from './interfaces/prisonApi/DamageObligation'
 import OffenderSentenceDetail from './interfaces/prisonApi/OffenderSentenceDetail'
-import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces/prisonApi/PrisonerSchedule'
+import { PrisonerPrisonSchedule } from './interfaces/prisonApi/PrisonerSchedule'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
 import Telephone, { AddressPhoneNumberRequest } from './interfaces/prisonApi/Telephone'
@@ -377,114 +377,11 @@ export default class PrisonApiRestClient extends RestClient implements PrisonApi
     return this.get({ path: `/api/bookings/${bookingId}/events/nextWeek` }, this.token)
   }
 
-  getAppointmentTypes(): Promise<ReferenceCode[]> {
-    return this.get({ path: '/api/reference-domains/scheduleReasons?eventType=APP' }, this.token)
-  }
-
   getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]> {
     return this.post(
       {
         path: '/api/offender-sentences',
         data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
-    return this.post(
-      {
-        path: `/api/schedules/${agencyId}/courtEvents?date=${date}`,
-        data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getVisits(
-    offenderNumbers: string[],
-    agencyId: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]> {
-    return this.post(
-      {
-        path: `/api/schedules/${agencyId}/visits`,
-        query: mapToQueryString({ date, timeSlot }),
-        data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getAppointments(
-    offenderNumbers: string[],
-    agencyId: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]> {
-    return this.post(
-      {
-        path: `/api/schedules/${agencyId}/appointments`,
-        query: mapToQueryString({ date, timeSlot }),
-        data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getActivities(
-    offenderNumbers: string[],
-    agencyId: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]> {
-    return this.post(
-      {
-        path: `/api/schedules/${agencyId}/activities`,
-        query: mapToQueryString({ date, timeSlot }),
-        data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
-    return this.post(
-      {
-        path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
-        data: offenderNumbers,
-      },
-      this.token,
-    )
-  }
-
-  getActivitiesAtLocation(
-    locationId: number,
-    date: string,
-    timeSlot?: TimeSlot,
-    includeSuspended = false,
-  ): Promise<PrisonerSchedule[]> {
-    return this.get(
-      {
-        path: `/api/schedules/locations/${locationId}/activities`,
-        query: mapToQueryString({ date, timeSlot, includeSuspended }),
-      },
-      this.token,
-    )
-  }
-
-  getActivityList(
-    agencyId: string,
-    locationId: number,
-    usage: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]> {
-    return this.get(
-      {
-        path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
-        query: mapToQueryString({ date, timeSlot }),
       },
       this.token,
     )

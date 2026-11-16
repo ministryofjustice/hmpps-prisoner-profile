@@ -30,7 +30,6 @@ import {
   sentenceCase,
   sortByLatestAndUuid,
   summaryListOneHalfWidth,
-  toFullCourtLink,
   toNonAssociationRows,
   unavailableApiErrorMessage,
   unavailablePlaceholder,
@@ -242,7 +241,4 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('sexualOrientationText', mapSexualOrientationText)
   njkEnv.addFilter('sentenceCase', sentenceCase)
   njkEnv.addFilter('filterArrayOnProperty', filterArrayOnPropertyFilter)
-
-  // BVLS specific filter
-  njkEnv.addFilter('toFullCourtLink', toFullCourtLink)
 }

@@ -15,7 +15,6 @@ import PrisonerSearchService from './prisonerSearch'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import CsraService from './csraService'
 import MoneyService from './moneyService'
-import AppointmentService from './appointmentService'
 import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
@@ -68,10 +67,8 @@ export const services = () => {
     adjudicationsApiClientBuilder,
     prisonerPropertyApiClientBuilder,
     nonAssociationsApiClientBuilder,
-    whereaboutsApiClientBuilder,
     cellMovementsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
-    bookAVideoLinkApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
@@ -140,12 +137,6 @@ export const services = () => {
   )
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
-  const appointmentService = new AppointmentService(
-    locationDetailsService,
-    prisonApiClientBuilder,
-    whereaboutsApiClientBuilder,
-    bookAVideoLinkApiClientBuilder,
-  )
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
@@ -265,7 +256,6 @@ export const services = () => {
     offencesPageService,
     csraService,
     moneyService,
-    appointmentService,
     locationDetailsService,
     prisonerLocationHistoryService,
     professionalContactsService,
