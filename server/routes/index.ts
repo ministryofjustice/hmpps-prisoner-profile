@@ -22,7 +22,7 @@ import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
-import appointmentRouter from './appointmentRouter'
+import appointmentRedirectRouter from './appointmentRedirectRouter'
 import PrisonerLocationHistoryController from '../controllers/prisonerLocationHistoryController'
 import professionalContactsRouter from './professionalContactsRouter'
 import goalsRouter from './goalsRouter'
@@ -253,7 +253,7 @@ export default function routes(services: Services): Router {
   router.use(caseNotesRouter(services))
   router.use(alertsRouter(services))
   router.use(csraRouter(services))
-  router.use(appointmentRouter(services))
+  router.use(appointmentRedirectRouter())
   router.use(professionalContactsRouter(services))
   router.use(goalsRouter(services))
   router.use(locationDetailsRouter(services))

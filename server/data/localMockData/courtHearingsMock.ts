@@ -1,6 +1,4 @@
-import type { SelectOption } from '../../interfaces/GovOptions'
-import { CourtHearing } from '../interfaces/prisonApi/CourtCase'
-import ReferenceCode from '../interfaces/bookAVideoLinkApi/ReferenceCode'
+import type { CourtHearing } from '../interfaces/prisonApi/CourtCase'
 
 export const CourtHearingsMock: CourtHearing[] = [
   {
@@ -77,37 +75,5 @@ export const CourtHearingsMockA: CourtHearing[] = [
       active: true,
       courtType: 'CC',
     },
-  },
-]
-
-export const courtHearingTypes: ReferenceCode[] = [
-  {
-    referenceCodeId: 1,
-    groupCode: 'COURT_HEARING_TYPE',
-    code: 'APPEAL',
-    description: 'Appeal',
-  },
-]
-
-export const probationMeetingTypes: ReferenceCode[] = [
-  {
-    referenceCodeId: 1,
-    groupCode: 'PROBATION_MEETING_TYPE',
-    code: 'PSR',
-    description: 'Post-sentence report',
-  },
-]
-
-export const courtHearingTypesSelectOptions: SelectOption[] = [
-  {
-    value: 'APPEAL',
-    text: 'Appeal',
-  },
-]
-
-export const probationMeetingTypesSelectOptions: SelectOption[] = [
-  {
-    value: 'PSR',
-    text: 'Post-sentence report',
   },
 ]

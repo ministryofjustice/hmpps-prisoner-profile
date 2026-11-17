@@ -1,8 +1,7 @@
-import { AuditService } from '../../server/services/auditService'
+import type { AuditService } from '../../server/services/auditService'
 
-export const auditServiceMock = (): AuditService => ({
+export const auditServiceMock = (): jest.Mocked<AuditService> => ({
   sendAccessAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendAddAppointment: jest.fn().mockImplementation(() => Promise.resolve()),
   sendPageView: jest.fn().mockImplementation(() => Promise.resolve()),
   sendSearch: jest.fn().mockImplementation(() => Promise.resolve()),
   sendPostAttempt: jest.fn().mockImplementation(() => Promise.resolve()),

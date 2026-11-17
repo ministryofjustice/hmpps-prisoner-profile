@@ -9,8 +9,8 @@ First, build the project by running:
 
 `npm run setup` and then `npm run build`
 
-The Prisoner Profile service pulls data from a large number of sources and
-therefore has a number of dependencies:
+The Prisoner Profile service pulls data from a large number of sources and  therefore has a number of dependencies
+(NB: this is not an exhaustive list!):
 
 * [redis](https://redis.io/) - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
@@ -21,8 +21,6 @@ therefore has a number of dependencies:
   allocation service for associating Prison Offender Managers with Offenders
 * [keyworker-api](https://github.com/ministryofjustice/keyworker-api) - an API providing backend functionality for
   keyworkers
-* [whereabouts-api](https://github.com/ministryofjustice/whereabouts-api) - an API providing backend functionality for
-  the location of prisoners
 * [offender-case-notes](https://github.com/ministryofjustice/offender-case-notes) - an API managing storage of offender
   case notes
 * [hmpps-incentives-api](https://github.com/ministryofjustice/hmpps-incentives-api) - an API managing offender
@@ -61,7 +59,6 @@ ADJUDICATIONS_UI_URL=https://manage-adjudications-dev.hmpps.service.justice.gov.
 ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
 APPOINTMENTS_URL=https://activities-dev.prison.service.justice.gov.uk/appointments
 ASSESS_FOR_EARLY_RELEASE_UI_URL=https:https://assess-for-early-release-dev.hmpps.service.justice.gov.uk
-BOOK_A_VIDEO_LINK_API_URL=https://book-a-video-link-api-dev.prison.service.justice.gov.uk
 CASE_NOTES_API_URL=https://dev.offender-case-notes.service.justice.gov.uk
 COMPONENT_API_LATEST=true
 COMPONENT_API_URL=https://frontend-components-dev.hmpps.service.justice.gov.uk
@@ -92,7 +89,6 @@ USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
 WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov.uk
 INCIDENT_REPORTING_UI_URL=https://incident-reporting-dev.hmpps.service.justice.gov.uk
 PRISON_ROLL_COUNT_UI_URL=https://prison-roll-count-dev.hmpps.service.justice.gov.uk
-WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
 CELL_MOVEMENTS_API_URL=https://change-someones-cell-api-dev.hmpps.service.justice.gov.uk
 LEARNING_AND_WORK_PROGRESS_UI_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
 EDUCATION_AND_WORK_PLAN_API_URL=https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk

@@ -28,9 +28,7 @@ import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
-import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
-import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
@@ -344,129 +342,12 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAppointmentTypes', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulPrisonApiCall(`/api/reference-domains/scheduleReasons?eventType=APP`, appointmentTypesMock)
-      const output = await prisonApiClient.getAppointmentTypes()
-      expect(output).toEqual(appointmentTypesMock)
-    })
-  })
-
   describe('getSentenceData', () => {
     it('Should return data from the API', async () => {
       const offenderNumbers = ['AB1234C']
       mockSuccessfulPrisonApiPost(`/api/offender-sentences`, offenderNumbers, offenderSentenceDetailsMock)
       const output = await prisonApiClient.getSentenceData(offenderNumbers)
       expect(output).toEqual(offenderSentenceDetailsMock)
-    })
-  })
-
-  describe('getCourtEvents', () => {
-    it('Should return data from the API', async () => {
-      const offenderNumbers = ['AB1234C']
-      const agencyId = 'MDI'
-      const date = '2023-01-01'
-      mockSuccessfulPrisonApiPost(
-        `/api/schedules/${agencyId}/courtEvents?date=${date}`,
-        offenderNumbers,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getCourtEvents(offenderNumbers, agencyId, date)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getVisits', () => {
-    it('Should return data from the API', async () => {
-      const offenderNumbers = ['AB1234C']
-      const agencyId = 'MDI'
-      const date = '2023-01-01'
-      const timeSlot = 'AM'
-      mockSuccessfulPrisonApiPost(
-        `/api/schedules/${agencyId}/visits?${mapToQueryString({ date, timeSlot })}`,
-        offenderNumbers,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getVisits(offenderNumbers, agencyId, date, timeSlot)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getAppointments', () => {
-    it('Should return data from the API', async () => {
-      const offenderNumbers = ['AB1234C']
-      const agencyId = 'MDI'
-      const date = '2023-01-01'
-      const timeSlot = 'AM'
-      mockSuccessfulPrisonApiPost(
-        `/api/schedules/${agencyId}/appointments?${mapToQueryString({ date, timeSlot })}`,
-        offenderNumbers,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getAppointments(offenderNumbers, agencyId, date, timeSlot)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getActivities', () => {
-    it('Should return data from the API', async () => {
-      const offenderNumbers = ['AB1234C']
-      const agencyId = 'MDI'
-      const date = '2023-01-01'
-      const timeSlot = 'AM'
-      mockSuccessfulPrisonApiPost(
-        `/api/schedules/${agencyId}/activities?${mapToQueryString({ date, timeSlot })}`,
-        offenderNumbers,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getActivities(offenderNumbers, agencyId, date, timeSlot)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getExternalTransfers', () => {
-    it('Should return data from the API', async () => {
-      const offenderNumbers = ['AB1234C']
-      const agencyId = 'MDI'
-      const date = '2023-01-01'
-      mockSuccessfulPrisonApiPost(
-        `/api/schedules/${agencyId}/externalTransfers?${mapToQueryString({ date })}`,
-        offenderNumbers,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getExternalTransfers(offenderNumbers, agencyId, date)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getActivitiesAtLocation', () => {
-    it('Should return data from the API', async () => {
-      const locationId = 27000
-      const date = '2023-01-01'
-      const timeSlot = 'AM'
-      const includeSuspended = false
-      mockSuccessfulPrisonApiCall(
-        `/api/schedules/locations/${locationId}/activities?${mapToQueryString({ date, timeSlot, includeSuspended })}`,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getActivitiesAtLocation(locationId, date, timeSlot, includeSuspended)
-      expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getActivityList', () => {
-    it('Should return data from the API', async () => {
-      const agencyId = 'MDI'
-      const locationId = 27000
-      const usage = 'USAGE'
-      const date = '2023-01-01'
-      const timeSlot = 'AM'
-      mockSuccessfulPrisonApiCall(
-        `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}?${mapToQueryString({ date, timeSlot })}`,
-        prisonerSchedulesMock,
-      )
-      const output = await prisonApiClient.getActivityList(agencyId, locationId, usage, date, timeSlot)
-      expect(output).toEqual(prisonerSchedulesMock)
     })
   })
 

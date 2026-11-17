@@ -159,14 +159,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
-    whereaboutsApi: {
-      url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('WHEREABOUTS_API_URL_TIMEOUT_SECONDS', 3000)),
-        deadline: Number(get('WHEREABOUTS_API_URL_TIMEOUT_SECONDS', 3000)),
-      },
-      agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 3000))),
-    },
     cellMovementsApi: {
       url: get('CELL_MOVEMENTS_API_URL', 'http://localhost:8082', requiredInProduction),
       healthPath: '/health/ping',
@@ -175,15 +167,6 @@ export default {
         deadline: Number(get('CELL_MOVEMENTS_API_TIMEOUT_SECONDS', 3000)),
       },
       agent: new AgentConfig(Number(get('CELL_MOVEMENTS_API_TIMEOUT_DEADLINE', 3000))),
-    },
-    bookAVideoLinkApi: {
-      url: get('BOOK_A_VIDEO_LINK_API_URL', 'http://localhost:8082', requiredInProduction),
-      healthPath: '/health/ping',
-      timeout: {
-        response: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 3000)),
-        deadline: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 3000)),
-      },
-      agent: new AgentConfig(Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_DEADLINE', 3000))),
     },
     caseNotesApi: {
       url: get('CASE_NOTES_API_URL', 'http://localhost:8082', requiredInProduction),
@@ -422,7 +405,6 @@ export default {
       requiredInProduction,
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
-    profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
 
     editProfile: {
       enabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []) as string[],
@@ -475,7 +457,6 @@ export default {
 
     propertySummaryTileEnabled: toBoolean(get('PROPERTY_SUMMARY_TILE_ENABLED', 'false')),
   },
-  defaultCourtVideoUrl: get('DEFAULT_COURT_VIDEO_URL', 'meet.video.justice.gov.uk'),
   sentry: {
     dsn: get('SENTRY_DSN', null, requiredInProduction),
     environment: get('SENTRY_ENVIRONMENT', 'local', requiredInProduction),
