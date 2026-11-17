@@ -789,14 +789,6 @@ export const mapRelationshipDescriptionByCode = (code: string, fallbackDescripti
   return RELATIONSHIP_DESCRIPTIONS[code] || fallbackDescription
 }
 
-// BVLS convert shorthand CVP address number to full video link meeting URL
-export const toFullCourtLink = (hmctsNumber: string) => {
-  if (!hmctsNumber || hmctsNumber.length < 1) {
-    return undefined
-  }
-  return `HMCTS${hmctsNumber}@${config.defaultCourtVideoUrl}`
-}
-
 export const blankStringsToNull = <T>(object: T): T => {
   if (object === null || object === undefined) return object
   if (typeof object === 'string') return object?.trim() ? (object.trim() as T) : null

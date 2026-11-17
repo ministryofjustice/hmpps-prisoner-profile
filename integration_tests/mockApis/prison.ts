@@ -64,12 +64,7 @@ import { damageObligationContainerMock } from '../../server/data/localMockData/d
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
-import {
-  courtEventPrisonerSchedulesMock,
-  prisonerSchedulesMock,
-} from '../../server/data/localMockData/prisonerSchedulesMock'
 import { offenderSentenceDetailsMock } from '../../server/data/localMockData/offenderSentenceDetailsMock'
-import { appointmentTypesMock } from '../../server/data/localMockData/appointmentTypesMock'
 import { mockHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
@@ -84,13 +79,12 @@ import OffenderSentenceDetail from '../../server/data/interfaces/prisonApi/Offen
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
 import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
-import ReferenceCode, { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
+import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
 import { mockPagedVisits, pagedVisitsMock } from '../../server/data/localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
 import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
 import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
-import PrisonerSchedule, { TimeSlot } from '../../server/data/interfaces/prisonApi/PrisonerSchedule'
 import { loadFileAsBase64, stubGetWithBody } from './utils'
 import { formatDateISO } from '../../server/utils/dateHelpers'
 
@@ -1200,108 +1194,6 @@ export default {
     })
   },
 
-  stubSchedulesForOffenders: ({
-    schedule,
-    agencyId,
-    offenderNumbers,
-    date,
-    timeSlot,
-    response,
-  }: {
-    schedule: 'appointments' | 'activities' | 'courtEvents' | 'externalTransfers' | 'visits'
-    offenderNumbers: string[]
-    agencyId: string
-    date?: string
-    timeSlot?: TimeSlot
-    response?: PrisonerSchedule[]
-  }) => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPath: `/prison/api/schedules/${agencyId}/${schedule}`,
-        bodyPatterns: [{ equalToJson: offenderNumbers }],
-        queryParameters: {
-          ...(date ? { date: { equalTo: date } } : {}),
-          ...(timeSlot ? { timeSlot: { equalTo: timeSlot } } : {}),
-        },
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: response ?? (schedule === 'courtEvents' ? courtEventPrisonerSchedulesMock : prisonerSchedulesMock),
-      },
-    })
-  },
-
-  stubActivitiesAtLocation: ({
-    locationId,
-    date,
-    timeSlot,
-    includeSuspended = 'false',
-    response,
-  }: {
-    locationId: number
-    date: string
-    timeSlot?: TimeSlot
-    includeSuspended?: string
-    response?: PrisonerSchedule[]
-  }) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/prison/api/schedules/locations/${locationId}/activities`,
-        queryParameters: {
-          includeSuspended: { equalTo: includeSuspended },
-          ...(date ? { date: { equalTo: date } } : {}),
-          ...(timeSlot ? { timeSlot: { equalTo: timeSlot } } : {}),
-        },
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: response ?? prisonerSchedulesMock,
-      },
-    })
-  },
-
-  stubActivityList: ({
-    agencyId,
-    locationId,
-    usage,
-    date,
-    timeSlot,
-    response,
-  }: {
-    agencyId: string
-    locationId: number
-    usage: string
-    date: string
-    timeSlot?: TimeSlot
-    response?: PrisonerSchedule[]
-  }) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/prison/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
-        queryParameters: {
-          ...(date ? { date: { equalTo: date } } : {}),
-          ...(timeSlot ? { timeSlot: { equalTo: timeSlot } } : {}),
-        },
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: response ?? prisonerSchedulesMock,
-      },
-    })
-  },
-
   stubGetHistoryForLocation: ({
     nomisLocationId,
     locationHistories,
@@ -1336,23 +1228,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: getCellMoveReasonTypesMock,
-      },
-    })
-  },
-
-  stubGetAppointmentTypes: ({ response = appointmentTypesMock }: { response?: ReferenceCode[] }) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: '/prison/api/reference-domains/scheduleReasons',
-        queryParameters: { eventType: { equalTo: 'APP' } },
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: response,
       },
     })
   },

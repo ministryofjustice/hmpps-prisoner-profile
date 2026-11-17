@@ -13,7 +13,6 @@
 @use 'server/views/components/fileUploadWithPreview/fileUploadWithPreview';
 @use 'server/views/components/miniBanner/miniBanner';
 @use 'server/views/components/miniCard/miniCard';
-@use 'server/views/components/scheduledEvents/scheduledEvents';
 @use 'server/views/components/timePicker/timePicker';
 
 @use './components/actions-block';
@@ -33,7 +32,6 @@
 @use './components/miniSummary';
 @use './components/more-info-block';
 @use './components/notification-banner-yellow';
-@use './components/movement-slip';
 @use './components/api-error';
 @use './components/paged-list';
 @use './components/profile-banner';
@@ -50,10 +48,8 @@
 @use './components/photo-edit';
 @use './components/image-cropper';
 
-@use './pages/add-appointment';
 @use './pages/add-case-note';
 @use './pages/addresses';
-@use './pages/appointment-confirmation';
 @use './pages/alerts-list';
 @use './pages/belief-history';
 @use './pages/case-notes';

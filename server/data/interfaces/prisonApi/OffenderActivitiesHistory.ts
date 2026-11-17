@@ -1,5 +1,3 @@
-import { PageableData } from '../whereaboutsApi/PageableQuery'
-
 export default interface OffenderActivitiesHistory {
   content: OffenderHistory[]
   pageable: PageableData
@@ -18,7 +16,22 @@ export default interface OffenderActivitiesHistory {
   empty: boolean
 }
 
-export interface OffenderHistory {
+interface PageableData {
+  sort: Sort
+  offset: number
+  pageSize: number
+  pageNumber: number
+  paged: boolean
+  unpaged: boolean
+}
+
+interface Sort {
+  empty: boolean
+  unsorted: boolean
+  sorted: boolean
+}
+
+interface OffenderHistory {
   bookingId: number
   agencyLocationId: string
   agencyLocationDescription: string

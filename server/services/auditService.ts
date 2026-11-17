@@ -8,7 +8,6 @@ import { isInUsersCaseLoad } from '../utils/utils'
 export enum Page {
   ActiveAlerts = 'ACTIVE_ALERTS',
   AddAlert = 'ADD_ALERT',
-  AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
   AddDistinguishingMark = 'ADD_DISTINGUISHING_MARK',
   AddDistinguishingMarkPhoto = 'ADD_DISTINGUISHING_MARK_PHOTO',
@@ -27,8 +26,6 @@ export enum Page {
   AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Alerts = 'ALERTS',
-  AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
-  AppointmentMovementSlips = 'APPOINTMENT_MOVEMENT_SLIPS',
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
@@ -40,7 +37,6 @@ export enum Page {
   EditAddressNoFixedAddressManual = 'EDIT_ADDRESS_NO_FIXED_ADDRESS_MANUAL',
   EditAddressPrimaryOrPostal = 'EDIT_ADDRESS_PRIMARY_OR_POSTAL',
   EditAddressUkManual = 'EDIT_ADDRESS_UK_MANUAL',
-  EditAppointment = 'EDIT_APPOINTMENT',
   EditBuild = 'EDIT_BUILD',
   EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
   EditConflicts = 'EDIT_CONFLICTS',
@@ -76,7 +72,6 @@ export enum Page {
   EditNextOfKinAddressUkManual = 'EDIT_NEXT_OF_KIN_ADDRESS_UK_MANUAL',
   EditNumberOfChildren = 'EDIT_NUMBER_OF_CHILDREN',
   EditOtherLanguages = 'EDIT_OTHER_LANGUAGES',
-  EditPrePostAppointments = 'EDIT_PRE_POST_APPOINTMENTS',
   EditReligion = 'EDIT_RELIGION',
   EditSexualOrientation = 'EDIT_SEXUAL_ORIENTATION',
   EditShoeSize = 'EDIT_SHOE_SIZE',
@@ -99,12 +94,10 @@ export enum Page {
   PhotoList = 'PHOTO_LIST',
   PossibleDuplicateProfiles = 'POSSIBLE_DUPLICATE_PROFILES',
   PostAddAlert = 'POST_ADD_ALERT',
-  PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',
   PostAlertAddMoreDetails = 'POST_ALERT_ADD_MORE_DETAILS',
   PostAlertClose = 'POST_ALERT_CLOSE',
   PostAddPhoneNumber = 'POST_ADD_PHONE_NUMBER',
-  PostEditAppointment = 'POST_EDIT_APPOINTMENT',
   PostEditBuild = 'POST_EDIT_BUILD',
   PostEditCityOrTownOfBirth = 'POST_EDIT_CITY_OR_TOWN_OF_BIRTH',
   PostEditCountryOfBirth = 'POST_EDIT_COUNTRY_OF_BIRTH',
@@ -119,17 +112,13 @@ export enum Page {
   PostEditNationality = 'POST_EDIT_NATIONALITY',
   PostEditNumberOfChildren = 'POST_EDIT_NUMBER_OF_CHILDREN',
   PostEditPhoneNumber = 'POST_EDIT_PHONE_NUMBER',
-  PostEditPrePostAppointments = 'POST_EDIT_PRE_POST_APPOINTMENTS',
   PostEditReligion = 'POST_EDIT_RELIGION',
   PostEditSexualOrientation = 'POST_EDIT_SEXUAL_ORIENTATION',
   PostEditShoeSize = 'POST_EDIT_SHOE_SIZE',
   PostEditSmokerOrVaper = 'POST_EDIT_SMOKER_OR_VAPER',
   PostEditWeight = 'POST_EDIT_WEIGHT',
   PostEditProfileImageWithheld = 'POST_EDIT_PROFILE_IMAGE_WITHHELD',
-  PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
-  PrePostAppointmentConfirmation = 'PRE_POST_APPOINTMENT_CONFIRMATION',
-  PrePostAppointments = 'PRE_POST_APPOINTMENTS',
   PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
   ProbationDocuments = 'PROBATION_DOCUMENTS',
   ReligionBeliefHistory = 'RELIGION_BELIEF_HISTORY',
@@ -162,7 +151,6 @@ export enum PostAction {
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
   AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
-  Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
   EditAddressFindUkAddress = 'EDIT_ADDRESS_FIND_UK_ADDRESS',
   EditAddressLocation = 'EDIT_ADDRESS_LOCATION',
@@ -244,13 +232,6 @@ export interface PageViewAudit {
   correlationId: string
 }
 
-interface AddAppointmentAudit {
-  user: HmppsUser
-  prisonerNumber: string
-  correlationId: string
-  details: object
-}
-
 interface SearchAudit {
   user: HmppsUser
   prisonerNumber: string
@@ -288,7 +269,6 @@ interface SendEvent {
 export interface AuditService {
   sendAccessAttempt: (object: AccessAttemptAudit) => Promise<void>
   sendPageView: (object: PageViewAudit) => Promise<void>
-  sendAddAppointment: (object: AddAppointmentAudit) => Promise<void>
   sendSearch: (object: SearchAudit) => Promise<void>
   sendPostAttempt: (object: PostAudit) => Promise<void>
   sendPostSuccess: (object: PostAudit) => Promise<void>
@@ -422,19 +402,6 @@ export const auditService = ({
     })
   }
 
-  const sendAddAppointment = async ({ user, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
-    await sendMessage({
-      what: 'ADD_APPOINTMENT',
-      correlationId,
-      details: JSON.stringify({ ...details, build }),
-      service: serviceName,
-      subjectId: prisonerNumber,
-      subjectType: SubjectType.PrisonerId,
-      when: new Date(),
-      who: user.username,
-    })
-  }
-
   const sendSearch = async ({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
     await sendMessage({
       what: `SEARCH_${searchPage}`,
@@ -459,7 +426,6 @@ export const auditService = ({
   return {
     sendAccessAttempt,
     sendPageView,
-    sendAddAppointment,
     sendSearch,
     sendPostAttempt,
     sendPostSuccess,

@@ -30,9 +30,6 @@ export default (
   permissions: PrisonerPermissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
-  const addAppointmentUrl = config.featureToggles.profileAddAppointmentEnabled
-    ? `/prisoner/${prisonerData.prisonerNumber}/add-appointment`
-    : `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`
 
   if (isGranted(CaseNotesPermission.edit, permissions)) {
     actions.push({
@@ -71,7 +68,7 @@ export default (
     actions.push({
       text: 'Add appointment',
       icon: ActionIcon.AddAppointment,
-      url: addAppointmentUrl,
+      url: `${config.serviceUrls.appointments}/create/start-prisoner/${prisonerData.prisonerNumber}`,
       dataQA: 'add-appointment-action-link',
     })
   }

@@ -31,7 +31,7 @@ import CsraAssessment, { CsraAssessmentSummary } from './CsraAssessment'
 import Transaction from './Transaction'
 import { DamageObligationContainer } from './DamageObligation'
 import OffenderSentenceDetail from './OffenderSentenceDetail'
-import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './PrisonerSchedule'
+import { PrisonerPrisonSchedule } from './PrisonerSchedule'
 import HistoryForLocationItem from './HistoryForLocationItem'
 import CellMoveReasonType from './CellMoveReasonTypes'
 import Telephone, { AddressPhoneNumberRequest } from './Telephone'
@@ -145,44 +145,7 @@ export interface PrisonApiClient {
 
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
 
-  getAppointmentTypes(): Promise<ReferenceCode[]>
-
   getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]>
-
-  getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
-
-  getVisits(offenderNumbers: string[], agencyId: string, date: string, timeSlot?: TimeSlot): Promise<PrisonerSchedule[]>
-
-  getAppointments(
-    offenderNumbers: string[],
-    agencyId: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]>
-
-  getActivities(
-    offenderNumbers: string[],
-    agencyId: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]>
-
-  getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
-
-  getActivitiesAtLocation(
-    locationId: number,
-    date: string,
-    timeSlot?: TimeSlot,
-    includeSuspended?: boolean,
-  ): Promise<PrisonerSchedule[]>
-
-  getActivityList(
-    agencyId: string,
-    locationId: number,
-    usage: string,
-    date: string,
-    timeSlot?: TimeSlot,
-  ): Promise<PrisonerSchedule[]>
 
   getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
 

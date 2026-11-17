@@ -19,7 +19,6 @@ import socApi from './integration_tests/mockApis/socApi'
 import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfileDeliusApi'
-import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
 import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import prisonRegisterApi from './integration_tests/mockApis/prisonRegisterApi'
 import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateReleaseDatesApi'
@@ -28,7 +27,6 @@ import alertsApi from './integration_tests/mockApis/alertsApi'
 import componentApi from './integration_tests/mockApis/componentApi'
 import personIntegrationApi from './integration_tests/mockApis/personIntegrationApi'
 import csipApi from './integration_tests/mockApis/csipApi'
-import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
 import healthAndMedicationApi from './integration_tests/mockApis/healthAndMedication'
 import osPlacesApi from './integration_tests/mockApis/osPlacesApi'
 import personCommunicationNeedsApi from './integration_tests/mockApis/personCommunicationNeedsApi'
@@ -76,7 +74,6 @@ export default defineConfig({
         ...adjudicationsApi,
         ...nonAssociationsApi,
         ...prisonerProfileDeliusApi,
-        ...whereAboutsApi,
         ...cellMovementsApi,
         ...prisonRegisterApi,
         ...calcluateReleaseDatesApi,
@@ -85,7 +82,6 @@ export default defineConfig({
         ...componentApi,
         ...personIntegrationApi,
         ...csipApi,
-        ...bookAVideoLinkApi,
         ...healthAndMedicationApi,
         ...osPlacesApi,
         ...personCommunicationNeedsApi,
