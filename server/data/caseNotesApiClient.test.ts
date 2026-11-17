@@ -1,4 +1,4 @@
-import nock, { RequestBodyMatcher } from 'nock'
+import nock from 'nock'
 import config from '../config'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
@@ -26,6 +26,10 @@ describe('caseNotesApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulCaseNotesApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeCaseNotesApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
@@ -34,7 +38,7 @@ describe('caseNotesApiClient', () => {
   }
   const mockSuccessfulCaseNotesPostApiCallWithExpectedBody = <TReturnData>(
     url: string,
-    expectedBody: RequestBodyMatcher,
+    expectedBody: nock.RequestBodyMatcher,
     returnData: TReturnData,
   ) => {
     fakeCaseNotesApi
@@ -162,7 +166,7 @@ describe('caseNotesApiClient', () => {
           subTypes: ['SUB_TWO', 'SUB_THREE'],
         },
       ]
-      const expectedRequest: RequestBodyMatcher = {
+      const expectedRequest: nock.RequestBodyMatcher = {
         personIdentifiers: [prisonerNumber],
         typeSubTypes,
       }
@@ -187,7 +191,7 @@ describe('caseNotesApiClient', () => {
           subTypes: [CaseNoteSubType.IncentiveWarning],
         },
       ]
-      const expectedRequest: RequestBodyMatcher = {
+      const expectedRequest: nock.RequestBodyMatcher = {
         personIdentifiers: [incentivesPrisonerNumber],
         typeSubTypes,
       }

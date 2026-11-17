@@ -20,6 +20,10 @@ describe('cellMovementsApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getCellMovementReason', () => {
     it('Should return data from the API', async () => {
       fakeCellMovementsApi

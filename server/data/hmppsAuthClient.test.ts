@@ -25,6 +25,10 @@ describe('hmppsAuthClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getSystemClientToken', () => {
     it('should instantiate the redis client', async () => {
       tokenStore.getToken.mockResolvedValue(token.access_token)

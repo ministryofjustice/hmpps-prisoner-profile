@@ -18,6 +18,10 @@ describe('educationAndWorkPlanApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getAllGoals', () => {
     it('should get all goals', async () => {
       // Given

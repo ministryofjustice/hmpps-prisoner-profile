@@ -19,6 +19,10 @@ describe('adjudicationsApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulAdjudicationsApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     adjudicationsApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
