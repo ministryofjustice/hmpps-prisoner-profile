@@ -69,9 +69,10 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       const alertSummaryData = toAlertSummaryData(alerts)
 
       if (assessments && Array.isArray(assessments)) {
-        prisonerData.assessments = assessments.sort(
-          (a, b) => new Date(b.assessmentDate).getTime() - new Date(a.assessmentDate).getTime(),
-        )
+        prisonerData.assessments = assessments.sort((a, b) => {
+          const dateComparison = new Date(b.assessmentDate).getTime() - new Date(a.assessmentDate).getTime()
+          return dateComparison !== 0 ? dateComparison : (b.assessmentSeq ?? 0) - (a.assessmentSeq ?? 0)
+        })
       }
       prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
         assessment.assessmentDescription.includes(AssessmentCode.csra),
