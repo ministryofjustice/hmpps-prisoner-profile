@@ -19,6 +19,7 @@ import { Alert, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatDateISO } from '../utils/dateHelpers'
 import { DataAccess } from '../data'
+import Assessment from '../data/interfaces/prisonApi/Assessment'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
@@ -160,6 +161,24 @@ describe('GetPrisonerDataMiddleware', () => {
       highPublicInterestPrisoner: false,
     })
     expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should sort assessments by date first and then by assessmentSeq descending', async () => {
+    const assessments = [
+      { assessmentDate: '2024-01-01', assessmentSeq: 2, classification: 'A', assessmentDescription: 'CSR Rating' },
+      { assessmentDate: '2024-01-01', assessmentSeq: 5, classification: 'B', assessmentDescription: 'CSR Rating' },
+      { assessmentDate: '2023-12-31', assessmentSeq: 1, classification: 'C', assessmentDescription: 'CSR Rating' },
+    ] as Assessment[]
+
+    prisonApiClient.getAssessments.mockResolvedValue([...assessments])
+
+    await getPrisonerData(services)(req, res, next)
+
+    expect(req.middleware.prisonerData.assessments).toEqual([
+      { assessmentDate: '2024-01-01', assessmentSeq: 5, classification: 'B', assessmentDescription: 'CSR Rating' },
+      { assessmentDate: '2024-01-01', assessmentSeq: 2, classification: 'A', assessmentDescription: 'CSR Rating' },
+      { assessmentDate: '2023-12-31', assessmentSeq: 1, classification: 'C', assessmentDescription: 'CSR Rating' },
+    ])
   })
 
   it('should populate commonly used data in res.locals for use in template (minimal)', async () => {
