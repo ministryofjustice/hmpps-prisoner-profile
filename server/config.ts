@@ -387,6 +387,7 @@ export default {
     transferScheduler: get('TRANSFER_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     releaseScheduler: get('RELEASE_SCHEDULER_UI_URL', 'http://localhost:3001', requiredInProduction),
     prisonerProperty: get('PRISONER_PROPERTY_UI_URL', 'http://localhost:3001', requiredInProduction),
+    csraService: get('CSRA_SERVICE_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -456,6 +457,7 @@ export default {
     },
 
     propertySummaryTileEnabled: toBoolean(get('PROPERTY_SUMMARY_TILE_ENABLED', 'false')),
+    csraServiceEnabled: toBoolean(get('CSRA_SERVICE_ENABLED', false)),
   },
   sentry: {
     dsn: get('SENTRY_DSN', null, requiredInProduction),

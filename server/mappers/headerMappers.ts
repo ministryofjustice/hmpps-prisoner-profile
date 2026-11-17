@@ -49,14 +49,19 @@ export function mapProfileBannerTopLinks(
   }
 
   if (isGranted(PrisonerSpecificRisksPermission.read_csra_rating, prisonerPermissions)) {
+    let csraUrl: string | undefined
+    if (config.featureToggles.csraServiceEnabled) {
+      csraUrl = `${config.serviceUrls.csraService}/prisoner/${prisonerData.prisonerNumber}`
+    } else if (isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions)) {
+      csraUrl = `/prisoner/${prisonerData.prisonerNumber}/csra-history`
+    }
+
     profileBannerTopLinks.push({
       heading: 'CSRA',
       hiddenLabel: 'CSRA',
       info: prisonerData.csra ? prisonerData.csra : 'Not entered',
       classes: '',
-      url: isGranted(PrisonerSpecificRisksPermission.read_csra_assessment_history, prisonerPermissions)
-        ? `/prisoner/${prisonerData.prisonerNumber}/csra-history`
-        : undefined,
+      url: csraUrl,
     })
   }
 
