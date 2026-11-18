@@ -20,6 +20,10 @@ describe('Support for additional needs API REST client', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   it('should check prisoner’s additional needs with the API', async () => {
     fakeSupportForAdditionalNeedsApi
       .get('/profile/G6123VU/has-need')

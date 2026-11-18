@@ -19,6 +19,10 @@ describe('caseNotesApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulIncentivesApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     incentivesApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }

@@ -18,6 +18,10 @@ describe('prisonRegisterClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getAllPrisons', () => {
     it('should get all prisons', async () => {
       // Given

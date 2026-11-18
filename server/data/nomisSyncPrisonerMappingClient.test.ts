@@ -18,6 +18,10 @@ describe('nomisSyncPrisonerMappingClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeNomisSyncPrisonerMappingClient
       .get(url)

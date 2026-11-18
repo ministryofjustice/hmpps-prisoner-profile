@@ -31,6 +31,10 @@ describe('personalRelationshipsApiRestClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const prisonerNumber = 'A1234BC'
 
   const contactCount = { offical: 1, social: 1 }

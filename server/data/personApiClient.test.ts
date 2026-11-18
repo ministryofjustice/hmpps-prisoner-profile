@@ -19,6 +19,10 @@ describe('Person API REST Client', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   it('should call regular record endpoint when religion history is not needed', async () => {
     fakePersonApi
       .get(`/person/prison/${encodeURIComponent(prisonerNumber)}`)

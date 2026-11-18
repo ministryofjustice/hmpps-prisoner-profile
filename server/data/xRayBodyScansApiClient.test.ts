@@ -20,6 +20,10 @@ describe('xRayBodyScansApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getScanSummary', () => {
     const scanSummaryResponseMock = mockScanSummaryResponse({
       prisonerNumber: samplePrisonerNumber,

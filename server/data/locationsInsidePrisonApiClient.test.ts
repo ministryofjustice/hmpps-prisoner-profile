@@ -19,6 +19,10 @@ describe('locationsInsidePrisonApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeLocationsInsidePrisonApi
       .get(url)

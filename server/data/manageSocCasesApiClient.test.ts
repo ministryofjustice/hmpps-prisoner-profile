@@ -19,6 +19,10 @@ describe('manageSocCasesApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeManageSocCasesApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }

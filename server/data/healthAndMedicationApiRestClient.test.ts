@@ -19,6 +19,10 @@ describe('healthAndMedicationApiRestClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getHealthAndMedication', () => {
     it('should return data from api', async () => {
       fakeHealthAndMedicationApi

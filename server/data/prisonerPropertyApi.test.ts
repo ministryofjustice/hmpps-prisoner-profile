@@ -21,6 +21,10 @@ describe('prisonerPropertyApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getPrisonerPropertySummary', () => {
     it('should return the summary from the api', async () => {
       fakePrisonerPropertyApi
