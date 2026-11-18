@@ -90,7 +90,6 @@ generic-service:
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api-dev.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_API_URL: "https://prisoner-property-api-dev.hmpps.service.justice.gov.uk"
     MANAGE_USERS_API_URL: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
-    CSRA_SERVICE_API_URL: "https://cell-sharing-risk-assessment-api-dev.hmpps.service.justice.gov.uk"
 
     # Circuit Breaker
     CIRCUIT_BREAKER_DEFAULT_THRESHOLD: 80
