@@ -457,7 +457,7 @@ export default {
     },
 
     propertySummaryTileEnabled: toBoolean(get('PROPERTY_SUMMARY_TILE_ENABLED', 'false')),
-    csraServiceEnabled: toBoolean(get('CSRA_SERVICE_ENABLED', false)),
+    csraServiceEnabled: toBoolean(get('CSRA_SERVICE_ENABLED', 'false')),
   },
   sentry: {
     dsn: get('SENTRY_DSN', null, requiredInProduction),
