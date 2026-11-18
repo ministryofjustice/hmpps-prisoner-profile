@@ -22,6 +22,10 @@ describe('curiousApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getLearnerGoals', () => {
     it('should return data from api', async () => {
       const expectedLearnerGoals = aValidLearnerGoals()

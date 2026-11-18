@@ -19,6 +19,10 @@ describe('prisonerSearchClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('getPrisonerDetails', () => {
     it('should return data from api', async () => {
       fakePrisonerSearchApi

@@ -20,6 +20,10 @@ describe('nonAssociationsApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeNonAssociationsApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }

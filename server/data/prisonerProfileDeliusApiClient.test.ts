@@ -21,6 +21,10 @@ describe('prisonerProfileDeliusApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakePrisonerProfileDeliusApi
       .get(url)

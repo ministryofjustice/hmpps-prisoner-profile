@@ -25,6 +25,10 @@ describe('personCommunicationNeedsApiRestClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const prisonerNumber = 'A1234BC'
 
   const communicationNeeds: CommunicationNeedsDto = {

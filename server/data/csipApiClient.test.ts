@@ -19,6 +19,10 @@ describe('csipApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeCsipApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }

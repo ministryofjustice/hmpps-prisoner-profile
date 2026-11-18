@@ -44,6 +44,10 @@ describe('personIntegrationApiClient', () => {
     nock.cleanAll()
   })
 
+  afterAll(() => {
+    nock.restore()
+  })
+
   describe('updateBirthPlace', () => {
     it('should update birth place', async () => {
       fakePersonIntegrationApi.patch('/v1/core-person-record?prisonerNumber=A1234AA').reply(204)
