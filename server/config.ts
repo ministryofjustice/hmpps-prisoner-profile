@@ -355,6 +355,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 3000))),
     },
+    permissionsApi: {
+      url: get('PERMISSIONS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PERMISSIONS_API_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('PERMISSIONS_API_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('PERMISSIONS_API_TIMEOUT_DEADLINE', 3000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),

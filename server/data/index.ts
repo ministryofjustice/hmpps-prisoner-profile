@@ -44,6 +44,7 @@ import { EphemeralDataStore } from './ephemeralDataStore/ephemeralDataStore'
 import { circuitBreakerBuilder } from './restClient'
 import PrisonerPropertyApiRestClient from './prisonerPropertyApiClient'
 import ManageUsersApiRestClient from './manageUsersApiClient'
+import PermissionsApiRestClient from './permissionsApiClient'
 
 type RestClientBuilder<T> = (token: string) => T
 type CuriousRestClientBuilder<T> = (token: CuriousApiToken) => T
@@ -89,6 +90,7 @@ const circuitBreakers = {
   xRayBodyScans: circuitBreakerBuilder('xRayBodyScans', config.apis.xRayBodyScans),
   prisonerProperty: circuitBreakerBuilder('prisonerPropertyApi', config.apis.prisonerPropertyApi),
   manageUsersApi: circuitBreakerBuilder('manageUsersApi', config.apis.manageUsersApi),
+  permissionsApi: circuitBreakerBuilder('permissionsApi', config.apis.permissionsApi),
 }
 
 export const dataAccess = {
@@ -152,6 +154,7 @@ export const dataAccess = {
   prisonerPropertyApiClientBuilder: (token: string) =>
     new PrisonerPropertyApiRestClient(token, circuitBreakers.prisonerProperty),
   manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token, circuitBreakers.manageUsersApi),
+  permissionsApiClientBuilder: (token: string) => new PermissionsApiRestClient(token, circuitBreakers.permissionsApi),
   tokenStore,
 }
 
