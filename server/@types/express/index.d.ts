@@ -54,6 +54,7 @@ export declare global {
       }
       user: HmppsUser
       prisonerPermissions?: PrisonerPermissions
+      isHighProfilePrisoner?: boolean
     }
   }
 }

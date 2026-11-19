@@ -415,6 +415,8 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
 
+    highProfilePrisonersEnabled: toBoolean(get('HIGH_PROFILE_PRISONERS_ENABLED', 'false')),
+
     editProfile: {
       enabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('EDIT_PROFILE_ENABLED_PRISONS_BY_DATE', []) as string[],
@@ -435,8 +437,8 @@ export default {
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
-    personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
 
+    personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
     usePersonApi: {
       religion: toBoolean(get('USE_PERSON_API_FOR_RELIGION', 'false')),
     },
