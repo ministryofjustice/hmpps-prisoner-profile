@@ -53,7 +53,11 @@ interface TabLink {
   active: boolean
 }
 
-export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabLink[] {
+export function tabLinks(
+  prisonerNumber: string,
+  canViewCaseNotes = false,
+  isHighProfilePrisonerOutsideCaseloads = false,
+): TabLink[] {
   const baseUrl = `/prisoner/${prisonerNumber}`
   const links = [
     {
@@ -77,20 +81,24 @@ export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabL
       active: false,
       href: `${baseUrl}/alerts/active`,
     },
-    {
-      label: 'Offences',
-      classes: 'govuk-heading-s',
-      id: 'offences',
-      href: `${baseUrl}/offences`,
-      active: false,
-    },
-    {
-      label: 'Work and skills',
-      classes: 'govuk-heading-s',
-      id: 'work-and-skills',
-      href: `${baseUrl}/work-and-skills`,
-      active: false,
-    },
+    isHighProfilePrisonerOutsideCaseloads
+      ? null
+      : {
+          label: 'Offences',
+          classes: 'govuk-heading-s',
+          id: 'offences',
+          href: `${baseUrl}/offences`,
+          active: false,
+        },
+    isHighProfilePrisonerOutsideCaseloads
+      ? null
+      : {
+          label: 'Work and skills',
+          classes: 'govuk-heading-s',
+          id: 'work-and-skills',
+          href: `${baseUrl}/work-and-skills`,
+          active: false,
+        },
   ]
   if (canViewCaseNotes) {
     links.splice(2, 0, {
@@ -101,5 +109,5 @@ export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabL
       href: `${baseUrl}/case-notes`,
     })
   }
-  return links
+  return links.filter(Boolean)
 }

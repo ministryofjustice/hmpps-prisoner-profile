@@ -52,6 +52,7 @@ import { isServiceEnabled } from '../utils/isServiceEnabled'
 import { offencesMoved, propertySummaryTileEnabled } from '../utils/featureFlags'
 import ContactsService from '../services/contactsService'
 import PrisonerPropertyService from '../services/prisonerPropertyService'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -208,7 +209,15 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
+      ...mapHeaderData(
+        prisonerData,
+        inmateDetail,
+        alertSummaryData,
+        prisonerPermissions,
+        'overview',
+        null,
+        isHighProfilePrisonerOutsideCaseloads(),
+      ),
       moneySummary,
       adjudicationSummary,
       propertySummary: showPropertyCard ? propertySummaryResult : null,
@@ -242,6 +251,7 @@ export default class OverviewController {
         hasNeedsForAdditionalSupport,
         scheduledTransfers,
         xrayBodyScanSummary,
+        isHighProfilePrisonerOutsideCaseloads(),
       ),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,

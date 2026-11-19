@@ -76,6 +76,7 @@ import { ApplicationInfo } from '../applicationInfo'
 import filterArrayOnPropertyFilter from './filterArrayOnPropertyFilter'
 import generateContactChangeLink from '../views/dataUtils/generateContactChangeLink'
 import propertySummaryToMiniSummary from '../views/dataUtils/propertySummaryToMiniSummary'
+import isHighProfilePrisonerOutsideCaseloads from './isHighProfilePrisonerOutsideCaseloads'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
@@ -141,6 +142,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('generateContactChangeLink', generateContactChangeLink)
   njkEnv.addGlobal('offencesMoved', offencesMoved)
   njkEnv.addGlobal('courtCaseReleaseDatesUrl', config.serviceUrls.courtCaseReleaseDates)
+  njkEnv.addGlobal('isHighProfilePrisonerOutsideCaseloads', isHighProfilePrisonerOutsideCaseloads)
 
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('initialiseName', initialiseName)

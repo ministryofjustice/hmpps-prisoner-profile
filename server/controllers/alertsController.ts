@@ -16,6 +16,7 @@ import { Alert, AlertCode, AlertForm, AlertType } from '../data/interfaces/alert
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 // Some alert codes cannot be added or made inactive via the Prisoner Profile
 // The Alerts API now supports limiting alert administration to a list of named users so if a user list can be sourced
@@ -42,7 +43,15 @@ export default class AlertsController {
       // Render banner
       return res.render('pages/alerts/alertsPage', {
         pageTitle: 'Alerts',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'alerts'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          'alerts',
+          null,
+          isHighProfilePrisonerOutsideCaseloads(),
+        ),
       })
     }
 
@@ -112,7 +121,15 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'alerts'),
+      ...mapHeaderData(
+        prisonerData,
+        inmateDetail,
+        alertSummaryData,
+        prisonerPermissions,
+        'alerts',
+        null,
+        isHighProfilePrisonerOutsideCaseloads(),
+      ),
       ...alertsPageData,
       alertsList,
       showingAll,

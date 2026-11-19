@@ -17,6 +17,7 @@ import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 import type { SelectOption } from '../interfaces/GovOptions'
 import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -56,7 +57,15 @@ export default class CaseNotesController {
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
-          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'case-notes'),
+          ...mapHeaderData(
+            prisonerData,
+            inmateDetail,
+            alertSummaryData,
+            prisonerPermissions,
+            'case-notes',
+            null,
+            isHighProfilePrisonerOutsideCaseloads(),
+          ),
           caseNotesApiUnavailable: true,
         })
       }
@@ -81,7 +90,15 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'case-notes'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          'case-notes',
+          null,
+          isHighProfilePrisonerOutsideCaseloads(),
+        ),
         ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,

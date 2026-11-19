@@ -13,6 +13,7 @@ import { formatCategoryALabel, formatCategoryCodeDescription, prisonerIsOut, pri
 import config from '../config'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 export function mapProfileBannerTopLinks(
   prisonerData: Prisoner,
@@ -65,7 +66,10 @@ export function mapProfileBannerTopLinks(
     })
   }
 
-  if (isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)) {
+  if (
+    isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) &&
+    !isHighProfilePrisonerOutsideCaseloads()
+  ) {
     profileBannerTopLinks.push({
       heading: 'Incentive level',
       hiddenLabel: 'incentive level',
@@ -87,8 +91,14 @@ export function mapHeaderData(
   prisonerPermissions?: PrisonerPermissions,
   pageId?: string,
   hideBanner?: boolean,
+  // TODO - Remove this when it's folded into prisoner permissions
+  highProfilePrisonerOutsideCaseloads = false,
 ) {
-  const tabs = tabLinks(prisonerData.prisonerNumber, isGranted(CaseNotesPermission.read, prisonerPermissions))
+  const tabs = tabLinks(
+    prisonerData.prisonerNumber,
+    isGranted(CaseNotesPermission.read, prisonerPermissions),
+    highProfilePrisonerOutsideCaseloads,
+  )
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true

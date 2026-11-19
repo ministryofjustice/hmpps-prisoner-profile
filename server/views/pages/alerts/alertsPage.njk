@@ -13,7 +13,7 @@
             testIdPrefix: 'alerts-tabs-',
             tabs: [
                 { text: 'Active ('+activeAlertCount+' alerts)', url: '/prisoner/' + prisonerNumber + '/alerts/active', visible: true, testId: 'active' },
-                { text: 'Inactive ('+inactiveAlertCount+' alerts)', url: '/prisoner/' + prisonerNumber + '/alerts/inactive', visible: true, testId: 'inactive' }
+                { text: 'Inactive ('+inactiveAlertCount+' alerts)', url: '/prisoner/' + prisonerNumber + '/alerts/inactive', visible: not isHighProfilePrisonerOutsideCaseloads(), testId: 'inactive' }
             ]
         }) }}
     {% endset %}

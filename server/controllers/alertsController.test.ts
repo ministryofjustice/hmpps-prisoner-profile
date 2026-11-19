@@ -100,6 +100,8 @@ describe('Alerts Controller', () => {
         req.middleware.alertSummaryData,
         res.locals.prisonerPermissions,
         'alerts',
+        null,
+        false,
       )
     })
 
@@ -207,6 +209,8 @@ describe('Alerts Controller', () => {
         req.middleware.alertSummaryData,
         res.locals.prisonerPermissions,
         'alerts',
+        null,
+        false,
       )
     })
   })
