@@ -15,6 +15,7 @@ import type CareNeedsService from '../../services/careNeedsService'
 import type PersonalPageService from '../../services/personalPageService'
 import type { XRayBodyScansAvailabilityService } from '../../services/xRayBodyScansAvailabilityService'
 import { isServiceEnabled } from '../../utils/isServiceEnabled'
+import isGlobalHighPriorityPrisoner from '../../utils/isGlobalHighPriorityPrisoner'
 
 export default class PersonalController {
   constructor(
@@ -67,7 +68,15 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'personal'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          'personal',
+          null,
+          isGlobalHighPriorityPrisoner(),
+        ),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.getOrNull()?.leftEyeColour ===

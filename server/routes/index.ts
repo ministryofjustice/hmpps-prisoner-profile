@@ -46,6 +46,7 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import DuplicateProfilesController from '../controllers/duplicateProfilesController'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
+import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
 
 export function standardGetPaths(path: string): boolean {
   return !/^(\/api|\/save-backlink|\/$)/.test(path)
@@ -197,7 +198,15 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'work-and-skills'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          'work-and-skills',
+          null,
+          isGlobalHighPriorityPrisoner(),
+        ),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         allFunctionalSkillsLinkUrl,
@@ -241,7 +250,15 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'offences'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          'offences',
+          null,
+          isGlobalHighPriorityPrisoner(),
+        ),
         courtCaseData,
         releaseDates,
         activeTab: true,

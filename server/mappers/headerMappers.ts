@@ -91,8 +91,14 @@ export function mapHeaderData(
   prisonerPermissions?: PrisonerPermissions,
   pageId?: string,
   hideBanner?: boolean,
+  // TODO - Remove this when it's folded into prisoner permissions
+  isGlobalHighProfilePrisoner = false,
 ) {
-  const tabs = tabLinks(prisonerData.prisonerNumber, isGranted(CaseNotesPermission.read, prisonerPermissions))
+  const tabs = tabLinks(
+    prisonerData.prisonerNumber,
+    isGranted(CaseNotesPermission.read, prisonerPermissions),
+    isGlobalHighProfilePrisoner,
+  )
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true

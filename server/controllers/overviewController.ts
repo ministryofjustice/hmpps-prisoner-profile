@@ -209,7 +209,15 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
+      ...mapHeaderData(
+        prisonerData,
+        inmateDetail,
+        alertSummaryData,
+        prisonerPermissions,
+        'overview',
+        null,
+        isGlobalHighPriorityPrisoner(),
+      ),
       moneySummary,
       adjudicationSummary,
       propertySummary: showPropertyCard ? propertySummaryResult : null,

@@ -18,6 +18,7 @@ import ImageController from '../controllers/imageController'
 import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
+import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -89,7 +90,15 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          null,
+          null,
+          isGlobalHighPriorityPrisoner(),
+        ),
         miniBannerData,
         imageUploadedDate,
         photoStatus,
@@ -131,7 +140,15 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          null,
+          null,
+          isGlobalHighPriorityPrisoner(),
+        ),
         miniBannerData,
         facialImages,
       })
