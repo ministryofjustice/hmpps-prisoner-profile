@@ -18,7 +18,7 @@ import ImageController from '../controllers/imageController'
 import { imagePageBreadcrumbs } from '../mappers/imagePageBreadcrumbs'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -97,7 +97,7 @@ export default function imageRouter(services: Services): Router {
           prisonerPermissions,
           null,
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         miniBannerData,
         imageUploadedDate,
@@ -147,7 +147,7 @@ export default function imageRouter(services: Services): Router {
           prisonerPermissions,
           null,
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         miniBannerData,
         facialImages,

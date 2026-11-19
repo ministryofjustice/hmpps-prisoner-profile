@@ -46,8 +46,8 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import DuplicateProfilesController from '../controllers/duplicateProfilesController'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
-import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
+import { highProfilePrisonerOutsideCaseloadsGuard } from '../middleware/highProfilePrisonerOutsideCaseloadsGuard'
 
 export function standardGetPaths(path: string): boolean {
   return !/^(\/api|\/save-backlink|\/$)/.test(path)
@@ -146,7 +146,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    highProfilePrisonerGuard(),
+    highProfilePrisonerOutsideCaseloadsGuard(),
     retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),
     retrieveCuriousFunctionalSkills(services.curiousService),
@@ -207,7 +207,7 @@ export default function routes(services: Services): Router {
           prisonerPermissions,
           'work-and-skills',
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
@@ -234,7 +234,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    highProfilePrisonerGuard(),
+    highProfilePrisonerOutsideCaseloadsGuard(),
     async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -260,7 +260,7 @@ export default function routes(services: Services): Router {
           prisonerPermissions,
           'offences',
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         courtCaseData,
         releaseDates,

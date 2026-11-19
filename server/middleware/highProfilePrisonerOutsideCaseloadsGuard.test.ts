@@ -1,13 +1,13 @@
 import type { NextFunction, Request, Response } from 'express'
 import config from '../config'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
-import { highProfilePrisonerGuard } from './highProfilePrisonerGuard'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
+import { highProfilePrisonerOutsideCaseloadsGuard } from './highProfilePrisonerOutsideCaseloadsGuard'
 
-jest.mock('../utils/isGlobalHighPriorityPrisoner')
+jest.mock('../utils/isHighProfilePrisonerOutsideCaseloads')
 
-describe('highProfilePrisonerGuard', () => {
-  const isGlobalHighPriorityPrisonerMock = jest.mocked(isGlobalHighPriorityPrisoner)
-  const middleware = highProfilePrisonerGuard()
+describe('highProfilePrisonerOutsideCaseloadsGuard', () => {
+  const isHighProfilePrisonerOutsideCaseloadsMock = jest.mocked(isHighProfilePrisonerOutsideCaseloads)
+  const middleware = highProfilePrisonerOutsideCaseloadsGuard()
 
   let req: Request
   let res: Response
@@ -31,7 +31,7 @@ describe('highProfilePrisonerGuard', () => {
     middleware(req, res, next)
 
     expect(next).toHaveBeenCalledWith()
-    expect(isGlobalHighPriorityPrisonerMock).not.toHaveBeenCalled()
+    expect(isHighProfilePrisonerOutsideCaseloadsMock).not.toHaveBeenCalled()
   })
 
   describe('when enabled', () => {
@@ -39,17 +39,17 @@ describe('highProfilePrisonerGuard', () => {
       config.featureToggles.highProfilePrisonersEnabled = true
     })
 
-    it('should defer to next request handler when isGlobalHighPriorityPrisoner returns false', () => {
-      isGlobalHighPriorityPrisonerMock.mockReturnValue(false)
+    it('should defer to next request handler when isHighProfilePrisonerOutsideCaseloads returns false', () => {
+      isHighProfilePrisonerOutsideCaseloadsMock.mockReturnValue(false)
 
       middleware(req, res, next)
 
       expect(next).toHaveBeenCalledWith()
-      expect(isGlobalHighPriorityPrisonerMock).toHaveBeenCalledWith()
+      expect(isHighProfilePrisonerOutsideCaseloadsMock).toHaveBeenCalledWith()
     })
 
-    it('should 404 when isGlobalHighPriorityPrisoner returns true', () => {
-      isGlobalHighPriorityPrisonerMock.mockReturnValue(true)
+    it('should 404 when isHighProfilePrisonerOutsideCaseloads returns true', () => {
+      isHighProfilePrisonerOutsideCaseloadsMock.mockReturnValue(true)
 
       middleware(req, res, next)
 
@@ -59,7 +59,7 @@ describe('highProfilePrisonerGuard', () => {
           status: 404,
         }),
       )
-      expect(isGlobalHighPriorityPrisonerMock).toHaveBeenCalledWith()
+      expect(isHighProfilePrisonerOutsideCaseloadsMock).toHaveBeenCalledWith()
     })
   })
 })

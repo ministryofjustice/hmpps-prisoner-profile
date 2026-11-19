@@ -52,7 +52,7 @@ import { isServiceEnabled } from '../utils/isServiceEnabled'
 import { offencesMoved, propertySummaryTileEnabled } from '../utils/featureFlags'
 import ContactsService from '../services/contactsService'
 import PrisonerPropertyService from '../services/prisonerPropertyService'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -216,7 +216,7 @@ export default class OverviewController {
         prisonerPermissions,
         'overview',
         null,
-        isGlobalHighPriorityPrisoner(),
+        isHighProfilePrisonerOutsideCaseloads(),
       ),
       moneySummary,
       adjudicationSummary,
@@ -251,7 +251,7 @@ export default class OverviewController {
         hasNeedsForAdditionalSupport,
         scheduledTransfers,
         xrayBodyScanSummary,
-        isGlobalHighPriorityPrisoner(),
+        isHighProfilePrisonerOutsideCaseloads(),
       ),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,

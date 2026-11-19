@@ -3,7 +3,7 @@
     <div class="hmpps-alert-card-list-item__content">
         <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertCode.alertTypeDescription }}</div>
         <div class="hmpps-alert-card-list-item__title">{{ alert.alertCode.description }}</div>
-        {% if not isGlobalHighProfilePrisoner() %}
+        {% if not isHighProfilePrisonerOutsideCaseloads() %}
           <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.description }}</pre>
         {%  endif %}
         <div class="hmpps-alert-card-list-item__metadata"><span>Start date:</span> {{ alert.activeFrom | formatDate }} {% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }} {% endif %}</div>

@@ -17,7 +17,7 @@ import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
 import type { SelectOption } from '../interfaces/GovOptions'
 import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -64,7 +64,7 @@ export default class CaseNotesController {
             prisonerPermissions,
             'case-notes',
             null,
-            isGlobalHighPriorityPrisoner(),
+            isHighProfilePrisonerOutsideCaseloads(),
           ),
           caseNotesApiUnavailable: true,
         })
@@ -97,7 +97,7 @@ export default class CaseNotesController {
           prisonerPermissions,
           'case-notes',
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         ...caseNotesPageData.getOrThrow(),
         types,

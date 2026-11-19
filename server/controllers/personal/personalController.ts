@@ -15,7 +15,7 @@ import type CareNeedsService from '../../services/careNeedsService'
 import type PersonalPageService from '../../services/personalPageService'
 import type { XRayBodyScansAvailabilityService } from '../../services/xRayBodyScansAvailabilityService'
 import { isServiceEnabled } from '../../utils/isServiceEnabled'
-import isGlobalHighPriorityPrisoner from '../../utils/isGlobalHighPriorityPrisoner'
+import isHighProfilePrisonerOutsideCaseloads from '../../utils/isHighProfilePrisonerOutsideCaseloads'
 
 export default class PersonalController {
   constructor(
@@ -75,7 +75,7 @@ export default class PersonalController {
           prisonerPermissions,
           'personal',
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
         ...personalPageData,
         changeEyeColourUrl:

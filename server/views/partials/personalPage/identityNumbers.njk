@@ -74,7 +74,7 @@
   <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">
       {{ summaryListHeading("Justice numbers", "justice-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/justice-id-numbers", text: "Add justice ID numbers" }) }}
-      {% if isGlobalHighProfilePrisoner() %}
+      {% if isHighProfilePrisonerOutsideCaseloads() %}
         {%- call identityNumbersList() -%}
           {{ identityNumber("Prison number", [{ value: identityNumbers.justice.prisonNumber }], { editable: false, redirectAnchor: 'prison-number' }) }}
           {{ identityNumber("PNC number", identityNumbers.justice.pncNumber, { redirectAnchor: 'pnc-number' }) }}
@@ -93,7 +93,7 @@
         {%- endcall -%}
       {% endif %}
 
-      {% if hasPersonalId and not isGlobalHighProfilePrisoner() %}
+      {% if hasPersonalId and not isHighProfilePrisonerOutsideCaseloads() %}
         {{ summaryListHeading("Personal numbers", "personal-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/personal-id-numbers", text: "Add personal ID numbers" }) }}
         {%- call identityNumbersList() -%}
           {{ identityNumber("Driving licence number", identityNumbers.personal.drivingLicenceNumber, { hideIfEmpty: true, redirectAnchor: 'driving-licence-number' }) }}
@@ -105,7 +105,7 @@
         {%- endcall -%}
       {% endif %}
 
-      {% if hasHomeOfficeId and not isGlobalHighProfilePrisoner() %}
+      {% if hasHomeOfficeId and not isHighProfilePrisonerOutsideCaseloads() %}
         {{ summaryListHeading("Home office numbers", "home-office-numbers", { enabled: identityNumberEditEnabled, href: "/prisoner/" + prisonerNumber + "/personal/home-office-id-numbers", text: "Add Home Office ID numbers" }) }}
         {%- call identityNumbersList() -%}
           {{ identityNumber("Case Information Database (CID) number", identityNumbers.homeOffice.caseInformationDatabase, { hideIfEmpty: true, redirectAnchor: 'cid-number' }) }}

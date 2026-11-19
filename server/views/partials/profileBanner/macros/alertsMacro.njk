@@ -24,7 +24,7 @@
                 <li>
                     {{ alertFlag({
                         alert: alert,
-                        href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids=') if not isGlobalHighProfilePrisoner(),
+                        href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids=') if not isHighProfilePrisonerOutsideCaseloads(),
                         attributes: {
                             'data-prisoner-number': prisonerNumber
                         }
@@ -39,7 +39,7 @@
         {% endif %}
     </ul>
 
-    {% if not isGlobalHighProfilePrisoner() %}
+    {% if not isHighProfilePrisonerOutsideCaseloads() %}
       {{ hmppsModal({
           id: "alert-details",
           title: "Alert details",

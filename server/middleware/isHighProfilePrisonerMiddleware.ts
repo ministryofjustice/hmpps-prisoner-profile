@@ -3,6 +3,7 @@ import type { Services } from '../services'
 import config from '../config'
 
 /** Sets `res.locals.isHighProfilePrisoner` flag to true for high profile prisoners */
+// TODO: Fold into permissions library
 // eslint-disable-next-line import/prefer-default-export
 export function isHighProfilePrisonerMiddleware(services: Services): RequestHandler {
   const { permissionsApiClientBuilder } = services.dataAccess

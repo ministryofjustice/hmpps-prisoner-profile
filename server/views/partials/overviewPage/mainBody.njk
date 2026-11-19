@@ -9,7 +9,7 @@
 
 {% call conditionallyShow({
   id: 'ccard-edit',
-  condition: options.showCourtCaseSummary and not isGlobalHighProfilePrisoner()
+  condition: options.showCourtCaseSummary and not isHighProfilePrisonerOutsideCaseloads()
 }) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -68,7 +68,7 @@
 
 {% call conditionallyShow({
   id: 'xray-body-scan-card',
-  condition: xrayBodyScanSummary and not isGlobalHighProfilePrisoner()
+  condition: xrayBodyScanSummary and not isHighProfilePrisonerOutsideCaseloads()
 }) %}
   {% include './xrayBodyScansCard.njk' %}
 {% endcall %}
@@ -79,7 +79,7 @@
   not options.showCourtCaseSummary
   and offencesMoved(user.activeCaseLoadId)
   and isGranted(PersonSentenceCalculationPermission.read, prisonerPermissions)
-  and not isGlobalHighProfilePrisoner()
+  and not isHighProfilePrisonerOutsideCaseloads()
   )
 }) %}
   <div class="govuk-grid-row">
@@ -93,7 +93,7 @@
 {# TODO: remove this once we have fully moved the offences tab data away to CCARD: #}
 {% call conditionallyShow({
   id: 'old-offences-card',
-  condition: not options.showCourtCaseSummary and not offencesMoved(user.activeCaseLoadId) and not isGlobalHighProfilePrisoner()
+  condition: not options.showCourtCaseSummary and not offencesMoved(user.activeCaseLoadId) and not isHighProfilePrisonerOutsideCaseloads()
 }) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full" data-qa="overview-offences">

@@ -16,7 +16,7 @@ import { Alert, AlertCode, AlertForm, AlertType } from '../data/interfaces/alert
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
-import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
+import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 
 // Some alert codes cannot be added or made inactive via the Prisoner Profile
 // The Alerts API now supports limiting alert administration to a list of named users so if a user list can be sourced
@@ -50,7 +50,7 @@ export default class AlertsController {
           prisonerPermissions,
           'alerts',
           null,
-          isGlobalHighPriorityPrisoner(),
+          isHighProfilePrisonerOutsideCaseloads(),
         ),
       })
     }
@@ -128,7 +128,7 @@ export default class AlertsController {
         prisonerPermissions,
         'alerts',
         null,
-        isGlobalHighPriorityPrisoner(),
+        isHighProfilePrisonerOutsideCaseloads(),
       ),
       ...alertsPageData,
       alertsList,

@@ -56,7 +56,7 @@ interface TabLink {
 export function tabLinks(
   prisonerNumber: string,
   canViewCaseNotes = false,
-  isGlobalHighProfilePrisoner = false,
+  isHighProfilePrisonerOutsideCaseloads = false,
 ): TabLink[] {
   const baseUrl = `/prisoner/${prisonerNumber}`
   const links = [
@@ -81,7 +81,7 @@ export function tabLinks(
       active: false,
       href: `${baseUrl}/alerts/active`,
     },
-    isGlobalHighProfilePrisoner
+    isHighProfilePrisonerOutsideCaseloads
       ? null
       : {
           label: 'Offences',
@@ -90,7 +90,7 @@ export function tabLinks(
           href: `${baseUrl}/offences`,
           active: false,
         },
-    isGlobalHighProfilePrisoner
+    isHighProfilePrisonerOutsideCaseloads
       ? null
       : {
           label: 'Work and skills',
