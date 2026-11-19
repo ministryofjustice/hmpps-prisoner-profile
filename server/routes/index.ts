@@ -49,6 +49,7 @@ import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
 import { JustifyAccessController } from '../controllers/justifyAccessController'
 import { isHighProfilePrisonerMiddleware } from '../middleware/isHighProfilePrisonerMiddleware'
+import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
 
 export function standardGetPaths(path: string): boolean {
   return !/^(\/api|\/save-backlink|\/$)/.test(path)
@@ -155,6 +156,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard(),
     retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),
     retrieveCuriousFunctionalSkills(services.curiousService),
@@ -234,6 +236,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard(),
     async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { prisonerNumber, prisonId } = prisonerData
