@@ -1,4 +1,4 @@
-{% if incentiveSummary and isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) %}
+{% if incentiveSummary and isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) and not isGlobalHighProfilePrisoner() %}
   {% set incentivesWidth = "govuk-grid-column-one-third" if propertySummary else "govuk-grid-column-one-half" %}
   <div class={{ incentivesWidth }} data-qa="incentives-summary">
     {{ miniCard(incentiveSummary | toIncentiveMiniSummary(prisonerNumber, prisonerDisplayName, prisonerPermissions), 'mini-card--incentives', incentiveSummary.status != 'fulfilled') }}

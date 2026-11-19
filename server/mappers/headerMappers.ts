@@ -13,6 +13,7 @@ import { formatCategoryALabel, formatCategoryCodeDescription, prisonerIsOut, pri
 import config from '../config'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import isGlobalHighPriorityPrisoner from '../utils/isGlobalHighPriorityPrisoner'
 
 export function mapProfileBannerTopLinks(
   prisonerData: Prisoner,
@@ -65,7 +66,10 @@ export function mapProfileBannerTopLinks(
     })
   }
 
-  if (isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)) {
+  if (
+    isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) &&
+    !isGlobalHighPriorityPrisoner()
+  ) {
     profileBannerTopLinks.push({
       heading: 'Incentive level',
       hiddenLabel: 'incentive level',

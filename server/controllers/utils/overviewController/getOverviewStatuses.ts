@@ -16,13 +16,15 @@ export default function getOverviewStatuses(
   hasNeedsForAdditionalSupport: Result<HasNeed>,
   scheduledTransfers: PrisonerPrisonSchedule[] | null,
   xrayBodyScanSummary: Result<XrayBodyScanSummary> | null,
+  isGlobalHighProfilePrisoner: boolean = false,
 ): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
-    getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
-    getListenerStatus(inmateDetail),
-    getScheduledTransferStatus(scheduledTransfers),
-    getXrayBodyScanLimitReachedStatus(xrayBodyScanSummary),
+    // TODO: These need to become permissions checks
+    isGlobalHighProfilePrisoner ? null : getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
+    isGlobalHighProfilePrisoner ? null : getListenerStatus(inmateDetail),
+    isGlobalHighProfilePrisoner ? null : getScheduledTransferStatus(scheduledTransfers),
+    isGlobalHighProfilePrisoner ? null : getXrayBodyScanLimitReachedStatus(xrayBodyScanSummary),
   ].filter(Boolean)
 }
 
