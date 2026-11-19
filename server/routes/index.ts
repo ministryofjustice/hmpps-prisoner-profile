@@ -57,7 +57,7 @@ export default function routes(services: Services): Router {
 
   router.use(basePath, prisonerNumberGuard())
 
-  router.use(async (req, res, next) => {
+  router.use((req, res, next) => {
     res.locals = {
       ...res.locals,
       currentUrlPath: req.baseUrl + req.path,
