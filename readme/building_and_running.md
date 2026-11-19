@@ -108,6 +108,7 @@ X_RAY_BODY_SCANS_API_URL=https://x-ray-body-scans-api-dev.hmpps.service.justice.
 TRANSFER_SCHEDULER_UI_URL=https://transfer-scheduler-dev.hmpps.service.justice.gov.uk
 RELEASE_SCHEDULER_UI_URL=https://release-scheduler-dev.hmpps.service.justice.gov.uk
 MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
+PERMISSIONS_API_URL=https://permissions-api-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>
