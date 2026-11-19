@@ -10,6 +10,7 @@ import { toAlertSummaryData } from '../services/mappers/alertMapper'
 import { Result } from '../utils/result/result'
 import { formatName, isActiveCaseLoad } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import config from '../config'
 
 const prisonerNumberRegex = /^[a-zA-Z][0-9]{4}[a-zA-Z]{2}$/
 
@@ -74,9 +75,12 @@ export default function getPrisonerData(services: Services, options: { minimal?:
           return dateComparison !== 0 ? dateComparison : (b.assessmentSeq ?? 0) - (a.assessmentSeq ?? 0)
         })
       }
-      prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
-        assessment.assessmentDescription.includes(AssessmentCode.csra),
-      )?.classification
+
+      if (!config.featureToggles.csraServiceEnabled) {
+        prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
+          assessment.assessmentDescription.includes(AssessmentCode.csra),
+        )?.classification
+      }
       // End
 
       if (arrivalDate) {

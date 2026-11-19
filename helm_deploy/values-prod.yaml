@@ -50,6 +50,7 @@ generic-service:
     TRANSFER_SCHEDULER_UI_URL: "https://transfer-scheduler.hmpps.service.justice.gov.uk"
     RELEASE_SCHEDULER_UI_URL: "https://release-scheduler.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_UI_URL: "https://prisoner-property.hmpps.service.justice.gov.uk"
+    CSRA_SERVICE_UI_URL: "https://cell-sharing-risk-assessment.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: 'https://activities.prison.service.justice.gov.uk/activities'
@@ -105,6 +106,7 @@ generic-service:
     OFFENCES_MOVED_ENABLED_FROM: '2026-08-20T10:00:00'
     PROPERTY_SUMMARY_TILE_ENABLED: "true"
     USE_PERSON_API_FOR_RELIGION: "false"
+    CSRA_SERVICE_ENABLED: "false"
 
   allowlist:
     groups:

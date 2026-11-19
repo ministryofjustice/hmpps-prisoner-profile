@@ -69,6 +69,15 @@ describe('HeaderMapping', () => {
     })
 
     describe('CSRA', () => {
+      const originalCsraServiceEnabled = config.featureToggles.csraServiceEnabled
+
+      beforeEach(() => {
+        config.featureToggles.csraServiceEnabled = false
+      })
+      afterEach(() => {
+        config.featureToggles.csraServiceEnabled = originalCsraServiceEnabled
+      })
+
       it('should not show CSRA data when read permission is not granted', () => {
         mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: false })
 
@@ -100,6 +109,44 @@ describe('HeaderMapping', () => {
         expect(csraLink.info).toBe('High')
         expect(csraLink.hiddenLabel).toBe('CSRA')
         expect(csraLink.url).toBe(`/prisoner/${PrisonerMockDataA.prisonerNumber}/csra-history`)
+      })
+
+      describe('when the CSRA service setting is on', () => {
+        beforeEach(() => {
+          config.featureToggles.csraServiceEnabled = true
+        })
+
+        it('should link to the CSRA service only when read_csra_rating permission is granted', () => {
+          mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: true })
+
+          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+
+          const csraLink = topLinks.find(link => link.heading === 'CSRA')
+          expect(csraLink).toBeDefined()
+          expect(csraLink.info).toBe('High')
+          expect(csraLink.hiddenLabel).toBe('CSRA')
+          expect(csraLink.url).toBe(`${config.serviceUrls.csraService}/prisoner/${PrisonerMockDataA.prisonerNumber}`)
+        })
+
+        it('should link to the CSRA service, not CSRA history, when both read permissions are granted', () => {
+          mockPermissions({
+            [PrisonerSpecificRisksPermission.read_csra_rating]: true,
+            [PrisonerSpecificRisksPermission.read_csra_assessment_history]: true,
+          })
+
+          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+
+          const csraLink = topLinks.find(link => link.heading === 'CSRA')
+          expect(csraLink.url).toBe(`${config.serviceUrls.csraService}/prisoner/${PrisonerMockDataA.prisonerNumber}`)
+        })
+
+        it('should not show CSRA data when read permission is not granted', () => {
+          mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: false })
+
+          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+
+          expect(topLinks.map(link => link.heading)).not.toContain('CSRA')
+        })
       })
     })
   })

@@ -20,6 +20,7 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatDateISO } from '../utils/dateHelpers'
 import { DataAccess } from '../data'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
+import config from '../config'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
@@ -238,5 +239,45 @@ describe('GetPrisonerDataMiddleware', () => {
 
     expect(prisonApiClient.getLatestArrivalDate).toHaveBeenCalledWith('G6123VU')
     expect(req.middleware.prisonerData.newArrival72).toBe(true)
+  })
+
+  describe('CSRA rating', () => {
+    const originalCsraServiceEnabled = config.featureToggles.csraServiceEnabled
+
+    beforeEach(() => {
+      prisonerSearchApiClient.getPrisonerDetails = jest.fn(async (): Promise<Prisoner> => ({
+        ...PrisonerMockDataA,
+        csra: 'High - general',
+      }))
+      prisonApiClient.getAssessments.mockResolvedValue([
+        {
+          assessmentDate: '2024-01-01',
+          assessmentSeq: 2,
+          classification: 'Standard',
+          assessmentDescription: 'CSR Rating',
+        },
+      ] as Assessment[])
+    })
+
+    afterEach(() => {
+      config.featureToggles.csraServiceEnabled = originalCsraServiceEnabled
+    })
+
+    it('should overwrite csra with the Prison API classification when the CSRA service setting is off', async () => {
+      config.featureToggles.csraServiceEnabled = false
+
+      await getPrisonerData(services)(req, res, next)
+
+      expect(req.middleware.prisonerData.csra).toEqual('Standard')
+    })
+
+    it('should keep the Prisoner Search csra when the CSRA setting is on', async () => {
+      config.featureToggles.csraServiceEnabled = true
+
+      await getPrisonerData(services)(req, res, next)
+
+      expect(req.middleware.prisonerData.csra).toEqual('High - general')
+      expect(prisonApiClient.getAssessments).toHaveBeenCalled()
+    })
   })
 })
