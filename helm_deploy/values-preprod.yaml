@@ -89,6 +89,7 @@ generic-service:
     X_RAY_BODY_SCANS_API_URL: "https://x-ray-body-scans-api-preprod.hmpps.service.justice.gov.uk"
     PRISONER_PROPERTY_API_URL: "https://prisoner-property-api-preprod.hmpps.service.justice.gov.uk"
     MANAGE_USERS_API_URL: "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
+    PERMISSIONS_API_URL: "https://permissions-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -98,6 +99,7 @@ generic-service:
     PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS: "AGI,BZI,DHI,DWI,ESI,EWI,FHI,LNI,NHI,PFI,SDI,STI"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
 
+    HIGH_PROFILE_PRISONERS_ENABLED: "false"
     EDIT_PROFILE_SIMULATE_FETCH: 'false'
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-17T12:00:00"
     MANAGE_ALLOCATIONS_ENABLED: "true"
