@@ -125,6 +125,8 @@ describe('Case Notes Controller', () => {
         req.middleware.alertSummaryData,
         res.locals.prisonerPermissions,
         'case-notes',
+        null,
+        false,
       )
     })
 
