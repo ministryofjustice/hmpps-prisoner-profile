@@ -45,7 +45,7 @@ export default function alertsRouter(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    highProfilePrisonerGuard(),
+    highProfilePrisonerGuard('outside-caseloads'),
     (req, res, next) => alertsController.displayAlerts(req, res, next, false),
   )
 
@@ -70,7 +70,7 @@ export default function alertsRouter(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
-    highProfilePrisonerGuard(),
+    highProfilePrisonerGuard('outside-caseloads'),
     alertsController.displayAlert(),
   )
 
