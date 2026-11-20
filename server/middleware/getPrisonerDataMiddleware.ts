@@ -14,10 +14,15 @@ import config from '../config'
 
 const prisonerNumberRegex = /^[a-zA-Z][0-9]{4}[a-zA-Z]{2}$/
 
-export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
+export default function getPrisonerData(
+  services: Services,
+  { minimal = false }: { minimal?: boolean } = {},
+): RequestHandler {
   return async (req, res, next) => {
+    const minimalInfoAlreadyLoaded = Boolean(req.middleware.prisonerData)
+    const fullInfoAlreadyLoaded = Boolean(req.middleware.inmateDetail)
+
     try {
-      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
       let prisonerNumber = ''
       if (req.params?.prisonerNumber) {
         prisonerNumber = req.params.prisonerNumber
@@ -29,6 +34,15 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         return next(new NotFoundError())
       }
 
+      // don’t repopulate if already loaded
+      if (
+        res.locals.prisonerNumber === prisonerNumber &&
+        ((minimal && minimalInfoAlreadyLoaded) || fullInfoAlreadyLoaded)
+      ) {
+        return next()
+      }
+
+      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
       const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(prisonerNumber)
 
       if (prisonerData.prisonerNumber === undefined) {
@@ -48,7 +62,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         },
       }
 
-      if (options.minimal) {
+      if (minimal) {
         req.middleware = { ...req.middleware, prisonerData }
         return next()
       }
@@ -99,6 +113,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         alertSummaryData,
       }
 
+      // recreate name since prisoner search can lag behind prison-api
       const { firstName: firstNameInmate, middleName: middleNameInmate, lastName: lastNameInmate } = inmateDetail
       res.locals.prisonerName = {
         firstLast: formatName(firstNameInmate, '', lastNameInmate),
@@ -113,7 +128,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       }
     } catch (error) {
       logger.error(error, `Failed to retrieve get prisoner data: ${error.endpoint}`)
-      next(error)
+      return next(error)
     }
 
     return next()

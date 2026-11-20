@@ -132,6 +132,47 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(req.middleware.prisonerData).toBeUndefined()
   })
 
+  it.each([
+    { scenario: 'full already loaded', firstMiddlewareIsMinimal: false, secondMiddlewareIsMinimal: false },
+    { scenario: 'minimal already loaded', firstMiddlewareIsMinimal: true, secondMiddlewareIsMinimal: true },
+    { scenario: 'full loaded but minimal required', firstMiddlewareIsMinimal: false, secondMiddlewareIsMinimal: true },
+  ])('should not repopulate details if $scenario', async ({ firstMiddlewareIsMinimal, secondMiddlewareIsMinimal }) => {
+    await getPrisonerData(services, { minimal: firstMiddlewareIsMinimal })(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+      await getPrisonerData(services, { minimal: secondMiddlewareIsMinimal })(req, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(1)
+  })
+
+  it('should still repopulate full details if only minimal were loaded', async () => {
+    await getPrisonerData(services, { minimal: true })(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+      await getPrisonerData(services)(req, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(2)
+  })
+
+  it('should still repopulate details if prisoner number doesn’t match', async () => {
+    await getPrisonerData(services)(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+
+      const secondReq = {
+        ...req,
+        params: { ...req.params },
+      } as Request
+      secondReq.params.prisonerNumber = 'A1234AA'
+      await getPrisonerData(services)(secondReq, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('A1234AA')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(2)
+  })
+
   it('should populate prisonerData, inmateDetail and alertSummaryData in middleware', async () => {
     featureToggleStoreMock = {
       getToggle: jest.fn(async () => true),
