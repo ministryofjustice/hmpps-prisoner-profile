@@ -1,0 +1,92 @@
+{% extends "partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set pageTitle =  "Before you continue" %}
+{% set breadCrumbs = [{ text: "Digital Prison Services", href: "/" | prependBaseUrl }] %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errors,
+          attributes: { "data-qa-errors": true },
+          classes: "govuk-!-margin-bottom-6"
+        })}}
+      {% endif %}
+
+      <div class="justify-access">
+        <div class="justify-access__interruption">
+          <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+          <h2 class="govuk-heading-m">{{ prisonerName.firstLast }} is a high profile prisoner</h2>
+          <p>You must only access {{ prisonerName.firstLast | apostrophe }} profile where there is a legitimate business or operational need directly related to your role.</p>
+          <p>Your access to this profile is recorded and may be reviewed. You may need to justify it later.</p>
+          <p>Unauthorised or inappropriate access may result in disciplinary action and, in serious cases, criminal investigation.</p>
+        </div>
+
+        <form method="post" novalidate="novalidate" autocomplete="off" class="justify-access__form govuk-!-display-none-print">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+          <div class="justify-access__form__content">
+
+            {{ govukCheckboxes({
+              id: "confirmation",
+              name: "confirmation",
+              fieldset: {
+                legend: {
+                  text: "I confirm that I have a legitimate business or operational need to access this profile",
+                  classes: "govuk-fieldset__legend--s"
+                }
+              },
+              items: [{
+                value: "yes",
+                text: "Yes",
+                checked: formValues.confirmation == "yes"
+              }],
+              errorMessage: errors | findError("confirmation")
+            }) }}
+
+            {{ govukCharacterCount({
+              id: "justification",
+              name: "justification",
+              label: {
+                text: "Why do you need access and how does it relate to your role?",
+                classes: "govuk-label--s"
+              },
+              hint: {
+                text: "Include enough detail to explain why access is needed. If you cannot record sensitive details, keep a record you can provide if requested."
+              },
+              rows: 4,
+              maxlength: 250,
+              countType: "length",
+              spellcheck: true,
+              value: formValues.justification,
+              errorMessage: errors | findError("justification")
+            }) }}
+
+            <div class="govuk-button-group">
+              {{ govukButton({
+                text: "Continue to prisoner profile",
+                type: "submit",
+                preventDoubleClick: true,
+                attributes: { "data-qa": "continue-to-profile" }
+              }) }}
+              <a href="{{ backUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">
+                Back
+              </a>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
