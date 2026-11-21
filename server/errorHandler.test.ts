@@ -4,7 +4,6 @@ import { DataAccess } from './data'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import { aliasServiceMock } from '../tests/mocks/aliasServiceMock'
 import { commonApiRoutesMock } from '../tests/mocks/comonApiRoutesMock'
-import AliasService from './services/aliasService'
 
 jest.mock('./services')
 
@@ -15,7 +14,7 @@ beforeEach(() => {
     services: {
       dataAccess: {} as DataAccess,
       commonApiRoutes: commonApiRoutesMock(),
-      aliasService: aliasServiceMock() as AliasService,
+      aliasService: aliasServiceMock(),
     },
   })
 })
