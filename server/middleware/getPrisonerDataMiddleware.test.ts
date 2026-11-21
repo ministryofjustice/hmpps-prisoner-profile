@@ -144,20 +144,29 @@ describe('GetPrisonerDataMiddleware', () => {
 
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(1)
+    if (firstMiddlewareIsMinimal && secondMiddlewareIsMinimal) {
+      expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+    } else {
+      expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(1)
+    }
   })
 
-  it('should still repopulate full details if only minimal were loaded', async () => {
+  it('should only populate full details if only minimal were loaded', async () => {
     await getPrisonerData(services, { minimal: true })(req, res, async (error?: unknown) => {
       expect(error).toBeUndefined()
       await getPrisonerData(services)(req, res, next)
     })
 
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
-    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(2)
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(1)
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(1)
   })
 
-  it('should still repopulate details if prisoner number doesn’t match', async () => {
-    await getPrisonerData(services)(req, res, async (error?: unknown) => {
+  it.each([
+    { scenario: 'full', minimal: false },
+    { scenario: 'minimal', minimal: true },
+  ])('should still repopulate $scenario details if prisoner number doesn’t match', async ({ minimal }) => {
+    await getPrisonerData(services, { minimal })(req, res, async (error?: unknown) => {
       expect(error).toBeUndefined()
 
       const secondReq = {
@@ -165,12 +174,17 @@ describe('GetPrisonerDataMiddleware', () => {
         params: { ...req.params },
       } as Request
       secondReq.params.prisonerNumber = 'A1234AA'
-      await getPrisonerData(services)(secondReq, res, next)
+      await getPrisonerData(services, { minimal })(secondReq, res, next)
     })
 
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('A1234AA')
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
     expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(2)
+    if (minimal) {
+      expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+    } else {
+      expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(2)
+    }
   })
 
   it('should populate prisonerData, inmateDetail and alertSummaryData in middleware', async () => {
