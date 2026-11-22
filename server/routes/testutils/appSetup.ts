@@ -21,6 +21,10 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
     req.user = userSupplier()
+    req.middleware = {
+      ...req.middleware,
+      clientToken: 'clientToken021',
+    }
     req.flash = flashProvider
     res.locals = {
       feComponents: {
@@ -57,6 +61,6 @@ export function appWithAllRoutes({
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => Express.User
-}): Express {
+} = {}): Express {
   return appSetup(services as Services, production, userSupplier)
 }
