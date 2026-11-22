@@ -1,4 +1,4 @@
-import type { Readable } from 'stream'
+import type { Readable } from 'node:stream'
 
 export default interface MulterFile {
   /** Name of the form field associated with this file. */

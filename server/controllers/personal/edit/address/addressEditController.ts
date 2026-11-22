@@ -1,4 +1,4 @@
-import type { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
 import type { RequestHandler } from 'express'
 import logger from '../../../../../logger'
 import { apostrophe, blankStringsToNull } from '../../../../utils/utils'

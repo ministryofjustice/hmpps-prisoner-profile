@@ -1,4 +1,4 @@
-import { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
 
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { Role } from '../data/enums/role'

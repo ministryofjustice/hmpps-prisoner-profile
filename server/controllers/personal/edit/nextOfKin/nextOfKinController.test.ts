@@ -1,4 +1,4 @@
-import { randomUUID, UUID } from 'crypto'
+import { randomUUID, UUID } from 'node:crypto'
 import type { Request, Response } from 'express'
 import type { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import type { AuditService } from '../../../../services/interfaces/auditService'
