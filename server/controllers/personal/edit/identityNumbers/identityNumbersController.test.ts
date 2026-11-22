@@ -1,10 +1,12 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import IdentityNumbersService from '../../../../services/identityNumbersService'
 import IdentityNumbersController, { EditIdentityNumberSubmission } from './identityNumbersController'
 import { GetIdentifierMock, GetIdentifiersMock } from '../../../../data/localMockData/getIdentifiersMock'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,

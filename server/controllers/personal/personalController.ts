@@ -10,7 +10,8 @@ import {
   editReligionEnabled,
   propertySummaryTileEnabled,
 } from '../../utils/featureFlags'
-import { type AuditService, Page } from '../../services/auditService'
+import type { AuditService } from '../../services/interfaces/auditService'
+import { Page } from '../../services/interfaces/auditService/page'
 import type CareNeedsService from '../../services/careNeedsService'
 import type PersonalPageService from '../../services/personalPageService'
 import type { XRayBodyScansAvailabilityService } from '../../services/xRayBodyScansAvailabilityService'

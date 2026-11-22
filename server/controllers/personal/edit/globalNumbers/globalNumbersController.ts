@@ -1,6 +1,7 @@
 import PersonalEditController from '../personalEditController'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
 import { addPhoneNumberFieldData, changePhoneNumberFieldData } from '../../fieldData'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'

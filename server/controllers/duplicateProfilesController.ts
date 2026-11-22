@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
-import { PermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import { HmppsUser } from '@ministryofjustice/hmpps-prison-permissions-lib/dist/types/internal/user/HmppsUser'
-import { AuditService, Page } from '../services/auditService'
+import type { NextFunction, Request, Response } from 'express'
+import type { PermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import type { HmppsUser } from '@ministryofjustice/hmpps-prison-permissions-lib/dist/types/internal/user/HmppsUser'
+import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import NotFoundError from '../utils/notFoundError'
-import logger from '../../logger'
 
 export default class DuplicateProfilesController {
   constructor(

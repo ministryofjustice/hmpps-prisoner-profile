@@ -1,7 +1,9 @@
-import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, capitaliseFirstLetter } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { Request, RequestHandler, Response } from 'express'
 import logger from '../../../../../logger'
+import { apostrophe, capitaliseFirstLetter } from '../../../../utils/utils'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import IdentityNumbersService from '../../../../services/identityNumbersService'
 import {

@@ -1,11 +1,13 @@
 import { RequestHandler } from 'express'
-import { AuditService, Page, PostAction } from '../../services/auditService'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
 import { mapToQueryString } from '../../utils/utils'
 import EphemeralDataService from '../../services/ephemeralDataService'
 import AddressService from '../../services/addressService'
 import getCommonRequestData from '../../utils/getCommonRequestData'
+import { Page } from '../../services/interfaces/auditService/page'
+import { PostAction } from '../../services/interfaces/auditService/actions'
+import { AuditService } from '../../services/interfaces/auditService'
 
 export interface DisplayFindUkAddressOptions {
   pageTitle: string

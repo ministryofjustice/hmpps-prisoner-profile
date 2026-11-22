@@ -1,7 +1,9 @@
-import { RequestHandler } from 'express'
-import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { RequestHandler } from 'express'
 import logger from '../../../../../logger'
+import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import MilitaryRecordsService from '../../../../services/militaryRecordsService'
 import {
   Conflicts,

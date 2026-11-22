@@ -1,13 +1,14 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { add, format, isAfter, isBefore, startOfToday } from 'date-fns'
+import logger from '../../logger'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import ScheduledEvent, { SelectedWeekDates } from '../data/interfaces/prisonApi/ScheduledEvent'
-import { AuditService, Page } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 /**
  * Parse requests for case notes routes and orchestrate response

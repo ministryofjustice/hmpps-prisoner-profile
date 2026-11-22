@@ -1,6 +1,6 @@
+import type { UUID } from 'crypto'
 import { jwtDecode } from 'jwt-decode'
 import express from 'express'
-import { UUID } from 'crypto'
 import { convertToTitleCase } from '../utils/utils'
 import logger from '../../logger'
 import { Role } from '../data/enums/role'

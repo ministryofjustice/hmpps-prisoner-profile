@@ -1,12 +1,14 @@
-import { Request, RequestHandler } from 'express'
-import { UUID } from 'crypto'
+import type { UUID } from 'crypto'
+import type { Request, RequestHandler } from 'express'
 import {
   apostrophe,
   formatName,
   mapRelationshipDescriptionByCode,
   objectToSelectOptions,
 } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import NextOfKinService from '../../../../services/nextOfKinService'
 import { NameFormatStyle } from '../../../../data/enums/nameFormatStyle'
 import logger from '../../../../../logger'

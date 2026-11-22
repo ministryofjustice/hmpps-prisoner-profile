@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express'
-import { ApiAction, Page } from '../services/auditService'
 import { Services } from '../services'
+import { Page } from '../services/interfaces/auditService/page'
+import { ApiAction } from '../services/interfaces/auditService/actions'
 
 export default function auditPageAccessAttempt({
   services,

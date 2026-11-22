@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import DistinguishingMarksService, {
   findBodyPartByCodeAndSideAndOrientation,
@@ -18,7 +18,9 @@ import {
   BodyPartSideId,
   PartOrientationId,
 } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import logger from '../../../../../logger'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import ProblemSavingError from '../../../../utils/problemSavingError'

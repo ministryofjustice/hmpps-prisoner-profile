@@ -1,6 +1,6 @@
 import PersonalEditController from '../personalEditController'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
 import { smokerOrVaperFieldData } from '../../fieldData'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import { objectToRadioOptions } from '../../../../utils/utils'

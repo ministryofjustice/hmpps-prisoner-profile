@@ -1,7 +1,9 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import { apostrophe, objectToSelectOptions, requestStringToBoolean } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import logger from '../../../../../logger'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import LanguagesService from '../../../../services/languagesService'
 import {
   CommunicationNeedsDto,

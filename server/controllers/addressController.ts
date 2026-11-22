@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
-import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import AddressService from '../services/addressService'
 import { getErrorStatus } from '../utils/errorHelpers'
 import type { PrisonUser } from '../interfaces/HmppsUser'

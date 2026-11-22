@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import {
   isGranted,
   PersonalRelationshipsPermission,
@@ -13,6 +13,7 @@ import {
   XRayBodyScansPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
 
+import logger from '../../logger'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -24,8 +25,8 @@ import type { SupportForAdditionalNeedsApiClient } from '../data/interfaces/supp
 import type { XRayBodyScansApiClient } from '../data/interfaces/xRayBodyScansApi'
 import type { RestClientBuilder } from '../data'
 import buildOverviewActions from './utils/overviewController/buildOverviewActions'
-import { AuditService, Page } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import OffencesService from '../services/offencesService'
 import OverviewPageData from './interfaces/OverviewPageData'
 import mapCourtCaseSummary from './utils/overviewController/mapCourtCaseSummary'

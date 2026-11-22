@@ -1,6 +1,7 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
-import { AuditService, Page } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 export default class GoalsController {
   constructor(

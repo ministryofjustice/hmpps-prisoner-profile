@@ -1,8 +1,10 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import LanguagesController from './languagesController'
 import LanguagesService from '../../../../services/languagesService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,

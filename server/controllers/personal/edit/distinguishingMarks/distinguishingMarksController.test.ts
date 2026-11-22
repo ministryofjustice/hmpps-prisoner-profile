@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
 import DistinguishingMarksService from '../../../../services/distinguishingMarksService'
 import { distinguishingMarkMock, leftLegMarkMock } from '../../../../data/localMockData/distinguishingMarksMock'
@@ -8,7 +8,9 @@ import {
   type ValidBodyPart,
 } from '../../../interfaces/distinguishingMarks/selectionTypes'
 import { getBodyPartDescription } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../../data/localMockData/user'

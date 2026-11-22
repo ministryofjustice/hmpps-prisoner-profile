@@ -6,7 +6,7 @@ import {
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import LocationDetailsController from '../controllers/locationDetailsController'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 

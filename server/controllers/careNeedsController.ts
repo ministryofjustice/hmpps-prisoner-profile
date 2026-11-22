@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express'
 import config from '../config'
 import logger from '../../logger'
-import { type AuditService, Page } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import type CareNeedsService from '../services/careNeedsService'
 import {
   XRayBodyScansAvailability,
