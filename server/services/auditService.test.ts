@@ -1,4 +1,5 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
+import logger from '../../logger'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import type { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
@@ -9,6 +10,7 @@ import { SubjectType } from './interfaces/auditService/subjectType'
 import AuditService from './auditService'
 
 jest.mock('@aws-sdk/client-sqs')
+jest.mock('../../logger')
 
 const user = { ...prisonUserMock, userRoles: [Role.PrisonUser] }
 const prisonerNumber = 'G6123VU'
@@ -25,15 +27,10 @@ describe('AuditService', () => {
 
   const sqsClient = jest.mocked(new SQSClient({ region: config.audit.region }))
   sqsClient.send.mockResolvedValue({ MessageId: 'msg1' } as never)
-  const auditService = AuditService({
-    sqsClient,
-    queueUrl: config.audit.queueUrl,
-    serviceName: config.audit.serviceName,
-    build: config.gitRef,
-    enabled: true,
-  })
+  const auditService = new AuditService(sqsClient, config.audit.queueUrl, config.gitRef, config.audit.serviceName, true)
 
   const expectMessageSent = (expectedMessage: object, expectedDetails?: object) => {
+    expect(logger.info).toHaveBeenCalledWith('Message sent to audit (msg1)')
     expect(sqsClient.send).toHaveBeenCalled()
     const { MessageBody, QueueUrl } = jest.mocked(SendMessageCommand).mock.calls[0][0]
     expect(QueueUrl).toEqual(config.audit.queueUrl)

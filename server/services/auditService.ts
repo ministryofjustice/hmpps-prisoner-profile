@@ -12,6 +12,7 @@ import type {
 } from './interfaces/auditService'
 import { SubjectType } from './interfaces/auditService/subjectType'
 
+/** Payload expected by HMPPS audit service */
 interface AuditMessage extends SendEvent {
   what: string
   when: Date
@@ -23,146 +24,121 @@ interface AuditMessage extends SendEvent {
   details?: string
 }
 
-export default ({
-  sqsClient,
-  queueUrl,
-  build,
-  serviceName,
-  enabled,
-}: {
-  sqsClient: SQSClient
-  queueUrl: string
-  build: string
-  serviceName: string
-  enabled: boolean
-}): AuditService => {
-  const sendMessage = async (message: AuditMessage) => {
-    if (enabled) {
+export default class implements AuditService {
+  constructor(
+    private readonly sqsClient: SQSClient,
+    private readonly queueUrl: string,
+    private readonly build: string,
+    private readonly serviceName: string,
+    private readonly enabled: boolean,
+  ) {}
+
+  private async sendMessage(message: Omit<AuditMessage, 'when' | 'service'>): Promise<void> {
+    if (this.enabled) {
+      const msg: AuditMessage = {
+        ...message,
+        when: new Date(),
+        service: this.serviceName,
+      }
       try {
-        const messageResponse = await sqsClient.send(
-          new SendMessageCommand({ MessageBody: JSON.stringify(message), QueueUrl: queueUrl }),
+        const messageResponse = await this.sqsClient.send(
+          new SendMessageCommand({
+            MessageBody: JSON.stringify(msg),
+            QueueUrl: this.queueUrl,
+          }),
         )
-        logger.info(`Page view sent to audit (${messageResponse.MessageId})`)
+        logger.info(`Message sent to audit (${messageResponse.MessageId})`)
       } catch (error) {
-        logger.error('Problem sending page view to audit', error)
+        logger.error('Problem sending message to audit', error)
       }
     }
   }
 
-  const sendAccessAttempt = async ({ user, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
-    await sendMessage({
-      what: `ACCESS_ATTEMPT_${page.toString()}`,
-      when: new Date(),
+  sendAccessAttempt({ user, prisonerNumber, page, correlationId }: AccessAttemptAudit) {
+    return this.sendMessage({
+      what: `ACCESS_ATTEMPT_${page}`,
       who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
-      service: serviceName,
       correlationId,
-      details: JSON.stringify({ build, userRoles: user.userRoles }),
+      details: JSON.stringify({ build: this.build, userRoles: user.userRoles }),
     })
   }
 
-  const sendPostAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
-    await sendMessage({
-      what: `POST_${action.toString()}`,
-      when: new Date(),
-      who: user.username,
-      subjectId: prisonerNumber,
-      subjectType: SubjectType.PrisonerId,
-      service: serviceName,
-      correlationId,
-      details: JSON.stringify({ build, ...details }),
-    })
-  }
-
-  const sendPostSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
-    await sendMessage({
-      what: `POST_SUCCESS_${action.toString()}`,
-      when: new Date(),
-      who: user.username,
-      subjectId: prisonerNumber,
-      subjectType: SubjectType.PrisonerId,
-      service: serviceName,
-      correlationId,
-      details: JSON.stringify({ build, ...details }),
-    })
-  }
-
-  const sendPutAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
-    await sendMessage({
-      what: `PUT_${action.toString()}`,
-      when: new Date(),
-      who: user.username,
-      subjectId: prisonerNumber,
-      subjectType: SubjectType.PrisonerId,
-      service: serviceName,
-      correlationId,
-      details: JSON.stringify({ build, ...details }),
-    })
-  }
-
-  const sendPutSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
-    await sendMessage({
-      what: `PUT_SUCCESS_${action.toString()}`,
-      when: new Date(),
-      who: user.username,
-      subjectId: prisonerNumber,
-      subjectType: SubjectType.PrisonerId,
-      service: serviceName,
-      correlationId,
-      details: JSON.stringify({ build, ...details }),
-    })
-  }
-
-  const sendPageView = async ({ user, prisonerNumber, prisonId, page, correlationId }: PageViewAudit) => {
+  sendPageView({ user, prisonerNumber, prisonId, page, correlationId }: PageViewAudit) {
     const details = {
       globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
       userRoles: user.userRoles,
-      build,
+      build: this.build,
     }
 
-    await sendMessage({
-      what: `PAGE_VIEW_${page.toString()}`,
-      when: new Date(),
+    return this.sendMessage({
+      what: `PAGE_VIEW_${page}`,
       who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
-      service: serviceName,
       correlationId,
       details: JSON.stringify(details),
     })
   }
 
-  const sendSearch = async ({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
-    await sendMessage({
+  sendSearch({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) {
+    return this.sendMessage({
       what: `SEARCH_${searchPage}`,
       correlationId,
-      details: JSON.stringify({ ...details, build }),
-      service: serviceName,
+      details: JSON.stringify({ build: this.build, ...details }),
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,
-      when: new Date(),
       who: user.username,
     })
   }
 
-  const sendEvent = async (event: SendEvent) => {
-    await sendMessage({
-      service: serviceName,
-      when: new Date(),
-      ...event,
+  sendPostAttempt({ user, prisonerNumber, action, correlationId, details }: PostAudit) {
+    return this.sendMessage({
+      what: `POST_${action}`,
+      who: user.username,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      correlationId,
+      details: JSON.stringify({ build: this.build, ...details }),
     })
   }
 
-  return {
-    sendAccessAttempt,
-    sendPageView,
-    sendSearch,
-    sendPostAttempt,
-    sendPostSuccess,
-    sendPutAttempt,
-    sendPutSuccess,
-    sendEvent,
+  sendPostSuccess({ user, prisonerNumber, action, correlationId, details }: PostAudit) {
+    return this.sendMessage({
+      what: `POST_SUCCESS_${action}`,
+      who: user.username,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      correlationId,
+      details: JSON.stringify({ build: this.build, ...details }),
+    })
+  }
+
+  sendPutAttempt({ user, prisonerNumber, action, correlationId, details }: PutAudit) {
+    return this.sendMessage({
+      what: `PUT_${action}`,
+      who: user.username,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      correlationId,
+      details: JSON.stringify({ build: this.build, ...details }),
+    })
+  }
+
+  sendPutSuccess({ user, prisonerNumber, action, correlationId, details }: PutAudit) {
+    return this.sendMessage({
+      what: `PUT_SUCCESS_${action}`,
+      who: user.username,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      correlationId,
+      details: JSON.stringify({ build: this.build, ...details }),
+    })
+  }
+
+  sendEvent(event: SendEvent) {
+    return this.sendMessage(event)
   }
 }

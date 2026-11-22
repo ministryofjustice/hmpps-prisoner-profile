@@ -1,7 +1,7 @@
 import type { HmppsUser } from '../../../interfaces/HmppsUser'
 import type { ApiAction, PostAction, PutAction, SearchAction } from './actions'
 import type { Page } from './page'
-import { SubjectType } from './subjectType'
+import type { SubjectType } from './subjectType'
 
 export interface AccessAttemptAudit {
   user: HmppsUser
