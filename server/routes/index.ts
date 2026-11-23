@@ -46,6 +46,8 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import DuplicateProfilesController from '../controllers/duplicateProfilesController'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
+import { JustifyAccessController } from '../controllers/justifyAccessController'
+import { isHighProfilePrisonerMiddleware } from '../middleware/isHighProfilePrisonerMiddleware'
 
 export function standardGetPaths(path: string): boolean {
   return !/^(\/api|\/save-backlink|\/$)/.test(path)
@@ -65,6 +67,14 @@ export default function routes(services: Services): Router {
     }
     next()
   })
+
+  const justifyAccessController = new JustifyAccessController()
+  router.use(
+    basePath,
+    isHighProfilePrisonerMiddleware(services),
+    getPrisonerData(services, { minimal: true }),
+    justifyAccessController.requestHandler,
+  )
 
   const { prisonPermissionsService } = services
   const overviewController = new OverviewController(

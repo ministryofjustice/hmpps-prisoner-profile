@@ -9,14 +9,14 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import getPrisonerData from './getPrisonerDataMiddleware'
 import { Services } from '../services'
+import { alertsApiClientMock } from '../../tests/mocks/alertsApiClientMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { prisonerSearchClientMock } from '../../tests/mocks/prisonerSearchClientMock'
 import NotFoundError from '../utils/notFoundError'
 import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import FeatureToggleService from '../services/featureToggleService'
 import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
-import { Alert, AlertType } from '../data/interfaces/alertsApi/Alert'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatDateISO } from '../utils/dateHelpers'
 import { DataAccess } from '../data'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
@@ -31,8 +31,8 @@ let res: Response
 let next: NextFunction
 let services: Services
 let prisonApiClient: jest.Mocked<PrisonApiClient>
-let prisonerSearchApiClient: PrisonerSearchClient
-let alertsApiClient: AlertsApiClient
+let prisonerSearchApiClient: jest.Mocked<PrisonerSearchClient>
+let alertsApiClient: jest.Mocked<AlertsApiClient>
 let featureToggleStoreMock: FeatureToggleStore
 
 describe('GetPrisonerDataMiddleware', () => {
@@ -57,26 +57,18 @@ describe('GetPrisonerDataMiddleware', () => {
       render: jest.fn(),
     } as unknown as Response
     next = jest.fn()
-    prisonerSearchApiClient = {
-      getPrisonerDetails: jest.fn(async () => PrisonerMockDataA),
-      findByNumbers: jest.fn(),
-    }
+    prisonerSearchApiClient = prisonerSearchClientMock()
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getAssessments.mockResolvedValue(assessmentsMock)
     prisonApiClient.getInmateDetail.mockResolvedValue(inmateDetailMock)
-    alertsApiClient = {
-      createAlert: jest.fn(async (): Promise<Alert> => null),
-      getAlertDetails: jest.fn(async (): Promise<Alert> => null),
-      getAlertTypes: jest.fn(async (): Promise<AlertType[]> => null),
-      updateAlert: jest.fn(async (): Promise<Alert> => null),
-      getAlerts: jest.fn(async () => pagedActiveAlertsMock),
-    }
+    alertsApiClient = alertsApiClientMock()
+    alertsApiClient.getAlerts.mockResolvedValue(pagedActiveAlertsMock)
 
     services = {
       dataAccess: {
-        prisonerSearchApiClientBuilder: jest.fn(() => prisonerSearchApiClient),
-        prisonApiClientBuilder: jest.fn(() => prisonApiClient),
-        alertsApiClientBuilder: jest.fn(() => alertsApiClient),
+        prisonerSearchApiClientBuilder: () => prisonerSearchApiClient,
+        prisonApiClientBuilder: () => prisonApiClient,
+        alertsApiClientBuilder: () => alertsApiClient,
       } as unknown as DataAccess,
     } as Services
 
@@ -118,10 +110,10 @@ describe('GetPrisonerDataMiddleware', () => {
   )
 
   it('should return NotFoundError if prisonerData.prisonerNumber is undefined', async () => {
-    prisonerSearchApiClient.getPrisonerDetails = jest.fn(async (): Promise<Prisoner> => ({
+    prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue({
       ...PrisonerMockDataA,
       prisonerNumber: undefined,
-    }))
+    })
 
     await getPrisonerData(services)(req, res, next)
 
@@ -130,6 +122,61 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
     expect(prisonApiClient.getAssessments).not.toHaveBeenCalled()
     expect(req.middleware.prisonerData).toBeUndefined()
+  })
+
+  it.each([
+    { scenario: 'full already loaded', firstMiddlewareIsMinimal: false, secondMiddlewareIsMinimal: false },
+    { scenario: 'minimal already loaded', firstMiddlewareIsMinimal: true, secondMiddlewareIsMinimal: true },
+    { scenario: 'full loaded but minimal required', firstMiddlewareIsMinimal: false, secondMiddlewareIsMinimal: true },
+  ])('should not repopulate details if $scenario', async ({ firstMiddlewareIsMinimal, secondMiddlewareIsMinimal }) => {
+    await getPrisonerData(services, { minimal: firstMiddlewareIsMinimal })(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+      await getPrisonerData(services, { minimal: secondMiddlewareIsMinimal })(req, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(1)
+    if (firstMiddlewareIsMinimal && secondMiddlewareIsMinimal) {
+      expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+    } else {
+      expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(1)
+    }
+  })
+
+  it('should only populate full details if only minimal were loaded', async () => {
+    await getPrisonerData(services, { minimal: true })(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+      await getPrisonerData(services)(req, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(1)
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    { scenario: 'full', minimal: false },
+    { scenario: 'minimal', minimal: true },
+  ])('should still repopulate $scenario details if prisoner number doesn’t match', async ({ minimal }) => {
+    await getPrisonerData(services, { minimal })(req, res, async (error?: unknown) => {
+      expect(error).toBeUndefined()
+
+      const secondReq = {
+        ...req,
+        params: { ...req.params },
+      } as Request
+      secondReq.params.prisonerNumber = 'A1234AA'
+      await getPrisonerData(services, { minimal })(secondReq, res, next)
+    })
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('A1234AA')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledTimes(2)
+    if (minimal) {
+      expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+    } else {
+      expect(prisonApiClient.getInmateDetail).toHaveBeenCalledTimes(2)
+    }
   })
 
   it('should populate prisonerData, inmateDetail and alertSummaryData in middleware', async () => {
@@ -245,10 +292,10 @@ describe('GetPrisonerDataMiddleware', () => {
     const originalCsraServiceEnabled = config.featureToggles.csraServiceEnabled
 
     beforeEach(() => {
-      prisonerSearchApiClient.getPrisonerDetails = jest.fn(async (): Promise<Prisoner> => ({
+      prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue({
         ...PrisonerMockDataA,
         csra: 'High - general',
-      }))
+      })
       prisonApiClient.getAssessments.mockResolvedValue([
         {
           assessmentDate: '2024-01-01',

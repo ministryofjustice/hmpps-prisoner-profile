@@ -6,11 +6,12 @@ import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMoc
 import { alertDetailsCreatedMock, alertDetailsMock } from '../data/localMockData/alertDetailsMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import { alertsApiClientMock } from '../../tests/mocks/alertsApiClientMock'
 
 jest.mock('../data/prisonApiClient')
 
 describe('Alerts Service', () => {
-  let alertsApiClientSpy: AlertsApiClient
+  let alertsApiClientSpy: jest.Mocked<AlertsApiClient>
   let prisonerData: Prisoner
   let alertSummaryData: AlertSummaryData
   let alertsService: AlertsService
@@ -25,13 +26,7 @@ describe('Alerts Service', () => {
       alertFlags: [],
       apiUnavailable: false,
     }
-    alertsApiClientSpy = {
-      createAlert: jest.fn(),
-      getAlertDetails: jest.fn(),
-      updateAlert: jest.fn(),
-      getAlerts: jest.fn(),
-      getAlertTypes: jest.fn(),
-    } as AlertsApiClient
+    alertsApiClientSpy = alertsApiClientMock()
   })
 
   afterEach(() => {
@@ -42,7 +37,7 @@ describe('Alerts Service', () => {
     describe('Get Alerts', () => {
       it('should call Alerts API tp get active alerts when queryParams includes ACTIVE', async () => {
         const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
-        alertsApiClientSpy.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+        alertsApiClientSpy.getAlerts.mockResolvedValue(pagedActiveAlertsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alertsPageData = await alertsService.get('TOKEN', prisonerData, alertSummaryData, queryParams)
@@ -60,7 +55,7 @@ describe('Alerts Service', () => {
 
       it('should call Alerts API to get inactive alerts when queryParams includes INACTIVE', async () => {
         const queryParams: AlertsListQueryParams = { alertStatus: 'INACTIVE', sort: 'dateExpires,DESC' }
-        alertsApiClientSpy.getAlerts = jest.fn(async () => pagedInactiveAlertsMock)
+        alertsApiClientSpy.getAlerts.mockResolvedValue(pagedInactiveAlertsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alertsPageData = await alertsService.get(
@@ -84,7 +79,7 @@ describe('Alerts Service', () => {
 
     describe('Create alert', () => {
       it('should call Alerts API to create the alert', async () => {
-        alertsApiClientSpy.createAlert = jest.fn(async () => alertDetailsMock)
+        alertsApiClientSpy.createAlert.mockResolvedValue(alertDetailsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alert = await alertsService.createAlert('TOKEN', {
@@ -96,7 +91,7 @@ describe('Alerts Service', () => {
       })
 
       it('should call Alerts API to create the alert without expiry date', async () => {
-        alertsApiClientSpy.createAlert = jest.fn(async () => alertDetailsMock)
+        alertsApiClientSpy.createAlert.mockResolvedValue(alertDetailsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alert = await alertsService.createAlert('TOKEN', {
@@ -110,7 +105,7 @@ describe('Alerts Service', () => {
 
     describe('Get active alert by code', () => {
       it('should return the matching active alert', async () => {
-        alertsApiClientSpy.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+        alertsApiClientSpy.getAlerts.mockResolvedValue(pagedActiveAlertsMock)
         alertsService = new AlertsService(() => alertsApiClientSpy)
 
         const alert = await alertsService.getActiveAlertByCode('TOKEN', 'AA1234A', 'AS')
@@ -122,7 +117,7 @@ describe('Alerts Service', () => {
 
     describe('Get Alert Details', () => {
       it('should call Alerts API tp get alert details', async () => {
-        alertsApiClientSpy.getAlertDetails = jest.fn(async () => alertDetailsMock)
+        alertsApiClientSpy.getAlertDetails.mockResolvedValue(alertDetailsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alertDetails = await alertsService.getAlertDetails('TOKEN', 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d')
@@ -135,7 +130,7 @@ describe('Alerts Service', () => {
 
     describe('Update alert', () => {
       it('should call Alerts API to update the alert', async () => {
-        alertsApiClientSpy.updateAlert = jest.fn(async () => alertDetailsMock)
+        alertsApiClientSpy.updateAlert.mockResolvedValue(alertDetailsMock)
 
         alertsService = new AlertsService(() => alertsApiClientSpy)
         const alert = await alertsService.updateAlert('TOKEN', 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d', {

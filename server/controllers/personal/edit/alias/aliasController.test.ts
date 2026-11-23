@@ -23,7 +23,7 @@ describe('Alias Controller', () => {
   let req: Request
   let res: Response
   let next: NextFunction
-  let aliasService: AliasService
+  let aliasService: jest.Mocked<AliasService>
   let referenceDataService: ReferenceDataService
   let auditService: AuditService
   let controller: AliasController
@@ -55,7 +55,7 @@ describe('Alias Controller', () => {
     next = jest.fn()
 
     auditService = auditServiceMock()
-    aliasService = aliasServiceMock() as AliasService
+    aliasService = aliasServiceMock()
     referenceDataService = {
       getActiveReferenceDataCodes: jest.fn().mockImplementation(() => Promise.resolve(ethnicityCodesMock)),
     } as unknown as ReferenceDataService
@@ -213,7 +213,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.updateWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
@@ -233,9 +233,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.updateWorkingName = async () => {
-        throw new Error()
-      }
+      aliasService.updateWorkingName.mockRejectedValue(new Error())
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
@@ -253,7 +251,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.updateWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
@@ -350,7 +348,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.createNewWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.createNewWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameLegal()(req, res, next)
 
@@ -370,9 +368,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.createNewWorkingName = async () => {
-        throw new Error()
-      }
+      aliasService.createNewWorkingName.mockRejectedValue(new Error())
 
       await controller.submitChangeNameLegal()(req, res, next)
 
@@ -390,7 +386,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.createNewWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.createNewWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameLegal()(req, res, next)
 
@@ -467,8 +463,8 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.checkForDuplicateAlias = jest.fn().mockResolvedValue(true)
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.checkForDuplicateAlias.mockResolvedValue(true)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -524,7 +520,7 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -552,9 +548,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.addNewAlias = async () => {
-        throw new Error()
-      }
+      aliasService.addNewAlias.mockRejectedValue(new Error())
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -579,7 +573,7 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -687,9 +681,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.updateDateOfBirth = async () => {
-        throw new Error()
-      }
+      aliasService.updateDateOfBirth.mockRejectedValue(new Error())
 
       await controller.submitChangeDateOfBirth()(req, res, next)
 
@@ -707,7 +699,7 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.updateDateOfBirth = jest.fn().mockResolvedValue({
+      aliasService.updateDateOfBirth.mockResolvedValue({
         ...PseudonymResponseMock,
         dateOfBirth: '1999-02-01',
       })
@@ -790,9 +782,9 @@ describe('Alias Controller', () => {
 
     it(`Saves ethnicity as 'They prefer not to say'`, async () => {
       req = { ...req, body: { radioField: 'NS' } } as unknown as Request
-      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+      aliasService.updateEthnicity.mockResolvedValue({
         ...PseudonymResponseMock,
-        ethnicity: { code: 'NS' },
+        ethnicity: { id: 'ETHNICITY_NS', code: 'NS', description: 'They prefer not to say' },
       })
 
       await controller.submitChangeEthnicGroup()(req, res, next)
@@ -903,9 +895,7 @@ describe('Alias Controller', () => {
     it('Submission handles API errors', async () => {
       req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
-      aliasService.updateEthnicity = async () => {
-        throw new Error()
-      }
+      aliasService.updateEthnicity.mockRejectedValue(new Error())
 
       await controller.submitChangeEthnicBackground()(req, res, next)
 
@@ -916,9 +906,9 @@ describe('Alias Controller', () => {
     it('Sends a post success audit event', async () => {
       req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
-      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+      aliasService.updateEthnicity.mockResolvedValue({
         ...PseudonymResponseMock,
-        ethnicity: { code: ethnicityCodeSubmitted },
+        ethnicity: { id: 'CODE', code: ethnicityCodeSubmitted, description: ethnicityCodeSubmitted },
       })
 
       await controller.submitChangeEthnicBackground()(req, res, next)
