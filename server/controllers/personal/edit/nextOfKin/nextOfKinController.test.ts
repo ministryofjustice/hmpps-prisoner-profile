@@ -225,6 +225,7 @@ describe('NextOfKinController', () => {
         details: { formValues: req.body },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#next-of-kin`)
     })
@@ -469,6 +470,7 @@ describe('NextOfKinController', () => {
         details: { location },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -564,6 +566,7 @@ describe('NextOfKinController', () => {
           details: { uprn },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -717,6 +720,7 @@ describe('NextOfKinController', () => {
             details: { address: expect.objectContaining(cachedAddress) },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
     })

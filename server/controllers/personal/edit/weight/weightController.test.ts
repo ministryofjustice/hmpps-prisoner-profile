@@ -188,6 +188,7 @@ describe('WeightController', () => {
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -375,6 +376,7 @@ describe('WeightController', () => {
               details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
               justification: null,
             })
+            expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
           },
         )
       })

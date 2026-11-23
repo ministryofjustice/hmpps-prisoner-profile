@@ -246,6 +246,7 @@ describe('GlobalEmailsController', () => {
             details: { fieldName: 'emailAddress', previous: '', updated: 'foo@bar.com' },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -433,6 +434,7 @@ describe('GlobalEmailsController', () => {
             details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })

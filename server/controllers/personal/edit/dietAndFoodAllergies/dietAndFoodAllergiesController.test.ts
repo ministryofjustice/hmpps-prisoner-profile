@@ -365,6 +365,7 @@ describe('DietAndFoodAllergiesController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

@@ -254,6 +254,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: 1 },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('throws ProblemSavingError for middleware to handle if the upload fails', async () => {
@@ -434,6 +435,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: 1, photoId: 100 },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -757,6 +759,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'leftLeg' },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -907,6 +910,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'lowerLeftArm' },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1040,6 +1044,7 @@ describe('Distinguishing Marks Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1201,6 +1206,7 @@ describe('Distinguishing Marks Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('redirects back and shows an error if the upload fails', async () => {
@@ -1374,6 +1380,7 @@ describe('Distinguishing Marks Controller', () => {
         details: { markId: '101', photoId: 100 },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('Redirects back and shows an error if the upload fails', async () => {

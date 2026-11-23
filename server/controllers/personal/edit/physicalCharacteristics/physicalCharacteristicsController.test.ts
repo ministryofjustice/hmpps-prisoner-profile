@@ -231,6 +231,7 @@ describe('PhysicalCharacteristicsController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

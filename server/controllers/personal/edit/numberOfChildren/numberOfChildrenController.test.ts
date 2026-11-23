@@ -246,6 +246,7 @@ describe('NumberOfChildrenController', () => {
           details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

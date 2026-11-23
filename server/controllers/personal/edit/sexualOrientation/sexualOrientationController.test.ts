@@ -230,6 +230,7 @@ describe('SexualOrientationController', () => {
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

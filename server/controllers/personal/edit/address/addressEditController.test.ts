@@ -145,6 +145,7 @@ describe('Address Edit Controller', () => {
         details: { location },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -228,6 +229,7 @@ describe('Address Edit Controller', () => {
           details: { uprn },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -483,6 +485,7 @@ describe('Address Edit Controller', () => {
           details: { address: expectedAddressSubmission },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
       })
@@ -679,6 +682,7 @@ describe('Address Edit Controller', () => {
             details: { address: expect.objectContaining(cachedAddress) },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
     })

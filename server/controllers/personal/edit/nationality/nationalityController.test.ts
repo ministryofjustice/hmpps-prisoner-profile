@@ -315,6 +315,7 @@ describe('NationalityController', () => {
           ],
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

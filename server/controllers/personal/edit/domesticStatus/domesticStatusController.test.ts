@@ -261,6 +261,7 @@ describe('DomesticStatusController', () => {
           details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

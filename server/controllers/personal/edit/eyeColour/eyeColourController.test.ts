@@ -220,6 +220,7 @@ describe('EyeColourController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -411,6 +412,7 @@ describe('EyeColourController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

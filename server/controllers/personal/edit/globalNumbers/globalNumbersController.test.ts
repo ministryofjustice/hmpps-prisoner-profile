@@ -352,6 +352,7 @@ describe('GlobalNumbersController', () => {
             },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -604,6 +605,7 @@ describe('GlobalNumbersController', () => {
             },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })

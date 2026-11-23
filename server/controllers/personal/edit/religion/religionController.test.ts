@@ -1,5 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import type { AuditService } from '../../../../services/interfaces/auditService'
 import { PostAction } from '../../../../services/interfaces/auditService/actions'
@@ -15,6 +16,8 @@ describe('ReligionController', () => {
   let controller: ReligionController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -135,7 +138,7 @@ describe('ReligionController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -169,7 +172,7 @@ describe('ReligionController', () => {
             return []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -182,7 +185,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -200,7 +203,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -220,7 +223,7 @@ describe('ReligionController', () => {
               : []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -240,7 +243,7 @@ describe('ReligionController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { religion: 'ZORO', reasonKnown: 'NO' },
           flash: jest.fn(),
@@ -322,7 +325,7 @@ describe('ReligionController', () => {
               profileInformation: [],
             } as InmateDetail,
           },
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body,
           flash: jest.fn(),
@@ -365,6 +368,7 @@ describe('ReligionController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('Does not submit a request if no religion was selected', async () => {

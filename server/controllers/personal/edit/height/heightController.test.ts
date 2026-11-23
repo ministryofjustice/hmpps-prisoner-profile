@@ -185,6 +185,7 @@ describe('ShoeSizeController', () => {
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -345,6 +346,7 @@ describe('ShoeSizeController', () => {
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })

@@ -24,7 +24,6 @@ export default class PermissionsApiRestClient extends RestClient implements Perm
   }
 
   private async checkHighProfilePrisonerStatuses(prisonerNumbersToCheck: string[]): Promise<Map<string, boolean>> {
-    // return new Map(prisonerNumbersToCheck.map(prisonerNumber => [prisonerNumber, true]))
     const statuses = await this.post<HighProfilePrisonerResponse>(
       {
         path: '/api/high-profile-prisoners',

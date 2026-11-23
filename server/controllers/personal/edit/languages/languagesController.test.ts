@@ -190,6 +190,7 @@ describe('LanguagesController', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#main-language`)
     })
@@ -413,6 +414,7 @@ describe('LanguagesController', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })
@@ -478,6 +480,7 @@ describe('LanguagesController', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })

@@ -193,6 +193,7 @@ describe('CityOrTownOfBirthController', () => {
           },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

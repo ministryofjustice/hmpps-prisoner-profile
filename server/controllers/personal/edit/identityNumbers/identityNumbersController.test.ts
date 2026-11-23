@@ -224,6 +224,7 @@ describe('IdentityNumbersController', () => {
         details: { formValues: req.body },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Identity numbers updated',
         fieldName: expect.stringContaining(`'probation-legacy-system-row','yjaf-row'`),
@@ -489,6 +490,7 @@ describe('IdentityNumbersController', () => {
           details: { formValues: req.body },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Identity numbers updated',
           fieldName: `'${editPageUrl}-row'`,

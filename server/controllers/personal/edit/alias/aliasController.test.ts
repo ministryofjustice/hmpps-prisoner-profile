@@ -139,6 +139,7 @@ describe('Alias Controller', () => {
           details: { purpose },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
   })
@@ -287,6 +288,7 @@ describe('Alias Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -423,6 +425,7 @@ describe('Alias Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -602,6 +605,7 @@ describe('Alias Controller', () => {
         details: PseudonymResponseMock,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -736,6 +740,7 @@ describe('Alias Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -797,6 +802,7 @@ describe('Alias Controller', () => {
           details: { ethnicGroup },
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
 
@@ -829,6 +835,7 @@ describe('Alias Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -948,6 +955,7 @@ describe('Alias Controller', () => {
         },
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 })
