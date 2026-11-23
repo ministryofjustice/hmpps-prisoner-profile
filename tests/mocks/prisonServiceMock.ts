@@ -4,9 +4,9 @@ import { allPrisons, prisonsKeyedByPrisonId } from '../../server/data/localMockD
 // eslint-disable-next-line import/prefer-default-export
 export function prisonServiceMock(): jest.MockedObject<PrisonService> {
   return {
-    getAllPrisonNamesById: jest.fn(() =>
-      Promise.resolve(Object.fromEntries(allPrisons.map(prison => [prison.prisonId, prison.prisonName]))),
-    ),
+    getAllPrisonNamesById: jest
+      .fn()
+      .mockResolvedValue(Object.fromEntries(allPrisons.map(prison => [prison.prisonId, prison.prisonName]))),
 
     getPrisonByPrisonId: jest.fn(prisonId =>
       Promise.resolve({

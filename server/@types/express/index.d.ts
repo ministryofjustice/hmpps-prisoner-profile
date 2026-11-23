@@ -8,12 +8,12 @@ import type InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import type Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
 
 export declare module 'express-session' {
-  // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
     userBackLink?: { url: string; text: string }
     movementSlipData: object
     temporaryDataCache: Record<UUID, unknown>
+    justifiedHighProfilePrisonerAccess?: Record<string, string>
   }
 }
 
