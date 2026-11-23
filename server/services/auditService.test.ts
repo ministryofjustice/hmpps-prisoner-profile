@@ -190,22 +190,37 @@ describe('AuditService', () => {
     )
   })
 
-  it('should send event to SQS', async () => {
+  it.each([
+    {
+      scenario: 'send event',
+      extraProperties: {},
+      expectedDetails: undefined as object | undefined,
+    },
+    {
+      scenario: 'send event with details',
+      extraProperties: { details: { justification: 'checking non-associations for work' } },
+      expectedDetails: { justification: 'checking non-associations for work' } as object | undefined,
+    },
+  ])('should $scenario to SQS', async ({ extraProperties, expectedDetails }) => {
     await auditService.sendEvent({
       who: user.username,
       subjectId: prisonerNumber,
       correlationId: requestId,
       what: `API_${ApiAction.PrisonerImage}`,
       subjectType: SubjectType.PrisonerId,
+      ...extraProperties,
     })
-    expectMessageSent({
-      what: 'API_PRISONER_IMAGE',
-      when: nowStr,
-      who: 'JSMITH_GEN',
-      subjectId: prisonerNumber,
-      subjectType: 'PRISONER_ID',
-      service: 'hmpps-prisoner-profile',
-      correlationId: requestId,
-    })
+    expectMessageSent(
+      {
+        what: 'API_PRISONER_IMAGE',
+        when: nowStr,
+        who: 'JSMITH_GEN',
+        subjectId: prisonerNumber,
+        subjectType: 'PRISONER_ID',
+        service: 'hmpps-prisoner-profile',
+        correlationId: requestId,
+      },
+      expectedDetails,
+    )
   })
 })

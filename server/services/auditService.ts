@@ -13,7 +13,7 @@ import type {
 import { SubjectType } from './interfaces/auditService/subjectType'
 
 /** Payload expected by HMPPS audit service */
-interface AuditMessage extends SendEvent {
+interface AuditMessage {
   what: string
   when: Date
   who: string
@@ -22,6 +22,11 @@ interface AuditMessage extends SendEvent {
   service: string
   correlationId: string
   details?: string
+}
+
+/** Internal incomplete message which is turned into `AuditMessage` */
+interface PartialMessage extends Omit<AuditMessage, 'when' | 'service' | 'details'> {
+  details?: object
 }
 
 export default class implements AuditService {
@@ -33,12 +38,13 @@ export default class implements AuditService {
     private readonly enabled: boolean,
   ) {}
 
-  private async sendMessage(message: Omit<AuditMessage, 'when' | 'service'>): Promise<void> {
+  private async sendMessage(message: PartialMessage): Promise<void> {
     if (this.enabled) {
       const msg: AuditMessage = {
         ...message,
         when: new Date(),
         service: this.serviceName,
+        details: message.details ? JSON.stringify(message.details) : undefined,
       }
       try {
         const messageResponse = await this.sqsClient.send(
@@ -61,7 +67,7 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify({ build: this.build, userRoles: user.userRoles }),
+      details: { build: this.build, userRoles: user.userRoles },
     })
   }
 
@@ -69,6 +75,7 @@ export default class implements AuditService {
     const details = {
       globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
+      // TODO: flag if high profile?
       userRoles: user.userRoles,
       build: this.build,
     }
@@ -79,15 +86,16 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify(details),
+      details,
     })
   }
 
   sendSearch({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) {
+    // TODO: flag if high profile?
     return this.sendMessage({
       what: `SEARCH_${searchPage}`,
       correlationId,
-      details: JSON.stringify({ build: this.build, ...details }),
+      details: { build: this.build, ...details },
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,
       who: user.username,
@@ -101,7 +109,7 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify({ build: this.build, ...details }),
+      details: { build: this.build, ...details },
     })
   }
 
@@ -112,7 +120,7 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify({ build: this.build, ...details }),
+      details: { build: this.build, ...details },
     })
   }
 
@@ -123,7 +131,7 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify({ build: this.build, ...details }),
+      details: { build: this.build, ...details },
     })
   }
 
@@ -134,7 +142,7 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       correlationId,
-      details: JSON.stringify({ build: this.build, ...details }),
+      details: { build: this.build, ...details },
     })
   }
 

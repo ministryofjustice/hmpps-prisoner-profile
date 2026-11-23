@@ -49,7 +49,7 @@ export interface SendEvent {
   subjectId: string
   subjectType?: SubjectType
   correlationId: string
-  details?: string
+  details?: object
 }
 
 export interface AuditService {
