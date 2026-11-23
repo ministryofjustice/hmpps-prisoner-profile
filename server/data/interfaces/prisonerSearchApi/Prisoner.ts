@@ -124,6 +124,7 @@ export default interface Prisoner {
   marks?: BodyPartDetail[]
   newArrival24?: boolean
   newArrival72?: boolean
+  currentCsra?: CurrentCsra
 }
 
 export interface Alias {
@@ -170,4 +171,12 @@ export interface BodyPartDetail {
     | 'Front and side'
 
   comment?: string
+}
+
+export interface CurrentCsra {
+  rating?: 'HIGH' | 'HIGH_GENERAL' | 'HIGH_SPECIFIC' | 'STANDARD' | null
+  ratingStage?: 'PROVISIONAL' | 'INTERIM' | 'FINAL' | null
+  description?: string | null
+  shortDescription?: string | null
+  reviewDueDate?: string | null
 }

@@ -14,6 +14,7 @@ import NonAssociationSummary from '../../services/interfaces/offenderService/Non
 import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
 import { PrisonerPropertySummary } from '../../data/interfaces/prisonerPropertyApi/prisonerPropertyApiClient'
+import { CurrentCsra } from '../../data/interfaces/prisonerSearchApi/Prisoner'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -68,6 +69,7 @@ export interface CourtCaseSummary {
 interface CsraSummary {
   classification?: string
   assessmentDate?: string
+  currentCsra?: CurrentCsra
 }
 
 interface CategorySummary {
