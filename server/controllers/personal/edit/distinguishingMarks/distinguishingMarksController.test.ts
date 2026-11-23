@@ -12,6 +12,7 @@ import type { AuditService } from '../../../../services/interfaces/auditService'
 import { Page } from '../../../../services/interfaces/auditService/page'
 import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
@@ -27,6 +28,8 @@ describe('Distinguishing Marks Controller', () => {
   let distinguishingMarksService: DistinguishingMarksService
   let auditService: AuditService
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       id: '123',
@@ -36,7 +39,7 @@ describe('Distinguishing Marks Controller', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -57,6 +60,10 @@ describe('Distinguishing Marks Controller', () => {
     auditService = auditServiceMock() as AuditService
 
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   describe('newDistinguishingMark', () => {
@@ -161,6 +168,7 @@ describe('Distinguishing Marks Controller', () => {
         page: Page.AddDistinguishingMark,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -542,6 +550,7 @@ describe('Distinguishing Marks Controller', () => {
         page: Page.EditDistinguishingMark,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1139,6 +1148,7 @@ describe('Distinguishing Marks Controller', () => {
         page: Page.EditDistinguishingMarkPhoto,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1306,6 +1316,7 @@ describe('Distinguishing Marks Controller', () => {
         page: Page.AddDistinguishingMarkPhoto,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1435,6 +1446,7 @@ describe('Distinguishing Marks Controller', () => {
         page: Page.DistinguishingMarkAllPhotos,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 })

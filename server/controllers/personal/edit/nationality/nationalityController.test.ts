@@ -7,6 +7,7 @@ import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { nationalityFieldData } from '../../fieldData'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
@@ -18,6 +19,8 @@ describe('NationalityController', () => {
   let controller: NationalityController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -58,6 +61,10 @@ describe('NationalityController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('nationality', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.nationality().edit(req, response, next)
@@ -67,7 +74,7 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -103,7 +110,7 @@ describe('NationalityController', () => {
             return []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -116,7 +123,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -134,7 +141,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -153,7 +160,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -176,7 +183,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -193,7 +200,7 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -206,6 +213,7 @@ describe('NationalityController', () => {
           page: Page.EditNationality,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -217,7 +225,7 @@ describe('NationalityController', () => {
         validRequest = {
           id: '1',
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'BRIT' },
           flash: jest.fn(),

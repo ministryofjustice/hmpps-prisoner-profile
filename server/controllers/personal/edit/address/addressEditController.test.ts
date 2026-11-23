@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from 'express'
 import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import config from '../../../../config'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import AddressEditController from './addressEditController'
@@ -43,6 +44,8 @@ describe('Address Edit Controller', () => {
   let controller: AddressEditController
   let enabledAddressPhonePrisons: string[]
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     enabledAddressPhonePrisons = [...config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons]
     req = {
@@ -50,7 +53,7 @@ describe('Address Edit Controller', () => {
       query: {},
       params: { prisonerNumber },
       middleware: { clientToken, prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -120,6 +123,7 @@ describe('Address Edit Controller', () => {
         page: Page.EditAddressLocation,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -174,6 +178,7 @@ describe('Address Edit Controller', () => {
           page: Page.EditAddressFindUkAddress,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should repopulate input value from flash if present', async () => {
@@ -272,6 +277,7 @@ describe('Address Edit Controller', () => {
           page: Page.EditAddressConfirm,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {
@@ -370,6 +376,7 @@ describe('Address Edit Controller', () => {
           page: Page.EditAddressPrimaryOrPostal,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {
@@ -585,6 +592,7 @@ describe('Address Edit Controller', () => {
             page: auditPage,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
 

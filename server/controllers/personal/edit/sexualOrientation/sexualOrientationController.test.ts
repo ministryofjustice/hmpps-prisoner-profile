@@ -1,5 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import type { AuditService } from '../../../../services/interfaces/auditService'
 import { Page } from '../../../../services/interfaces/auditService/page'
@@ -17,6 +18,8 @@ describe('SexualOrientationController', () => {
   let controller: SexualOrientationController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -70,6 +73,10 @@ describe('SexualOrientationController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('Sexual orientation', () => {
     describe('Edit', () => {
       const action: RequestHandler = async (req, response) => controller.sexualOrientation().edit(req, response, next)
@@ -87,7 +94,7 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -115,7 +122,7 @@ describe('SexualOrientationController', () => {
             return []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -128,7 +135,7 @@ describe('SexualOrientationController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
           },
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -145,7 +152,7 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -158,6 +165,7 @@ describe('SexualOrientationController', () => {
           page: Page.EditSexualOrientation,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -169,7 +177,7 @@ describe('SexualOrientationController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'HET' },
           flash: jest.fn(),

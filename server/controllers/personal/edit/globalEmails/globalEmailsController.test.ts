@@ -5,6 +5,7 @@ import { Page } from '../../../../services/interfaces/auditService/page'
 import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/globalPhonesAndEmails'
 import GlobalEmailsController from './globalEmailsController'
@@ -15,6 +16,8 @@ describe('GlobalEmailsController', () => {
   let controller: GlobalEmailsController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -52,6 +55,10 @@ describe('GlobalEmailsController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   describe('Emails', () => {
     describe('Creating an email', () => {
       describe('edit', () => {
@@ -66,7 +73,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -99,7 +106,7 @@ describe('GlobalEmailsController', () => {
               return []
             },
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -112,7 +119,7 @@ describe('GlobalEmailsController', () => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -127,7 +134,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
 
           await action(req, res, next)
@@ -140,6 +147,7 @@ describe('GlobalEmailsController', () => {
             page: Page.AddEmailAddress,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -152,7 +160,7 @@ describe('GlobalEmailsController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'fOO@exaMple.com' },
             flash: jest.fn(),
@@ -254,7 +262,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -287,7 +295,7 @@ describe('GlobalEmailsController', () => {
               return []
             },
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -300,7 +308,7 @@ describe('GlobalEmailsController', () => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -315,7 +323,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
 
           await action(req, res, next)
@@ -328,6 +336,7 @@ describe('GlobalEmailsController', () => {
             page: Page.EditEmailAddress,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
       describe('submit', () => {
@@ -339,7 +348,7 @@ describe('GlobalEmailsController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'foo@example.com' },
             flash: jest.fn(),

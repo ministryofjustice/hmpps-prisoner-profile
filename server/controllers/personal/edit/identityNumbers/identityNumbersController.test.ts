@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import IdentityNumbersService from '../../../../services/identityNumbersService'
 import IdentityNumbersController, { EditIdentityNumberSubmission } from './identityNumbersController'
@@ -32,11 +33,13 @@ describe('IdentityNumbersController', () => {
   let auditService: AuditService
   let controller: IdentityNumbersController
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -63,6 +66,10 @@ describe('IdentityNumbersController', () => {
     } as unknown as IdentityNumbersService
     auditService = auditServiceMock()
     controller = new IdentityNumbersController(identityNumbersService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe.each([
@@ -121,6 +128,7 @@ describe('IdentityNumbersController', () => {
         page: pageViewEvent,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('should populate the page data from the request flash', async () => {
@@ -393,6 +401,7 @@ describe('IdentityNumbersController', () => {
         page: Page.EditIdNumber,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('should populate the page data from the request flash', async () => {

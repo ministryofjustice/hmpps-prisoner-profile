@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -11,6 +12,12 @@ import AddressService from '../services/addressService'
 import AddressPhoneNumberController from './addressPhoneNumberController'
 
 describe('AddressPhoneNumberController', () => {
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('submits all phone numbers and returns to the personal page', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.addAddressPhoneNumbers = jest
@@ -217,7 +224,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837', phoneId: '1324254' },
       flash: jest.fn().mockReturnValue([]),
     } as unknown as Request
@@ -254,6 +261,7 @@ describe('AddressPhoneNumberController', () => {
     expect(auditService.sendPageView).toHaveBeenCalledWith(
       expect.objectContaining({ page: Page.EditAddressPhoneNumber }),
     )
+    expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
   })
 
   it('returns to address completion when cancelling the new address phone step', async () => {

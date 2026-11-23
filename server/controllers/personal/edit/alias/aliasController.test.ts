@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import AliasController from './aliasController'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import type { AuditService } from '../../../../services/interfaces/auditService'
 import { Page } from '../../../../services/interfaces/auditService/page'
@@ -30,12 +31,14 @@ describe('Alias Controller', () => {
   let auditService: AuditService
   let controller: AliasController
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       id: '123',
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -64,6 +67,10 @@ describe('Alias Controller', () => {
     } as unknown as ReferenceDataService
 
     controller = new AliasController(aliasService, referenceDataService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('Change name purpose page', () => {
@@ -105,6 +112,7 @@ describe('Alias Controller', () => {
         page: Page.EditNamePurpose,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -207,6 +215,7 @@ describe('Alias Controller', () => {
         page: Page.EditNameCorrection,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -342,6 +351,7 @@ describe('Alias Controller', () => {
         page: Page.EditNameLegal,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -509,6 +519,7 @@ describe('Alias Controller', () => {
         page: Page.AddNewAlias,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the new alias request', async () => {
@@ -657,6 +668,7 @@ describe('Alias Controller', () => {
         page: Page.EditDateOfBirth,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the date of birth change', async () => {
@@ -758,6 +770,7 @@ describe('Alias Controller', () => {
         page: Page.EditEthnicGroup,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -879,6 +892,7 @@ describe('Alias Controller', () => {
         page: Page.EditEthnicBackground,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the ethnicity change', async () => {

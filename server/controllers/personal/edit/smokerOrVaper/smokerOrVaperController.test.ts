@@ -7,6 +7,7 @@ import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { smokerOrVaperFieldData } from '../../fieldData'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
@@ -19,6 +20,8 @@ describe('SmokerOrVaperController', () => {
   let controller: SmokerOrVaperController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -54,6 +57,10 @@ describe('SmokerOrVaperController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('smokerOrVaper', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.smokerOrVaper().edit(req, response, next)
@@ -63,7 +70,7 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -95,7 +102,7 @@ describe('SmokerOrVaperController', () => {
             return []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -108,7 +115,7 @@ describe('SmokerOrVaperController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -125,7 +132,7 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -138,6 +145,7 @@ describe('SmokerOrVaperController', () => {
           page: Page.EditSmokerOrVaper,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -149,7 +157,7 @@ describe('SmokerOrVaperController', () => {
         validRequest = {
           id: '1',
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),

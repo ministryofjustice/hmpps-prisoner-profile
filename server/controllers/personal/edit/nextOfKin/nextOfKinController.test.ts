@@ -7,6 +7,7 @@ import { PostAction } from '../../../../services/interfaces/auditService/actions
 import NextOfKinService from '../../../../services/nextOfKinService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { PersonalRelationshipsReferenceDataDomain } from '../../../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import {
@@ -51,6 +52,8 @@ describe('NextOfKinController', () => {
     addressTypes: [],
   }
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     nextOfKinService = {
       getReferenceData: jest.fn().mockResolvedValue({
@@ -83,7 +86,7 @@ describe('NextOfKinController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn(),
       body: {},
       query: {},
@@ -144,6 +147,7 @@ describe('NextOfKinController', () => {
         page: Page.EditNextOfKin,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith('pages/nextOfKin/nextOfKinEmergencyContacts', {
         pageTitle: 'Next of kin and emergency contacts - Prisoner personal details',
@@ -441,6 +445,7 @@ describe('NextOfKinController', () => {
         page: Page.EditNextOfKinAddressLocation,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -502,6 +507,7 @@ describe('NextOfKinController', () => {
           page: Page.EditNextOfKinAddressFindUkAddress,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should repopulate input value from flash if present', async () => {
@@ -624,6 +630,7 @@ describe('NextOfKinController', () => {
             page: auditPage,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
 
@@ -758,6 +765,7 @@ describe('NextOfKinController', () => {
           page: Page.EditNextOfKinAddressConfirm,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {

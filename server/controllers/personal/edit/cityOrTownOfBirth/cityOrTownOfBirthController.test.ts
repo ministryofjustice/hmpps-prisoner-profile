@@ -7,6 +7,7 @@ import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { cityOrTownOfBirthFieldData } from '../../fieldData'
 import CityOrTownOfBirthController from './cityOrTownOfBirthController'
@@ -17,6 +18,8 @@ describe('CityOrTownOfBirthController', () => {
   let controller: CityOrTownOfBirthController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -43,6 +46,10 @@ describe('CityOrTownOfBirthController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('cityOrTownOfBirth', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.cityOrTownOfBirth().edit(req, response, next)
@@ -52,7 +59,7 @@ describe('CityOrTownOfBirthController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -85,7 +92,7 @@ describe('CityOrTownOfBirthController', () => {
             return []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -98,7 +105,7 @@ describe('CityOrTownOfBirthController', () => {
             return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: 'SHEFFIELD' }))
@@ -110,7 +117,7 @@ describe('CityOrTownOfBirthController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -123,6 +130,7 @@ describe('CityOrTownOfBirthController', () => {
           page: Page.EditCityOrTownOfBirth,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -133,7 +141,7 @@ describe('CityOrTownOfBirthController', () => {
       beforeEach(() => {
         validRequest = {
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { cityOrTownOfBirth: 'Sheffield' },
           flash: jest.fn(),

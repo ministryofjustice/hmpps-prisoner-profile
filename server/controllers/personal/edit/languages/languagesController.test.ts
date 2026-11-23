@@ -15,6 +15,7 @@ import {
   LanguageRefDataMock,
 } from '../../../../data/localMockData/personCommunicationNeedsApiRefDataMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 describe('LanguagesController', () => {
@@ -25,6 +26,8 @@ describe('LanguagesController', () => {
   let res: Response
   const prisonerNumber = 'A1234BC'
   const clientToken = 'CLIENT_TOKEN'
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   beforeEach(() => {
     languagesService = {
@@ -48,7 +51,7 @@ describe('LanguagesController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
-      session: {},
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn(),
       body: {},
       params: { offenderNo: prisonerNumber },
@@ -103,6 +106,7 @@ describe('LanguagesController', () => {
         page: Page.EditMainLanguage,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/languages/updateMainLanguage',
@@ -307,6 +311,7 @@ describe('LanguagesController', () => {
         page: Page.EditOtherLanguages,
         justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/languages/updateOtherLanguages',

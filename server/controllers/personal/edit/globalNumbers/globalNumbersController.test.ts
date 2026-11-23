@@ -5,6 +5,7 @@ import { Page } from '../../../../services/interfaces/auditService/page'
 import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/globalPhonesAndEmails'
 import GlobalNumbersController from './globalNumbersController'
@@ -15,6 +16,8 @@ describe('GlobalNumbersController', () => {
   let controller: GlobalNumbersController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -58,6 +61,10 @@ describe('GlobalNumbersController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('Phone numbers', () => {
     describe('Add a phone number', () => {
       describe('edit', () => {
@@ -66,7 +73,7 @@ describe('GlobalNumbersController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         it('Renders the default edit page with the correct data', async () => {
@@ -148,6 +155,7 @@ describe('GlobalNumbersController', () => {
             page: Page.AddPhoneNumber,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -160,7 +168,7 @@ describe('GlobalNumbersController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
@@ -356,7 +364,7 @@ describe('GlobalNumbersController', () => {
           params: { prisonerNumber, phoneNumberId: '123' },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         beforeEach(() => {
@@ -430,6 +438,7 @@ describe('GlobalNumbersController', () => {
             page: Page.EditPhoneNumber,
             justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -442,7 +451,7 @@ describe('GlobalNumbersController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
-            session: {},
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber, phoneNumberId: '123' },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),

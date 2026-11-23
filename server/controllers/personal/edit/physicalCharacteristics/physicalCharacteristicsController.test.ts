@@ -9,6 +9,7 @@ import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMoc
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { corePersonPhysicalAttributesMock } from '../../../../data/localMockData/physicalAttributesMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { RadioFieldData } from '../../fieldData'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -21,6 +22,8 @@ describe('PhysicalCharacteristicsController', () => {
   let controller: PhysicalCharacteristicsController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -46,6 +49,10 @@ describe('PhysicalCharacteristicsController', () => {
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   /**
@@ -74,7 +81,7 @@ describe('PhysicalCharacteristicsController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -109,7 +116,7 @@ describe('PhysicalCharacteristicsController', () => {
             return []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -124,7 +131,7 @@ describe('PhysicalCharacteristicsController', () => {
             return []
           },
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -141,7 +148,7 @@ describe('PhysicalCharacteristicsController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -154,6 +161,7 @@ describe('PhysicalCharacteristicsController', () => {
           page: fieldData.auditEditPageLoad,
           justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -166,7 +174,7 @@ describe('PhysicalCharacteristicsController', () => {
         validRequest = {
           id: '1',
           middleware,
-          session: {},
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'MEDIUM' },
           flash: jest.fn(),
