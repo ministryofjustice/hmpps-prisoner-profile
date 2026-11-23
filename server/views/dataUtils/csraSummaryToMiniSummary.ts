@@ -6,8 +6,6 @@ import { CurrentCsra } from '../../data/interfaces/prisonerSearchApi/Prisoner'
 import { pluralise } from '../../utils/pluralise'
 import config from '../../config'
 
-// import logger from '../../../logger'
-
 const csraServiceCard = (currentCsra: CurrentCsra | undefined, prisonerNumber: string) => {
   const dueDate = currentCsra?.reviewDueDate ? parseISO(currentCsra.reviewDueDate) : null
   const today = startOfToday()
