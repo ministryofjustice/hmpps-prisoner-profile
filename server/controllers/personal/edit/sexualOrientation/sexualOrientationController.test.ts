@@ -87,6 +87,7 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -114,6 +115,7 @@ describe('SexualOrientationController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -126,6 +128,7 @@ describe('SexualOrientationController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -142,18 +145,19 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSexualOrientation,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -165,6 +169,7 @@ describe('SexualOrientationController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'HET' },
           flash: jest.fn(),
@@ -206,17 +211,17 @@ describe('SexualOrientationController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSexualOrientation,
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

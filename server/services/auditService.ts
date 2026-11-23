@@ -27,6 +27,8 @@ interface AuditMessage {
 /** Internal incomplete message which is turned into `AuditMessage` */
 interface PartialMessage extends Omit<AuditMessage, 'when' | 'service' | 'details'> {
   details?: object
+  /** Reason for accessing high profile prisoner, if any */
+  justification: string | null
 }
 
 export default class implements AuditService {
@@ -38,18 +40,24 @@ export default class implements AuditService {
     private readonly enabled: boolean,
   ) {}
 
-  private async sendMessage(message: PartialMessage): Promise<void> {
+  private async sendMessage(partialMessage: PartialMessage): Promise<void> {
     if (this.enabled) {
-      const msg: AuditMessage = {
-        ...message,
+      if (partialMessage.justification !== null) {
+        // eslint-disable-next-line no-param-reassign
+        partialMessage.details = { ...partialMessage.details, justification: partialMessage.justification }
+      }
+      // eslint-disable-next-line no-param-reassign
+      delete partialMessage?.justification
+      const auditMessage: AuditMessage = {
+        ...partialMessage,
         when: new Date(),
         service: this.serviceName,
-        details: message.details ? JSON.stringify(message.details) : undefined,
+        details: partialMessage.details ? JSON.stringify(partialMessage.details) : undefined,
       }
       try {
         const messageResponse = await this.sqsClient.send(
           new SendMessageCommand({
-            MessageBody: JSON.stringify(msg),
+            MessageBody: JSON.stringify(auditMessage),
             QueueUrl: this.queueUrl,
           }),
         )
@@ -60,7 +68,7 @@ export default class implements AuditService {
     }
   }
 
-  sendAccessAttempt({ user, prisonerNumber, page, correlationId }: AccessAttemptAudit) {
+  sendAccessAttempt({ user, prisonerNumber, page, correlationId, justification }: AccessAttemptAudit) {
     return this.sendMessage({
       what: `ACCESS_ATTEMPT_${page}`,
       who: user.username,
@@ -68,10 +76,11 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details: { build: this.build, userRoles: user.userRoles },
+      justification,
     })
   }
 
-  sendPageView({ user, prisonerNumber, prisonId, page, correlationId }: PageViewAudit) {
+  sendPageView({ user, prisonerNumber, prisonId, page, correlationId, justification }: PageViewAudit) {
     const details = {
       globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
@@ -87,10 +96,11 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details,
+      justification,
     })
   }
 
-  sendSearch({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) {
+  sendSearch({ user, prisonerNumber, searchPage, details, correlationId, justification }: SearchAudit) {
     // TODO: flag if high profile?
     return this.sendMessage({
       what: `SEARCH_${searchPage}`,
@@ -99,10 +109,11 @@ export default class implements AuditService {
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,
       who: user.username,
+      justification,
     })
   }
 
-  sendPostAttempt({ user, prisonerNumber, action, correlationId, details }: PostAudit) {
+  sendPostAttempt({ user, prisonerNumber, action, correlationId, details, justification }: PostAudit) {
     return this.sendMessage({
       what: `POST_${action}`,
       who: user.username,
@@ -110,10 +121,11 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details: { build: this.build, ...details },
+      justification,
     })
   }
 
-  sendPostSuccess({ user, prisonerNumber, action, correlationId, details }: PostAudit) {
+  sendPostSuccess({ user, prisonerNumber, action, correlationId, details, justification }: PostAudit) {
     return this.sendMessage({
       what: `POST_SUCCESS_${action}`,
       who: user.username,
@@ -121,10 +133,11 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details: { build: this.build, ...details },
+      justification,
     })
   }
 
-  sendPutAttempt({ user, prisonerNumber, action, correlationId, details }: PutAudit) {
+  sendPutAttempt({ user, prisonerNumber, action, correlationId, details, justification }: PutAudit) {
     return this.sendMessage({
       what: `PUT_${action}`,
       who: user.username,
@@ -132,10 +145,11 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details: { build: this.build, ...details },
+      justification,
     })
   }
 
-  sendPutSuccess({ user, prisonerNumber, action, correlationId, details }: PutAudit) {
+  sendPutSuccess({ user, prisonerNumber, action, correlationId, details, justification }: PutAudit) {
     return this.sendMessage({
       what: `PUT_SUCCESS_${action}`,
       who: user.username,
@@ -143,6 +157,7 @@ export default class implements AuditService {
       subjectType: SubjectType.PrisonerId,
       correlationId,
       details: { build: this.build, ...details },
+      justification,
     })
   }
 

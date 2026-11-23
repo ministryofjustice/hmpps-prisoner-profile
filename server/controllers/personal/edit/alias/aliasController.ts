@@ -51,6 +51,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: Page.EditNamePurpose,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -97,6 +98,7 @@ export default class AliasController {
           correlationId: req.id,
           action: PostAction.EditNamePurpose,
           details: { purpose },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -161,6 +163,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: Page.AddNewAlias,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -226,6 +229,7 @@ export default class AliasController {
             correlationId: req.id,
             action: PostAction.AddNewAlias,
             details: result,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -258,6 +262,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: Page.EditDateOfBirth,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -312,6 +317,7 @@ export default class AliasController {
               previous: previousWorkingName.dateOfBirth,
               updated: result.dateOfBirth,
             },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -345,6 +351,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: Page.EditEthnicGroup,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -378,6 +385,7 @@ export default class AliasController {
           correlationId: req.id,
           action: PostAction.EditEthnicGroup,
           details: { ethnicGroup },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -412,6 +420,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: Page.EditEthnicBackground,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -468,6 +477,7 @@ export default class AliasController {
               previous: previousWorkingName.ethnicity?.code,
               updated: result.ethnicity?.code,
             },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -524,6 +534,7 @@ export default class AliasController {
           prisonId,
           correlationId: req.id,
           page: auditPage,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -600,6 +611,7 @@ export default class AliasController {
                 lastName: result.lastName,
               },
             },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

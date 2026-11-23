@@ -35,6 +35,7 @@ describe('Alias Controller', () => {
       id: '123',
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: {},
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -102,6 +103,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNamePurpose,
+        justification: null,
       })
     })
 
@@ -127,6 +129,7 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditNamePurpose,
           details: { purpose },
+          justification: null,
         })
       }
     })
@@ -202,6 +205,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameCorrection,
+        justification: null,
       })
     })
 
@@ -257,7 +261,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -272,9 +276,8 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
     })
   })
 
@@ -337,6 +340,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameLegal,
+        justification: null,
       })
     })
 
@@ -392,7 +396,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeNameLegal()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -407,9 +411,8 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
     })
   })
 
@@ -504,6 +507,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.AddNewAlias,
+        justification: null,
       })
     })
 
@@ -579,15 +583,14 @@ describe('Alias Controller', () => {
 
       await controller.submitAddNewAlias()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddNewAlias,
         details: PseudonymResponseMock,
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
     })
   })
 
@@ -652,6 +655,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditDateOfBirth,
+        justification: null,
       })
     })
 
@@ -708,7 +712,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeDateOfBirth()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -718,9 +722,8 @@ describe('Alias Controller', () => {
           previous: '1990-10-12',
           updated: '1999-02-01',
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
     })
   })
 
@@ -753,6 +756,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicGroup,
+        justification: null,
       })
     })
 
@@ -778,6 +782,7 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditEthnicGroup,
           details: { ethnicGroup },
+          justification: null,
         })
       }
     })
@@ -809,6 +814,7 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: 'NS',
         },
+        justification: null,
       })
     })
   })
@@ -871,6 +877,7 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicBackground,
+        justification: null,
       })
     })
 
@@ -915,7 +922,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeEthnicBackground()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -925,9 +932,8 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: ethnicityCodeSubmitted,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
     })
   })
 })

@@ -61,6 +61,7 @@ export default class PersonalController {
         prisonId,
         correlationId: req.id,
         page: Page.Personal,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       const hasPersonalId = Object.values(personalPageData.identityNumbers.personal).some(v => v.length > 0)

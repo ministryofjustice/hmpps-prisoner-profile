@@ -34,6 +34,7 @@ describe('Address controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
       } as unknown as Request
       res = {
         locals: { user: prisonUserMock },
@@ -91,6 +92,7 @@ describe('Address controller', () => {
         middleware: {
           clientToken: 'CLIENT_TOKEN',
         },
+        session: {},
       } as unknown as Request
       res = {
         status: jest.fn().mockReturnThis(),

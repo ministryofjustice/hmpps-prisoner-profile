@@ -164,6 +164,7 @@ describe('overviewController', () => {
           alertFlags: [],
         },
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { offenderNo },
       protocol: 'http',

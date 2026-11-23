@@ -73,6 +73,7 @@ export default class GlobalNumbersController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: Page.AddPhoneNumber,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/phone', {
@@ -204,6 +205,7 @@ export default class GlobalNumbersController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: Page.EditPhoneNumber,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/phone', {

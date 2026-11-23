@@ -15,6 +15,7 @@ export default class DuplicateProfilesController {
 
   public async getDuplicateProfiles(req: Request, res: Response, next: NextFunction) {
     const { prisonerData, duplicatePrisonerData } = req.middleware
+    const { prisonerNumber, prisonId } = prisonerData
     const { miniBannerData } = getCommonRequestData(req, res)
 
     if (!duplicatePrisonerData?.length && !res.locals.duplicateRecordApiFailure) {
@@ -41,10 +42,11 @@ export default class DuplicateProfilesController {
     this.auditService
       .sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.PossibleDuplicateProfiles,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

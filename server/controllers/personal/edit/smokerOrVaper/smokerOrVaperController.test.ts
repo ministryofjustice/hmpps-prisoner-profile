@@ -63,6 +63,7 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -94,6 +95,7 @@ describe('SmokerOrVaperController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -106,6 +108,7 @@ describe('SmokerOrVaperController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -122,18 +125,19 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSmokerOrVaper,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -145,6 +149,7 @@ describe('SmokerOrVaperController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
@@ -185,17 +190,17 @@ describe('SmokerOrVaperController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSmokerOrVaper,
           details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKER_YES', updated: 'SMOKER_NO' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

@@ -74,6 +74,7 @@ describe('PhysicalCharacteristicsController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
 
         await action(req, res, next)
@@ -108,6 +109,7 @@ describe('PhysicalCharacteristicsController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -122,6 +124,7 @@ describe('PhysicalCharacteristicsController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -138,18 +141,19 @@ describe('PhysicalCharacteristicsController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: fieldData.auditEditPageLoad,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -162,6 +166,7 @@ describe('PhysicalCharacteristicsController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'MEDIUM' },
           flash: jest.fn(),
@@ -204,7 +209,9 @@ describe('PhysicalCharacteristicsController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
+        await action(validRequest, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: validRequest.id,
@@ -214,11 +221,8 @@ describe('PhysicalCharacteristicsController', () => {
             previous: corePersonPhysicalAttributesMock.buildCode,
             updated: 'MEDIUM',
           },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

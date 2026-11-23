@@ -83,12 +83,13 @@ describe('NextOfKinController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
+      session: {},
       flash: jest.fn(),
       body: {},
       query: {},
       params: { prisonerNumber },
       id: 'request-id',
-    } as Partial<Request> as Request
+    } as unknown as Request
 
     res = {
       locals: {
@@ -141,6 +142,7 @@ describe('NextOfKinController', () => {
         prisonId: 'MDI',
         correlationId: req.id,
         page: Page.EditNextOfKin,
+        justification: null,
       })
 
       expect(res.render).toHaveBeenCalledWith('pages/nextOfKin/nextOfKinEmergencyContacts', {
@@ -217,6 +219,7 @@ describe('NextOfKinController', () => {
         correlationId: req.id,
         action: PostAction.EditNextOfKin,
         details: { formValues: req.body },
+        justification: null,
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#next-of-kin`)
@@ -436,6 +439,7 @@ describe('NextOfKinController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNextOfKinAddressLocation,
+        justification: null,
       })
     })
 
@@ -458,6 +462,7 @@ describe('NextOfKinController', () => {
         correlationId: req.id,
         action: PostAction.EditNextOfKinAddressLocation,
         details: { location },
+        justification: null,
       })
     })
   })
@@ -495,6 +500,7 @@ describe('NextOfKinController', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKinAddressFindUkAddress,
+          justification: null,
         })
       })
 
@@ -550,6 +556,7 @@ describe('NextOfKinController', () => {
           correlationId: req.id,
           action: PostAction.EditNextOfKinAddressFindUkAddress,
           details: { uprn },
+          justification: null,
         })
       })
     })
@@ -615,6 +622,7 @@ describe('NextOfKinController', () => {
             prisonId: PrisonerMockDataA.prisonId,
             correlationId: req.id,
             page: auditPage,
+            justification: null,
           })
         },
       )
@@ -700,6 +708,7 @@ describe('NextOfKinController', () => {
             correlationId: req.id,
             action: auditAction,
             details: { address: expect.objectContaining(cachedAddress) },
+            justification: null,
           })
         },
       )
@@ -747,6 +756,7 @@ describe('NextOfKinController', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKinAddressConfirm,
+          justification: null,
         })
       })
 

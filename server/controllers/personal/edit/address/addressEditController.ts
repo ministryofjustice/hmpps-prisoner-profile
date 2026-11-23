@@ -123,6 +123,7 @@ export default class AddressEditController {
           prisonId,
           correlationId: req.id,
           page: Page.EditAddressPrimaryOrPostal,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -187,6 +188,7 @@ export default class AddressEditController {
             correlationId: req.id,
             action: PostAction.EditAddressPrimaryOrPostal,
             details: { address },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

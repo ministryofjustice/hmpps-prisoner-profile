@@ -68,6 +68,7 @@ export default class MoneyController {
         prisonId,
         correlationId: req.id,
         page: Page.MoneyDamageObligations,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -209,6 +210,7 @@ export default class MoneyController {
         prisonId,
         correlationId: req.id,
         page: auditPage,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

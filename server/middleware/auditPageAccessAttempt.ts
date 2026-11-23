@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express'
-import { Services } from '../services'
-import { Page } from '../services/interfaces/auditService/page'
-import { ApiAction } from '../services/interfaces/auditService/actions'
+import type { Services } from '../services'
+import type { Page } from '../services/interfaces/auditService/page'
+import type { ApiAction } from '../services/interfaces/auditService/actions'
 
 export default function auditPageAccessAttempt({
   services,
@@ -20,6 +20,7 @@ export default function auditPageAccessAttempt({
       prisonerNumber,
       page: pageViewAction,
       correlationId: requestId,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     next()

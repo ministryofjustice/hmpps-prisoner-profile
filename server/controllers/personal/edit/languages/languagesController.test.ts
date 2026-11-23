@@ -48,11 +48,12 @@ describe('LanguagesController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
+      session: {},
       flash: jest.fn(),
       body: {},
       params: { offenderNo: prisonerNumber },
       id: 'request-id',
-    } as Partial<Request> as Request
+    } as unknown as Request
 
     res = {
       locals: {
@@ -100,6 +101,7 @@ describe('LanguagesController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditMainLanguage,
+        justification: null,
       })
 
       expect(res.render).toHaveBeenCalledWith(
@@ -182,6 +184,7 @@ describe('LanguagesController', () => {
           languagePreferences: formValues,
           previousLanguagePreferences: CommunicationNeedsDtoMock.languagePreferences,
         },
+        justification: null,
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#main-language`)
@@ -302,6 +305,7 @@ describe('LanguagesController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditOtherLanguages,
+        justification: null,
       })
 
       expect(res.render).toHaveBeenCalledWith(
@@ -402,6 +406,7 @@ describe('LanguagesController', () => {
           secondaryLanguages: formValues,
           previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
         },
+        justification: null,
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
@@ -466,6 +471,7 @@ describe('LanguagesController', () => {
           secondaryLanguages: cleanFormValues,
           previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
         },
+        justification: null,
       })
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)

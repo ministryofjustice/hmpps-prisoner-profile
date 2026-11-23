@@ -70,6 +70,7 @@ export default abstract class PersonalEditController {
           prisonId,
           correlationId: req.id,
           page: auditEditPageLoad,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
 
         res.render(options?.template ? `pages/edit/textFields/${options?.template}` : 'pages/edit/textField', {
@@ -126,6 +127,7 @@ export default abstract class PersonalEditController {
         prisonId,
         correlationId: req.id,
         page: auditEditPageLoad,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       res.render('pages/edit/radioField', {
@@ -172,6 +174,7 @@ export default abstract class PersonalEditController {
         prisonId,
         correlationId: req.id,
         page: auditEditPageLoad,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       res.render('pages/edit/radioFieldWithAutocomplete', {
@@ -236,6 +239,7 @@ export default abstract class PersonalEditController {
             correlationId: req.id,
             action: auditEditPostAction,
             details: auditDetails,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
       }

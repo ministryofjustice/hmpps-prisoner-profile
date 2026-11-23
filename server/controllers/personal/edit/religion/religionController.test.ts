@@ -135,6 +135,7 @@ describe('ReligionController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -168,6 +169,7 @@ describe('ReligionController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -180,6 +182,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -197,6 +200,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -216,6 +220,7 @@ describe('ReligionController', () => {
               : []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -235,6 +240,7 @@ describe('ReligionController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
+          session: {},
           params: { prisonerNumber },
           body: { religion: 'ZORO', reasonKnown: 'NO' },
           flash: jest.fn(),
@@ -316,6 +322,7 @@ describe('ReligionController', () => {
               profileInformation: [],
             } as InmateDetail,
           },
+          session: {},
           params: { prisonerNumber },
           body,
           flash: jest.fn(),
@@ -343,7 +350,10 @@ describe('ReligionController', () => {
           id: 1,
           body: { religion: 'ZORO', currentReligionCode: 'DRU', reasonKnown: 'NO' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -353,11 +363,8 @@ describe('ReligionController', () => {
             previous: 'DRU',
             updated: 'ZORO',
           },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
 
       it('Does not submit a request if no religion was selected', async () => {

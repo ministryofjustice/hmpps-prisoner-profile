@@ -36,6 +36,7 @@ describe('Money Controller', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
+      session: {},
       headers: {
         referer: 'http://referer',
       },

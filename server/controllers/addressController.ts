@@ -36,6 +36,7 @@ export default class AddressController {
         prisonId,
         correlationId: req.id,
         page: Page.Addresses,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

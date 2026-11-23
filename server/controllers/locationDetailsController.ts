@@ -55,6 +55,7 @@ export default class LocationDetailsController {
         prisonId,
         correlationId: req.id,
         page: Page.PrisonerCellHistory,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

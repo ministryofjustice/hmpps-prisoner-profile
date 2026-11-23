@@ -36,6 +36,7 @@ describe('Prisoner Location Details', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { offenderNo },
       protocol: 'http',

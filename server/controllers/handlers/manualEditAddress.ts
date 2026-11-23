@@ -53,6 +53,7 @@ export function displayManualEditAddressHandler(
         prisonId,
         correlationId: req.id,
         page: auditPage,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -120,6 +121,7 @@ export function submitManualEditAddressHandler(
         correlationId: req.id,
         action: auditAction,
         details: { address },
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

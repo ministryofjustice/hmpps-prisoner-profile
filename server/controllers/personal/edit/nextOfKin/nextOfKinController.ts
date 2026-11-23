@@ -145,6 +145,7 @@ export default class NextOfKinController {
           prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKin,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -219,6 +220,7 @@ export default class NextOfKinController {
           correlationId: req.id,
           action: PostAction.EditNextOfKin,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -397,6 +399,7 @@ export default class NextOfKinController {
             correlationId: req.id,
             action: PostAction.EditNextOfKinAddAddress,
             details: { addressRequest },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

@@ -25,6 +25,7 @@ export default class GoalsController {
       prisonId,
       correlationId: req.id,
       page: Page.VirtualCampusGoals,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     return res.render('pages/goals/vc2GoalsPage', {

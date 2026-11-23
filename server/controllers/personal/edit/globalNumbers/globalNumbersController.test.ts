@@ -66,6 +66,7 @@ describe('GlobalNumbersController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         it('Renders the default edit page with the correct data', async () => {
@@ -136,17 +137,17 @@ describe('GlobalNumbersController', () => {
             ...defaultReq,
             id: 1,
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.AddPhoneNumber,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
 
@@ -159,6 +160,7 @@ describe('GlobalNumbersController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
+            session: {},
             params: { prisonerNumber },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
@@ -324,7 +326,9 @@ describe('GlobalNumbersController', () => {
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
           } as unknown as Request
 
-          const expectedAuditEvent = {
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
@@ -338,11 +342,8 @@ describe('GlobalNumbersController', () => {
                 phoneNumberType: 'MOB',
               },
             },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
     })
@@ -355,6 +356,7 @@ describe('GlobalNumbersController', () => {
           params: { prisonerNumber, phoneNumberId: '123' },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         beforeEach(() => {
@@ -417,17 +419,17 @@ describe('GlobalNumbersController', () => {
             ...defaultReq,
             id: 1,
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditPhoneNumber,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
 
@@ -440,6 +442,7 @@ describe('GlobalNumbersController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
+            session: {},
             params: { prisonerNumber, phoneNumberId: '123' },
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
             flash: jest.fn(),
@@ -570,7 +573,9 @@ describe('GlobalNumbersController', () => {
             body: { phoneNumberType: 'MOB', phoneNumber: '1234', phoneExtension: '4321' },
           } as unknown as Request
 
-          const expectedAuditEvent = {
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
@@ -588,11 +593,8 @@ describe('GlobalNumbersController', () => {
                 phoneNumberType: 'MOB',
               },
             },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
     })

@@ -8,6 +8,7 @@ export interface AccessAttemptAudit {
   prisonerNumber: string
   page: Page | ApiAction
   correlationId: string
+  justification: string | null
 }
 
 export interface PageViewAudit {
@@ -16,6 +17,7 @@ export interface PageViewAudit {
   prisonId: string
   page: Page
   correlationId: string
+  justification: string | null
 }
 
 export interface SearchAudit {
@@ -25,6 +27,7 @@ export interface SearchAudit {
   correlationId: string
   searchPage: SearchAction
   details: object
+  justification: string | null
 }
 
 export interface PostAudit {
@@ -33,6 +36,7 @@ export interface PostAudit {
   correlationId: string
   action: PostAction
   details: object
+  justification: string | null
 }
 
 export interface PutAudit {
@@ -41,6 +45,7 @@ export interface PutAudit {
   correlationId: string
   action: PutAction
   details: object
+  justification: string | null
 }
 
 export interface SendEvent {
@@ -50,6 +55,7 @@ export interface SendEvent {
   subjectType?: SubjectType
   correlationId: string
   details?: object
+  justification: string | null
 }
 
 export interface AuditService {

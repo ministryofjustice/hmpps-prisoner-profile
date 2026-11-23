@@ -115,6 +115,7 @@ export default class IdentityNumbersController {
             prisonId,
             correlationId: req.id,
             page: Page.EditIdNumber,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -198,6 +199,7 @@ export default class IdentityNumbersController {
             correlationId: req.id,
             action: PostAction.EditIdNumber,
             details: { formValues },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -224,6 +226,7 @@ export default class IdentityNumbersController {
           prisonId,
           correlationId: req.id,
           page: options.pageViewAuditEvent,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       const identifierOptions = buildIdentityNumberOptions(
@@ -288,6 +291,7 @@ export default class IdentityNumbersController {
           correlationId: req.id,
           action: PostAction.AddIdNumbers,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 

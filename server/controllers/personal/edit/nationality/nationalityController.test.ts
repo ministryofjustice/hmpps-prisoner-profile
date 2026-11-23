@@ -67,6 +67,7 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -102,6 +103,7 @@ describe('NationalityController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -114,6 +116,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -131,6 +134,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -149,6 +153,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -171,6 +176,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -187,18 +193,19 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditNationality,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -210,6 +217,7 @@ describe('NationalityController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'BRIT' },
           flash: jest.fn(),
@@ -285,7 +293,10 @@ describe('NationalityController', () => {
           id: 1,
           body: { radioField: 'FREN', additionalNationalities: 'Updated nationalities' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -294,11 +305,8 @@ describe('NationalityController', () => {
             { fieldName: nationalityFieldData.fieldName, previous: 'British', updated: 'FREN' },
             { fieldName: 'otherNationalities', previous: 'Some other nationality', updated: 'Updated nationalities' },
           ],
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

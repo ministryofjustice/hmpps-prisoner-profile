@@ -53,6 +53,7 @@ describe('CountryOfBirthController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -87,6 +88,7 @@ describe('CountryOfBirthController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -99,6 +101,7 @@ describe('CountryOfBirthController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'ENG' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -117,6 +120,7 @@ describe('CountryOfBirthController', () => {
             return key === 'requestBody' ? [JSON.stringify({ autocompleteField: 'FRA' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -134,6 +138,7 @@ describe('CountryOfBirthController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -150,6 +155,7 @@ describe('CountryOfBirthController', () => {
       beforeEach(() => {
         validRequest = {
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'ENG' },
           flash: jest.fn(),

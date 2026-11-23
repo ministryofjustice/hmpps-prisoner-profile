@@ -34,6 +34,7 @@ export default class BeliefHistoryController {
         prisonId,
         correlationId: req.id,
         page: Page.ReligionBeliefHistory,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

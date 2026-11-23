@@ -115,6 +115,7 @@ export default class DietAndFoodAllergiesController extends PersonalEditControll
           prisonId,
           correlationId: req.id,
           page: auditEditPageLoad,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
 
         res.render('pages/edit/dietAndFoodAllergies', {

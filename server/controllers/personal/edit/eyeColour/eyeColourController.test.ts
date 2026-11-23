@@ -60,6 +60,7 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
 
         await action(req, res, next)
@@ -97,6 +98,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -111,6 +113,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -127,18 +130,19 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -150,6 +154,7 @@ describe('EyeColourController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { eyeColour: 'GREEN' },
           flash: jest.fn(),
@@ -193,7 +198,9 @@ describe('EyeColourController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
+        await action(validRequest, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: validRequest.id,
@@ -203,11 +210,8 @@ describe('EyeColourController', () => {
             previous: { leftEyeColourCode: 'BLUE', rightEyeColourCode: 'BLUE' },
             updated: { leftEyeColourCode: 'GREEN', rightEyeColourCode: 'GREEN' },
           },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })
@@ -225,6 +229,7 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
 
         await action(req, res, next)
@@ -272,6 +277,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -286,6 +292,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -303,18 +310,19 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -327,6 +335,7 @@ describe('EyeColourController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
           flash: jest.fn(),
@@ -375,7 +384,10 @@ describe('EyeColourController', () => {
           id: 1,
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -388,11 +400,8 @@ describe('EyeColourController', () => {
             },
             updated: { leftEyeColourCode: 'BROWN', rightEyeColourCode: 'GREEN' },
           },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

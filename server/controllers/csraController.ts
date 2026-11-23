@@ -41,6 +41,7 @@ export default class CsraController {
         prisonId,
         correlationId: req.id,
         page: Page.CsraHistory,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -71,6 +72,7 @@ export default class CsraController {
         prisonId,
         correlationId: req.id,
         page: Page.CsraReview,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

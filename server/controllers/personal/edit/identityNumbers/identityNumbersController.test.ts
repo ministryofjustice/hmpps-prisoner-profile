@@ -36,6 +36,7 @@ describe('IdentityNumbersController', () => {
     req = {
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: {},
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -118,6 +119,7 @@ describe('IdentityNumbersController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: pageViewEvent,
+        justification: null,
       })
     })
 
@@ -212,6 +214,7 @@ describe('IdentityNumbersController', () => {
         correlationId: req.id,
         action: PostAction.AddIdNumbers,
         details: { formValues: req.body },
+        justification: null,
       })
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Identity numbers updated',
@@ -388,6 +391,7 @@ describe('IdentityNumbersController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditIdNumber,
+        justification: null,
       })
     })
 
@@ -474,6 +478,7 @@ describe('IdentityNumbersController', () => {
           correlationId: req.id,
           action: PostAction.EditIdNumber,
           details: { formValues: req.body },
+          justification: null,
         })
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Identity numbers updated',

@@ -55,6 +55,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
 
@@ -80,6 +81,7 @@ describe('WeightController', () => {
               return []
             },
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -92,6 +94,7 @@ describe('WeightController', () => {
               return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
@@ -103,18 +106,19 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: {},
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
 
@@ -125,6 +129,7 @@ describe('WeightController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: {},
             params: { prisonerNumber },
             body: { kilograms: '80' },
             flash: jest.fn(),
@@ -164,17 +169,17 @@ describe('WeightController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { kilograms: '96' } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
     })
@@ -188,6 +193,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
 
@@ -215,6 +221,7 @@ describe('WeightController', () => {
               return []
             },
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -236,6 +243,7 @@ describe('WeightController', () => {
                 : []
             },
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -259,6 +267,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: {},
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -273,18 +282,19 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: {},
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
         })
       })
 
@@ -295,6 +305,7 @@ describe('WeightController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: {},
             params: { prisonerNumber },
             body: { imperialWeightOption: 'stoneAndPounds', stone: '10', pounds: '12' },
             flash: jest.fn(),
@@ -344,17 +355,17 @@ describe('WeightController', () => {
               id: 1,
               body: { stone: '15', pounds: '2', poundsOnly: '212', imperialWeightOption },
             } as unknown as Request
-            const expectedAuditEvent = {
+
+            await action(request, res, next)
+
+            expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
               user: prisonUserMock,
               prisonerNumber,
               correlationId: request.id,
               action: PostAction.EditWeight,
               details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
-            }
-
-            await action(request, res, next)
-
-            expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+              justification: null,
+            })
           },
         )
       })

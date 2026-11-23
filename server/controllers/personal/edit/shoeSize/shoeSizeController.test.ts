@@ -52,6 +52,7 @@ describe('ShoeSizeController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
 
         await action(req, res, next)
@@ -89,6 +90,7 @@ describe('ShoeSizeController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: { ...middleware, prisonerData: { ...middleware.prisonerData, gender: sex } },
+          session: {},
         } as unknown as Request
 
         await action(req, res, next)
@@ -115,6 +117,7 @@ describe('ShoeSizeController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -127,6 +130,7 @@ describe('ShoeSizeController', () => {
             return key === 'requestBody' ? [JSON.stringify({ autocompleteError: '1234' })] : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -143,6 +147,7 @@ describe('ShoeSizeController', () => {
       beforeEach(() => {
         validRequest = {
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: { autocompleteField: '10' },
           flash: jest.fn(),

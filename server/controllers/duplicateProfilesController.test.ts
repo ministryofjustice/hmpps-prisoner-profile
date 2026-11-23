@@ -47,6 +47,7 @@ describe('DuplicateProfilesController', () => {
         inmateDetail: inmateDetailMock,
         duplicatePrisonerData: [duplicateRecord1, duplicateRecord2],
       },
+      session: {},
       params: { prisonerNumber: prisonerInContext.prisonerNumber },
       id: 'test-correlation-id',
     } as unknown as Request
@@ -143,6 +144,7 @@ describe('DuplicateProfilesController', () => {
         prisonId: prisonerInContext.prisonId,
         correlationId: 'test-correlation-id',
         page: Page.PossibleDuplicateProfiles,
+        justification: null,
       })
     })
 

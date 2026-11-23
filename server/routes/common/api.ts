@@ -38,6 +38,7 @@ export default class CommonApiRoutes {
         correlationId: req.id,
         what: `API_${ApiAction.PrisonerImage}`,
         subjectType: SubjectType.PrisonerId,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -70,6 +71,7 @@ export default class CommonApiRoutes {
         subjectId: imageId,
         correlationId: req.id,
         what: `API_${ApiAction.Image}`,
+        justification: null, // TODO: is it possible for this route to be associated with a prisoner number?
       })
       .catch(error => logger.error(error))
 

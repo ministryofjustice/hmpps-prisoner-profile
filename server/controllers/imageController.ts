@@ -145,6 +145,7 @@ export default class ImageController {
             correlationId: req.id,
             action: PostAction.EditProfileImage,
             details: {},
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -221,6 +222,7 @@ export default class ImageController {
               correlationId: req.id,
               action: PostAction.EditProfileImageWithheld,
               details: {},
+              justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
             })
             .catch(error => logger.error(error))
 

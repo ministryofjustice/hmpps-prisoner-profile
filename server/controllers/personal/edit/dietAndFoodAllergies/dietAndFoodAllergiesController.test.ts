@@ -122,6 +122,7 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -143,6 +144,7 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -176,6 +178,7 @@ describe('DietAndFoodAllergiesController', () => {
             return []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -203,6 +206,7 @@ describe('DietAndFoodAllergiesController', () => {
               : []
           },
           middleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -229,18 +233,19 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDietAndFoodAllergies,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -253,6 +258,7 @@ describe('DietAndFoodAllergiesController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: {},
           params: { prisonerNumber },
           body: {
             medical: [{ value: medicalDietCodesMock[0].id }, { value: 'MEDICAL_DIET_OTHER', comment: 'abc' }],
@@ -318,7 +324,9 @@ describe('DietAndFoodAllergiesController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
+        await action(validRequest, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: validRequest.id,
@@ -347,11 +355,8 @@ describe('DietAndFoodAllergiesController', () => {
               cateringInstructions: 'jkl',
             },
           },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })

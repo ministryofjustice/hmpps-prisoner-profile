@@ -271,14 +271,15 @@ export default class OverviewController {
     res.render('pages/overviewPage', { ...viewData, useCustomErrorBanner: true })
   }
 
-  private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
+  private auditOverviewPageView = (req: Request, res: Response, { prisonerNumber, prisonId }: Prisoner) => {
     this.auditService
       .sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.Overview,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
   }

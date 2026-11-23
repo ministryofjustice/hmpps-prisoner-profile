@@ -34,6 +34,7 @@ export default class HeightController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: auditEditPageLoad,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/heightMetric', {
@@ -92,6 +93,7 @@ export default class HeightController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: auditEditPageLoad,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/heightImperial', {

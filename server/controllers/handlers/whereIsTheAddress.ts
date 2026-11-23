@@ -42,6 +42,7 @@ export function displayWhereIsTheAddressHandler(
         prisonId,
         correlationId: req.id,
         page,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -81,6 +82,7 @@ export function submitWhereIsTheAddressHandler(
         correlationId: req.id,
         action,
         details: { location },
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

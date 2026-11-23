@@ -26,6 +26,7 @@ export default class ProbationDocumentsController {
         page: Page.ProbationDocuments,
         prisonerNumber,
         prisonId,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

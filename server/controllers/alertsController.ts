@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
 import { HttpError } from 'http-errors'
 import { isGranted, PrisonerAlertsPermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
@@ -38,6 +38,7 @@ export default class AlertsController {
   public async displayAlerts(req: Request, res: Response, _next: NextFunction, isActive: boolean) {
     // Get data from middleware
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
+    const { prisonerNumber } = prisonerData
     const { prisonerPermissions } = res.locals
 
     if (alertSummaryData.apiUnavailable) {
@@ -65,7 +66,7 @@ export default class AlertsController {
     }
 
     const canUpdateAlert = isGranted(PrisonerAlertsPermission.edit, prisonerPermissions)
-    const addAlertLinkUrl = canUpdateAlert ? `/prisoner/${prisonerData.prisonerNumber}/add-alert` : undefined
+    const addAlertLinkUrl = canUpdateAlert ? `/prisoner/${prisonerNumber}/add-alert` : undefined
 
     // Get alerts based on given query params
     const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(
@@ -85,15 +86,13 @@ export default class AlertsController {
       return {
         ...alert,
         addMoreDetailsLinkUrl: alertUpdatable
-          ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/add-more-details`
+          ? `/prisoner/${prisonerNumber}/alerts/${alert.alertUuid}/add-more-details`
           : null,
         closeAlertLinkUrl:
-          alertUpdatable && !alert.activeTo
-            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/close`
-            : null,
+          alertUpdatable && !alert.activeTo ? `/prisoner/${prisonerNumber}/alerts/${alert.alertUuid}/close` : null,
         changeEndDateLinkUrl:
           alertUpdatable && alert.activeTo
-            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/change-end-date`
+            ? `/prisoner/${prisonerNumber}/alerts/${alert.alertUuid}/change-end-date`
             : null,
       }
     })
@@ -103,11 +102,12 @@ export default class AlertsController {
     this.auditService
       .sendSearch({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
+        prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         searchPage: SearchAction.Alerts,
         details: { queryParams },
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -156,6 +156,7 @@ export default class AlertsController {
         prisonId,
         correlationId: req.id,
         page: Page.AddAlert,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -222,6 +223,7 @@ export default class AlertsController {
           correlationId: req.id,
           action: PostAction.Alert,
           details: { alertForm },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -301,6 +303,7 @@ export default class AlertsController {
         prisonId,
         correlationId: req.id,
         page: Page.AlertAddMoreDetails,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -342,6 +345,7 @@ export default class AlertsController {
           correlationId: req.id,
           action: PostAction.AlertAddMoreDetails,
           details: { description },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -386,6 +390,7 @@ export default class AlertsController {
         prisonId,
         correlationId: req.id,
         page: Page.AlertClose,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -432,6 +437,7 @@ export default class AlertsController {
           correlationId: req.id,
           action: PostAction.AlertClose,
           details: { description, activeTo },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -476,6 +482,7 @@ export default class AlertsController {
         prisonId,
         correlationId: req.id,
         page: Page.AlertChangeEndDate,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -522,6 +529,7 @@ export default class AlertsController {
           correlationId: req.id,
           action: PostAction.AlertChangeEndDate,
           details: { description, activeTo, removeEndDate },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)

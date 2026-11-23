@@ -39,6 +39,7 @@ export default class NumberOfChildrenController extends PersonalEditController {
           prisonId,
           correlationId: req.id,
           page: auditEditPageLoad,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
 
         res.render('pages/edit/children', {

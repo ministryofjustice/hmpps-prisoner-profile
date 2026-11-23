@@ -20,6 +20,7 @@ describe('Prisoner schedule', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { offenderNo },
       query: {},

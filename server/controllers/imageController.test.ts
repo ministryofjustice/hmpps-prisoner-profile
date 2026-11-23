@@ -91,6 +91,7 @@ describe('ImageController', () => {
       it('Loads the page with the correct information', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(),
         } as unknown as Request
 
@@ -104,6 +105,7 @@ describe('ImageController', () => {
       it('Populates the errors if there are any', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(s => {
             if (s === 'errors') return ['Error']
             return null
@@ -117,6 +119,7 @@ describe('ImageController', () => {
       it('Populates the request if there is any', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(s => {
             if (s === 'requestBody') return [JSON.stringify({ value: 'Example' })]
             return null
@@ -132,6 +135,7 @@ describe('ImageController', () => {
       it('Non-withheld: Loads the page with the correct information', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           body: { photoType: 'new' },
           flash: jest.fn(),
           file,
@@ -154,6 +158,7 @@ describe('ImageController', () => {
       it('Withheld: Redirects the users', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           body: { photoType: 'withheld' },
           flash: jest.fn(),
         } as unknown as Request
@@ -166,6 +171,7 @@ describe('ImageController', () => {
       it('Withheld: Redirects with referer', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           body: { photoType: 'withheld' },
           query: { referer: 'case-notes' },
           flash: jest.fn(),
@@ -179,6 +185,7 @@ describe('ImageController', () => {
       it('Webcam: Redirects the users', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           body: { photoType: 'webcam' },
           flash: jest.fn(),
         } as unknown as Request
@@ -191,6 +198,7 @@ describe('ImageController', () => {
       it('Webcam: Redirects with referer', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           body: { photoType: 'webcam' },
           query: { referer: 'case-notes' },
           flash: jest.fn(),
@@ -213,6 +221,7 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
+        session: {},
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
@@ -225,6 +234,7 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
+        session: {},
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
@@ -241,6 +251,7 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
+        session: {},
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
@@ -253,6 +264,7 @@ describe('ImageController', () => {
         file,
         flash: jest.fn(),
         middleware: defaultMiddleware,
+        session: {},
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
@@ -274,6 +286,7 @@ describe('ImageController', () => {
         query: { referer: 'personal' },
         flash: jest.fn(),
         middleware: defaultMiddleware,
+        session: {},
       } as unknown as Request
 
       await controller.updateProfileImage().submitImage(request, response)
@@ -298,6 +311,7 @@ describe('ImageController', () => {
       it('Loads the page with the correct information', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(),
         } as unknown as Request
 
@@ -314,6 +328,7 @@ describe('ImageController', () => {
       it('Populates the errors if there are any', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(s => {
             if (s === 'errors') return ['Error']
             return null
@@ -327,6 +342,7 @@ describe('ImageController', () => {
       it('Populates the request if there is any', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(s => {
             if (s === 'requestBody') return [JSON.stringify({ value: 'Example' })]
             return null
@@ -343,6 +359,7 @@ describe('ImageController', () => {
         const request = {
           flash: jest.fn(),
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
@@ -355,6 +372,7 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
@@ -371,6 +389,7 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
@@ -383,6 +402,7 @@ describe('ImageController', () => {
           file,
           flash: jest.fn(),
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
@@ -401,6 +421,7 @@ describe('ImageController', () => {
           query: { referer: 'personal' },
           flash: jest.fn(),
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
 
         await controller.updateProfileImage().newWithheldImage.post(request, response)
@@ -422,6 +443,7 @@ describe('ImageController', () => {
       it('Loads the page with the correct information', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(),
           file,
         } as unknown as Request
@@ -439,6 +461,7 @@ describe('ImageController', () => {
       it('Loads the page with the correct information', async () => {
         const request = {
           middleware: defaultMiddleware,
+          session: {},
           flash: jest.fn(),
           file,
         } as unknown as Request

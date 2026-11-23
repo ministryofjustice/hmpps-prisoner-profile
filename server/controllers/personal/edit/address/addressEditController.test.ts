@@ -50,6 +50,7 @@ describe('Address Edit Controller', () => {
       query: {},
       params: { prisonerNumber },
       middleware: { clientToken, prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: {},
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -117,6 +118,7 @@ describe('Address Edit Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditAddressLocation,
+        justification: null,
       })
     })
 
@@ -137,6 +139,7 @@ describe('Address Edit Controller', () => {
         correlationId: req.id,
         action: PostAction.EditAddressLocation,
         details: { location },
+        justification: null,
       })
     })
   })
@@ -169,6 +172,7 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressFindUkAddress,
+          justification: null,
         })
       })
 
@@ -217,6 +221,7 @@ describe('Address Edit Controller', () => {
           correlationId: req.id,
           action: PostAction.EditAddressFindUkAddress,
           details: { uprn },
+          justification: null,
         })
       })
     })
@@ -265,6 +270,7 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressConfirm,
+          justification: null,
         })
       })
 
@@ -362,6 +368,7 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressPrimaryOrPostal,
+          justification: null,
         })
       })
 
@@ -467,6 +474,7 @@ describe('Address Edit Controller', () => {
           correlationId: req.id,
           action: PostAction.EditAddressPrimaryOrPostal,
           details: { address: expectedAddressSubmission },
+          justification: null,
         })
 
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
@@ -575,6 +583,7 @@ describe('Address Edit Controller', () => {
             prisonId: PrisonerMockDataA.prisonId,
             correlationId: req.id,
             page: auditPage,
+            justification: null,
           })
         },
       )
@@ -660,6 +669,7 @@ describe('Address Edit Controller', () => {
             correlationId: req.id,
             action: auditAction,
             details: { address: expect.objectContaining(cachedAddress) },
+            justification: null,
           })
         },
       )

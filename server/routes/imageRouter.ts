@@ -85,6 +85,7 @@ export default function imageRouter(services: Services): Router {
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.Photo,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       return res.render('pages/photoPage', {
@@ -127,6 +128,7 @@ export default function imageRouter(services: Services): Router {
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.PhotoList,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       return res.render('pages/photoPageAll', {

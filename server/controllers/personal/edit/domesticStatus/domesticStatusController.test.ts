@@ -116,6 +116,7 @@ describe('DomesticStatusController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
 
@@ -143,6 +144,7 @@ describe('DomesticStatusController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -155,6 +157,7 @@ describe('DomesticStatusController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
           },
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -171,18 +174,19 @@ describe('DomesticStatusController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: {},
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDomesticStatus,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
 
@@ -194,6 +198,7 @@ describe('DomesticStatusController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
+          session: {},
           params: { prisonerNumber },
           body: { radioField: 'M' },
           flash: jest.fn(),
@@ -237,17 +242,17 @@ describe('DomesticStatusController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'M' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditDomesticStatus,
           details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
       })
     })
   })
