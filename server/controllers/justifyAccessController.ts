@@ -90,7 +90,7 @@ export class JustifyAccessController {
       characterLimit: this.#characterLimit,
       formValues,
       errors,
-      backUrl: '/', // TODO: js to use browser back
+      backUrl: '/',
     })
   }
 
