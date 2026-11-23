@@ -44,18 +44,18 @@ export class JustifyAccessController {
     const errors = req.errors || []
     if (confirmation !== 'yes') {
       errors.push({
-        text: 'Confirm that you have a legitimate business or operational need to access this profile',
+        text: 'Confirm that you have a legitimate business or operational reason to access this profile',
         href: '#confirmation',
       })
     }
     if (justification.length === 0) {
       errors.push({
-        text: 'Enter a reason for accessing this profile',
+        text: 'Enter why you need to access this prisoner’s profile',
         href: '#justification',
       })
     } else if (justification.length > this.#characterLimit) {
       errors.push({
-        text: `Your reason for accessing this profile must be ${this.#characterLimit} characters or fewer`,
+        text: `Your explanation must be ${this.#characterLimit} characters or fewer`,
         href: '#justification',
       })
     }
@@ -87,6 +87,7 @@ export class JustifyAccessController {
     const errors = req.flash('errors') || []
 
     res.render('pages/justifyAccess', {
+      characterLimit: this.#characterLimit,
       formValues,
       errors,
       backUrl: '/', // TODO: js to use browser back
