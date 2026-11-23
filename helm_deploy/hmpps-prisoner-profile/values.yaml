@@ -67,6 +67,8 @@ generic-service:
       SYSTEM_CLIENT_SECRET: "CLIENT_CREDS_CLIENT_SECRET"
     hmpps-prisoner-profile-session-secret:
       SESSION_SECRET: "SESSION_SECRET"
+    high-profile-prisoners:
+      HIGH_PROFILE_PRISONERS_OVERRIDE_LIST: "HIGH_PROFILE_PRISONERS_OVERRIDE_LIST"
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
