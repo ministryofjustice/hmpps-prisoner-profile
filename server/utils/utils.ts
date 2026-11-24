@@ -10,7 +10,7 @@ import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import type { RadioOption, SelectOption } from '../interfaces/GovOptions'
-import type { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
+import Address from '../services/interfaces/personalPageService/Address'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
@@ -351,15 +351,7 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
 export const formatCurrency = (number: number, currency: string): string =>
   typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
 
-export const addressToLines = ({
-  flat,
-  premise,
-  street,
-  town,
-  county,
-  postalCode,
-  country,
-}: OldAddresses['address']): string[] => {
+export const addressToLines = ({ flat, premise, street, town, county, postalCode, country }: Address): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `${/flat/i.test(flat) ? '' : 'Flat '}${flat}, ${lineOne}`

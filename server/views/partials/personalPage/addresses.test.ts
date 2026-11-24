@@ -56,7 +56,6 @@ const render = (overrides = {}) => {
   const params = {
     prisonerNumber: 'A1234BC',
     addresses: Result.fulfilled({ primaryOrPostal: [address], totalActive: 2 }),
-    editEnabled: true,
     editAddressSpecificPhoneNumbersEnabled: true,
     CorePersonRecordPermission,
     prisonerPermissions: {},
@@ -125,11 +124,6 @@ describe('Personal page addresses', () => {
     expect($('[data-qa="address-phone-numbers"]').text()).toContain(mockHomePhone.number)
     expect($('.hmpps-address a')).toHaveLength(0)
     expect($('a[href="personal/where-is-address"]')).toHaveLength(0)
-  })
-
-  it('hides phone edit links when general profile editing is disabled', () => {
-    const $ = render({ editEnabled: false })
-    expect($('.hmpps-address a')).toHaveLength(0)
   })
 
   it.each([

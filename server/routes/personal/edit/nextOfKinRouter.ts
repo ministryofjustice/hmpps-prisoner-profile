@@ -12,8 +12,6 @@ import { AddressLocation } from '../../../services/mappers/addressMapper'
 import { Page } from '../../../services/interfaces/auditService/page'
 import { PostAction } from '../../../services/interfaces/auditService/actions'
 import { addressValidator } from '../../../validators/personal/addressValidator'
-import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureFlags'
 
 export default function nextOfKinRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -27,7 +25,6 @@ export default function nextOfKinRouter(services: Services): Router {
   )
 
   const commonMiddleware: RequestHandler[] = [
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PersonalRelationshipsPermission.edit_emergency_contacts],
     }),

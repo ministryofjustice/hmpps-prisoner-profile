@@ -5,7 +5,7 @@ import { Page } from '../services/interfaces/auditService/page'
 import AddressService from '../services/addressService'
 import { getErrorStatus } from '../utils/errorHelpers'
 import type { PrisonUser } from '../interfaces/HmppsUser'
-import { editAddressSpecificPhoneNumbersEnabled, editProfileEnabled } from '../utils/featureFlags'
+import { editAddressSpecificPhoneNumbersEnabled } from '../utils/featureFlags'
 
 export default class AddressController {
   constructor(
@@ -46,7 +46,6 @@ export default class AddressController {
       primaryAddress,
       mailAddress,
       otherAddresses,
-      editEnabled: editProfileEnabled(activeCaseLoadId),
       editAddressSpecificPhoneNumbersEnabled: editAddressSpecificPhoneNumbersEnabled(activeCaseLoadId),
     })
   }

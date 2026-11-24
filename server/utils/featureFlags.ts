@@ -21,26 +21,15 @@ const scheduledFeatureFlag =
     )
   }
 
-export const editProfileSimulateFetch: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  config.featureToggles.editProfileSimulateFetch && !editProfileEnabled(activeCaseLoadId)
-
-export const editProfileEnabled: FeatureFlagMethod = scheduledFeatureFlag(config.featureToggles.editProfile)
-
 export const editAddressSpecificPhoneNumbersEnabled: FeatureFlagMethod = scheduledFeatureFlag(
   config.featureToggles.editAddressSpecificPhoneNumbers,
 )
 
 export const militaryHistoryEnabled: FeatureFlagMethod = () => true
 
-export const editReligionEnabled: FeatureFlagMethod = () => true
-
 export const appInsightsWebAnalyticsEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes('***') ||
   config.featureToggles.appInsightsWebAnalyticsEnabledPrisons.includes(activeCaseLoadId)
-
-export const changeContactDetailsLinkEnabled: FeatureFlagMethod = (activeCaseLoadId: string) =>
-  editProfileEnabled(activeCaseLoadId) &&
-  scheduledFeatureFlag(config.featureToggles.changeContactDetailsLink)(activeCaseLoadId)
 
 export const personDuplicateRecordsEnabled: FeatureFlagMethod = scheduledFeatureFlag(
   config.featureToggles.personDuplicateRecords,

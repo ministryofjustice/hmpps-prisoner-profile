@@ -8,8 +8,6 @@ import {
   editIdentityNumberValidator,
 } from '../../../validators/personal/identityNumbersValidator'
 import { IdentifierMappings } from '../../../data/constants/identifierMappings'
-import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureFlags'
 
 export default function identityNumbersRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -23,7 +21,6 @@ export default function identityNumbersRouter(services: Services): Router {
   )
 
   const commonMiddleware: RequestHandler[] = [
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [CorePersonRecordPermission.edit_identifiers],
     }),

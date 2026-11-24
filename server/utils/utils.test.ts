@@ -65,7 +65,7 @@ import config from '../config'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
-import type { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
+import Address from '../services/interfaces/personalPageService/Address'
 import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
@@ -340,7 +340,7 @@ describe('utils', () => {
 
   describe('Address to lines', () => {
     it('Maps a full address', () => {
-      const address: OldAddresses['address'] = {
+      const address: Address = {
         flat: '7',
         premise: 'some premise',
         street: 'street field',
@@ -360,7 +360,7 @@ describe('utils', () => {
     })
 
     it('Does not add Flat prefix if it already exists', () => {
-      const address: OldAddresses['address'] = {
+      const address: Address = {
         flat: 'flat 7',
         premise: 'some premise',
         street: 'street field',
@@ -370,7 +370,7 @@ describe('utils', () => {
     })
 
     it('Maps a partial address', () => {
-      const address: OldAddresses['address'] = {
+      const address: Address = {
         premise: 'premises address',
         street: 'street field',
         locality: 'locality field',
@@ -387,7 +387,7 @@ describe('utils', () => {
     })
 
     it('does not return a country on its own', () => {
-      const address: OldAddresses['address'] = {
+      const address: Address = {
         country: 'England',
       }
 
@@ -396,7 +396,7 @@ describe('utils', () => {
     })
 
     it('does return single lines that are not country', () => {
-      const address: OldAddresses['address'] = {
+      const address: Address = {
         premise: 'premises address',
       }
 

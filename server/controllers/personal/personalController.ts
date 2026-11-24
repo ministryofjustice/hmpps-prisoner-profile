@@ -2,14 +2,7 @@ import type { RequestHandler } from 'express'
 import config from '../../config'
 import type { PrisonUser } from '../../interfaces/HmppsUser'
 import { mapHeaderData } from '../../mappers/headerMappers'
-import {
-  changeContactDetailsLinkEnabled,
-  editAddressSpecificPhoneNumbersEnabled,
-  editProfileEnabled,
-  editProfileSimulateFetch,
-  editReligionEnabled,
-  propertySummaryTileEnabled,
-} from '../../utils/featureFlags'
+import { editAddressSpecificPhoneNumbersEnabled, propertySummaryTileEnabled } from '../../utils/featureFlags'
 import type { AuditService } from '../../services/interfaces/auditService'
 import { Page } from '../../services/interfaces/auditService/page'
 import type CareNeedsService from '../../services/careNeedsService'
@@ -32,21 +25,15 @@ export default class PersonalController {
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
       const { activeCaseLoadId } = user as PrisonUser
 
-      const editEnabled = editProfileEnabled(activeCaseLoadId)
-      const changeContactLinkEnabled = changeContactDetailsLinkEnabled(activeCaseLoadId)
-      const simulateFetchEnabled = editProfileSimulateFetch(activeCaseLoadId)
       const prisonerPropertyServiceEnabled =
         propertySummaryTileEnabled() && isServiceEnabled('prisoner-property', res.locals.feComponents?.sharedData)
-      const { personalRelationshipsApiReadEnabled, personEndpointsEnabled } = config.featureToggles
+      const { personEndpointsEnabled } = config.featureToggles
       const xrayBodyScansMoved = await this.xRayBodyScansAvailabilityService
         .getAvailability(req, res)
         .then(this.xRayBodyScansAvailabilityService.showOverviewCard)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
         this.personalPageService.get(clientToken, prisonerData, prisonerPermissions, {
-          editProfileEnabled: editEnabled,
-          simulateFetchEnabled,
-          personalRelationshipsApiReadEnabled,
           apiErrorCallback,
           personEndpointsEnabled,
           prisonerPropertyServiceEnabled,
@@ -79,15 +66,10 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        editEnabled,
-        displayNewAddressesCard: editEnabled,
         editAddressSpecificPhoneNumbersEnabled: editAddressSpecificPhoneNumbersEnabled(activeCaseLoadId),
-        editReligionEnabled: editEnabled || editReligionEnabled(),
-        personalRelationshipsApiReadEnabled,
         hasPersonalId,
         hasHomeOfficeId,
         useCustomErrorBanner: true,
-        changeContactLinkEnabled,
         xrayBodyScansMoved,
       })
     }

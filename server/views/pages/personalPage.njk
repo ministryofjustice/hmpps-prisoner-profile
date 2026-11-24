@@ -42,7 +42,7 @@
     {
       text: "Addresses",
       href: "#addresses",
-      template: "partials/personalPage/addresses.njk" if displayNewAddressesCard else "partials/personalPage/oldAddresses.njk",
+      template: "partials/personalPage/addresses.njk",
       condition: isGranted(CorePersonRecordPermission.read_address, prisonerPermissions)
     },
     {
@@ -55,7 +55,7 @@
     {
       text: "Next of kin",
       href: "#next-of-kin",
-      template: "partials/personalPage/nextOfKin.njk" if personalRelationshipsApiReadEnabled else "partials/personalPage/oldNextOfKin.njk",
+      template: "partials/personalPage/nextOfKin.njk",
       condition: isGranted(PersonalRelationshipsPermission.read_emergency_contacts, prisonerPermissions)
     },
     {
