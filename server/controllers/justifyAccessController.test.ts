@@ -34,6 +34,7 @@ describe('Justify access controller', () => {
       locals: {
         prisonerNumber,
         isHighProfilePrisoner: undefined,
+        isHighProfilePrisonerOutsideCaseloads: undefined,
         prisonerName: { firstLast: 'John Smith' },
       },
       redirect: jest.fn(),
@@ -57,8 +58,9 @@ describe('Justify access controller', () => {
       config.featureToggles.highProfilePrisonersEnabled = true
     })
 
-    it('should require res.locals.isHighProfilePrisoner to be set', () => {
+    it('should require res.locals.isHighProfilePrisonerOutsideCaseloads to be set', () => {
       delete res.locals.isHighProfilePrisoner
+      delete res.locals.isHighProfilePrisonerOutsideCaseloads
 
       expect(() => controller.requestHandler(req, res, next)).toThrow('Usage error')
 
@@ -75,8 +77,23 @@ describe('Justify access controller', () => {
         }
       })
 
-      it('should defer to next request handler when accessing prisoner who is not high-profile', () => {
-        res.locals.isHighProfilePrisoner = false
+      it.each([
+        {
+          scenario: 'not high-profile',
+          setup() {
+            res.locals.isHighProfilePrisoner = false
+            res.locals.isHighProfilePrisonerOutsideCaseloads = false
+          },
+        },
+        {
+          scenario: 'high-profile and in caseloads',
+          setup() {
+            res.locals.isHighProfilePrisoner = true
+            res.locals.isHighProfilePrisonerOutsideCaseloads = false
+          },
+        },
+      ])('should defer to next request handler when accessing prisoner who is $scenario', ({ setup }) => {
+        setup()
 
         controller.requestHandler(req, res, next)
 
@@ -85,8 +102,9 @@ describe('Justify access controller', () => {
         expect(res.render).not.toHaveBeenCalled()
       })
 
-      it('should defer to next request handler when accessing high-profile prisoner and had already justified it', () => {
+      it('should defer to next request handler when accessing high-profile prisoner outside caseloads and had already justified it', () => {
         res.locals.isHighProfilePrisoner = true
+        res.locals.isHighProfilePrisonerOutsideCaseloads = true
         req.session.justifiedHighProfilePrisonerAccess = { [prisonerNumber]: 'checking non-associations for work' }
 
         controller.requestHandler(req, res, next)
@@ -97,9 +115,10 @@ describe('Justify access controller', () => {
       })
     })
 
-    describe('and accessing high-profile prisoner', () => {
+    describe('and accessing high-profile prisoner outside caseloads', () => {
       beforeEach(() => {
         res.locals.isHighProfilePrisoner = true
+        res.locals.isHighProfilePrisonerOutsideCaseloads = true
       })
 
       it('should render justification form', () => {
@@ -187,10 +206,11 @@ describe('Justify access controller', () => {
       })
     })
 
-    describe('and submitting form to access high-profile prisoner', () => {
+    describe('and submitting form to access high-profile prisoner outside caseloads', () => {
       beforeEach(() => {
         req.method = 'POST'
         res.locals.isHighProfilePrisoner = true
+        res.locals.isHighProfilePrisonerOutsideCaseloads = true
       })
 
       it('should defer to next request handler when there are no errors and save session', () => {

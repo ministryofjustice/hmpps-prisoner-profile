@@ -13,15 +13,19 @@ export declare module 'express-session' {
     userBackLink?: { url: string; text: string }
     movementSlipData: object
     temporaryDataCache: Record<UUID, unknown>
+    /**
+     * Justifications for accessing given high-profile prisoners’ information (keyed by prisoner number)
+     * NB: currently set only for prison users on prisoners in prison, but outside their caseloads
+     */
     justifiedHighProfilePrisonerAccess?: Record<string, string>
   }
 }
 
 export declare global {
   namespace Express {
-    interface User {
+    interface User extends HmppsUser {
       username: string
-      token: string
+      token?: string
       authSource: string
     }
 
@@ -54,7 +58,9 @@ export declare global {
       }
       user: HmppsUser
       prisonerPermissions?: PrisonerPermissions
+      /** Whether current prisoner is high-profile */
       isHighProfilePrisoner?: boolean
+      /** Whether current prisoner is high-profile, in prison but outside user’s caseloads */
       isHighProfilePrisonerOutsideCaseloads?: boolean
     }
   }
