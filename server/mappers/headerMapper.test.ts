@@ -1,25 +1,31 @@
 import {
+  CaseNotesPermission,
   PersonPrisonCategoryPermission,
   PrisonerBaseLocationPermission,
   PrisonerIncentivesPermission,
   PrisonerPermissions,
   PrisonerSpecificRisksPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import config from '../config'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
-import { mapProfileBannerTopLinks } from './headerMappers'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import mockPermissions from '../../tests/mocks/mockPermissions'
-import config from '../config'
+import { mapHeaderData, mapProfileBannerTopLinks } from './headerMappers'
 
 jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
+const mockedPrisonerPermissions = {} as PrisonerPermissions
 
 describe('HeaderMapping', () => {
-  describe('Header data', () => {
+  describe('Profile banner top links', () => {
     describe('Location', () => {
       it('Displays the location link if permitted', () => {
         mockPermissions({ [PrisonerBaseLocationPermission.read_location_details]: true })
 
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         const locationLink = topLinks.find(link => link.heading === 'Location')
         expect(locationLink).toBeDefined()
@@ -31,7 +37,11 @@ describe('HeaderMapping', () => {
       it('Displays the location link if permitted but the user has active out status', () => {
         mockPermissions({ [PrisonerBaseLocationPermission.read_location_details]: true })
 
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataB, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataB,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         const locationLink = topLinks.find(link => link.heading === 'Location')
         expect(locationLink).toBeDefined()
@@ -42,7 +52,11 @@ describe('HeaderMapping', () => {
 
       it('Hides the the location if not permitted', () => {
         mockPermissions({ [PrisonerBaseLocationPermission.read_location_details]: false })
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         expect(topLinks.map(link => link.heading)).not.toContain('Location')
       })
@@ -52,14 +66,22 @@ describe('HeaderMapping', () => {
       it('should not show category data when read permission is not granted', () => {
         mockPermissions({ [PersonPrisonCategoryPermission.read]: false })
 
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         expect(topLinks.map(link => link.heading)).not.toContain('Category')
       })
 
       it('should show category link if permitted', () => {
         mockPermissions({ [PersonPrisonCategoryPermission.read]: true })
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         const categoryLink = topLinks.find(link => link.heading === 'Category')
         expect(categoryLink).toBeDefined()
@@ -81,7 +103,11 @@ describe('HeaderMapping', () => {
       it('should not show CSRA data when read permission is not granted', () => {
         mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: false })
 
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         expect(topLinks.map(link => link.heading)).not.toContain('CSRA')
       })
@@ -89,7 +115,11 @@ describe('HeaderMapping', () => {
       it('should show CSRA without a link when only read_csra_rating permission is granted', () => {
         mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: true })
 
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         const csra = topLinks.find(link => link.heading === 'CSRA')
         expect(csra).toBeDefined()
@@ -102,7 +132,11 @@ describe('HeaderMapping', () => {
           [PrisonerSpecificRisksPermission.read_csra_rating]: true,
           [PrisonerSpecificRisksPermission.read_csra_assessment_history]: true,
         })
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
         const csraLink = topLinks.find(link => link.heading === 'CSRA')
         expect(csraLink).toBeDefined()
@@ -119,7 +153,11 @@ describe('HeaderMapping', () => {
         it('should link to the CSRA service only when read_csra_rating permission is granted', () => {
           mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: true })
 
-          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+          const topLinks = mapProfileBannerTopLinks({
+            prisonerData: PrisonerMockDataA,
+            inmateDetail: inmateDetailMock,
+            prisonerPermissions: mockedPrisonerPermissions,
+          })
 
           const csraLink = topLinks.find(link => link.heading === 'CSRA')
           expect(csraLink).toBeDefined()
@@ -134,7 +172,11 @@ describe('HeaderMapping', () => {
             [PrisonerSpecificRisksPermission.read_csra_assessment_history]: true,
           })
 
-          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+          const topLinks = mapProfileBannerTopLinks({
+            prisonerData: PrisonerMockDataA,
+            inmateDetail: inmateDetailMock,
+            prisonerPermissions: mockedPrisonerPermissions,
+          })
 
           const csraLink = topLinks.find(link => link.heading === 'CSRA')
           expect(csraLink.url).toBe(`${config.serviceUrls.csraService}/prisoner/${PrisonerMockDataA.prisonerNumber}`)
@@ -143,48 +185,89 @@ describe('HeaderMapping', () => {
         it('should not show CSRA data when read permission is not granted', () => {
           mockPermissions({ [PrisonerSpecificRisksPermission.read_csra_rating]: false })
 
-          const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+          const topLinks = mapProfileBannerTopLinks({
+            prisonerData: PrisonerMockDataA,
+            inmateDetail: inmateDetailMock,
+            prisonerPermissions: mockedPrisonerPermissions,
+          })
 
           expect(topLinks.map(link => link.heading)).not.toContain('CSRA')
         })
       })
     })
-  })
 
-  describe('Incentive level', () => {
-    it('should not show incentive level when read permission is not granted', () => {
-      mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: false })
+    describe('Incentive level', () => {
+      it('should not show incentive level when read permission is not granted', () => {
+        mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: false })
 
-      const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
 
-      expect(topLinks.map(link => link.heading)).not.toContain('Incentive level')
-    })
-
-    it('should show incentive level without history link when only read_incentive_level permission is granted', () => {
-      mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: true })
-
-      const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
-
-      const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
-      expect(incentiveLink).toBeDefined()
-      expect(incentiveLink.info).toBe('Standard')
-      expect(incentiveLink.url).toBeUndefined()
-    })
-
-    it('should show incentive level with history link when both read permissions are granted', () => {
-      mockPermissions({
-        [PrisonerIncentivesPermission.read_incentive_level]: true,
-        [PrisonerIncentivesPermission.read_incentive_level_history]: true,
+        expect(topLinks.map(link => link.heading)).not.toContain('Incentive level')
       })
 
-      const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, {} as PrisonerPermissions)
+      it('should show incentive level without history link when only read_incentive_level permission is granted', () => {
+        mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: true })
 
-      const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
-      expect(incentiveLink).toBeDefined()
-      expect(incentiveLink.info).toBe('Standard')
-      expect(incentiveLink.hiddenLabel).toBe('incentive level')
-      expect(incentiveLink.url).toBe(
-        `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
+
+        const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
+        expect(incentiveLink).toBeDefined()
+        expect(incentiveLink.info).toBe('Standard')
+        expect(incentiveLink.url).toBeUndefined()
+      })
+
+      it('should show incentive level with history link when both read permissions are granted', () => {
+        mockPermissions({
+          [PrisonerIncentivesPermission.read_incentive_level]: true,
+          [PrisonerIncentivesPermission.read_incentive_level_history]: true,
+        })
+
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+        })
+
+        const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
+        expect(incentiveLink).toBeDefined()
+        expect(incentiveLink.info).toBe('Standard')
+        expect(incentiveLink.hiddenLabel).toBe('incentive level')
+        expect(incentiveLink.url).toBe(
+          `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+        )
+      })
+    })
+  })
+
+  describe('Tab links', () => {
+    it.each([
+      { scenario: 'cannot view case notes', canViewCaseNotes: false, expectedLength: 5, alertsIsNth: 2 },
+      { scenario: 'can view case notes', canViewCaseNotes: true, expectedLength: 6, alertsIsNth: 3 },
+    ])('should highlight current (alerts) page when $scenario', ({ canViewCaseNotes, expectedLength, alertsIsNth }) => {
+      mockPermissions({ [CaseNotesPermission.read]: canViewCaseNotes })
+
+      const { tabLinks } = mapHeaderData({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: { apiUnavailable: true },
+        prisonerPermissions: mockedPrisonerPermissions,
+        pageId: 'alerts',
+      })
+
+      expect(tabLinks).toHaveLength(expectedLength)
+      // alerts is active
+      expect(tabLinks.findIndex(tab => tab.active)).toEqual(alertsIsNth)
+      // all but alerts is inactive
+      expect(tabLinks.filter((_, index) => index !== alertsIsNth).map(tab => tab.active)).toEqual(
+        Array.from({ length: expectedLength - 1 }).map(() => false),
       )
     })
   })

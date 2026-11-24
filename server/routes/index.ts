@@ -210,7 +210,13 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'work-and-skills'),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          pageId: 'work-and-skills',
+        }),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         allFunctionalSkillsLinkUrl,
@@ -255,7 +261,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'offences'),
+        ...mapHeaderData({ prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, pageId: 'offences' }),
         courtCaseData,
         releaseDates,
         activeTab: true,

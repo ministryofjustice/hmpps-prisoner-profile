@@ -95,13 +95,13 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        req.middleware.alertSummaryData,
-        res.locals.prisonerPermissions,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: req.middleware.alertSummaryData,
+        prisonerPermissions: res.locals.prisonerPermissions,
+        pageId: 'alerts',
+      })
     })
 
     it('should not add update links to alerts the user cannot administer', async () => {
@@ -202,13 +202,13 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        req.middleware.alertSummaryData,
-        res.locals.prisonerPermissions,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: req.middleware.alertSummaryData,
+        prisonerPermissions: res.locals.prisonerPermissions,
+        pageId: 'alerts',
+      })
     })
   })
 
