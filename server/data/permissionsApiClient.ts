@@ -16,6 +16,9 @@ export default class PermissionsApiRestClient extends RestClient implements Perm
   }
 
   async checkHighProfilePrisonerStatus(prisonerNumber: string): Promise<boolean> {
+    if (config.apis.permissionsApi.highProfilePrisonersOverrideList?.length > 0) {
+      return config.apis.permissionsApi.highProfilePrisonersOverrideList.includes(prisonerNumber)
+    }
     const statuses = await this.checkHighProfilePrisonerStatuses([prisonerNumber])
     return statuses.get(prisonerNumber)
   }

@@ -1,8 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import AliasController from './aliasController'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import AliasService, { Name } from '../../../../services/aliasService'
 import { aliasServiceMock } from '../../../../../tests/mocks/aliasServiceMock'
@@ -28,11 +31,14 @@ describe('Alias Controller', () => {
   let auditService: AuditService
   let controller: AliasController
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       id: '123',
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -61,6 +67,10 @@ describe('Alias Controller', () => {
     } as unknown as ReferenceDataService
 
     controller = new AliasController(aliasService, referenceDataService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('Change name purpose page', () => {
@@ -100,7 +110,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNamePurpose,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -125,7 +137,9 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditNamePurpose,
           details: { purpose },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
   })
@@ -200,7 +214,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameCorrection,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -255,7 +271,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -270,9 +286,9 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -335,7 +351,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameLegal,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -390,7 +408,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeNameLegal()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -405,9 +423,9 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -502,7 +520,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.AddNewAlias,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the new alias request', async () => {
@@ -577,15 +597,15 @@ describe('Alias Controller', () => {
 
       await controller.submitAddNewAlias()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddNewAlias,
         details: PseudonymResponseMock,
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -650,7 +670,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditDateOfBirth,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the date of birth change', async () => {
@@ -706,7 +728,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeDateOfBirth()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -716,9 +738,9 @@ describe('Alias Controller', () => {
           previous: '1990-10-12',
           updated: '1999-02-01',
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -751,7 +773,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicGroup,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -776,7 +800,9 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditEthnicGroup,
           details: { ethnicGroup },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
 
@@ -807,7 +833,9 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: 'NS',
         },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -869,7 +897,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicBackground,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the ethnicity change', async () => {
@@ -913,7 +943,7 @@ describe('Alias Controller', () => {
 
       await controller.submitChangeEthnicBackground()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -923,9 +953,9 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: ethnicityCodeSubmitted,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 })

@@ -1,8 +1,10 @@
 import { RequestHandler } from 'express'
 import { AddressLocation } from '../../services/mappers/addressMapper'
-import { AuditService, Page, PostAction } from '../../services/auditService'
-import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import logger from '../../../logger'
+import type { AuditService } from '../../services/interfaces/auditService'
+import { Page } from '../../services/interfaces/auditService/page'
+import { PostAction } from '../../services/interfaces/auditService/actions'
+import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import { convertToTitleCase, mapToQueryString, objectToSelectOptions } from '../../utils/utils'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { formatDateISO } from '../../utils/dateHelpers'
@@ -51,6 +53,7 @@ export function displayManualEditAddressHandler(
         prisonId,
         correlationId: req.id,
         page: auditPage,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -118,6 +121,7 @@ export function submitManualEditAddressHandler(
         correlationId: req.id,
         action: auditAction,
         details: { address },
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

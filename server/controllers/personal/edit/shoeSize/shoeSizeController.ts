@@ -1,6 +1,6 @@
 import PersonalPageService from '../../../../services/personalPageService'
 import PersonalEditController from '../personalEditController'
-import { AuditService } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
 import { shoeSizeFieldData } from '../../fieldData'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import { EditControllerRequestHandlers } from '../../../interfaces/EditControllerRequestHandlers'
@@ -39,6 +39,7 @@ export default class ShoeSizeController extends PersonalEditController {
           prisonId,
           correlationId: req.id,
           page: auditEditPageLoad,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
 
         res.render('pages/edit/shoeSize', {

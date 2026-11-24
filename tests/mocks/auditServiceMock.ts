@@ -1,14 +1,14 @@
-import type { AuditService } from '../../server/services/auditService'
+import type { AuditService } from '../../server/services/interfaces/auditService'
 
 export const auditServiceMock = (): jest.Mocked<AuditService> => ({
-  sendAccessAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendPageView: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendSearch: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendPostAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendPostSuccess: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendPutAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendPutSuccess: jest.fn().mockImplementation(() => Promise.resolve()),
-  sendEvent: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendAccessAttempt: jest.fn().mockResolvedValue(undefined),
+  sendPageView: jest.fn().mockResolvedValue(undefined),
+  sendSearch: jest.fn().mockResolvedValue(undefined),
+  sendPostAttempt: jest.fn().mockResolvedValue(undefined),
+  sendPostSuccess: jest.fn().mockResolvedValue(undefined),
+  sendPutAttempt: jest.fn().mockResolvedValue(undefined),
+  sendPutSuccess: jest.fn().mockResolvedValue(undefined),
+  sendEvent: jest.fn().mockResolvedValue(undefined),
 })
 
 export default { auditServiceMock }

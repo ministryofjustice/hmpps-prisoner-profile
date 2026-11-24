@@ -1,12 +1,15 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import EyeColourController from './eyeColourController'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { corePersonPhysicalAttributesMock } from '../../../../data/localMockData/physicalAttributesMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { eyeColourCodesMock } from '../../../../data/localMockData/personIntegrationApi/referenceDataMocks'
@@ -18,6 +21,8 @@ describe('EyeColourController', () => {
   let controller: EyeColourController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -45,6 +50,10 @@ describe('EyeColourController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   /**
    * Tests for the eye colour edit page - where both eyes are the same colour
    */
@@ -58,6 +67,7 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -95,6 +105,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -109,6 +120,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -125,18 +137,20 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -148,6 +162,7 @@ describe('EyeColourController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { eyeColour: 'GREEN' },
           flash: jest.fn(),
@@ -191,7 +206,9 @@ describe('EyeColourController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
+        await action(validRequest, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: validRequest.id,
@@ -201,11 +218,9 @@ describe('EyeColourController', () => {
             previous: { leftEyeColourCode: 'BLUE', rightEyeColourCode: 'BLUE' },
             updated: { leftEyeColourCode: 'GREEN', rightEyeColourCode: 'GREEN' },
           },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -223,6 +238,7 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
 
         await action(req, res, next)
@@ -270,6 +286,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -284,6 +301,7 @@ describe('EyeColourController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -301,18 +319,20 @@ describe('EyeColourController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditEyeColour,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -325,6 +345,7 @@ describe('EyeColourController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
           flash: jest.fn(),
@@ -373,7 +394,10 @@ describe('EyeColourController', () => {
           id: 1,
           body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -386,11 +410,9 @@ describe('EyeColourController', () => {
             },
             updated: { leftEyeColourCode: 'BROWN', rightEyeColourCode: 'GREEN' },
           },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

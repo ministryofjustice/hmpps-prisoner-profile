@@ -1,10 +1,12 @@
-import { NextFunction, Request, Response } from 'express'
-import { PermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import type { NextFunction, Request, Response } from 'express'
+import type { PermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { AuditService, Page } from '../services/auditService'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import DuplicateProfilesController from './duplicateProfilesController'
 import NotFoundError from '../utils/notFoundError'
 
@@ -25,6 +27,8 @@ const mockPermissionsRecord1 = { permission1: true }
 const mockPermissionsRecord2 = { permission2: true }
 
 describe('DuplicateProfilesController', () => {
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     jest.resetAllMocks()
 
@@ -46,6 +50,7 @@ describe('DuplicateProfilesController', () => {
         inmateDetail: inmateDetailMock,
         duplicatePrisonerData: [duplicateRecord1, duplicateRecord2],
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { prisonerNumber: prisonerInContext.prisonerNumber },
       id: 'test-correlation-id',
     } as unknown as Request
@@ -142,7 +147,9 @@ describe('DuplicateProfilesController', () => {
         prisonId: prisonerInContext.prisonId,
         correlationId: 'test-correlation-id',
         page: Page.PossibleDuplicateProfiles,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerInContext.prisonerNumber)
     })
 
     it('should not fail if audit service rejects', async () => {

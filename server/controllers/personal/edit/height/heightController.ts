@@ -1,6 +1,6 @@
 import PersonalEditController from '../personalEditController'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
 import { heightFieldData, heightImperialFieldData } from '../../fieldData'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
@@ -34,6 +34,7 @@ export default class HeightController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: auditEditPageLoad,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/heightMetric', {
@@ -92,6 +93,7 @@ export default class HeightController extends PersonalEditController {
             prisonId,
             correlationId: req.id,
             page: auditEditPageLoad,
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
 
           res.render('pages/edit/heightImperial', {

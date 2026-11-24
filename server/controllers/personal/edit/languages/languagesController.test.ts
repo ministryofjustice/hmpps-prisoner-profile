@@ -1,8 +1,10 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import LanguagesController from './languagesController'
 import LanguagesService from '../../../../services/languagesService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
@@ -13,6 +15,7 @@ import {
   LanguageRefDataMock,
 } from '../../../../data/localMockData/personCommunicationNeedsApiRefDataMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 
 describe('LanguagesController', () => {
@@ -23,6 +26,8 @@ describe('LanguagesController', () => {
   let res: Response
   const prisonerNumber = 'A1234BC'
   const clientToken = 'CLIENT_TOKEN'
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   beforeEach(() => {
     languagesService = {
@@ -46,11 +51,12 @@ describe('LanguagesController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn(),
       body: {},
       params: { offenderNo: prisonerNumber },
       id: 'request-id',
-    } as Partial<Request> as Request
+    } as unknown as Request
 
     res = {
       locals: {
@@ -98,7 +104,9 @@ describe('LanguagesController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditMainLanguage,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/languages/updateMainLanguage',
@@ -180,7 +188,9 @@ describe('LanguagesController', () => {
           languagePreferences: formValues,
           previousLanguagePreferences: CommunicationNeedsDtoMock.languagePreferences,
         },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#main-language`)
     })
@@ -300,7 +310,9 @@ describe('LanguagesController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditOtherLanguages,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/languages/updateOtherLanguages',
@@ -400,7 +412,9 @@ describe('LanguagesController', () => {
           secondaryLanguages: formValues,
           previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
         },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })
@@ -464,7 +478,9 @@ describe('LanguagesController', () => {
           secondaryLanguages: cleanFormValues,
           previousSecondaryLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
         },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#other-languages`)
     })

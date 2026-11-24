@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import { RestClientBuilder } from '../data'
 import filterEmptyFieldsFromObject from '../utils/filterEmptyFieldsFromObject'
 import {

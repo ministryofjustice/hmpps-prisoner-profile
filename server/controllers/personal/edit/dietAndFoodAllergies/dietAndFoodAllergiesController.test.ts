@@ -1,11 +1,14 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import DietAndFoodAllergiesController from './dietAndFoodAllergiesController'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { healthAndMedicationMock } from '../../../../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 import { ReferenceDataIdSelection } from '../../../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
@@ -21,6 +24,8 @@ describe('DietAndFoodAllergiesController', () => {
   let controller: DietAndFoodAllergiesController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -46,6 +51,10 @@ describe('DietAndFoodAllergiesController', () => {
       render: jest.fn(),
       redirect: jest.fn(),
     } as unknown as Response
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('dietAndFoodAllergies', () => {
@@ -120,6 +129,7 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -141,6 +151,7 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -174,6 +185,7 @@ describe('DietAndFoodAllergiesController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -201,6 +213,7 @@ describe('DietAndFoodAllergiesController', () => {
               : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -227,18 +240,20 @@ describe('DietAndFoodAllergiesController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDietAndFoodAllergies,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -251,6 +266,7 @@ describe('DietAndFoodAllergiesController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: {
             medical: [{ value: medicalDietCodesMock[0].id }, { value: 'MEDICAL_DIET_OTHER', comment: 'abc' }],
@@ -316,7 +332,9 @@ describe('DietAndFoodAllergiesController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const expectedAuditEvent = {
+        await action(validRequest, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: validRequest.id,
@@ -345,11 +363,9 @@ describe('DietAndFoodAllergiesController', () => {
               cateringInstructions: 'jkl',
             },
           },
-        }
-
-        await action(validRequest, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

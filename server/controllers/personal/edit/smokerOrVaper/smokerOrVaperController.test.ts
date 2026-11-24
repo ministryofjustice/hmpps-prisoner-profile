@@ -1,10 +1,13 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { smokerOrVaperFieldData } from '../../fieldData'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
@@ -17,6 +20,8 @@ describe('SmokerOrVaperController', () => {
   let controller: SmokerOrVaperController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -52,6 +57,10 @@ describe('SmokerOrVaperController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('smokerOrVaper', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.smokerOrVaper().edit(req, response, next)
@@ -61,6 +70,7 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -92,6 +102,7 @@ describe('SmokerOrVaperController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -104,6 +115,7 @@ describe('SmokerOrVaperController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -120,18 +132,20 @@ describe('SmokerOrVaperController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSmokerOrVaper,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -143,6 +157,7 @@ describe('SmokerOrVaperController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
@@ -183,17 +198,18 @@ describe('SmokerOrVaperController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSmokerOrVaper,
           details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKER_YES', updated: 'SMOKER_NO' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

@@ -1,10 +1,11 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+import logger from '../../logger'
 import CsraService from '../services/csraService'
 import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSummaryListMapper'
 import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
 import validateDateRange from '../utils/validateDateRange'
-import { AuditService, Page } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 export default class CsraController {
   constructor(
@@ -40,6 +41,7 @@ export default class CsraController {
         prisonId,
         correlationId: req.id,
         page: Page.CsraHistory,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -70,6 +72,7 @@ export default class CsraController {
         prisonId,
         correlationId: req.id,
         page: Page.CsraReview,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

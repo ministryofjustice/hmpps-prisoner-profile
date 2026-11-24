@@ -1,11 +1,14 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { corePersonPhysicalAttributesMock } from '../../../../data/localMockData/physicalAttributesMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { heightFieldData } from '../../fieldData'
 import HeightController from './heightController'
@@ -16,6 +19,8 @@ describe('ShoeSizeController', () => {
   let controller: HeightController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -43,6 +48,10 @@ describe('ShoeSizeController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('height', () => {
     describe('metric', () => {
       describe('edit', () => {
@@ -53,6 +62,7 @@ describe('ShoeSizeController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -78,6 +88,7 @@ describe('ShoeSizeController', () => {
               return []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -90,6 +101,7 @@ describe('ShoeSizeController', () => {
               return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
@@ -101,18 +113,20 @@ describe('ShoeSizeController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditHeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -123,6 +137,7 @@ describe('ShoeSizeController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber },
             body: { editField: '123' },
             flash: jest.fn(),
@@ -159,17 +174,18 @@ describe('ShoeSizeController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { editField: 157 } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -183,6 +199,7 @@ describe('ShoeSizeController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -208,6 +225,7 @@ describe('ShoeSizeController', () => {
               return []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -220,6 +238,7 @@ describe('ShoeSizeController', () => {
               return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -238,6 +257,7 @@ describe('ShoeSizeController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -252,18 +272,20 @@ describe('ShoeSizeController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditHeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -274,6 +296,7 @@ describe('ShoeSizeController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber },
             body: { feet: '5', inches: '10' },
             flash: jest.fn(),
@@ -312,17 +335,18 @@ describe('ShoeSizeController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })

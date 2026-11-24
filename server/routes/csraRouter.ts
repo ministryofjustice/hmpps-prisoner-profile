@@ -7,7 +7,7 @@ import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import CsraController from '../controllers/csraController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function alertsRouter(services: Services): Router {

@@ -1,6 +1,7 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import logger from '../../logger'
-import { AuditService, Page } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import ProbationDocumentsService from '../services/probationDocumentsService'
 import config from '../config'
 
@@ -25,6 +26,7 @@ export default class ProbationDocumentsController {
         page: Page.ProbationDocuments,
         prisonerNumber,
         prisonId,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

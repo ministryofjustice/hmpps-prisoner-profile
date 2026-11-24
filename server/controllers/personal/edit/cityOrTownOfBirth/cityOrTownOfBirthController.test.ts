@@ -1,10 +1,13 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { cityOrTownOfBirthFieldData } from '../../fieldData'
 import CityOrTownOfBirthController from './cityOrTownOfBirthController'
@@ -15,6 +18,8 @@ describe('CityOrTownOfBirthController', () => {
   let controller: CityOrTownOfBirthController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -41,6 +46,10 @@ describe('CityOrTownOfBirthController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('cityOrTownOfBirth', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.cityOrTownOfBirth().edit(req, response, next)
@@ -50,6 +59,7 @@ describe('CityOrTownOfBirthController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -82,6 +92,7 @@ describe('CityOrTownOfBirthController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -94,6 +105,7 @@ describe('CityOrTownOfBirthController', () => {
             return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: 'SHEFFIELD' }))
@@ -105,18 +117,20 @@ describe('CityOrTownOfBirthController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditCityOrTownOfBirth,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -127,6 +141,7 @@ describe('CityOrTownOfBirthController', () => {
       beforeEach(() => {
         validRequest = {
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { cityOrTownOfBirth: 'Sheffield' },
           flash: jest.fn(),
@@ -163,7 +178,10 @@ describe('CityOrTownOfBirthController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { cityOrTownOfBirth: 'Rotherham' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -173,11 +191,9 @@ describe('CityOrTownOfBirthController', () => {
             previous: 'La La Land',
             updated: 'Rotherham',
           },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

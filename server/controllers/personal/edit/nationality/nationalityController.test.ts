@@ -1,10 +1,13 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { nationalityFieldData } from '../../fieldData'
 import { ProfileInformationType } from '../../../../data/interfaces/prisonApi/ProfileInformation'
@@ -16,6 +19,8 @@ describe('NationalityController', () => {
   let controller: NationalityController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -56,6 +61,10 @@ describe('NationalityController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('nationality', () => {
     describe('edit', () => {
       const action: RequestHandler = async (req, response) => controller.nationality().edit(req, response, next)
@@ -65,6 +74,7 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -100,6 +110,7 @@ describe('NationalityController', () => {
             return []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -112,6 +123,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -129,6 +141,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -147,6 +160,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -169,6 +183,7 @@ describe('NationalityController', () => {
             return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
           },
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -185,18 +200,20 @@ describe('NationalityController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditNationality,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -208,6 +225,7 @@ describe('NationalityController', () => {
         validRequest = {
           id: '1',
           middleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'BRIT' },
           flash: jest.fn(),
@@ -283,7 +301,10 @@ describe('NationalityController', () => {
           id: 1,
           body: { radioField: 'FREN', additionalNationalities: 'Updated nationalities' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -292,11 +313,9 @@ describe('NationalityController', () => {
             { fieldName: nationalityFieldData.fieldName, previous: 'British', updated: 'FREN' },
             { fieldName: 'otherNationalities', previous: 'Some other nationality', updated: 'Updated nationalities' },
           ],
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

@@ -108,6 +108,7 @@ describe('Justify access controller', () => {
         expect(next).not.toHaveBeenCalled()
         expect(res.redirect).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/justifyAccess', {
+          characterLimit: 250,
           formValues: { justification: '' },
           errors: [],
           backUrl: '/',
@@ -120,7 +121,7 @@ describe('Justify access controller', () => {
           formValues: { justification: 'checking non-associations for work' },
           errors: [
             {
-              text: 'Confirm that you have a legitimate business or operational need to access this profile',
+              text: 'Confirm that you have a legitimate business or operational reason to access this profile',
               href: '#confirmation',
             },
           ],
@@ -130,7 +131,7 @@ describe('Justify access controller', () => {
           formValues: { confirmation: 'yes', justification: '' },
           errors: [
             {
-              text: 'Enter a reason for accessing this profile',
+              text: 'Enter why you need to access this prisoner’s profile',
               href: '#justification',
             },
           ],
@@ -140,7 +141,7 @@ describe('Justify access controller', () => {
           formValues: { confirmation: 'yes', justification: 'ab'.repeat(126) },
           errors: [
             {
-              text: 'Your reason for accessing this profile must be 250 characters or fewer',
+              text: 'Your explanation must be 250 characters or fewer',
               href: '#justification',
             },
           ],
@@ -150,11 +151,11 @@ describe('Justify access controller', () => {
           formValues: { justification: '' },
           errors: [
             {
-              text: 'Confirm that you have a legitimate business or operational need to access this profile',
+              text: 'Confirm that you have a legitimate business or operational reason to access this profile',
               href: '#confirmation',
             },
             {
-              text: 'Enter a reason for accessing this profile',
+              text: 'Enter why you need to access this prisoner’s profile',
               href: '#justification',
             },
           ],
@@ -178,6 +179,7 @@ describe('Justify access controller', () => {
         expect(next).not.toHaveBeenCalled()
         expect(res.redirect).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/justifyAccess', {
+          characterLimit: 250,
           formValues,
           errors,
           backUrl: '/',
@@ -210,7 +212,7 @@ describe('Justify access controller', () => {
           expectedFormValues: { justification: 'checking non-associations for work' },
           expectedErrors: [
             {
-              text: 'Confirm that you have a legitimate business or operational need to access this profile',
+              text: 'Confirm that you have a legitimate business or operational reason to access this profile',
               href: '#confirmation',
             },
           ],
@@ -221,7 +223,7 @@ describe('Justify access controller', () => {
           expectedFormValues: { confirmation: 'yes', justification: '' },
           expectedErrors: [
             {
-              text: 'Enter a reason for accessing this profile',
+              text: 'Enter why you need to access this prisoner’s profile',
               href: '#justification',
             },
           ],
@@ -232,7 +234,7 @@ describe('Justify access controller', () => {
           expectedFormValues: { confirmation: 'yes', justification: 'ab'.repeat(126) },
           expectedErrors: [
             {
-              text: 'Your reason for accessing this profile must be 250 characters or fewer',
+              text: 'Your explanation must be 250 characters or fewer',
               href: '#justification',
             },
           ],
@@ -243,11 +245,11 @@ describe('Justify access controller', () => {
           expectedFormValues: { justification: '' },
           expectedErrors: [
             {
-              text: 'Confirm that you have a legitimate business or operational need to access this profile',
+              text: 'Confirm that you have a legitimate business or operational reason to access this profile',
               href: '#confirmation',
             },
             {
-              text: 'Enter a reason for accessing this profile',
+              text: 'Enter why you need to access this prisoner’s profile',
               href: '#justification',
             },
           ],

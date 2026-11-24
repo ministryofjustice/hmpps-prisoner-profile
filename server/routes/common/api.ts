@@ -1,8 +1,10 @@
-import { Request, RequestHandler, Response } from 'express'
+import type { RequestHandler } from 'express'
 import { CorePersonRecordPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import OffenderService from '../../services/offenderService'
-import { ApiAction, AuditService, SubjectType } from '../../services/auditService'
 import logger from '../../../logger'
+import OffenderService from '../../services/offenderService'
+import type { AuditService } from '../../services/interfaces/auditService'
+import { ApiAction } from '../../services/interfaces/auditService/actions'
+import { SubjectType } from '../../services/interfaces/auditService/subjectType'
 import PhotoService from '../../services/photoService'
 import DistinguishingMarksService from '../../services/distinguishingMarksService'
 import MetricsService from '../../services/metrics/metricsService'
@@ -23,7 +25,7 @@ export default class CommonApiRoutes {
     private readonly metricsService: MetricsService,
   ) {}
 
-  public prisonerImage: RequestHandler = (req: Request, res: Response) => {
+  public prisonerImage: RequestHandler = (req, res) => {
     const { prisonerNumber } = req.params
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
@@ -36,6 +38,7 @@ export default class CommonApiRoutes {
         correlationId: req.id,
         what: `API_${ApiAction.PrisonerImage}`,
         subjectType: SubjectType.PrisonerId,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -59,7 +62,7 @@ export default class CommonApiRoutes {
     }
   }
 
-  public image: RequestHandler = (req: Request, res: Response) => {
+  public image: RequestHandler = (req, res) => {
     const { imageId } = req.params
 
     this.auditService
@@ -68,6 +71,7 @@ export default class CommonApiRoutes {
         subjectId: imageId,
         correlationId: req.id,
         what: `API_${ApiAction.Image}`,
+        justification: null, // TODO: is it possible for this route to be associated with a prisoner number?
       })
       .catch(error => logger.error(error))
 
@@ -88,7 +92,7 @@ export default class CommonApiRoutes {
     }
   }
 
-  public distinguishingMarkImage: RequestHandler = (req: Request, res: Response) => {
+  public distinguishingMarkImage: RequestHandler = (req, res) => {
     const { imageId } = req.params
 
     this.distinguishingMarksService

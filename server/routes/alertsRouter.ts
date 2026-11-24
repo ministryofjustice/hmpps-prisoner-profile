@@ -15,7 +15,7 @@ import {
   AlertValidator,
 } from '../validators/alertValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 
 export default function alertsRouter(services: Services): Router {

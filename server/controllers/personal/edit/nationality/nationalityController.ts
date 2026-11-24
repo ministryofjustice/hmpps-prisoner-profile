@@ -1,6 +1,6 @@
 import PersonalEditController from '../personalEditController'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
 import { nationalityFieldData } from '../../fieldData'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import { objectToRadioOptions, objectToSelectOptions } from '../../../../utils/utils'
@@ -71,6 +71,7 @@ export default class NationalityController extends PersonalEditController {
           prisonId,
           correlationId: req.id,
           page: auditEditPageLoad,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
 
         res.render('pages/edit/nationality', {
