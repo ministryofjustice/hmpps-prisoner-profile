@@ -26,7 +26,7 @@ describe('isHighProfilePrisonerMiddleware', () => {
   })
 
   beforeEach(() => {
-    req = { middleware: { clientToken: 'tok' }, params: { prisonerNumber } } as unknown as Request
+    req = { middleware: { clientToken: 'tok', prisonerData: { prisonerNumber } } } as unknown as Request
     res = { locals: {} } as Response
     next = jest.fn() as NextFunction
   })
@@ -44,8 +44,8 @@ describe('isHighProfilePrisonerMiddleware', () => {
       config.featureToggles.highProfilePrisonersEnabled = true
     })
 
-    it('should require a prisoner number', async () => {
-      delete req.params.prisonerNumber
+    it('should require a prisoner data middleware', async () => {
+      delete req.middleware.prisonerData
 
       await expect(middleware(req, res, next)).rejects.toThrow('Usage error')
 

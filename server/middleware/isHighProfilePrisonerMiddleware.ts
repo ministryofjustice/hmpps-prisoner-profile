@@ -13,14 +13,15 @@ export function isHighProfilePrisonerMiddleware(services: Services): RequestHand
       return
     }
 
-    if (!req.params?.prisonerNumber) {
-      // only works on routes with known prisoner number
-      throw new Error('Usage error: req.params.prisonerNumber is required')
+    if (!req.middleware?.prisonerData?.prisonerNumber) {
+      throw new Error('Usage error: requires getPrisonerData middleware')
     }
 
-    res.locals.isHighProfilePrisoner = await permissionsApiClientBuilder(
-      req.middleware.clientToken,
-    ).checkHighProfilePrisonerStatus(req.params.prisonerNumber)
+    const { prisonerNumber } = req.middleware.prisonerData
+
+    const permissionsApiClient = permissionsApiClientBuilder(req.middleware.clientToken)
+    res.locals.isHighProfilePrisoner = await permissionsApiClient.checkHighProfilePrisonerStatus(prisonerNumber)
+
     next()
   }
 }
