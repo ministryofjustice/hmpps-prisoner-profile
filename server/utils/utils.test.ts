@@ -60,19 +60,19 @@ import {
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import type { SelectOption } from '../interfaces/GovOptions'
 import HmppsError from '../interfaces/HmppsError'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 import config from '../config'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import type { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import type { OldAddresses } from '../services/interfaces/personalPageService/PersonalPage'
-import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
 import type { SortOption } from '../interfaces/SortParams'
 import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { ReferenceDataOverride } from '../controllers/personal/referenceDataOverride'
 import { emptyAlertsMock, pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { CaseLoadsDummyDataB } from '../data/localMockData/caseLoad'
 import { mockPrisonerContact } from '../data/localMockData/contactDetail'
+import { azureUserMock, externalUserMock, prisonUserMock, probationUserMock } from '../data/localMockData/user'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -449,71 +449,53 @@ describe('utils', () => {
 
   describe('isActiveCaseLoad', () => {
     it('Should return true when the prisonId matches the active case load', () => {
-      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
-      expect(isActiveCaseLoad('ABC', user)).toEqual(true)
+      expect(isActiveCaseLoad('MDI', prisonUserMock)).toEqual(true)
     })
 
     it('Should return false when the prisonId does not match the active case load', () => {
-      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
-      expect(isActiveCaseLoad('DEF', user)).toEqual(false)
+      expect(isActiveCaseLoad('LEI', prisonUserMock)).toEqual(false)
     })
 
     it('Should return false for non prison users', () => {
-      const probationUser = { authSource: 'delius' } as ProbationUser
-      const externalUser = { authSource: 'external' } as ExternalUser
-
-      expect(isActiveCaseLoad('123', probationUser)).toEqual(false)
-      expect(isActiveCaseLoad('123', externalUser)).toEqual(false)
+      expect(isActiveCaseLoad('123', azureUserMock)).toEqual(false)
+      expect(isActiveCaseLoad('123', externalUserMock)).toEqual(false)
+      expect(isActiveCaseLoad('123', probationUserMock)).toEqual(false)
     })
   })
 
   describe('includesActiveCaseLoad', () => {
     it('Should return true when one of the prisonIds matches the active case load', () => {
-      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
-      expect(includesActiveCaseLoad(['ABC', 'DEF'], user)).toEqual(true)
+      expect(includesActiveCaseLoad(['MDI', 'LEI'], prisonUserMock)).toEqual(true)
     })
 
     it('Should return false when non of the prisonIds match the active case load', () => {
-      const user = { authSource: 'nomis', activeCaseLoadId: 'ABC' } as PrisonUser
-      expect(includesActiveCaseLoad(['DEF', 'GHI'], user)).toEqual(false)
+      expect(includesActiveCaseLoad(['BXI', 'LEI'], prisonUserMock)).toEqual(false)
     })
 
     it('Should return false for non prison users', () => {
-      const probationUser = { authSource: 'delius' } as ProbationUser
-      const externalUser = { authSource: 'external' } as ExternalUser
-
-      expect(includesActiveCaseLoad(['ABC'], probationUser)).toEqual(false)
-      expect(includesActiveCaseLoad(['ABC'], externalUser)).toEqual(false)
+      expect(includesActiveCaseLoad(['ABC'], azureUserMock)).toEqual(false)
+      expect(includesActiveCaseLoad(['ABC'], externalUserMock)).toEqual(false)
+      expect(includesActiveCaseLoad(['ABC'], probationUserMock)).toEqual(false)
     })
   })
 
   describe('isInUsersCaseLoad', () => {
     it('Should return true when the user has a caseload matching the prisoner', () => {
-      const caseLoads: CaseLoad[] = [
-        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
-        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
-      ]
-      const user = { authSource: 'nomis', caseLoads } as PrisonUser
+      const user = { ...prisonUserMock, caseLoads: CaseLoadsDummyDataB }
 
-      expect(isInUsersCaseLoad('DEF', user)).toEqual(true)
+      expect(isInUsersCaseLoad('BLI', user)).toEqual(true)
     })
 
     it('Should return false when the user has a caseload that doesnt match the prisoner', () => {
-      const caseLoads: CaseLoad[] = [
-        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
-        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
-      ]
-      const user = { authSource: 'nomis', caseLoads } as PrisonUser
+      const user = { ...prisonUserMock, caseLoads: CaseLoadsDummyDataB }
 
       expect(isInUsersCaseLoad('123', user)).toEqual(false)
     })
 
     it('Should return false for non prison users', () => {
-      const probationUser = { authSource: 'delius' } as ProbationUser
-      const externalUser = { authSource: 'external' } as ExternalUser
-
-      expect(isInUsersCaseLoad('123', probationUser)).toEqual(false)
-      expect(isInUsersCaseLoad('123', externalUser)).toEqual(false)
+      expect(isInUsersCaseLoad('123', azureUserMock)).toEqual(false)
+      expect(isInUsersCaseLoad('123', externalUserMock)).toEqual(false)
+      expect(isInUsersCaseLoad('123', probationUserMock)).toEqual(false)
     })
   })
 

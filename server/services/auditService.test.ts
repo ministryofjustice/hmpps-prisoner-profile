@@ -1,9 +1,8 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { Role } from '../data/enums/role'
 import type { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
-import { prisonUserMock } from '../data/localMockData/user'
+import { prisonUserMock as user } from '../data/localMockData/user'
 import { Page } from './interfaces/auditService/page'
 import { ApiAction, PostAction, PutAction, SearchAction } from './interfaces/auditService/actions'
 import { SubjectType } from './interfaces/auditService/subjectType'
@@ -12,7 +11,6 @@ import AuditService from './auditService'
 jest.mock('@aws-sdk/client-sqs')
 jest.mock('../../logger')
 
-const user = { ...prisonUserMock, userRoles: [Role.PrisonUser] }
 const prisonerNumber = 'G6123VU'
 const requestId = 'requestId1231'
 
