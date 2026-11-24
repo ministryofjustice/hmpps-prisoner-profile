@@ -1,7 +1,7 @@
 import type { Request, RequestHandler, Response } from 'express'
 import config from '../config'
 
-/** Presents a form where justification must be entered once per session to access the given high profile prisoner */
+/** Presents a form where justification must be entered once per session to access the given high-profile prisoner */
 // eslint-disable-next-line import/prefer-default-export
 export class JustifyAccessController {
   #characterLimit = 250

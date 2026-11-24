@@ -27,7 +27,7 @@ interface AuditMessage {
 /** Internal incomplete message which is turned into `AuditMessage` */
 interface PartialMessage extends Omit<AuditMessage, 'when' | 'service' | 'details'> {
   details?: object
-  /** Reason for accessing high profile prisoner, if any */
+  /** Reason for accessing high-profile prisoner, if any */
   justification: string | null
 }
 
@@ -84,7 +84,7 @@ export default class implements AuditService {
     const details = {
       globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
-      // TODO: flag if high profile?
+      // TODO: flag if high-profile?
       userRoles: user.userRoles,
       build: this.build,
     }
@@ -101,7 +101,7 @@ export default class implements AuditService {
   }
 
   sendSearch({ user, prisonerNumber, searchPage, details, correlationId, justification }: SearchAudit) {
-    // TODO: flag if high profile?
+    // TODO: flag if high-profile?
     return this.sendMessage({
       what: `SEARCH_${searchPage}`,
       correlationId,

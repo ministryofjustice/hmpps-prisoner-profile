@@ -75,7 +75,7 @@ describe('Justify access controller', () => {
         }
       })
 
-      it('should defer to next request handler when accessing prisoner who is not high profile', () => {
+      it('should defer to next request handler when accessing prisoner who is not high-profile', () => {
         res.locals.isHighProfilePrisoner = false
 
         controller.requestHandler(req, res, next)
@@ -85,7 +85,7 @@ describe('Justify access controller', () => {
         expect(res.render).not.toHaveBeenCalled()
       })
 
-      it('should defer to next request handler when accessing high profile prisoner and had already justified it', () => {
+      it('should defer to next request handler when accessing high-profile prisoner and had already justified it', () => {
         res.locals.isHighProfilePrisoner = true
         req.session.justifiedHighProfilePrisonerAccess = { [prisonerNumber]: 'checking non-associations for work' }
 
@@ -97,7 +97,7 @@ describe('Justify access controller', () => {
       })
     })
 
-    describe('and accessing high profile prisoner', () => {
+    describe('and accessing high-profile prisoner', () => {
       beforeEach(() => {
         res.locals.isHighProfilePrisoner = true
       })
@@ -187,7 +187,7 @@ describe('Justify access controller', () => {
       })
     })
 
-    describe('and submitting form to access high profile prisoner', () => {
+    describe('and submitting form to access high-profile prisoner', () => {
       beforeEach(() => {
         req.method = 'POST'
         res.locals.isHighProfilePrisoner = true

@@ -77,7 +77,7 @@ describe('Justify access checks are correctly wired up', () => {
       config.featureToggles.highProfilePrisonersEnabled = true
     })
 
-    it('should not ask for justification when accessing a prisoner who is not high profile', () => {
+    it('should not ask for justification when accessing a prisoner who is not high-profile', () => {
       permissionsApiClient.checkHighProfilePrisonerStatus.mockResolvedValue(false)
 
       return request(makeApp())
@@ -88,7 +88,7 @@ describe('Justify access checks are correctly wired up', () => {
         })
     })
 
-    it('should ask for justification when accessing high profile prisoner', () => {
+    it('should ask for justification when accessing high-profile prisoner', () => {
       permissionsApiClient.checkHighProfilePrisonerStatus.mockResolvedValue(true)
 
       return request
