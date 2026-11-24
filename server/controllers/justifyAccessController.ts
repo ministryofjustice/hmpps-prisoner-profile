@@ -1,7 +1,7 @@
 import type { Request, RequestHandler, Response } from 'express'
 import config from '../config'
 
-/** Presents a form where justification must be entered once per session to access the given high profile prisoner */
+/** Presents a form where justification must be entered once per session to access the given high-profile prisoner */
 // eslint-disable-next-line import/prefer-default-export
 export class JustifyAccessController {
   #characterLimit = 250
@@ -12,14 +12,14 @@ export class JustifyAccessController {
     }
 
     return (req, res, next) => {
-      if (!('isHighProfilePrisoner' in res.locals)) {
+      if (!('isHighProfilePrisonerOutsideCaseloads' in res.locals)) {
         // requires isHighProfilePrisonerMiddleware middleware
-        throw new Error('Usage error: req.locals.isHighProfilePrisoner must be set')
+        throw new Error('Usage error: req.locals.isHighProfilePrisonerOutsideCaseloads must be set')
       }
 
-      const { prisonerNumber, isHighProfilePrisoner } = res.locals
-      if (!isHighProfilePrisoner) {
-        // no need to justify access
+      const { prisonerNumber, isHighProfilePrisonerOutsideCaseloads } = res.locals
+      if (!isHighProfilePrisonerOutsideCaseloads) {
+        // no need to justify access if not high-profile or in caseloads
         next()
         return
       }

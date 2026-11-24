@@ -1,9 +1,9 @@
-import CaseLoad from '../interfaces/prisonApi/CaseLoad'
+import type CaseLoad from '../interfaces/prisonApi/CaseLoad'
 
 export const CaseLoadsDummyDataA: CaseLoad[] = [
   {
     caseLoadId: 'MDI',
-    description: 'Moorland Closed (HMP & YOI)',
+    description: 'Moorland (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',
     currentlyActive: true,
@@ -13,14 +13,14 @@ export const CaseLoadsDummyDataA: CaseLoad[] = [
 export const CaseLoadsDummyDataB: CaseLoad[] = [
   {
     caseLoadId: 'BAI',
-    description: 'Moorland Closed (HMP & YOI)',
+    description: 'Belmarsh (HMP)',
     type: 'INST',
     caseloadFunction: 'GENERAL',
     currentlyActive: true,
   },
   {
-    caseLoadId: 'BAI',
-    description: 'Hyland Closed (HMP & YOI)',
+    caseLoadId: 'BLI',
+    description: 'Bristol (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',
     currentlyActive: false,

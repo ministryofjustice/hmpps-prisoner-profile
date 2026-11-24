@@ -72,8 +72,8 @@ export default function routes(services: Services): Router {
   const justifyAccessController = new JustifyAccessController()
   router.use(
     basePath,
-    isHighProfilePrisonerMiddleware(services),
     getPrisonerData(services, { minimal: true }),
+    isHighProfilePrisonerMiddleware(services),
     justifyAccessController.requestHandler,
   )
 
