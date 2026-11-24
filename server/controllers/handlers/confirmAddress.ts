@@ -1,9 +1,10 @@
-import { RequestHandler } from 'express'
-import { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
+import type { RequestHandler } from 'express'
+import logger from '../../../logger'
 import { AddressRequestDto } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../../utils/notFoundError'
-import { AuditService, Page } from '../../services/auditService'
-import logger from '../../../logger'
+import type { AuditService } from '../../services/interfaces/auditService'
+import { Page } from '../../services/interfaces/auditService/page'
 import AddressService from '../../services/addressService'
 import EphemeralDataService from '../../services/ephemeralDataService'
 import getCommonRequestData from '../../utils/getCommonRequestData'
@@ -57,6 +58,7 @@ export function displayConfirmAddressHandler(
         prisonId,
         correlationId: req.id,
         page: auditPage,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

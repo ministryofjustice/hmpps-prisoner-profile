@@ -1,7 +1,9 @@
-import { RequestHandler } from 'express'
-import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { RequestHandler } from 'express'
 import logger from '../../../../../logger'
+import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import MilitaryRecordsService from '../../../../services/militaryRecordsService'
 import {
   Conflicts,
@@ -132,6 +134,7 @@ export default class MilitaryRecordsController {
           prisonId,
           correlationId: req.id,
           page: militarySeq ? Page.EditMilitaryServiceInformation : Page.AddMilitaryServiceInformation,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -210,6 +213,7 @@ export default class MilitaryRecordsController {
           correlationId: req.id,
           action: militarySeq ? PostAction.EditMilitaryServiceInformation : PostAction.AddMilitaryServiceInformation,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -259,6 +263,7 @@ export default class MilitaryRecordsController {
           prisonId,
           correlationId: req.id,
           page: Page.EditConflicts,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -317,6 +322,7 @@ export default class MilitaryRecordsController {
           correlationId: req.id,
           action: PostAction.EditConflicts,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -374,6 +380,7 @@ export default class MilitaryRecordsController {
           prisonId,
           correlationId: req.id,
           page: Page.EditDisciplinaryAction,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -432,6 +439,7 @@ export default class MilitaryRecordsController {
           correlationId: req.id,
           action: PostAction.EditDisciplinaryAction,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -496,6 +504,7 @@ export default class MilitaryRecordsController {
           prisonId,
           correlationId: req.id,
           page: Page.EditDischargeDetails,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -556,6 +565,7 @@ export default class MilitaryRecordsController {
           correlationId: req.id,
           action: PostAction.EditDischargeDetails,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 

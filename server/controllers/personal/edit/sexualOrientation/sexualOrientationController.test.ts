@@ -1,7 +1,10 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import PersonalPageService from '../../../../services/personalPageService'
 import SexualOrientationController from './sexualOrientationController'
 import { sexualOrientationFieldData } from '../../fieldData'
@@ -15,6 +18,8 @@ describe('SexualOrientationController', () => {
   let controller: SexualOrientationController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -68,6 +73,10 @@ describe('SexualOrientationController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('Sexual orientation', () => {
     describe('Edit', () => {
       const action: RequestHandler = async (req, response) => controller.sexualOrientation().edit(req, response, next)
@@ -85,6 +94,7 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -112,6 +122,7 @@ describe('SexualOrientationController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -124,6 +135,7 @@ describe('SexualOrientationController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -140,18 +152,20 @@ describe('SexualOrientationController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditSexualOrientation,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -163,6 +177,7 @@ describe('SexualOrientationController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'HET' },
           flash: jest.fn(),
@@ -204,17 +219,18 @@ describe('SexualOrientationController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditSexualOrientation,
           details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

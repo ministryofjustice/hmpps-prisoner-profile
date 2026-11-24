@@ -1,10 +1,13 @@
-import { Request, Response } from 'express'
-import { randomUUID, UUID } from 'crypto'
-import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import { randomUUID, UUID } from 'node:crypto'
+import type { Request, Response } from 'express'
+import type { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import NextOfKinService from '../../../../services/nextOfKinService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import NextOfKinController, { PersonalRelationshipsContactForm } from './nextOfKinController'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { PersonalRelationshipsReferenceDataDomain } from '../../../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import {
@@ -49,6 +52,8 @@ describe('NextOfKinController', () => {
     addressTypes: [],
   }
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     nextOfKinService = {
       getReferenceData: jest.fn().mockResolvedValue({
@@ -81,12 +86,13 @@ describe('NextOfKinController', () => {
         inmateDetail: inmateDetailMock,
         clientToken,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn(),
       body: {},
       query: {},
       params: { prisonerNumber },
       id: 'request-id',
-    } as Partial<Request> as Request
+    } as unknown as Request
 
     res = {
       locals: {
@@ -139,7 +145,9 @@ describe('NextOfKinController', () => {
         prisonId: 'MDI',
         correlationId: req.id,
         page: Page.EditNextOfKin,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.render).toHaveBeenCalledWith('pages/nextOfKin/nextOfKinEmergencyContacts', {
         pageTitle: 'Next of kin and emergency contacts - Prisoner personal details',
@@ -215,7 +223,9 @@ describe('NextOfKinController', () => {
         correlationId: req.id,
         action: PostAction.EditNextOfKin,
         details: { formValues: req.body },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#next-of-kin`)
     })
@@ -434,7 +444,9 @@ describe('NextOfKinController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNextOfKinAddressLocation,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -456,7 +468,9 @@ describe('NextOfKinController', () => {
         correlationId: req.id,
         action: PostAction.EditNextOfKinAddressLocation,
         details: { location },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -493,7 +507,9 @@ describe('NextOfKinController', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKinAddressFindUkAddress,
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should repopulate input value from flash if present', async () => {
@@ -548,7 +564,9 @@ describe('NextOfKinController', () => {
           correlationId: req.id,
           action: PostAction.EditNextOfKinAddressFindUkAddress,
           details: { uprn },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -613,7 +631,9 @@ describe('NextOfKinController', () => {
             prisonId: PrisonerMockDataA.prisonId,
             correlationId: req.id,
             page: auditPage,
+            justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
 
@@ -698,7 +718,9 @@ describe('NextOfKinController', () => {
             correlationId: req.id,
             action: auditAction,
             details: { address: expect.objectContaining(cachedAddress) },
+            justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
     })
@@ -745,7 +767,9 @@ describe('NextOfKinController', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKinAddressConfirm,
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {

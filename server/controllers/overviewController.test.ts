@@ -30,7 +30,7 @@ import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinder
 import { pathfinderApiClientMock } from '../../tests/mocks/pathfinderApiClientMock'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { manageSocCasesApiClientMock } from '../../tests/mocks/manageSocCasesApiClientMock'
-import { AuditService } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import OffencesService from '../services/offencesService'
 import { offencesServiceMock } from '../../tests/mocks/offencesServiceMock'
@@ -164,6 +164,7 @@ describe('overviewController', () => {
           alertFlags: [],
         },
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { offenderNo },
       protocol: 'http',

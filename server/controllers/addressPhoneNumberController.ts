@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express'
 import AddressService from '../services/addressService'
-import { AuditService, Page, PostAction } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
+import { PostAction } from '../services/interfaces/auditService/actions'
 import { addressPhoneNumberFormValues, addressToLines } from '../utils/utils'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import NotFoundError from '../utils/notFoundError'
@@ -69,6 +71,7 @@ export default class AddressPhoneNumberController {
         prisonId,
         correlationId: req.id,
         page: isChanging ? Page.EditAddressPhoneNumber : Page.AddAddressPhoneNumber,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       return res.render('pages/edit/addressPhoneNumbers', {
@@ -214,6 +217,7 @@ export default class AddressPhoneNumberController {
             details: isChanging
               ? { addressId, phoneId: Number(req.params.phoneId), phoneNumber: phoneNumberRequests[0] }
               : { addressId, phoneNumbers: phoneNumberRequests },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

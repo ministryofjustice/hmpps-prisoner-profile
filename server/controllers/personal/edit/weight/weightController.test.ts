@@ -1,11 +1,14 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { corePersonPhysicalAttributesMock } from '../../../../data/localMockData/physicalAttributesMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { weightFieldData } from '../../fieldData'
 import WeightController from './weightController'
@@ -16,6 +19,8 @@ describe('WeightController', () => {
   let controller: WeightController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const { prisonerNumber } = PrisonerMockDataA
 
@@ -43,6 +48,10 @@ describe('WeightController', () => {
     } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('weight', () => {
     describe('metric', () => {
       describe('edit', () => {
@@ -53,6 +62,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -78,6 +88,7 @@ describe('WeightController', () => {
               return []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -90,6 +101,7 @@ describe('WeightController', () => {
               return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
@@ -101,18 +113,20 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -123,6 +137,7 @@ describe('WeightController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber },
             body: { kilograms: '80' },
             flash: jest.fn(),
@@ -162,17 +177,18 @@ describe('WeightController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { kilograms: '96' } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -186,6 +202,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -213,6 +230,7 @@ describe('WeightController', () => {
               return []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -234,6 +252,7 @@ describe('WeightController', () => {
                 : []
             },
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -257,6 +276,7 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -271,18 +291,20 @@ describe('WeightController', () => {
             params: { prisonerNumber },
             flash: (): string[] => [],
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditWeight,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -293,6 +315,7 @@ describe('WeightController', () => {
         beforeEach(() => {
           validRequest = {
             middleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber },
             body: { imperialWeightOption: 'stoneAndPounds', stone: '10', pounds: '12' },
             flash: jest.fn(),
@@ -342,17 +365,18 @@ describe('WeightController', () => {
               id: 1,
               body: { stone: '15', pounds: '2', poundsOnly: '212', imperialWeightOption },
             } as unknown as Request
-            const expectedAuditEvent = {
+
+            await action(request, res, next)
+
+            expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
               user: prisonUserMock,
               prisonerNumber,
               correlationId: request.id,
               action: PostAction.EditWeight,
               details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
-            }
-
-            await action(request, res, next)
-
-            expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+              justification: null,
+            })
+            expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
           },
         )
       })

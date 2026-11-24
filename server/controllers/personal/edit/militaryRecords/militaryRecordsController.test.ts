@@ -25,6 +25,7 @@ describe('MilitaryRecordsController', () => {
     req = {
       params: { prisonerNumber: 'G6123VU', militarySeq: '1' },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: {},
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request

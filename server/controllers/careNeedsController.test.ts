@@ -35,6 +35,7 @@ describe('Care needs controller', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { prisonerNumber },
       query: {},

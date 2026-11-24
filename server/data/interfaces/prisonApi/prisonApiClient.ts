@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import AccountBalances from './AccountBalances'
 import VisitSummary from './VisitSummary'
 import VisitBalances from './VisitBalances'

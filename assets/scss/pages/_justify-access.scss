@@ -28,6 +28,10 @@
   .govuk-checkboxes__label::before {
     background-color: govuk.govuk-colour('white');
   }
+
+  .justify-access__back-link {
+    color: govuk.govuk-functional-colour(text);
+  }
 }
 
 .justify-access__form__content {

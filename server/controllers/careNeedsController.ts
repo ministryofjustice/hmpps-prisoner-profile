@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express'
 import config from '../config'
 import logger from '../../logger'
-import { type AuditService, Page } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import type CareNeedsService from '../services/careNeedsService'
 import {
   XRayBodyScansAvailability,
@@ -31,6 +32,7 @@ export default class CareNeedsController {
         prisonId,
         correlationId: req.id,
         page: Page.PastCareNeeds,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -44,28 +46,30 @@ export default class CareNeedsController {
 
   public async displayXrayBodyScans(req: Request, res: Response) {
     const { prisonerData, clientToken } = req.middleware
+    const { prisonerNumber, prisonId } = prisonerData
 
     const xRayBodyScansAvailability = await this.xRayBodyScansAvailabilityService.getAvailability(req, res)
 
     if (xRayBodyScansAvailability === XRayBodyScansAvailability.AVAILABLE) {
       // TODO: replace displayXrayBodyScans with redirect at router level once enabled everywhere
-      res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerData.prisonerNumber}/scan-overview`)
+      res.redirect(`${config.serviceUrls.xRayBodyScansUi}/prisoner/${prisonerNumber}/scan-overview`)
       return
     }
 
     try {
       const xRayBodyScansApiClient = this.xRayBodyScansApiClientBuilder(clientToken)
-      const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerData.prisonerNumber, { size: 200 })
+      const pageOfScans = await xRayBodyScansApiClient.listScans(prisonerNumber, { size: 200 })
       const showingDpsAndNomisScans =
         pageOfScans.content.some(scan => scan.source === 'DPS') &&
         pageOfScans.content.some(scan => scan.source === 'NOMIS')
 
       await this.auditService.sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.XRayBodyScans,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       res.render('pages/xrayBodyScans', {

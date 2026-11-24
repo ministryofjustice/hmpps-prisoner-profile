@@ -1,10 +1,13 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import IdentityNumbersService from '../../../../services/identityNumbersService'
 import IdentityNumbersController, { EditIdentityNumberSubmission } from './identityNumbersController'
 import { GetIdentifierMock, GetIdentifiersMock } from '../../../../data/localMockData/getIdentifiersMock'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import {
   AddIdentityNumberSubmission,
   buildIdentityNumberOptions,
@@ -30,10 +33,13 @@ describe('IdentityNumbersController', () => {
   let auditService: AuditService
   let controller: IdentityNumbersController
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -60,6 +66,10 @@ describe('IdentityNumbersController', () => {
     } as unknown as IdentityNumbersService
     auditService = auditServiceMock()
     controller = new IdentityNumbersController(identityNumbersService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe.each([
@@ -116,7 +126,9 @@ describe('IdentityNumbersController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: pageViewEvent,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('should populate the page data from the request flash', async () => {
@@ -210,7 +222,9 @@ describe('IdentityNumbersController', () => {
         correlationId: req.id,
         action: PostAction.AddIdNumbers,
         details: { formValues: req.body },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Identity numbers updated',
         fieldName: expect.stringContaining(`'probation-legacy-system-row','yjaf-row'`),
@@ -386,7 +400,9 @@ describe('IdentityNumbersController', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditIdNumber,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('should populate the page data from the request flash', async () => {
@@ -472,7 +488,9 @@ describe('IdentityNumbersController', () => {
           correlationId: req.id,
           action: PostAction.EditIdNumber,
           details: { formValues: req.body },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         expect(req.flash).toHaveBeenCalledWith('flashMessage', {
           text: 'Identity numbers updated',
           fieldName: `'${editPageUrl}-row'`,

@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express'
-import { AuditService, Page, PostAction } from '../../services/auditService'
 import logger from '../../../logger'
+import type { AuditService } from '../../services/interfaces/auditService'
+import { Page } from '../../services/interfaces/auditService/page'
+import { PostAction } from '../../services/interfaces/auditService/actions'
 import { AddressLocation } from '../../services/mappers/addressMapper'
 import { mapToQueryString } from '../../utils/utils'
 import getCommonRequestData from '../../utils/getCommonRequestData'
@@ -40,6 +42,7 @@ export function displayWhereIsTheAddressHandler(
         prisonId,
         correlationId: req.id,
         page,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -79,6 +82,7 @@ export function submitWhereIsTheAddressHandler(
         correlationId: req.id,
         action,
         details: { location },
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

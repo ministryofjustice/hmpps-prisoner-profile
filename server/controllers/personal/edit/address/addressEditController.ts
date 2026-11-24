@@ -1,10 +1,12 @@
-import { RequestHandler } from 'express'
-import { UUID } from 'crypto'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { UUID } from 'node:crypto'
+import type { RequestHandler } from 'express'
 import logger from '../../../../../logger'
 import { apostrophe, blankStringsToNull } from '../../../../utils/utils'
-import EphemeralDataService from '../../../../services/ephemeralDataService'
 import AddressService from '../../../../services/addressService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
+import EphemeralDataService from '../../../../services/ephemeralDataService'
 import NotFoundError from '../../../../utils/notFoundError'
 import { AddressRequestDto } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AddressLocation } from '../../../../services/mappers/addressMapper'
@@ -121,6 +123,7 @@ export default class AddressEditController {
           prisonId,
           correlationId: req.id,
           page: Page.EditAddressPrimaryOrPostal,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -185,6 +188,7 @@ export default class AddressEditController {
             correlationId: req.id,
             action: PostAction.EditAddressPrimaryOrPostal,
             details: { address },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

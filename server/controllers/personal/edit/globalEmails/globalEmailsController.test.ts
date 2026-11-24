@@ -1,8 +1,11 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { globalPhonesAndEmailsMock } from '../../../../data/localMockData/globalPhonesAndEmails'
 import GlobalEmailsController from './globalEmailsController'
@@ -13,6 +16,8 @@ describe('GlobalEmailsController', () => {
   let controller: GlobalEmailsController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -50,6 +55,10 @@ describe('GlobalEmailsController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   describe('Emails', () => {
     describe('Creating an email', () => {
       describe('edit', () => {
@@ -64,6 +73,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -96,6 +106,7 @@ describe('GlobalEmailsController', () => {
               return []
             },
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -108,6 +119,7 @@ describe('GlobalEmailsController', () => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -122,18 +134,20 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.AddEmailAddress,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
 
@@ -146,6 +160,7 @@ describe('GlobalEmailsController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'fOO@exaMple.com' },
             flash: jest.fn(),
@@ -220,17 +235,18 @@ describe('GlobalEmailsController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.AddEmailAddress,
             details: { fieldName: 'emailAddress', previous: '', updated: 'foo@bar.com' },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })
@@ -247,6 +263,7 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
 
@@ -279,6 +296,7 @@ describe('GlobalEmailsController', () => {
               return []
             },
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -291,6 +309,7 @@ describe('GlobalEmailsController', () => {
               return key === 'requestBody' ? [JSON.stringify({ emailAddress: 'foo@bar.com' })] : []
             },
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
           await action(req, res, next)
           expect(res.render).toHaveBeenCalledWith(
@@ -305,18 +324,20 @@ describe('GlobalEmailsController', () => {
             params: { prisonerNumber, emailAddressId: '234' },
             flash: (): string[] => [],
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
           } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(req, res, next)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             prisonId: 999,
             correlationId: req.id,
             page: Page.EditEmailAddress,
-          }
-
-          await action(req, res, next)
-
-          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
       describe('submit', () => {
@@ -328,6 +349,7 @@ describe('GlobalEmailsController', () => {
           validRequest = {
             id: '1',
             middleware: defaultMiddleware,
+            session: { justifiedHighProfilePrisonerAccess },
             params: { prisonerNumber, emailAddressId: '234' },
             body: { emailAddress: 'foo@example.com' },
             flash: jest.fn(),
@@ -401,17 +423,18 @@ describe('GlobalEmailsController', () => {
 
         it('Sends a post success audit event', async () => {
           const request = { ...validRequest, id: 1, body: { emailAddress: 'foo@bar.com' } } as unknown as Request
-          const expectedAuditEvent = {
+
+          await action(request, res, next)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
             user: prisonUserMock,
             prisonerNumber,
             correlationId: request.id,
             action: PostAction.EditEmailAddress,
             details: { fieldName: 'emailAddress', previous: 'one@example.com', updated: 'foo@bar.com' },
-          }
-
-          await action(request, res, next)
-
-          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+            justification: null,
+          })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         })
       })
     })

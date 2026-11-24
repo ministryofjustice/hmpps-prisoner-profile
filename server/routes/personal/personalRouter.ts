@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import auditPageAccessAttempt from '../../middleware/auditPageAccessAttempt'
-import { Page } from '../../services/auditService'
+import { Page } from '../../services/interfaces/auditService/page'
 import getPrisonerData from '../../middleware/getPrisonerDataMiddleware'
 import { Services } from '../../services'
 import PersonalController from '../../controllers/personal/personalController'

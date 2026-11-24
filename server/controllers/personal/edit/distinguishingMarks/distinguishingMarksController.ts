@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import DistinguishingMarksService, {
   findBodyPartByCodeAndSideAndOrientation,
@@ -18,7 +18,9 @@ import {
   BodyPartSideId,
   PartOrientationId,
 } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import logger from '../../../../../logger'
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import ProblemSavingError from '../../../../utils/problemSavingError'
@@ -96,6 +98,7 @@ export default class DistinguishingMarksController {
       prisonId,
       correlationId: req.id,
       page: Page.AddDistinguishingMark,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     const cancelUrl = `/prisoner/${prisonerNumber}/personal#marks`
@@ -140,6 +143,7 @@ export default class DistinguishingMarksController {
           details: {
             markId: mark.id,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -202,6 +206,7 @@ export default class DistinguishingMarksController {
             markId: mark.id,
             photoId: mark.photographUuids?.find(id => id.latest)?.id,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -240,6 +245,7 @@ export default class DistinguishingMarksController {
       prisonId,
       correlationId: req.id,
       page: Page.EditDistinguishingMark,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     return res.render('pages/distinguishingMarks/changeDistinguishingMark', {
@@ -330,6 +336,7 @@ export default class DistinguishingMarksController {
             previous: currentSpecificBodyPart,
             updated: verifiedBodyPart,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
     } catch (error) {
@@ -417,6 +424,7 @@ export default class DistinguishingMarksController {
             previous: currentSpecificBodyPart,
             updated: specificBodyPart,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
     } catch (error) {
@@ -485,6 +493,7 @@ export default class DistinguishingMarksController {
             previous: currentDescription,
             updated: description,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
     } catch (error) {
@@ -514,6 +523,7 @@ export default class DistinguishingMarksController {
       prisonId,
       correlationId: req.id,
       page: Page.EditDistinguishingMarkPhoto,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     return res.render('pages/distinguishingMarks/changePhoto', {
@@ -546,6 +556,7 @@ export default class DistinguishingMarksController {
       prisonId,
       correlationId: req.id,
       page: Page.AddDistinguishingMarkPhoto,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     return res.render('pages/distinguishingMarks/addPhoto', {
@@ -584,6 +595,7 @@ export default class DistinguishingMarksController {
             markId,
             photoId,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
     } catch (error) {
@@ -626,6 +638,7 @@ export default class DistinguishingMarksController {
             markId,
             photoId: newPhotoId,
           },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
     } catch (error) {
@@ -656,6 +669,7 @@ export default class DistinguishingMarksController {
       prisonId,
       correlationId: req.id,
       page: Page.DistinguishingMarkAllPhotos,
+      justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
     })
 
     return res.render('pages/distinguishingMarks/viewAllImages', {

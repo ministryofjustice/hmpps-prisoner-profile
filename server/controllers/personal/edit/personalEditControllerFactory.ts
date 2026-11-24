@@ -1,5 +1,5 @@
 import PersonalPageService from '../../../services/personalPageService'
-import { AuditService } from '../../../services/auditService'
+import type { AuditService } from '../../../services/interfaces/auditService'
 import CityOrTownOfBirthController from './cityOrTownOfBirth/cityOrTownOfBirthController'
 import CountryOfBirthController from './countryOfBirth/countryOfBirthController'
 import DietAndFoodAllergiesController from './dietAndFoodAllergies/dietAndFoodAllergiesController'

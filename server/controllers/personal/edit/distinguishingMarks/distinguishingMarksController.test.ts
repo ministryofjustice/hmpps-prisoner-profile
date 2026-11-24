@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
 import DistinguishingMarksService from '../../../../services/distinguishingMarksService'
 import { distinguishingMarkMock, leftLegMarkMock } from '../../../../data/localMockData/distinguishingMarksMock'
@@ -8,8 +8,11 @@ import {
   type ValidBodyPart,
 } from '../../../interfaces/distinguishingMarks/selectionTypes'
 import { getBodyPartDescription } from '../../../../views/dataUtils/groupDistinguishingMarksForView'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
@@ -25,6 +28,8 @@ describe('Distinguishing Marks Controller', () => {
   let distinguishingMarksService: DistinguishingMarksService
   let auditService: AuditService
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     req = {
       id: '123',
@@ -34,6 +39,7 @@ describe('Distinguishing Marks Controller', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -54,6 +60,10 @@ describe('Distinguishing Marks Controller', () => {
     auditService = auditServiceMock() as AuditService
 
     controller = new DistinguishingMarksController(distinguishingMarksService, auditService)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   describe('newDistinguishingMark', () => {
@@ -147,17 +157,18 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo' },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.newDistinguishingMark(typeReq, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
         page: Page.AddDistinguishingMark,
-      }
-
-      await controller.newDistinguishingMark(typeReq, res, next)
-
-      expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -232,17 +243,18 @@ describe('Distinguishing Marks Controller', () => {
         body: { bodyPart: 'left-leg' },
         flash: jest.fn().mockReturnValue([]),
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.postNewDistinguishingMark(typeReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMark,
         details: { markId: 1 },
-      }
-
-      await controller.postNewDistinguishingMark(typeReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('throws ProblemSavingError for middleware to handle if the upload fails', async () => {
@@ -412,17 +424,18 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
         flash: jest.fn(),
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMark,
         details: { markId: 1, photoId: 100 },
-      }
-
-      await controller.postNewDistinguishingMarkWithDetail(partReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -528,17 +541,18 @@ describe('Distinguishing Marks Controller', () => {
         },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.changeDistinguishingMark(typeReq, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
         page: Page.EditDistinguishingMark,
-      }
-
-      await controller.changeDistinguishingMark(typeReq, res, next)
-
-      expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -734,17 +748,18 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo', markId: '100' },
         body: { bodyPart: 'left-leg' },
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.updateBodyPart(typeReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMark,
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'leftLeg' },
-      }
-
-      await controller.updateBodyPart(typeReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -884,17 +899,18 @@ describe('Distinguishing Marks Controller', () => {
         },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.updateLocation(markReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.EditDistinguishingMark,
         details: { markId: '100', fieldName: 'location', previous: 'leftArm', updated: 'lowerLeftArm' },
-      }
-
-      await controller.updateLocation(markReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1012,7 +1028,10 @@ describe('Distinguishing Marks Controller', () => {
         },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.updateDescription(markReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -1023,11 +1042,9 @@ describe('Distinguishing Marks Controller', () => {
           previous: 'Horrible arm scar',
           updated: 'updated description',
         },
-      }
-
-      await controller.updateDescription(markReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1123,19 +1140,20 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
-        user: prisonUserMock,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.EditDistinguishingMarkPhoto,
-      }
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
       await controller.changePhoto(typeReq, res, next)
 
-      expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.EditDistinguishingMarkPhoto,
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1174,7 +1192,10 @@ describe('Distinguishing Marks Controller', () => {
         file: { originalname: 'file.jpg' },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.updatePhoto(photoReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -1183,11 +1204,9 @@ describe('Distinguishing Marks Controller', () => {
           markId: '100',
           photoId: '123',
         },
-      }
-
-      await controller.updatePhoto(photoReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('redirects back and shows an error if the upload fails', async () => {
@@ -1292,17 +1311,18 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber, markType: 'tattoo', bodyPart: 'left-leg' },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.addNewPhoto(typeReq, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
         page: Page.AddDistinguishingMarkPhoto,
-      }
-
-      await controller.addNewPhoto(typeReq, res, next)
-
-      expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -1349,17 +1369,18 @@ describe('Distinguishing Marks Controller', () => {
         file: { originalname: 'file.jpg' },
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
+
+      await controller.addPhoto(photoReq, res, next)
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddDistinguishingMarkPhoto,
         details: { markId: '101', photoId: 100 },
-      }
-
-      await controller.addPhoto(photoReq, res, next)
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('Redirects back and shows an error if the upload fails', async () => {
@@ -1419,19 +1440,20 @@ describe('Distinguishing Marks Controller', () => {
         body: {},
         query: {},
       } as unknown as Request
-      const expectedAuditEvent = {
-        user: prisonUserMock,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.DistinguishingMarkAllPhotos,
-      }
 
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
       await controller.viewAllImages(imagesReq, res, next)
 
-      expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.DistinguishingMarkAllPhotos,
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 })
