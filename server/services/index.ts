@@ -17,7 +17,8 @@ import CsraService from './csraService'
 import MoneyService from './moneyService'
 import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import ProfessionalContactsService from './professionalContactsService'
-import { auditService as AuditService } from './auditService'
+import AuditServiceImpl from './auditService'
+import type { AuditService } from './interfaces/auditService'
 import config from '../config'
 import BeliefService from './beliefService'
 import LocationDetailsService from './locationDetailsService'
@@ -88,13 +89,13 @@ export const services = () => {
     manageUsersApiClientBuilder,
   } = dataAccess
 
-  const auditService = AuditService({
-    sqsClient: new SQSClient({ region: config.audit.region }),
-    queueUrl: config.audit.queueUrl,
-    serviceName: config.audit.serviceName,
-    build: config.gitRef,
-    enabled: config.audit.enabled,
-  })
+  const auditService: AuditService = new AuditServiceImpl(
+    new SQSClient({ region: config.audit.region }),
+    config.audit.queueUrl,
+    config.gitRef,
+    config.audit.serviceName,
+    config.audit.enabled,
+  )
 
   const prisonPermissionsService = PrisonPermissionsService.create({
     prisonerSearchConfig: config.apis.prisonerSearchApi,

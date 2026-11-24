@@ -22,6 +22,7 @@ describe('Prisoner belief history', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { prisonerNumber },
       query: {},

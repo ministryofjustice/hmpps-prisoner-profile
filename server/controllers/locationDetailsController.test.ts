@@ -1,12 +1,12 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { PrisonerBaseLocationPermission, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import config from '../config'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import LocationDetailsController from './locationDetailsController'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { AuditService } from '../services/auditService'
-import config from '../config'
+import type { AuditService } from '../services/interfaces/auditService'
 import { locationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
 import LocationDetailsService from '../services/locationDetailsService'
 import LocationDetailsPageData from '../services/interfaces/locationDetailsService/LocationDetailsPageData'
@@ -36,6 +36,7 @@ describe('Prisoner Location Details', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: {},
       originalUrl: 'http://localhost',
       params: { offenderNo },
       protocol: 'http',

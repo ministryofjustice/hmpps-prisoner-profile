@@ -1,4 +1,3 @@
-import { Page, PostAction } from '../../services/auditService'
 import { formatHeight, formatName, formatWeight } from '../../utils/utils'
 import {
   CorePersonPhysicalAttributesRequest,
@@ -6,6 +5,8 @@ import {
 } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataOverride } from './referenceDataOverride'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
+import { Page } from '../../services/interfaces/auditService/page'
+import { PostAction } from '../../services/interfaces/auditService/actions'
 
 export interface FieldData {
   url: string

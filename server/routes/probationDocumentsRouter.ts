@@ -3,7 +3,7 @@ import { prisonerPermissionsGuard, ProbationDocumentsPermission } from '@ministr
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import ProbationDocumentsController from '../controllers/probationDocumentsController'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 

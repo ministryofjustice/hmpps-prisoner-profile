@@ -8,7 +8,9 @@ const toBoolean = (value: unknown): boolean => {
   return value === 'true'
 }
 
-function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
+function get<T = string>(name: string, options?: { requireInProduction: boolean }): T | string
+function get<T = string>(name: string, fallback: T, options?: { requireInProduction: boolean }): T | string
+function get<T = string>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name] !== undefined) {
     return process.env[name]
   }
@@ -362,6 +364,8 @@ export default {
         deadline: Number(get('PERMISSIONS_API_TIMEOUT_DEADLINE', 3000)),
       },
       agent: new AgentConfig(Number(get('PERMISSIONS_API_TIMEOUT_DEADLINE', 3000))),
+      /** Expects a comma-separated list of prisoner numbers; ignored if empty or not set */
+      highProfilePrisonersOverrideList: get('HIGH_PROFILE_PRISONERS_OVERRIDE_LIST', '').split(',').filter(Boolean),
     },
   },
   serviceUrls: {

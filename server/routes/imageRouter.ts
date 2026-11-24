@@ -4,7 +4,7 @@ import { CorePersonRecordPermission, prisonerPermissionsGuard } from '@ministryo
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -86,6 +86,7 @@ export default function imageRouter(services: Services): Router {
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.Photo,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       return res.render('pages/photoPage', {
@@ -136,6 +137,7 @@ export default function imageRouter(services: Services): Router {
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
         page: Page.PhotoList,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       return res.render('pages/photoPageAll', {

@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import CircuitBreaker from 'opossum'
 import config from '../config'
 import { PrisonApiClient, TransactionHistoryParams } from './interfaces/prisonApi/prisonApiClient'

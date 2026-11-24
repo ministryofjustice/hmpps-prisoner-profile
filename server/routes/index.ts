@@ -26,7 +26,8 @@ import appointmentRedirectRouter from './appointmentRedirectRouter'
 import PrisonerLocationHistoryController from '../controllers/prisonerLocationHistoryController'
 import professionalContactsRouter from './professionalContactsRouter'
 import goalsRouter from './goalsRouter'
-import { ApiAction, Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
+import { ApiAction } from '../services/interfaces/auditService/actions'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import BeliefHistoryController from '../controllers/beliefHistoryController'
 import locationDetailsRouter from './locationDetailsRouter'
@@ -46,6 +47,8 @@ import { featureFlagGuard } from '../middleware/featureFlagGuard'
 import DuplicateProfilesController from '../controllers/duplicateProfilesController'
 import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
+import { JustifyAccessController } from '../controllers/justifyAccessController'
+import { isHighProfilePrisonerMiddleware } from '../middleware/isHighProfilePrisonerMiddleware'
 import isHighProfilePrisonerOutsideCaseloads from '../utils/isHighProfilePrisonerOutsideCaseloads'
 import { highProfilePrisonerOutsideCaseloadsGuard } from '../middleware/highProfilePrisonerOutsideCaseloadsGuard'
 
@@ -67,6 +70,14 @@ export default function routes(services: Services): Router {
     }
     next()
   })
+
+  const justifyAccessController = new JustifyAccessController()
+  router.use(
+    basePath,
+    isHighProfilePrisonerMiddleware(services),
+    getPrisonerData(services, { minimal: true }),
+    justifyAccessController.requestHandler,
+  )
 
   const { prisonPermissionsService } = services
   const overviewController = new OverviewController(
@@ -152,9 +163,8 @@ export default function routes(services: Services): Router {
     retrieveCuriousFunctionalSkills(services.curiousService),
     async (req, res) => {
       const { apiErrorCallback, user, prisonerPermissions } = res.locals
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertSummaryData = req.middleware?.alertSummaryData
+      const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
+      const { prisonerNumber, prisonId } = prisonerData
       const { workAndSkillsPageService } = services
       const workAndSkillsPageData = await workAndSkillsPageService.get(
         req.middleware.clientToken,
@@ -162,12 +172,12 @@ export default function routes(services: Services): Router {
         apiErrorCallback,
       )
 
-      const allFunctionalSkillsLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/functional-skills`
-      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerData.prisonerNumber}/in-prison-courses-and-qualifications`
-      const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
-      const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
-      const manageAllocationsLinkUrl = `${config.serviceUrls.activities}/prisoner-allocations/${prisonerData.prisonerNumber}`
-      const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
+      const allFunctionalSkillsLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerNumber}/functional-skills`
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/plan/${prisonerNumber}/in-prison-courses-and-qualifications`
+      const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/work-activities`
+      const workAndActivities7DayLinkUrl = `/prisoner/${prisonerNumber}/schedule`
+      const manageAllocationsLinkUrl = `${config.serviceUrls.activities}/prisoner-allocations/${prisonerNumber}`
+      const vc2goalsUrl = `/prisoner/${prisonerNumber}/vc2-goals`
       const canEditLearningAndWorkPlan = userHasRoles([Role.LearningAndWorkProgressManager], res.locals.user.userRoles)
       const canManageAllocations =
         config.featureToggles.manageAllocationsEnabled &&
@@ -193,10 +203,11 @@ export default function routes(services: Services): Router {
 
       await services.auditService.sendPageView({
         user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.WorkAndSkills,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       res.render('pages/workAndSkills', {
@@ -236,19 +247,19 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
     highProfilePrisonerOutsideCaseloadsGuard(),
     async (req, res) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertSummaryData = req.middleware?.alertSummaryData
+      const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
+      const { prisonerNumber, prisonId } = prisonerData
       const { user, prisonerPermissions } = res.locals
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
         user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.Offences,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
 
       res.render('pages/offences', {
@@ -265,7 +276,7 @@ export default function routes(services: Services): Router {
         courtCaseData,
         releaseDates,
         activeTab: true,
-        prisonerNumber: prisonerData.prisonerNumber,
+        prisonerNumber,
       })
     },
   )

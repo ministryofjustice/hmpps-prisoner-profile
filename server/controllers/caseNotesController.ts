@@ -1,12 +1,14 @@
-import { RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import { CaseNotesPermission, isGranted } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import config from '../config'
+import logger from '../../logger'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { formatDate } from '../utils/dateHelpers'
-import config from '../config'
 import { BehaviourPrompt, behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
-import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
+import { PostAction, PutAction, SearchAction } from '../services/interfaces/auditService/actions'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
@@ -33,6 +35,7 @@ export default class CaseNotesController {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
       const { clientToken, prisonerData, inmateDetail, alertSummaryData } = req.middleware
+      const { prisonerNumber, prisonId } = prisonerData
       const { user, prisonerPermissions } = res.locals
 
       queryParams.sort = this.mapSortParam(req.query.sort as string)
@@ -79,11 +82,12 @@ export default class CaseNotesController {
       this.auditService
         .sendSearch({
           user,
-          prisonerNumber: prisonerData.prisonerNumber,
-          prisonId: prisonerData.prisonId,
+          prisonerNumber,
+          prisonId,
           correlationId: req.id,
           searchPage: SearchAction.CaseNotes,
           details: { queryParams },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -104,7 +108,7 @@ export default class CaseNotesController {
         subTypes,
         typeSubTypeMap,
         showingAll,
-        addCaseNoteLinkUrl: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
+        addCaseNoteLinkUrl: `/prisoner/${prisonerNumber}/add-case-note`,
       })
     }
   }
@@ -167,6 +171,7 @@ export default class CaseNotesController {
           prisonId,
           correlationId: req.id,
           page: Page.AddCaseNote,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -249,6 +254,7 @@ export default class CaseNotesController {
           correlationId: req.id,
           action: PostAction.CaseNote,
           details: {},
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(refererUrl || `/prisoner/${prisonerNumber}/case-notes`)
@@ -291,6 +297,7 @@ export default class CaseNotesController {
           prisonId,
           correlationId: req.id,
           page: Page.UpdateCaseNote,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -357,6 +364,7 @@ export default class CaseNotesController {
           correlationId: req.id,
           action: PutAction.CaseNote,
           details: { caseNoteId },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/case-notes`)

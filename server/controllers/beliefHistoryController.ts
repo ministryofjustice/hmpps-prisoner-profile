@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express'
 import logger from '../../logger'
 import { apostrophe } from '../utils/utils'
-import { AuditService, Page } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import type { BeliefHistoryItem } from '../services/interfaces/beliefService/BeliefHistoryItem'
 import type BeliefService from '../services/beliefService'
 import { religionFieldData } from './personal/fieldData'
@@ -33,6 +34,7 @@ export default class BeliefHistoryController {
         prisonId,
         correlationId: req.id,
         page: Page.ReligionBeliefHistory,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

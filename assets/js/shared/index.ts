@@ -10,6 +10,7 @@ import { BackToTop } from './backToTop'
 import { BodyParts } from './bodyParts'
 import { fileUploadWithPreview } from './fileUploadWithPreview'
 import { FlashMessage } from './flashMessage'
+import { justifyAccessBackLink } from './justifyAccessBackLink'
 import { OpenCloseAll } from './openCloseAll'
 import { printPage } from './printPage'
 import { sortSelector } from './sortSelector'
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   alertFlags()
   autocomplete()
   fileUploadWithPreview()
+  justifyAccessBackLink()
   printPage()
   sortSelector()
   govukFrontend.createAll(BackToTop)

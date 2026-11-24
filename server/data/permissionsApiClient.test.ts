@@ -8,6 +8,7 @@ import type { PermissionsApi } from './interfaces/permissionsApi'
 
 const token = 'token-1'
 const samplePrisonerNumber = 'G6123VU'
+const differentPrisonerNumber = 'A1234AA'
 
 describe('permissionsApiClient', () => {
   let fakePermissionsApi: nock.Scope
@@ -28,34 +29,55 @@ describe('permissionsApiClient', () => {
   })
 
   describe('checkHighProfilePrisonerStatus', () => {
-    it('should return true when prisoner is found in list', () => {
-      fakePermissionsApi
-        .post('/api/high-profile-prisoners', {
-          prisonerNumbersToCheck: [samplePrisonerNumber],
-        } satisfies HighProfilePrisonerRequest)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, { highProfilePrisoners: [samplePrisonerNumber] } satisfies HighProfilePrisonerResponse)
+    describe('with no override list', () => {
+      beforeAll(() => {
+        config.apis.permissionsApi.highProfilePrisonersOverrideList = []
+      })
 
-      return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).resolves.toBe(true)
+      it('should return true when prisoner is found in list', () => {
+        fakePermissionsApi
+          .post('/api/high-profile-prisoners', {
+            prisonerNumbersToCheck: [samplePrisonerNumber],
+          } satisfies HighProfilePrisonerRequest)
+          .matchHeader('authorization', `Bearer ${token}`)
+          .reply(200, { highProfilePrisoners: [samplePrisonerNumber] } satisfies HighProfilePrisonerResponse)
+
+        return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).resolves.toBe(true)
+      })
+
+      it('should return false when prisoner is not found in list', () => {
+        fakePermissionsApi
+          .post('/api/high-profile-prisoners', {
+            prisonerNumbersToCheck: [samplePrisonerNumber],
+          } satisfies HighProfilePrisonerRequest)
+          .matchHeader('authorization', `Bearer ${token}`)
+          .reply(200, { highProfilePrisoners: [] } satisfies HighProfilePrisonerResponse)
+
+        return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).resolves.toBe(
+          false,
+        )
+      })
+
+      it('should propagate error from api', () => {
+        fakePermissionsApi.post('/api/high-profile-prisoners').reply(500)
+
+        return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).rejects.toThrow(
+          'Internal Server Error',
+        )
+      })
     })
 
-    it('should return false when prisoner is not found in list', () => {
-      fakePermissionsApi
-        .post('/api/high-profile-prisoners', {
-          prisonerNumbersToCheck: [samplePrisonerNumber],
-        } satisfies HighProfilePrisonerRequest)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, { highProfilePrisoners: [] } satisfies HighProfilePrisonerResponse)
+    describe('with override list', () => {
+      beforeAll(() => {
+        config.apis.permissionsApi.highProfilePrisonersOverrideList = [samplePrisonerNumber]
+        fakePermissionsApi.post('/api/high-profile-prisoners').reply(500) // to ensure api is not called
+      })
 
-      return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).resolves.toBe(false)
-    })
+      it('should return true when prisoner is found in list', () =>
+        expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).resolves.toBe(true))
 
-    it('should propagate error from api', () => {
-      fakePermissionsApi.post('/api/high-profile-prisoners').reply(500)
-
-      return expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(samplePrisonerNumber)).rejects.toThrow(
-        'Internal Server Error',
-      )
+      it('should return false when prisoner is not found in list', () =>
+        expect(permissionsApiRestClient.checkHighProfilePrisonerStatus(differentPrisonerNumber)).resolves.toBe(false))
     })
   })
 })

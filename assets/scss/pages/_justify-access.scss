@@ -1,0 +1,39 @@
+@use 'govuk-frontend/dist/govuk';
+
+.justify-access {
+  @include govuk.govuk-responsive-margin(6, 'bottom');
+}
+
+.justify-access__interruption, .justify-access__form {
+  @include govuk.govuk-responsive-padding(7);
+  @include govuk.govuk-responsive-padding(3, 'bottom');
+}
+
+.justify-access__interruption {
+  background: govuk.govuk-colour('blue');
+
+  h1, h2, p {
+    color: govuk.govuk-functional-colour(inverse-text);
+  }
+
+  p {
+    @extend .govuk-body-l;
+  }
+}
+
+.justify-access__form {
+  background: #ddeaf4;
+
+
+  .govuk-checkboxes__label::before {
+    background-color: govuk.govuk-colour('white');
+  }
+
+  .justify-access__back-link {
+    color: govuk.govuk-functional-colour(text);
+  }
+}
+
+.justify-access__form__content {
+  max-width: 630px;
+}

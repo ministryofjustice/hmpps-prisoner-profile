@@ -1,19 +1,22 @@
-import { NextFunction, Request, Response } from 'express'
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
+import type { NextFunction, Request, Response } from 'express'
 import { OsAddress } from '@ministryofjustice/hmpps-connect-dps-shared-items'
+import config from '../../../../config'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import AddressEditController from './addressEditController'
 import AddressService from '../../../../services/addressService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import EphemeralDataService from '../../../../services/ephemeralDataService'
 import { ephemeralDataServiceMock } from '../../../../../tests/mocks/ephemeralDataServiceMock'
 import { addressServiceMock } from '../../../../../tests/mocks/addressServiceMock'
 import { AddressRequestDto } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { AddressLocation } from '../../../../services/mappers/addressMapper'
 import { inmateDetailMock } from '../../../../data/localMockData/inmateDetailMock'
-import config from '../../../../config'
 
 const clientToken = 'CLIENT_TOKEN'
 const { prisonerNumber } = PrisonerMockDataA
@@ -41,6 +44,8 @@ describe('Address Edit Controller', () => {
   let controller: AddressEditController
   let enabledAddressPhonePrisons: string[]
 
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
   beforeEach(() => {
     enabledAddressPhonePrisons = [...config.featureToggles.editAddressSpecificPhoneNumbers.enabledPrisons]
     req = {
@@ -48,6 +53,7 @@ describe('Address Edit Controller', () => {
       query: {},
       params: { prisonerNumber },
       middleware: { clientToken, prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -115,7 +121,9 @@ describe('Address Edit Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditAddressLocation,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -135,7 +143,9 @@ describe('Address Edit Controller', () => {
         correlationId: req.id,
         action: PostAction.EditAddressLocation,
         details: { location },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -167,7 +177,9 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressFindUkAddress,
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should repopulate input value from flash if present', async () => {
@@ -215,7 +227,9 @@ describe('Address Edit Controller', () => {
           correlationId: req.id,
           action: PostAction.EditAddressFindUkAddress,
           details: { uprn },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })
@@ -263,7 +277,9 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressConfirm,
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {
@@ -360,7 +376,9 @@ describe('Address Edit Controller', () => {
           prisonId: PrisonerMockDataA.prisonId,
           correlationId: req.id,
           page: Page.EditAddressPrimaryOrPostal,
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('should throw not found error if address uuid not provided', async () => {
@@ -465,7 +483,9 @@ describe('Address Edit Controller', () => {
           correlationId: req.id,
           action: PostAction.EditAddressPrimaryOrPostal,
           details: { address: expectedAddressSubmission },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
 
         expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#addresses`)
       })
@@ -573,7 +593,9 @@ describe('Address Edit Controller', () => {
             prisonId: PrisonerMockDataA.prisonId,
             correlationId: req.id,
             page: auditPage,
+            justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
 
@@ -658,7 +680,9 @@ describe('Address Edit Controller', () => {
             correlationId: req.id,
             action: auditAction,
             details: { address: expect.objectContaining(cachedAddress) },
+            justification: null,
           })
+          expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
         },
       )
     })

@@ -1,13 +1,14 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { add, format, isAfter, isBefore, startOfToday } from 'date-fns'
+import logger from '../../logger'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import ScheduledEvent, { SelectedWeekDates } from '../data/interfaces/prisonApi/ScheduledEvent'
-import { AuditService, Page } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -27,7 +28,7 @@ export default class PrisonerScheduleController {
 
     let schedule: ScheduledEvent[]
     const { when } = req.query
-    const { bookingId } = prisonerData
+    const { bookingId, prisonerNumber, prisonId } = prisonerData
 
     if (when === 'nextWeek') {
       schedule = await prisonApiClient.getScheduledEventsForNextWeek(bookingId)
@@ -120,10 +121,11 @@ export default class PrisonerScheduleController {
     this.auditService
       .sendPageView({
         user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.Schedule,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

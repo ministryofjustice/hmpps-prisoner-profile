@@ -1,5 +1,6 @@
-import { Request, RequestHandler, Response } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
 import { format, parseISO } from 'date-fns'
+import logger from '../../logger'
 import { formatMoney, formatName, isEmpty } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -11,8 +12,8 @@ import { TransactionPostingType } from '../data/enums/transactionPostingType'
 import Agency from '../data/interfaces/prisonApi/Agency'
 import { TransactionType } from '../data/enums/transactionType'
 import DamageObligation from '../data/interfaces/prisonApi/DamageObligation'
-import { AuditService, Page } from '../services/auditService'
-import logger from '../../logger'
+import type { AuditService } from '../services/interfaces/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 /**
  * Parse requests for money routes and orchestrate response
@@ -67,6 +68,7 @@ export default class MoneyController {
         prisonId,
         correlationId: req.id,
         page: Page.MoneyDamageObligations,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 
@@ -208,6 +210,7 @@ export default class MoneyController {
         prisonId,
         correlationId: req.id,
         page: auditPage,
+        justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
       })
       .catch(error => logger.error(error))
 

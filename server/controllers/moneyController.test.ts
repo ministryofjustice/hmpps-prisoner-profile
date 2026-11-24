@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { format } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -15,7 +15,7 @@ import {
 import { damageObligationsMock } from '../data/localMockData/damageObligationsMock'
 import { AccountCode } from '../data/enums/accountCode'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: Request
@@ -36,6 +36,7 @@ describe('Money Controller', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
+      session: {},
       headers: {
         referer: 'http://referer',
       },

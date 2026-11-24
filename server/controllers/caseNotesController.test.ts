@@ -65,6 +65,7 @@ describe('Case Notes Controller', () => {
           alertFlags: [],
         },
       },
+      session: {},
       path: 'case-notes',
       flash: jest.fn(),
     } as unknown as Request

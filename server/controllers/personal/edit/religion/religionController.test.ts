@@ -1,7 +1,9 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
-import { AuditService, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import PersonalPageService from '../../../../services/personalPageService'
 import ReligionController from './religionController'
 import { prisonUserMock } from '../../../../data/localMockData/user'
@@ -14,6 +16,8 @@ describe('ReligionController', () => {
   let controller: ReligionController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -134,6 +138,7 @@ describe('ReligionController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -167,6 +172,7 @@ describe('ReligionController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -179,6 +185,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -196,6 +203,7 @@ describe('ReligionController', () => {
             return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -215,6 +223,7 @@ describe('ReligionController', () => {
               : []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -234,6 +243,7 @@ describe('ReligionController', () => {
       beforeEach(() => {
         validRequest = {
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { religion: 'ZORO', reasonKnown: 'NO' },
           flash: jest.fn(),
@@ -315,6 +325,7 @@ describe('ReligionController', () => {
               profileInformation: [],
             } as InmateDetail,
           },
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body,
           flash: jest.fn(),
@@ -342,7 +353,10 @@ describe('ReligionController', () => {
           id: 1,
           body: { religion: 'ZORO', currentReligionCode: 'DRU', reasonKnown: 'NO' },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
@@ -352,11 +366,9 @@ describe('ReligionController', () => {
             previous: 'DRU',
             updated: 'ZORO',
           },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
 
       it('Does not submit a request if no religion was selected', async () => {

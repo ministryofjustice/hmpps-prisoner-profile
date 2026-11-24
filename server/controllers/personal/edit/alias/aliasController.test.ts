@@ -1,8 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import AliasController from './aliasController'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { PrisonerMockDataA } from '../../../../data/localMockData/prisoner'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import AliasService, { Name } from '../../../../services/aliasService'
 import { aliasServiceMock } from '../../../../../tests/mocks/aliasServiceMock'
@@ -23,16 +26,19 @@ describe('Alias Controller', () => {
   let req: Request
   let res: Response
   let next: NextFunction
-  let aliasService: AliasService
+  let aliasService: jest.Mocked<AliasService>
   let referenceDataService: ReferenceDataService
   let auditService: AuditService
   let controller: AliasController
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   beforeEach(() => {
     req = {
       id: '123',
       params: { prisonerNumber },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA, inmateDetail: inmateDetailMock },
+      session: { justifiedHighProfilePrisonerAccess },
       flash: jest.fn().mockReturnValue([]),
       body: {},
     } as unknown as Request
@@ -55,12 +61,16 @@ describe('Alias Controller', () => {
     next = jest.fn()
 
     auditService = auditServiceMock()
-    aliasService = aliasServiceMock() as AliasService
+    aliasService = aliasServiceMock()
     referenceDataService = {
       getActiveReferenceDataCodes: jest.fn().mockImplementation(() => Promise.resolve(ethnicityCodesMock)),
     } as unknown as ReferenceDataService
 
     controller = new AliasController(aliasService, referenceDataService, auditService)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('Change name purpose page', () => {
@@ -100,7 +110,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNamePurpose,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -125,7 +137,9 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditNamePurpose,
           details: { purpose },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
   })
@@ -200,7 +214,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameCorrection,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -213,7 +229,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.updateWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
@@ -233,9 +249,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.updateWorkingName = async () => {
-        throw new Error()
-      }
+      aliasService.updateWorkingName.mockRejectedValue(new Error())
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
@@ -253,11 +267,11 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.updateWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameCorrection()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -272,9 +286,9 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -337,7 +351,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditNameLegal,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the name change', async () => {
@@ -350,7 +366,7 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.createNewWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.createNewWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameLegal()(req, res, next)
 
@@ -370,9 +386,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.createNewWorkingName = async () => {
-        throw new Error()
-      }
+      aliasService.createNewWorkingName.mockRejectedValue(new Error())
 
       await controller.submitChangeNameLegal()(req, res, next)
 
@@ -390,11 +404,11 @@ describe('Alias Controller', () => {
 
       req = { ...req, body: newName } as unknown as Request
 
-      aliasService.createNewWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+      aliasService.createNewWorkingName.mockResolvedValue({ ...PseudonymResponseMock, ...newName })
 
       await controller.submitChangeNameLegal()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -409,9 +423,9 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -467,8 +481,8 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.checkForDuplicateAlias = jest.fn().mockResolvedValue(true)
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.checkForDuplicateAlias.mockResolvedValue(true)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -506,7 +520,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.AddNewAlias,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the new alias request', async () => {
@@ -524,7 +540,7 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -552,9 +568,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.addNewAlias = async () => {
-        throw new Error()
-      }
+      aliasService.addNewAlias.mockRejectedValue(new Error())
 
       await controller.submitAddNewAlias()(req, res, next)
 
@@ -579,19 +593,19 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+      aliasService.addNewAlias.mockResolvedValue(PseudonymResponseMock)
 
       await controller.submitAddNewAlias()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
         action: PostAction.AddNewAlias,
         details: PseudonymResponseMock,
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -656,7 +670,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditDateOfBirth,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the date of birth change', async () => {
@@ -687,9 +703,7 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      aliasService.updateDateOfBirth = async () => {
-        throw new Error()
-      }
+      aliasService.updateDateOfBirth.mockRejectedValue(new Error())
 
       await controller.submitChangeDateOfBirth()(req, res, next)
 
@@ -707,14 +721,14 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.updateDateOfBirth = jest.fn().mockResolvedValue({
+      aliasService.updateDateOfBirth.mockResolvedValue({
         ...PseudonymResponseMock,
         dateOfBirth: '1999-02-01',
       })
 
       await controller.submitChangeDateOfBirth()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -724,9 +738,9 @@ describe('Alias Controller', () => {
           previous: '1990-10-12',
           updated: '1999-02-01',
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -759,7 +773,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicGroup,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it.each([
@@ -784,15 +800,17 @@ describe('Alias Controller', () => {
           correlationId: req.id,
           action: PostAction.EditEthnicGroup,
           details: { ethnicGroup },
+          justification: null,
         })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       }
     })
 
     it(`Saves ethnicity as 'They prefer not to say'`, async () => {
       req = { ...req, body: { radioField: 'NS' } } as unknown as Request
-      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+      aliasService.updateEthnicity.mockResolvedValue({
         ...PseudonymResponseMock,
-        ethnicity: { code: 'NS' },
+        ethnicity: { id: 'ETHNICITY_NS', code: 'NS', description: 'They prefer not to say' },
       })
 
       await controller.submitChangeEthnicGroup()(req, res, next)
@@ -815,7 +833,9 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: 'NS',
         },
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 
@@ -877,7 +897,9 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicBackground,
+        justification: null,
       })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('submits the ethnicity change', async () => {
@@ -903,9 +925,7 @@ describe('Alias Controller', () => {
     it('Submission handles API errors', async () => {
       req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
-      aliasService.updateEthnicity = async () => {
-        throw new Error()
-      }
+      aliasService.updateEthnicity.mockRejectedValue(new Error())
 
       await controller.submitChangeEthnicBackground()(req, res, next)
 
@@ -916,14 +936,14 @@ describe('Alias Controller', () => {
     it('Sends a post success audit event', async () => {
       req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
-      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+      aliasService.updateEthnicity.mockResolvedValue({
         ...PseudonymResponseMock,
-        ethnicity: { code: ethnicityCodeSubmitted },
+        ethnicity: { id: 'CODE', code: ethnicityCodeSubmitted, description: ethnicityCodeSubmitted },
       })
 
       await controller.submitChangeEthnicBackground()(req, res, next)
 
-      const expectedAuditEvent = {
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
         user: prisonUserMock,
         prisonerNumber,
         correlationId: req.id,
@@ -933,9 +953,9 @@ describe('Alias Controller', () => {
           previous: 'W1',
           updated: ethnicityCodeSubmitted,
         },
-      }
-
-      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        justification: null,
+      })
+      expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
     })
   })
 })

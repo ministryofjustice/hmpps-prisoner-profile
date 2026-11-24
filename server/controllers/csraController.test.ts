@@ -29,6 +29,7 @@ describe('CSRA Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
       } as unknown as Request
       res = {
         locals: {
@@ -73,6 +74,7 @@ describe('CSRA Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
         query: {},
       } as unknown as Request
       res = {
@@ -146,6 +148,7 @@ describe('CSRA Controller', () => {
             prisonerData: PrisonerMockDataA,
             inmateDetail: inmateDetailMock,
           },
+          session: {},
           query: {},
         } as unknown as Request
         res = {

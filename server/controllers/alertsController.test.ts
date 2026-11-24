@@ -47,6 +47,7 @@ describe('Alerts Controller', () => {
           inmateDetail: inmateDetailMock,
           alertSummaryData: { alertFlags: [] },
         },
+        session: {},
       } as unknown as Request
       res = {
         locals: {
@@ -226,6 +227,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
         flash: jest.fn(),
       } as unknown as Request
       res = {
@@ -335,6 +337,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
       } as unknown as Request
       res = {
         locals: {
@@ -411,6 +414,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
       } as unknown as Request
       res = {
         locals: {
@@ -472,6 +476,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
         flash: jest.fn(),
       } as unknown as Request
       res = {
@@ -603,6 +608,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
         flash: jest.fn(),
       } as unknown as Request
       res = {
@@ -710,6 +716,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        session: {},
         flash: jest.fn(),
       } as unknown as Request
       res = {

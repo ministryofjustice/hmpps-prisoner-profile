@@ -1,8 +1,11 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 import PersonalPageService from '../../../../services/personalPageService'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import { personalPageServiceMock } from '../../../../../tests/mocks/personalPageServiceMock'
 import { auditServiceMock } from '../../../../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../../../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { prisonUserMock } from '../../../../data/localMockData/user'
 import { domesticStatusFieldData } from '../../fieldData'
 import { PersonalRelationshipsDomesticStatusMock } from '../../../../data/localMockData/personalRelationshipsApiMock'
@@ -17,6 +20,8 @@ describe('DomesticStatusController', () => {
   let controller: DomesticStatusController
   let res: Response
   const next: NextFunction = jest.fn()
+
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
 
   const prisonerNumber = 'A1234BC'
 
@@ -71,6 +76,10 @@ describe('DomesticStatusController', () => {
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as unknown as Response
   })
 
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('Domestic status', () => {
     describe('Edit', () => {
       const action: RequestHandler = async (req, response) => controller.domesticStatus().edit(req, response, next)
@@ -114,6 +123,7 @@ describe('DomesticStatusController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
 
@@ -141,6 +151,7 @@ describe('DomesticStatusController', () => {
             return []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
@@ -153,6 +164,7 @@ describe('DomesticStatusController', () => {
             return key === 'requestBody' ? [JSON.stringify({ radioField: 'M' })] : []
           },
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
         await action(req, res, next)
         expect(res.render).toHaveBeenCalledWith(
@@ -169,18 +181,20 @@ describe('DomesticStatusController', () => {
           params: { prisonerNumber },
           flash: (): string[] => [],
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
         } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(req, res, next)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           prisonId: 999,
           correlationId: req.id,
           page: Page.EditDomesticStatus,
-        }
-
-        await action(req, res, next)
-
-        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
 
@@ -192,6 +206,7 @@ describe('DomesticStatusController', () => {
         validRequest = {
           id: '1',
           middleware: defaultMiddleware,
+          session: { justifiedHighProfilePrisonerAccess },
           params: { prisonerNumber },
           body: { radioField: 'M' },
           flash: jest.fn(),
@@ -235,17 +250,18 @@ describe('DomesticStatusController', () => {
 
       it('Sends a post success audit event', async () => {
         const request = { ...validRequest, id: 1, body: { radioField: 'M' } } as unknown as Request
-        const expectedAuditEvent = {
+
+        await action(request, res, next)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber,
           correlationId: request.id,
           action: PostAction.EditDomesticStatus,
           details: { fieldName: domesticStatusFieldData.fieldName, previous: 'S', updated: 'M' },
-        }
-
-        await action(request, res, next)
-
-        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+          justification: null,
+        })
+        expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(prisonerNumber)
       })
     })
   })

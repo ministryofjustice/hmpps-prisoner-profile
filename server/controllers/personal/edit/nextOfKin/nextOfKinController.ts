@@ -1,12 +1,14 @@
-import { Request, RequestHandler } from 'express'
-import { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
+import type { Request, RequestHandler } from 'express'
 import {
   apostrophe,
   formatName,
   mapRelationshipDescriptionByCode,
   objectToSelectOptions,
 } from '../../../../utils/utils'
-import { AuditService, Page, PostAction } from '../../../../services/auditService'
+import type { AuditService } from '../../../../services/interfaces/auditService'
+import { Page } from '../../../../services/interfaces/auditService/page'
+import { PostAction } from '../../../../services/interfaces/auditService/actions'
 import NextOfKinService from '../../../../services/nextOfKinService'
 import { NameFormatStyle } from '../../../../data/enums/nameFormatStyle'
 import logger from '../../../../../logger'
@@ -143,6 +145,7 @@ export default class NextOfKinController {
           prisonId,
           correlationId: req.id,
           page: Page.EditNextOfKin,
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -217,6 +220,7 @@ export default class NextOfKinController {
           correlationId: req.id,
           action: PostAction.EditNextOfKin,
           details: { formValues },
+          justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
         })
         .catch(error => logger.error(error))
 
@@ -395,6 +399,7 @@ export default class NextOfKinController {
             correlationId: req.id,
             action: PostAction.EditNextOfKinAddAddress,
             details: { addressRequest },
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 

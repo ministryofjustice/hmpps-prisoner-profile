@@ -1,10 +1,11 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+import logger from '../../logger'
 import { RestClientBuilder } from '../data'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { AuditService, PostAction } from '../services/auditService'
+import type { AuditService } from '../services/interfaces/auditService'
+import { PostAction } from '../services/interfaces/auditService/actions'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import MulterFile from './interfaces/MulterFile'
-import logger from '../../logger'
 import { PrisonerProfileApiClient } from '../data/prisonerProfileApiClient'
 import MetricsService from '../services/metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
@@ -144,6 +145,7 @@ export default class ImageController {
             correlationId: req.id,
             action: PostAction.EditProfileImage,
             details: {},
+            justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
           })
           .catch(error => logger.error(error))
 
@@ -220,6 +222,7 @@ export default class ImageController {
               correlationId: req.id,
               action: PostAction.EditProfileImageWithheld,
               details: {},
+              justification: req.session.justifiedHighProfilePrisonerAccess?.[prisonerNumber] ?? null,
             })
             .catch(error => logger.error(error))
 

@@ -1,15 +1,23 @@
 import { Request, Response } from 'express'
 import { addressServiceMock } from '../../tests/mocks/addressServiceMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { justifiedHighProfilePrisonerAccessSpy } from '../../tests/utils/justifiedHighProfilePrisonerAccessSpy'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
-import { Page, PostAction } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
+import { PostAction } from '../services/interfaces/auditService/actions'
 import AddressService from '../services/addressService'
 import AddressPhoneNumberController from './addressPhoneNumberController'
 
 describe('AddressPhoneNumberController', () => {
+  const justifiedHighProfilePrisonerAccess = justifiedHighProfilePrisonerAccessSpy()
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('submits all phone numbers and returns to the personal page', async () => {
     const addressService = addressServiceMock() as AddressService
     addressService.addAddressPhoneNumbers = jest
@@ -23,6 +31,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: {},
       body: {
@@ -73,6 +82,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: {},
       body: { phoneNumberType0: 'MOB', phoneNumber0: ' (01234)567890 ', phoneExtension0: '' },
@@ -106,6 +116,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: {},
       body: { phoneNumberType0: 'MOB', phoneNumber0: '(01234)567890', phoneExtension0: '' },
@@ -143,6 +154,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: {},
       body: { phoneNumberType0: 'MOB', phoneNumber0: '01234567890', phoneExtension0: '' },
@@ -178,6 +190,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: {},
       body: { phoneNumberType0: 'MOB', phoneNumber0: '(01234)567890', phoneExtension0: '456' },
@@ -211,6 +224,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837', phoneId: '1324254' },
       flash: jest.fn().mockReturnValue([]),
     } as unknown as Request
@@ -247,6 +261,7 @@ describe('AddressPhoneNumberController', () => {
     expect(auditService.sendPageView).toHaveBeenCalledWith(
       expect.objectContaining({ page: Page.EditAddressPhoneNumber }),
     )
+    expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
   })
 
   it('returns to address completion when cancelling the new address phone step', async () => {
@@ -260,6 +275,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       query: { addressCacheId: 'address-cache-id' },
       flash: jest.fn().mockReturnValue([]),
@@ -293,6 +309,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837' },
       flash: jest.fn(),
     } as unknown as Request
@@ -325,6 +342,7 @@ describe('AddressPhoneNumberController', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
+      session: { justifiedHighProfilePrisonerAccess },
       params: { addressId: '5622837', phoneId: '1324254' },
       query: {},
       body: { phoneNumberType0: 'HOME', phoneNumber0: '02012345678', phoneExtension0: '123' },
@@ -363,7 +381,9 @@ describe('AddressPhoneNumberController', () => {
         phoneId: 1324254,
         phoneNumber: { phoneNumber: '02012 345678', phoneNumberType: 'HOME', extension: '123' },
       },
+      justification: null,
     })
+    expect(justifiedHighProfilePrisonerAccess).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#addresses`)
   })
 })

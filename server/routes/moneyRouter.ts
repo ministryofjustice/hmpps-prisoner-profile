@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { Services } from '../services'
 import MoneyController from '../controllers/moneyController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { Page } from '../services/interfaces/auditService/page'
 
 export default function moneyRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
