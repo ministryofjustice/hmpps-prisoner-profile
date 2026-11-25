@@ -17,7 +17,7 @@ import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList
 import { Result } from '../utils/result/result'
 import getCommonRequestData from '../utils/getCommonRequestData'
 import { errorHasStatus } from '../utils/errorHelpers'
-import type { SelectOption } from '../interfaces/GovOptions'
+import type { GovukSelectItem } from '../interfaces/govukComponents'
 import CaseNoteNotSavedError from '../utils/CaseNoteNotSavedError'
 
 /**
@@ -376,9 +376,9 @@ export default class CaseNotesController {
    * @param onlyActive - if true, filter out types/subtypes where active is true
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const types: SelectOption[] = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
+    const types: GovukSelectItem[] = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
 
-    const typeSubTypeMap: Record<string, SelectOption[]> = caseNoteTypes.reduce(
+    const typeSubTypeMap: Record<string, GovukSelectItem[]> = caseNoteTypes.reduce(
       (ts, t) => ({
         ...ts,
         [t.code]: t.subCodes?.map(s => ({ value: s.code, text: s.description })),
@@ -386,7 +386,7 @@ export default class CaseNotesController {
       {},
     )
 
-    let subTypes: SelectOption[] = []
+    let subTypes: GovukSelectItem[] = []
     if (type) {
       const selectedType = caseNoteTypes.find(t => t.code === type)
       if (selectedType) {

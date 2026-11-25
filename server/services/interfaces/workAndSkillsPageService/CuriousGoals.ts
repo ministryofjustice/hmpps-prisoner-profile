@@ -1,4 +1,4 @@
-import GovSummaryItem from '../../../interfaces/GovSummaryItem'
+import type { GovukSummaryListRow } from '../../../interfaces/govukComponents'
 
 /**
  * Interfaces defining Curious Goal view model types.
@@ -8,8 +8,8 @@ import GovSummaryItem from '../../../interfaces/GovSummaryItem'
  */
 export default interface CuriousGoals {
   prisonerNumber: string
-  employmentGoals: Array<GovSummaryItem>
-  personalGoals: Array<GovSummaryItem>
-  longTermGoals: Array<GovSummaryItem>
-  shortTermGoals: Array<GovSummaryItem>
+  employmentGoals: GovukSummaryListRow[]
+  personalGoals: GovukSummaryListRow[]
+  longTermGoals: GovukSummaryListRow[]
+  shortTermGoals: GovukSummaryListRow[]
 }

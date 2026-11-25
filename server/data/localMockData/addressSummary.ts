@@ -1,6 +1,6 @@
-import GovSummaryItem from '../../interfaces/GovSummaryItem'
+import type { GovukSummaryListRow } from '../../interfaces/govukComponents'
 
-export const addressSummaryMock: GovSummaryItem[] = [
+export const addressSummaryMock: GovukSummaryListRow[] = [
   {
     key: { text: 'Address' },
     value: { html: 'Flat 7, premises address, street field<br/>Leeds<br/>West Yorkshire<br/>LS1 AAA<br/>England' },

@@ -1,7 +1,7 @@
 import nunjucks from 'nunjucks'
 import * as cheerio from 'cheerio'
 import { formatDate } from '../../../../utils/dateHelpers'
-import GovSummaryItem from '../../../../interfaces/GovSummaryItem'
+import type { GovukSummaryListRow } from '../../../../interfaces/govukComponents'
 import {
   aValidPersonalLearningPlanActionPlan,
   aValidPersonalLearningPlanGoal,
@@ -30,10 +30,10 @@ describe('Work and Skills Page - Goals panel tests', () => {
     curiousGoals: {
       value: {
         prisonerNumber,
-        employmentGoals: [] as Array<GovSummaryItem>,
-        personalGoals: [] as Array<GovSummaryItem>,
-        longTermGoals: [] as Array<GovSummaryItem>,
-        shortTermGoals: [] as Array<GovSummaryItem>,
+        employmentGoals: <GovukSummaryListRow[]>[],
+        personalGoals: <GovukSummaryListRow[]>[],
+        longTermGoals: <GovukSummaryListRow[]>[],
+        shortTermGoals: <GovukSummaryListRow[]>[],
       },
     },
     personalLearningPlanActionPlan: aValidPersonalLearningPlanActionPlan({

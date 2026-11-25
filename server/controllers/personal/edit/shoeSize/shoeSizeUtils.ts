@@ -1,6 +1,6 @@
-import type { SelectOption } from '../../../../interfaces/GovOptions'
+import type { GovukSelectItem } from '../../../../interfaces/govukComponents'
 
-export const womensShoeSizes: SelectOption[] = [
+export const womensShoeSizes: GovukSelectItem[] = [
   { text: 'UK 1 (EU 34)', value: '1' },
   { text: 'UK 1.5 (EU 34.5)', value: '1.5' },
   { text: 'UK 2 (EU 35)', value: '2' },
@@ -52,7 +52,7 @@ export const womensShoeSizes: SelectOption[] = [
   { text: 'UK 25 (EU 58)', value: '25' },
 ]
 
-export const mensShoeSizes: SelectOption[] = [
+export const mensShoeSizes: GovukSelectItem[] = [
   { text: 'UK 1 (EU 34)', value: '1' },
   { text: 'UK 1.5 (EU 34.5)', value: '1.5' },
   { text: 'UK 2 (EU 35)', value: '2' },
