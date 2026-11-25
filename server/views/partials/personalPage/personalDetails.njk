@@ -161,7 +161,7 @@
       <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
 
       {# Put a border at the bottom of the main list if there are additional details to be shown - currently only when militaryHistoryEnabled #}
-      {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if militaryHistoryEnabled %}
+      {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if militaryHistoryEnabled and not isHighProfilePrisonerOutsideCaseloads %}
 
       {{
         govukSummaryList({
@@ -298,7 +298,7 @@
                 changeHref: 'personal/diet-and-food-allergies',
                 rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies'
               }
-            },
+            } if not isHighProfilePrisonerOutsideCaseloads,
             {
               key: "Smoking and vaping",
               value: personalDetails.smokerOrVaper,
@@ -354,7 +354,7 @@
         })
       }}
 
-      {% if militaryHistoryEnabled %}
+      {% if militaryHistoryEnabled and not isHighProfilePrisonerOutsideCaseloads %}
         {% if militaryRecords.status === 'fulfilled' %}
           {% if militaryRecords.value.length > 0 %}
             <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"

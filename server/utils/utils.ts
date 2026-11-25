@@ -94,19 +94,25 @@ export const formatScheduleItem = (scheduleItem: ScheduledEvent): string => {
 /**
  * Converts the personal details to the rows for a summary list component
  */
-export type SummaryListRowItem = {
-  text?: string
-  html?: string
+
+export type SummaryListRowItem = ({ text: string } | { html: string }) & { classes?: string }
+export interface SummaryListActions {
+  items: (({ text: string } | { html: string }) & {
+    href: string
+    visuallyHiddenText?: string
+    classes?: string
+  })[]
+  classes?: string
+}
+export interface SummaryListRow {
+  key: SummaryListRowItem
+  value: SummaryListRowItem
+  actions?: SummaryListActions
   classes?: string
 }
 
-export type SummaryListRow = {
-  key: SummaryListRowItem
-  value: SummaryListRowItem
-}
-
 export const summaryListOneHalfWidth = (rows: SummaryListRow[]) => {
-  return rows.map((row: SummaryListRow) => {
+  return rows.map(row => {
     const { key, value } = row
     key.classes = 'govuk-!-width-one-half'
     value.classes = 'govuk-!-width-one-half'
