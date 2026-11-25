@@ -1,12 +1,13 @@
 import type { RequestHandler } from 'express'
-import type { Services } from '../services'
 import config from '../config'
+import type { Services } from '../services'
 
 /**
  * Sets flags for high-profile prisoners:
  * - `res.locals.isHighProfilePrisoner`
  * - `res.locals.isHighProfilePrisonerOutsideCaseloads` when also in prison, but not in user’s caseloads
  */
+// TODO: Fold into permissions library
 // eslint-disable-next-line import/prefer-default-export
 export function isHighProfilePrisonerMiddleware(services: Services): RequestHandler {
   const { permissionsApiClientBuilder } = services.dataAccess

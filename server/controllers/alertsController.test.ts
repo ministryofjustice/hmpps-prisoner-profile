@@ -66,6 +66,7 @@ describe('Alerts Controller', () => {
           },
           prisonId: PrisonerMockDataA.prisonId,
           prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         },
         render: jest.fn(),
       } as unknown as Response
@@ -95,13 +96,14 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        req.middleware.alertSummaryData,
-        res.locals.prisonerPermissions,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: req.middleware.alertSummaryData,
+        prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
+        pageId: 'alerts',
+      })
     })
 
     it('should not add update links to alerts the user cannot administer', async () => {
@@ -202,13 +204,14 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        req.middleware.alertSummaryData,
-        res.locals.prisonerPermissions,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: req.middleware.alertSummaryData,
+        prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
+        pageId: 'alerts',
+      })
     })
   })
 

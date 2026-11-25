@@ -1,4 +1,4 @@
-{% if nonAssociationSummary %}
+{% if nonAssociationSummary and not isHighProfilePrisonerOutsideCaseloads %}
   <div class="govuk-grid-column-one-third">
     {{ miniCard(nonAssociationSummary | toNonAssociationMiniSummary(prisonerNumber), '', nonAssociationSummary.status != 'fulfilled') }}
   </div>

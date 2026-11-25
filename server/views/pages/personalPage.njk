@@ -25,13 +25,14 @@
     {
       text: "Care needs",
       href: "#care-needs",
-      template: "partials/personalPage/careNeeds.njk"
+      template: "partials/personalPage/careNeeds.njk",
+      condition: not isHighProfilePrisonerOutsideCaseloads
     },
     {
       text: "Neurodiversity",
       href: "#neurodiversity",
       template: "partials/personalPage/neurodiversity.njk",
-      condition: neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length
+      condition: neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.status === 'fulfilled' and learnerNeurodivergence.value.length and not isHighProfilePrisonerOutsideCaseloads
     },
     {
       text: "Appearance",
@@ -43,7 +44,7 @@
       text: "Addresses",
       href: "#addresses",
       template: "partials/personalPage/addresses.njk",
-      condition: isGranted(CorePersonRecordPermission.read_address, prisonerPermissions)
+      condition: isGranted(CorePersonRecordPermission.read_address, prisonerPermissions) and not isHighProfilePrisonerOutsideCaseloads
     },
     {
       id: "global-numbers-and-email-addresses",
@@ -61,13 +62,14 @@
     {
       text: "Security",
       href: "#security",
-      template: "partials/personalPage/security.njk"
+      template: "partials/personalPage/security.njk",
+      condition: not isHighProfilePrisonerOutsideCaseloads
     },
     {
       text: "Property",
       href: "#property",
       template: "partials/personalPage/property.njk",
-      condition: property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
+      condition: property is not null and isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions) and not isHighProfilePrisonerOutsideCaseloads
     }
   ] %}
 

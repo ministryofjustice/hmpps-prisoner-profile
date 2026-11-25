@@ -80,6 +80,7 @@ describe('Case Notes Controller', () => {
           full: 'John Middle Names Saunders',
         },
         prisonId: PrisonerMockDataA.prisonId,
+        isHighProfilePrisonerOutsideCaseloads: false,
       },
       render: jest.fn(),
       redirect: jest.fn(),
@@ -120,13 +121,14 @@ describe('Case Notes Controller', () => {
         canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        req.middleware.alertSummaryData,
-        res.locals.prisonerPermissions,
-        'case-notes',
-      )
+      expect(mapSpy).toHaveBeenCalledWith({
+        prisonerData: PrisonerMockDataA,
+        inmateDetail: inmateDetailMock,
+        alertSummaryData: req.middleware.alertSummaryData,
+        prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
+        pageId: 'case-notes',
+      })
     })
 
     it('should handle API being unavailable', async () => {

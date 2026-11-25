@@ -487,7 +487,7 @@ export const formatCategoryCodeDescription = (code: string, categoryText: string
  *
  * @param code
  */
-export const formatCategoryALabel = (code: string): string => {
+export const formatCategoryALabel = (code: string): string | undefined => {
   switch (code) {
     case 'A':
       return 'Cat A'
