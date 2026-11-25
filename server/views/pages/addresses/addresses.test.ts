@@ -57,7 +57,6 @@ const render = (overrides = {}) => {
     otherAddresses: [] as AddressForDisplay[],
     prisonerNumber: 'G6123VU',
     prisonerName: { firstLast: 'John Saunders' },
-    editEnabled: true,
     editAddressSpecificPhoneNumbersEnabled: true,
     CorePersonRecordPermission,
     isGranted: () => true,
@@ -70,7 +69,7 @@ const render = (overrides = {}) => {
 
 describe('Addresses page', () => {
   it.each([false, true])('shows stored address phone values unchanged when the flag is %s', enabled => {
-    const $ = render({ editEnabled: false, editAddressSpecificPhoneNumbersEnabled: enabled })
+    const $ = render({ editAddressSpecificPhoneNumbersEnabled: enabled })
     const rows = $('.govuk-summary-list__row')
 
     expect(rows.eq(4).find('dt').text().trim()).toBe('Phone numbers')
@@ -80,7 +79,6 @@ describe('Addresses page', () => {
         .find('.govuk-summary-list__value')
         .text(),
     ).toContain('02012  345678')
-    expect($('a')).toHaveLength(0)
   })
 
   it('renders address details and latest-first phone actions', () => {
@@ -141,13 +139,11 @@ describe('Addresses page', () => {
   it('always shows empty phone and comment states', () => {
     const $ = render({
       primaryAddress: { ...address, comment: undefined, addressPhoneNumbersForDisplay: [] },
-      editEnabled: false,
     })
 
     expect($('dt')).toHaveLength(5)
     expect($('.govuk-summary-list__value').eq(3).text().trim()).toBe('Not entered')
     expect($('.govuk-summary-list__value').eq(4).text().trim()).toBe('Not entered')
-    expect($('a')).toHaveLength(0)
   })
 
   it('renders no fixed address without address lines', () => {

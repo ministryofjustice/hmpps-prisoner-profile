@@ -12,8 +12,8 @@ import { Page } from '../services/interfaces/auditService/page'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { editAddressSpecificPhoneNumbersEnabled } from '../utils/featureFlags'
 import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
-import { editAddressSpecificPhoneNumbersEnabled, editProfileEnabled } from '../utils/featureFlags'
 
 export default function addressRouter(services: Services): Router {
   const router = Router()
@@ -24,7 +24,6 @@ export default function addressRouter(services: Services): Router {
   const addressPhoneNumberController = new AddressPhoneNumberController(services.addressService, services.auditService)
 
   const addressPhoneNumberMiddleware = [
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     featureFlagGuard('Address-specific phone numbers', editAddressSpecificPhoneNumbersEnabled),
     getPrisonerData(services),
     getDuplicatePrisonerData(services),

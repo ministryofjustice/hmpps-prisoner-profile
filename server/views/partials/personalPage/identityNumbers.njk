@@ -16,7 +16,7 @@
       {% endif %}
     </div>
   </dd>
-  {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
+  {% if editable and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
     <dd class="govuk-summary-list__actions {{ rowClasses }}">
       <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change <span class="govuk-visually-hidden">{{ name }} {{ identityNumber.value }}</span></a>
     </dd>
@@ -33,7 +33,7 @@
       </div>
     </dd>
 
-    {% if editable and editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
+    {% if editable and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
       <dd class="govuk-summary-list__actions no-bottom-border">
         <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/{{ identityNumber.editPageUrl }}/{{ identityNumber.offenderId }}-{{ identityNumber.sequenceId }}">Change <span class="govuk-visually-hidden">{{ name }} {{ identityNumber.value }}</span></a>
       </dd>
@@ -68,7 +68,7 @@
 {% set showAdditionalIdRow = not hasPersonalId or not hasHomeOfficeId %}
 
 {%- call summaryCard({title: "Identity numbers", id: "identity-numbers" }) -%}
-  {% set identityNumberEditEnabled = editEnabled and isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
+  {% set identityNumberEditEnabled = isGranted(CorePersonRecordPermission.edit_identifiers, prisonerPermissions) %}
 
   <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">

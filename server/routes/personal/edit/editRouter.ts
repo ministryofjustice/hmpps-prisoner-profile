@@ -11,7 +11,6 @@ import auditPageAccessAttempt from '../../../middleware/auditPageAccessAttempt'
 import { Page } from '../../../services/interfaces/auditService/page'
 import getPrisonerData from '../../../middleware/getPrisonerDataMiddleware'
 import { Services } from '../../../services'
-import { editProfileEnabled } from '../../../utils/featureFlags'
 import {
   buildFieldData,
   faceShapeFieldData,
@@ -40,7 +39,6 @@ import addressEditRouter from './addressEditRouter'
 import { emailValidator } from '../../../validators/personal/emailValidator'
 import identityNumbersRouter from './identityNumbersRouter'
 import { populateEditPageData } from '../../../middleware/populateEditPageData'
-import { featureFlagGuard, FeatureFlagMethod } from '../../../middleware/featureFlagGuard'
 import { personalPageBasePath } from '../personalRouter'
 import { textFieldLengthValidator } from '../../../validators/personal/textFieldLengthValidator'
 import { countryOfBirthValidator } from '../../../validators/personal/countryOfBirthValidator'
@@ -95,7 +93,6 @@ export default function editRouter(services: Services): Router {
     edit,
     submit,
     requiredPermission,
-    featureFlag = { featureName: 'Profile Edit', method: editProfileEnabled },
   }: {
     requiredRoles?: string[]
     path: string
@@ -113,7 +110,6 @@ export default function editRouter(services: Services): Router {
       }
     }
     requiredPermission: PrisonerPermission
-    featureFlag?: { featureName: string; method: FeatureFlagMethod }
   }) => {
     const routePath = `${personalPageBasePath}/${path}`
 
@@ -121,7 +117,6 @@ export default function editRouter(services: Services): Router {
       routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
-      featureFlagGuard(featureFlag.featureName, featureFlag.method),
       prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
       populateEditPageData(),
       edit.method,
@@ -141,7 +136,6 @@ export default function editRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        featureFlagGuard(featureFlag.featureName, featureFlag.method),
         prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
         validationMiddleware(submit.validation.validators, validationOptions),
         submit.method,
@@ -151,7 +145,6 @@ export default function editRouter(services: Services): Router {
         routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
-        featureFlagGuard(featureFlag.featureName, featureFlag.method),
         prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [requiredPermission] }),
         submit.method,
       )
@@ -349,7 +342,6 @@ export default function editRouter(services: Services): Router {
       },
     },
     requiredPermission: PersonHealthAndMedicationPermission.edit_diet,
-    featureFlag: { featureName: 'Diet and Allergy', method: () => true },
   })
 
   editRoute({
@@ -424,7 +416,6 @@ export default function editRouter(services: Services): Router {
       },
     },
     requiredPermission: PersonProtectedCharacteristicsPermission.edit_religion_and_belief,
-    featureFlag: { featureName: 'Religion Edit', method: () => true },
   })
 
   editRoute({

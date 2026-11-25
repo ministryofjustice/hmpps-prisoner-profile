@@ -3,7 +3,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
-{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
+{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
 
 {% macro addressSummary(address, primaryOrPostal) %}
   <div class="hmpps-address {{ 'row-updated' if flashMessage and flashMessage.addressIds and address.addressId in flashMessage.addressIds }}" id="hmpps-address-{{ primaryOrPostal }}">
@@ -108,7 +108,7 @@
   title: "Addresses",
   id: "addresses",
   actions: [{ text: 'Add a home address', href: 'personal/where-is-address' }]
-    if editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions)
+    if isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions)
 }) %}
   {% if addresses.status === 'fulfilled' %}
     <div class="govuk-grid-row" data-qa="addresses">

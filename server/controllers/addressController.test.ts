@@ -77,7 +77,6 @@ describe('Address controller', () => {
           primaryAddress: primaryAndPostalAddress,
           mailAddress: undefined,
           otherAddresses: [latestOtherAddress, otherAddress],
-          editEnabled: expect.any(Boolean),
           editAddressSpecificPhoneNumbersEnabled: expect.any(Boolean),
         }),
       )

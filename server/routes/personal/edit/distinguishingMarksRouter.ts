@@ -12,8 +12,6 @@ import {
   updatePhotoValidator,
 } from '../../../validators/personal/distinguishingMarksValidator'
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
-import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureFlags'
 import {
   allBodyParts,
   markTypeSelections,
@@ -35,7 +33,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
   const { prisonPermissionsService } = services
 
   const commonMiddleware: RequestHandler[] = [
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [CorePersonRecordPermission.edit_distinguishing_marks],
     }),
@@ -147,7 +144,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
   // View all images for a mark
   router.get(
     '/:markId/all-photos',
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [CorePersonRecordPermission.read_distinguishing_marks],
     }),

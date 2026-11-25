@@ -41,7 +41,7 @@
   id: "next-of-kin",
   actions: [
     {text: 'Add a new contact', href: 'personal/next-of-kin-emergency-contacts' }
-  ] if editEnabled and isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions)
+  ] if isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions)
 }) -%}
   {% if nextOfKinAndEmergencyContacts.status === 'fulfilled'  %}
     <div class="govuk-grid-row">
@@ -96,8 +96,6 @@
                 </div>
 
                 {% if
-                  editEnabled and
-                  changeContactLinkEnabled and
                   isGranted(PersonalRelationshipsPermission.edit_emergency_contacts, prisonerPermissions) and
                   isGranted(PersonalRelationshipsPermission.edit_contacts, prisonerPermissions)
                 %}

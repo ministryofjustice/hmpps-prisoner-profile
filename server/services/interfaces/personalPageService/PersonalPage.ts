@@ -1,5 +1,3 @@
-import Address from './Address'
-import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { Result } from '../../../utils/result/result'
 import {
@@ -14,9 +12,6 @@ export default interface PersonalPage {
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
   addresses: Result<SummarisedAddresses>
-  oldAddresses: OldAddresses // TODO remove after edit profile is rolled out
-  oldAddressSummary: GovSummaryItem[] // TODO remove after edit profile is rolled out
-  nextOfKin: NextOfKin[]
   nextOfKinAndEmergencyContacts: Result<NextOfKinAndEmergencyContactsDetails>
   physicalCharacteristics: Result<PhysicalCharacteristics>
   security: Security
@@ -118,28 +113,6 @@ export interface PropertyItem {
   containerType: string
   sealMark: string
   location: string
-}
-
-// TODO: Remove once we've rolled out edit the profile
-export interface OldAddresses {
-  isPrimaryAddress: boolean
-  noFixedAddress: boolean
-  address: Address
-  comment: string
-  addressTypes: string[]
-  phones: string[]
-  addedOn: string
-}
-
-// TODO: Remove once we've rolled out edit the profile
-export interface NextOfKin {
-  emergencyContact: boolean
-  nextOfKin: boolean
-  name: string
-  relationship: string
-  emails: string[]
-  phones: string[]
-  address: OldAddresses
 }
 
 export interface DistinguishingMark {

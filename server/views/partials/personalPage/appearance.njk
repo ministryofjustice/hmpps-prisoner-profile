@@ -67,7 +67,7 @@
       <div class="govuk-grid-row" data-qa="appearance">
           <div class="govuk-grid-column-full" data-qa="physical-characteristics">
               <h3 class="govuk-heading-m">Physical characteristics</h3>
-              {% set physicalCharacteristicsEditEnabled = editEnabled and isGranted(CorePersonRecordPermission.edit_physical_characteristics, prisonerPermissions) %}
+              {% set physicalCharacteristicsEditEnabled = isGranted(CorePersonRecordPermission.edit_physical_characteristics, prisonerPermissions) %}
               {{ govukSummaryList({
                   classes: listClasses,
                   rows: toSummaryListRows([

@@ -5,7 +5,7 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and editEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
+{% set canEditAddressPhoneNumbers = editAddressSpecificPhoneNumbersEnabled and isGranted(CorePersonRecordPermission.edit_address, prisonerPermissions) %}
 
 {% macro addressDetails(address, classes='') %}
   {% if address %}

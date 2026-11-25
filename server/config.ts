@@ -421,25 +421,14 @@ export default {
 
     highProfilePrisonersEnabled: toBoolean(get('HIGH_PROFILE_PRISONERS_ENABLED', 'false')),
 
-    editProfile: {
-      enabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []) as string[],
-      enabledPrisonsByDate: get('EDIT_PROFILE_ENABLED_PRISONS_BY_DATE', []) as string[],
-      enabledPrisonsFrom: get('EDIT_PROFILE_ENABLED_FROM', '2099-01-01T00:00:00'),
-    },
-
-    editProfileSimulateFetch: toBoolean(get('EDIT_PROFILE_SIMULATE_FETCH', 'false')),
-
     editAddressSpecificPhoneNumbers: {
       enabledPrisons: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS', []) as string[],
       enabledPrisonsByDate: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_PRISONS_BY_DATE', []) as string[],
       enabledPrisonsFrom: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    personalRelationshipsApiReadEnabled: toBoolean(get('PERSONAL_RELATIONSHIPS_API_READ_ENABLED', 'true')),
-
     healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
-    editReligionEnabledFrom: get('EDIT_RELIGION_ENABLED_FROM', '2099-01-01T00:00:00'),
     manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
 
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
@@ -457,12 +446,6 @@ export default {
     },
 
     circuitBreakerEnabled: toBoolean(get('CIRCUIT_BREAKER_ENABLED', 'false')),
-
-    changeContactDetailsLink: {
-      enabledPrisons: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS', []) as string[],
-      enabledPrisonsByDate: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_PRISONS_BY_DATE', []) as string[],
-      enabledPrisonsFrom: get('CHANGE_CONTACT_DETAILS_LINK_ENABLED_FROM', '2099-01-01T00:00:00'),
-    },
 
     offencesMoved: {
       enabledPrisons: get('OFFENCES_MOVED_ENABLED_PRISONS', []) as string[],

@@ -4,8 +4,6 @@ import { Services } from '../../../services'
 import AliasController from '../../../controllers/personal/edit/alias/aliasController'
 import validationMiddleware from '../../../middleware/validationMiddleware'
 import { nameValidator } from '../../../validators/personal/nameValidator'
-import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { editProfileEnabled } from '../../../utils/featureFlags'
 import { radioFieldValidator } from '../../../validators/personal/radioFieldValidator'
 import { dateOfBirthValidator } from '../../../validators/personal/dateOfBirthValidator'
 import { parameterGuard } from '../../../middleware/parameterGuard'
@@ -23,7 +21,6 @@ export default function aliasRouter(services: Services): Router {
   )
 
   const commonMiddleware: RequestHandler[] = [
-    featureFlagGuard('Profile Edit', editProfileEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [CorePersonRecordPermission.edit_name_and_aliases],
     }),

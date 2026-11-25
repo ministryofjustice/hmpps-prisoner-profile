@@ -125,7 +125,7 @@
               anchor: "name",
               dataQa: "full-name",
               changeHref: "personal/change-name",
-              changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
+              changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
               rowUpdated: flashMessage.fieldName === 'fullName'
             }
           },
@@ -137,7 +137,7 @@
               dataQa: "aliases",
               changeText: 'Add an alias',
               changeHref: "personal/enter-alias-details",
-              changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
+              changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_name_and_aliases, prisonerPermissions),
               activateHiddenText: false,
               rowUpdated: flashMessage.fieldName === 'aliases',
               hideIfEmpty: false,
@@ -175,7 +175,7 @@
                 dataQa: "date-of-birth",
                 visible: isGranted(CorePersonRecordPermission.read_date_of_birth, prisonerPermissions),
                 changeHref: "personal/date-of-birth",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
+                changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_date_of_birth, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'dateOfBirth'
               }
             },
@@ -187,7 +187,7 @@
                 dataQa: "city-or-town-of-birth",
                 visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
                 changeHref: "personal/city-or-town-of-birth",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
+                changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth'
               }
             },
@@ -199,7 +199,7 @@
                 dataQa: "country-of-birth",
                 visible: isGranted(CorePersonRecordPermission.read_place_of_birth, prisonerPermissions),
                 changeHref: "personal/country-of-birth",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
+                changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_place_of_birth, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'countryOfBirth'
               }
             },
@@ -211,7 +211,7 @@
                 dataQa: "nationality",
                 visible: isGranted(CorePersonRecordPermission.read_nationality, prisonerPermissions),
                 changeHref: "personal/nationality",
-                changeLinkEnabled: editEnabled and isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
+                changeLinkEnabled: isGranted(CorePersonRecordPermission.edit_nationality, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'nationality'
               }
             },
@@ -223,7 +223,7 @@
                 dataQa: "ethnic-group",
                 visible: isGranted(PersonProtectedCharacteristicsPermission.read_ethnicity, prisonerPermissions),
                 changeHref: "personal/ethnic-group",
-                changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonProtectedCharacteristicsPermission.edit_ethnicity, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'ethnicity'
               }
             },
@@ -236,7 +236,7 @@
                 html: true,
                 visible: isGranted(PersonProtectedCharacteristicsPermission.read_religion_and_belief, prisonerPermissions),
                 changeHref: "personal/religion",
-                changeLinkEnabled: editReligionEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_religion_and_belief, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonProtectedCharacteristicsPermission.edit_religion_and_belief, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'religion'
               }
             },
@@ -249,7 +249,7 @@
                 dataQa: "sexual-orientation",
                 visible: isGranted(PersonProtectedCharacteristicsPermission.read_sexual_orientation, prisonerPermissions),
                 changeHref: "personal/sexual-orientation",
-                changeLinkEnabled: editEnabled and isGranted(PersonProtectedCharacteristicsPermission.edit_sexual_orientation, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonProtectedCharacteristicsPermission.edit_sexual_orientation, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'sexualOrientation'
               }
             },
@@ -261,7 +261,7 @@
                 dataQa: "marriage-or-civil-partnership",
                 visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_domestic_status, prisonerPermissions),
                 changeHref: "personal/marital-status",
-                changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_domestic_status, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonalRelationshipsPermission.edit_domestic_status, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'domesticStatus'
               }
             },
@@ -273,7 +273,7 @@
                 dataQa: "number-of-children",
                 visible: isInUsersCaseLoad and isGranted(PersonalRelationshipsPermission.read_number_of_children, prisonerPermissions),
                 changeHref: "personal/children",
-                changeLinkEnabled: editEnabled and isGranted(PersonalRelationshipsPermission.edit_number_of_children, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonalRelationshipsPermission.edit_number_of_children, prisonerPermissions),
                 rowUpdated: flashMessage.fieldName === 'numberOfChildren'
               }
             }
@@ -306,7 +306,7 @@
                 anchor: "smoking-and-vaping",
                 dataQa: "smoker-or-vaper",
                 visible: isGranted(PersonHealthAndMedicationPermission.read_smoker, prisonerPermissions),
-                changeLinkEnabled: editEnabled and isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
+                changeLinkEnabled: isGranted(PersonHealthAndMedicationPermission.edit_smoker, prisonerPermissions),
                 changeHref: 'personal/smoker-or-vaper',
                 rowUpdated: flashMessage.fieldName === 'smokerOrVaper'
               }

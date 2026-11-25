@@ -3,7 +3,6 @@ import {
   PrisonerPermissions,
   PrisonerPropertyPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import logger from '../../logger'
 import config from '../config'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
@@ -11,8 +10,6 @@ import PersonalPage, {
   GlobalEmail,
   GlobalNumbersAndEmails,
   IdentityNumbers,
-  NextOfKin,
-  OldAddresses,
   PersonalDetails,
   PhoneNumber,
   PhysicalCharacteristics,
@@ -21,7 +18,6 @@ import PersonalPage, {
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
-  addressToLines,
   calculateAge,
   convertToTitleCase,
   formatHeight,
@@ -37,8 +33,6 @@ import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
 import { formatDate } from '../utils/dateHelpers'
-import { getMostRecentAddress } from '../utils/getMostRecentAddress'
-import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
@@ -73,21 +67,16 @@ import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 import NextOfKinService from './nextOfKinService'
 import {
   PersonalRelationshipsApiClient,
-  PersonalRelationshipsContact,
   PersonalRelationshipsDomesticStatusDto,
   PersonalRelationshipsNumberOfChildrenDto,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import DomesticStatusService from './domesticStatusService'
-import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { religionFieldData } from '../controllers/personal/fieldData'
 import GlobalPhoneNumberAndEmailAddressesService from './globalPhoneNumberAndEmailAddressesService'
 import { OffenderIdentifierType } from '../data/interfaces/prisonApi/OffenderIdentifierType'
 import AddressService from './addressService'
 
 interface PersonalPageGetOptions {
-  editProfileEnabled: boolean
-  simulateFetchEnabled: boolean
-  personalRelationshipsApiReadEnabled: boolean
   personEndpointsEnabled: boolean
   prisonerPropertyServiceEnabled: boolean
   apiErrorCallback: (error: Error) => void
@@ -264,9 +253,6 @@ export default class PersonalPageService {
     options: Partial<PersonalPageGetOptions> = {},
   ): Promise<PersonalPage> {
     const defaultOptions: PersonalPageGetOptions = {
-      editProfileEnabled: false,
-      simulateFetchEnabled: false,
-      personalRelationshipsApiReadEnabled: true,
       personEndpointsEnabled: false,
       prisonerPropertyServiceEnabled: false,
       apiErrorCallback: () => null,
@@ -281,8 +267,6 @@ export default class PersonalPageService {
       inmateDetail,
       secondaryLanguages,
       property,
-      oldAddressList,
-      offenderContacts,
       identifiers,
       learnerNeurodivergence,
       healthAndMedication,
@@ -296,38 +280,19 @@ export default class PersonalPageService {
       isGranted(PrisonerPropertyPermission.read_property_details, prisonerPermissions)
         ? prisonApiClient.getProperty(bookingId)
         : null,
-      !getOptions.editProfileEnabled ? prisonApiClient.getAddresses(prisonerNumber) : null,
-      prisonApiClient.getOffenderContacts(prisonerNumber),
-      prisonApiClient.getIdentifiers(prisonerNumber, getOptions.editProfileEnabled),
+      prisonApiClient.getIdentifiers(prisonerNumber, true),
       Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), getOptions.apiErrorCallback),
       Result.wrap(this.getHealthAndMedication(token, prisonerNumber), getOptions.apiErrorCallback),
-      getOptions.personalRelationshipsApiReadEnabled
-        ? Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback)
-        : Result.rejected<PersonalRelationshipsContact[], Error>(undefined),
-      getOptions.personalRelationshipsApiReadEnabled
-        ? Result.wrap(
-            this.getNumberOfChildren(token, prisonerNumber),
-            noCallbackOnErrorBecause('we are falling back to prisoner search data'),
-          )
-        : Result.rejected<PersonalRelationshipsNumberOfChildrenDto, Error>(undefined),
-      getOptions.personalRelationshipsApiReadEnabled
-        ? Result.wrap(
-            this.getDomesticStatus(token, prisonerNumber),
-            noCallbackOnErrorBecause('we are falling back to prison api data'),
-          )
-        : Result.rejected<PersonalRelationshipsDomesticStatusDto, Error>(undefined),
+      Result.wrap(this.getNextOfKinAndEmergencyContacts(token, prisonerNumber), getOptions.apiErrorCallback),
+      Result.wrap(
+        this.getNumberOfChildren(token, prisonerNumber),
+        noCallbackOnErrorBecause('we are falling back to prisoner search data'),
+      ),
+      Result.wrap(
+        this.getDomesticStatus(token, prisonerNumber),
+        noCallbackOnErrorBecause('we are falling back to prison api data'),
+      ),
     ])
-
-    // When enabled, call the services required for edit profile without blocking for load testing purposes
-    // Does not use the person endpoints (which are not active in prod 10/10/25) - this should result in a worst case test
-    if (options.simulateFetchEnabled) {
-      Promise.all([
-        prisonApiClient.getIdentifiers(prisonerNumber, true),
-        this.addressService.getAddressesForDisplay(token, prisonerNumber),
-        this.getDistinguishingMarks(token, prisonerNumber),
-        this.getGlobalPhonesAndEmails(token, prisonerNumber),
-      ]).catch(logger.warn)
-    }
 
     let addresses: Result<AddressForDisplay[], Error>
     let distinguishingMarks: Result<PersonIntegrationDistinguishingMark[], Error>
@@ -341,43 +306,27 @@ export default class PersonalPageService {
       )
       ;[addresses, globalNumbersAndEmails, distinguishingMarks, militaryRecords, physicalAttributes] =
         await Promise.all([
-          Result.wrap(
-            getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
-            getOptions.apiErrorCallback,
-          ),
+          Result.wrap(this.addressService.getAddressesForDisplay(token, prisonerNumber), getOptions.apiErrorCallback),
           profileSummary.mapAsync(summary =>
-            getOptions.editProfileEnabled
-              ? this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts)
-              : null,
+            this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts),
           ),
-          profileSummary.map(summary => (getOptions.editProfileEnabled ? summary.distinguishingMarks : null)),
+          profileSummary.map(summary => summary.distinguishingMarks),
           profileSummary.map(summary => (militaryHistoryEnabled() ? summary.militaryRecords : null)),
           profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
         ])
     } else {
       ;[addresses, distinguishingMarks, militaryRecords, physicalAttributes, globalNumbersAndEmails] =
         await Promise.all([
-          Result.wrap(
-            getOptions.editProfileEnabled ? this.addressService.getAddressesForDisplay(token, prisonerNumber) : null,
-            getOptions.apiErrorCallback,
-          ),
-          Result.wrap(
-            getOptions.editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
-            getOptions.apiErrorCallback,
-          ),
+          Result.wrap(this.addressService.getAddressesForDisplay(token, prisonerNumber), getOptions.apiErrorCallback),
+          Result.wrap(this.getDistinguishingMarks(token, prisonerNumber), getOptions.apiErrorCallback),
           Result.wrap(
             militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
             getOptions.apiErrorCallback,
           ),
           Result.wrap(this.getPhysicalAttributes(token, prisonerNumber), getOptions.apiErrorCallback),
-          Result.wrap(
-            getOptions.editProfileEnabled ? this.getGlobalPhonesAndEmails(token, prisonerNumber) : null,
-            getOptions.apiErrorCallback,
-          ),
+          Result.wrap(this.getGlobalPhonesAndEmails(token, prisonerNumber), getOptions.apiErrorCallback),
         ])
     }
-
-    const oldAddresses: OldAddresses = !getOptions.editProfileEnabled && this.oldAddresses(oldAddressList)
 
     const addressResponseResult: Result<SummarisedAddresses, Error> = addresses.map(addressesForDisplay => {
       return {
@@ -396,7 +345,7 @@ export default class PersonalPageService {
       countryOfBirth = refData.map(data => data.description)
     }
 
-    const [personalDetails, nextOfKin] = await Promise.all([
+    const [personalDetails] = await Promise.all([
       this.personalDetails(
         token,
         id => this.prisonService.getPrisonByPrisonId(id, token),
@@ -409,16 +358,12 @@ export default class PersonalPageService {
         personalRelationshipsNumberOfChildren,
         personalRelationshipsDomesticStatus,
       ),
-      this.nextOfKin(offenderContacts, prisonApiClient),
     ])
     return {
       personalDetails,
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses: addressResponseResult,
-      oldAddresses,
-      oldAddressSummary: this.addressSummary(oldAddresses),
-      nextOfKin,
       nextOfKinAndEmergencyContacts: nextOfKinAndEmergencyContacts.map(contacts => ({
         contacts,
         hasNextOfKin: contacts.some(contact => contact.isNextOfKin),
@@ -440,35 +385,6 @@ export default class PersonalPageService {
       militaryRecords: militaryRecords.map(records => records?.filter(record => record.militarySeq === 1)), // Temporary fix to only show the first military record - designs for multiple not ready yet
       globalNumbersAndEmails,
     }
-  }
-
-  // TODO: Remove this once edit profile is live
-  private addressSummary(addresses: OldAddresses): GovSummaryItem[] {
-    const addressSummary: GovSummaryItem[] = []
-
-    if (addresses) {
-      addressSummary.push({
-        key: { text: 'Address' },
-        value: { html: addressToLines(addresses.address).join('<br/>') },
-        classes: 'govuk-summary-list__row--no-border',
-      })
-      addressSummary.push({
-        key: { text: 'Type of address' },
-        value: { html: addresses.addressTypes.join('<br/>') },
-      })
-      addressSummary.push({
-        key: { text: 'Phone' },
-        value: { html: addresses.phones?.length ? addresses.phones.join('<br/>') : 'Not entered' },
-      })
-      if (addresses.comment) {
-        addressSummary.push({
-          key: { text: 'Comment' },
-          value: { text: addresses.comment },
-        })
-      }
-    }
-
-    return addressSummary
   }
 
   private async personalDetails(
@@ -727,69 +643,12 @@ export default class PersonalPageService {
     }))
   }
 
-  // TODO: Remove once the new NoK/Emergency Contacts tile is released.
-  private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
-    const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
-    let contactAddresses: { personId: number; addresses: Address[] }[] = []
-    if (activeNextOfKinContacts) {
-      contactAddresses = await Promise.all(
-        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId, prisonApiClient)),
-      )
-    }
-
-    return contacts.offenderContacts
-      ?.filter(contact => contact.nextOfKin && contact.active)
-      .map(contact => {
-        const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
-        return {
-          address: this.oldAddresses(personAddresses?.addresses),
-          emails: contact.emails?.map(({ email }) => email) || [],
-          emergencyContact: contact.emergencyContact,
-          name: formatName(contact.firstName, contact.middleName, contact.lastName),
-          nextOfKin: contact.nextOfKin,
-          phones: contact.phones?.map(({ number }) => number),
-          relationship: contact.relationshipDescription,
-        }
-      })
-  }
-
   private async addressForPerson(
     personId: number,
     prisonApiClient: PrisonApiClient,
   ): Promise<{ personId: number; addresses: Address[] }> {
     const addresses = await prisonApiClient.getAddressesForPerson(personId)
     return { personId, addresses }
-  }
-
-  // TODO: remove once edit profile is rolled out:
-  private oldAddresses(addresses: Address[]): OldAddresses | undefined {
-    if (!Array.isArray(addresses)) {
-      return undefined
-    }
-
-    const mostRecentAddress = getMostRecentAddress(addresses)
-
-    return {
-      isPrimaryAddress: !!mostRecentAddress,
-      noFixedAddress: mostRecentAddress?.noFixedAddress,
-      comment: mostRecentAddress?.comment,
-      phones: mostRecentAddress?.phones.map(phone => phone.number) || [],
-      addressTypes:
-        mostRecentAddress?.addressUsages
-          .filter(usage => usage.activeFlag && usage.activeFlag)
-          .map(usage => usage.addressUsageDescription) || [],
-      address: {
-        country: mostRecentAddress?.country || '',
-        county: mostRecentAddress?.county || '',
-        flat: mostRecentAddress?.flat || '',
-        locality: mostRecentAddress?.locality || '',
-        postalCode: mostRecentAddress?.postalCode || '',
-        premise: mostRecentAddress?.premise || '',
-        street: mostRecentAddress?.street || '',
-        town: mostRecentAddress?.town || '',
-      },
-      addedOn: mostRecentAddress?.startDate || '',
-    }
   }
 
   private physicalCharacteristics(
