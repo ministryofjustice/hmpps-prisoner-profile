@@ -12,6 +12,7 @@ import { Page } from '../services/interfaces/auditService/page'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
 import { featureFlagGuard } from '../middleware/featureFlagGuard'
+import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
 import { editAddressSpecificPhoneNumbersEnabled, editProfileEnabled } from '../utils/featureFlags'
 
 export default function addressRouter(services: Services): Router {
@@ -72,6 +73,7 @@ export default function addressRouter(services: Services): Router {
     getPrisonerData(services, { minimal: true }),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     (req, res) => addressController.displayAddresses(req, res),
   )
 
