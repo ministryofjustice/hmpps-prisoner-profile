@@ -177,6 +177,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
   cy.task('stubOffenderContacts', prisonerNumber)
+  cy.task('stubAddresses', { prisonerNumber }) // TODO: Remove this after profile edit rolled out
   cy.task('stubGetAddresses', { prisonerNumber })
   cy.task('stubPersonAddresses')
   cy.task('stubImages')
