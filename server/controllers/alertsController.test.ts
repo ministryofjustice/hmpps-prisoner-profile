@@ -66,6 +66,7 @@ describe('Alerts Controller', () => {
           },
           prisonId: PrisonerMockDataA.prisonId,
           prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         },
         render: jest.fn(),
       } as unknown as Response
@@ -100,6 +101,7 @@ describe('Alerts Controller', () => {
         inmateDetail: inmateDetailMock,
         alertSummaryData: req.middleware.alertSummaryData,
         prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
         pageId: 'alerts',
       })
     })
@@ -207,6 +209,7 @@ describe('Alerts Controller', () => {
         inmateDetail: inmateDetailMock,
         alertSummaryData: req.middleware.alertSummaryData,
         prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
         pageId: 'alerts',
       })
     })

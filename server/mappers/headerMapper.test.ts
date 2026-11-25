@@ -25,6 +25,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const locationLink = topLinks.find(link => link.heading === 'Location')
@@ -41,6 +42,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataB,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const locationLink = topLinks.find(link => link.heading === 'Location')
@@ -56,6 +58,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         expect(topLinks.map(link => link.heading)).not.toContain('Location')
@@ -70,6 +73,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         expect(topLinks.map(link => link.heading)).not.toContain('Category')
@@ -81,6 +85,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const categoryLink = topLinks.find(link => link.heading === 'Category')
@@ -107,6 +112,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         expect(topLinks.map(link => link.heading)).not.toContain('CSRA')
@@ -119,6 +125,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const csra = topLinks.find(link => link.heading === 'CSRA')
@@ -136,6 +143,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const csraLink = topLinks.find(link => link.heading === 'CSRA')
@@ -157,6 +165,7 @@ describe('HeaderMapping', () => {
             prisonerData: PrisonerMockDataA,
             inmateDetail: inmateDetailMock,
             prisonerPermissions: mockedPrisonerPermissions,
+            isHighProfilePrisonerOutsideCaseloads: false,
           })
 
           const csraLink = topLinks.find(link => link.heading === 'CSRA')
@@ -176,6 +185,7 @@ describe('HeaderMapping', () => {
             prisonerData: PrisonerMockDataA,
             inmateDetail: inmateDetailMock,
             prisonerPermissions: mockedPrisonerPermissions,
+            isHighProfilePrisonerOutsideCaseloads: false,
           })
 
           const csraLink = topLinks.find(link => link.heading === 'CSRA')
@@ -189,6 +199,7 @@ describe('HeaderMapping', () => {
             prisonerData: PrisonerMockDataA,
             inmateDetail: inmateDetailMock,
             prisonerPermissions: mockedPrisonerPermissions,
+            isHighProfilePrisonerOutsideCaseloads: false,
           })
 
           expect(topLinks.map(link => link.heading)).not.toContain('CSRA')
@@ -204,6 +215,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         expect(topLinks.map(link => link.heading)).not.toContain('Incentive level')
@@ -216,12 +228,27 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
         expect(incentiveLink).toBeDefined()
         expect(incentiveLink.info).toBe('Standard')
         expect(incentiveLink.url).toBeUndefined()
+      })
+
+      it('should not show incentive level when high-profile prisoner outside caseloads', () => {
+        // TODO: this will become false and test case can be removed
+        mockPermissions({ [PrisonerIncentivesPermission.read_incentive_level]: true })
+
+        const topLinks = mapProfileBannerTopLinks({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: true,
+        })
+
+        expect(topLinks.map(link => link.heading)).not.toContain('Incentive level')
       })
 
       it('should show incentive level with history link when both read permissions are granted', () => {
@@ -234,6 +261,7 @@ describe('HeaderMapping', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: false,
         })
 
         const incentiveLink = topLinks.find(link => link.heading === 'Incentive level')
@@ -249,26 +277,69 @@ describe('HeaderMapping', () => {
 
   describe('Tab links', () => {
     it.each([
-      { scenario: 'cannot view case notes', canViewCaseNotes: false, expectedLength: 5, alertsIsNth: 2 },
-      { scenario: 'can view case notes', canViewCaseNotes: true, expectedLength: 6, alertsIsNth: 3 },
-    ])('should highlight current (alerts) page when $scenario', ({ canViewCaseNotes, expectedLength, alertsIsNth }) => {
-      mockPermissions({ [CaseNotesPermission.read]: canViewCaseNotes })
+      {
+        scenario: 'cannot view case notes',
+        canViewCaseNotes: false,
+        isHighProfilePrisonerOutsideCaseloads: false,
+        expected: [
+          { id: 'overview', active: false },
+          { id: 'personal', active: false },
+          { id: 'alerts', active: true },
+          { id: 'offences', active: false },
+          { id: 'work-and-skills', active: false },
+        ],
+      },
+      {
+        scenario: 'can view case notes',
+        canViewCaseNotes: true,
+        isHighProfilePrisonerOutsideCaseloads: false,
+        expected: [
+          { id: 'overview', active: false },
+          { id: 'personal', active: false },
+          { id: 'case-notes', active: false },
+          { id: 'alerts', active: true },
+          { id: 'offences', active: false },
+          { id: 'work-and-skills', active: false },
+        ],
+      },
+      {
+        scenario: 'high-profile prisoner outside caseloads',
+        canViewCaseNotes: false,
+        isHighProfilePrisonerOutsideCaseloads: true,
+        expected: [
+          { id: 'overview', active: false },
+          { id: 'personal', active: false },
+          { id: 'alerts', active: true },
+        ],
+      },
+    ])(
+      'should highlight current (alerts) page when $scenario',
+      ({ canViewCaseNotes, isHighProfilePrisonerOutsideCaseloads, expected }) => {
+        mockPermissions({ [CaseNotesPermission.read]: canViewCaseNotes })
 
+        const { tabLinks } = mapHeaderData({
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+          alertSummaryData: { apiUnavailable: true },
+          prisonerPermissions: mockedPrisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads,
+          pageId: 'alerts',
+        })
+
+        expect(tabLinks.map(tab => ({ id: tab.id, active: tab.active }))).toEqual(expected)
+      },
+    )
+
+    it('should not highlight any page if not current', () => {
       const { tabLinks } = mapHeaderData({
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
         alertSummaryData: { apiUnavailable: true },
         prisonerPermissions: mockedPrisonerPermissions,
-        pageId: 'alerts',
+        isHighProfilePrisonerOutsideCaseloads: false,
       })
 
-      expect(tabLinks).toHaveLength(expectedLength)
-      // alerts is active
-      expect(tabLinks.findIndex(tab => tab.active)).toEqual(alertsIsNth)
-      // all but alerts is inactive
-      expect(tabLinks.filter((_, index) => index !== alertsIsNth).map(tab => tab.active)).toEqual(
-        Array.from({ length: expectedLength - 1 }).map(() => false),
-      )
+      expect(tabLinks.values().every(tab => tab.active)).toBe(false)
     })
   })
 })

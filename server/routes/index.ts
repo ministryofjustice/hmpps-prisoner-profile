@@ -215,6 +215,7 @@ export default function routes(services: Services): Router {
           inmateDetail,
           alertSummaryData,
           prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
           pageId: 'work-and-skills',
         }),
         ...workAndSkillsPageData,
@@ -261,7 +262,14 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData({ prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, pageId: 'offences' }),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+          pageId: 'offences',
+        }),
         courtCaseData,
         releaseDates,
         activeTab: true,

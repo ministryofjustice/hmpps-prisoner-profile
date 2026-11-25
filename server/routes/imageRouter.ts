@@ -90,7 +90,13 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerNumber}`,
-        ...mapHeaderData({ prisonerData, inmateDetail, alertSummaryData, prisonerPermissions }),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+        }),
         miniBannerData,
         imageUploadedDate,
         photoStatus,
@@ -133,7 +139,13 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
-        ...mapHeaderData({ prisonerData, inmateDetail, alertSummaryData, prisonerPermissions }),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+        }),
         miniBannerData,
         facialImages,
       })

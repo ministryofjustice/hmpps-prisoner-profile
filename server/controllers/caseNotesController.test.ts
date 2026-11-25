@@ -80,6 +80,7 @@ describe('Case Notes Controller', () => {
           full: 'John Middle Names Saunders',
         },
         prisonId: PrisonerMockDataA.prisonId,
+        isHighProfilePrisonerOutsideCaseloads: false,
       },
       render: jest.fn(),
       redirect: jest.fn(),
@@ -125,6 +126,7 @@ describe('Case Notes Controller', () => {
         inmateDetail: inmateDetailMock,
         alertSummaryData: req.middleware.alertSummaryData,
         prisonerPermissions: res.locals.prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: false,
         pageId: 'case-notes',
       })
     })
