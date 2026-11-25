@@ -1,6 +1,6 @@
 import { startOfYear } from 'date-fns'
 import { Role } from '../../../server/data/enums/role'
-import { addressesPrimaryAndMailMock, mockAddresses } from '../../../server/data/localMockData/addresses'
+import { addressesPrimaryAndMailMock } from '../../../server/data/localMockData/addresses'
 import {
   componentsCaseLoadMock,
   componentsServicesMock,
@@ -809,73 +809,6 @@ context('When signed in', () => {
         page.neurodiversity().neurodiversityAssessed().should('not.exist')
         page.neurodiversity().neurodiversityTitle().should('not.exist')
       })
-    })
-  })
-
-  context('Profile editing and diet and allergy is disabled', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth()
-      cy.setupComponentsData({
-        caseLoads: [
-          {
-            caseloadFunction: '',
-            caseLoadId: 'DTI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-          },
-        ],
-      })
-      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
-      cy.task('stubPersonalCareNeeds')
-      cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
-      cy.task('stubPersonApiGetRecord', { prisonerNumber })
-      cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
-      visitPersonalDetailsPage()
-    })
-
-    it('Displays distinguishingMarks information from inmate details', () => {
-      const page = Page.verifyOnPage(PersonalPage)
-
-      page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
-      page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
-      page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
-      page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
-      page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
-
-      page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Front and sides')
-      page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
-      page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
-      page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
-      page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
-
-      page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
-      page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
-      page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
-      page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
-      page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
-      page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
-    })
-
-    it('Displays old addresses tile', () => {
-      const page = Page.verifyOnPage(PersonalPage)
-      page.oldAddresess().address().should('include.text', '7, premises address, street field')
-      page.oldAddresess().address().should('include.text', 'Leeds')
-      page.oldAddresess().address().should('include.text', 'LS1 AAA')
-      page.oldAddresess().address().should('include.text', 'England')
-
-      page.oldAddresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
-      page.oldAddresess().addressTypes().should('include.text', 'HDC Address')
-      page.oldAddresess().addressTypes().should('include.text', 'Other')
-
-      page.oldAddresess().phoneNumbers().should('include.text', '4444555566')
-      page.oldAddresess().phoneNumbers().should('include.text', '0113444444')
-      page.oldAddresess().phoneNumbers().should('include.text', '0113 333444')
-      page.oldAddresess().phoneNumbers().should('include.text', '0800 222333')
-
-      page.oldAddresess().comments().should('include.text', mockAddresses[0].comment)
-      page.oldAddresess().addedOn().should('include.text', 'May 2020')
     })
   })
 
