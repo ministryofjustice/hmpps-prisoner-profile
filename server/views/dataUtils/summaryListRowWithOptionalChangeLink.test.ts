@@ -1,10 +1,14 @@
+import type { SummaryListRowItem } from '../../utils/utils'
 import summaryListRowWithOptionalChangeLink, { listToSummaryListRows } from './summaryListRowWithOptionalChangeLink'
+
+const textItem = (item: SummaryListRowItem): string | null => ('text' in item && item.text) ?? null
+const htmlItem = (item: SummaryListRowItem): string | null => ('html' in item && item.html) ?? null
 
 describe('summaryListRowWithOptionalChangeLink', () => {
   it('Creates a summary list row without a change link', () => {
     const res = summaryListRowWithOptionalChangeLink('key', 'value', { changeLinkEnabled: false })
-    expect(res.key.text).toEqual('key')
-    expect(res.value.text).toEqual('value')
+    expect(textItem(res.key)).toEqual('key')
+    expect(textItem(res.value)).toEqual('value')
     expect(res.actions.items).toEqual([])
   })
 
@@ -19,8 +23,8 @@ describe('summaryListRowWithOptionalChangeLink', () => {
       dataQa: 'used-for-tests',
     })
 
-    expect(res.key.html).toContain('data-qa="used-for-tests-key"')
-    expect(res.value.html).toContain('data-qa="used-for-tests"')
+    expect(htmlItem(res.key)).toContain('data-qa="used-for-tests-key"')
+    expect(htmlItem(res.value)).toContain('data-qa="used-for-tests"')
   })
 
   it('Allows HTML to be given for the value', () => {
@@ -28,7 +32,7 @@ describe('summaryListRowWithOptionalChangeLink', () => {
       html: true,
     })
 
-    expect(res.value.html).toEqual('value')
+    expect(htmlItem(res.value)).toEqual('value')
   })
 
   describe('With the merge key down option enabled', () => {
@@ -41,12 +45,12 @@ describe('summaryListRowWithOptionalChangeLink', () => {
   describe('When row is not visible', () => {
     it('Displays no value', () => {
       const res = summaryListRowWithOptionalChangeLink('key', 'value', { visible: false })
-      expect(res.value.text).toEqual('')
+      expect(textItem(res.value)).toEqual('')
     })
 
     it('Adds the data-qa to the key if provided', () => {
       const res = summaryListRowWithOptionalChangeLink('key', 'value', { dataQa: 'example', visible: false })
-      expect(res.key.html).toContain('data-qa="hidden-example-key"')
+      expect(htmlItem(res.key)).toContain('data-qa="hidden-example-key"')
     })
 
     it('Adds the hidden class to the row', () => {
@@ -58,7 +62,7 @@ describe('summaryListRowWithOptionalChangeLink', () => {
   describe('When hide if empty is enabled', () => {
     it('Adds the data-qa to the key if provided', () => {
       const res = summaryListRowWithOptionalChangeLink('key', '', { dataQa: 'example', hideIfEmpty: true })
-      expect(res.key.html).toContain('data-qa="hidden-example-key"')
+      expect(htmlItem(res.key)).toContain('data-qa="hidden-example-key"')
     })
 
     it('Adds the hidden class to the row', () => {
@@ -95,17 +99,32 @@ describe('summaryListRowWithOptionalChangeLink', () => {
   })
 
   describe('Creating a list of summary row items', () => {
-    it('Transforms all items into row items', () => {
-      const res = listToSummaryListRows([
-        { key: 'key1', value: 'value1' },
-        { key: 'key2', value: 'value2' },
-        { key: 'key3', value: 'value3' },
-      ])
+    it.each([
+      {
+        scenario: 'Transforms all items into row items',
+        input: [
+          { key: 'key1', value: 'value1' },
+          { key: 'key2', value: 'value2' },
+          { key: 'key3', value: 'value3' },
+        ],
+      },
+      {
+        scenario: 'Skips falsey items',
+        input: [
+          { key: 'key1', value: 'value1' },
+          undefined,
+          { key: 'key2', value: 'value2' },
+          null,
+          { key: 'key3', value: 'value3' },
+        ],
+      },
+    ])('$scenario', ({ input }) => {
+      const res = listToSummaryListRows(input)
 
       expect(res.length).toEqual(3)
-      expect(res[0].key.text).toEqual('key1')
-      expect(res[1].key.text).toEqual('key2')
-      expect(res[2].key.text).toEqual('key3')
+      expect(textItem(res[0].key)).toEqual('key1')
+      expect(textItem(res[1].key)).toEqual('key2')
+      expect(textItem(res[2].key)).toEqual('key3')
     })
   })
 })

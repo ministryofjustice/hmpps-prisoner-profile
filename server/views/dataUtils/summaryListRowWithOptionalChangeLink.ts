@@ -1,5 +1,10 @@
 import { isResult, Result } from '../../utils/result/result'
-import { unavailableApiErrorMessage } from '../../utils/utils'
+import {
+  type SummaryListRow,
+  type SummaryListRowItem,
+  type SummaryListActions,
+  unavailableApiErrorMessage,
+} from '../../utils/utils'
 
 interface Options {
   changeLinkEnabled?: boolean
@@ -27,32 +32,27 @@ const defaultOptions: Options = {
 }
 
 export const listToSummaryListRows = (
-  items: {
-    key: string
-    value: string | Result<string>
-    options?: Options
-  }[],
-) => {
-  return items.map(i => summaryListRowWithOptionalChangeLink(i.key, i.value, i.options))
-}
+  items: (
+    | {
+        key: string
+        value: string | Result<string>
+        options?: Options
+      }
+    | undefined
+    | null
+  )[],
+) => items.filter(Boolean).map(i => summaryListRowWithOptionalChangeLink(i.key, i.value, i.options))
 
 const summaryListRowWithOptionalChangeLink = (
   key: string,
   value: string | Result<string>,
   opts: Options = {},
-): {
-  key: { html?: string; text?: string }
-  value: { html?: string; text?: string }
-  actions: {
-    items: { href: string; text: string; visuallyHiddenText: string; classes: string }[]
-  }
-  classes: string
-} => {
+): SummaryListRow => {
   const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string)
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
-  const valueResult = (): { text?: string; html?: string } => {
+  const valueResult = (): SummaryListRowItem => {
     if (!valueAsResult.isFulfilled()) {
       const errorHtml = `<p class="hmpps-api-error-inset">${unavailableApiErrorMessage}</p>`
       if (options.dataQa) {
@@ -74,7 +74,7 @@ const summaryListRowWithOptionalChangeLink = (
     return options.html ? { html: valueAsResult.getOrNull() } : { text: valueAsResult.getOrNull() }
   }
 
-  const items = [
+  const items: SummaryListActions['items'] = [
     ...(options.changeLinkEnabled && valueAsResult.isFulfilled()
       ? [
           {
