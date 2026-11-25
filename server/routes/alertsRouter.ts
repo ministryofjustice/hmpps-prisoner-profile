@@ -17,6 +17,7 @@ import {
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/interfaces/auditService/page'
 import getDuplicatePrisonerData from '../middleware/getDuplicatePrisonerDataMiddleware'
+import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
@@ -44,6 +45,7 @@ export default function alertsRouter(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     (req, res, next) => alertsController.displayAlerts(req, res, next, false),
   )
 
@@ -68,6 +70,7 @@ export default function alertsRouter(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     alertsController.displayAlert(),
   )
 

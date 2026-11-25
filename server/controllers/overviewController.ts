@@ -209,7 +209,14 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'overview'),
+      ...mapHeaderData({
+        prisonerData,
+        inmateDetail,
+        alertSummaryData,
+        prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+        pageId: 'overview',
+      }),
       moneySummary,
       adjudicationSummary,
       propertySummary: showPropertyCard ? propertySummaryResult : null,
@@ -237,13 +244,15 @@ export default class OverviewController {
         isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
-      statuses: getOverviewStatuses(
+      statuses: getOverviewStatuses({
+        prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
         prisonerData,
         inmateDetail,
         hasNeedsForAdditionalSupport,
         scheduledTransfers,
         xrayBodyScanSummary,
-      ),
+      }),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       prisonerNumber: prisonerData.prisonerNumber,

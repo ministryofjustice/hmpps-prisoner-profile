@@ -1,51 +1,6 @@
-export const profileBannerData = {
-  prisonerName: 'Jones, David',
-  prisonId: 'A8469DY',
-}
+import { CaseNotesPermission, isGranted, PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 
-export const profileBannerTopLinks = [
-  {
-    heading: 'Location',
-    info: 'C-2-013',
-    classes: '',
-  },
-  {
-    heading: 'Category',
-    info: 'B',
-    classes: '',
-  },
-  {
-    heading: 'CSRA',
-    info: 'Standard',
-    classes: '',
-  },
-  {
-    heading: 'Incentive level',
-    info: 'Standard',
-    classes: 'remove-column-gutter-right',
-  },
-]
-
-export const alerts = [
-  {
-    label: 'Staff assaulter',
-    classes: 'alert-status alert-status--security',
-  },
-  {
-    label: 'Risk to females',
-    classes: 'alert-status alert-status--security',
-  },
-  {
-    label: 'Gang member',
-    classes: 'alert-status alert-status--security',
-  },
-  {
-    label: 'ACCT open',
-    classes: 'alert-status alert-status--self-harm',
-  },
-]
-
-interface TabLink {
+export interface TabLink {
   label: string
   classes: string
   id: string
@@ -53,7 +8,15 @@ interface TabLink {
   active: boolean
 }
 
-export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabLink[] {
+export function tabLinks({
+  prisonerNumber,
+  prisonerPermissions,
+  isHighProfilePrisonerOutsideCaseloads, // TODO: remove once folded into permissions library
+}: {
+  prisonerNumber: string
+  prisonerPermissions?: PrisonerPermissions
+  isHighProfilePrisonerOutsideCaseloads: boolean
+}): TabLink[] {
   const baseUrl = `/prisoner/${prisonerNumber}`
   const links = [
     {
@@ -70,6 +33,15 @@ export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabL
       href: `${baseUrl}/personal`,
       active: false,
     },
+    isGranted(CaseNotesPermission.read, prisonerPermissions)
+      ? {
+          label: 'Case notes',
+          classes: 'govuk-heading-s',
+          id: 'case-notes',
+          active: false,
+          href: `${baseUrl}/case-notes`,
+        }
+      : null,
     {
       label: 'Alerts',
       classes: 'govuk-heading-s',
@@ -77,29 +49,24 @@ export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabL
       active: false,
       href: `${baseUrl}/alerts/active`,
     },
-    {
-      label: 'Offences',
-      classes: 'govuk-heading-s',
-      id: 'offences',
-      href: `${baseUrl}/offences`,
-      active: false,
-    },
-    {
-      label: 'Work and skills',
-      classes: 'govuk-heading-s',
-      id: 'work-and-skills',
-      href: `${baseUrl}/work-and-skills`,
-      active: false,
-    },
+    isHighProfilePrisonerOutsideCaseloads
+      ? null
+      : {
+          label: 'Offences',
+          classes: 'govuk-heading-s',
+          id: 'offences',
+          href: `${baseUrl}/offences`,
+          active: false,
+        },
+    isHighProfilePrisonerOutsideCaseloads
+      ? null
+      : {
+          label: 'Work and skills',
+          classes: 'govuk-heading-s',
+          id: 'work-and-skills',
+          href: `${baseUrl}/work-and-skills`,
+          active: false,
+        },
   ]
-  if (canViewCaseNotes) {
-    links.splice(2, 0, {
-      label: 'Case notes',
-      classes: 'govuk-heading-s',
-      id: 'case-notes',
-      active: false,
-      href: `${baseUrl}/case-notes`,
-    })
-  }
-  return links
+  return links.filter(Boolean)
 }

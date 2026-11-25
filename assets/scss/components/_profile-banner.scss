@@ -5,14 +5,6 @@
   padding: 20px 30px;
   margin: 0 -15px;
 
-  &--warning {
-    background-color: rgba(govuk.govuk-colour('orange'), 0.25);
-  }
-
-  &--info {
-    background-color: rgba(govuk.govuk-colour('green'), 0.25);
-  }
-
   p {
     margin: 0 0 10px 0;
 
@@ -20,6 +12,20 @@
       margin: 0;
     }
   }
+}
+
+.hmpps-profile-banner-alert--warning, .hmpps-profile-banner-alert--info {
+  .hmpps-tag--high-profile {
+    border: 1px solid govuk.govuk-colour('white');
+  }
+}
+
+.hmpps-profile-banner-alert--warning {
+  background-color: rgba(govuk.govuk-colour('orange'), 0.25);
+}
+
+.hmpps-profile-banner-alert--info {
+  background-color: rgba(govuk.govuk-colour('green'), 0.25);
 }
 
 .hmpps-profile-banner {

@@ -1,3 +1,4 @@
+import type { PrisonerPermissions } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import type { Result } from '../../../utils/result/result'
 import type { OverviewStatus, XrayBodyScanSummary } from '../../interfaces/OverviewPageData'
 import type Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
@@ -10,19 +11,28 @@ import {
 } from '../../../data/interfaces/prisonApi/ProfileInformation'
 import { BooleanString } from '../../../data/enums/booleanString'
 
-export default function getOverviewStatuses(
-  prisonerData: Prisoner,
-  inmateDetail: InmateDetail,
-  hasNeedsForAdditionalSupport: Result<HasNeed>,
-  scheduledTransfers: PrisonerPrisonSchedule[] | null,
-  xrayBodyScanSummary: Result<XrayBodyScanSummary> | null,
-): OverviewStatus[] {
+export default function getOverviewStatuses({
+  isHighProfilePrisonerOutsideCaseloads, // TODO: remove once folded into permissions library
+  prisonerData,
+  inmateDetail,
+  hasNeedsForAdditionalSupport,
+  scheduledTransfers,
+  xrayBodyScanSummary,
+}: {
+  prisonerPermissions: PrisonerPermissions
+  isHighProfilePrisonerOutsideCaseloads: boolean
+  prisonerData: Prisoner
+  inmateDetail: InmateDetail
+  hasNeedsForAdditionalSupport: Result<HasNeed>
+  scheduledTransfers: PrisonerPrisonSchedule[] | null
+  xrayBodyScanSummary: Result<XrayBodyScanSummary> | null
+}): OverviewStatus[] {
   return [
     getLocationStatus(prisonerData),
-    getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
-    getListenerStatus(inmateDetail),
-    getScheduledTransferStatus(scheduledTransfers),
-    getXrayBodyScanLimitReachedStatus(xrayBodyScanSummary),
+    isHighProfilePrisonerOutsideCaseloads ? null : getAdditionalSupportNeedsStatus(hasNeedsForAdditionalSupport),
+    isHighProfilePrisonerOutsideCaseloads ? null : getListenerStatus(inmateDetail),
+    isHighProfilePrisonerOutsideCaseloads ? null : getScheduledTransferStatus(scheduledTransfers),
+    isHighProfilePrisonerOutsideCaseloads ? null : getXrayBodyScanLimitReachedStatus(xrayBodyScanSummary),
   ].filter(Boolean)
 }
 

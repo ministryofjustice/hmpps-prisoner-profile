@@ -3,7 +3,7 @@
 {% from "components/catAPrisonerTag/catAPrisonerTag.njk" import catAPrisonerTag %}
 {% from "macros/hmppsError.njk" import hmppsError %}
 
-{% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) %}
+{% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel, isHighProfilePrisonerOutsideCaseloads) %}
     {% set otherActiveCount = alertSummaryData.activeAlertCount - alertSummaryData.alertFlags.length %}
     {% set includePlus = alertSummaryData.alertFlags.length > 0 %}
     <ul class="alerts-list" data-qa="alert-flags">
@@ -24,7 +24,9 @@
                 <li>
                     {{ alertFlag({
                         alert: alert,
-                        href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids='),
+                        href:
+                            ("/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids='))
+                            if not isHighProfilePrisonerOutsideCaseloads,
                         attributes: {
                             'data-prisoner-number': prisonerNumber
                         }
@@ -39,9 +41,11 @@
         {% endif %}
     </ul>
 
-    {{ hmppsModal({
-        id: "alert-details",
-        title: "Alert details",
-        classes: "alert-details-modal"
-    }) }}
+    {% if not isHighProfilePrisonerOutsideCaseloads %}
+        {{ hmppsModal({
+            id: "alert-details",
+            title: "Alert details",
+            classes: "alert-details-modal"
+        }) }}
+    {% endif %}
 {% endmacro %}

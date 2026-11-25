@@ -49,6 +49,7 @@ import { personDuplicateRecordsEnabled } from '../utils/featureFlags'
 import accessibilityStatementRouter from './accessibility/accessibilityStatementRouter'
 import { JustifyAccessController } from '../controllers/justifyAccessController'
 import { isHighProfilePrisonerMiddleware } from '../middleware/isHighProfilePrisonerMiddleware'
+import { highProfilePrisonerGuard } from '../middleware/highProfilePrisonerGuard'
 
 export function standardGetPaths(path: string): boolean {
   return !/^(\/api|\/save-backlink|\/$)/.test(path)
@@ -155,6 +156,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     retrievePrisonNamesById(services.prisonService),
     retrieveCuriousInPrisonCourses(services.curiousService),
     retrieveCuriousFunctionalSkills(services.curiousService),
@@ -208,7 +210,14 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'work-and-skills'),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+          pageId: 'work-and-skills',
+        }),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         allFunctionalSkillsLinkUrl,
@@ -234,6 +243,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     async (req, res) => {
       const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
       const { prisonerNumber, prisonId } = prisonerData
@@ -252,7 +262,14 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, prisonerPermissions, 'offences'),
+        ...mapHeaderData({
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          prisonerPermissions,
+          isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
+          pageId: 'offences',
+        }),
         courtCaseData,
         releaseDates,
         activeTab: true,

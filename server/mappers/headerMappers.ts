@@ -1,5 +1,4 @@
 import {
-  CaseNotesPermission,
   isGranted,
   PersonPrisonCategoryPermission,
   PrisonerBaseLocationPermission,
@@ -7,20 +6,46 @@ import {
   PrisonerPermissions,
   PrisonerSpecificRisksPermission,
 } from '@ministryofjustice/hmpps-prison-permissions-lib'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { tabLinks } from '../data/profileBanner/profileBanner'
-import { formatCategoryALabel, formatCategoryCodeDescription, prisonerIsOut, prisonerIsTRN } from '../utils/utils'
 import config from '../config'
-import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
-import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import type { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import type InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import type Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { type TabLink, tabLinks } from '../data/profileBanner/profileBanner'
+import { formatCategoryALabel, formatCategoryCodeDescription, prisonerIsOut, prisonerIsTRN } from '../utils/utils'
 
-export function mapProfileBannerTopLinks(
-  prisonerData: Prisoner,
-  inmateDetail: InmateDetail,
-  prisonerPermissions: PrisonerPermissions,
-) {
+interface HeaderData {
+  backLinkLabel: string
+  profileBannerTopLinks: ProfileBannerTopLink[]
+  alertSummaryData: AlertSummaryData
+  categoryLabel: string | undefined
+  tabLinks: TabLink[]
+  restrictedPatient: boolean
+  hideBanner: boolean
+  newArrival24: boolean | undefined
+  newArrival72: boolean | undefined
+}
+
+interface ProfileBannerTopLink {
+  heading: string
+  hiddenLabel: string
+  info: string
+  classes: string
+  url: string | undefined
+}
+
+export function mapProfileBannerTopLinks({
+  prisonerData,
+  inmateDetail,
+  prisonerPermissions,
+  isHighProfilePrisonerOutsideCaseloads, // TODO: remove once folded into permissions library
+}: {
+  prisonerData: Prisoner
+  inmateDetail: InmateDetail
+  prisonerPermissions: PrisonerPermissions
+  isHighProfilePrisonerOutsideCaseloads: boolean
+}): ProfileBannerTopLink[] {
   const { prisonId } = prisonerData
-  const profileBannerTopLinks = []
+  const profileBannerTopLinks: ProfileBannerTopLink[] = []
 
   if (isGranted(PrisonerBaseLocationPermission.read_location_details, prisonerPermissions)) {
     // eslint-disable-next-line no-nested-ternary
@@ -65,7 +90,10 @@ export function mapProfileBannerTopLinks(
     })
   }
 
-  if (isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions)) {
+  if (
+    isGranted(PrisonerIncentivesPermission.read_incentive_level, prisonerPermissions) &&
+    !isHighProfilePrisonerOutsideCaseloads
+  ) {
     profileBannerTopLinks.push({
       heading: 'Incentive level',
       hiddenLabel: 'incentive level',
@@ -80,15 +108,28 @@ export function mapProfileBannerTopLinks(
   return profileBannerTopLinks
 }
 
-export function mapHeaderData(
-  prisonerData: Prisoner,
-  inmateDetail: InmateDetail,
-  alertSummaryData: AlertSummaryData,
-  prisonerPermissions?: PrisonerPermissions,
-  pageId?: string,
-  hideBanner?: boolean,
-) {
-  const tabs = tabLinks(prisonerData.prisonerNumber, isGranted(CaseNotesPermission.read, prisonerPermissions))
+export function mapHeaderData({
+  prisonerData,
+  inmateDetail,
+  alertSummaryData,
+  prisonerPermissions,
+  isHighProfilePrisonerOutsideCaseloads, // TODO: remove once folded into permissions library
+  pageId,
+  hideBanner = false,
+}: {
+  prisonerData: Prisoner
+  inmateDetail: InmateDetail
+  alertSummaryData: AlertSummaryData
+  prisonerPermissions?: PrisonerPermissions
+  isHighProfilePrisonerOutsideCaseloads: boolean
+  pageId?: string
+  hideBanner?: boolean
+}): HeaderData {
+  const tabs = tabLinks({
+    prisonerNumber: prisonerData.prisonerNumber,
+    prisonerPermissions,
+    isHighProfilePrisonerOutsideCaseloads,
+  })
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true
@@ -96,12 +137,17 @@ export function mapHeaderData(
 
   return {
     backLinkLabel: 'Back to search results',
-    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, prisonerPermissions),
+    profileBannerTopLinks: mapProfileBannerTopLinks({
+      prisonerData,
+      inmateDetail,
+      prisonerPermissions,
+      isHighProfilePrisonerOutsideCaseloads,
+    }),
     alertSummaryData,
     categoryLabel: formatCategoryALabel(prisonerData.category),
     tabLinks: tabs,
     restrictedPatient: prisonerData.restrictedPatient,
-    hideBanner: hideBanner || false,
+    hideBanner,
     newArrival24: prisonerData.newArrival24,
     newArrival72: prisonerData.newArrival72,
   }

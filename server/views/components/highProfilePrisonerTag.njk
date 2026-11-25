@@ -1,0 +1,8 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{%- macro highProfilePrisonerTag(params) %}
+  {{ govukTag({
+    text: "High-profile prisoner",
+    classes: "hmpps-tag hmpps-tag--high-profile " + params.classes
+  }) }}
+{% endmacro %}
