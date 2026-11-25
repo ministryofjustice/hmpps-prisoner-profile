@@ -244,13 +244,15 @@ export default class OverviewController {
         isGranted(PersonSentenceCalculationPermission.edit_adjustments, prisonerPermissions),
         prisonerData.prisonerNumber,
       ),
-      statuses: getOverviewStatuses(
+      statuses: getOverviewStatuses({
+        prisonerPermissions,
+        isHighProfilePrisonerOutsideCaseloads: res.locals.isHighProfilePrisonerOutsideCaseloads,
         prisonerData,
         inmateDetail,
         hasNeedsForAdditionalSupport,
         scheduledTransfers,
         xrayBodyScanSummary,
-      ),
+      }),
       prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       prisonerNumber: prisonerData.prisonerNumber,

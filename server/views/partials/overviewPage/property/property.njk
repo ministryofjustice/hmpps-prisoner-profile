@@ -1,4 +1,4 @@
-{% if propertySummary and isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions) %}
+{% if propertySummary and isGranted(PrisonerPropertyPermission.read_property_overview, prisonerPermissions) and not isHighProfilePrisonerOutsideCaseloads %}
   <div class="govuk-grid-column-one-third">
     {{ miniCard(propertySummary | toPropertyMiniSummary(prisonerNumber, prisonerPermissions), 'mini-card--property', propertySummary.status != 'fulfilled') }}
   </div>
