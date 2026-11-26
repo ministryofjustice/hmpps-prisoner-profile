@@ -5,8 +5,6 @@ import MilitaryRecordsController from '../../../controllers/personal/edit/milita
 import { militaryServiceInformationValidator } from '../../../validators/personal/militaryServiceInformationValidator'
 import validationMiddleware from '../../../middleware/validationMiddleware'
 import { dischargeDetailsValidator } from '../../../validators/personal/dischargeDetailsValidator'
-import { featureFlagGuard } from '../../../middleware/featureFlagGuard'
-import { militaryHistoryEnabled } from '../../../utils/featureFlags'
 
 export default function militaryRecordsRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -18,7 +16,6 @@ export default function militaryRecordsRouter(services: Services): Router {
   )
 
   const commonMiddleware: RequestHandler[] = [
-    featureFlagGuard('Military History', militaryHistoryEnabled),
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [CorePersonRecordPermission.edit_military_history],
     }),

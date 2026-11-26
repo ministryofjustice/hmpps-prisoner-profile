@@ -160,8 +160,8 @@
 
       <hr class="govuk-section-break govuk-section-break--visible" aria-hidden="true" />
 
-      {# Put a border at the bottom of the main list if there are additional details to be shown - currently only when militaryHistoryEnabled #}
-      {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if militaryHistoryEnabled and not isHighProfilePrisonerOutsideCaseloads %}
+      {# Put a border at the bottom of the main list if there are additional details to be shown - currently only for military history #}
+      {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if not isHighProfilePrisonerOutsideCaseloads %}
 
       {{
         govukSummaryList({
@@ -354,7 +354,7 @@
         })
       }}
 
-      {% if militaryHistoryEnabled and not isHighProfilePrisonerOutsideCaseloads %}
+      {% if not isHighProfilePrisonerOutsideCaseloads %}
         {% if militaryRecords.status === 'fulfilled' %}
           {% if militaryRecords.value.length > 0 %}
             <dl class="govuk-summary-list hmpps-military-history {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}"

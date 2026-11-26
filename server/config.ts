@@ -427,10 +427,6 @@ export default {
       enabledPrisonsFrom: get('EDIT_ADDRESS_SPECIFIC_PHONE_NUMBERS_ENABLED_FROM', '2099-01-01T00:00:00'),
     },
 
-    healthAndMedicationApiReadEnabled: toBoolean(get('HEALTH_AND_MEDICATION_API_READ_ENABLED', 'false')),
-    militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
-    manageAllocationsEnabled: toBoolean(get('MANAGE_ALLOCATIONS_ENABLED', 'false')),
-
     personEndpointsEnabled: toBoolean(get('PERSON_ENDPOINTS_ENABLED', 'false')),
     usePersonApi: {
       religion: toBoolean(get('USE_PERSON_API_FOR_RELIGION', 'false')),

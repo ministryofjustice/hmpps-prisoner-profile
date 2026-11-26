@@ -297,15 +297,13 @@ describe('buildOverviewActions', () => {
 
   describe('Manage activity allocations', () => {
     test.each`
-      manageAllocationsEnabled | permissionGranted | availableServices                            | visible
-      ${false}                 | ${true}           | ${[{ id: 'activities', navEnabled: true }]}  | ${false}
-      ${true}                  | ${true}           | ${[{ id: 'activities', navEnabled: true }]}  | ${true}
-      ${true}                  | ${true}           | ${[{ id: 'activities', navEnabled: true }]}  | ${true}
-      ${true}                  | ${true}           | ${[{ id: 'activities', navEnabled: false }]} | ${false}
-      ${true}                  | ${false}          | ${[{ id: 'activities', navEnabled: true }]}  | ${false}
+      permissionGranted | availableServices                            | visible
+      ${true}           | ${[{ id: 'activities', navEnabled: true }]}  | ${true}
+      ${true}           | ${[{ id: 'activities', navEnabled: false }]} | ${false}
+      ${false}          | ${[{ id: 'activities', navEnabled: true }]}  | ${false}
     `(
       'user with permission granted: $permissionGranted and navEnabled: $availableServices.0.navEnabled can see Log an activity application: $visible',
-      ({ manageAllocationsEnabled, permissionGranted, availableServices, visible }) => {
+      ({ permissionGranted, availableServices, visible }) => {
         mockPermissions({ [PrisonerSchedulePermission.edit_activity]: permissionGranted })
 
         const resp = buildOverviewActions(
@@ -315,10 +313,6 @@ describe('buildOverviewActions', () => {
           prisonUserMock,
           {
             ...config,
-            featureToggles: {
-              ...config.featureToggles,
-              manageAllocationsEnabled,
-            },
           },
           { services: availableServices } as SharedData,
           permissions,

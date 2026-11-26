@@ -179,7 +179,6 @@ export default function routes(services: Services): Router {
       const vc2goalsUrl = `/prisoner/${prisonerNumber}/vc2-goals`
       const canEditLearningAndWorkPlan = userHasRoles([Role.LearningAndWorkProgressManager], res.locals.user.userRoles)
       const canManageAllocations =
-        config.featureToggles.manageAllocationsEnabled &&
         isGranted(PrisonerSchedulePermission.edit_activity, prisonerPermissions) &&
         isServiceNavEnabled('activities', res.locals.feComponents?.sharedData)
 

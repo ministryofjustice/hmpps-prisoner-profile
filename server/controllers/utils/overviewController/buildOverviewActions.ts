@@ -138,7 +138,6 @@ export default (
 
   if (
     isGranted(PrisonerSchedulePermission.edit_activity, permissions) &&
-    config.featureToggles.manageAllocationsEnabled &&
     isServiceNavEnabled('activities', feComponentsSharedData)
   ) {
     actions.push({
