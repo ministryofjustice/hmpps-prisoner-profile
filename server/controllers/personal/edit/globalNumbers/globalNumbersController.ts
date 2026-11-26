@@ -14,7 +14,7 @@ import {
 import { PrisonUser } from '../../../../interfaces/HmppsUser'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../../../data/interfaces/referenceData'
-import type { RadioOption } from '../../../../interfaces/GovOptions'
+import type { GovukRadiosItem } from '../../../../interfaces/govukComponents'
 import { EditControllerRequestHandlers } from '../../../interfaces/EditControllerRequestHandlers'
 import {
   deduplicatePhoneNumberPairs,
@@ -33,7 +33,7 @@ export default class GlobalNumbersController extends PersonalEditController {
   }
 
   globalNumbers(): Record<'add' | 'edit', EditControllerRequestHandlers> {
-    const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): RadioOption[] => {
+    const phoneTypeOptions = (referenceData: ReferenceDataCodeDto[], chosenType: string = null): GovukRadiosItem[] => {
       const orderedReferenceDataCodes = ['MOB', 'HOME', 'ALTH', 'BUS', 'ALTB', 'VISIT', 'FAX']
 
       return referenceData

@@ -1,11 +1,11 @@
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
-import type { RadioOption } from '../../../interfaces/GovOptions'
+import type { GovukRadiosItem } from '../../../interfaces/govukComponents'
 import { objectToRadioOptions } from '../../../utils/utils'
 
 export function getEthnicGroupRadioOptions(
   ethnicityReferenceCodes: ReferenceDataCodeDto[],
   selectedEthnicityCode: string = null,
-): (RadioOption | { divider: string })[] {
+): GovukRadiosItem[] {
   const allowPreferNotToSay = isActive('NS', ethnicityReferenceCodes)
 
   const activeEthnicGroups = ethnicGroups.filter(group =>
@@ -35,7 +35,7 @@ export function getEthnicBackgroundRadioOptions(
   ethnicGroup: string,
   ethnicityReferenceCodes: ReferenceDataCodeDto[],
   selectedEthnicityCode: string = null,
-): RadioOption[] {
+): GovukRadiosItem[] {
   const activeEthnicBackgrounds =
     findEthnicGroup(ethnicGroup)?.backgrounds?.filter(background =>
       isActive(background.code, ethnicityReferenceCodes),

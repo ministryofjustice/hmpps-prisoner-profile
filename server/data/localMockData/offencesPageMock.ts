@@ -1,4 +1,4 @@
-import { SummaryListRow } from '../../utils/utils'
+import type { GovukSummaryListRow } from '../../interfaces/govukComponents'
 import ReleaseDates from '../../services/interfaces/offencesPageService/ReleaseDates'
 
 export const OffencesPageMockSentences = {
@@ -582,7 +582,7 @@ export const GroupedSentencesMock = [
       },
     ],
     key: 5,
-    summaryListRows: [] as SummaryListRow[],
+    summaryListRows: <GovukSummaryListRow[]>[],
   },
   {
     caseId: '1563148',
@@ -604,7 +604,7 @@ export const GroupedSentencesMock = [
       },
     ],
     key: 4,
-    summaryListRows: [] as SummaryListRow[],
+    summaryListRows: <GovukSummaryListRow[]>[],
   },
 ]
 

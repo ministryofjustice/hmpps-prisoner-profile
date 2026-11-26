@@ -1,6 +1,7 @@
 import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import type { GovukRadiosItem, GovukSelectItem, GovukSummaryListRow } from '../interfaces/govukComponents'
 import { SortOption } from '../interfaces/SortParams'
 import HmppsError from '../interfaces/HmppsError'
 import type { ListMetadata, ListMetadataPage } from '../interfaces/ListMetadata'
@@ -9,7 +10,6 @@ import OverviewNonAssociation from '../services/interfaces/overviewPageService/O
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
-import type { RadioOption, SelectOption } from '../interfaces/GovOptions'
 import Address from '../services/interfaces/personalPageService/Address'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import logger from '../../logger'
@@ -95,23 +95,7 @@ export const formatScheduleItem = (scheduleItem: ScheduledEvent): string => {
  * Converts the personal details to the rows for a summary list component
  */
 
-export type SummaryListRowItem = ({ text: string } | { html: string }) & { classes?: string }
-export interface SummaryListActions {
-  items: (({ text: string } | { html: string }) & {
-    href: string
-    visuallyHiddenText?: string
-    classes?: string
-  })[]
-  classes?: string
-}
-export interface SummaryListRow {
-  key: SummaryListRowItem
-  value: SummaryListRowItem
-  actions?: SummaryListActions
-  classes?: string
-}
-
-export const summaryListOneHalfWidth = (rows: SummaryListRow[]) => {
+export const summaryListOneHalfWidth = (rows: GovukSummaryListRow[]) => {
   return rows.map(row => {
     const { key, value } = row
     key.classes = 'govuk-!-width-one-half'
@@ -612,7 +596,7 @@ export const sortByDateTime = (t1: string, t2: string): number => {
   return date1 - date2
 }
 
-export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
+export const refDataToSelectOptions = (refData: ReferenceCode[]): GovukSelectItem[] => {
   return refData.map(r => ({
     text: r.description,
     value: r.code,
@@ -625,9 +609,9 @@ export const objectToRadioOptions = <T>(
   description: keyof (typeof array)[number],
   checked?: string | number,
   overrides?: ReferenceDataOverride[],
-): RadioOption[] => {
+): GovukRadiosItem[] => {
   return array.map(obj => {
-    const value = obj[id] as string | number
+    const value = obj[id] as string
     const override = overrides?.find(o => o.id === value)
     const baseText = (override?.description ? override.description : (obj[description] as string))
       ?.replaceAll(' - ', ' – ')
@@ -646,10 +630,10 @@ export const objectToSelectOptions = <T>(
   id: keyof (typeof array)[number],
   description: keyof (typeof array)[number],
   selected?: string,
-): SelectOption[] => {
+): GovukSelectItem[] => {
   return array.map(obj => ({
     text: lowercasePrepositions(obj[description] as string),
-    value: obj[id] as string | number,
+    value: obj[id] as string,
     ...(selected && obj[id as keyof typeof obj] === selected && { selected: true }),
   }))
 }
@@ -679,10 +663,10 @@ export const unavailablePlaceholder = 'Unavailable'
 export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
 
 export const addDefaultSelectedValue = (
-  items: SelectOption[],
+  items: GovukSelectItem[],
   text: string,
   setHidden = true,
-): SelectOption[] | null => {
+): GovukSelectItem[] | null => {
   if (!items) return null
 
   return [

@@ -1,8 +1,8 @@
-import type { SummaryListRowItem } from '../../utils/utils'
+import type { GovukSummaryListRowItem } from '../../interfaces/govukComponents'
 import summaryListRowWithOptionalChangeLink, { listToSummaryListRows } from './summaryListRowWithOptionalChangeLink'
 
-const textItem = (item: SummaryListRowItem): string | null => ('text' in item && item.text) ?? null
-const htmlItem = (item: SummaryListRowItem): string | null => ('html' in item && item.html) ?? null
+const textItem = (item: GovukSummaryListRowItem): string | null => ('text' in item && item.text) ?? null
+const htmlItem = (item: GovukSummaryListRowItem): string | null => ('html' in item && item.html) ?? null
 
 describe('summaryListRowWithOptionalChangeLink', () => {
   it('Creates a summary list row without a change link', () => {

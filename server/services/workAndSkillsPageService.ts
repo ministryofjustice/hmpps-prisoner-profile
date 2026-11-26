@@ -1,7 +1,7 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import GovSummaryItem from '../interfaces/GovSummaryItem'
+import type { GovukSummaryListRow } from '../interfaces/govukComponents'
 
 import OffenderActivitiesHistory from '../data/interfaces/prisonApi/OffenderActivitiesHistory'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -29,7 +29,7 @@ export interface WorkAndSkillsData {
 }
 
 interface ActivitiesHistoryData {
-  activitiesHistory: Array<GovSummaryItem>
+  activitiesHistory: GovukSummaryListRow[]
 }
 
 interface UnacceptableAttendanceData {
@@ -120,7 +120,7 @@ export default class WorkAndSkillsPageService {
       prisonerNumber,
       today,
     )
-    const activitiesHistory: GovSummaryItem[] = []
+    const activitiesHistory: GovukSummaryListRow[] = []
     if (offenderActivitiesHistory.content?.length) {
       offenderActivitiesHistory.content.forEach(content => {
         const item = {

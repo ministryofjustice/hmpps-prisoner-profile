@@ -1,4 +1,4 @@
-import { SummaryListRow } from '../../../utils/utils'
+import type { GovukSummaryListRow } from '../../../interfaces/govukComponents'
 import OffenderSentenceTerms from '../../../data/interfaces/prisonApi/OffenderSentenceTerms'
 
 export default interface GroupedSentence {
@@ -7,5 +7,5 @@ export default interface GroupedSentence {
   sentenceHeader: string
   caseId: number
   items: OffenderSentenceTerms[]
-  summaryListRows: SummaryListRow[]
+  summaryListRows: GovukSummaryListRow[]
 }

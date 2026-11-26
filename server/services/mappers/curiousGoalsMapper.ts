@@ -1,23 +1,19 @@
-import CuriousGoals from '../interfaces/workAndSkillsPageService/CuriousGoals'
-import GovSummaryItem from '../../interfaces/GovSummaryItem'
-import LearnerGoals from '../../data/interfaces/curiousApi/LearnerGoals'
+import type { GovukSummaryListRow } from '../../interfaces/govukComponents'
+import type CuriousGoals from '../interfaces/workAndSkillsPageService/CuriousGoals'
+import type LearnerGoals from '../../data/interfaces/curiousApi/LearnerGoals'
 
 /**
  * Simple mapper function to map from the Curious API type [LearnerGoals]
  * into the view model type [CuriousGoals]
  */
-const toCuriousGoals = (learnerGoals: LearnerGoals): CuriousGoals => {
-  return {
-    prisonerNumber: learnerGoals.prn,
-    employmentGoals: learnerGoals.employmentGoals.map(toGovSummaryItem),
-    personalGoals: learnerGoals.personalGoals.map(toGovSummaryItem),
-    shortTermGoals: learnerGoals.shortTermGoals.map(toGovSummaryItem),
-    longTermGoals: learnerGoals.longTermGoals.map(toGovSummaryItem),
-  }
-}
+const toCuriousGoals = (learnerGoals: LearnerGoals): CuriousGoals => ({
+  prisonerNumber: learnerGoals.prn,
+  employmentGoals: learnerGoals.employmentGoals.map(toRow),
+  personalGoals: learnerGoals.personalGoals.map(toRow),
+  shortTermGoals: learnerGoals.shortTermGoals.map(toRow),
+  longTermGoals: learnerGoals.longTermGoals.map(toRow),
+})
 
-const toGovSummaryItem = (value: string): GovSummaryItem => {
-  return { key: { text: value }, value: { text: '' } }
-}
+const toRow = (value: string): GovukSummaryListRow => ({ key: { text: value }, value: { text: '' } })
 
 export default toCuriousGoals

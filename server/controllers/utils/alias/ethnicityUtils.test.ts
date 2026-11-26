@@ -1,4 +1,4 @@
-import type { RadioOption } from '../../../interfaces/GovOptions'
+import type { GovukRadiosItem } from '../../../interfaces/govukComponents'
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
 import { getEthnicBackgroundRadioOptions, getEthnicGroupRadioOptions } from './ethnicityUtils'
 
@@ -107,7 +107,7 @@ describe('ethnicityUtils', () => {
       ],
     ])(
       'Ethnic group %s returns expected options when all codes match active reference codes',
-      (group: string, expectedRadioOptions: RadioOption[]) => {
+      (group: string, expectedRadioOptions: GovukRadiosItem[]) => {
         expect(getEthnicBackgroundRadioOptions(group, allActiveEthnicityReferenceCodes())).toEqual(expectedRadioOptions)
       },
     )

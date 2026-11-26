@@ -10,7 +10,7 @@ import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import type { AuditService } from '../services/interfaces/auditService'
 import { Page } from '../services/interfaces/auditService/page'
 import { PostAction, SearchAction } from '../services/interfaces/auditService/actions'
-import type { SelectOption } from '../interfaces/GovOptions'
+import type { GovukSelectItem } from '../interfaces/govukComponents'
 import type HmppsError from '../interfaces/HmppsError'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import AlertView from '../services/interfaces/alertsService/AlertView'
@@ -560,7 +560,7 @@ export default class AlertsController {
   private mapAlertTypes(types: AlertType[], type?: string, existingAlertCodes?: string) {
     const alertTypes = this.mapActiveSortedAlertTypes(types)
 
-    const typeCodeMap: Record<string, SelectOption[]> = types.reduce(
+    const typeCodeMap: Record<string, GovukSelectItem[]> = types.reduce(
       (ts, t) => ({
         ...ts,
         [t.code]: this.mapActiveSortedAlertCodes(t.alertCodes, existingAlertCodes),
@@ -568,7 +568,7 @@ export default class AlertsController {
       {},
     )
 
-    let alertCodes: SelectOption[] = []
+    let alertCodes: GovukSelectItem[] = []
     if (type) {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
@@ -578,10 +578,10 @@ export default class AlertsController {
     return { alertTypes, alertCodes, typeCodeMap }
   }
 
-  private mapActiveSortedAlertTypes(alertTypes: AlertType[]): SelectOption[] {
+  private mapActiveSortedAlertTypes(alertTypes: AlertType[]): GovukSelectItem[] {
     return alertTypes
       ?.filter(alertType => alertType.isActive)
-      .map<SelectOption>(alertType => {
+      .map<GovukSelectItem>(alertType => {
         return {
           value: alertType.code,
           text: alertType.description,
@@ -590,12 +590,12 @@ export default class AlertsController {
       .sort((a, b) => a.text.localeCompare(b.text))
   }
 
-  private mapActiveSortedAlertCodes(alertCodes: AlertCode[], existingAlertCodes?: string): SelectOption[] {
+  private mapActiveSortedAlertCodes(alertCodes: AlertCode[], existingAlertCodes?: string): GovukSelectItem[] {
     return alertCodes
       ?.filter(
         alertCode => alertCode.isActive && alertCode.canBeAdministered && !excludedAlertCodes.includes(alertCode.code),
       )
-      .map<SelectOption>(alertType => {
+      .map<GovukSelectItem>(alertType => {
         return {
           value: alertType.code,
           text: alertType.description,

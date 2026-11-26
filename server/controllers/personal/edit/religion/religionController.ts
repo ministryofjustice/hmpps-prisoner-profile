@@ -8,7 +8,7 @@ import getCommonRequestData from '../../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../../utils/requestBodyFromFlash'
 import { apostrophe, objectToRadioOptions } from '../../../../utils/utils'
 import { CorePersonRecordReferenceDataDomain } from '../../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import type { RadioOption } from '../../../../interfaces/GovOptions'
+import type { GovukRadiosItem } from '../../../../interfaces/govukComponents'
 
 export default class ReligionController extends PersonalEditController {
   constructor(
@@ -22,8 +22,8 @@ export default class ReligionController extends PersonalEditController {
     const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
 
     // When there are multiple variants of a religion, we want to display the 'Other' option last:
-    const demoteOtherVariant = (prefix: string, a: RadioOption, b: RadioOption): number => {
-      if (a.text.startsWith(prefix) && b.text.startsWith(prefix)) {
+    const demoteOtherVariant = (prefix: string, a: GovukRadiosItem, b: GovukRadiosItem): number => {
+      if ('text' in a && a.text.startsWith(prefix) && 'text' in b && b.text.startsWith(prefix)) {
         if (a.text.endsWith('Other')) return 1
         if (b.text.endsWith('Other')) return -1
       }
@@ -34,16 +34,18 @@ export default class ReligionController extends PersonalEditController {
     const preferOrder = (
       optionToDisplayFirst: string,
       optionToDisplayLast: string,
-      a: RadioOption,
-      b: RadioOption,
+      a: GovukRadiosItem,
+      b: GovukRadiosItem,
     ): number => {
-      if (a.text === optionToDisplayFirst && b.text === optionToDisplayLast) return -1
-      if (b.text === optionToDisplayFirst && a.text === optionToDisplayLast) return 1
+      if ('text' in a && 'text' in b) {
+        if (a.text === optionToDisplayFirst && b.text === optionToDisplayLast) return -1
+        if (b.text === optionToDisplayFirst && a.text === optionToDisplayLast) return 1
+      }
       return 0
     }
 
     // Options are already sorted alphabetically, this then applies additional non-alphabetical sorting
-    const religionOptionsSorter = (a: RadioOption, b: RadioOption): number => {
+    const religionOptionsSorter = (a: GovukRadiosItem, b: GovukRadiosItem): number => {
       const otherVariantSort = demoteOtherVariant('Christian', a, b) || demoteOtherVariant('Muslim', a, b)
       if (otherVariantSort !== 0) return otherVariantSort
 

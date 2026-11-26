@@ -53,12 +53,11 @@ import {
   sortByLatestAndUuid,
   SortType,
   summaryListOneHalfWidth,
-  SummaryListRow,
   toNonAssociationRows,
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import type { SelectOption } from '../interfaces/GovOptions'
+import type { GovukSelectItem, GovukSummaryListRow } from '../interfaces/govukComponents'
 import HmppsError from '../interfaces/HmppsError'
 
 import config from '../config'
@@ -133,7 +132,7 @@ describe('utils', () => {
       ['List of one row', 1],
       ['List of two rows', 2],
     ])('%s: summaryListOneHalfWidth(%s rows)', (_, numberOfRows) => {
-      const rows: SummaryListRow[] = []
+      const rows: GovukSummaryListRow[] = []
       for (let i = 0; i < numberOfRows; i += 1) {
         rows.push({ key: { text: i.toString() }, value: { text: i.toString() } })
       }
@@ -953,7 +952,7 @@ describe('utils', () => {
   })
 
   describe('add default selected value', () => {
-    const testItems: SelectOption[] = [{ value: 'val', text: 'text' }]
+    const testItems: GovukSelectItem[] = [{ value: 'val', text: 'text' }]
 
     it.each([
       ['null', null, 'default', undefined, null],
@@ -967,7 +966,7 @@ describe('utils', () => {
       ['Keep default', testItems, 'default', false, [{ text: 'default', value: '', selected: true }, ...testItems]],
     ])(
       '%s: addDefaultSelectedValue(%s, %s, %s, %s)',
-      (_: string, items: SelectOption[], text: string, setHidden: boolean, expected: SelectOption[] | null) => {
+      (_: string, items: GovukSelectItem[], text: string, setHidden: boolean, expected: GovukSelectItem[] | null) => {
         expect(addDefaultSelectedValue(items, text, setHidden)).toEqual(expected)
       },
     )

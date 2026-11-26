@@ -1,10 +1,10 @@
+import type {
+  GovukSummaryListActions,
+  GovukSummaryListRow,
+  GovukSummaryListRowItem,
+} from '../../interfaces/govukComponents'
 import { isResult, Result } from '../../utils/result/result'
-import {
-  type SummaryListRow,
-  type SummaryListRowItem,
-  type SummaryListActions,
-  unavailableApiErrorMessage,
-} from '../../utils/utils'
+import { unavailableApiErrorMessage } from '../../utils/utils'
 
 interface Options {
   changeLinkEnabled?: boolean
@@ -47,12 +47,12 @@ const summaryListRowWithOptionalChangeLink = (
   key: string,
   value: string | Result<string>,
   opts: Options = {},
-): SummaryListRow => {
+): GovukSummaryListRow => {
   const valueAsResult: Result<string> = isResult(value) ? value : Result.fulfilled(value as string)
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
-  const valueResult = (): SummaryListRowItem => {
+  const valueResult = (): GovukSummaryListRowItem => {
     if (!valueAsResult.isFulfilled()) {
       const errorHtml = `<p class="hmpps-api-error-inset">${unavailableApiErrorMessage}</p>`
       if (options.dataQa) {
@@ -74,7 +74,7 @@ const summaryListRowWithOptionalChangeLink = (
     return options.html ? { html: valueAsResult.getOrNull() } : { text: valueAsResult.getOrNull() }
   }
 
-  const items: SummaryListActions['items'] = [
+  const items: GovukSummaryListActions['items'] = [
     ...(options.changeLinkEnabled && valueAsResult.isFulfilled()
       ? [
           {

@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express'
 import { FieldData, RadioFieldData, TextFieldData } from '../fieldData'
 import type { AuditService } from '../../../services/interfaces/auditService'
-import type { RadioOption, SelectOption } from '../../../interfaces/GovOptions'
+import type { GovukRadiosItem, GovukSelectItem } from '../../../interfaces/govukComponents'
 import getCommonRequestData from '../../../utils/getCommonRequestData'
 import { requestBodyFromFlash } from '../../../utils/requestBodyFromFlash'
 import logger from '../../../../logger'
@@ -110,11 +110,7 @@ export default abstract class PersonalEditController {
     }
   }
 
-  protected editRadioFields(
-    formTitle: string,
-    fieldData: RadioFieldData,
-    options: (RadioOption | { divider: string })[],
-  ): RequestHandler {
+  protected editRadioFields(formTitle: string, fieldData: RadioFieldData, options: GovukRadiosItem[]): RequestHandler {
     return async (req, res) => {
       const { prisonerNumber, prisonId, miniBannerData } = getCommonRequestData(req, res)
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
@@ -155,8 +151,8 @@ export default abstract class PersonalEditController {
   }: {
     formTitle: string
     fieldData: RadioFieldData
-    radioOptions: RadioOption[]
-    autocompleteOptions: SelectOption[]
+    radioOptions: GovukRadiosItem[]
+    autocompleteOptions: GovukSelectItem[]
     autocompleteSelected: boolean
     autocompleteOptionTitle: string
     autocompleteOptionLabel: string

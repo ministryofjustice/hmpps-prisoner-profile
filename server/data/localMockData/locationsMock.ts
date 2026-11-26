@@ -1,4 +1,4 @@
-import type { SelectOption } from '../../interfaces/GovOptions'
+import type { GovukSelectItem } from '../../interfaces/govukComponents'
 import Location from '../interfaces/prisonApi/Location'
 import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
@@ -29,7 +29,7 @@ export const locationsMock: Location[] = [
   },
 ]
 
-export const locationsApiSelectOptionsMock: SelectOption[] = [
+export const locationsApiSelectOptionsMock: GovukSelectItem[] = [
   {
     text: 'Local name one',
     value: 'location-1',
@@ -40,13 +40,13 @@ export const locationsApiSelectOptionsMock: SelectOption[] = [
   },
 ]
 
-export const locationsSelectOptionsMock: SelectOption[] = [
+export const locationsSelectOptionsMock: GovukSelectItem[] = [
   {
-    value: 27000,
+    value: '27000',
     text: 'CES',
   },
   {
-    value: 26152,
+    value: '26152',
     text: 'Chapel',
   },
 ]

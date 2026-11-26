@@ -1,4 +1,4 @@
-import { SummaryListRow } from '../../../utils/utils'
+import type { GovukSummaryListRow } from '../../../interfaces/govukComponents'
 
 export default interface OffenderSentenceTerms {
   bookingId?: number
@@ -19,7 +19,7 @@ export default interface OffenderSentenceTerms {
   lineSeq?: number
   sentenceStartDate?: string
   licence?: Licence
-  summaryListRow?: SummaryListRow[]
+  summaryListRow?: GovukSummaryListRow[]
 }
 
 export interface Licence {
