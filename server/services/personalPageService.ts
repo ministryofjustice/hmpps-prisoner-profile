@@ -57,7 +57,6 @@ import {
   ReferenceDataCode,
   ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { militaryHistoryEnabled } from '../utils/featureFlags'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
@@ -311,7 +310,7 @@ export default class PersonalPageService {
             this.globalPhoneNumberAndEmailAddressesService.transformContacts(token, summary.contacts),
           ),
           profileSummary.map(summary => summary.distinguishingMarks),
-          profileSummary.map(summary => (militaryHistoryEnabled() ? summary.militaryRecords : null)),
+          profileSummary.map(summary => summary.militaryRecords),
           profileSummary.map(summary => this.transformPhysicalAttributes(summary.physicalAttributes)),
         ])
     } else {
@@ -319,10 +318,7 @@ export default class PersonalPageService {
         await Promise.all([
           Result.wrap(this.addressService.getAddressesForDisplay(token, prisonerNumber), getOptions.apiErrorCallback),
           Result.wrap(this.getDistinguishingMarks(token, prisonerNumber), getOptions.apiErrorCallback),
-          Result.wrap(
-            militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
-            getOptions.apiErrorCallback,
-          ),
+          Result.wrap(this.getMilitaryRecords(token, prisonerNumber), getOptions.apiErrorCallback),
           Result.wrap(this.getPhysicalAttributes(token, prisonerNumber), getOptions.apiErrorCallback),
           Result.wrap(this.getGlobalPhonesAndEmails(token, prisonerNumber), getOptions.apiErrorCallback),
         ])

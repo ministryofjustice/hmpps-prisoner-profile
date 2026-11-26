@@ -1,4 +1,4 @@
-import type { SelectOption } from '../../server/interfaces/GovOptions'
+import type { GovukSelectItem } from '../../server/interfaces/govukComponents'
 
 const WARNING: Record<string, string> = {
   'OMIC.OPEN_COMM':
@@ -51,7 +51,7 @@ function toggleOpenCaseNoteWarning() {
 function initTypeSubTypeDropdowns() {
   const typeElement = document.getElementById('type') as HTMLSelectElement
   const subTypeElement = document.getElementById('subType') as HTMLSelectElement
-  const typeSubTypeMap: Record<string, SelectOption[]> = JSON.parse(document.getElementById('typeData').textContent)
+  const typeSubTypeMap: Record<string, GovukSelectItem[]> = JSON.parse(document.getElementById('typeData').textContent)
 
   typeElement.addEventListener('change', () => {
     toggleBehaviourPrompts()
