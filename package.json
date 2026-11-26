@@ -83,8 +83,8 @@
   "devDependencies": {
     "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "1.0.4",
-    "@ministryofjustice/frontend-types": "2.0.3",
-    "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
+    "@ministryofjustice/frontend-types": "2.1.0",
+    "@ministryofjustice/hmpps-precommit-hooks": "3.1.0",
     "@tsconfig/node26": "26.0.2",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
