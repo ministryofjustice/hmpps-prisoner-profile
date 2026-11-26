@@ -20,20 +20,24 @@
     {% else %}
       {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) != true, id: 'outside-establishment-banner'}) -%}
       <div class="hmpps-profile-banner-alert hmpps-profile-banner-alert--warning">
-        {% if isHighProfilePrisonerOutsideCaseloads %}
-          {{ highProfilePrisonerTag({ classes: "govuk-!-margin-bottom-2" }) }}
-        {% endif %}
-        <p class="govuk-heading-m">
-          This prisoner is not in your establishment
-        </p>
-        <p>
-          {% if isHighProfilePrisonerOutsideCaseloads %}
-            Some information in this profile may be hidden.
-            If you have a legitimate business or operational need to view additional information, contact the establishment managing this prisoner.
-          {% else %}
-            Some information may be hidden
-          {% endif %}
-        </p>
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            {% if isHighProfilePrisonerOutsideCaseloads %}
+              {{ highProfilePrisonerTag({ classes: "govuk-!-margin-bottom-2" }) }}
+            {% endif %}
+            <p class="govuk-heading-m">
+              This prisoner is not in your establishment
+            </p>
+            <p>
+              {% if isHighProfilePrisonerOutsideCaseloads %}
+                Some information in this profile may be hidden.
+                If you have a legitimate business or operational need to view additional information, contact the establishment managing this prisoner.
+              {% else %}
+                Some information may be hidden
+              {% endif %}
+            </p>
+          </div>
+        </div>
       </div>
       {%- endcall -%}
     {% endif %}
@@ -79,7 +83,7 @@
             {{ prisonerNumber }} <span class="govuk-visually-hidden"> prison number</span>
           </p>
           <div class="info__links">
-            {% for link in  profileBannerTopLinks %}
+            {% for link in profileBannerTopLinks %}
               <div class="{{ link.classes }}">
                 <h3 class="govuk-heading-s">{{ link.heading }}</h3>
                 {% if  link.url === undefined %}
