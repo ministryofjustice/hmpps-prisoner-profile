@@ -301,6 +301,7 @@ export default function routes(services: Services): Router {
     prisonerPermissionsGuard(prisonPermissionsService, {
       requestDependentOn: [PrisonerSchedulePermission.read_schedule],
     }),
+    highProfilePrisonerGuard('outside-caseloads'),
     async (req, res) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
@@ -376,6 +377,7 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     getDuplicatePrisonerData(services),
     prisonerPermissionsGuard(prisonPermissionsService, { requestDependentOn: [PrisonerBasePermission.read] }),
+    highProfilePrisonerGuard('outside-caseloads'),
     async (req, res, next) => {
       return duplicateProfilesController.getDuplicateProfiles(req, res, next)
     },
