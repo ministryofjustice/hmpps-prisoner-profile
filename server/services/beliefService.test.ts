@@ -4,7 +4,7 @@ import config from '../config'
 import type { ManageUsersApiClient } from '../data/interfaces/manageUsersApi'
 import type { PersonApiClient } from '../data/interfaces/personApi'
 import type { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { mockPersonRecordWithReligionHistory } from '../data/localMockData/personApi/personRecordMock'
+import { mockReligionHistory } from '../data/localMockData/personApi/personRecordMock'
 import { beliefHistoryMock } from '../data/localMockData/beliefHistoryMock'
 import { beliefServiceMock } from './mocks/beliefServiceMocks'
 import { withPersonApi, withoutPersonApi } from '../../tests/utils/withPersonApiFeature'
@@ -55,13 +55,14 @@ describe('beliefService', () => {
         expect(response).toEqual(beliefServiceMock)
         expect(prisonApiClient.getBeliefHistory).toHaveBeenCalledWith(prisonerNumber)
         expect(manageUsersApiClient.getPrisonUser).not.toHaveBeenCalled()
+        expect(personApiClient.getReligionHistory).not.toHaveBeenCalled()
         expect(personApiClient.getRecord).not.toHaveBeenCalled()
       })
     })
 
     withPersonApi(() => {
       it('should return a list of offender beliefs from person api', async () => {
-        personApiClient.getRecord.mockResolvedValue(mockPersonRecordWithReligionHistory)
+        personApiClient.getReligionHistory.mockResolvedValue(mockReligionHistory)
         manageUsersApiClient.getPrisonUser.mockImplementation(async username => {
           if (username === 'jlpic') {
             return { username, firstName: 'Jean-Luc', lastName: 'Picard' }
@@ -104,7 +105,8 @@ describe('beliefService', () => {
         expect(prisonApiClient.getBeliefHistory).not.toHaveBeenCalled()
         expect(manageUsersApiClient.getPrisonUser).toHaveBeenCalledWith('jlpic')
         expect(manageUsersApiClient.getPrisonUser).toHaveBeenCalledWith('jkirk')
-        expect(personApiClient.getRecord).toHaveBeenCalledWith(prisonerNumber, true)
+        expect(personApiClient.getReligionHistory).toHaveBeenCalledWith(prisonerNumber)
+        expect(personApiClient.getRecord).not.toHaveBeenCalled()
         expect(logger.warn).toHaveBeenCalledWith('Unknown usernames in religion history: jkirk')
       })
     })

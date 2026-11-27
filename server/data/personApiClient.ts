@@ -6,6 +6,7 @@ import type {
   PersonApiClient,
   PersonApiReferenceDataCode,
   PersonRecord,
+  ReligionHistoryItem,
   UpdateReligionRequest,
 } from './interfaces/personApi'
 
@@ -28,10 +29,14 @@ export default class PersonApiRestClient extends RestClient implements PersonApi
       : this.get<PersonRecord>({ path: `/person/prison/${encodeURIComponent(prisonerNumber)}` }, this.token)
   }
 
+  getReligionHistory(prisonerNumber: string): Promise<ReligionHistoryItem[]> {
+    return this.get({ path: `/person/prison/${encodeURIComponent(prisonerNumber)}/religion-history` }, this.token)
+  }
+
   updateReligion(prisonerNumber: string, request: UpdateReligionRequest): Promise<void> {
     return this.put(
       {
-        path: `/person/prison/${prisonerNumber}/religion`,
+        path: `/person/prison/${encodeURIComponent(prisonerNumber)}/religion`,
         data: request,
       },
       this.token,
