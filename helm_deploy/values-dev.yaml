@@ -112,7 +112,7 @@ generic-service:
     OFFENCES_MOVED_ENABLED_PRISONS: "HLI"
     PROPERTY_SUMMARY_TILE_ENABLED: "true"
     USE_PERSON_API_FOR_RELIGION: "true"
-    CSRA_SERVICE_ENABLED: "false"
+    CSRA_SERVICE_ENABLED: "true"
 
   allowlist:
     groups:
