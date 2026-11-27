@@ -2,7 +2,7 @@ import logger from '../../logger'
 import config from '../config'
 import type { RestClientBuilder } from '../data'
 import type { ManageUsersApiClient, PrisonUser } from '../data/interfaces/manageUsersApi'
-import type { DpsPersonRecord, PersonApiClient } from '../data/interfaces/personApi'
+import type { PersonApiClient, ReligionHistoryItem } from '../data/interfaces/personApi'
 import type { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import type { BeliefHistoryItem } from './interfaces/beliefService/BeliefHistoryItem'
 
@@ -46,11 +46,11 @@ export default class BeliefService {
 
   private async getBeliefHistoryFromPersonApi(token: string, prisonerNumber: string): Promise<BeliefHistoryItem[]> {
     const personApiClient = this.personApiClientBuilder(token)
-    const record = await personApiClient.getRecord(prisonerNumber, true)
+    const religionHistory = await personApiClient.getReligionHistory(prisonerNumber)
 
-    const mapUser = await this.makeUserMapper(token, record)
+    const mapUser = await this.makeUserMapper(token, religionHistory)
 
-    return record.religionHistory.map<BeliefHistoryItem>(item => {
+    return religionHistory.map<BeliefHistoryItem>(item => {
       const { firstName: createUserFirstName, lastName: createUserLastName } = mapUser(item.createUserId)
       const { firstName: modifyUserFirstName, lastName: modifyUserLastName } = mapUser(item.modifyUserId)
       return {
@@ -72,14 +72,14 @@ export default class BeliefService {
 
   private async makeUserMapper(
     token: string,
-    record: DpsPersonRecord,
+    religionHistory: ReligionHistoryItem[],
   ): Promise<(username: string) => { firstName: string; lastName: string }> {
     const manageUsersApiClient = this.manageUsersApiClientBuilder(token)
 
     const users = new Map<string, PrisonUser>()
     const unknownUsers = new Set<string>()
     await Promise.allSettled(
-      record.religionHistory
+      religionHistory
         .reduce((usernames, { createUserId, modifyUserId }) => {
           if (createUserId) {
             usernames.add(createUserId)

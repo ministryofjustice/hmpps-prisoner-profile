@@ -1,6 +1,6 @@
 import Page from '../pages/page'
 import BeliefHistoryPage from '../pages/beliefHistoryPage'
-import { mockPersonRecordWithReligionHistory } from '../../server/data/localMockData/personApi/personRecordMock'
+import { mockReligionHistory } from '../../server/data/localMockData/personApi/personRecordMock'
 
 const prisonerNumber = 'G6123VU'
 const visitBeliefHistoryPage = (): BeliefHistoryPage => {
@@ -20,7 +20,7 @@ context('Belief history page', () => {
   })
 
   it('should contain a list of beliefs', () => {
-    cy.task('stubPersonApiGetRecord', { prisonerNumber, withReligionHistory: true })
+    cy.task('stubPersonApiGetReligionHistory', { prisonerNumber, response: mockReligionHistory })
 
     beliefHistoryPage = visitBeliefHistoryPage()
     beliefHistoryPage.beliefHistoryList.should('have.length', 2)
@@ -45,17 +45,13 @@ context('Belief history page', () => {
   })
 
   it('should not display belief history comment if it is not present', () => {
-    cy.task('stubPersonApiGetRecord', {
+    cy.task('stubPersonApiGetReligionHistory', {
       prisonerNumber,
-      personRecord: {
-        ...mockPersonRecordWithReligionHistory,
-        religionHistory: [
-          { ...mockPersonRecordWithReligionHistory.religionHistory[0], comments: null },
-          { ...mockPersonRecordWithReligionHistory.religionHistory[0], current: false, comments: undefined },
-          { ...mockPersonRecordWithReligionHistory.religionHistory[0], current: false, comments: '' },
-        ],
-      },
-      withReligionHistory: true,
+      response: [
+        { ...mockReligionHistory[0], comments: null },
+        { ...mockReligionHistory[0], current: false, comments: undefined },
+        { ...mockReligionHistory[0], current: false, comments: '' },
+      ],
     })
 
     beliefHistoryPage = visitBeliefHistoryPage()
@@ -65,18 +61,22 @@ context('Belief history page', () => {
   })
 
   it('should display belief history comment even if change reason is false', () => {
-    cy.task('stubPersonApiGetRecord', {
+    cy.task('stubPersonApiGetReligionHistory', {
       prisonerNumber,
-      personRecord: {
-        ...mockPersonRecordWithReligionHistory,
-        religionHistory: [
-          { ...mockPersonRecordWithReligionHistory.religionHistory[0], changeReason: false, comments: 'Comments' },
-        ],
-      },
-      withReligionHistory: true,
+      response: [{ ...mockReligionHistory[0], changeReason: false, comments: 'Comments' }],
     })
 
     beliefHistoryPage = visitBeliefHistoryPage()
     beliefHistoryPage.getBeliefCard(0).comments.contains('Comments')
+  })
+
+  it('should state when there is no history', () => {
+    cy.task('stubPersonApiGetReligionHistory', {
+      prisonerNumber,
+      response: [],
+    })
+
+    visitBeliefHistoryPage()
+    cy.get('main').should('contain.text', 'John Saunders has no religion history')
   })
 })

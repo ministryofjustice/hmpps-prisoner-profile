@@ -11,45 +11,49 @@
     </div>
   </div>
 
-  <div class="belief-history-list" role="list">
-    {% for belief in beliefs %}
-      <div class="belief-card">
-        <header>
-          <h2 class="govuk-heading-m govuk-!-margin-top-4">
-            {{ belief.religionDescription }}
-          </h2>
-          {% if belief.current %}
-            {{ govukTag({
-              text: 'ACTIVE',
-              classes: 'govuk-tag--green'
-            }) }}
+  {% if beliefs.length %}
+    <div class="belief-history-list" role="list">
+      {% for belief in beliefs %}
+        <div class="belief-card">
+          <header>
+            <h2 class="govuk-heading-m govuk-!-margin-top-4">
+              {{ belief.religionDescription }}
+            </h2>
+            {% if belief.current %}
+              {{ govukTag({
+                text: 'ACTIVE',
+                classes: 'govuk-tag--green'
+              }) }}
+            {% endif %}
+          </header>
+          {% if belief.comments %}
+            <div class="belief-card__comments">{{ belief.comments }}</div>
           {% endif %}
-        </header>
-        {% if belief.comments %}
-          <div class="belief-card__comments">{{ belief.comments }}</div>
-        {% endif %}
-        <div data-qa="belief-start-date">
-          <span class="govuk-!-font-weight-bold">Start date:</span>
-          {{ belief.startDate | formatDate('long') }}</div>
-        {% if belief.endDate %}
-          <div data-qa="belief-end-date">
-            <span class="govuk-!-font-weight-bold">End date:</span>
-            {{ belief.endDate | formatDate('long') }}</div>
-        {% endif %}
-        <div data-qa="belief-added-by">
-          <span class="govuk-!-font-weight-bold">Added by:</span>
-          {{ belief.createUserFirstName | formatName('', belief.createUserLastName) }}
-        </div>
-        {% if belief.modifyUserFirstName or belief.modifyUserLastName %}
-          <div data-qa="belief-updated-by">
-            <span class="govuk-!-font-weight-bold">Modified by:</span>
-            {{ belief.modifyUserFirstName | formatName('', belief.modifyUserLastName) }}
-            on {{ belief.modifyDate | formatDate('long') }}
+          <div data-qa="belief-start-date">
+            <span class="govuk-!-font-weight-bold">Start date:</span>
+            {{ belief.startDate | formatDate('long') }}</div>
+          {% if belief.endDate %}
+            <div data-qa="belief-end-date">
+              <span class="govuk-!-font-weight-bold">End date:</span>
+              {{ belief.endDate | formatDate('long') }}</div>
+          {% endif %}
+          <div data-qa="belief-added-by">
+            <span class="govuk-!-font-weight-bold">Added by:</span>
+            {{ belief.createUserFirstName | formatName('', belief.createUserLastName) }}
           </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
+          {% if belief.modifyUserFirstName or belief.modifyUserLastName %}
+            <div data-qa="belief-updated-by">
+              <span class="govuk-!-font-weight-bold">Modified by:</span>
+              {{ belief.modifyUserFirstName | formatName('', belief.modifyUserLastName) }}
+              on {{ belief.modifyDate | formatDate('long') }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>{{ prisonerName.firstLast }} has no religion history.</p>
+  {% endif %}
 
   <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/personal#religion-faith-or-belief" data-qa="belief-history-back-link">
     Return to prisoner’s profile
