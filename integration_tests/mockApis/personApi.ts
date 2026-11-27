@@ -1,7 +1,7 @@
 import type { SuperAgentRequest } from 'superagent'
 import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
-import type { PersonRecord, UpdateReligionRequest } from '../../server/data/interfaces/personApi'
+import type { PersonRecord, ReligionHistoryItem, UpdateReligionRequest } from '../../server/data/interfaces/personApi'
 import {
   mockPersonRecord,
   mockPersonRecordWithReligionHistory,
@@ -70,6 +70,27 @@ export default {
       },
       response: {
         status: 500,
+      },
+    }),
+
+  stubPersonApiGetReligionHistory: ({
+    prisonerNumber,
+    response = [],
+  }: {
+    prisonerNumber: string
+    response?: ReligionHistoryItem[]
+  }) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/personRecord/person/prison/${prisonerNumber}/religion-history`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
       },
     }),
 
