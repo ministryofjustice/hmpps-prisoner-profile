@@ -15,10 +15,6 @@ export interface PersonRecord {
   }
 }
 
-export interface DpsPersonRecord extends PersonRecord {
-  religionHistory: ReligionHistoryItem[]
-}
-
 export interface ReligionHistoryItem {
   current: boolean
   religionCode: string
@@ -45,9 +41,7 @@ export interface PersonApiClient {
   getReligionCodes(activeOnly?: boolean): Promise<PersonApiReferenceDataCode[]>
 
   // whole record endpoints
-  getRecord(prisonerNumber: string, withReligionHistory?: false): Promise<PersonRecord>
-  getRecord(prisonerNumber: string, withReligionHistory: true): Promise<DpsPersonRecord>
-  getRecord(prisonerNumber: string, withReligionHistory?: boolean): Promise<PersonRecord | DpsPersonRecord>
+  getRecord(prisonerNumber: string): Promise<PersonRecord>
 
   // religion endpoints
   getReligionHistory(prisonerNumber: string): Promise<ReligionHistoryItem[]>

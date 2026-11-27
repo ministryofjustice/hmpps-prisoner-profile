@@ -2,7 +2,6 @@ import type CircuitBreaker from 'opossum'
 import config from '../config'
 import RestClient, { type Request } from './restClient'
 import type {
-  DpsPersonRecord,
   PersonApiClient,
   PersonApiReferenceDataCode,
   PersonRecord,
@@ -19,14 +18,8 @@ export default class PersonApiRestClient extends RestClient implements PersonApi
     return this.get({ path: '/person/reference-data/religion-codes', query: { active: activeOnly } }, this.token)
   }
 
-  getRecord(prisonerNumber: string, withReligionHistory?: false): Promise<PersonRecord>
-
-  getRecord(prisonerNumber: string, withReligionHistory: true): Promise<DpsPersonRecord>
-
-  getRecord(prisonerNumber: string, withReligionHistory = false): Promise<PersonRecord | DpsPersonRecord> {
-    return withReligionHistory
-      ? this.get<DpsPersonRecord>({ path: `/person/prison/dps/${encodeURIComponent(prisonerNumber)}` }, this.token)
-      : this.get<PersonRecord>({ path: `/person/prison/${encodeURIComponent(prisonerNumber)}` }, this.token)
+  getRecord(prisonerNumber: string): Promise<PersonRecord> {
+    return this.get({ path: `/person/prison/${encodeURIComponent(prisonerNumber)}` }, this.token)
   }
 
   getReligionHistory(prisonerNumber: string): Promise<ReligionHistoryItem[]> {

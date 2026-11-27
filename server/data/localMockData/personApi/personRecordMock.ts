@@ -1,4 +1,4 @@
-import type { DpsPersonRecord, PersonRecord, ReligionHistoryItem } from '../../interfaces/personApi'
+import type { PersonRecord, ReligionHistoryItem } from '../../interfaces/personApi'
 
 export const mockPersonRecord: PersonRecord = {
   identifiers: {
@@ -35,8 +35,3 @@ export const mockReligionHistory: ReligionHistoryItem[] = [
     modifyDateTime: '2026-10-28T14:30:00',
   },
 ]
-
-export const mockPersonRecordWithReligionHistory: DpsPersonRecord = {
-  ...mockPersonRecord,
-  religionHistory: mockReligionHistory,
-}
