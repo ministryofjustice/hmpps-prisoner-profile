@@ -1,6 +1,6 @@
 import Page from '../pages/page'
 import BeliefHistoryPage from '../pages/beliefHistoryPage'
-import { mockReligionHistory } from '../../server/data/localMockData/personApi/personRecordMock'
+import { mockReligionHistory } from '../../server/data/localMockData/personApi/religionMocks'
 
 const prisonerNumber = 'G6123VU'
 const visitBeliefHistoryPage = (): BeliefHistoryPage => {

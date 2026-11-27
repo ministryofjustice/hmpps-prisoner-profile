@@ -1,6 +1,7 @@
 import nock from 'nock'
 import config from '../config'
-import { mockPersonRecord, mockPersonRecordWithReligionHistory } from './localMockData/personApi/personRecordMock'
+import { mockPersonRecord } from './localMockData/personApi/personRecordMock'
+import { personApiReligionCodesMock, mockReligionHistory } from './localMockData/personApi/religionMocks'
 import type { PersonApiClient } from './interfaces/personApi'
 import PersonApiRestClient from './personApiClient'
 
@@ -23,19 +24,41 @@ describe('Person API REST Client', () => {
     nock.restore()
   })
 
-  it('should call regular record endpoint when religion history is not needed', async () => {
-    fakePersonApi
-      .get(`/person/prison/${encodeURIComponent(prisonerNumber)}`)
-      .matchHeader('authorization', `Bearer ${token}`)
-      .reply(200, mockPersonRecord)
-    await expect(personApiClient.getRecord(prisonerNumber)).resolves.toEqual(mockPersonRecord)
-  })
-
-  it('should call DPS record endpoint when religion history is needed', async () => {
-    fakePersonApi
-      .get(`/person/prison/dps/${encodeURIComponent(prisonerNumber)}`)
-      .matchHeader('authorization', `Bearer ${token}`)
-      .reply(200, mockPersonRecordWithReligionHistory)
-    await expect(personApiClient.getRecord(prisonerNumber, true)).resolves.toEqual(mockPersonRecordWithReligionHistory)
+  it.each([
+    {
+      scenario: 'all religion codes',
+      url: '/person/reference-data/religion-codes?active=false',
+      callApi() {
+        return personApiClient.getReligionCodes()
+      },
+      response: personApiReligionCodesMock,
+    },
+    {
+      scenario: 'active religion codes',
+      url: '/person/reference-data/religion-codes?active=true',
+      callApi() {
+        return personApiClient.getReligionCodes(true)
+      },
+      response: personApiReligionCodesMock,
+    },
+    {
+      scenario: 'person record',
+      url: `/person/prison/${prisonerNumber}`,
+      callApi() {
+        return personApiClient.getRecord(prisonerNumber)
+      },
+      response: mockPersonRecord,
+    },
+    {
+      scenario: 'religion history',
+      url: `/person/prison/${prisonerNumber}/religion-history`,
+      callApi() {
+        return personApiClient.getReligionHistory(prisonerNumber)
+      },
+      response: mockReligionHistory,
+    },
+  ])('should call $scenario endpoint and return data unchanged', async ({ url, callApi, response }) => {
+    fakePersonApi.get(url).matchHeader('authorization', `Bearer ${token}`).reply(200, response)
+    await expect(callApi()).resolves.toEqual(response)
   })
 })
