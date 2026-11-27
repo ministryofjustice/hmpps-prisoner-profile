@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
-import { mockPersonRecord, mockReligionHistory } from './localMockData/personApi/personRecordMock'
-import { personApiReligionCodesMock } from './localMockData/personApi/religionCodesMock'
+import { mockPersonRecord } from './localMockData/personApi/personRecordMock'
+import { personApiReligionCodesMock, mockReligionHistory } from './localMockData/personApi/religionMocks'
 import type { PersonApiClient } from './interfaces/personApi'
 import PersonApiRestClient from './personApiClient'
 

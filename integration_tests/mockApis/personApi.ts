@@ -3,7 +3,7 @@ import { stubGetWithBody } from './utils'
 import { stubFor, stubPing } from './wiremock'
 import type { PersonRecord, ReligionHistoryItem, UpdateReligionRequest } from '../../server/data/interfaces/personApi'
 import { mockPersonRecord } from '../../server/data/localMockData/personApi/personRecordMock'
-import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionCodesMock'
+import { personApiReligionCodesMock } from '../../server/data/localMockData/personApi/religionMocks'
 
 export default {
   stubPersonApiPing: (httpStatus = 200): SuperAgentRequest => stubPing('/personRecord', httpStatus),
